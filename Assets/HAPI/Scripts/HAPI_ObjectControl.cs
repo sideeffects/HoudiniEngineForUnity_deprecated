@@ -1,3 +1,5 @@
+//#define USE_DUMMY_DLL
+
 using UnityEngine;
 using UnityEditor;
 using System.Runtime.InteropServices;
@@ -5,8 +7,8 @@ using System.Collections;
 using System.Collections.Generic;
 using HAPI;
 
-//[ RequireComponent ( typeof( MeshFilter ) ) ]
-//[ RequireComponent ( typeof( MeshRenderer ) ) ]
+using System.Text;
+
 public class HAPI_ObjectControl : MonoBehaviour {	
 	
 	//
@@ -20,6 +22,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	}
 	
 	public void Build() {
+#if USE_DUMMY_DLL
 		// clean up
 		DestroyChildren();
 		
@@ -94,6 +97,20 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		
 		mainChildMesh.RecalculateBounds();
 		mainChildMesh.RecalculateNormals();
+		
+#else
+		HAPI_Initialize();
+		
+		HAPI_LoadHIPFile( "C:/donut.hip" );
+		
+		StringBuilder str = new StringBuilder( 2048 );
+		
+		HAPI_PrintNetwork( str );
+		
+		Debug.Log( str );
+		
+		HAPI_Cleanup();
+#endif
 	}
 	
 	// Use this for initialization
@@ -114,17 +131,33 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	// Private Methods
 	//
 	
-	[ DllImport( "DummyDLL" ) ]
+#if USE_DUMMY_DLL
+	[ DllImport( "DummyDLL2008" ) ]
 	private static extern int GetGeometry( out HAPI_RawGeometry geo );
 	
-	[ DllImport( "DummyDLL" ) ]
+	[ DllImport( "DummyDLL2008" ) ]
 	private static extern int GetVertexArray( [Out] HAPI_RawVertex[] vertices, int start, int end );
 	
-	[ DllImport( "DummyDLL" ) ]
+	[ DllImport( "DummyDLL2008" ) ]
 	private static extern int GetPrimitveArray( [Out] HAPI_RawPrimitive[] primitives, int start, int end );
 	
-	[ DllImport( "DummyDLL" ) ]
+	[ DllImport( "DummyDLL2008" ) ]
 	private static extern int GetInstanceArray( [Out] HAPI_RawInstance[] instances, int count );
+	
+#else
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern int HAPI_Initialize();
+	
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern int HAPI_LoadHIPFile( string fileName );
+	
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern int HAPI_PrintNetwork( StringBuilder buffer );
+	
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern int HAPI_Cleanup();
+
+#endif
 	
 	private void DestroyChildren() {
 		List< GameObject > children = new List< GameObject >();

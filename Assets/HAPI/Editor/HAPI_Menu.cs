@@ -13,8 +13,8 @@ public class HAPI_Menu : MonoBehaviour {
 		gameObject.AddComponent( "HAPI_ObjectControl" );
 		
 		// save as prefab
-		Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/HAPI/HAPI_Object.prefab" );
-		PrefabUtility.ReplacePrefab( gameObject, prefab, ReplacePrefabOptions.ConnectToPrefab );
+		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/HAPI/HAPI_Object.prefab" );
+		//PrefabUtility.ReplacePrefab( gameObject, prefab, ReplacePrefabOptions.ConnectToPrefab );
 				
 		// do initial geometry build
 		//HAPI_ObjectControl objectControl = gameObject.GetComponent< HAPI_ObjectControl >();
