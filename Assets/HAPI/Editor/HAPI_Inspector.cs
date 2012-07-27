@@ -17,16 +17,55 @@ public class HAPI_Inspector : Editor {
 	public override void OnInspectorGUI() {
 		myUndoManager.CheckUndo();
 		
-		EditorGUILayout.LabelField( new GUIContent( "Box Size" ) );
-		myObjectControl.myBoxSize = EditorGUILayout.FloatField( myObjectControl.myBoxSize );
+		myObjectControl.myShowObjectControls = EditorGUILayout.Foldout( myObjectControl.myShowObjectControls, new GUIContent( "Object Controls" ) );
 		
-		//GUI.Button( new Rect( 10, 10, 100, 50 ), "Test" );
+		if ( myObjectControl.myShowObjectControls ) {
+			EditorGUILayout.LabelField( new GUIContent( "OTL Path:" ) );
+			EditorGUILayout.BeginHorizontal(); {
+				string oldAssetPath = myObjectControl.GetAssetPath();
+				string newAssetPath = "";
+				newAssetPath = EditorGUILayout.TextField( oldAssetPath );
+		        
+		        if ( GUILayout.Button( "...", GUILayout.Width( 40 ) ) ) {
+					string promptResultPath = PromptForAssetPath( oldAssetPath );
+					if ( promptResultPath.Length > 0 ) {
+						newAssetPath = promptResultPath;	
+					}
+		        }
+				
+				myObjectControl.SetAssetPath( newAssetPath );
+			} EditorGUILayout.EndHorizontal();
 			
+			if ( GUILayout.Button( "Rebuild" ) ) {
+				myObjectControl.Build();	
+			}
+		}
+		
+		myObjectControl.myShowAssetControls = EditorGUILayout.Foldout( myObjectControl.myShowAssetControls, new GUIContent( "Asset Controls" ) );
+		
+		if ( myObjectControl.myShowAssetControls ) {
+			GenerateAssetControls();
+		}
+					
 		if ( GUI.changed ) {
 			myObjectControl.Build();
 		}
 		
 		myUndoManager.CheckDirty();
+	}
+	
+	public void GenerateAssetControls() {
+		EditorGUILayout.LabelField( new GUIContent( "Box Size" ) );
+		myObjectControl.myBoxSize = EditorGUILayout.FloatField( myObjectControl.myBoxSize );
+		
+	}
+	
+	public static string PromptForAssetPath( string location = "" ) {
+		string path = EditorUtility.OpenFilePanel(
+			"Open Houdini OTL",
+			location,
+			"hip");
+		return path;
 	}
 	
 	private HOEditorUndoManager myUndoManager;

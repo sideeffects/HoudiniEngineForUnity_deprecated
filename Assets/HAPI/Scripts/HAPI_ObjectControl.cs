@@ -1,4 +1,4 @@
-//#define USE_DUMMY_DLL
+#define USE_DUMMY_DLL
 
 using UnityEngine;
 using UnityEditor;
@@ -15,13 +15,37 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	// Public Methods
 	//
 	
-	public void OnEnable() {
+	public HAPI_ObjectControl() {
+		Debug.Log( "HAPI_ObjectControl created!" );
+		
+		myAssetPath = "";
+		myAssetPathChanged = false;
+		
+		myShowAssetControls = true;
+		myShowObjectControls = true;
 		myBoxSize = 1f;
 		
-		Build();
+		myInnerPath = "";
+	}
+	
+	public bool SetAssetPath( string path ) {
+		if ( path != myAssetPath ) {
+			myAssetPath = path;
+			myAssetPathChanged = true;
+		}
+		return myAssetPathChanged;
+	}
+	
+	public string GetAssetPath() {
+		return myAssetPath;	
 	}
 	
 	public void Build() {
+		if ( myAssetPathChanged ) {
+			HAPI_Host.UnloadOTL( myInnerPath );
+			myInnerPath = HAPI_Host.LoadOTL( myAssetPath );
+		}
+		
 #if USE_DUMMY_DLL
 		// clean up
 		DestroyChildren();
@@ -125,23 +149,25 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	
 	// Public Variables
 	
-	public float myBoxSize;	
+	public bool myShowObjectControls;
+	public bool myShowAssetControls;
+	public float myBoxSize;
 	
 	//
 	// Private Methods
 	//
 	
 #if USE_DUMMY_DLL
-	[ DllImport( "DummyDLL2008" ) ]
+	[ DllImport( "DummyDLL" ) ]
 	private static extern int GetGeometry( out HAPI_RawGeometry geo );
 	
-	[ DllImport( "DummyDLL2008" ) ]
+	[ DllImport( "DummyDLL" ) ]
 	private static extern int GetVertexArray( [Out] HAPI_RawVertex[] vertices, int start, int end );
 	
-	[ DllImport( "DummyDLL2008" ) ]
+	[ DllImport( "DummyDLL" ) ]
 	private static extern int GetPrimitveArray( [Out] HAPI_RawPrimitive[] primitives, int start, int end );
 	
-	[ DllImport( "DummyDLL2008" ) ]
+	[ DllImport( "DummyDLL" ) ]
 	private static extern int GetInstanceArray( [Out] HAPI_RawInstance[] instances, int count );
 	
 #else
@@ -171,4 +197,11 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		}
 	}
 	
+	//
+	// Private Variables
+	//
+	
+	public string myAssetPath;
+	private bool myAssetPathChanged;
+	private string myInnerPath;	
 }
