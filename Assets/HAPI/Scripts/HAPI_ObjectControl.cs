@@ -26,6 +26,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		myBoxSize = 1f;
 		
 		myInnerPath = "";
+		
 	}
 	
 	public bool SetAssetPath( string path ) {
@@ -46,7 +47,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 			myInnerPath = HAPI_Host.LoadOTL( myAssetPath );
 		}
 		
-#if USE_DUMMY_DLL
 		// clean up
 		DestroyChildren();
 		
@@ -69,7 +69,12 @@ public class HAPI_ObjectControl : MonoBehaviour {
 				
 		// get geometry
 		HAPI_RawGeometry geo = new HAPI_RawGeometry();
+#if USE_DUMMY_DLL
 		GetGeometry( out geo );
+#else
+		HAPI_Host.GetGeometry( "/geo/torus_object1", out geo );
+#endif
+		Debug.Log( geo.primCount );
 		
 		//transform.rotation = Quaternion.Euler( -geo.pitch, -geo.yaw, geo.roll );		
 		//transform.localScale = new Vector3( geo.scale[ 0 ], geo.scale[ 1 ], geo.scale[ 2 ] );
@@ -82,9 +87,15 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		HAPI_RawPrimitive[] rawPrimitives = new HAPI_RawPrimitive[ geo.primCount ];
 		HAPI_RawInstance[] rawInstances = new HAPI_RawInstance[ geo.instanceCount ];
 		
+#if USE_DUMMY_DLL
 		GetVertexArray( rawVertices, 0, geo.vertexCount );
 		GetPrimitveArray( rawPrimitives, 0, geo.primCount );
 		GetInstanceArray( rawInstances, geo.instanceCount );
+#else
+		HAPI_Host.GetPointArray( "/geo/torus_object1", rawVertices, 0, geo.vertexCount );
+		HAPI_Host.GetPrimitveArray( "/geo/torus_object1", rawPrimitives, 0, geo.primCount );
+		HAPI_Host.GetInstanceArray( "/geo/torus_object1", rawInstances, geo.instanceCount );
+#endif
 		
 		// create data objects
 		Vector3[] vertices = new Vector3[ geo.vertexCount ];
@@ -108,7 +119,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 			Vector3 scale = new Vector3( myBoxSize, myBoxSize, myBoxSize );
 			
 			GameObject instance = Instantiate( mainChild, position, rotation ) as GameObject;
-			
+									
 			instance.name = "HAPI_InstanceGeo " + i.ToString();
 			instance.transform.parent = transform;
 			instance.transform.localScale = scale;
@@ -122,20 +133,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		mainChildMesh.RecalculateBounds();
 		mainChildMesh.RecalculateNormals();
 		
-#else
-		HAPI_Initialize();
-		
-		HAPI_LoadHIPFile( "C:/donut.hip" );
-		
-		StringBuilder str = new StringBuilder( 2048 );
-		
-		HAPI_PrintNetwork( str );
-		
-		Debug.Log( str );
-		
-		HAPI_Cleanup();
-#endif
-	}
+	}	
 	
 	// Use this for initialization
 	public void Start() {		
@@ -159,6 +157,9 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	
 #if USE_DUMMY_DLL
 	[ DllImport( "DummyDLL" ) ]
+	private static extern int GetDummy();
+	
+	[ DllImport( "DummyDLL" ) ]
 	private static extern int GetGeometry( out HAPI_RawGeometry geo );
 	
 	[ DllImport( "DummyDLL" ) ]
@@ -169,20 +170,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	
 	[ DllImport( "DummyDLL" ) ]
 	private static extern int GetInstanceArray( [Out] HAPI_RawInstance[] instances, int count );
-	
-#else
-	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern int HAPI_Initialize();
-	
-	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern int HAPI_LoadHIPFile( string fileName );
-	
-	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern int HAPI_PrintNetwork( StringBuilder buffer );
-	
-	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern int HAPI_Cleanup();
-
 #endif
 	
 	private void DestroyChildren() {
