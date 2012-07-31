@@ -1,4 +1,4 @@
-#define USE_DUMMY_DLL
+//#define USE_DUMMY_DLL
 
 using UnityEngine;
 using UnityEditor;
@@ -42,7 +42,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	}
 	
 	public void Build() {
-		if ( myAssetPathChanged ) {
+		if ( true || myAssetPathChanged ) {
 			HAPI_Host.UnloadOTL( myInnerPath );
 			myInnerPath = HAPI_Host.LoadOTL( myAssetPath );
 		}
@@ -72,7 +72,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 #if USE_DUMMY_DLL
 		GetGeometry( out geo );
 #else
-		HAPI_Host.GetGeometry( "/geo/torus_object1", out geo );
+		HAPI_Host.GetGeometry( "/obj/torus_object1", out geo );
 #endif
 		Debug.Log( geo.primCount );
 		
@@ -85,16 +85,16 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		// get geometry data
 		HAPI_RawVertex[] rawVertices = new HAPI_RawVertex[ geo.vertexCount ];
 		HAPI_RawPrimitive[] rawPrimitives = new HAPI_RawPrimitive[ geo.primCount ];
-		HAPI_RawInstance[] rawInstances = new HAPI_RawInstance[ geo.instanceCount ];
+		//HAPI_RawInstance[] rawInstances = new HAPI_RawInstance[ geo.instanceCount ];
 		
 #if USE_DUMMY_DLL
 		GetVertexArray( rawVertices, 0, geo.vertexCount );
 		GetPrimitveArray( rawPrimitives, 0, geo.primCount );
-		GetInstanceArray( rawInstances, geo.instanceCount );
+		//GetInstanceArray( rawInstances, geo.instanceCount );
 #else
-		HAPI_Host.GetPointArray( "/geo/torus_object1", rawVertices, 0, geo.vertexCount );
-		HAPI_Host.GetPrimitveArray( "/geo/torus_object1", rawPrimitives, 0, geo.primCount );
-		HAPI_Host.GetInstanceArray( "/geo/torus_object1", rawInstances, geo.instanceCount );
+		HAPI_Host.GetPointArray( "/obj/torus_object1", rawVertices, 0, geo.vertexCount );
+		HAPI_Host.GetPrimitveArray( "/obj/torus_object1", rawPrimitives, 0, geo.primCount );
+		//HAPI_Host.GetInstanceArray( "/obj/torus_object1", rawInstances, geo.instanceCount );
 #endif
 		
 		// create data objects
@@ -112,6 +112,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 				triangles[ i * 3 + j ] = rawPrimitives[ i ].vertices[ j ];	
 			}
 		}
+		/*
 		for ( int i = 0; i < geo.instanceCount; ++i ) {
 			Vector3 position = new Vector3( rawInstances[ i ].position[ 0 ], rawInstances[ i ].position[ 1 ], rawInstances[ i ].position[ 2 ] );
 			Quaternion rotation = Quaternion.Euler( -rawInstances[ i ].pitch, -rawInstances[ i ].yaw, rawInstances[ i ].roll );
@@ -124,7 +125,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 			instance.transform.parent = transform;
 			instance.transform.localScale = scale;
 		}
-		
+		*/
 		// load into vertices and face into mesh
 		mainChildMesh.vertices = vertices;
 		mainChildMesh.triangles = triangles;

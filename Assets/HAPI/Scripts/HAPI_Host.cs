@@ -18,7 +18,7 @@ namespace HAPI {
 			} else {
 				Debug.Log( "Loading OTL: new hip created" );
 				
-				/*
+				
 				HAPI_Initialize();
 				
 				HAPI_LoadHIPFile( "C:/donut.hip" );
@@ -30,7 +30,7 @@ namespace HAPI {
 				Debug.Log( str );
 				
 				HAPI_Cleanup();				
-				*/
+				
 			}
 			
 			myHoudiniSceneExists = true;
@@ -44,7 +44,7 @@ namespace HAPI {
 		
 		static private bool myHoudiniSceneExists = false;
 		
-		/*
+		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Initialize();
 		
@@ -68,7 +68,7 @@ namespace HAPI {
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int GetInstanceArray( string path, [Out] HAPI_RawInstance[] instances, int count );	
-		*/
+		
 	
 	}
 
