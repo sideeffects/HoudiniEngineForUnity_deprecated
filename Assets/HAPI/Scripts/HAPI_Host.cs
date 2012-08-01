@@ -12,17 +12,18 @@ namespace HAPI {
 			return myHoudiniSceneExists;
 		}
 			
-		static public string LoadOTL( string path ) {
+		static public int LoadOTL( string path ) {
 			if ( myHoudiniSceneExists ) {
 				Debug.Log( "Loading OTL: hip already exists" );
 			} else {
 				Debug.Log( "Loading OTL: new hip created" );
-				
-				
+								
 				HAPI_Initialize();
-				
+							
 				//HAPI_LoadHIPFile( "C:/donut.hip" );				
 				//HAPI_Cleanup();
+			
+				myHoudiniSceneExists = true;
 			}
 			
 			HAPI_AssetInfo assetInfo = new HAPI_AssetInfo();
@@ -33,17 +34,24 @@ namespace HAPI {
 			Debug.Log( str );
 			
 			if ( result > 0 ) {
-				Debug.LogError( "OTL File Failed to Load" );	
+				Debug.LogError( "OTL File Failed to Load" );
+				return -1;
 			}
 			
-			myHoudiniSceneExists = true;
-			
-			Debug.Log( assetInfo.assetInstancePath );
-			return assetInfo.assetInstancePath;
+			Debug.Log( "Asset Loaded - Path: " + assetInfo.assetInstancePath + ", ID: " + assetInfo.id );			
+			return assetInfo.id;
 		}
 		
-		static public bool UnloadOTL( string innerPath ) {
+		static public bool UnloadOTL( int assetId ) {
+			if ( assetId < 0 )
+				return false;
 			
+			int result = HAPI_UnloadOTLFile( assetId );
+			
+			if ( result > 0 ) {
+				Debug.LogError( "OTL File Failed to Unload" );
+				return false;
+			}
 			
 			return true;	
 		}
@@ -61,22 +69,25 @@ namespace HAPI {
 		private static extern int HAPI_LoadOTLFile( string fileName, out HAPI_AssetInfo assetInfo );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_UnloadOTLFile( int assetId );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_PrintNetwork( StringBuilder buffer );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Cleanup();
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetGeometry( string path, out HAPI_RawGeometry geo );
+		public static extern int HAPI_GetGeometry( int assetId, out HAPI_RawGeometry geo );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetVertexArray( string path, [Out] HAPI_RawVertex[] vertices, int start, int end );
+		public static extern int HAPI_GetVertexArray( int assetId, [Out] HAPI_RawVertex[] vertices, int start, int end );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetPrimitveArray( string path, [Out] HAPI_RawPrimitive[] primitives, int start, int end );
+		public static extern int HAPI_GetPrimitveArray( int assetId, [Out] HAPI_RawPrimitive[] primitives, int start, int end );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetInstanceArray( string path, [Out] HAPI_RawInstance[] instances, int count );	
+		public static extern int HAPI_GetInstanceArray( int assetId, [Out] HAPI_RawInstance[] instances, int count );	
 		
 	
 	}

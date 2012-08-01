@@ -20,13 +20,12 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		
 		myAssetPath = "";
 		myAssetPathChanged = false;
+		myAssetId = -1;
 		
 		myShowAssetControls = true;
 		myShowObjectControls = true;
 		myBoxSize = 1f;
-		
-		myInnerPath = "";
-		
+				
 	}
 	
 	public bool SetAssetPath( string path ) {
@@ -43,12 +42,16 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	
 	public void Build() {
 		if ( myAssetPathChanged ) {
-			HAPI_Host.UnloadOTL( myInnerPath );
-			myInnerPath = HAPI_Host.LoadOTL( myAssetPath );
+			HAPI_Host.UnloadOTL( myAssetId );
+			myAssetId = HAPI_Host.LoadOTL( myAssetPath );
 		}
-		
+			
 		// clean up
 		DestroyChildren();
+		
+		// if path was invalid, don't try to get more info
+		if ( myAssetId < 0 )
+			return;
 		
 		// create main underling
 		GameObject mainChild = new GameObject( "HAPI_MainGeo" );
@@ -72,7 +75,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 #if USE_DUMMY_DLL
 		GetGeometry( out geo );
 #else
-		HAPI_Host.HAPI_GetGeometry( myInnerPath, out geo );
+		HAPI_Host.HAPI_GetGeometry( myAssetId, out geo );
 #endif
 		Debug.Log( "Prim Count: " + geo.primCount );
 		Debug.Log( "Vertex Count: " + geo.vertexCount );
@@ -93,9 +96,9 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		GetPrimitveArray( rawPrimitives, 0, geo.primCount );
 		//GetInstanceArray( rawInstances, geo.instanceCount );
 #else
-		HAPI_Host.HAPI_GetVertexArray( myInnerPath, rawVertices, 0, geo.vertexCount );
-		HAPI_Host.HAPI_GetPrimitveArray( myInnerPath, rawPrimitives, 0, geo.primCount );
-		//HAPI_Host.GetInstanceArray( myInnerPath, rawInstances, geo.instanceCount );
+		HAPI_Host.HAPI_GetVertexArray( myAssetId, rawVertices, 0, geo.vertexCount );
+		HAPI_Host.HAPI_GetPrimitveArray( myAssetId, rawPrimitives, 0, geo.primCount );
+		//HAPI_Host.GetInstanceArray( myAssetId, rawInstances, geo.instanceCount );
 #endif
 		
 		// create data objects
@@ -149,6 +152,8 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	
 	// Public Variables
 	
+	public string myAssetPath;
+	
 	public bool myShowObjectControls;
 	public bool myShowAssetControls;
 	public float myBoxSize;
@@ -190,7 +195,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	// Private Variables
 	//
 	
-	public string myAssetPath;
 	private bool myAssetPathChanged;
-	private string myInnerPath;	
+	private int myAssetId;
 }
