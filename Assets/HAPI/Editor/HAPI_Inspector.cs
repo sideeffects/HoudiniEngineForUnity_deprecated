@@ -64,7 +64,7 @@ public class HAPI_Inspector : Editor {
 		string path = EditorUtility.OpenFilePanel(
 			"Open Houdini OTL",
 			location,
-			"hip");
+			"otl");
 		return path;
 	}
 	

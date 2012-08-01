@@ -12,7 +12,7 @@ public class HAPI_Menu : MonoBehaviour {
 	static void CreateHAPIObject() {
 		// create game object
 		GameObject gameObject = new GameObject( myNewHoudiniObjectLabel );
-				
+		
 		// add HAPI script
 		gameObject.AddComponent( "HAPI_ObjectControl" );		
 		HAPI_ObjectControl objectControl = gameObject.GetComponent< HAPI_ObjectControl >();

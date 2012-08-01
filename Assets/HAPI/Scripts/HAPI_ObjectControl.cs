@@ -42,7 +42,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	}
 	
 	public void Build() {
-		if ( true || myAssetPathChanged ) {
+		if ( myAssetPathChanged ) {
 			HAPI_Host.UnloadOTL( myInnerPath );
 			myInnerPath = HAPI_Host.LoadOTL( myAssetPath );
 		}
@@ -72,9 +72,10 @@ public class HAPI_ObjectControl : MonoBehaviour {
 #if USE_DUMMY_DLL
 		GetGeometry( out geo );
 #else
-		HAPI_Host.GetGeometry( "/obj/torus_object1", out geo );
+		HAPI_Host.HAPI_GetGeometry( myInnerPath, out geo );
 #endif
-		Debug.Log( geo.primCount );
+		Debug.Log( "Prim Count: " + geo.primCount );
+		Debug.Log( "Vertex Count: " + geo.vertexCount );
 		
 		//transform.rotation = Quaternion.Euler( -geo.pitch, -geo.yaw, geo.roll );		
 		//transform.localScale = new Vector3( geo.scale[ 0 ], geo.scale[ 1 ], geo.scale[ 2 ] );
@@ -92,9 +93,9 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		GetPrimitveArray( rawPrimitives, 0, geo.primCount );
 		//GetInstanceArray( rawInstances, geo.instanceCount );
 #else
-		HAPI_Host.GetPointArray( "/obj/torus_object1", rawVertices, 0, geo.vertexCount );
-		HAPI_Host.GetPrimitveArray( "/obj/torus_object1", rawPrimitives, 0, geo.primCount );
-		//HAPI_Host.GetInstanceArray( "/obj/torus_object1", rawInstances, geo.instanceCount );
+		HAPI_Host.HAPI_GetVertexArray( myInnerPath, rawVertices, 0, geo.vertexCount );
+		HAPI_Host.HAPI_GetPrimitveArray( myInnerPath, rawPrimitives, 0, geo.primCount );
+		//HAPI_Host.GetInstanceArray( myInnerPath, rawInstances, geo.instanceCount );
 #endif
 		
 		// create data objects

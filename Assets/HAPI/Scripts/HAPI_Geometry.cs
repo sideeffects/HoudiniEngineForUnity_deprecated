@@ -5,6 +5,20 @@ using System.Runtime.InteropServices;
 namespace HAPI {
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_AssetInfo {
+		public int id;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 1024 ) ]
+		public string otlFilePath;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 256 ) ]		
+		public string assetName;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 256 ) ]		
+		public string assetInstancePath;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_RawGeometry {
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 512 ) ]
 		public string name;
