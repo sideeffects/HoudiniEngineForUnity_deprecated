@@ -18,7 +18,7 @@ public class HAPI_Menu : MonoBehaviour {
 		HAPI_ObjectControl objectControl = gameObject.GetComponent< HAPI_ObjectControl >();
 				
 		// get asset path now
-		string assetPath = HAPI_Inspector.PromptForAssetPath();
+		string assetPath = HAPI_Inspector.PromptForAssetPath( "" );
 		objectControl.SetAssetPath( assetPath );
 		
 		// save as prefab

@@ -16,6 +16,19 @@ namespace HAPI {
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 256 ) ]		
 		public string assetInstancePath;
+		
+		public int objectCount;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_ObjectInfo {
+		public int id;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 1024 ) ]
+		public string objectInstancePath;
+		
+		public bool hasTransformChanged;
+		public bool hasGeoChanged;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]

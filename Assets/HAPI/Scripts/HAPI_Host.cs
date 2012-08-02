@@ -7,7 +7,9 @@ using System.Text;
 
 namespace HAPI {
 
-	public class HAPI_Host : MonoBehaviour {		
+	public class HAPI_Host : MonoBehaviour {
+		// Public 
+		
 		static public bool HasScene() {
 			return myHoudiniSceneExists;
 		}
@@ -56,8 +58,19 @@ namespace HAPI {
 			return true;	
 		}
 		
-		static private bool myHoudiniSceneExists = false;
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetGeometryInfo( int assetId, int objectId, out HAPI_RawGeometry geo );
 		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetVertexArray( int assetId, int objectId, [Out] HAPI_RawVertex[] vertices, int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetPrimitveArray( int assetId, int objectId, [Out] HAPI_RawPrimitive[] primitives, int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetInstanceArray( int assetId, int objectId, [Out] HAPI_RawInstance[] instances, int count );	
+		
+		// Private
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Initialize();
@@ -77,17 +90,7 @@ namespace HAPI {
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Cleanup();
 		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetGeometry( int assetId, out HAPI_RawGeometry geo );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetVertexArray( int assetId, [Out] HAPI_RawVertex[] vertices, int start, int end );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetPrimitveArray( int assetId, [Out] HAPI_RawPrimitive[] primitives, int start, int end );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetInstanceArray( int assetId, [Out] HAPI_RawInstance[] instances, int count );	
+		static private bool myHoudiniSceneExists = false;
 		
 	
 	}

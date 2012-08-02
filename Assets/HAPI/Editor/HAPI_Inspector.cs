@@ -60,7 +60,7 @@ public class HAPI_Inspector : Editor {
 		
 	}
 	
-	public static string PromptForAssetPath( string location = "" ) {
+	public static string PromptForAssetPath( string location ) {
 		string path = EditorUtility.OpenFilePanel(
 			"Open Houdini OTL",
 			location,
