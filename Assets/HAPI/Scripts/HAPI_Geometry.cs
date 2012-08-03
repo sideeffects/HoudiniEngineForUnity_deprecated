@@ -65,7 +65,7 @@ namespace HAPI {
 		public float[] normal;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3, ArraySubType = UnmanagedType.R4 ) ]
-		public float[] point;
+		public float[] position;
 		
 		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float u;

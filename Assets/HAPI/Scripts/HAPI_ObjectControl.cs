@@ -103,7 +103,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		
 		for ( int i = 0; i < geo.vertexCount; ++i ) {
 			for ( int j = 0; j < 3; ++j ) {
-				vertices[ i ][ j ] = rawVertices[ i ].point[ j ];	
+				vertices[ i ][ j ] = rawVertices[ i ].position[ j ];	
 			}
 		}
 		for ( int i = 0; i < geo.primCount; ++i ) {

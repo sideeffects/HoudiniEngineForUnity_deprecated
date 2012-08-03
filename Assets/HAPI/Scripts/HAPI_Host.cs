@@ -8,7 +8,7 @@ using System.Text;
 namespace HAPI {
 
 	public class HAPI_Host : MonoBehaviour {
-		// Public 
+		// Public
 		
 		static public bool HasScene() {
 			return myHoudiniSceneExists;
