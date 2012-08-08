@@ -1,3 +1,5 @@
+#define DEBUG // since Unity doesn't seem to define it itself
+
 using UnityEngine;
 using UnityEditor;
 using System.Runtime.InteropServices;
@@ -17,13 +19,23 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		Debug.Log( "HAPI_ObjectControl created!" );
 		
 		myAssetPath = "";
-		myAssetPathChanged = false;
+		myAssetPathChanged = true;
 		myAssetId = -1;
+		
+		myObjectCount = 0;
+		myParameterCount = 0;
 		
 		myShowAssetControls = true;
 		myShowObjectControls = true;
-		myBoxSize = 1f;
-				
+	}
+	
+	~HAPI_ObjectControl() {
+		Debug.Log( "HAPI_ObjectControl destroyed!" );
+		
+		if ( myAssetId > 0 )
+		{
+			HAPI_Host.UnloadOTL( myAssetId );	
+		}
 	}
 	
 	public bool SetAssetPath( string path ) {
@@ -31,6 +43,9 @@ public class HAPI_ObjectControl : MonoBehaviour {
 			myAssetPath = path;
 			myAssetPathChanged = true;
 		}
+#if DEBUG
+		myAssetPathChanged = true;
+#endif
 		return myAssetPathChanged;
 	}
 	
@@ -41,7 +56,19 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	public void Build() {
 		if ( myAssetPathChanged ) {
 			HAPI_Host.UnloadOTL( myAssetId );
-			myAssetId = HAPI_Host.LoadOTL( myAssetPath );
+			
+			myAssetInfo = HAPI_Host.LoadOTL( myAssetPath );
+			
+			// for convinience
+			myAssetId = myAssetInfo.id;
+			myObjectCount = myAssetInfo.objectCount;
+			myParameterCount = myAssetInfo.parameterCount;
+						
+			// get parameters
+			myParameters = new HAPI_Parameter[ myParameterCount ];
+			HAPI_Host.HAPI_GetParameterArray( myAssetId, myParameters, myParameterCount );
+			
+			myAssetPathChanged = false;
 		}
 			
 		// clean up
@@ -82,7 +109,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		//transform.localScale = new Vector3( geo.scale[ 0 ], geo.scale[ 1 ], geo.scale[ 2 ] );
 		//transform.localScale = new Vector3( myBoxSize, myBoxSize, myBoxSize );
 		mainChild.transform.rotation = Quaternion.Euler( -geo.pitch, -geo.yaw, geo.roll );
-		mainChild.transform.localScale = new Vector3( myBoxSize, myBoxSize, myBoxSize );
+		mainChild.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
 		
 		// get geometry data
 		HAPI_RawVertex[] rawVertices = new HAPI_RawVertex[ geo.vertexCount ];
@@ -116,7 +143,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 			Vector3 position = new Vector3( rawInstances[ i ].position[ 0 ], rawInstances[ i ].position[ 1 ], rawInstances[ i ].position[ 2 ] );
 			Quaternion rotation = Quaternion.Euler( -rawInstances[ i ].pitch, -rawInstances[ i ].yaw, rawInstances[ i ].roll );
 			//Vector3 scale = new Vector3( rawInstances[ i ].scale[ 0 ], rawInstances[ i ].scale[ 1 ], rawInstances[ i ].scale[ 2 ] );
-			Vector3 scale = new Vector3( myBoxSize, myBoxSize, myBoxSize );
+			Vector3 scale = new Vector3( 1.0f, 1.0f, 1.0f );
 			
 			GameObject instance = Instantiate( mainChild, position, rotation ) as GameObject;
 									
@@ -132,7 +159,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		
 		mainChildMesh.RecalculateBounds();
 		mainChildMesh.RecalculateNormals();
-		
 	}	
 	
 	// Use this for initialization
@@ -146,12 +172,17 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	}
 	
 	// Public Variables
-	
+	 
 	public string myAssetPath;
+	public int myAssetId;
+	public int myParameterCount;
+	public int myObjectCount;
+	
+	public HAPI_AssetInfo myAssetInfo;
+	public HAPI_Parameter[] myParameters;
 	
 	public bool myShowObjectControls;
 	public bool myShowAssetControls;
-	public float myBoxSize;
 	
 	//
 	// Private Methods
@@ -202,6 +233,9 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	// Private Variables
 	//
 	
-	private bool myAssetPathChanged;
-	private int myAssetId;
+#if DEBUG
+	public bool myAssetPathChanged;
+#else
+	pivate bool myAssetPathChanged;
+#endif
 }

@@ -2,10 +2,21 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-namespace HAPI {
+namespace HAPI 
+{
+	public enum HAPI_ParameterType
+	{
+		HAPI_PARMTYPE_INT = 0,
+		HAPI_PARMTYPE_FLOAT = 1,
+		HAPI_PARMTYPE_STRING = 2,
+		HAPI_PARMTYPE_FOLDER = 3,
+		HAPI_PARMTYPE_TOGGLE = 4,
+		HAPI_PARMTYPE_COLOUR = 5
+	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_AssetInfo {
+	public struct HAPI_AssetInfo 
+	{
 		public int id;
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 1024 ) ]
@@ -18,10 +29,38 @@ namespace HAPI {
 		public string assetInstancePath;
 		
 		public int objectCount;
+		public int parameterCount;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_ObjectInfo {
+	public struct HAPI_Parameter 
+	{
+		public int id;
+		public int parentId;
+		
+		public int type;
+		public int size;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 256 ) ]
+		public string name;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 256 ) ]		
+		public string label;		
+		
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 4 ) ]
+		public int[] intValue;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 4 ) ]
+		public float[] floatValue;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 8192 ) ]		
+		public string stringValue;
+		
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_ObjectInfo 
+	{
 		public int id;
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 1024 ) ]
@@ -60,7 +99,8 @@ namespace HAPI {
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_RawVertex {
+	public struct HAPI_RawVertex 
+	{
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] normal;
 		
@@ -83,7 +123,8 @@ namespace HAPI {
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_RawPrimitive {	
+	public struct HAPI_RawPrimitive 
+	{	
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 16 ) ]
 		public int[] vertices;
 		
@@ -101,7 +142,8 @@ namespace HAPI {
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_RawInstance {
+	public struct HAPI_RawInstance 
+	{
 		public int id;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]

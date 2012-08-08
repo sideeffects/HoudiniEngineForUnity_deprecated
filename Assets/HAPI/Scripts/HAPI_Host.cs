@@ -14,7 +14,7 @@ namespace HAPI {
 			return myHoudiniSceneExists;
 		}
 			
-		static public int LoadOTL( string path ) {
+		static public HAPI_AssetInfo LoadOTL( string path ) {
 			if ( myHoudiniSceneExists ) {
 				Debug.Log( "Loading OTL: hip already exists" );
 			} else {
@@ -37,11 +37,13 @@ namespace HAPI {
 			
 			if ( result > 0 ) {
 				Debug.LogError( "OTL File Failed to Load" );
-				return -1;
+				return assetInfo;
 			}
 			
+			
+			
 			Debug.Log( "Asset Loaded - Path: " + assetInfo.assetInstancePath + ", ID: " + assetInfo.id );			
-			return assetInfo.id;
+			return assetInfo;
 		}
 		
 		static public bool UnloadOTL( int assetId ) {
@@ -57,6 +59,9 @@ namespace HAPI {
 			
 			return true;	
 		}
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetParameterArray( int assetId, [Out] HAPI_Parameter[] parameters, int count );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_GetGeometryInfo( int assetId, int objectId, out HAPI_RawGeometry geo );
