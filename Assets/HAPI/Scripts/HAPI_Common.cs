@@ -41,6 +41,15 @@ namespace HAPI
 		public int type;
 		public int size;
 		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool invisible;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool joinNext;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool labelNone;
+		
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 256 ) ]
 		public string name;
 		
@@ -66,7 +75,10 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 1024 ) ]
 		public string objectInstancePath;
 		
+		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasTransformChanged;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasGeoChanged;
 	}
 	

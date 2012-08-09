@@ -27,6 +27,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		
 		myShowAssetControls = true;
 		myShowObjectControls = true;
+		myAssetTabSelectedIndex = 0;
 	}
 	
 	~HAPI_ObjectControl() {
@@ -43,9 +44,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 			myAssetPath = path;
 			myAssetPathChanged = true;
 		}
-#if DEBUG
-		myAssetPathChanged = true;
-#endif
 		return myAssetPathChanged;
 	}
 	
@@ -66,7 +64,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 						
 			// get parameters
 			myParameters = new HAPI_Parameter[ myParameterCount ];
-			HAPI_Host.HAPI_GetParameterArray( myAssetId, myParameters, myParameterCount );
+			HAPI_Host.HAPI_GetParameterArray( myAssetId, myParameters, 0, myParameterCount );
 			
 			myAssetPathChanged = false;
 		}
@@ -99,8 +97,8 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		HAPI_RawGeometry geo = new HAPI_RawGeometry();
 		HAPI_Host.HAPI_GetGeometryInfo( myAssetId, 0, out geo );
 		
-		Debug.Log( "Prim Count: " + geo.primCount );
-		Debug.Log( "Vertex Count: " + geo.vertexCount );
+		//Debug.Log( "Prim Count: " + geo.primCount );
+		//Debug.Log( "Vertex Count: " + geo.vertexCount );
 		
 		geo.primCount = Mathf.Min( geo.primCount, 65000 * 3 );
 		geo.vertexCount = Mathf.Min( geo.vertexCount, 65000 );
@@ -183,6 +181,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	
 	public bool myShowObjectControls;
 	public bool myShowAssetControls;
+	public int myAssetTabSelectedIndex;
 	
 	//
 	// Private Methods
