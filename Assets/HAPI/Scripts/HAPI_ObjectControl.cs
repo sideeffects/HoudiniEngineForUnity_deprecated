@@ -64,9 +64,15 @@ public class HAPI_ObjectControl : MonoBehaviour {
 						
 			// get parameters
 			myParameters = new HAPI_Parameter[ myParameterCount ];
-			HAPI_Host.HAPI_GetParameterArray( myAssetId, myParameters, 0, myParameterCount );
+			HAPI_Host.HAPI_GetParameters( myAssetId, myParameters, 0, myParameterCount );
 			
 			myAssetPathChanged = false;
+		}
+		else
+		{
+			Debug.Log( "Set Parameters" );
+			// set parameters
+			HAPI_Host.HAPI_SetParameters( myAssetId, myParameters, 0, myParameterCount );	
 		}
 			
 		// clean up
