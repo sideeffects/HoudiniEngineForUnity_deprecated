@@ -70,7 +70,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		}
 		else
 		{
-			Debug.Log( "Set Parameters" );
 			// set parameters
 			HAPI_Host.HAPI_SetParameters( myAssetId, myParameters, 0, myParameterCount );	
 		}
@@ -126,7 +125,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		List< GameObject > children = new List< GameObject >();
 		
 		foreach ( Transform child in transform ) {
-			children.Add ( child.gameObject );
+			children.Add( child.gameObject );
 		}
 		
 		foreach ( GameObject child in children ) {
@@ -143,6 +142,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		// add required components
 		mainChild.AddComponent( "MeshFilter" );
 		mainChild.AddComponent( "MeshRenderer" );
+		mainChild.AddComponent( "HAPI_ChildSelectionControl" );
 		
 		// get or create mesh
 		MeshFilter mainChildMeshFilter = mainChild.GetComponent< MeshFilter >();

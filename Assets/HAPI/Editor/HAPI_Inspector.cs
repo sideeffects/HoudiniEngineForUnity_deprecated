@@ -61,7 +61,6 @@ public class HAPI_Inspector : Editor {
 		}
 					
 		if ( GUI.changed ) {
-			Debug.Log( "GUI changed!" );
 			myObjectControl.Build();
 		}
 		
