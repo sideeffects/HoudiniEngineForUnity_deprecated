@@ -5,13 +5,13 @@ using HAPI;
 
 public class HAPI_Menu : MonoBehaviour {
 	
-	public const string myNewHoudiniObjectLabel = "HAPI Object";
-	public const string myNewHoudiniPrefabLabel = "New Houdini Object";
+	public const string myNewHoudiniAssetLabel = "Houdini Asset";
+	public const string myNewHoudiniPrefabLabel = "Houdini Asset";
 	
-	[ MenuItem( "HAPI/Create HAPI Object" ) ]
+	[ MenuItem( "HAPI/Load Houdini Asset" ) ]
 	static void CreateHAPIObject() {
 		// create game object
-		GameObject gameObject = new GameObject( myNewHoudiniObjectLabel );
+		GameObject gameObject = new GameObject( myNewHoudiniAssetLabel );
 		
 		// add HAPI script
 		gameObject.AddComponent( "HAPI_ObjectControl" );		
@@ -27,6 +27,11 @@ public class HAPI_Menu : MonoBehaviour {
 		
 		// do first build
 		objectControl.Build();
+		
+		// select the new houdini asset
+		GameObject[] selection = new GameObject[ 1 ];
+		selection[ 0 ] = gameObject;
+		Selection.objects = selection;
 	}
 	
 }

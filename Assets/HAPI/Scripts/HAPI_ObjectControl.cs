@@ -82,10 +82,65 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		if ( myAssetId < 0 )
 			return;
 		
+		myObjects = new HAPI_ObjectInfo[ myObjectCount ];
+		myObjectTransforms = new HAPI_Transform[ myObjectCount ];
+		
+		HAPI_Host.HAPI_GetObjects( myAssetId, myObjects, 0, myObjectCount );
+		HAPI_Host.HAPI_GetObjectTransforms( myAssetId, myObjectTransforms, 0, myObjectCount );
+				
+		for ( int objectIndex = 0; objectIndex < myObjectCount; ++objectIndex )
+			CreateObject( objectIndex );
+	}	
+	
+	// Use this for initialization
+	public void Start() {		
+		
+	}
+	
+	// Update is called once per frame
+	public void Update() {
+		
+	}
+	
+	// Public Variables
+	 
+	public string myAssetPath;
+	public int myAssetId;
+	public int myParameterCount;
+	public int myObjectCount;
+	
+	public HAPI_AssetInfo myAssetInfo;
+	public HAPI_ObjectInfo[] myObjects;
+	public HAPI_Transform[] myObjectTransforms;
+	public HAPI_Parameter[] myParameters;
+	
+	public bool myShowObjectControls;
+	public bool myShowAssetControls;
+	public int myAssetTabSelectedIndex;
+	
+	//
+	// Private Methods
+	//
+	
+	private void DestroyChildren() {
+		List< GameObject > children = new List< GameObject >();
+		
+		foreach ( Transform child in transform ) {
+			children.Add ( child.gameObject );
+		}
+		
+		foreach ( GameObject child in children ) {
+			DestroyImmediate( child );
+		}
+	}
+		
+	private void CreateObject( int objectId )
+	{
 		// create main underling
-		GameObject mainChild = new GameObject( "HAPI_MainGeo" );
+		GameObject mainChild = new GameObject( "HAPI_Geo" + objectId );
 		mainChild.transform.parent = transform;
 		
+		// add required components
 		mainChild.AddComponent( "MeshFilter" );
 		mainChild.AddComponent( "MeshRenderer" );
 		
@@ -98,34 +153,37 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		}
 		
 		mainChildMesh.Clear();
+		
+		// get transforms
+		HAPI_Transform trans = myObjectTransforms[ objectId ];
 				
 		// get geometry
 		HAPI_RawGeometry geo = new HAPI_RawGeometry();
-		HAPI_Host.HAPI_GetGeometryInfo( myAssetId, 0, out geo );
+		HAPI_Host.HAPI_GetGeometryInfo( myAssetId, objectId, out geo );
 		
-		//Debug.Log( "Prim Count: " + geo.primCount );
-		//Debug.Log( "Vertex Count: " + geo.vertexCount );
-		
+		// TODO: add this limit in a more proper place
 		geo.primCount = Mathf.Min( geo.primCount, 65000 * 3 );
 		geo.vertexCount = Mathf.Min( geo.vertexCount, 65000 );
 		
-		//transform.rotation = Quaternion.Euler( -geo.pitch, -geo.yaw, geo.roll );		
-		//transform.localScale = new Vector3( geo.scale[ 0 ], geo.scale[ 1 ], geo.scale[ 2 ] );
-		//transform.localScale = new Vector3( myBoxSize, myBoxSize, myBoxSize );
-		mainChild.transform.rotation = Quaternion.Euler( -geo.pitch, -geo.yaw, geo.roll );
-		mainChild.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
+		// apply object transforms
+		mainChild.transform.position = new Vector3( trans.position[ 0 ], 
+													trans.position[ 1 ],
+													trans.position[ 2 ] );
+		mainChild.transform.rotation = Quaternion.Euler( -trans.pitch, 
+														 -trans.yaw, 
+														  trans.roll );
+		mainChild.transform.localScale = new Vector3( trans.scale[ 0 ], 
+													  trans.scale[ 1 ], 
+													  trans.scale[ 2 ] );
 		
 		// get geometry data
 		HAPI_RawVertex[] rawVertices = new HAPI_RawVertex[ geo.vertexCount ];
 		HAPI_RawPrimitive[] rawPrimitives = new HAPI_RawPrimitive[ geo.primCount ];
 		//HAPI_RawInstance[] rawInstances = new HAPI_RawInstance[ geo.instanceCount ];
 		
-		FillArray( myAssetId, 0, rawVertices, HAPI_Host.HAPI_GetVertexArray, geo.vertexCount );
-		FillArray( myAssetId, 0, rawPrimitives, HAPI_Host.HAPI_GetPrimitveArray, geo.primCount );
-		
-		//HAPI_Host.HAPI_GetVertexArray( myAssetId, 0, rawVertices, 0, 100 );
-		//HAPI_Host.HAPI_GetPrimitveArray( myAssetId, 0, rawPrimitives, 0, geo.primCount );
-		//HAPI_Host.GetInstanceArray( myAssetId, 0, rawInstances, geo.instanceCount );
+		FillArray( myAssetId, objectId, rawVertices, HAPI_Host.HAPI_GetVertexArray, geo.vertexCount );
+		FillArray( myAssetId, objectId, rawPrimitives, HAPI_Host.HAPI_GetPrimitveArray, geo.primCount );
+		//FillArray( myAssetId, objectId, rawInstances, HAPI_Host.GetInstanceArray, geo.instanceCount );
 		
 		// create data objects
 		Vector3[] vertices = new Vector3[ geo.vertexCount ];
@@ -163,46 +221,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		
 		mainChildMesh.RecalculateBounds();
 		mainChildMesh.RecalculateNormals();
-	}	
-	
-	// Use this for initialization
-	public void Start() {		
-		
-	}
-	
-	// Update is called once per frame
-	public void Update() {
-		
-	}
-	
-	// Public Variables
-	 
-	public string myAssetPath;
-	public int myAssetId;
-	public int myParameterCount;
-	public int myObjectCount;
-	
-	public HAPI_AssetInfo myAssetInfo;
-	public HAPI_Parameter[] myParameters;
-	
-	public bool myShowObjectControls;
-	public bool myShowAssetControls;
-	public int myAssetTabSelectedIndex;
-	
-	//
-	// Private Methods
-	//
-	
-	private void DestroyChildren() {
-		List< GameObject > children = new List< GameObject >();
-		
-		foreach ( Transform child in transform ) {
-			children.Add ( child.gameObject );
-		}
-		
-		foreach ( GameObject child in children ) {
-			DestroyImmediate( child );
-		}
 	}
 	
 	private delegate int FillArrayInputFunc< T >( int assetId, int objectId, [Out] T[] items, int start, int end );

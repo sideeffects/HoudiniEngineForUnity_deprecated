@@ -63,14 +63,34 @@ namespace HAPI
 		public float[] floatValue;
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 8192 ) ]		
-		public string stringValue;
+		public string stringValue;	
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_Transform {		
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
+		public float[] position;
 		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float roll;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float pitch;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float yaw;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
+		public float[] scale;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ObjectInfo 
 	{
 		public int id;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 512 ) ]
+		public string name;
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 1024 ) ]
 		public string objectInstancePath;
@@ -97,7 +117,13 @@ namespace HAPI
 		public float[] position;
 		
 		[ MarshalAs( UnmanagedType.R4) ]
-		public float roll, pitch, yaw;
+		public float roll;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float pitch;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float yaw;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
 		public float[] scale;

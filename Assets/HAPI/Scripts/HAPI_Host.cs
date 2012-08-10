@@ -67,6 +67,12 @@ namespace HAPI {
 		public static extern int HAPI_SetParameters( int assetId, [Out] HAPI_Parameter[] parameters, int start, int end );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetObjects( int assetId, [Out] HAPI_ObjectInfo[] objects, int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetObjectTransforms( int assetId, [Out] HAPI_Transform[] transforms, int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_GetGeometryInfo( int assetId, int objectId, out HAPI_RawGeometry geo );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
