@@ -8,7 +8,9 @@ using System.Text;
 namespace HAPI {
 
 	public class HAPI_Host : MonoBehaviour {
+		//
 		// Public
+		//
 		
 		static public bool HasScene() {
 			return myHoudiniSceneExists;
@@ -22,25 +24,19 @@ namespace HAPI {
 								
 				HAPI_Initialize();
 							
-				//HAPI_LoadHIPFile( "C:/donut.hip" );				
-				//HAPI_Cleanup();
-			
 				myHoudiniSceneExists = true;
 			}
 			
 			HAPI_AssetInfo assetInfo = new HAPI_AssetInfo();
-			int result = HAPI_LoadOTLFile( path, out assetInfo );
-			
-			StringBuilder str = new StringBuilder( 2048 );		
-			HAPI_PrintNetwork( str );				
-			Debug.Log( str );
+			assetInfo.otlFilePath = path;
+			assetInfo.minVerticesPerPrimitive = 3;
+			assetInfo.maxVerticesPerPrimitive = 3;
+			int result = HAPI_LoadOTLFile( ref assetInfo );
 			
 			if ( result > 0 ) {
 				Debug.LogError( "OTL File Failed to Load" );
 				return assetInfo;
-			}
-			
-			
+			}			
 			
 			Debug.Log( "Asset Loaded - Path: " + assetInfo.assetInstancePath + ", ID: " + assetInfo.id );			
 			return assetInfo;
@@ -84,16 +80,15 @@ namespace HAPI {
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_GetInstanceArray( int assetId, int objectId, [Out] HAPI_RawInstance[] instances, int count );	
 		
+		//
 		// Private
+		//
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Initialize();
-		
+				
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_LoadHIPFile( string fileName );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_LoadOTLFile( string fileName, out HAPI_AssetInfo assetInfo );
+		private static extern int HAPI_LoadOTLFile( ref HAPI_AssetInfo assetInfo );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_UnloadOTLFile( int assetId );

@@ -30,6 +30,9 @@ namespace HAPI
 		
 		public int objectCount;
 		public int parameterCount;
+		
+		public int minVerticesPerPrimitive;
+		public int maxVerticesPerPrimitive;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]

@@ -86,23 +86,15 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		
 		HAPI_Host.HAPI_GetObjects( myAssetId, myObjects, 0, myObjectCount );
 		HAPI_Host.HAPI_GetObjectTransforms( myAssetId, myObjectTransforms, 0, myObjectCount );
-				
+		
 		for ( int objectIndex = 0; objectIndex < myObjectCount; ++objectIndex )
 			CreateObject( objectIndex );
-	}	
-	
-	// Use this for initialization
-	public void Start() {		
-		
 	}
 	
-	// Update is called once per frame
-	public void Update() {
-		
-	}
-	
+	//
 	// Public Variables
-	 
+	//
+	
 	public string myAssetPath;
 	public int myAssetId;
 	public int myParameterCount;
@@ -160,6 +152,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		// get geometry
 		HAPI_RawGeometry geo = new HAPI_RawGeometry();
 		HAPI_Host.HAPI_GetGeometryInfo( myAssetId, objectId, out geo );
+		Debug.Log( "Obj #" + objectId + ": verts: " + geo.vertexCount + " prims: " + geo.primCount );		
 		
 		// TODO: add this limit in a more proper place
 		geo.primCount = Mathf.Min( geo.primCount, 65000 * 3 );
@@ -240,7 +233,6 @@ public class HAPI_ObjectControl : MonoBehaviour {
 				localCount = 0;
 			}
 			
-			//Debug.Log( "currentIndex: " + currentIndex + ", delta: " + delta );
 			T[] localArray = new T[ delta ];
 			getFunc( assetId, objectId, localArray, currentIndex, delta );
 			
