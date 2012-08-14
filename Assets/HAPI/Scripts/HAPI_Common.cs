@@ -62,7 +62,7 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 4 ) ]
 		public int[] intValue;
 		
-		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 4 ) ]
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] floatValue;
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 8192 ) ]		
@@ -71,7 +71,7 @@ namespace HAPI
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Transform {		
-		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] position;
 		
 		[ MarshalAs( UnmanagedType.R4) ]
@@ -83,7 +83,7 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.R4) ]
 		public float yaw;
 		
-		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] scale;
 	}
 	
@@ -116,16 +116,16 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 1024 ) ]		
 		public string bumpName;		
 		
-		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] position;
 		
-		[ MarshalAs( UnmanagedType.R4) ]
+		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float roll;
 		
-		[ MarshalAs( UnmanagedType.R4) ]
+		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float pitch;
 		
-		[ MarshalAs( UnmanagedType.R4) ]
+		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float yaw;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
@@ -148,13 +148,10 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] position;
 		
-		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float u;
+		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 2, ArraySubType = UnmanagedType.R4 ) ]
+		public float[] uv;
 		
-		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float v;
-		
-		public int INDEX;
+		public int index;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 16 ) ]
 		public char[] id;

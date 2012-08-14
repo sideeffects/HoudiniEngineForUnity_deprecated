@@ -136,6 +136,10 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		mainChild.AddComponent( "MeshRenderer" );
 		mainChild.AddComponent( "HAPI_ChildSelectionControl" );
 		
+		// set diffuse material
+		Material diffuse = new Material( Shader.Find( "Diffuse" ) );		
+		mainChild.GetComponent< MeshRenderer >().material = diffuse;
+		
 		// get or create mesh
 		MeshFilter mainChildMeshFilter = mainChild.GetComponent< MeshFilter >();
 		Mesh mainChildMesh = mainChildMeshFilter.sharedMesh;
@@ -182,10 +186,15 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		Vector3[] vertices = new Vector3[ geo.vertexCount ];
 		int[] triangles = new int[ geo.primCount * 3 ];
 		Vector2[] uvs = new Vector2[ geo.vertexCount ];
+		Vector3[] normals = new Vector3[ geo.vertexCount ];
 		
 		for ( int i = 0; i < geo.vertexCount; ++i ) {
 			for ( int j = 0; j < 3; ++j ) {
-				vertices[ i ][ j ] = rawVertices[ i ].position[ j ];	
+				vertices[ i ][ j ] = rawVertices[ i ].position[ j ];
+				normals[ i ][ j ] = rawVertices[ i ].normal[ j ];
+			}
+			for ( int j = 0; j < 2; ++j ) {
+				uvs[ i ][ j ] = rawVertices[ i ].uv[ j ];
 			}
 		}
 		for ( int i = 0; i < geo.primCount; ++i ) {
@@ -211,9 +220,10 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		mainChildMesh.vertices = vertices;
 		mainChildMesh.triangles = triangles;
 		mainChildMesh.uv = uvs;
+		mainChildMesh.normals = normals;
 		
 		mainChildMesh.RecalculateBounds();
-		mainChildMesh.RecalculateNormals();
+		//mainChildMesh.RecalculateNormals();
 	}
 	
 	private delegate int FillArrayInputFunc< T >( int assetId, int objectId, [Out] T[] items, int start, int end );
