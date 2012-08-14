@@ -76,6 +76,8 @@ public class HAPI_Inspector : Editor {
 			GUILayoutOption labelWidth = GUILayout.Width( myLabelWidth );
 			GUILayoutOption toggleWidth = GUILayout.Width( myToggleWidth );
 			
+			GUIContent nullContent = new GUIContent( "" );
+			
 			GUIStyle labelStyle = new GUIStyle( GUI.skin.label );
 			labelStyle.alignment = TextAnchor.MiddleRight;
 			
@@ -142,16 +144,25 @@ public class HAPI_Inspector : Editor {
 					for ( int p = 0; p < parms[ i ].size; ++p )
 						parms[ i ].intValue[ p ] = EditorGUILayout.IntField( parms[ i ].intValue[ p ] );
 				else if ( parms[ i ].type == (int) HAPI_ParameterType.HAPI_PARMTYPE_FLOAT )
-					for ( int p = 0; p < parms[ i ].size; ++p )
-						parms[ i ].floatValue[ p ] = EditorGUILayout.FloatField( parms[ i ].floatValue[ p ] );
+				{
+					if ( parms[ i ].size == 1 )
+					{						
+						parms[ i ].floatValue[ 0 ] = EditorGUILayout.FloatField( parms[ i ].floatValue[ 0 ] );
+						EditorGUILayout.LabelField( nullContent );
+						parms[ i ].floatValue[ 0 ] = GUI.HorizontalSlider( GUILayoutUtility.GetLastRect(), parms[ i ].floatValue[ 0 ], 0.0f, 10.0f );
+					}
+					else
+						for ( int p = 0; p < parms[ i ].size; ++p )
+							parms[ i ].floatValue[ p ] = EditorGUILayout.FloatField( parms[ i ].floatValue[ p ] );
+				}
 				else if ( parms[ i ].type == (int) HAPI_ParameterType.HAPI_PARMTYPE_STRING )
 					parms[ i ].stringValue = EditorGUILayout.TextField( parms[ i ].stringValue );
 				else if ( parms[ i ].type == (int) HAPI_ParameterType.HAPI_PARMTYPE_TOGGLE )
 				{
 					if ( !parms[ i ].joinNext )
 					{
-						EditorGUILayout.LabelField( new GUIContent( "" ), toggleWidth ); // add padding for the toggle column
-						EditorGUILayout.LabelField( new GUIContent( "" ), labelWidth ); // add empty space to align with fields
+						EditorGUILayout.LabelField( nullContent, toggleWidth ); // add padding for the toggle column
+						EditorGUILayout.LabelField( nullContent, labelWidth ); // add empty space to align with fields
 					}
 						
 					parms[ i ].intValue[ 0 ] = ( EditorGUILayout.Toggle( parms[ i ].intValue[ 0 ] != 0, toggleWidth ) ? 1 : 0 );
@@ -176,6 +187,10 @@ public class HAPI_Inspector : Editor {
 					
 					if ( parms[ i ].size > 3 )
 						parms[ i ].floatValue[ 3 ] = color.a;
+				}
+				else if ( parms[ i ].type == (int) HAPI_ParameterType.HAPI_PARMTYPE_SEPARATOR )
+				{
+					EditorGUILayout.Separator();
 				}
 				
 				// decide whether to join with the next parameter on the same line or not
