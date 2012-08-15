@@ -46,6 +46,30 @@ namespace HAPI
 		public int size;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasMin;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasMax;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasUIMin;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasUIMax;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float min;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float max;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float UIMin;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float UIMax;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool invisible;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
