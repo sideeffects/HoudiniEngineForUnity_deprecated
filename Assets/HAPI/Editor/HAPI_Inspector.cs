@@ -27,8 +27,7 @@ public class HAPI_Inspector : Editor
 	{		
 		myObjectControl = target as HAPI_ObjectControl;
 		
-		myUndoManager = new HOEditorUndoManager( myObjectControl, 
-												 "HAPI_ObjectControl" );
+		myUndoManager = new HOEditorUndoManager( myObjectControl, "HAPI_ObjectControl" );
 		
 		if ( GUI.changed )
 			myObjectControl.Build();
@@ -39,8 +38,7 @@ public class HAPI_Inspector : Editor
 		myUndoManager.CheckUndo();
 		
 		myObjectControl.myShowObjectControls = 
-			EditorGUILayout.Foldout( myObjectControl.myShowObjectControls, 
-									 new GUIContent( "Object Controls" ) );
+			EditorGUILayout.Foldout( myObjectControl.myShowObjectControls, new GUIContent( "Object Controls" ) );
 		
 		if ( myObjectControl.myShowObjectControls ) {
 			EditorGUILayout.LabelField( new GUIContent( "OTL Path:" ) );
@@ -69,13 +67,13 @@ public class HAPI_Inspector : Editor
 		
 		EditorGUILayout.Separator();
 		myObjectControl.myShowAssetControls = 
-			EditorGUILayout.Foldout( myObjectControl.myShowAssetControls, 
-									 new GUIContent( "Asset Controls" ) );
+			EditorGUILayout.Foldout( myObjectControl.myShowAssetControls, new GUIContent( "Asset Controls" ) );
 		
 		bool hasAssetChanged = false;
 		if ( myObjectControl.myShowAssetControls ) {
-			// the root has ID -1, depth 0
-			hasAssetChanged |= GenerateAssetControls( -1, 0 );
+			// the root has ID -1, currentIndex 0
+			int currentIndex = 0;
+			hasAssetChanged |= GenerateAssetControls( -1, ref currentIndex );
 		}
 					
 		if ( hasAssetChanged ) {
@@ -101,24 +99,21 @@ public class HAPI_Inspector : Editor
 		return new Rect( xMin, yMin, width + width2, height );
 	}
 	
-	private bool GenerateAssetControl( int id, int depth, ref bool joinLast, 
-									   ref bool noLabelToggleLast ) 
+	private bool GenerateAssetControl( int id, ref bool joinLast, ref bool noLabelToggleLast ) 
 	{
 		if ( myObjectControl.myParameters == null )
 			return false;
 		
 		bool changed = false;
 		HAPI_Parameter[] parms = myObjectControl.myParameters;
-		int parentId = myObjectControl.mySelectedAssetTabIds[ depth ];
 		HAPI_ParameterType parm_type = (HAPI_ParameterType) parms[ id ].type;
 				
 		GUIStyle labelStyle = new GUIStyle( GUI.skin.label );
 		labelStyle.alignment = TextAnchor.MiddleRight;
-		
+		GUIStyle sliderStyle = new GUIStyle( GUI.skin.horizontalSlider );
+		GUIStyle sliderThumbStyle = new GUIStyle( GUI.skin.horizontalSliderThumb );
+				
 		if ( parms[ id ].invisible )
-			return changed;
-			
-		if ( parms[ id ].parentId != parentId )
 			return changed;
 						
 		// decide whether to join with the previous parameter on the same 
@@ -136,8 +131,7 @@ public class HAPI_Inspector : Editor
 			{
 				float minWidth;
 				float maxWidth;
-				labelStyle.CalcMinMaxWidth( new GUIContent( parms[ id ].label ), 
-											out minWidth, out maxWidth );
+				labelStyle.CalcMinMaxWidth( new GUIContent( parms[ id ].label ), out minWidth, out maxWidth );
 				labelFinalWidth = GUILayout.Width( minWidth );
 			}
 			else if ( !joinLast )
@@ -145,8 +139,7 @@ public class HAPI_Inspector : Editor
 				// add padding for the toggle column
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
 			}
-			EditorGUILayout.SelectableLabel( parms[ id ].label, labelStyle, 
-											 labelFinalWidth, myLineHeightGUI );
+			EditorGUILayout.SelectableLabel( parms[ id ].label, labelStyle, labelFinalWidth, myLineHeightGUI );
 			noLabelToggleLast = false;
 		}
 		
@@ -156,22 +149,19 @@ public class HAPI_Inspector : Editor
 		{
 			for ( int p = 0; p < parms[ id ].size; ++p )
 			{
-				int new_value = 
-					EditorGUILayout.IntField( parms[ id ].intValue[ p ] );
+				int new_value = EditorGUILayout.IntField( parms[ id ].intValue[ p ] );
 				
 				if ( parms[ id ].size == 1 
 					&& !joinLast 
 					&& !parms[ id ].joinNext )
 				{
-					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin 
-														  : 0.0f );
-					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax 
-														  : 10.0f );
-					new_value = 
-						(int) GUI.HorizontalSlider( GetLastDoubleRect(), 
-											  		new_value, 
-											  		ui_min, 
-													ui_max );
+					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
+					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
+					Rect lastDoubleRect = GetLastDoubleRect();
+					sliderStyle.stretchWidth = false;
+					sliderStyle.fixedWidth = lastDoubleRect.width;
+					new_value = (int) GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
+															sliderStyle, sliderThumbStyle );
 				}
 				
 				if ( parms[ id ].hasMin && new_value < (int) parms[ id ].min )
@@ -192,20 +182,19 @@ public class HAPI_Inspector : Editor
 		{
 			for ( int p = 0; p < parms[ id ].size; ++p )
 			{				
-				float new_value = 
-					EditorGUILayout.FloatField( parms[ id ].floatValue[ p ] );
+				float new_value = EditorGUILayout.FloatField( parms[ id ].floatValue[ p ] );
 				
 				if ( parms[ id ].size == 1 
 					&& !joinLast 
 					&& !parms[ id ].joinNext )
 				{
-					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin 
-														  : 0.0f );
-					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax 
-														  : 10.0f );
-					new_value = GUI.HorizontalSlider( GetLastDoubleRect(), 
-											  		  new_value, 
-											  		  ui_min, ui_max );
+					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
+					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
+					Rect lastDoubleRect = GetLastDoubleRect();
+					sliderStyle.stretchWidth = false;
+					sliderStyle.fixedWidth = lastDoubleRect.width;
+					new_value = GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
+													  sliderStyle, sliderThumbStyle );
 				}
 				
 				if ( parms[ id ].hasMin && new_value < parms[ id ].min )
@@ -224,8 +213,7 @@ public class HAPI_Inspector : Editor
 		// String Parameter
 		else if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_STRING )
 		{
-			string new_value = 
-				EditorGUILayout.TextField( parms[ id ].stringValue );
+			string new_value = EditorGUILayout.TextField( parms[ id ].stringValue );
 		
 			if ( parms[ id ].stringValue != new_value )
 			{
@@ -244,14 +232,11 @@ public class HAPI_Inspector : Editor
 				// add empty space to align with fields
 				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
 			}
-				
-			int new_value = 
-				( EditorGUILayout.Toggle( parms[ id ].intValue[ 0 ] != 0, 
-										  myToggleWidthGUI ) 
-				  ? 1 : 0 );
+			
+			bool toggle_result = EditorGUILayout.Toggle( parms[ id ].intValue[ 0 ] != 0, myToggleWidthGUI );
+			int new_value = ( toggle_result ? 1 : 0 );
 			if ( !parms[ id ].labelNone )
-				EditorGUILayout.SelectableLabel( parms[ id ].label, 
-												 myLineHeightGUI );
+				EditorGUILayout.SelectableLabel( parms[ id ].label, myLineHeightGUI );
 			else
 				noLabelToggleLast = true;
 			
@@ -301,79 +286,110 @@ public class HAPI_Inspector : Editor
 		return changed;
 	}
 	
-	private bool GenerateAssetControls( int parentId, int depth ) {		
+	private bool GenerateAssetControls( int parentId, ref int currentIndex ) {		
 		if ( myObjectControl.myParameters == null )
-			return false;		
+			return false;
 		
 		bool changed = false;
 		HAPI_Parameter[] parms = myObjectControl.myParameters;
-		int childDepth = depth + 1;
-		
-		// make sure the list of tab selections is big enough
-		if ( myObjectControl.mySelectedAssetTabs.Count <= childDepth )
-			myObjectControl.mySelectedAssetTabs.Add( 0 );
-		if ( myObjectControl.mySelectedAssetTabIds.Count <= childDepth )
-			myObjectControl.mySelectedAssetTabIds.Add( parentId );
-		
+				
 		bool joinLast = false;
 		bool noLabelToggleLast = false;
-				
-		int tabCount = -1;
-		List< string > tabLabels = new List< string >();
-		List< int > tabIds = new List< int >();
-		for ( int i = 0; i < myObjectControl.myParameterCount; ++i )
+		
+		int folder_list_count = 0;
+		Stack< int > parent_id_stack = new Stack< int >();
+		Stack< int > parent_count_stack = new Stack< int >();
+		while ( currentIndex < myObjectControl.myParameterCount )
 		{
-			if ( parms[ i ].invisible ) 
-				continue;
-			if ( parms[ i ].parentId != parentId ) 
-				continue;
+			int current_parent_id = -1;
+			if ( parent_id_stack.Count != 0 )
+		    {
+				current_parent_id = parent_id_stack.Peek();
+				
+				if ( parent_count_stack.Count == 0 ) Debug.LogError( "" );
+				
+				if ( parms[ currentIndex ].parentId != current_parent_id )
+				{
+					currentIndex++;
+					continue;
+				}				
+				
+				int current_parent_count = parent_count_stack.Peek();
+				current_parent_count--;
+				if ( current_parent_count <= 0 )
+				{
+					parent_id_stack.Pop();
+					parent_count_stack.Pop();
+				}
+				else
+				{
+					parent_count_stack.Pop();
+					parent_count_stack.Push( current_parent_count );
+				}
+		    }
 			
-			if ( parms[ i ].type == (int) HAPI_ParameterType.HAPI_PARMTYPE_FOLDER )
-			{	
-				// increment first so that all elements afterwards get 
-				// this folder as their parent
-				tabCount++;
-				
-				tabLabels.Add( parms[ i ].label );
-				tabIds.Add( parms[ i ].id );
-				parms[ i ].intValue[ 0 ] = tabCount;
-			}
-			else if ( depth == 0 )
+			if ( parms[ currentIndex ].parentId != current_parent_id )
 			{
-				changed |= GenerateAssetControl( i, depth, ref joinLast, 
-												 ref noLabelToggleLast );
-			} // if
-		} // for
-		
-		myObjectControl.mySelectedAssetTabs[ childDepth ] = 
-			GUILayout.Toolbar( myObjectControl.mySelectedAssetTabs[ childDepth ], 
-							   tabLabels.ToArray() );
-		
-		int childParentId = 
-			tabIds[ myObjectControl.mySelectedAssetTabs[ childDepth ] ];
-		myObjectControl.mySelectedAssetTabIds[ childDepth ] = childParentId;
-		
-		joinLast = false;
-		noLabelToggleLast = false;
-		for ( int i = 0; i < myObjectControl.myParameterCount; ++i )
-		{
-			if ( parms[ i ].type == (int) HAPI_ParameterType.HAPI_PARMTYPE_FOLDER
-				&& parms[ i ].parentId == childParentId )
-				changed |= GenerateAssetControls( childParentId, childDepth );
+				currentIndex++;
+				continue;
+			}
+			
+			HAPI_ParameterType parm_type = (HAPI_ParameterType) parms[ currentIndex ].type;
+					
+			if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_FOLDERLIST )
+			{
+				folder_list_count++;
+				int folder_count = parms[ currentIndex ].size;
+				int first_folder_index = currentIndex + 1;
+				int last_folder_index = currentIndex + folder_count;
+				
+				if ( myObjectControl.myFolderListSelections.Count <= folder_list_count )
+				{
+					myObjectControl.myFolderListSelections.Add( 0 );
+					myObjectControl.myFolderListSelectionIds.Add( -1 );
+				}
+				
+				List< int > tab_ids = new List< int >();
+				List< string > tab_labels = new List< string >();
+				List< int > tab_sizes = new List< int >();
+				for ( currentIndex = first_folder_index; currentIndex <= last_folder_index; ++currentIndex )
+				{
+					if ( parms[ currentIndex ].type != (int) HAPI_ParameterType.HAPI_PARMTYPE_FOLDER )
+					{
+						Debug.LogError( "We should be iterating through folders only here!"
+							+ "\nCurrent Index: " + currentIndex + ", folder_count: " + folder_count );
+					}
+					
+					tab_ids.Add( parms[ currentIndex ].id );
+					tab_labels.Add( parms[ currentIndex ].label );
+					tab_sizes.Add( parms[ currentIndex ].size );
+				}
+				currentIndex--;
+				
+				int selected_folder = myObjectControl.myFolderListSelections[ folder_list_count ];
+				selected_folder = GUILayout.Toolbar( selected_folder, tab_labels.ToArray() );
+				myObjectControl.myFolderListSelections[ folder_list_count ] = selected_folder;
+				
+				parent_id_stack.Push( tab_ids[ selected_folder ] );
+				parent_count_stack.Push( tab_sizes[ selected_folder ] );
+			}
 			else
-				changed |= GenerateAssetControl( i, childDepth, 
-												 ref joinLast, 
-												 ref noLabelToggleLast );
-		} // for
-		
+			{	
+				if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_FOLDER )
+					Debug.LogError( "All folders should have been parsed in the folder list if clause!" );
+				
+				changed |= GenerateAssetControl( currentIndex, ref joinLast, ref noLabelToggleLast );
+			}
+			
+			currentIndex++;
+		}
+				
 		return changed;
 	}
 	
 	public static string PromptForAssetPath( string location ) 
 	{
-		string path = EditorUtility.OpenFilePanel( "Open Houdini OTL",
-												   location,
-												   "otl" );
+		string path = EditorUtility.OpenFilePanel( "Open Houdini OTL", location, "otl" );
 		return path;
 	}
 	

@@ -28,10 +28,10 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		myShowAssetControls = true;
 		myShowObjectControls = true;
 				
-		mySelectedAssetTabs = new List< int >();
-		mySelectedAssetTabs.Add( 0 );
-		mySelectedAssetTabIds = new List< int >();
-		mySelectedAssetTabIds.Add( -1 );
+		myFolderListSelections = new List< int >();
+		myFolderListSelections.Add( 0 );
+		myFolderListSelectionIds = new List< int >();
+		myFolderListSelectionIds.Add( -1 );
 	}
 	
 	~HAPI_ObjectControl() {
@@ -112,8 +112,8 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	public bool myShowObjectControls;
 	public bool myShowAssetControls;
 	
-	public List< int > mySelectedAssetTabs;
-	public List< int > mySelectedAssetTabIds;
+	public List< int > myFolderListSelections;
+	public List< int > myFolderListSelectionIds;
 	
 	//
 	// Private Methods
