@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace HAPI 
 {
-	public enum HAPI_ParameterType
+	public enum HAPI_ParmType
 	{
 		HAPI_PARMTYPE_INT = 0,
 		HAPI_PARMTYPE_FLOAT = 1,
@@ -31,14 +31,14 @@ namespace HAPI
 		public string assetInstancePath;
 		
 		public int objectCount;
-		public int parameterCount;
+		public int parmCount;
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_Parameter 
+	public struct HAPI_ParmInfo
 	{
 		public int id;
 		public int parentId;
@@ -160,14 +160,14 @@ namespace HAPI
 		public int vertexCount;
 		public int primCount;
 		public int instanceCount;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 16 ) ]
-		public string id;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_RawVertex 
 	{
+		public int index;
+		public int offset;
+		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] normal;
 		
@@ -176,39 +176,27 @@ namespace HAPI
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 2, ArraySubType = UnmanagedType.R4 ) ]
 		public float[] uv;
-		
-		public int index;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 16 ) ]
-		public char[] id;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 16 ) ]
-		public char[] owner;		
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_RawPrimitive 
 	{	
+		public int index;
+		public int offset;
+		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 16 ) ]
 		public int[] vertices;
 		
-		public int vertexCount;		
-		public int index;
+		public int vertexCount;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
-		public float[] normal;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 16 ) ]
-		public string id;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, SizeConst = 16 ) ]
-		public string owner;	
+		public float[] normal;	
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_RawInstance 
 	{
-		public int id;
+		public int index;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, SizeConst = 3 ) ]
 		public float[] position;

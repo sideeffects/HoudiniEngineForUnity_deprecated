@@ -7,8 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using HAPI;
 
-using System.Text;
-
 public class HAPI_ObjectControl : MonoBehaviour {	
 	
 	//
@@ -23,7 +21,7 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		myAssetId = -1;
 		
 		myObjectCount = 0;
-		myParameterCount = 0;
+		myParmCount = 0;
 		
 		myShowAssetControls = true;
 		myShowObjectControls = true;
@@ -64,18 +62,18 @@ public class HAPI_ObjectControl : MonoBehaviour {
 			// for convinience
 			myAssetId = myAssetInfo.id;
 			myObjectCount = myAssetInfo.objectCount;
-			myParameterCount = myAssetInfo.parameterCount;
+			myParmCount = myAssetInfo.parmCount;
 						
 			// get parameters
-			myParameters = new HAPI_Parameter[ myParameterCount ];
-			HAPI_Host.HAPI_GetParameters( myAssetId, myParameters, 0, myParameterCount );
+			myParms = new HAPI_ParmInfo[ myParmCount ];
+			HAPI_Host.HAPI_GetParameters( myAssetId, myParms, 0, myParmCount );
 			
 			myAssetPathChanged = false;
 		}
 		else
 		{
 			// set parameters
-			HAPI_Host.HAPI_SetParameters( myAssetId, myParameters, 0, myParameterCount );	
+			HAPI_Host.HAPI_SetParameters( myAssetId, myParms, 0, myParmCount );	
 		}
 			
 		// clean up
@@ -99,21 +97,21 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	// Public Variables
 	//
 	
-	public string myAssetPath;
-	public int myAssetId;
-	public int myParameterCount;
-	public int myObjectCount;
+	public string 				myAssetPath;
+	public int 					myAssetId;
+	public int 					myParmCount;
+	public int 					myObjectCount;
 	
-	public HAPI_AssetInfo myAssetInfo;
-	public HAPI_ObjectInfo[] myObjects;
-	public HAPI_Transform[] myObjectTransforms;
-	public HAPI_Parameter[] myParameters;
+	public HAPI_AssetInfo 		myAssetInfo;
+	public HAPI_ObjectInfo[] 	myObjects;
+	public HAPI_Transform[] 	myObjectTransforms;
+	public HAPI_ParmInfo[] 		myParms;
 	
-	public bool myShowObjectControls;
-	public bool myShowAssetControls;
+	public bool 				myShowObjectControls;
+	public bool 				myShowAssetControls;
 	
-	public List< int > myFolderListSelections;
-	public List< int > myFolderListSelectionIds;
+	public List< int > 			myFolderListSelections;
+	public List< int > 			myFolderListSelectionIds;
 	
 	//
 	// Private Methods
@@ -223,13 +221,12 @@ public class HAPI_ObjectControl : MonoBehaviour {
 		}
 		*/
 		// load into vertices and face into mesh
-		mainChildMesh.vertices = vertices;
-		mainChildMesh.triangles = triangles;
-		mainChildMesh.uv = uvs;
-		mainChildMesh.normals = normals;
+		mainChildMesh.vertices 		= vertices;
+		mainChildMesh.triangles 	= triangles;
+		mainChildMesh.uv 			= uvs;
+		mainChildMesh.normals 		= normals;
 		
 		mainChildMesh.RecalculateBounds();
-		//mainChildMesh.RecalculateNormals();
 	}
 	
 	private delegate int FillArrayInputFunc< T >( int assetId, int objectId, [Out] T[] items, int start, int end );

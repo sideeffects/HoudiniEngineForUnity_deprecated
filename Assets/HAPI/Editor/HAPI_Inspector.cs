@@ -40,22 +40,25 @@ public class HAPI_Inspector : Editor
 		myObjectControl.myShowObjectControls = 
 			EditorGUILayout.Foldout( myObjectControl.myShowObjectControls, new GUIContent( "Object Controls" ) );
 		
-		if ( myObjectControl.myShowObjectControls ) {
+		if ( myObjectControl.myShowObjectControls ) 
+		{
 			EditorGUILayout.LabelField( new GUIContent( "OTL Path:" ) );
-			EditorGUILayout.BeginHorizontal(); {
+			EditorGUILayout.BeginHorizontal(); 
+			{
 				string oldAssetPath = myObjectControl.GetAssetPath();
 				string newAssetPath = "";
 				newAssetPath = EditorGUILayout.TextField( oldAssetPath );
 		        
-		        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) {
+		        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+				{
 					string promptResultPath = PromptForAssetPath( oldAssetPath );
-					if ( promptResultPath.Length > 0 ) {
-						newAssetPath = promptResultPath;	
-					}
+					if ( promptResultPath.Length > 0 )
+						newAssetPath = promptResultPath;
 		        }
 				
 				myObjectControl.SetAssetPath( newAssetPath );
-			} EditorGUILayout.EndHorizontal();
+			} 
+			EditorGUILayout.EndHorizontal();
 			
 			if ( GUILayout.Button( "Rebuild" ) ) {
 #if DEBUG
@@ -70,15 +73,11 @@ public class HAPI_Inspector : Editor
 			EditorGUILayout.Foldout( myObjectControl.myShowAssetControls, new GUIContent( "Asset Controls" ) );
 		
 		bool hasAssetChanged = false;
-		if ( myObjectControl.myShowAssetControls ) {
-			// the root has ID -1, currentIndex 0
-			int currentIndex = 0;
-			hasAssetChanged |= GenerateAssetControls( -1, ref currentIndex );
-		}
+		if ( myObjectControl.myShowAssetControls )
+			hasAssetChanged |= GenerateAssetControls();
 					
-		if ( hasAssetChanged ) {
+		if ( hasAssetChanged )
 			myObjectControl.Build();
-		}
 		
 		myUndoManager.CheckDirty();
 	}
@@ -101,12 +100,12 @@ public class HAPI_Inspector : Editor
 	
 	private bool GenerateAssetControl( int id, ref bool joinLast, ref bool noLabelToggleLast ) 
 	{
-		if ( myObjectControl.myParameters == null )
+		if ( myObjectControl.myParms == null )
 			return false;
 		
 		bool changed = false;
-		HAPI_Parameter[] parms = myObjectControl.myParameters;
-		HAPI_ParameterType parm_type = (HAPI_ParameterType) parms[ id ].type;
+		HAPI_ParmInfo[] parms = myObjectControl.myParms;
+		HAPI_ParmType parm_type = (HAPI_ParmType) parms[ id ].type;
 				
 		GUIStyle labelStyle = new GUIStyle( GUI.skin.label );
 		labelStyle.alignment = TextAnchor.MiddleRight;
@@ -122,8 +121,8 @@ public class HAPI_Inspector : Editor
 			EditorGUILayout.BeginHorizontal();
 		
 		// add label first if we're not a toggle
-		if ( parm_type != HAPI_ParameterType.HAPI_PARMTYPE_TOGGLE
-			&& parm_type != HAPI_ParameterType.HAPI_PARMTYPE_FOLDER
+		if ( parm_type != HAPI_ParmType.HAPI_PARMTYPE_TOGGLE
+			&& parm_type != HAPI_ParmType.HAPI_PARMTYPE_FOLDER
 			&& !parms[ id ].labelNone )
 		{
 			GUILayoutOption labelFinalWidth = myLabelWidthGUI;
@@ -145,7 +144,7 @@ public class HAPI_Inspector : Editor
 		
 		//////////////////////////////////////////////////////////////////////
 		// Integer Parameter
-		if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_INT )
+		if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_INT )
 		{
 			for ( int p = 0; p < parms[ id ].size; ++p )
 			{
@@ -178,7 +177,7 @@ public class HAPI_Inspector : Editor
 		}		
 		//////////////////////////////////////////////////////////////////////
 		// Float Parameter
-		else if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_FLOAT )
+		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
 			for ( int p = 0; p < parms[ id ].size; ++p )
 			{				
@@ -211,7 +210,7 @@ public class HAPI_Inspector : Editor
 		}		
 		//////////////////////////////////////////////////////////////////////
 		// String Parameter
-		else if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_STRING )
+		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_STRING )
 		{
 			string new_value = EditorGUILayout.TextField( parms[ id ].stringValue );
 		
@@ -223,7 +222,7 @@ public class HAPI_Inspector : Editor
 		}
 		//////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
-		else if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_TOGGLE )
+		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
 			if ( !parms[ id ].joinNext )
 			{
@@ -248,7 +247,7 @@ public class HAPI_Inspector : Editor
 		}		
 		//////////////////////////////////////////////////////////////////////
 		// Color Parameter
-		else if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_COLOUR )
+		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_COLOUR )
 		{
 			Color color = new Color( parms[ id ].floatValue[ 0 ], 
 									 parms[ id ].floatValue[ 1 ], 
@@ -272,7 +271,7 @@ public class HAPI_Inspector : Editor
 		}		
 		//////////////////////////////////////////////////////////////////////
 		// Separator
-		else if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_SEPARATOR )
+		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_SEPARATOR )
 		{
 			EditorGUILayout.Separator();
 		}
@@ -286,12 +285,14 @@ public class HAPI_Inspector : Editor
 		return changed;
 	}
 	
-	private bool GenerateAssetControls( int parentId, ref int currentIndex ) {		
-		if ( myObjectControl.myParameters == null )
+	private bool GenerateAssetControls() 
+	{
+		if ( myObjectControl.myParms == null )
 			return false;
 		
 		bool changed = false;
-		HAPI_Parameter[] parms = myObjectControl.myParameters;
+		int currentIndex = 0;
+		HAPI_ParmInfo[] parms = myObjectControl.myParms;
 				
 		bool joinLast = false;
 		bool noLabelToggleLast = false;
@@ -299,7 +300,7 @@ public class HAPI_Inspector : Editor
 		int folder_list_count = 0;
 		Stack< int > parent_id_stack = new Stack< int >();
 		Stack< int > parent_count_stack = new Stack< int >();
-		while ( currentIndex < myObjectControl.myParameterCount )
+		while ( currentIndex < myObjectControl.myParmCount )
 		{
 			int current_parent_id = -1;
 			if ( parent_id_stack.Count != 0 )
@@ -334,9 +335,9 @@ public class HAPI_Inspector : Editor
 				continue;
 			}
 			
-			HAPI_ParameterType parm_type = (HAPI_ParameterType) parms[ currentIndex ].type;
+			HAPI_ParmType parm_type = (HAPI_ParmType) parms[ currentIndex ].type;
 					
-			if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_FOLDERLIST )
+			if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
 			{
 				folder_list_count++;
 				int folder_count = parms[ currentIndex ].size;
@@ -354,7 +355,7 @@ public class HAPI_Inspector : Editor
 				List< int > tab_sizes = new List< int >();
 				for ( currentIndex = first_folder_index; currentIndex <= last_folder_index; ++currentIndex )
 				{
-					if ( parms[ currentIndex ].type != (int) HAPI_ParameterType.HAPI_PARMTYPE_FOLDER )
+					if ( parms[ currentIndex ].type != (int) HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					{
 						Debug.LogError( "We should be iterating through folders only here!"
 							+ "\nCurrent Index: " + currentIndex + ", folder_count: " + folder_count );
@@ -375,7 +376,7 @@ public class HAPI_Inspector : Editor
 			}
 			else
 			{	
-				if ( parm_type == HAPI_ParameterType.HAPI_PARMTYPE_FOLDER )
+				if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					Debug.LogError( "All folders should have been parsed in the folder list if clause!" );
 				
 				changed |= GenerateAssetControl( currentIndex, ref joinLast, ref noLabelToggleLast );

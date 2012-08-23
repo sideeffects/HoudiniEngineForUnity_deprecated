@@ -57,10 +57,10 @@ namespace HAPI {
 		}
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_GetParameters( int assetId, [Out] HAPI_Parameter[] parameters, int start, int end );
+		public static extern int HAPI_GetParameters( int assetId, [Out] HAPI_ParmInfo[] parameters, int start, int end );
 				
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern int HAPI_SetParameters( int assetId, [Out] HAPI_Parameter[] parameters, int start, int end );
+		public static extern int HAPI_SetParameters( int assetId, [Out] HAPI_ParmInfo[] parameters, int start, int end );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_GetObjects( int assetId, [Out] HAPI_ObjectInfo[] objects, int start, int end );
