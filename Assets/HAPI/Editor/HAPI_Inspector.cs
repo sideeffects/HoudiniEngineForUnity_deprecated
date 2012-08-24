@@ -1,3 +1,18 @@
+/*
+ * PROPRIETARY INFORMATION.  This software is proprietary to
+ * Side Effects Software Inc., and is not to be reproduced,
+ * transmitted, or disclosed in any way without written permission.
+ *
+ * Produced by:
+ *      Side Effects Software Inc
+ *		123 Front Street West, Suite 1401
+ *		Toronto, Ontario
+ *		Canada   M5J 2M2
+ *		416-504-9876
+ *
+ * COMMENTS:
+ */
+
 #define DEBUG // since Unity doesn't seem to define it itself
 
 using UnityEngine;
@@ -30,7 +45,7 @@ public class HAPI_Inspector : Editor
 		myUndoManager = new HOEditorUndoManager( myObjectControl, "HAPI_ObjectControl" );
 		
 		if ( GUI.changed )
-			myObjectControl.Build();
+			myObjectControl.build();
 	}
 	
 	public override void OnInspectorGUI() 
@@ -45,18 +60,18 @@ public class HAPI_Inspector : Editor
 			EditorGUILayout.LabelField( new GUIContent( "OTL Path:" ) );
 			EditorGUILayout.BeginHorizontal(); 
 			{
-				string oldAssetPath = myObjectControl.GetAssetPath();
+				string oldAssetPath = myObjectControl.getAssetPath();
 				string newAssetPath = "";
 				newAssetPath = EditorGUILayout.TextField( oldAssetPath );
 		        
 		        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
 				{
-					string promptResultPath = PromptForAssetPath( oldAssetPath );
+					string promptResultPath = promptForAssetPath( oldAssetPath );
 					if ( promptResultPath.Length > 0 )
 						newAssetPath = promptResultPath;
 		        }
 				
-				myObjectControl.SetAssetPath( newAssetPath );
+				myObjectControl.setAssetPath( newAssetPath );
 			} 
 			EditorGUILayout.EndHorizontal();
 			
@@ -64,7 +79,7 @@ public class HAPI_Inspector : Editor
 #if DEBUG
 				myObjectControl.myAssetPathChanged = true;
 #endif
-				myObjectControl.Build();
+				myObjectControl.build();
 			}
 		} // if
 		
@@ -74,15 +89,15 @@ public class HAPI_Inspector : Editor
 		
 		bool hasAssetChanged = false;
 		if ( myObjectControl.myShowAssetControls )
-			hasAssetChanged |= GenerateAssetControls();
+			hasAssetChanged |= generateAssetControls();
 					
 		if ( hasAssetChanged )
-			myObjectControl.Build();
+			myObjectControl.build();
 		
 		myUndoManager.CheckDirty();
 	}
 	
-	private Rect GetLastDoubleRect()
+	private Rect getLastDoubleRect()
 	{		
 		// draw first empty label field 
 		EditorGUILayout.LabelField( myNullContent );
@@ -98,7 +113,7 @@ public class HAPI_Inspector : Editor
 		return new Rect( xMin, yMin, width + width2, height );
 	}
 	
-	private bool GenerateAssetControl( int id, ref bool joinLast, ref bool noLabelToggleLast ) 
+	private bool generateAssetControl( int id, ref bool joinLast, ref bool noLabelToggleLast ) 
 	{
 		if ( myObjectControl.myParms == null )
 			return false;
@@ -115,12 +130,12 @@ public class HAPI_Inspector : Editor
 		if ( parms[ id ].invisible )
 			return changed;
 						
-		// decide whether to join with the previous parameter on the same 
-		// line or not
+		// Decide whether to join with the previous parameter on the same 
+		// line or not.
 		if ( !joinLast )
 			EditorGUILayout.BeginHorizontal();
 		
-		// add label first if we're not a toggle
+		// Add label first if we're not a toggle.
 		if ( parm_type != HAPI_ParmType.HAPI_PARMTYPE_TOGGLE
 			&& parm_type != HAPI_ParmType.HAPI_PARMTYPE_FOLDER
 			&& !parms[ id ].labelNone )
@@ -156,7 +171,7 @@ public class HAPI_Inspector : Editor
 				{
 					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
 					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
-					Rect lastDoubleRect = GetLastDoubleRect();
+					Rect lastDoubleRect = getLastDoubleRect();
 					sliderStyle.stretchWidth = false;
 					sliderStyle.fixedWidth = lastDoubleRect.width;
 					new_value = (int) GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
@@ -189,7 +204,7 @@ public class HAPI_Inspector : Editor
 				{
 					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
 					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
-					Rect lastDoubleRect = GetLastDoubleRect();
+					Rect lastDoubleRect = getLastDoubleRect();
 					sliderStyle.stretchWidth = false;
 					sliderStyle.fixedWidth = lastDoubleRect.width;
 					new_value = GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
@@ -276,8 +291,8 @@ public class HAPI_Inspector : Editor
 			EditorGUILayout.Separator();
 		}
 		
-		// decide whether to join with the next parameter on the same line or not
-		// but also save our status for the next parameter
+		// Decide whether to join with the next parameter on the same line or not
+		// but also save our status for the next parameter.
 		joinLast = parms[ id ].joinNext;
 		if ( !parms[ id ].joinNext )
 			EditorGUILayout.EndHorizontal();
@@ -285,7 +300,7 @@ public class HAPI_Inspector : Editor
 		return changed;
 	}
 	
-	private bool GenerateAssetControls() 
+	private bool generateAssetControls() 
 	{
 		if ( myObjectControl.myParms == null )
 			return false;
@@ -379,7 +394,7 @@ public class HAPI_Inspector : Editor
 				if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					Debug.LogError( "All folders should have been parsed in the folder list if clause!" );
 				
-				changed |= GenerateAssetControl( currentIndex, ref joinLast, ref noLabelToggleLast );
+				changed |= generateAssetControl( currentIndex, ref joinLast, ref noLabelToggleLast );
 			}
 			
 			currentIndex++;
@@ -388,7 +403,7 @@ public class HAPI_Inspector : Editor
 		return changed;
 	}
 	
-	public static string PromptForAssetPath( string location ) 
+	public static string promptForAssetPath( string location ) 
 	{
 		string path = EditorUtility.OpenFilePanel( "Open Houdini OTL", location, "otl" );
 		return path;
