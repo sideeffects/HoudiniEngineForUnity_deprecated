@@ -11,6 +11,9 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		Contains the main script attached to a Unity game object that corresponds to a Houdini asset instance on the 
+ *		Houdini side. 
+ * 
  */
 
 #define DEBUG // since Unity doesn't seem to define it itself
@@ -26,8 +29,8 @@ using HAPI;
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
 /// 	Houdini side.
 /// </summary>
-public class HAPI_ObjectControl : MonoBehaviour {	
-	
+public class HAPI_ObjectControl : MonoBehaviour 
+{	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
@@ -77,7 +80,8 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	/// 	Whether the path was changed or not. If the new path is the same as the old path, no change will
 	/// 	be made and <c>false</c> will be returned.
 	/// </returns>
-	public bool setAssetPath( string path ) {
+	public bool setAssetPath( string path ) 
+	{
 		if ( path != myAssetPath ) 
 		{
 			myAssetPath = path;
@@ -92,7 +96,8 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	/// <returns>
 	/// 	The asset .otl path.
 	/// </returns>
-	public string getAssetPath() {
+	public string getAssetPath() 
+	{
 		return myAssetPath;	
 	}
 	
@@ -101,8 +106,10 @@ public class HAPI_ObjectControl : MonoBehaviour {
 	/// 	all parameter information. Either way, push parameter values back to Houdini and rebuild
 	///		all object geometries.
 	/// </summary>
-	public void build() {
-		if ( myAssetPathChanged ) {
+	public void build() 
+	{
+		if ( myAssetPathChanged ) 
+		{
 			HAPI_Host.unloadOTL( myAssetId );
 			
 			myAssetInfo 	= HAPI_Host.loadOTL( myAssetPath );

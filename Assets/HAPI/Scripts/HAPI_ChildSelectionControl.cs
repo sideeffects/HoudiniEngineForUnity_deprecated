@@ -11,15 +11,23 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		Contains HAPI_ChildSelectionControl which controls selection behaviour of asset game object children.
+ * 
  */
 
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-public class HAPI_ChildSelectionControl : MonoBehaviour {
-
-	public void SelectParent()
+/// <summary>
+/// 	Controls selection behaviour of asset game object children.
+/// </summary>
+public class HAPI_ChildSelectionControl : MonoBehaviour 
+{	
+	/// <summary>
+	/// 	Selects the parent of the current game object.
+	/// </summary>
+	public void selectParent()
 	{
 		GameObject[] selection 	= new GameObject[ 1 ];
 		selection[ 0 ] 			= transform.parent.gameObject;

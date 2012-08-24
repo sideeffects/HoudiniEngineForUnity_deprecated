@@ -11,6 +11,8 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		Contains main HAPI API constants and structures.
+ * 
  */
 
 using UnityEngine;
@@ -19,6 +21,9 @@ using System.Runtime.InteropServices;
 
 namespace HAPI 
 {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Defines
+	
 	public struct HAPI_Constants
 	{		
 		public const int HAPI_POSITION_VECTOR_SIZE			= 3;
@@ -43,6 +48,19 @@ namespace HAPI
 
 		public const int HAPI_PRIM_MAX_VERTEX_COUNT			= 16;
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Enums
+	
+	public enum HAPI_StatusCode 
+	{
+		HAPI_STATUS_SUCCESS								= 0,
+		HAPI_STATUS_FAILURE								= 1,
+		HAPI_STATUS_ALREADY_INITIALIZED					= 2,
+		HAPI_STATUS_CANT_LOADFILE						= 3,    
+		HAPI_STATUS_CANT_OBTAIN_READLOCK_ON_GEOMETRY	= 4,
+		HAPI_STATUS_ASSET_ID_INVALID					= 5
+	};
 	
 	public enum HAPI_ParmType
 	{
@@ -74,6 +92,9 @@ namespace HAPI
 		HAPI_PRMTYPE_NONVALUE_START	= HAPI_PARMTYPE_FOLDERLIST,
 		HAPI_PRMTYPE_NONVALUE_END	= HAPI_PARMTYPE_SEPARATOR
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Main API Structs
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_AssetInfo 

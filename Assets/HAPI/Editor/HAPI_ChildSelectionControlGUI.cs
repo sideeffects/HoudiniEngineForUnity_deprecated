@@ -11,18 +11,26 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		Contains HAPI_ChildSelectionControlGUI, the GUI companion to HAPI_ChildSelectionControl.
+ * 
  */
 
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
+/// <summary>
+/// 	GUI companion to <see cref="HAPI_ChildSelectionControl"/> which actually triggers the selections.
+/// </summary>
 [ CustomEditor( typeof( HAPI_ChildSelectionControl ) ) ]
 public class HAPI_ChildSelectionControlGUI : Editor 
 {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
+	
 	public void OnSceneGUI()
 	{
 		HAPI_ChildSelectionControl control = target as HAPI_ChildSelectionControl;		
-		control.SelectParent();
+		control.selectParent();
 	}
 }

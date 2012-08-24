@@ -11,6 +11,8 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		GUI companion to HAPI_Curve.
+ * 
  */
 
 using UnityEngine;
@@ -19,8 +21,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// 	GUI companion to <see cref="HAPI_Curve"/>.
+/// </summary>
 [ CustomEditor( typeof( HAPI_Curve ) ) ]
-public class HAPI_CurveGUI : Editor {
+public class HAPI_CurveGUI : Editor 
+{	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
 	
 	public void OnEnable() 
 	{		
@@ -117,7 +125,7 @@ public class HAPI_CurveGUI : Editor {
 		myUndoManager.CheckUndo();
 		
 		if ( GUILayout.Button( "Add Point" ) )
-			myCurve.AddPoint( Vector3.zero );
+			myCurve.addPoint( Vector3.zero );
 		
 		EditorGUILayout.LabelField( new GUIContent( "Segments:" ) );
 		EditorGUILayout.BeginHorizontal(); 
@@ -141,7 +149,8 @@ public class HAPI_CurveGUI : Editor {
 		myUndoManager.CheckDirty();	
 	}
 	
-	// Private Methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private
 	
 	private Vector3 calculateBezierPoint( float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) 
 	{
@@ -158,9 +167,7 @@ public class HAPI_CurveGUI : Editor {
 		
 		return p;
 	}
-	
-	// Private Members
-	
+		
 	private HOEditorUndoManager 	myUndoManager;
 	private HAPI_Curve 				myCurve;
 	

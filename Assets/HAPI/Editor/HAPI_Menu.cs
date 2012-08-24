@@ -11,6 +11,8 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		Contains HAPI_Menu which is added to the main Unity menu bar.
+ * 
  */
 
 using UnityEngine;
@@ -18,39 +20,58 @@ using UnityEditor;
 using System.Collections;
 using HAPI;
 
-public class HAPI_Menu : MonoBehaviour {
+/// <summary>
+/// 	Main HAPI menu which adds components to the main Unity menu bar.
+/// </summary>
+public class HAPI_Menu : MonoBehaviour 
+{	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
 	
-	public const string myNewHoudiniAssetLabel = "Houdini Asset";
-	public const string myNewHoudiniPrefabLabel = "Houdini Asset";
+	public const string myMenuName				= "HAPI";
+	public const string myMenuLoadAssetLabel	= "Load Houdini Asset";
+	public const string myDefaultAssetLabel 	= "Houdini Asset";
+	public const string myDefaultPrefabLabel 	= "Houdini Asset";
 	
-	[ MenuItem( "HAPI/Load Houdini Asset" ) ]
-	static void createHAPIObject() {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private
+	
+	/// <summary>
+	/// 	Prompts the user for a path to a .otl file and creates a HAPI game object from it.
+	/// </summary>
+	[ MenuItem( myMenuName + "/" + myMenuLoadAssetLabel ) ]
+	static private void createHAPIObject() 
+	{
+		// Prompt for the absolute path to the .otl file to use.
+		string asset_file_path = HAPI_Inspector.promptForAssetPath( "" );
+		if ( asset_file_path.Length == 0 )
+			return; // User pressed Cancel in the dialog so just return.
+				
 		// Create game object.
-		GameObject game_object = new GameObject( myNewHoudiniAssetLabel );
+		GameObject game_object = new GameObject( myDefaultAssetLabel );
 		
 		// Add HAPI Object Control script component.
 		game_object.AddComponent( "HAPI_ObjectControl" );		
 		HAPI_ObjectControl object_control = game_object.GetComponent< HAPI_ObjectControl >();
-				
-		// Get asset path now.
-		string asset_file_path = HAPI_Inspector.promptForAssetPath( "" );
+		
+		// Set that asset path.
 		object_control.setAssetPath( asset_file_path );
 		
 		// Save as a prefab.
-		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/" + myNewHoudiniPrefabLabel + ".prefab" );
+		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/" + myDefaultPrefabLabel + ".prefab" );
 		//PrefabUtility.ReplacePrefab( game_object, prefab, ReplacePrefabOptions.ConnectToPrefab );
 		
 		// Do first build.
 		object_control.build();
 		
 		// Set new object name from asset name.
-		string asset_name = object_control.myAssetInfo.assetName;
-		game_object.name = asset_name;
+		string asset_name 		= object_control.myAssetInfo.assetName;
+		game_object.name 		= asset_name;
 		
 		// Select the new houdini asset.
-		GameObject[] selection = new GameObject[ 1 ];
-		selection[ 0 ] = game_object;
-		Selection.objects = selection;
+		GameObject[] selection 	= new GameObject[ 1 ];
+		selection[ 0 ] 			= game_object;
+		Selection.objects 		= selection;
 	}
 	
 }

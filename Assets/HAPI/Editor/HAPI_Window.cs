@@ -11,27 +11,39 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		Only a test class. Not used currently.
+ * 
  */
 
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
 
-public class HAPI_Window : EditorWindow {
+/// <summary>
+/// 	Only a test class. Not used currently.
+/// </summary>
+public class HAPI_Window : EditorWindow 
+{
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
 	
-
-	// Add menu item named "My Window" to the Window menu
+	/// <summary>
+	/// 	Add menu item named "My Window" to the Window menu.
+	/// </summary>
 	[ MenuItem( "Window/HAPI" ) ]
-	public static void ShowWindow() {
+	public static void ShowWindow() 
+	{
 		//Show existing window instance. If one doesn't exist, make one.
 		EditorWindow.GetWindow( typeof( HAPI_Window ) );
 	}
 	
-	public void CreateHAPIObject() {
+	public void CreateHAPIObject() 
+	{
 			
 	}
 
-	public void OnGUI() {
+	public void OnGUI() 
+	{
 		
 		GUILayout.Label( "HAPI Controls", EditorStyles.boldLabel );
 		

@@ -11,19 +11,25 @@
  *		416-504-9876
  *
  * COMMENTS:
+ * 		Contains curve object prototype.
+ * 
  */
 
 using UnityEngine;
 using System.Collections;
 
-public class HAPI_Curve : MonoBehaviour {
+public class HAPI_Curve : MonoBehaviour 
+{
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
 	
-	public HAPI_Curve() {
+	public HAPI_Curve() 
+	{
 		mySegmentCount 	= 30;
 		myPointCount 	= 0;
 	}
 	
-	public void AddPoint( Vector3 position ) 
+	public void addPoint( Vector3 position ) 
 	{
 		myPointCount++;
 		
@@ -65,15 +71,15 @@ public class HAPI_Curve : MonoBehaviour {
 		}
 	}
 	
-	public int getPointCount() {
+	public int getPointCount() 
+	{
 		return myPointCount;	
 	}
-		
-	// Public Members
 	
 	public int 			mySegmentCount;
 	
-	// Private Members
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private
 	
 	private Vector3[] 	myPoints;
 	private int 		myPointCount;
