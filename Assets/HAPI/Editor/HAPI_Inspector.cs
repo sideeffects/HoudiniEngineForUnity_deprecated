@@ -114,14 +114,14 @@ public class HAPI_Inspector : Editor
 	private Rect getLastDoubleRect()
 	{		
 		// Draw first empty label field. 
-		EditorGUILayout.LabelField( myNullContent );
+		EditorGUILayout.LabelField( myNullContent, myDummyLabelMinWidthGUI );
 		float xMin = GUILayoutUtility.GetLastRect().xMin;
 		float yMin = GUILayoutUtility.GetLastRect().yMin;
 		float width = GUILayoutUtility.GetLastRect().width;
 		float height = GUILayoutUtility.GetLastRect().height;
 		
 		// Draw second empty label field.
-		EditorGUILayout.LabelField( myNullContent );
+		EditorGUILayout.LabelField( myNullContent, myDummyLabelMinWidthGUI );
 		float width2 = GUILayoutUtility.GetLastRect().width;
 		
 		// Create the double rectangle from the two above.
@@ -506,6 +506,7 @@ public class HAPI_Inspector : Editor
 	private const float 		myLineHeight 				= 16;
 	private const float 		myLabelWidth 				= 120;
 	private const float 		myToggleWidth 				= 12;
+	private const float			myDummyLabelMinWidth		= 60;
 	
 	private const float 		myDefaultUIMin 				= 0.0f;
 	private const float 		myDefaultUIMax 				= 10.0f;
@@ -513,6 +514,7 @@ public class HAPI_Inspector : Editor
 	private GUILayoutOption 	myLineHeightGUI 			= GUILayout.Height( myLineHeight );
 	private GUILayoutOption 	myLabelWidthGUI 			= GUILayout.Width( myLabelWidth );
 	private GUILayoutOption 	myToggleWidthGUI 			= GUILayout.Width( myToggleWidth );
+	private GUILayoutOption		myDummyLabelMinWidthGUI		= GUILayout.MinWidth( myDummyLabelMinWidth );
 	
 	private GUIContent 			myNullContent 				= new GUIContent( "" );
 	
