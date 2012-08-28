@@ -121,14 +121,14 @@ public class HAPI_ObjectControl : MonoBehaviour
 						
 			// Get all parameters.
 			myParms 		= new HAPI_ParmInfo[ myParmCount ];
-			HAPI_Host.HAPI_GetParameters( myAssetId, myParms, 0, myParmCount );
+			HAPI_Host.getParameters( myAssetId, myParms, 0, myParmCount );
 			
 			myAssetPathChanged = false;
 		}
 		else
 		{
 			// Set all parameter values.
-			HAPI_Host.HAPI_SetParameters( myAssetId, myParms, 0, myParmCount );	
+			HAPI_Host.setParameters( myAssetId, myParms, 0, myParmCount );	
 		}
 			
 		// Clean up.
@@ -142,8 +142,8 @@ public class HAPI_ObjectControl : MonoBehaviour
 		myObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
 		myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
 		
-		HAPI_Host.HAPI_GetObjects( 				myAssetId, myObjects, 0, myObjectCount );
-		HAPI_Host.HAPI_GetObjectTransforms( 	myAssetId, myObjectTransforms, 0, myObjectCount );
+		HAPI_Host.getObjects( 				myAssetId, myObjects, 0, myObjectCount );
+		HAPI_Host.getObjectTransforms( 	myAssetId, myObjectTransforms, 0, myObjectCount );
 		
 		for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			createObject( object_index );
@@ -231,7 +231,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 				
 		// Get geometry.
 		HAPI_GeometryInfo geo = new HAPI_GeometryInfo();
-		HAPI_Host.HAPI_GetGeometryInfo( myAssetId, object_id, out geo );
+		HAPI_Host.getGeometryInfo( myAssetId, object_id, out geo );
 		Debug.Log( "Obj #" + object_id + ": verts: " + geo.vertexCount + " prims: " + geo.primCount );		
 		
 		// Make sure our primitive and vertex numbers are supported by Unity.
@@ -255,8 +255,8 @@ public class HAPI_ObjectControl : MonoBehaviour
 		HAPI_RawPrimitive[] raw_primitives 	= new HAPI_RawPrimitive[ geo.primCount ];
 		//HAPI_RawInstance[] raw_instances 	= new HAPI_RawInstance[ geo.instanceCount ];
 		
-		fillArray( myAssetId, object_id, raw_vertices, HAPI_Host.HAPI_GetVertexArray, geo.vertexCount );
-		fillArray( myAssetId, object_id, raw_primitives, HAPI_Host.HAPI_GetPrimitveArray, geo.primCount );
+		fillArray( myAssetId, object_id, raw_vertices, HAPI_Host.getVertexArray, geo.vertexCount );
+		fillArray( myAssetId, object_id, raw_primitives, HAPI_Host.getPrimitveArray, geo.primCount );
 		//fillArray( myAssetId, object_id, raw_instances, HAPI_Host.GetInstanceArray, geo.instanceCount );
 		
 		// Create Unity-specific data objects.
@@ -307,7 +307,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 	/// <summary>
 	/// 	Function pointer parameter type for <see cref="fillArray"/>. 
 	/// </summary>
-	private delegate int fillArrayInputFunc< T >( int asset_id, int object_id, [Out] T[] items, int start, int end );
+	private delegate void fillArrayInputFunc< T >( int asset_id, int object_id, [Out] T[] items, int start, int end );
 	
 	/// <summary>
 	/// 	Fills an array of structs incrementally, never transferring too long of a data stream at once.
