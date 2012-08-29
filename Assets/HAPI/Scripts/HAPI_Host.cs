@@ -25,6 +25,21 @@ using System.Text;
 
 namespace HAPI 
 {	
+	public class HAPI_Error : System.Exception
+	{
+			
+	}
+	
+	public class HAPI_ErrorInitFailed : HAPI_Error
+	{
+			
+	}
+	
+	public class HAPI_ErrorFileLoadFailed : HAPI_Error
+	{
+		
+	}
+	
 	/// <summary>
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
 	/// 	Houdini runtime.
@@ -56,7 +71,7 @@ namespace HAPI
 		/// </returns>
 		static public HAPI_AssetInfo loadOTL( string path ) 
 		{
-			int status_code = 0;			
+			HAPI_StatusCode status_code = 0;			
 			
 			if ( myHoudiniSceneExists ) 
 			{
@@ -66,10 +81,16 @@ namespace HAPI
 			{
 				Debug.Log( "Loading OTL: new hip created" );
 								
-				status_code = HAPI_Initialize();
+				status_code = (HAPI_StatusCode) HAPI_Initialize();
 				
-				processStatusCode( (HAPI_StatusCode) status_code );
+				if ( status_code != HAPI_StatusCode.HAPI_STATUS_ALREADY_INITIALIZED )
+				{				
+					processStatusCode( status_code );
 					
+					if ( hasCallFailed( status_code ) )
+						throw new HAPI_ErrorInitFailed();
+				}
+				
 				myHoudiniSceneExists = true;
 			}
 			
@@ -78,9 +99,12 @@ namespace HAPI
 			asset_info.minVerticesPerPrimitive 	= 3;
 			asset_info.maxVerticesPerPrimitive 	= 3;
 			
-			status_code = HAPI_LoadOTLFile( ref asset_info );
+			status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( ref asset_info );
 			
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( status_code );
+			
+			if ( hasCallFailed( status_code ) )
+				throw new HAPI_ErrorFileLoadFailed();
 			
 			Debug.Log( "Asset Loaded - Path: " + asset_info.assetInstancePath + ", ID: " + asset_info.id );			
 			return asset_info;

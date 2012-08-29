@@ -62,7 +62,12 @@ public class HAPI_Menu : MonoBehaviour
 		//PrefabUtility.ReplacePrefab( game_object, prefab, ReplacePrefabOptions.ConnectToPrefab );
 		
 		// Do first build.
-		object_control.build();
+		bool build_result = object_control.build();
+		if ( build_result == false ) // Something is not right. Clean up.
+		{
+			DestroyImmediate( game_object );
+			return;
+		}
 		
 		// Set new object name from asset name.
 		string asset_name 		= object_control.myAssetInfo.assetName;

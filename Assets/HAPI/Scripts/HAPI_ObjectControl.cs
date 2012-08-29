@@ -106,13 +106,21 @@ public class HAPI_ObjectControl : MonoBehaviour
 	/// 	all parameter information. Either way, push parameter values back to Houdini and rebuild
 	///		all object geometries.
 	/// </summary>
-	public void build() 
+	public bool build() 
 	{
 		if ( myAssetPathChanged ) 
 		{
 			HAPI_Host.unloadOTL( myAssetId );
 			
-			myAssetInfo 	= HAPI_Host.loadOTL( myAssetPath );
+			try
+			{
+				myAssetInfo = HAPI_Host.loadOTL( myAssetPath );
+			}
+			catch ( HAPI_Error )
+			{
+				// Nothing to build since the load failed.
+				return false; // false for failed :)
+			}
 						
 			// For convinience we copy some asset info properties locally (since they are constant anyway).
 			myAssetId 		= myAssetInfo.id;
@@ -134,10 +142,6 @@ public class HAPI_ObjectControl : MonoBehaviour
 		// Clean up.
 		destroyChildren();
 		
-		// If asset file path was invalid, don't try to get more info.
-		if ( myAssetId < 0 )
-			return;
-		
 		// Create local object info caches (transforms need to be stored in a parallel array).
 		myObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
 		myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
@@ -147,6 +151,8 @@ public class HAPI_ObjectControl : MonoBehaviour
 		
 		for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			createObject( object_index );
+		
+		return true;
 	}
 		
 	public string 				myAssetPath;
