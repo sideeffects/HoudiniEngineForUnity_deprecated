@@ -121,6 +121,7 @@ namespace HAPI
 		
 		public int objectCount;
 		public int parmCount;
+		public int parmChoiceCount;
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
@@ -134,6 +135,7 @@ namespace HAPI
 		
 		public int type;
 		public int size;
+		public int choiceCount;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasMin;
@@ -188,6 +190,20 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_STRING_SIZE ) ]		
 		public string stringValue;	
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_ParmChoiceInfo
+	{
+		public int parentParmId;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_NAME_SIZE ) ]		
+		public string label;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_STRING_SIZE ) ]		
+		public string value;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]

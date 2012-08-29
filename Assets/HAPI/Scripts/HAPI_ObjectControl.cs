@@ -47,6 +47,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 		
 		myObjectCount 				= 0;
 		myParmCount 				= 0;
+		myParmChoiceCount			= 0;
 		
 		myShowAssetControls 		= true;
 		myShowObjectControls 		= true;
@@ -123,13 +124,17 @@ public class HAPI_ObjectControl : MonoBehaviour
 			}
 						
 			// For convinience we copy some asset info properties locally (since they are constant anyway).
-			myAssetId 		= myAssetInfo.id;
-			myObjectCount 	= myAssetInfo.objectCount;
-			myParmCount 	= myAssetInfo.parmCount;
+			myAssetId 			= myAssetInfo.id;
+			myObjectCount 		= myAssetInfo.objectCount;
+			myParmCount 		= myAssetInfo.parmCount;
+			myParmChoiceCount	= myAssetInfo.parmChoiceCount;
 						
 			// Get all parameters.
-			myParms 		= new HAPI_ParmInfo[ myParmCount ];
+			myParms = new HAPI_ParmInfo[ myParmCount ];
 			HAPI_Host.getParameters( myAssetId, myParms, 0, myParmCount );
+			
+			myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
+			HAPI_Host.getParmChoiceLists( myAssetId, myParmChoiceLists, myParmChoiceCount );
 			
 			myAssetPathChanged = false;
 		}
@@ -155,30 +160,32 @@ public class HAPI_ObjectControl : MonoBehaviour
 		return true;
 	}
 		
-	public string 				myAssetPath;
-	public int 					myAssetId;
-	public int 					myParmCount;
-	public int 					myObjectCount;
+	public string 					myAssetPath;
+	public int 						myAssetId;
+	public int 						myObjectCount;
+	public int 						myParmCount;
+	public int						myParmChoiceCount;
+		
+	public HAPI_AssetInfo 			myAssetInfo;
+	public HAPI_ObjectInfo[] 		myObjects;
+	public HAPI_Transform[] 		myObjectTransforms;
+	public HAPI_ParmInfo[] 			myParms;
+	public HAPI_ParmChoiceInfo[]	myParmChoiceLists;
 	
-	public HAPI_AssetInfo 		myAssetInfo;
-	public HAPI_ObjectInfo[] 	myObjects;
-	public HAPI_Transform[] 	myObjectTransforms;
-	public HAPI_ParmInfo[] 		myParms;
-	
-	public bool 				myShowObjectControls;
-	public bool 				myShowAssetControls;
+	public bool 					myShowObjectControls;
+	public bool 					myShowAssetControls;
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
 	/// 	A 1:1 mapping with myFolderListSelectionIds.
 	/// </summary>
-	public List< int > 			myFolderListSelections;
+	public List< int > 				myFolderListSelections;
 	
 	/// <summary>
 	/// 	Parameter ids of the currently selected folders in the Inspector. 
 	/// 	A 1:1 mapping with myFolderListSelections.
 	/// </summary>
-	public List< int > 			myFolderListSelectionIds;
+	public List< int > 				myFolderListSelectionIds;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods

@@ -165,6 +165,28 @@ namespace HAPI
 		}
 		
 		/// <summary>
+		/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information 
+		/// 	from the asset instance node.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="parm_infos">
+		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of 
+		/// 	<see cref="HAPI_AssetInfo.parmChoiceCount"/>.
+		/// </param>
+		/// <param name="count">
+		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmChoiceCount"/>.
+		/// </param>
+		public static void getParmChoiceLists( 	int asset_id, 
+												[Out] HAPI_ParmChoiceInfo[] parm_choices, 
+												int count )
+		{
+			int status_code = HAPI_GetParmChoiceLists( asset_id, parm_choices, count );
+			processStatusCode( (HAPI_StatusCode) status_code );	
+		}
+		
+		/// <summary>
 		/// 	Set a subset of parameter values using the given array of <see cref="HAPI_ParmInfo"/>.
 		/// </summary>
 		/// <param name="asset_id">
@@ -403,6 +425,28 @@ namespace HAPI
 		private static extern int HAPI_GetParameters( 		int asset_id, 
 															[Out] HAPI_ParmInfo[] parm_infos, 
 															int start, int end );
+		
+		/// <summary>
+		/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information 
+		/// 	from the asset instance node.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
+		/// </param>
+		/// <param name="parm_infos">
+		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of 
+		/// 	<see cref="HAPI_AssetInfo.parmChoiceCount"/>.
+		/// </param>
+		/// <param name="count">
+		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmChoiceCount"/>.
+		/// </param>
+		/// <returns>
+		/// 	A HAPI_StatusCode.
+		/// </returns>
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetParmChoiceLists( 	int asset_id, 
+															[Out] HAPI_ParmChoiceInfo[] parm_choices, 
+															int count );
 		
 		/// <summary>
 		/// 	Set a subset of parameter values using the given array of <see cref="HAPI_ParmInfo"/>.
