@@ -165,13 +165,34 @@ namespace HAPI
 		}
 		
 		/// <summary>
+		/// 	Fill an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="parm_extra_values">
+		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
+		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		/// <param name="count">
+		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		public static void getParmExtraValues( 	int asset_id, 
+												[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+												int count )
+		{
+			int status_code = HAPI_GetParmExtraValues( asset_id, parm_extra_values, count );
+			processStatusCode( (HAPI_StatusCode) status_code );	
+		}
+		
+		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information 
 		/// 	from the asset instance node.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
-		/// <param name="parm_infos">
+		/// <param name="parm_choices">
 		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of 
 		/// 	<see cref="HAPI_AssetInfo.parmChoiceCount"/>.
 		/// </param>
@@ -210,6 +231,27 @@ namespace HAPI
 		{
 			int status_code = HAPI_SetParameters( asset_id, parm_infos, start, end );
 			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		/// <summary>
+		/// 	Set an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="parm_extra_values">
+		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
+		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		/// <param name="count">
+		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		public static void setParmExtraValues( 	int asset_id, 
+												[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+												int count )
+		{
+			int status_code = HAPI_SetParmExtraValues( asset_id, parm_extra_values, count );
+			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
 		/// <summary>
@@ -427,13 +469,34 @@ namespace HAPI
 															int start, int end );
 		
 		/// <summary>
+		/// 	Fill an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="parm_extra_values">
+		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
+		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		/// <param name="count">
+		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		/// <returns>
+		/// 	A HAPI_StatusCode.
+		/// </returns>
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetParmExtraValues( 	int asset_id, 
+															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+															int count );
+		
+		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information 
 		/// 	from the asset instance node.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
 		/// </param>
-		/// <param name="parm_infos">
+		/// <param name="parm_choices">
 		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of 
 		/// 	<see cref="HAPI_AssetInfo.parmChoiceCount"/>.
 		/// </param>
@@ -473,6 +536,27 @@ namespace HAPI
 		private static extern int HAPI_SetParameters( 		int asset_id, 
 															[Out] HAPI_ParmInfo[] parm_infos, 
 															int start, int end );
+		
+		/// <summary>
+		/// 	Set an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="parm_extra_values">
+		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
+		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		/// <param name="count">
+		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// </param>
+		/// <returns>
+		/// 	A HAPI_StatusCode.
+		/// </returns>
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetParmExtraValues( 	int asset_id, 
+															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+															int count );
 		
 		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object 

@@ -38,6 +38,7 @@ namespace HAPI
 		public const int HAPI_PARM_MAX_VECTOR_SIZE			= 4;
 		public const int HAPI_PARM_MAX_NAME_SIZE			= 256;
 		public const int HAPI_PARM_MAX_STRING_SIZE			= 8192;
+		public const int HAPI_PARM_MAX_STRING_VEC_SIZE		= 1;
 
 		public const int HAPI_OBJ_MAX_NAME_SIZE				= 512;
 		public const int HAPI_OBJ_MAX_PATH_SIZE				= 1024;
@@ -86,17 +87,17 @@ namespace HAPI
 		
 		HAPI_PRMTYPE_MAX, // Total number of supported parameter types.
 		
-		HAPI_PARMTYPE_INT_START		= HAPI_PARMTYPE_INT,
-		HAPI_PARMTYPE_INT_END		= HAPI_PARMTYPE_TOGGLE,
+		HAPI_PARMTYPE_INT_START			= HAPI_PARMTYPE_INT,
+		HAPI_PARMTYPE_INT_END			= HAPI_PARMTYPE_TOGGLE,
 		
-		HAPI_PARMTYPE_FLOAT_START	= HAPI_PARMTYPE_FLOAT,
-		HAPI_PARMTYPE_FLOAT_END		= HAPI_PARMTYPE_COLOUR,
+		HAPI_PARMTYPE_FLOAT_START		= HAPI_PARMTYPE_FLOAT,
+		HAPI_PARMTYPE_FLOAT_END			= HAPI_PARMTYPE_COLOUR,
 		
-		HAPI_PRMTYPE_STR_START	    = HAPI_PARMTYPE_STRING,
-		HAPI_PRMTYPE_STR_END	    = HAPI_PARMTYPE_STRING,
+		HAPI_PARMTYPE_STR_START	    	= HAPI_PARMTYPE_STRING,
+		HAPI_PARMTYPE_STR_END	    	= HAPI_PARMTYPE_STRING,
 		
-		HAPI_PRMTYPE_NONVALUE_START	= HAPI_PARMTYPE_FOLDERLIST,
-		HAPI_PRMTYPE_NONVALUE_END	= HAPI_PARMTYPE_SEPARATOR
+		HAPI_PARMTYPE_NONVALUE_START	= HAPI_PARMTYPE_FOLDERLIST,
+		HAPI_PARMTYPE_NONVALUE_END		= HAPI_PARMTYPE_SEPARATOR
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,10 +122,27 @@ namespace HAPI
 		
 		public int objectCount;
 		public int parmCount;
+		public int parmExtraValueCount;
 		public int parmChoiceCount;
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_ParmSingleValue
+	{
+		public int parentParmId;
+		public int vectorIndex;
+		
+		public int intValue;
+		
+		[ MarshalAs( UnmanagedType.R4 ) ]
+		public float floatValue;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_STRING_SIZE ) ]		
+		public string stringValue;	
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -216,13 +234,13 @@ namespace HAPI
 					 ArraySubType = UnmanagedType.R4 ) ]
 		public float[] position;
 		
-		[ MarshalAs( UnmanagedType.R4) ]
+		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float roll;
 		
-		[ MarshalAs( UnmanagedType.R4) ]
+		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float pitch;
 		
-		[ MarshalAs( UnmanagedType.R4) ]
+		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float yaw;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, 

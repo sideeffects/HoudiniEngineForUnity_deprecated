@@ -124,15 +124,21 @@ public class HAPI_ObjectControl : MonoBehaviour
 			}
 						
 			// For convinience we copy some asset info properties locally (since they are constant anyway).
-			myAssetId 			= myAssetInfo.id;
-			myObjectCount 		= myAssetInfo.objectCount;
-			myParmCount 		= myAssetInfo.parmCount;
-			myParmChoiceCount	= myAssetInfo.parmChoiceCount;
+			myAssetId 				= myAssetInfo.id;
+			myObjectCount 			= myAssetInfo.objectCount;
+			myParmCount 			= myAssetInfo.parmCount;
+			myParmExtraValueCount 	= myAssetInfo.parmExtraValueCount;
+			myParmChoiceCount		= myAssetInfo.parmChoiceCount;
 						
 			// Get all parameters.
 			myParms = new HAPI_ParmInfo[ myParmCount ];
 			HAPI_Host.getParameters( myAssetId, myParms, 0, myParmCount );
 			
+			// Get any parameter extra values.
+			myParmExtraValues = new HAPI_ParmSingleValue[ myParmExtraValueCount ];
+			HAPI_Host.getParmExtraValues( myAssetId, myParmExtraValues, myParmExtraValueCount );
+			
+			// Get parameter choice lists.
 			myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
 			HAPI_Host.getParmChoiceLists( myAssetId, myParmChoiceLists, myParmChoiceCount );
 			
@@ -141,7 +147,10 @@ public class HAPI_ObjectControl : MonoBehaviour
 		else
 		{
 			// Set all parameter values.
-			HAPI_Host.setParameters( myAssetId, myParms, 0, myParmCount );	
+			HAPI_Host.setParameters( myAssetId, myParms, 0, myParmCount );
+			
+			// Set extra parameter values.
+			HAPI_Host.setParmExtraValues( myAssetId, myParmExtraValues, myParmExtraValueCount );
 		}
 			
 		// Clean up.
@@ -164,12 +173,14 @@ public class HAPI_ObjectControl : MonoBehaviour
 	public int 						myAssetId;
 	public int 						myObjectCount;
 	public int 						myParmCount;
+	public int						myParmExtraValueCount;
 	public int						myParmChoiceCount;
 		
 	public HAPI_AssetInfo 			myAssetInfo;
 	public HAPI_ObjectInfo[] 		myObjects;
 	public HAPI_Transform[] 		myObjectTransforms;
 	public HAPI_ParmInfo[] 			myParms;
+	public HAPI_ParmSingleValue[]	myParmExtraValues;
 	public HAPI_ParmChoiceInfo[]	myParmChoiceLists;
 	
 	public bool 					myShowObjectControls;

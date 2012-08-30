@@ -136,6 +136,9 @@ public class HAPI_Inspector : Editor
 	/// <param name="id">
 	/// 	Corresponding parameter id as given by <see cref="HAPI_Host.GetParameters"/>.
 	/// </param>
+	/// <param name="current_extra_value_index">
+	/// 	Persistant iterator in the extra values array.
+	/// </param>
 	/// <param name="current_choice_list_index">
 	/// 	Persistant iterator in the choice lists array.
 	/// </param>
@@ -150,27 +153,36 @@ public class HAPI_Inspector : Editor
 	/// <returns>
 	/// 	<c>true</c> if the parameter value corresponding to this control has changed, <c>false</c> otherwise.
 	/// </returns>
-	private bool generateAssetControl( int id, ref int current_choice_list_index, 
-									   ref bool join_last, ref bool no_label_toggle_last ) 
+	private bool generateAssetControl( 	int id, 
+										ref int current_extra_value_index,
+										ref int current_choice_list_index, 
+									   	ref bool join_last, ref bool no_label_toggle_last ) 
 	{
 		if ( myObjectControl.myParms == null )
 			return false;
 		
-		bool changed = false;
-		HAPI_ParmInfo[] parms = myObjectControl.myParms;
-		HAPI_ParmType parm_type = (HAPI_ParmType) parms[ id ].type;
+		bool changed 				= false;
+		HAPI_ParmInfo[] parms 		= myObjectControl.myParms;
+		HAPI_ParmType parm_type 	= (HAPI_ParmType) parms[ id ].type;
+		int parm_size				= parms[ id ].size;
+		bool is_string 				= ( parm_type >= HAPI_ParmType.HAPI_PARMTYPE_STR_START 
+						   				&& parm_type <= HAPI_ParmType.HAPI_PARMTYPE_STR_END );
+		
+		int max_vector_size 		= ( is_string ? HAPI_Constants.HAPI_PARM_MAX_STRING_VEC_SIZE 
+									  			  : HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE );
+		int contained_size 			= Mathf.Min( parm_size, max_vector_size );
 				
-		GUIStyle labelStyle = new GUIStyle( GUI.skin.label );
-		labelStyle.alignment = TextAnchor.MiddleRight;
-		GUIStyle sliderStyle = new GUIStyle( GUI.skin.horizontalSlider );
-		GUIStyle sliderThumbStyle = new GUIStyle( GUI.skin.horizontalSliderThumb );
+		GUIStyle labelStyle 		= new GUIStyle( GUI.skin.label );
+		labelStyle.alignment 		= TextAnchor.MiddleRight;
+		GUIStyle sliderStyle 		= new GUIStyle( GUI.skin.horizontalSlider );
+		GUIStyle sliderThumbStyle 	= new GUIStyle( GUI.skin.horizontalSliderThumb );
 				
 		if ( parms[ id ].invisible )
 			return changed;
 						
 		// Decide whether to join with the previous parameter on the same 
 		// line or not.
-		if ( !join_last )
+		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
 		// Add label first if we're not a toggle.
@@ -229,14 +241,41 @@ public class HAPI_Inspector : Editor
 				}
 			}
 			else
-			{			
-				for ( int p = 0; p < parms[ id ].size; ++p )
+			{
+				bool has_jumped_next_line = false;
+				int per_line = 0;
+				for ( int p = 0; p < parm_size; ++p, ++per_line )
 				{
+					if ( per_line >= myMaxFieldCountPerLine )
+					{
+						EditorGUILayout.EndHorizontal();
+						EditorGUILayout.BeginHorizontal();
+						EditorGUILayout.LabelField( "", myToggleWidthGUI );
+						EditorGUILayout.LabelField( "", myLabelWidthGUI );
+						has_jumped_next_line = true;
+						per_line = 0;
+					}
+					
+					// Get old value.
+					int old_value = 0;
+					if ( p < contained_size )
+						old_value = parms[ id ].intValue[ p ];
+					else
+					{
+						if ( myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId != id )
+							Debug.LogError( "Extra choice parent id not matching current parm id!" );
+						old_value = myObjectControl.myParmExtraValues[ current_extra_value_index ].intValue;
+					}
+					
 					// Draw field.
-					int new_value = EditorGUILayout.IntField( parms[ id ].intValue[ p ] );
+					int new_value = old_value;
+					if ( !has_jumped_next_line )
+						new_value = EditorGUILayout.IntField( old_value );
+					else
+						new_value = EditorGUILayout.IntField( old_value );
 					
 					// Draw the slider.
-					if ( parms[ id ].size == 1 
+					if ( parm_size == 1 
 						&& !join_last 
 						&& !parms[ id ].joinNext )
 					{
@@ -256,11 +295,18 @@ public class HAPI_Inspector : Editor
 						new_value = (int) parms[ id ].max;
 					
 					// Determine if value changed and update parameter value.
-					if ( parms[ id ].intValue[ p ] != new_value )
+					if ( new_value != old_value )
 					{
-						parms[ id ].intValue[ p ] = new_value;
+						if ( p < contained_size )
+							parms[ id ].intValue[ p ] = new_value;
+						else
+							myObjectControl.myParmExtraValues[ current_extra_value_index ].intValue = new_value;
 						changed |= true;
 					}
+					
+					// Increment extra value index.
+					if ( p >= contained_size )
+						current_extra_value_index++;
 				}
 			}
 		}		
@@ -268,13 +314,13 @@ public class HAPI_Inspector : Editor
 		// Float Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
-			for ( int p = 0; p < parms[ id ].size; ++p )
+			for ( int p = 0; p < contained_size; ++p )
 			{	
 				// Draw field.
 				float new_value = EditorGUILayout.FloatField( parms[ id ].floatValue[ p ] );
 				
 				// Draw the slider.
-				if ( parms[ id ].size == 1 
+				if ( parm_size == 1 
 					&& !join_last 
 					&& !parms[ id ].joinNext )
 				{
@@ -348,7 +394,7 @@ public class HAPI_Inspector : Editor
 			Color color = new Color( parms[ id ].floatValue[ 0 ], 
 									 parms[ id ].floatValue[ 1 ], 
 									 parms[ id ].floatValue[ 2 ] );
-			if ( parms[ id ].size > 3 )
+			if ( contained_size > 3 )
 				color.a = parms[ id ].floatValue[ 3 ];
 			
 			// Draw control.
@@ -361,7 +407,7 @@ public class HAPI_Inspector : Editor
 				parms[ id ].floatValue[ 1 ] = new_color.g;
 				parms[ id ].floatValue[ 2 ] = new_color.b;
 				
-				if ( parms[ id ].size > 3 )
+				if ( contained_size > 3 )
 					parms[ id ].floatValue[ 3 ] = new_color.a;
 			
 				changed |= true;
@@ -376,8 +422,8 @@ public class HAPI_Inspector : Editor
 		
 		// Decide whether to join with the next parameter on the same line or not
 		// but also save our status for the next parameter.
-		join_last = parms[ id ].joinNext;
-		if ( !parms[ id ].joinNext )
+		join_last = ( parms[ id ].joinNext && parm_size <= 1 );
+		if ( !parms[ id ].joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
 		
 		return changed;
@@ -397,6 +443,7 @@ public class HAPI_Inspector : Editor
 		
 		bool changed 					= false;
 		int current_index 				= 0;
+		int current_extra_value_index	= 0;
 		int current_choice_list_index 	= 0;
 		HAPI_ParmInfo[] parms 			= myObjectControl.myParms;
 				
@@ -515,7 +562,9 @@ public class HAPI_Inspector : Editor
 				if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					Debug.LogError( "All folders should have been parsed in the folder list if clause!" );
 				
-				changed |= generateAssetControl( current_index, ref current_choice_list_index, 
+				changed |= generateAssetControl( current_index,
+												 ref current_extra_value_index,
+												 ref current_choice_list_index, 
 												 ref join_last, ref no_label_toggle_last );
 			}
 			
@@ -540,11 +589,13 @@ public class HAPI_Inspector : Editor
 		return path;
 	}
 	
+	private const float			myMaxFieldCountPerLine		= 4;
+	
 	private const float 		myFileChooserButtonWidth 	= 30;
 	private const float 		myLineHeight 				= 16;
 	private const float 		myLabelWidth 				= 120;
 	private const float 		myToggleWidth 				= 12;
-	private const float			myDummyLabelMinWidth		= 60;
+	private const float			myDummyLabelMinWidth		= 20;
 	
 	private const float 		myDefaultUIMin 				= 0.0f;
 	private const float 		myDefaultUIMax 				= 10.0f;
