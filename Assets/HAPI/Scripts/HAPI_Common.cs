@@ -122,6 +122,7 @@ namespace HAPI
 		
 		public int objectCount;
 		public int parmCount;
+		public int handleCount;
 		public int parmExtraValueCount;
 		public int parmChoiceCount;
 		
