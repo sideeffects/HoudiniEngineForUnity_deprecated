@@ -149,12 +149,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least <see cref="HAPI_AssetInfo.parmCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First parameter index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <see cref="HAPI_AssetInfo.parmCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/>
 		/// </param>
 		public static void getParameters( 	int asset_id, 
 											[Out] HAPI_ParmInfo[] parm_infos, 
@@ -218,12 +218,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/> containing the new parameter values.
 		/// </param>
 		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least <see cref="HAPI_AssetInfo.parmCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First parameter index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <see cref="HAPI_AssetInfo.parmCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/> 
 		/// </param>
 		public static void setParameters( 		int asset_id, 
 												[Out] HAPI_ParmInfo[] parm_infos, 
@@ -266,12 +266,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First object index to begin with. Must be at least <see cref="HAPI_AssetInfo.objectCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First object index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last object index to use. Must be at least <see cref="HAPI_AssetInfo.objectCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and
+		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
 		/// </param>
 		public static void getObjects( 			int asset_id, 
 												[Out] HAPI_ObjectInfo[] object_infos, 
@@ -294,12 +294,12 @@ namespace HAPI
     	/// 	set to the object id as given by <see cref="HAPI_Host.HAPI_GetObjects"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First object index to begin with. Must be at least <see cref="HAPI_AssetInfo.objectCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First object index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last object index to use. Must be at least <see cref="HAPI_AssetInfo.objectCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
 		/// </param>
 		public static void getObjectTransforms( 		int asset_id, 
 													[Out] HAPI_Transform[] transforms, 
@@ -344,12 +344,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First vertex index to begin with. Must be at least <see cref="HAPI_GeometryInfo.vertexCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First vertex index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last vertex index to use. Must be at least <see cref="HAPI_GeometryInfo.vertexCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last vertex index to use. Must be at least <paramref name="start"/> + 1 and
+		/// 	at most <see cref="HAPI_GeometryInfo.vertexCount"/>
 		/// </param>
 		static public void getVertexArray( 		int asset_id, int object_id, 
 												[Out] HAPI_RawVertex[] vertices, 
@@ -374,12 +374,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First primitive index to begin with. Must be at least <see cref="HAPI_GeometryInfo.primCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First primitive index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last primitive index to use. Must be at least <see cref="HAPI_GeometryInfo.primCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last primitive index to use. Must be at least <paramref name="start"/> and 
+		/// 	at most <see cref="HAPI_GeometryInfo.primCount"/>
 		/// </param>
 		static public void getPrimitveArray( 	int asset_id, int object_id, 
 												[Out] HAPI_RawPrimitive[] primitives, 
@@ -404,12 +404,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First instance index to begin with. Must be at least <see cref="HAPI_GeometryInfo.instanceCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First instance index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last instance index to use. Must be at least <see cref="HAPI_GeometryInfo.instanceCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last instance index to use. Must be at least <paramref name="start"/> and
+		/// 	at most <see cref="HAPI_GeometryInfo.instanceCount"/>
 		/// </param>
 		static public void getInstanceArray( 	int asset_id, int object_id, 
 												[Out] HAPI_RawInstance[] instances, 
@@ -453,12 +453,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least <see cref="HAPI_AssetInfo.parmCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First parameter index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <see cref="HAPI_AssetInfo.parmCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/>
 		/// </param>
 		/// <returns>
 		/// 	A HAPI_StatusCode.
@@ -522,12 +522,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/> containing the new parameter values.
 		/// </param>
 		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least <see cref="HAPI_AssetInfo.parmCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First parameter index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <see cref="HAPI_AssetInfo.parmCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/>
 		/// </param>
 		/// <returns>
 		/// 	A HAPI_StatusCode.
@@ -570,12 +570,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First object index to begin with. Must be at least <see cref="HAPI_AssetInfo.objectCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First object index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last object index to use. Must be at least <see cref="HAPI_AssetInfo.objectCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
 		/// </param>
 		/// <returns>
 		/// 	A HAPI_StatusCode.
@@ -598,12 +598,12 @@ namespace HAPI
     	/// 	set to the object id as given by <see cref="HAPI_Host.HAPI_GetObjects"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First object index to begin with. Must be at least <see cref="HAPI_AssetInfo.objectCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First object index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last object index to use. Must be at least <see cref="HAPI_AssetInfo.objectCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
 		/// </param>
 		/// <returns>
 		/// 	A HAPI_StatusCode.
@@ -648,12 +648,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First vertex index to begin with. Must be at least <see cref="HAPI_GeometryInfo.vertexCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First vertex index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last vertex index to use. Must be at least <see cref="HAPI_GeometryInfo.vertexCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last vertex index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_GeometryInfo.vertexCount"/>
 		/// </param>
 		/// <returns>
 		/// 	A HAPI_StatusCode.
@@ -678,12 +678,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First primitive index to begin with. Must be at least <see cref="HAPI_GeometryInfo.primCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First primitive index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last primitive index to use. Must be at least <see cref="HAPI_GeometryInfo.primCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last primitive index to use. Must be at least <paramref name="start"/> + 1 and 
+		/// 	at most <see cref="HAPI_GeometryInfo.primCount"/>
 		/// </param>
 		/// <returns>
 		/// 	A HAPI_StatusCode.
@@ -708,12 +708,12 @@ namespace HAPI
 		/// 	<paramref name="end"/> - <paramref name="start"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First instance index to begin with. Must be at least <see cref="HAPI_GeometryInfo.instanceCount"/>
-		/// 	and at most <paramref name="end"/>.
+		/// 	First instance index to begin with. Must be at least 0
+		/// 	and at most <paramref name="end"/> - 1.
 		/// </param>
 		/// <param name="end">
-		/// 	Last instance index to use. Must be at least <see cref="HAPI_GeometryInfo.instanceCount"/> and 
-		/// 	more than or equal to <paramref name="start"/>.
+		/// 	Last instance index to use. Must be at least <paramref name="start"/> and 
+		/// 	at most <see cref="HAPI_GeometryInfo.instanceCount"/>
 		/// </param>
 		/// <returns>
 		/// 	A HAPI_StatusCode.
