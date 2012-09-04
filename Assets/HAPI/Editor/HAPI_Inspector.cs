@@ -171,7 +171,7 @@ public class HAPI_Inspector : Editor
 		int max_vector_size 		= ( is_string ? HAPI_Constants.HAPI_PARM_MAX_STRING_VEC_SIZE 
 									  			  : HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE );
 		int contained_size 			= Mathf.Min( parm_size, max_vector_size );
-				
+		
 		GUIStyle labelStyle 		= new GUIStyle( GUI.skin.label );
 		labelStyle.alignment 		= TextAnchor.MiddleRight;
 		GUIStyle sliderStyle 		= new GUIStyle( GUI.skin.horizontalSlider );
@@ -242,7 +242,6 @@ public class HAPI_Inspector : Editor
 			}
 			else
 			{
-				bool has_jumped_next_line = false;
 				int per_line = 0;
 				for ( int p = 0; p < parm_size; ++p, ++per_line )
 				{
@@ -252,7 +251,6 @@ public class HAPI_Inspector : Editor
 						EditorGUILayout.BeginHorizontal();
 						EditorGUILayout.LabelField( "", myToggleWidthGUI );
 						EditorGUILayout.LabelField( "", myLabelWidthGUI );
-						has_jumped_next_line = true;
 						per_line = 0;
 					}
 					
@@ -263,16 +261,14 @@ public class HAPI_Inspector : Editor
 					else
 					{
 						if ( myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId != id )
-							Debug.LogError( "Extra choice parent id not matching current parm id!" );
+							Debug.LogError( "Extra choice parent id (" 
+								+ myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId 
+								+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
 						old_value = myObjectControl.myParmExtraValues[ current_extra_value_index ].intValue;
 					}
 					
 					// Draw field.
-					int new_value = old_value;
-					if ( !has_jumped_next_line )
-						new_value = EditorGUILayout.IntField( old_value );
-					else
-						new_value = EditorGUILayout.IntField( old_value );
+					int new_value = EditorGUILayout.IntField( old_value );
 					
 					// Draw the slider.
 					if ( parm_size == 1 
@@ -314,10 +310,33 @@ public class HAPI_Inspector : Editor
 		// Float Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
-			for ( int p = 0; p < contained_size; ++p )
-			{	
+			int per_line = 0;
+			for ( int p = 0; p < parm_size; ++p, ++per_line )
+			{
+				if ( per_line >= myMaxFieldCountPerLine )
+				{
+					EditorGUILayout.EndHorizontal();
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.LabelField( "", myToggleWidthGUI );
+					EditorGUILayout.LabelField( "", myLabelWidthGUI );
+					per_line = 0;
+				}
+				
+				// Get old value.
+				float old_value = 0;
+				if ( p < contained_size )
+					old_value = parms[ id ].floatValue[ p ];
+				else
+				{
+					if ( myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId != id )
+						Debug.LogError( "Extra choice parent id (" 
+							+ myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId 
+							+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
+					old_value = myObjectControl.myParmExtraValues[ current_extra_value_index ].floatValue;
+				}
+				
 				// Draw field.
-				float new_value = EditorGUILayout.FloatField( parms[ id ].floatValue[ p ] );
+				float new_value = EditorGUILayout.FloatField( old_value );
 				
 				// Draw the slider.
 				if ( parm_size == 1 
@@ -340,24 +359,65 @@ public class HAPI_Inspector : Editor
 					new_value = parms[ id ].max;
 				
 				// Determine if value changed and update parameter value.
-				if ( parms[ id ].floatValue[ p ] != new_value )
-				{
-					parms[ id ].floatValue[ p ] = new_value;
+				if ( new_value != old_value )
+				{					
+					if ( p < contained_size )
+						parms[ id ].floatValue[ p ] = new_value;
+					else
+						myObjectControl.myParmExtraValues[ current_extra_value_index ].floatValue = new_value;
 					changed |= true;
 				}
+				
+				// Increment extra value index.
+				if ( p >= contained_size )
+					current_extra_value_index++;
 			}
 		}		
 		///////////////////////////////////////////////////////////////////////
 		// String Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_STRING )
-		{
-			string new_value = EditorGUILayout.TextField( parms[ id ].stringValue );
-			
-			// Determine if value changed and update parameter value.
-			if ( parms[ id ].stringValue != new_value )
+		{			
+			int per_line = 0;
+			for ( int p = 0; p < parm_size; ++p, ++per_line )
 			{
-				parms[ id ].stringValue = new_value;
-				changed |= true;
+				if ( per_line >= myMaxFieldCountPerLine )
+				{
+					EditorGUILayout.EndHorizontal();
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.LabelField( "", myToggleWidthGUI );
+					EditorGUILayout.LabelField( "", myLabelWidthGUI );
+					per_line = 0;
+				}
+				
+				// Get old value.
+				string old_value = "";
+				if ( p < contained_size )
+					old_value = parms[ id ].stringValue;
+				else
+				{
+					if ( myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId != id )
+						Debug.LogError( "Extra choice parent id (" 
+							+ myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId 
+							+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
+					old_value = myObjectControl.myParmExtraValues[ current_extra_value_index ].stringValue;
+				}
+				
+				// Draw field.
+				string new_value = EditorGUILayout.TextField( old_value );
+				
+				// Determine if value changed and update parameter value.
+				if ( new_value != old_value )
+				{					
+					if ( p < contained_size )
+						parms[ id ].stringValue = new_value;
+					else
+						myObjectControl.myParmExtraValues[ current_extra_value_index ].stringValue = new_value;
+					changed |= true;
+				}
+				
+				// Increment extra value index.
+				if ( p >= contained_size )
+					current_extra_value_index++;
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
