@@ -421,6 +421,26 @@ public class HAPI_Inspector : Editor
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
+		// File Field
+		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FILE )
+		{
+			string old_path = parms[ id ].stringValue;
+			string new_path = EditorGUILayout.TextField( old_path );
+		        
+	        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+			{
+				string prompt_path = EditorUtility.OpenFilePanel( "Select File", old_path, "*" );;
+				if ( prompt_path.Length > 0 )
+					new_path = prompt_path;
+	        }
+			
+			if ( new_path != old_path )
+			{
+				parms[ id ].stringValue = new_path;
+				changed |= true;	
+			}
+		}
+		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
