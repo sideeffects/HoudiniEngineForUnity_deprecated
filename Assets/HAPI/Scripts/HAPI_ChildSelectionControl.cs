@@ -24,13 +24,23 @@ using System.Collections;
 /// </summary>
 public class HAPI_ChildSelectionControl : MonoBehaviour 
 {	
+	public void setObjectControl( MonoBehaviour object_control )
+	{
+		myObjectControl = object_control as HAPI_ObjectControl;
+	}
+	
 	/// <summary>
 	/// 	Selects the parent of the current game object.
 	/// </summary>
 	public void selectParent()
 	{
-		GameObject[] selection 	= new GameObject[ 1 ];
-		selection[ 0 ] 			= transform.parent.gameObject;
-		Selection.objects 		= selection;
+		if ( myObjectControl.myAutoSelectAssetNode )
+		{
+			GameObject[] selection 	= new GameObject[ 1 ];
+			selection[ 0 ] 			= transform.parent.gameObject;
+			Selection.objects 		= selection;
+		}
 	}
+
+	private HAPI_ObjectControl	myObjectControl;
 }

@@ -51,6 +51,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 		
 		myShowAssetControls 		= true;
 		myShowObjectControls 		= true;
+		myAutoSelectAssetNode		= true;
 				
 		myFolderListSelections 		= new List< int >();
 		myFolderListSelectionIds 	= new List< int >();
@@ -185,6 +186,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 	
 	public bool 					myShowObjectControls;
 	public bool 					myShowAssetControls;
+	public bool						myAutoSelectAssetNode;
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
@@ -234,6 +236,9 @@ public class HAPI_ObjectControl : MonoBehaviour
 		main_child.AddComponent( "MeshFilter" );
 		main_child.AddComponent( "MeshRenderer" );
 		main_child.AddComponent( "HAPI_ChildSelectionControl" );
+		
+		// Set Object Control on child selection control so it can read settings from here.
+		main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
 		
 		// Set diffuse material.
 		Material diffuse = new Material( Shader.Find( "Diffuse" ) );		

@@ -48,6 +48,9 @@ public class HAPI_Inspector : Editor
 	{
 		myUndoManager.CheckUndo();
 		
+		myLabelStyle = new GUIStyle( GUI.skin.label );
+		myLabelStyle.alignment = TextAnchor.MiddleRight;
+		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
@@ -59,18 +62,18 @@ public class HAPI_Inspector : Editor
 			EditorGUILayout.LabelField( new GUIContent( "OTL Path:" ) );
 			EditorGUILayout.BeginHorizontal(); 
 			{
-				string oldAssetPath = myObjectControl.getAssetPath();
-				string newAssetPath = "";
-				newAssetPath = EditorGUILayout.TextField( oldAssetPath );
+				string old_asset_path = myObjectControl.getAssetPath();
+				string new_asset_path = "";
+				new_asset_path = EditorGUILayout.TextField( old_asset_path );
 		        
 		        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
 				{
-					string promptResultPath = promptForAssetPath( oldAssetPath );
-					if ( promptResultPath.Length > 0 )
-						newAssetPath = promptResultPath;
+					string prompt_result_path = promptForAssetPath( old_asset_path );
+					if ( prompt_result_path.Length > 0 )
+						new_asset_path = prompt_result_path;
 		        }
 				
-				myObjectControl.setAssetPath( newAssetPath );
+				myObjectControl.setAssetPath( new_asset_path );
 			} 
 			EditorGUILayout.EndHorizontal();
 			
@@ -80,6 +83,22 @@ public class HAPI_Inspector : Editor
 #endif
 				myObjectControl.build();
 			}
+			
+			// Draw Auto Select Asset Node Toggle
+			EditorGUILayout.BeginHorizontal(); 
+			{
+				// Add padding for the toggle column.
+				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
+				// Add empty space to align with fields.
+				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
+				
+				// Draw toggle with its label.
+				bool old_value = myObjectControl.myAutoSelectAssetNode;
+				myObjectControl.myAutoSelectAssetNode = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
+				EditorGUILayout.SelectableLabel( "Auto Select Parent", myLineHeightGUI );		
+			}
+			EditorGUILayout.EndHorizontal();
+			
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
@@ -172,10 +191,8 @@ public class HAPI_Inspector : Editor
 									  			  : HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE );
 		int contained_size 			= Mathf.Min( parm_size, max_vector_size );
 		
-		GUIStyle labelStyle 		= new GUIStyle( GUI.skin.label );
-		labelStyle.alignment 		= TextAnchor.MiddleRight;
-		GUIStyle sliderStyle 		= new GUIStyle( GUI.skin.horizontalSlider );
-		GUIStyle sliderThumbStyle 	= new GUIStyle( GUI.skin.horizontalSliderThumb );
+		GUIStyle slider_style 		= new GUIStyle( GUI.skin.horizontalSlider );
+		GUIStyle slider_thumb_style	= new GUIStyle( GUI.skin.horizontalSliderThumb );
 				
 		if ( parms[ id ].invisible )
 			return changed;
@@ -190,20 +207,20 @@ public class HAPI_Inspector : Editor
 			&& parm_type != HAPI_ParmType.HAPI_PARMTYPE_FOLDER
 			&& !parms[ id ].labelNone )
 		{
-			GUILayoutOption labelFinalWidth = myLabelWidthGUI;
+			GUILayoutOption label_final_width = myLabelWidthGUI;
 			if ( join_last && !no_label_toggle_last )
 			{
-				float minWidth;
-				float maxWidth;
-				labelStyle.CalcMinMaxWidth( new GUIContent( parms[ id ].label ), out minWidth, out maxWidth );
-				labelFinalWidth = GUILayout.Width( minWidth );
+				float min_width;
+				float max_width;
+				myLabelStyle.CalcMinMaxWidth( new GUIContent( parms[ id ].label ), out min_width, out max_width );
+				label_final_width = GUILayout.Width( min_width );
 			}
 			else if ( !join_last )
 			{
-				// add padding for the toggle column
+				// Add padding for the toggle column.
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
 			}
-			EditorGUILayout.SelectableLabel( parms[ id ].label, labelStyle, labelFinalWidth, myLineHeightGUI );
+			EditorGUILayout.SelectableLabel( parms[ id ].label, myLabelStyle, label_final_width, myLineHeightGUI );
 			no_label_toggle_last = false;
 		}
 		
@@ -278,10 +295,10 @@ public class HAPI_Inspector : Editor
 						float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
 						float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
 						Rect lastDoubleRect = getLastDoubleRect();
-						sliderStyle.stretchWidth = false;
-						sliderStyle.fixedWidth = lastDoubleRect.width;
+						slider_style.stretchWidth = false;
+						slider_style.fixedWidth = lastDoubleRect.width;
 						new_value = (int) GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
-																sliderStyle, sliderThumbStyle );
+																slider_style, slider_thumb_style );
 					}
 					
 					// Enforce min/max bounds.
@@ -346,10 +363,10 @@ public class HAPI_Inspector : Editor
 					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
 					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
 					Rect lastDoubleRect = getLastDoubleRect();
-					sliderStyle.stretchWidth = false;
-					sliderStyle.fixedWidth = lastDoubleRect.width;
+					slider_style.stretchWidth = false;
+					slider_style.fixedWidth = lastDoubleRect.width;
 					new_value = GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
-													  sliderStyle, sliderThumbStyle );
+													  slider_style, slider_thumb_style );
 				}
 				
 				// Enforce min/max bounds.
@@ -686,6 +703,8 @@ public class HAPI_Inspector : Editor
 	private GUILayoutOption		myDummyLabelMinWidthGUI		= GUILayout.MinWidth( myDummyLabelMinWidth );
 	
 	private GUIContent 			myNullContent 				= new GUIContent( "" );
+	
+	private GUIStyle			myLabelStyle;
 	
 	private HOEditorUndoManager myUndoManager;
 	private HAPI_ObjectControl 	myObjectControl;
