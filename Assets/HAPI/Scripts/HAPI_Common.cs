@@ -30,7 +30,9 @@ namespace HAPI
 		public const int HAPI_SCALE_VECTOR_SIZE				= 3;
 		public const int HAPI_NORMAL_VECTOR_SIZE			= 3;
 		public const int HAPI_UV_VECTOR_SIZE				= 2;
-
+		
+		public const int HAPI_GENERIC_MAX_NAME_SIZE			= 256;
+		
 		public const int HAPI_ASSET_MAX_FILE_PATH_SIZE		= 1024;
 		public const int HAPI_ASSET_MAX_NAME_SIZE			= 256;
 		public const int HAPI_ASSET_MAX_INSTANCE_PATH_SIZE	= 256;
@@ -130,6 +132,39 @@ namespace HAPI
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
 	}
+	
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_HandleInfo
+	{
+	
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
+	    public string handleTypeName;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
+	    public string handleName;
+		
+	    public int  bindingsCount;
+	}
+
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_HandleBindingInfo
+	{	    
+	
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]	
+	    public string handleParmName;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]
+	    public string assetParmName;
+		
+		public int    assetParmId;
+	};
+	
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ParmSingleValue

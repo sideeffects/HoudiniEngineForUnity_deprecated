@@ -254,6 +254,68 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
+		
+		/// <summary>	
+		/// 	Fill an array of HAPI_HandleInfo structs with information
+	    ///		about every exposed user manipulation handle on the asset    
+		/// </summary>
+	    ///
+	    /// <param name="asset_id">
+	    ///			The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+	    /// <param name ="handle_infos">
+	    ///			Array of <see cref="HAPI_HandleInfo"/> exactly the size of
+	    ///			<see cref="HAPI_AssetInfo.handleCount"/>.
+		/// </param>
+	    ///	<param name="start">
+	    ///			First object index to begin fill. Must be at least 
+	    ///			0 and at most <paramref name="end"/> - 1.
+		/// </param>
+	    /// <param name ="end">
+	    ///			Last object index to fill up to. Must be at least <paramref name="start"/> + 1 and
+	    ///         at most <see cref="HAPI_AssetInfo.handleCount"/>
+	    /// </param>
+	    public static void getHandleInfo(	int asset_id, 
+											[Out] HAPI_HandleInfo[] handle_infos,
+											int start, int end )
+		{
+			int status_code = HAPI_GetHandleInfo( asset_id, handle_infos, start, end );
+			processStatusCode( (HAPI_StatusCode) status_code );				
+		}
+	
+		
+		/// <summary>	
+		/// 	Fill an array of HAPI_HandleBindingInfo structs with information
+	    ///		about how each handle parameter maps to each asset parameter
+		/// </summary>
+	    ///
+	    /// <param name="asset_id">
+	    ///			The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="handle index">
+	    ///			The index of the handle, from 0 to handleCount - 1 from the call to <see cref="HAPI_Host.loadOTLFile"/>
+		/// </param>		
+		/// <param name ="handle_infos">
+	    ///			Array of <see cref="HAPI_HandleBindingInfo"/> exactly the size of
+	    ///			<see cref="HAPI_HandleInfo.bindingsCount"/>.
+		/// </param>
+	    ///	<param name="start">
+	    ///			First object index to begin fill. Must be at least 
+	    ///			0 and at most <paramref name="end"/> - 1.
+		/// </param>
+	    /// <param name ="end">
+	    ///			Last object index to fill up to. Must be at least <paramref name="start"/> + 1 and
+	    ///         at most <see cref="HAPI_HandleInfo.bindingsCount"/>
+	    /// </param>
+	    public static void getHandleBindingInfo (	int asset_id,
+	                                         		int handle_index,
+													[Out] HAPI_HandleBindingInfo[] handle_infos,
+													int start, int end )
+		{
+			int status_code = HAPI_GetHandleBindingInfo( asset_id, handle_index, handle_infos, start, end );
+			processStatusCode( (HAPI_StatusCode) status_code );	
+		}
+		
 		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object 
 		/// 	in the scene that has a SOP network (is not a sub-network).
@@ -489,6 +551,19 @@ namespace HAPI
 															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
 															int count );
 		
+	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	    private static extern int HAPI_GetHandleInfo(	int asset_id, 
+											[Out] HAPI_HandleInfo[] handle_infos,
+											int start, int end );
+		
+		
+		
+	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	    private static extern int HAPI_GetHandleBindingInfo (	int asset_id,
+	                                         		int handle_index,
+													[Out] HAPI_HandleBindingInfo[] handle_infos,
+													int start, int end );
+			
 		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information 
 		/// 	from the asset instance node.

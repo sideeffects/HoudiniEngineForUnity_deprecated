@@ -48,6 +48,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 		myObjectCount 				= 0;
 		myParmCount 				= 0;
 		myParmChoiceCount			= 0;
+		myHandleCount 				= 0;
 		
 		myShowAssetControls 		= true;
 		myShowObjectControls 		= true;
@@ -130,6 +131,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 			myParmCount 			= myAssetInfo.parmCount;
 			myParmExtraValueCount 	= myAssetInfo.parmExtraValueCount;
 			myParmChoiceCount		= myAssetInfo.parmChoiceCount;
+			myHandleCount 			= myAssetInfo.handleCount;
 						
 			// Get all parameters.
 			myParms = new HAPI_ParmInfo[ myParmCount ];
@@ -142,6 +144,23 @@ public class HAPI_ObjectControl : MonoBehaviour
 			// Get parameter choice lists.
 			myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
 			HAPI_Host.getParmChoiceLists( myAssetId, myParmChoiceLists, myParmChoiceCount );
+			
+			// Get exposed handle information.
+			myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
+			HAPI_Host.getHandleInfo( myAssetId, myHandleInfos, 0, myHandleCount );
+			
+			myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >();
+			
+			for ( int handle_index = 0; handle_index < myHandleCount; ++handle_index )
+			{				
+				
+				HAPI_HandleInfo handleInfo = myHandleInfos[handle_index];
+				HAPI_HandleBindingInfo[] handleBindingInfos = new HAPI_HandleBindingInfo[handleInfo.bindingsCount];
+				HAPI_Host.getHandleBindingInfo(myAssetId, handle_index, handleBindingInfos, 0, handleInfo.bindingsCount);
+				
+				myHandleBindingInfos.Add(handleBindingInfos);
+			}
+		
 			
 			myAssetPathChanged = false;
 		}
@@ -167,6 +186,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 		for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			createObject( object_index );
 		
+		
 		return true;
 	}
 		
@@ -176,6 +196,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 	public int 						myParmCount;
 	public int						myParmExtraValueCount;
 	public int						myParmChoiceCount;
+	public int						myHandleCount;
 		
 	public HAPI_AssetInfo 			myAssetInfo;
 	public HAPI_ObjectInfo[] 		myObjects;
@@ -183,6 +204,8 @@ public class HAPI_ObjectControl : MonoBehaviour
 	public HAPI_ParmInfo[] 			myParms;
 	public HAPI_ParmSingleValue[]	myParmExtraValues;
 	public HAPI_ParmChoiceInfo[]	myParmChoiceLists;
+	public HAPI_HandleInfo[]		myHandleInfos;
+	public List< HAPI_HandleBindingInfo[] > myHandleBindingInfos;
 	
 	public bool 					myShowObjectControls;
 	public bool 					myShowAssetControls;
@@ -269,12 +292,16 @@ public class HAPI_ObjectControl : MonoBehaviour
 		geo.vertexCount 	= Mathf.Min( geo.vertexCount, 65000 );
 		
 		// Apply object transforms.
+		
 		main_child.transform.position 	= new Vector3( 			trans.position[ 0 ], 
 																trans.position[ 1 ],
 																trans.position[ 2 ] );
-		main_child.transform.rotation 	= Quaternion.Euler(    -trans.pitch, 
-														 	   -trans.yaw, 
-														  		trans.roll );
+				float conv = (180.0f / 3.1415926f);
+		main_child.transform.rotation 	= Quaternion.Euler(     trans.pitch * conv, 
+														 	    trans.yaw * conv, 
+														  		trans.roll * conv );
+		
+
 		main_child.transform.localScale = new Vector3( 			trans.scale[ 0 ], 
 													  			trans.scale[ 1 ], 
 													  			trans.scale[ 2 ] );

@@ -29,7 +29,7 @@ using HAPI;
 /// 	for an asset game object.
 /// </summary>
 [ CustomEditor( typeof( HAPI_ObjectControl ) ) ]
-public class HAPI_Inspector : Editor 
+public partial class HAPI_Inspector : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
