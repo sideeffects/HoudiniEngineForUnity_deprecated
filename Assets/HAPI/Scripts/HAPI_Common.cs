@@ -50,6 +50,9 @@ namespace HAPI
 		public const int HAPI_GEO_MAX_BUMP_NAME_SIZE		= 1024;
 
 		public const int HAPI_PRIM_MAX_VERTEX_COUNT			= 16;
+		
+		public const int HAPI_ATTR_MAX_NAME_SIZE			= 64;
+		public const int HAPI_ATTR_MAX_STRING_SIZE			= 128;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +105,25 @@ namespace HAPI
 		HAPI_PARMTYPE_NONVALUE_START	= HAPI_PARMTYPE_FOLDERLIST,
 		HAPI_PARMTYPE_NONVALUE_END		= HAPI_PARMTYPE_SEPARATOR
 	}
+	
+	public enum HAPI_AttributeType
+	{
+		HAPI_ATTRTYPE_INVALID = -1,
+		HAPI_ATTRTYPE_VERTEX,
+	    HAPI_ATTRTYPE_POINT,
+	    HAPI_ATTRTYPE_PRIM,
+		HAPI_ATTRTYPE_DETAIL,
+	    HAPI_ATTRTYPE_MAX
+	}
+	
+	enum HAPI_DataType
+	{
+		HAPI_DATATYPE_INVALID = -1,
+		HAPI_DATATYPE_INT,
+		HAPI_DATATYPE_FLOAT,
+		HAPI_DATATYPE_STR,
+		HAPI_DATATYPE_MAX
+	};
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Main API Structs
@@ -398,6 +420,52 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ) ]
 		public float[] scale;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_DetailInfo
+	{
+		public int	    faceCount;
+		public int	    vertexCount;
+		public int		pointCount;
+		public int	    pointAttributeCount;
+		public int	    faceAttributeCount;
+		public int	    vertexAttributeCount;
+		public int	    detailAttributeCount;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_AttributeInfo
+	{		
+		public HAPI_AttributeInfo( string attr_name )
+		{
+			name 			= attr_name;
+			exists 			= false;
+			attributeType 	= (int) HAPI_AttributeType.HAPI_ATTRTYPE_INVALID;
+			dataType 		= (int) HAPI_DataType.HAPI_DATATYPE_INVALID;
+			count 			= 0;
+			tupleSize 		= 0;
+		}
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_ATTR_MAX_NAME_SIZE ) ]
+		public string	name;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool		exists;
+		
+		public int		attributeType;  // enum HAPI_AttributeType
+		public int		dataType; // enum HAPI_DataType
+		public int		count;
+		public int		tupleSize;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_AttributeStrValue
+	{
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_ATTR_MAX_STRING_SIZE ) ]
+		public string	name;
 	}
 	
 }

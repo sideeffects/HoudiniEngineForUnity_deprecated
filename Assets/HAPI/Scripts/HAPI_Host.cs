@@ -307,7 +307,7 @@ namespace HAPI
 	    ///			Last object index to fill up to. Must be at least <paramref name="start"/> + 1 and
 	    ///         at most <see cref="HAPI_HandleInfo.bindingsCount"/>
 	    /// </param>
-	    public static void getHandleBindingInfo (	int asset_id,
+	    public static void getHandleBindingInfo(	int asset_id,
 	                                         		int handle_index,
 													[Out] HAPI_HandleBindingInfo[] handle_infos,
 													int start, int end )
@@ -363,7 +363,7 @@ namespace HAPI
 		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
 		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
 		/// </param>
-		public static void getObjectTransforms( 		int asset_id, 
+		public static void getObjectTransforms( 	int asset_id, 
 													[Out] HAPI_Transform[] transforms, 
 													int start, int end )
 		{
@@ -481,6 +481,80 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		
+		
+		
+		
+		
+		
+		
+		static public void getDetailInfo(		int asset_id, int object_id,
+												out HAPI_DetailInfo detail )
+		{
+			int status_code = HAPI_GetDetailInfo( asset_id, object_id, out detail );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		static public void getFaceCounts(		int asset_id, int object_id,
+												[Out] int[] face_counts,
+												int start, int end )
+		{
+			int status_code = HAPI_GetFaceCounts( asset_id, object_id, face_counts, start, end );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		static public void getVertexList(		int asset_id, int object_id,
+												[Out] int[] vertex_list,
+												int start, int end )
+		{
+			int status_code = HAPI_GetVertexList( asset_id, object_id, vertex_list, start, end );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		static public void getAttributeInfo(	int asset_id, int object_id,
+												int attribute_type,
+												ref HAPI_AttributeInfo attr_info )
+		{
+			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, attribute_type, ref attr_info );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		static public void getAttributeArray(	int asset_id, int object_id,
+												int attribute_type,
+												[Out] HAPI_AttributeStrValue[] data,
+												int count )
+		{
+			int status_code = HAPI_GetAttributeArray( asset_id, object_id, attribute_type, data, count );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		static public void getAttributeIntData( int asset_id, int object_id,
+												ref HAPI_AttributeInfo attr_info,
+												[Out] int[] data,
+												int start, int end )
+		{
+			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, ref attr_info, data, start, end );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		static public void getAttributeFloatData(	int asset_id, int object_id,
+													ref HAPI_AttributeInfo attr_info,
+													[Out] float[] data,
+													int start, int end )
+		{
+			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, ref attr_info, data, start, end );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		static public void getAttributeStrData( int asset_id, int object_id,
+												ref HAPI_AttributeInfo attr_info,
+												[Out] HAPI_AttributeStrValue[] data,
+												int start, int end )
+		{
+			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, ref attr_info, data, start, end );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
 		
@@ -504,372 +578,137 @@ namespace HAPI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private HAPI API
 		
-		/// <summary>
-		/// 	Fill an array of HAPI_ParmInfo structs with parameter information from the asset instance node.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_infos">
-		/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
-		/// </param>
-		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/>
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParameters( 		int asset_id, 
 															[Out] HAPI_ParmInfo[] parm_infos, 
 															int start, int end );
 		
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_extra_values">
-		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
-		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
-		/// </param>
-		/// <param name="count">
-		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParmExtraValues( 	int asset_id, 
 															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
 															int count );
 		
 	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	    private static extern int HAPI_GetHandleInfo(	int asset_id, 
-											[Out] HAPI_HandleInfo[] handle_infos,
-											int start, int end );
-		
-		
+	    private static extern int HAPI_GetHandleInfo(		int asset_id, 
+															[Out] HAPI_HandleInfo[] handle_infos,
+															int start, int end );		
 		
 	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	    private static extern int HAPI_GetHandleBindingInfo (	int asset_id,
-	                                         		int handle_index,
-													[Out] HAPI_HandleBindingInfo[] handle_infos,
-													int start, int end );
-			
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information 
-		/// 	from the asset instance node.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_choices">
-		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of 
-		/// 	<see cref="HAPI_AssetInfo.parmChoiceCount"/>.
-		/// </param>
-		/// <param name="count">
-		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmChoiceCount"/>.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
+	    private static extern int HAPI_GetHandleBindingInfo(int asset_id,
+				                                         	int handle_index,
+															[Out] HAPI_HandleBindingInfo[] handle_infos,
+															int start, int end );
+		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParmChoiceLists( 	int asset_id, 
 															[Out] HAPI_ParmChoiceInfo[] parm_choices, 
 															int count );
 		
-		/// <summary>
-		/// 	Set a subset of parameter values using the given array of <see cref="HAPI_ParmInfo"/>.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_infos">
-		/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/> containing the new parameter values.
-		/// </param>
-		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/>
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetParameters( 		int asset_id, 
 															[Out] HAPI_ParmInfo[] parm_infos, 
 															int start, int end );
 		
-		/// <summary>
-		/// 	Set an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_extra_values">
-		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
-		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
-		/// </param>
-		/// <param name="count">
-		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetParmExtraValues( 	int asset_id, 
 															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
 															int count );
 		
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object 
-		/// 	in the scene that has a SOP network (is not a sub-network).
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="object_infos">
-		/// 	Array of <see cref="HAPI_ObjectInfo"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
-		/// </param>
-		/// <param name="start">
-		/// 	First object index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetObjects( 			int asset_id, 
 															[Out] HAPI_ObjectInfo[] object_infos, 
 															int start, int end );
 		
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object 
-		/// 	in the scene that has a SOP network (is not a sub-network).
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="transforms">
-		/// 	Array of <see cref="HAPI_Transform"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>. The <see cref="HAPI_Transform.id"/> of each will be 
-    	/// 	set to the object id as given by <see cref="HAPI_Host.HAPI_GetObjects"/>.
-		/// </param>
-		/// <param name="start">
-		/// 	First object index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetObjectTransforms( 	int asset_id, 
 															[Out] HAPI_Transform[] transforms, 
 															int start, int end );
 		
-		/// <summary>
-		/// 	Fill a <see cref="HAPI_GeometryInfo"/> with geometry information of an object.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.HAPI_GetObjects"/>.
-		/// </param>
-		/// <param name="geometry_info">
-		/// 	A <see cref="HAPI_GeometryInfo"/> to be filled with geometry information of the specified 
-		/// 	object and asset instance.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetGeometryInfo( 		int asset_id, int object_id, 
 															out HAPI_GeometryInfo geometry_info );
 		
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_RawVertex"/> structs with vertex information from 
-		/// 	an object's geometry.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.HAPI_GetObjects"/>.
-		/// </param>
-		/// <param name="vertices">
-		/// 	Array of <see cref="HAPI_RawVertex"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
-		/// </param>
-		/// <param name="start">
-		/// 	First vertex index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last vertex index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_GeometryInfo.vertexCount"/>
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetVertexArray( 		int asset_id, int object_id, 
 															[Out] HAPI_RawVertex[] vertices, 
 															int start, int end );
 		
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_RawPrimitive"/> structs with primitive information from 
-		/// 	an object's geometry.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.HAPI_GetObjects"/>.
-		/// </param>
-		/// <param name="primitives">
-		/// 	Array of <see cref="HAPI_RawPrimitive"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
-		/// </param>
-		/// <param name="start">
-		/// 	First primitive index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last primitive index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_GeometryInfo.primCount"/>
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetPrimitveArray( 	int asset_id, int object_id, 
 															[Out] HAPI_RawPrimitive[] primitives, 
 															int start, int end );
-		
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_RawInstance"/> structs with instance information from 
-		/// 	an object's geometry.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.HAPI_GetObjects"/>.
-		/// </param>
-		/// <param name="instances">
-		/// 	Array of <see cref="HAPI_RawInstance"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
-		/// </param>
-		/// <param name="start">
-		/// 	First instance index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last instance index to use. Must be at least <paramref name="start"/> and 
-		/// 	at most <see cref="HAPI_GeometryInfo.instanceCount"/>
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
+				
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetInstanceArray( 	int asset_id, int object_id, 
 															[Out] HAPI_RawInstance[] instances, 
 															int start, int end );
 		
-		/// <summary>
-		/// 	Create the asset manager, set up environment variables, and initialize the main Houdini scene.
-		/// </summary>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Initialize();
 		
-		/// <summary>
-		/// 	This does nothing for now. Placeholder.
-		/// </summary>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Cleanup();
 		
-		/// <summary>
-		/// 	Debug helper function that prints the contents of the main Houdini scene.
-		/// </summary>
-		/// <param name="buffer">
-		/// 	Buffer char array ready to be filled.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_PrintNetwork( 		StringBuilder buffer );
 		
-		/// <summary>
-		/// 	Debug helper function that returns more detailed text for a failed status code.
-		/// </summary>
-		/// <param name="buffer">
-		/// 	Buffer char array ready to be filled.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetLastErrorString( 	StringBuilder buffer );
 		
-		/// <summary>
-		/// 	Loads a .otl file, adds the definition to the library and instantiates the asset into the 
-		/// 	main Houdini scene.
-		/// </summary>
-		/// <param name="asset_info">
-		/// 	A <see cref="HAPI_AssetInfo"/> that has at least <see cref="HAPI_AssetInfo.otlFilePath"/>, 
-		/// 	<see cref="HAPI_AssetInfo.minVerticesPerPrimitive"/>, and 
-    	///		<see cref="HAPI_AssetInfo.maxVerticesPerPrimitive"/> properly initialized. The 
-		///		<see cref="HAPI_AssetInfo.otlFilePath"/> should contain the absolute path to the .otl file. The 
-    	///		function will initialize the rest of the struct with appropriate data so this argument 
-		///		serves as a return value as well.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_LoadOTLFile( 		ref HAPI_AssetInfo asset_info );
 		
-		/// <summary>
-		/// 	Destroy the asset instance and unload the OTL definition.
-		/// </summary>
-		/// <param name="asset_info">
-		/// 	The asset id returned by <see cref="HAPI_Host.HAPI_LoadOTLFile"/>.
-		/// </param>
-		/// <returns>
-		/// 	A HAPI_StatusCode.
-		/// </returns>
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_UnloadOTLFile( 		int asset_id );			
-	
+		private static extern int HAPI_UnloadOTLFile( 		int asset_id );
+		
+		
+		
+		
+		
+		
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetDetailInfo(		int asset_id, int object_id,
+															out HAPI_DetailInfo detail );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetFaceCounts(		int asset_id, int object_id,
+															[Out] int[] face_counts,
+															int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetVertexList(		int asset_id, int object_id,
+															[Out] int[] vertex_list,
+															int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAttributeInfo(	int asset_id, int object_id,
+															int attribute_type,
+															ref HAPI_AttributeInfo attr_info );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAttributeArray(	int asset_id, int object_id,
+															int attribute_type,
+															[Out] HAPI_AttributeStrValue[] data,
+															int count );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAttributeIntData( int asset_id, int object_id,
+															ref HAPI_AttributeInfo attr_info,
+															[Out] int[] data,
+															int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAttributeFloatData( int asset_id, int object_id,
+															  ref HAPI_AttributeInfo attr_info,
+															  [Out] float[] data,
+															  int start, int end );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAttributeStrData( int asset_id, int object_id,
+															ref HAPI_AttributeInfo attr_info,
+															[Out] HAPI_AttributeStrValue[] data,
+															int start, int end );
 	}
 
 }

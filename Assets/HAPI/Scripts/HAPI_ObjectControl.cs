@@ -280,16 +280,46 @@ public class HAPI_ObjectControl : MonoBehaviour
 		
 		// Get transforms.
 		HAPI_Transform trans = myObjectTransforms[ object_id ];
-				
-		// Get geometry.
-		HAPI_GeometryInfo geo = new HAPI_GeometryInfo();
-		HAPI_Host.getGeometryInfo( myAssetId, object_id, out geo );
-		Debug.Log( "Obj #" + object_id + ": verts: " + geo.vertexCount + " prims: " + geo.primCount );		
+		
+		// Get Detail info.
+		HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
+		HAPI_Host.getDetailInfo( myAssetId, object_id, out detail_info );
+		Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
+			+ "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
 		
 		// Make sure our primitive and vertex numbers are supported by Unity.
 		// TODO: add this limit in a more proper place
-		geo.primCount 		= Mathf.Min( geo.primCount, 65000 * 3 );
-		geo.vertexCount 	= Mathf.Min( geo.vertexCount, 65000 );
+		detail_info.faceCount	= Mathf.Min( detail_info.faceCount, 65000 * 3 );
+		detail_info.vertexCount = Mathf.Min( detail_info.vertexCount, 65000 );
+		
+		// Get Face counts.
+		int[] face_counts = new int[ detail_info.faceCount ];
+		fillArray( myAssetId, object_id, face_counts, HAPI_Host.getFaceCounts, detail_info.faceCount );
+		
+		// Get Vertex list.
+		int[] vertex_list = new int[ detail_info.vertexCount ];
+		fillArray( myAssetId, object_id, vertex_list, HAPI_Host.getVertexList, detail_info.vertexCount );
+		
+		// Get position vertex attributes.
+		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+		float[] pos_attr = new float[ 0 ];
+		getAttribute( myAssetId, object_id, ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+		if ( !pos_attr_info.exists )
+		{
+			Debug.LogError( "No position attribute found for object " + object_info.name + " (" + object_id + ")" );
+			return;
+		}
+		else if ( pos_attr_info.attributeType != (int) HAPI_AttributeType.HAPI_ATTRTYPE_POINT )
+		{
+			Debug.LogError( "I only understand position as point attributes!" );
+			return;
+		}
+				
+		// Get uv attributes.
+		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
+		uv_attr_info.tupleSize = 2;
+		float[] uv_attr = new float[ 0 ];
+		getAttribute( myAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
 		
 		// Apply object transforms.
 		
@@ -305,51 +335,34 @@ public class HAPI_ObjectControl : MonoBehaviour
 		main_child.transform.localScale = new Vector3( 			trans.scale[ 0 ], 
 													  			trans.scale[ 1 ], 
 													  			trans.scale[ 2 ] );
-		
-		// Get geometry data.
-		HAPI_RawVertex[] raw_vertices 		= new HAPI_RawVertex[ geo.vertexCount ];
-		HAPI_RawPrimitive[] raw_primitives 	= new HAPI_RawPrimitive[ geo.primCount ];
-		//HAPI_RawInstance[] raw_instances 	= new HAPI_RawInstance[ geo.instanceCount ];
-		
-		fillArray( myAssetId, object_id, raw_vertices, HAPI_Host.getVertexArray, geo.vertexCount );
-		fillArray( myAssetId, object_id, raw_primitives, HAPI_Host.getPrimitveArray, geo.primCount );
-		//fillArray( myAssetId, object_id, raw_instances, HAPI_Host.GetInstanceArray, geo.instanceCount );
-		
+				
 		// Create Unity-specific data objects.
-		Vector3[] vertices 	= new Vector3[ geo.vertexCount ];
-		int[] triangles 	= new int[ geo.primCount * 3 ];
-		Vector2[] uvs 		= new Vector2[ geo.vertexCount ];
-		Vector3[] normals 	= new Vector3[ geo.vertexCount ];
+		Vector3[] vertices 	= new Vector3[ detail_info.vertexCount ];
+		int[] triangles 	= new int[ detail_info.faceCount * 3 ];
+		Vector2[] uvs 		= new Vector2[ detail_info.vertexCount ];
+		Vector3[] normals 	= new Vector3[ detail_info.vertexCount ];
 		
 		// Fill Unity-specific data objects with data from the runtime.
-		for ( int i = 0; i < geo.vertexCount; ++i ) 
+		for ( int i = 0; i < detail_info.vertexCount; ++i ) 
 		{
 			for ( int j = 0; j < 3; ++j ) 
 			{
-				vertices[ i ][ j ] 		= raw_vertices[ i ].position[ j ];
-				normals[ i ][ j ] 		= raw_vertices[ i ].normal[ j ];
+				vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
+				//normals[ i ][ j ] 		= raw_vertices[ i ].normal[ j ];
 			}
-			for ( int j = 0; j < 2; ++j )
-				uvs[ i ][ j ] 			= raw_vertices[ i ].uv[ j ];
+			if ( uv_attr_info.exists )
+			{
+				if ( uv_attr_info.attributeType == (int) HAPI_AttributeType.HAPI_ATTRTYPE_VERTEX )
+					for ( int j = 0; j < 2; ++j )
+						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
+				else if ( uv_attr_info.attributeType == (int) HAPI_AttributeType.HAPI_ATTRTYPE_POINT )
+					for ( int j = 0; j < 2; ++j )
+						uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
+			}
 		}
-		for ( int i = 0; i < geo.primCount; ++i ) 
+		for ( int i = 0; i < detail_info.faceCount; ++i ) 
 			for ( int j = 0; j < 3; ++j )
-				triangles[ i * 3 + j ] 	= raw_primitives[ i ].vertices[ j ];
-		
-		/*
-		for ( int i = 0; i < geo.instanceCount; ++i ) {
-			Vector3 position = new Vector3( rawInstances[ i ].position[ 0 ], rawInstances[ i ].position[ 1 ], rawInstances[ i ].position[ 2 ] );
-			Quaternion rotation = Quaternion.Euler( -rawInstances[ i ].pitch, -rawInstances[ i ].yaw, rawInstances[ i ].roll );
-			//Vector3 scale = new Vector3( rawInstances[ i ].scale[ 0 ], rawInstances[ i ].scale[ 1 ], rawInstances[ i ].scale[ 2 ] );
-			Vector3 scale = new Vector3( 1.0f, 1.0f, 1.0f );
-			
-			GameObject instance = Instantiate( mainChild, position, rotation ) as GameObject;
-									
-			instance.name = "HAPI_InstanceGeo " + i.ToString();
-			instance.transform.parent = transform;
-			instance.transform.localScale = scale;
-		}
-		*/
+				triangles[ i * 3 + j ] 	= i * 3 + ( 2 - j );
 		
 		// Load into vertices and face into mesh.
 		main_child_mesh.vertices 	= vertices;
@@ -358,6 +371,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 		main_child_mesh.normals 	= normals;
 		
 		main_child_mesh.RecalculateBounds();
+		main_child_mesh.RecalculateNormals();
 	}
 	
 	/// <summary>
@@ -412,12 +426,97 @@ public class HAPI_ObjectControl : MonoBehaviour
 			T[] local_array = new T[ delta ];
 			get_func( asset_id, object_id, local_array, current_index, delta );
 			
-			// Copy data from the temporary
+			// Copy data from the temporary array.
 			for ( int i = current_index; i < current_index + delta; ++i )				
 				items[ i ] = local_array[ i - current_index ];
 			
 			current_index += delta;
 		}
+	}
+	
+	/// <summary>
+	/// 	Function pointer parameter type for <see cref="fillAttrArray"/>. 
+	/// </summary>
+	private delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
+													   [Out] T[] items, int start, int end );
+	
+	/// <summary>
+	/// 	Fills an array of attribute data incrementally, never transferring too long of a data stream at once.
+	/// </summary>
+	/// <typeparam name="T">
+	/// 	Array item type.
+	/// </typeparam>
+	/// <param name="asset_id">
+	/// 	Asset_id as returned by <see cref="LoadOTLFile"/>.
+	/// </param>
+	/// <param name="object_id">
+	/// 	Object_id as returned by <see cref="GetObjects"/>.
+	/// </param>
+	/// <param name="items">
+	/// 	Array of items to be filled.
+	/// </param>
+	/// <param name="get_func">
+	/// 	Function used to fill the item array. Must match the signature of <see cref="fillAttrArrayInputFunc"/>.
+	/// </param>
+	/// <param name="count">
+	/// 	Total number of items (size of <c>items</c> array).
+	/// </param>
+	private void fillAttrArray< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
+									 T[] items, fillAttrArrayInputFunc< T > get_func, int count ) 
+	{
+		// TODO: This number works well but it depends heavily on the size of T. 
+		// Should set it in a smarter way. Via sizeOf( T )?
+		const int max_array_size = 8000;
+		
+		int local_count = count;
+		int current_index = 0;
+		
+		while ( local_count > 0 ) 
+		{			
+			int delta = 0;
+			if ( local_count > max_array_size ) 
+			{
+				delta = max_array_size;
+				local_count -= max_array_size;
+			} 
+			else 
+			{
+				delta = local_count;
+				local_count = 0;
+			}
+			
+			T[] local_array = new T[ delta * info.tupleSize ];
+			get_func( asset_id, object_id, ref info, local_array, current_index, delta );
+			
+			// Copy data from the temporary array.
+			for ( int i = current_index; i < current_index + delta; ++i )
+				for ( int j = 0; j < info.tupleSize; ++j )
+					items[ i * info.tupleSize + j ] = local_array[ ( i - current_index ) * info.tupleSize + j ];
+			
+			current_index += delta;
+		}
+	}
+	
+	private void getAttribute< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, ref T[] data,
+									fillAttrArrayInputFunc< T > get_func )
+	{
+		int original_tuple_size = info.tupleSize;		
+		
+		for ( int type = 0; type < (int) HAPI_AttributeType.HAPI_ATTRTYPE_MAX; ++type )
+		{
+			info.attributeType = type;
+			HAPI_Host.getAttributeInfo( asset_id, object_id, type, ref info );
+			if ( info.exists )
+				break;
+		}
+		if ( !info.exists )
+			return;			
+		
+		if ( original_tuple_size > 0 )
+			info.tupleSize = original_tuple_size;
+		
+		data = new T[ info.count * info.tupleSize ];
+		fillAttrArray( asset_id, object_id, ref info, data, get_func, info.count );
 	}
 		
 #if DEBUG
