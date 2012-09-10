@@ -498,12 +498,12 @@ namespace HAPI
 		/// 	Sanity check count. Must be equal to the appropriate attribute owner type count 
 		/// 	in <see cref="HAPI_DetailInfo"/>.
 		/// </param>
-		static public void getAttributeArray(	int asset_id, int object_id,
+		static public void getAttributeNames(	int asset_id, int object_id,
 												int attribute_type,
 												[Out] HAPI_AttributeStrValue[] data,
 												int count )
 		{
-			int status_code = HAPI_GetAttributeArray( asset_id, object_id, attribute_type, data, count );
+			int status_code = HAPI_GetAttributeNames( asset_id, object_id, attribute_type, data, count );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -648,6 +648,7 @@ namespace HAPI
 				StringBuilder error_str = new StringBuilder( 200 );
 				HAPI_GetLastErrorString( error_str );
 				Debug.LogError( error_str );
+				Debug.DebugBreak();
 			}
 		}
 		
@@ -722,7 +723,7 @@ namespace HAPI
 															ref HAPI_AttributeInfo attr_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAttributeArray(	int asset_id, int object_id,
+		private static extern int HAPI_GetAttributeNames(	int asset_id, int object_id,
 															int attribute_type,
 															[Out] HAPI_AttributeStrValue[] data,
 															int count );

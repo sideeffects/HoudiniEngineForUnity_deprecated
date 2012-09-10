@@ -288,6 +288,10 @@ public class HAPI_ObjectControl : MonoBehaviour
 		
 		// Make sure our primitive and vertex numbers are supported by Unity.
 		// TODO: add this limit in a more proper place
+		if ( detail_info.faceCount > 65000 * 3 )
+			Debug.LogWarning( "Face count (" + detail_info.faceCount + ") above limit (" + ( 65000 * 3 ) + ")!" );
+		if ( detail_info.vertexCount > 65000 )
+			Debug.LogWarning( "Vertex count (" + detail_info.vertexCount + ") above limit (" + 65000 + ")!" );
 		detail_info.faceCount	= Mathf.Min( detail_info.faceCount, 65000 * 3 );
 		detail_info.vertexCount = Mathf.Min( detail_info.vertexCount, 65000 );
 		
@@ -299,6 +303,9 @@ public class HAPI_ObjectControl : MonoBehaviour
 		int[] vertex_list = new int[ detail_info.vertexCount ];
 		fillArray( myAssetId, object_id, vertex_list, HAPI_Host.getVertexList, detail_info.vertexCount );
 		
+		// Print attribute names.
+		printAllAttributeNames( myAssetId, object_id, detail_info );
+		
 		// Get position vertex attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 		float[] pos_attr = new float[ 0 ];
@@ -308,7 +315,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 			Debug.LogError( "No position attribute found for object " + object_info.name + " (" + object_id + ")" );
 			return;
 		}
-		else if ( pos_attr_info.attributeType != (int) HAPI_AttributeType.HAPI_ATTRTYPE_POINT )
+		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 		{
 			Debug.LogError( "I only understand position as point attributes!" );
 			return;
@@ -353,13 +360,13 @@ public class HAPI_ObjectControl : MonoBehaviour
 			if ( uv_attr_info.exists )
 			{
 				// If the UVs are per vertex just query directly into the UV array we filled above.
-				if ( uv_attr_info.attributeType == (int) HAPI_AttributeType.HAPI_ATTRTYPE_VERTEX )
+				if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
 				
 				// If the UVs are per point use the vertex list array point indicies to query into
 				// the UV array we filled above.
-				else if ( uv_attr_info.attributeType == (int) HAPI_AttributeType.HAPI_ATTRTYPE_POINT )
+				else if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
 			}
@@ -533,9 +540,9 @@ public class HAPI_ObjectControl : MonoBehaviour
 	{
 		int original_tuple_size = info.tupleSize;		
 		
-		for ( int type = 0; type < (int) HAPI_AttributeType.HAPI_ATTRTYPE_MAX; ++type )
+		for ( int type = 0; type < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
-			info.attributeType = type;
+			info.owner = type;
 			HAPI_Host.getAttributeInfo( asset_id, object_id, type, ref info );
 			if ( info.exists )
 				break;
@@ -548,6 +555,58 @@ public class HAPI_ObjectControl : MonoBehaviour
 		
 		data = new T[ info.count * info.tupleSize ];
 		fillAttrArray( asset_id, object_id, ref info, data, get_func, info.count );
+	}
+	
+	private string[] getAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info, 
+										HAPI_AttributeOwner owner )
+	{
+		int attr_count = detail_info.getOwnerCount( owner );
+			
+		string[] names = new string[ attr_count ];
+		
+		HAPI_AttributeStrValue[] attr_names = new HAPI_AttributeStrValue[ attr_count ];
+		HAPI_Host.getAttributeNames( asset_id, object_id, (int) owner, attr_names, attr_count );
+		for ( int ii = 0; ii < attr_count; ++ii )
+			names[ ii ] = attr_names[ ii ].value;
+		
+		return names;
+	}
+	
+	private void printAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info,
+									  HAPI_AttributeOwner owner )
+	{
+		string[] names = getAttributeNames( asset_id, object_id, detail_info, owner );
+		
+		string msg = "A" + asset_id + "O" + object_id + " - ";
+		
+		switch ( owner )
+		{
+			case HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX: msg += "Vertex"; break;
+			case HAPI_AttributeOwner.HAPI_ATTROWNER_POINT:	msg += "Point"; break;
+			case HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM: 	msg += "Primitive"; break;
+			case HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL:	msg += "Detail"; break;
+			default: Debug.LogError( "Invalid HAPI_AttributeOwner!" ); return;
+		}
+		
+		msg += " Attributes:";
+		
+		bool comma = false;
+		foreach ( string name in names )
+		{
+			if ( comma )
+				msg += ",";
+			else
+				comma = true;
+			msg += " " + name;
+		}
+		
+		Debug.Log( msg );
+	}
+	
+	private void printAllAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info )
+	{
+		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
+			printAttributeNames( asset_id, object_id, detail_info, (HAPI_AttributeOwner) owner );
 	}
 		
 #if DEBUG

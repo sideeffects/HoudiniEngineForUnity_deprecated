@@ -128,24 +128,24 @@ namespace HAPI
 		ZYX
 	}
 	
-	public enum HAPI_AttributeType
+	public enum HAPI_AttributeOwner
 	{
-		HAPI_ATTRTYPE_INVALID = -1,
-		HAPI_ATTRTYPE_VERTEX,
-	    HAPI_ATTRTYPE_POINT,
-	    HAPI_ATTRTYPE_PRIM,
-		HAPI_ATTRTYPE_DETAIL,
-	    HAPI_ATTRTYPE_MAX
+		HAPI_ATTROWNER_INVALID = -1,
+		HAPI_ATTROWNER_VERTEX,
+	    HAPI_ATTROWNER_POINT,
+	    HAPI_ATTROWNER_PRIM,
+		HAPI_ATTROWNER_DETAIL,
+	    HAPI_ATTROWNER_MAX
 	}
 	
-	enum HAPI_DataType
+	public enum HAPI_StorageType
 	{
-		HAPI_DATATYPE_INVALID = -1,
-		HAPI_DATATYPE_INT,
-		HAPI_DATATYPE_FLOAT,
-		HAPI_DATATYPE_STR,
-		HAPI_DATATYPE_MAX
-	};
+		HAPI_STORAGETYPE_INVALID = -1,
+		HAPI_STORAGETYPE_INT,
+		HAPI_STORAGETYPE_FLOAT,
+		HAPI_STORAGETYPE_STR,
+		HAPI_STORAGETYPE_MAX
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Main API Structs
@@ -384,6 +384,18 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_DetailInfo
 	{
+		public int		getOwnerCount( HAPI_AttributeOwner owner )
+		{
+			switch ( owner )
+			{
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX: return vertexAttributeCount;
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_POINT: return pointAttributeCount;
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM: return faceAttributeCount;
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL: return detailAttributeCount;
+				default: return 0;
+			}
+		}
+		
 		public int	    faceCount;
 		public int	    vertexCount;
 		public int		pointCount;
@@ -398,12 +410,12 @@ namespace HAPI
 	{		
 		public HAPI_AttributeInfo( string attr_name )
 		{
-			name 			= attr_name;
-			exists 			= false;
-			attributeType 	= (int) HAPI_AttributeType.HAPI_ATTRTYPE_INVALID;
-			dataType 		= (int) HAPI_DataType.HAPI_DATATYPE_INVALID;
-			count 			= 0;
-			tupleSize 		= 0;
+			name 		= attr_name;
+			exists 		= false;
+			owner 		= (int) HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
+			storage 	= (int) HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
+			count 		= 0;
+			tupleSize 	= 0;
 		}
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, 
@@ -413,8 +425,8 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool		exists;
 		
-		public int		attributeType;  // enum HAPI_AttributeType
-		public int		dataType; // enum HAPI_DataType
+		public int		owner;  // enum HAPI_AttributeOwner
+		public int		storage; // enum HAPI_StorageType
 		public int		count;
 		public int		tupleSize;
 	}
@@ -424,7 +436,7 @@ namespace HAPI
 	{
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_ATTR_MAX_STRING_SIZE ) ]
-		public string	name;
+		public string	value;
 	}
 	
 }
