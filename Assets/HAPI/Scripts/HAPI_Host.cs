@@ -406,15 +406,13 @@ namespace HAPI
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
 		/// <param name="face_counts">
-		/// 	An integer array at least the size of <paramref name="end"/> - <paramref name="start"/>.
+		/// 	An integer array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First index of range. Must be at least 0
-		/// 	and at most <paramref name="end"/>.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_DetailInfo.faceCount"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last non-inclusive index of range. Must be at least <paramref name="start"/> and
-		/// 	at most <see cref="HAPI_DetailInfo.faceCount"/>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_DetailInfo.faceCount"/> - <paramref name="start"/>.
 		/// </param>
 		static public void getFaceCounts(		int asset_id, int object_id,
 												[Out] int[] face_counts,
@@ -435,15 +433,13 @@ namespace HAPI
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
 		/// <param name="vertex_list">
-		/// 	An integer array at least the size of <paramref name="end"/> - <paramref name="start"/>.
+		/// 	An integer array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First index of range. Must be at least 0
-		/// 	and at most <paramref name="end"/>.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_DetailInfo.vertexCount"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last non-inclusive index of range. Must be at least <paramref name="start"/> and
-		/// 	at most <see cref="HAPI_DetailInfo.vertexCount"/>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_DetailInfo.vertexCount"/> - <paramref name="start"/>.
 		/// </param>
 		static public void getVertexList(		int asset_id, int object_id,
 												[Out] int[] vertex_list,
@@ -522,15 +518,13 @@ namespace HAPI
 		/// 	the same struct returned by <see cref="HAPI_Host.getAttributeInfo"/>.
 		/// </param>
 		/// <param name="data">
-		/// 	An integer array at least the size of <paramref name="end"/> - <paramref name="start"/>.
+		/// 	An integer array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First index of range. Must be at least 0
-		/// 	and at most <paramref name="end"/>.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last non-inclusive index of range. Must be at least <paramref name="start"/> and
-		/// 	at most <see cref="HAPI_AttributeInfo.count"/>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
 		static public void getAttributeIntData( int asset_id, int object_id,
 												ref HAPI_AttributeInfo attr_info,
@@ -556,15 +550,13 @@ namespace HAPI
 		/// 	the same struct returned by <see cref="HAPI_Host.getAttributeInfo"/>.
 		/// </param>
 		/// <param name="data">
-		/// 	An float array at least the size of <paramref name="end"/> - <paramref name="start"/>.
+		/// 	An float array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First index of range. Must be at least 0
-		/// 	and at most <paramref name="end"/>.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last non-inclusive index of range. Must be at least <paramref name="start"/> and
-		/// 	at most <see cref="HAPI_AttributeInfo.count"/>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
 		static public void getAttributeFloatData(	int asset_id, int object_id,
 													ref HAPI_AttributeInfo attr_info,
@@ -590,16 +582,13 @@ namespace HAPI
 		/// 	the same struct returned by <see cref="HAPI_Host.getAttributeInfo"/>.
 		/// </param>
 		/// <param name="data">
-		/// 	An string (<see cref="HAPI_AttributeStrValue"/>) array at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
+		/// 	An string (<see cref="HAPI_AttributeStrValue"/>) array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First index of range. Must be at least 0
-		/// 	and at most <paramref name="end"/>.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last non-inclusive index of range. Must be at least <paramref name="start"/> and
-		/// 	at most <see cref="HAPI_AttributeInfo.count"/>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
 		static public void getAttributeStrData( int asset_id, int object_id,
 												ref HAPI_AttributeInfo attr_info,
