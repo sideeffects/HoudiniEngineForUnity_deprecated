@@ -25,7 +25,9 @@ namespace HAPI
 	// Defines
 	
 	public struct HAPI_Constants
-	{		
+	{
+		public const int HAPI_MAX_PAGE_SIZE					= 32768;
+		
 		public const int HAPI_POSITION_VECTOR_SIZE			= 3;
 		public const int HAPI_SCALE_VECTOR_SIZE				= 3;
 		public const int HAPI_NORMAL_VECTOR_SIZE			= 3;

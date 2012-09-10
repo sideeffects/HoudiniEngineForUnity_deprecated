@@ -327,18 +327,14 @@ public class HAPI_ObjectControl : MonoBehaviour
 		float[] uv_attr = new float[ 0 ];
 		getAttribute( myAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
 		
-		// Apply object transforms.
-		
+		// Apply object transforms.		
 		main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 
 																trans.position[ 1 ],
-																trans.position[ 2 ] );
-		
-		main_child.transform.localRotation 	= new Quaternion( 	trans.rotationQuaternion[0],
-														  	trans.rotationQuaternion[1],
-															trans.rotationQuaternion[2],
-															trans.rotationQuaternion[3]);
-		
-
+																trans.position[ 2 ] );		
+		main_child.transform.localRotation 	= new Quaternion( 	trans.rotationQuaternion[ 0 ],
+														  		trans.rotationQuaternion[ 1 ],
+																trans.rotationQuaternion[ 2 ],
+																trans.rotationQuaternion[ 3 ] );
 		main_child.transform.localScale = new Vector3( 			trans.scale[ 0 ], 
 													  			trans.scale[ 1 ], 
 													  			trans.scale[ 2 ] );
@@ -416,35 +412,33 @@ public class HAPI_ObjectControl : MonoBehaviour
 	/// </param>
 	private void fillArray< T >( int asset_id, int object_id, T[] items, fillArrayInputFunc< T > get_func, int count ) 
 	{
-		// TODO: This number works well but it depends heavily on the size of T. 
-		// Should set it in a smarter way. Via sizeOf( T )?
-		const int max_array_size = 8000;
+		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / Marshal.SizeOf( typeof( T ) );
 		
 		int local_count = count;
 		int current_index = 0;
 		
 		while ( local_count > 0 ) 
 		{			
-			int delta = 0;
+			int length = 0;
 			if ( local_count > max_array_size ) 
 			{
-				delta = max_array_size;
+				length = max_array_size;
 				local_count -= max_array_size;
 			} 
 			else 
 			{
-				delta = local_count;
+				length = local_count;
 				local_count = 0;
 			}
 			
-			T[] local_array = new T[ delta ];
-			get_func( asset_id, object_id, local_array, current_index, delta );
+			T[] local_array = new T[ length ];
+			get_func( asset_id, object_id, local_array, current_index, length );
 			
 			// Copy data from the temporary array.
-			for ( int i = current_index; i < current_index + delta; ++i )				
+			for ( int i = current_index; i < current_index + length; ++i )				
 				items[ i ] = local_array[ i - current_index ];
 			
-			current_index += delta;
+			current_index += length;
 		}
 	}
 	
@@ -481,36 +475,34 @@ public class HAPI_ObjectControl : MonoBehaviour
 	private void fillAttrArray< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
 									 T[] items, fillAttrArrayInputFunc< T > get_func, int count ) 
 	{
-		// TODO: This number works well but it depends heavily on the size of T. 
-		// Should set it in a smarter way. Via sizeOf( T )?
-		const int max_array_size = 8000;
+		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
 		
 		int local_count = count;
 		int current_index = 0;
 		
 		while ( local_count > 0 ) 
 		{			
-			int delta = 0;
+			int length = 0;
 			if ( local_count > max_array_size ) 
 			{
-				delta = max_array_size;
+				length = max_array_size;
 				local_count -= max_array_size;
 			} 
 			else 
 			{
-				delta = local_count;
+				length = local_count;
 				local_count = 0;
 			}
 			
-			T[] local_array = new T[ delta * info.tupleSize ];
-			get_func( asset_id, object_id, ref info, local_array, current_index, delta );
+			T[] local_array = new T[ length * info.tupleSize ];
+			get_func( asset_id, object_id, ref info, local_array, current_index, length );
 			
 			// Copy data from the temporary array.
-			for ( int i = current_index; i < current_index + delta; ++i )
+			for ( int i = current_index; i < current_index + length; ++i )
 				for ( int j = 0; j < info.tupleSize; ++j )
 					items[ i * info.tupleSize + j ] = local_array[ ( i - current_index ) * info.tupleSize + j ];
 			
-			current_index += delta;
+			current_index += length;
 		}
 	}
 	

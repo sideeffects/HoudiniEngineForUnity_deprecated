@@ -535,9 +535,9 @@ namespace HAPI
 		static public void getAttributeIntData( int asset_id, int object_id,
 												ref HAPI_AttributeInfo attr_info,
 												[Out] int[] data,
-												int start, int end )
+												int start, int length )
 		{
-			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, ref attr_info, data, start, end );
+			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, ref attr_info, data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -569,9 +569,9 @@ namespace HAPI
 		static public void getAttributeFloatData(	int asset_id, int object_id,
 													ref HAPI_AttributeInfo attr_info,
 													[Out] float[] data,
-													int start, int end )
+													int start, int length )
 		{
-			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, ref attr_info, data, start, end );
+			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, ref attr_info, data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -604,9 +604,9 @@ namespace HAPI
 		static public void getAttributeStrData( int asset_id, int object_id,
 												ref HAPI_AttributeInfo attr_info,
 												[Out] HAPI_AttributeStrValue[] data,
-												int start, int end )
+												int start, int length )
 		{
-			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, ref attr_info, data, start, end );
+			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, ref attr_info, data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -626,8 +626,8 @@ namespace HAPI
 	    ///			The desired rotation order of the output        
 	    ///         XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
 	    /// </param>
-	    static public void convertTransform( ref HAPI_TransformEuler transform_in_out, 
-	                                     int rst_order, int rot_order )
+	    static public void convertTransform( 	ref HAPI_TransformEuler transform_in_out, 
+	                                     		int rst_order, int rot_order )
 		{
 			int status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
 			processStatusCode( (HAPI_StatusCode) status_code );
@@ -732,19 +732,23 @@ namespace HAPI
 		private static extern int HAPI_GetAttributeIntData( int asset_id, int object_id,
 															ref HAPI_AttributeInfo attr_info,
 															[Out] int[] data,
-															int start, int end );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeFloatData( int asset_id, int object_id,
 															  ref HAPI_AttributeInfo attr_info,
 															  [Out] float[] data,
-															  int start, int end );
+															  int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeStrData( int asset_id, int object_id,
 															ref HAPI_AttributeInfo attr_info,
 															[Out] HAPI_AttributeStrValue[] data,
-															int start, int end );
+															int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConvertTransform( 	ref HAPI_TransformEuler transform_in_out, 
+                                     					 	int rst_order, int rot_order );
 		
 		// None-exposed API calls: ----------------------------------------------------------------------------------
 		
@@ -765,11 +769,6 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_UnloadOTLFile( 		int asset_id );
-		
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_ConvertTransform( ref HAPI_TransformEuler transform_in_out, 
-                                     int rst_order, int rot_order );
 		
 	}
 
