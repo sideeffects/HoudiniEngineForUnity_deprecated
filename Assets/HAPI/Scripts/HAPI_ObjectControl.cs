@@ -149,16 +149,16 @@ public class HAPI_ObjectControl : MonoBehaviour
 			myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
 			HAPI_Host.getHandleInfo( myAssetId, myHandleInfos, 0, myHandleCount );
 			
-			myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >();
+			myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( myHandleCount );					
 			
 			for ( int handle_index = 0; handle_index < myHandleCount; ++handle_index )
 			{				
 				
-				HAPI_HandleInfo handleInfo = myHandleInfos[handle_index];
-				HAPI_HandleBindingInfo[] handleBindingInfos = new HAPI_HandleBindingInfo[handleInfo.bindingsCount];
-				HAPI_Host.getHandleBindingInfo(myAssetId, handle_index, handleBindingInfos, 0, handleInfo.bindingsCount);
+				HAPI_HandleInfo handleInfo = myHandleInfos[ handle_index ];
+				HAPI_HandleBindingInfo[] handleBindingInfos = new HAPI_HandleBindingInfo[ handleInfo.bindingsCount ];
+				HAPI_Host.getHandleBindingInfo( myAssetId, handle_index, handleBindingInfos, 0, handleInfo.bindingsCount );
 				
-				myHandleBindingInfos.Add(handleBindingInfos);
+				myHandleBindingInfos.Add( handleBindingInfos );
 			}
 		
 			
@@ -172,7 +172,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 			// Set extra parameter values.
 			HAPI_Host.setParmExtraValues( myAssetId, myParmExtraValues, myParmExtraValueCount );
 		}
-			
+					
 		// Clean up.
 		destroyChildren();
 		
@@ -181,12 +181,11 @@ public class HAPI_ObjectControl : MonoBehaviour
 		myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
 		
 		HAPI_Host.getObjects( 				myAssetId, myObjects, 0, myObjectCount );
-		HAPI_Host.getObjectTransforms( 	myAssetId, myObjectTransforms, 0, myObjectCount );
+		HAPI_Host.getObjectTransforms( 	myAssetId, myObjectTransforms, 0, myObjectCount, HAPI_RSTOrder.SRT );
 		
 		for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			createObject( object_index );
-		
-		
+						
 		return true;
 	}
 		
@@ -323,13 +322,14 @@ public class HAPI_ObjectControl : MonoBehaviour
 		
 		// Apply object transforms.
 		
-		main_child.transform.position 	= new Vector3( 			trans.position[ 0 ], 
+		main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 
 																trans.position[ 1 ],
 																trans.position[ 2 ] );
-				float conv = (180.0f / 3.1415926f);
-		main_child.transform.rotation 	= Quaternion.Euler(     trans.pitch * conv, 
-														 	    trans.yaw * conv, 
-														  		trans.roll * conv );
+		
+		main_child.transform.localRotation 	= new Quaternion( 	trans.rotationQuaternion[0],
+														  	trans.rotationQuaternion[1],
+															trans.rotationQuaternion[2],
+															trans.rotationQuaternion[3]);
 		
 
 		main_child.transform.localScale = new Vector3( 			trans.scale[ 0 ], 

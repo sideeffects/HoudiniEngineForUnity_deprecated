@@ -363,11 +363,16 @@ namespace HAPI
 		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
 		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
 		/// </param>
-		public static void getObjectTransforms( 	int asset_id, 
+		/// <param name="rstOrder">
+	    ///		The order of application of translation, rotation and
+	    ///     scale:
+	    ///		TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5	    
+	    /// </param>
+		public static void getObjectTransforms( 		int asset_id, 
 													[Out] HAPI_Transform[] transforms, 
-													int start, int end )
+													int start, int end, HAPI_RSTOrder rstOrder )
 		{
-			int status_code = HAPI_GetObjectTransforms( asset_id, transforms, start, end );
+			int status_code = HAPI_GetObjectTransforms( asset_id, transforms, start, end, (int) rstOrder );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -605,6 +610,29 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary>	
+		/// 	Fill an array of HAPI_RawInstance structs with vertex 
+	    ///		information from an object's geometry.
+		/// </summary>
+	    ///
+	    /// <param name= "transform_in_out">	    
+	    ///			Used for both input and output.
+		/// </param>
+	    /// <param name="rst_order">
+	    ///         input. The desired transform order of the output
+	    /// 		TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5    
+	    /// </param>	    
+	    ///	<param name="rot_order">
+	    ///			The desired rotation order of the output        
+	    ///         XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
+	    /// </param>
+	    static public void convertTransform( ref HAPI_TransformEuler transform_in_out, 
+	                                     int rst_order, int rot_order )
+		{
+			int status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
 		
@@ -672,7 +700,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetObjectTransforms( int asset_id, 
 															[Out] HAPI_Transform[] transforms, 
-															int start, int end );
+															int start, int end, int rstOrder );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetDetailInfo(		int asset_id, int object_id,
@@ -736,6 +764,11 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_UnloadOTLFile( 		int asset_id );
+		
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConvertTransform( ref HAPI_TransformEuler transform_in_out, 
+                                     int rst_order, int rot_order );
 		
 	}
 

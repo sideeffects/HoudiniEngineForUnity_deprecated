@@ -29,6 +29,8 @@ namespace HAPI
 		public const int HAPI_POSITION_VECTOR_SIZE			= 3;
 		public const int HAPI_SCALE_VECTOR_SIZE				= 3;
 		public const int HAPI_NORMAL_VECTOR_SIZE			= 3;
+		public const int HAPI_QUATERNION_VECTOR_SIZE		= 4;
+		public const int HAPI_EULER_VECTOR_SIZE				= 3;		
 		public const int HAPI_UV_VECTOR_SIZE				= 2;
 		
 		public const int HAPI_GENERIC_MAX_NAME_SIZE			= 256;
@@ -104,6 +106,26 @@ namespace HAPI
 		
 		HAPI_PARMTYPE_NONVALUE_START	= HAPI_PARMTYPE_FOLDERLIST,
 		HAPI_PARMTYPE_NONVALUE_END		= HAPI_PARMTYPE_SEPARATOR
+	}
+	
+	public enum HAPI_RSTOrder
+	{
+		TRS = 0, 
+		TSR, 
+		RTS, 
+		RST, 
+		STR,
+		SRT
+	}
+	
+	public enum HAPI_XYZOrder
+	{
+		XYZ = 0, 
+		XZY, 
+		YXZ, 
+		YZX, 
+		ZXY, 
+		ZYX
 	}
 	
 	public enum HAPI_AttributeType
@@ -292,20 +314,51 @@ namespace HAPI
 					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
 					 ArraySubType = UnmanagedType.R4 ) ]
 		public float[] position;
-		
-		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float roll;
-		
-		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float pitch;
-		
-		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float yaw;
+				
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] rotationQuaternion;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
 					 ArraySubType = UnmanagedType.R4 ) ]
 		public float[] scale;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_TransformEuler 
+	{
+		public HAPI_TransformEuler(bool initializeFields)
+		{
+			position = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
+			rotationeEuler = new float[HAPI_Constants.HAPI_EULER_VECTOR_SIZE];
+			scale = new float[HAPI_Constants.HAPI_SCALE_VECTOR_SIZE];
+			id = 0;
+			rotationOrder = 0;
+			rstOrder = 0;
+		}
+		
+	    public int id;
+	
+	    [ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] position;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_EULER_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] rotationeEuler;			    
+		
+		
+	    [ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] scale;
+	
+	    public int     rotationOrder;
+	    public int     rstOrder;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
