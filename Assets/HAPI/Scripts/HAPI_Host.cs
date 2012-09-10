@@ -391,8 +391,8 @@ namespace HAPI
 		}
 		
 		/// <summary>
-		/// 	Get the array of faces where the n'th integer in the array is the number of vertices
-		/// 	the n'th face has.
+		/// 	Get the array of faces where the nth integer in the array is the number of vertices
+		/// 	the nth face has.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
@@ -486,11 +486,11 @@ namespace HAPI
 		/// </param>
 		/// <param name="data">
 		/// 	Array of strings (<see cref="HAPI_AttributeStrValue"/>) to house the attribute names.
-		/// 	Should be exactly the size of the appropiate attribute owner type count 
+		/// 	Should be exactly the size of the appropriate attribute owner type count 
 		/// 	in <see cref="HAPI_DetailInfo"/>.
 		/// </param>
 		/// <param name="count">
-		/// 	Sanity check count. Must be equal to the appropiate attribute owner type count 
+		/// 	Sanity check count. Must be equal to the appropriate attribute owner type count 
 		/// 	in <see cref="HAPI_DetailInfo"/>.
 		/// </param>
 		static public void getAttributeArray(	int asset_id, int object_id,
