@@ -352,14 +352,21 @@ public class HAPI_ObjectControl : MonoBehaviour
 			}
 			if ( uv_attr_info.exists )
 			{
+				// If the UVs are per vertex just query directly into the UV array we filled above.
 				if ( uv_attr_info.attributeType == (int) HAPI_AttributeType.HAPI_ATTRTYPE_VERTEX )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
+				
+				// If the UVs are per point use the vertex list array point indicies to query into
+				// the UV array we filled above.
 				else if ( uv_attr_info.attributeType == (int) HAPI_AttributeType.HAPI_ATTRTYPE_POINT )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
 			}
 		}
+		
+		// Triangles are already specified by design. The only thing we need to do is reverse the order
+		// for Unity. We do this with the ( 2 - j ) below.
 		for ( int i = 0; i < detail_info.faceCount; ++i ) 
 			for ( int j = 0; j < 3; ++j )
 				triangles[ i * 3 + j ] 	= i * 3 + ( 2 - j );
@@ -386,10 +393,10 @@ public class HAPI_ObjectControl : MonoBehaviour
 	/// 	Array item type.
 	/// </typeparam>
 	/// <param name="asset_id">
-	/// 	Asset_id as returned by <see cref="LoadOTLFile"/>.
+	/// 	Asset_id as returned by <see cref="HAPI_Host.loadOTLFile"/>.
 	/// </param>
 	/// <param name="object_id">
-	/// 	Object_id as returned by <see cref="GetObjects"/>.
+	/// 	Object_id as returned by <see cref="HAPI_Host.getObjects"/>.
 	/// </param>
 	/// <param name="items">
 	/// 	Array of items to be filled.
@@ -447,10 +454,13 @@ public class HAPI_ObjectControl : MonoBehaviour
 	/// 	Array item type.
 	/// </typeparam>
 	/// <param name="asset_id">
-	/// 	Asset_id as returned by <see cref="LoadOTLFile"/>.
+	/// 	Asset_id as returned by <see cref="HAPI_Host.loadOTLFile"/>.
 	/// </param>
 	/// <param name="object_id">
-	/// 	Object_id as returned by <see cref="GetObjects"/>.
+	/// 	Object_id as returned by <see cref="HAPI_Host.getObjects"/>.
+	/// </param>
+	/// <param name="info">
+	/// 	<see cref="HAPI_AttributeInfo"/> use as input specifying the name and tuple size of the attribute.
 	/// </param>
 	/// <param name="items">
 	/// 	Array of items to be filled.
@@ -497,6 +507,27 @@ public class HAPI_ObjectControl : MonoBehaviour
 		}
 	}
 	
+	/// <summary>
+	/// 	User to easily get attribute data when owner information is not known.
+	/// </summary>
+	/// <typeparam name="T">
+	/// 	Array item type.
+	/// </typeparam>
+	/// <param name="asset_id">
+	/// 	Asset_id as returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	/// </param>
+	/// <param name="object_id">
+	/// 	Object_id as returned by <see cref="HAPI_Host.getObjects"/>.
+	/// </param>
+	/// <param name="info">
+	/// 	<see cref="HAPI_AttributeInfo"/> use as input specifying the name and tuple size of the attribute.
+	/// </param>
+	/// <param name="data">
+	/// 	Data array to be filled of type T.
+	/// </param>
+	/// <param name="get_func">
+	/// 	Function used to fill the item array. Must match the signature of <see cref="fillAttrArrayInputFunc"/>.
+	/// </param>
 	private void getAttribute< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, ref T[] data,
 									fillAttrArrayInputFunc< T > get_func )
 	{
