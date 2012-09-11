@@ -55,7 +55,7 @@ namespace HAPI
 		/// <returns>
 		/// 	Whether the singleton Houdini scene has been created yet or not.
 		/// </returns>
-		static public bool hasScene() 
+		public static bool hasScene() 
 		{
 			return myHoudiniSceneExists;
 		}
@@ -69,7 +69,7 @@ namespace HAPI
 		/// <returns>
 		/// 	An initialized <see cref="HAPI_AssetInfo"/>.
 		/// </returns>
-		static public HAPI_AssetInfo loadOTL( string path ) 
+		public static HAPI_AssetInfo loadOTL( string path ) 
 		{
 			HAPI_StatusCode status_code = 0;			
 			
@@ -119,7 +119,7 @@ namespace HAPI
 		/// <returns>
 		/// 	<c>true</c> if successfully unload the asset, <c>false</c> otherwise.
 		/// </returns>
-		static public bool unloadOTL( int asset_id ) 
+		public static bool unloadOTL( int asset_id ) 
 		{
 			if ( asset_id < 0 )
 				return false;
@@ -137,6 +137,33 @@ namespace HAPI
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Public HAPI API
+		
+		// GENERICS -------------------------------------------------------------------------------------------------
+		
+		/// <summary>	
+		/// 	Fill an array of HAPI_RawInstance structs with vertex 
+	    ///		information from an object's geometry.
+		/// </summary>
+	    ///
+	    /// <param name= "transform_in_out">	    
+	    ///			Used for both input and output.
+		/// </param>
+	    /// <param name="rst_order">
+	    ///         input. The desired transform order of the output
+	    /// 		TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5    
+	    /// </param>	    
+	    ///	<param name="rot_order">
+	    ///			The desired rotation order of the output        
+	    ///         XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
+	    /// </param>
+	    public static void convertTransform( 	ref HAPI_TransformEuler transform_in_out, 
+	                                     		int rst_order, int rot_order )
+		{
+			int status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		/// <summary>
 		/// 	Fill an array of HAPI_ParmInfo structs with parameter information from the asset instance node.
@@ -256,6 +283,7 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
+		// HANDLES --------------------------------------------------------------------------------------------------
 		
 		/// <summary>	
 		/// 	Fill an array of HAPI_HandleInfo structs with information
@@ -311,6 +339,8 @@ namespace HAPI
 			int status_code = HAPI_GetHandleBindingInfo( asset_id, handle_index, handle_infos, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
+		
+		// OBJECTS --------------------------------------------------------------------------------------------------
 		
 		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object 
@@ -368,6 +398,8 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
+		// DETAILS --------------------------------------------------------------------------------------------------
+		
 		/// <summary>
 		/// 	Get the main detail/geometry info struct (<see cref="HAPI_DetailInfo"/>).
 		/// </summary>
@@ -380,7 +412,7 @@ namespace HAPI
 		/// <param name="detail_info">
 		/// 	<see cref="HAPI_DetailInfo"/> out parameter.
 		/// </param>
-		static public void getDetailInfo(		int asset_id, int object_id,
+		public static void getDetailInfo(		int asset_id, int object_id,
 												out HAPI_DetailInfo detail_info )
 		{
 			int status_code = HAPI_GetDetailInfo( asset_id, object_id, out detail_info );
@@ -406,7 +438,7 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_DetailInfo.faceCount"/> - <paramref name="start"/>.
 		/// </param>
-		static public void getFaceCounts(		int asset_id, int object_id,
+		public static void getFaceCounts(		int asset_id, int object_id,
 												[Out] int[] face_counts,
 												int start, int length )
 		{
@@ -433,7 +465,7 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_DetailInfo.vertexCount"/> - <paramref name="start"/>.
 		/// </param>
-		static public void getVertexList(		int asset_id, int object_id,
+		public static void getVertexList(		int asset_id, int object_id,
 												[Out] int[] vertex_list,
 												int start, int length )
 		{
@@ -457,7 +489,7 @@ namespace HAPI
 		/// 	<see cref="HAPI_AttributeInfo"/> used as input for which (by name) attribute you want the info 
 		/// 	for and as output for the rest of the information.
 		/// </param>
-		static public void getAttributeInfo(	int asset_id, int object_id,
+		public static void getAttributeInfo(	int asset_id, int object_id,
 												int attribute_type,
 												ref HAPI_AttributeInfo attr_info )
 		{
@@ -486,7 +518,7 @@ namespace HAPI
 		/// 	Sanity check count. Must be equal to the appropriate attribute owner type count 
 		/// 	in <see cref="HAPI_DetailInfo"/>.
 		/// </param>
-		static public void getAttributeNames(	int asset_id, int object_id,
+		public static void getAttributeNames(	int asset_id, int object_id,
 												int attribute_type,
 												[Out] HAPI_AttributeStrValue[] data,
 												int count )
@@ -518,7 +550,7 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		static public void getAttributeIntData( int asset_id, int object_id,
+		public static void getAttributeIntData( int asset_id, int object_id,
 												ref HAPI_AttributeInfo attr_info,
 												[Out] int[] data,
 												int start, int length )
@@ -550,7 +582,7 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		static public void getAttributeFloatData(	int asset_id, int object_id,
+		public static void getAttributeFloatData(	int asset_id, int object_id,
 													ref HAPI_AttributeInfo attr_info,
 													[Out] float[] data,
 													int start, int length )
@@ -582,7 +614,7 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		static public void getAttributeStrData( int asset_id, int object_id,
+		public static void getAttributeStrData( int asset_id, int object_id,
 												ref HAPI_AttributeInfo attr_info,
 												[Out] HAPI_AttributeStrValue[] data,
 												int start, int length )
@@ -591,38 +623,15 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
-		/// <summary>	
-		/// 	Fill an array of HAPI_RawInstance structs with vertex 
-	    ///		information from an object's geometry.
-		/// </summary>
-	    ///
-	    /// <param name= "transform_in_out">	    
-	    ///			Used for both input and output.
-		/// </param>
-	    /// <param name="rst_order">
-	    ///         input. The desired transform order of the output
-	    /// 		TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5    
-	    /// </param>	    
-	    ///	<param name="rot_order">
-	    ///			The desired rotation order of the output        
-	    ///         XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
-	    /// </param>
-	    static public void convertTransform( 	ref HAPI_TransformEuler transform_in_out, 
-	                                     		int rst_order, int rot_order )
-		{
-			int status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
-			processStatusCode( (HAPI_StatusCode) status_code );
-		}
-		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
 		
-		static private bool hasCallFailed( HAPI_StatusCode code )
+		private static bool hasCallFailed( HAPI_StatusCode code )
 		{
 			return ( (int) code > 0 );	
 		}
 		
-		static private void processStatusCode( HAPI_StatusCode code )
+		private static void processStatusCode( HAPI_StatusCode code )
 		{
 			if ( hasCallFailed( code ) )
 			{
@@ -638,6 +647,14 @@ namespace HAPI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private HAPI API
 		
+		// GENERICS -------------------------------------------------------------------------------------------------
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConvertTransform( 	ref HAPI_TransformEuler transform_in_out, 
+                                     					 	int rst_order, int rot_order );
+		
+		// PARAMETERS -----------------------------------------------------------------------------------------------
+		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParameters( 		int asset_id, 
 															[Out] HAPI_ParmInfo[] parm_infos, 
@@ -649,17 +666,6 @@ namespace HAPI
 															int start, int length );
 		
 	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	    private static extern int HAPI_GetHandleInfo(		int asset_id, 
-															[Out] HAPI_HandleInfo[] handle_infos,
-															int start, int length );		
-		
-	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-	    private static extern int HAPI_GetHandleBindingInfo(int asset_id,
-				                                         	int handle_index,
-															[Out] HAPI_HandleBindingInfo[] handle_infos,
-															int start, int length );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParmChoiceLists( 	int asset_id, 
 															[Out] HAPI_ParmChoiceInfo[] parm_choices, 
 															int start, int length );
@@ -674,6 +680,21 @@ namespace HAPI
 															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
 															int start, int length );
 		
+		// HANDLES --------------------------------------------------------------------------------------------------
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	    private static extern int HAPI_GetHandleInfo(		int asset_id, 
+															[Out] HAPI_HandleInfo[] handle_infos,
+															int start, int length );		
+		
+	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	    private static extern int HAPI_GetHandleBindingInfo(int asset_id,
+				                                         	int handle_index,
+															[Out] HAPI_HandleBindingInfo[] handle_infos,
+															int start, int length );
+		
+		// OBJECTS --------------------------------------------------------------------------------------------------
+		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetObjects( 			int asset_id, 
 															[Out] HAPI_ObjectInfo[] object_infos, 
@@ -684,6 +705,8 @@ namespace HAPI
 															[Out] HAPI_Transform[] transforms, 
 															int rst_order,
 															int start, int length );
+		
+		// DETAILS --------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetDetailInfo(		int asset_id, int object_id,
@@ -727,10 +750,6 @@ namespace HAPI
 															ref HAPI_AttributeInfo attr_info,
 															[Out] HAPI_AttributeStrValue[] data,
 															int start, int length );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_ConvertTransform( 	ref HAPI_TransformEuler transform_in_out, 
-                                     					 	int rst_order, int rot_order );
 		
 		// None-exposed API calls: ----------------------------------------------------------------------------------
 		

@@ -152,6 +152,66 @@ namespace HAPI
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Main API Structs
 	
+	// GENERICS -----------------------------------------------------------------------------------------------------
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_Transform 
+	{
+		public int id;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] position;
+				
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] rotationQuaternion;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] scale;
+	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_TransformEuler 
+	{
+		public HAPI_TransformEuler(bool initializeFields)
+		{
+			position = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
+			rotationeEuler = new float[HAPI_Constants.HAPI_EULER_VECTOR_SIZE];
+			scale = new float[HAPI_Constants.HAPI_SCALE_VECTOR_SIZE];
+			id = 0;
+			rotationOrder = 0;
+			rstOrder = 0;
+		}
+		
+	    public int id;
+	
+	    [ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] position;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_EULER_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] rotationeEuler;			    
+		
+		
+	    [ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] scale;
+	
+	    public int     rotationOrder;
+	    public int     rstOrder;
+	}
+	
+	// ASSETS -------------------------------------------------------------------------------------------------------
+	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_AssetInfo 
 	{
@@ -179,38 +239,7 @@ namespace HAPI
 		public int maxVerticesPerPrimitive;
 	}
 	
-	
-	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_HandleInfo
-	{
-	
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
-	    public string handleTypeName;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
-	    public string handleName;
-		
-	    public int  bindingsCount;
-	}
-
-	
-	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_HandleBindingInfo
-	{	    
-	
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]	
-	    public string handleParmName;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]
-	    public string assetParmName;
-		
-		public int    assetParmId;
-	};
-	
+	// PARAMETERS ---------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ParmSingleValue
@@ -307,61 +336,40 @@ namespace HAPI
 		public string value;
 	}
 	
-	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_Transform 
-	{
-		public int id;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] position;
-				
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] rotationQuaternion;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] scale;
-	}
+	// HANDLES ------------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_TransformEuler 
+	public struct HAPI_HandleInfo
 	{
-		public HAPI_TransformEuler(bool initializeFields)
-		{
-			position = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
-			rotationeEuler = new float[HAPI_Constants.HAPI_EULER_VECTOR_SIZE];
-			scale = new float[HAPI_Constants.HAPI_SCALE_VECTOR_SIZE];
-			id = 0;
-			rotationOrder = 0;
-			rstOrder = 0;
-		}
-		
-	    public int id;
 	
-	    [ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] position;
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
+	    public string handleTypeName;
 		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_EULER_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] rotationeEuler;			    
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
+	    public string handleName;
 		
-		
-	    [ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] scale;
-	
-	    public int     rotationOrder;
-	    public int     rstOrder;
+	    public int  bindingsCount;
 	}
+
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_HandleBindingInfo
+	{	    
+	
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]	
+	    public string handleParmName;
+		
+		[ MarshalAs( UnmanagedType.ByValTStr, 
+					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]
+	    public string assetParmName;
+		
+		public int    assetParmId;
+	};
+	
+	// OBJECTS ------------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ObjectInfo 
@@ -382,6 +390,8 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasGeoChanged;
 	}
+	
+	// DETAILS ------------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_DetailInfo
