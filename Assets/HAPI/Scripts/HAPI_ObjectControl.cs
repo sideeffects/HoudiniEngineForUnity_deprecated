@@ -289,11 +289,15 @@ public class HAPI_ObjectControl : MonoBehaviour
 		// Make sure our primitive and vertex numbers are supported by Unity.
 		// TODO: add this limit in a more proper place
 		if ( detail_info.faceCount > 65000 * 3 )
-			Debug.LogWarning( "Face count (" + detail_info.faceCount + ") above limit (" + ( 65000 * 3 ) + ")!" );
+		{
+			Debug.LogError( "Face count (" + detail_info.faceCount + ") above limit (" + ( 65000 * 3 ) + ")!" );
+			return;
+		}
 		if ( detail_info.vertexCount > 65000 )
-			Debug.LogWarning( "Vertex count (" + detail_info.vertexCount + ") above limit (" + 65000 + ")!" );
-		detail_info.faceCount	= Mathf.Min( detail_info.faceCount, 65000 * 3 );
-		detail_info.vertexCount = Mathf.Min( detail_info.vertexCount, 65000 );
+		{
+			Debug.LogError( "Vertex count (" + detail_info.vertexCount + ") above limit (" + 65000 + ")!" );
+			return;
+		}
 		
 		// Get Face counts.
 		int[] face_counts = new int[ detail_info.faceCount ];
