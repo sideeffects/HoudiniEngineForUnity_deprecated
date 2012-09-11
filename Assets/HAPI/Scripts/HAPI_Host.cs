@@ -146,15 +146,13 @@ namespace HAPI
 		/// </param>
 		/// <param name="parm_infos">
 		/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
+		/// 	<paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void getParameters( 	int asset_id, 
 											[Out] HAPI_ParmInfo[] parm_infos, 
@@ -179,9 +177,9 @@ namespace HAPI
 		/// </param>
 		public static void getParmExtraValues( 	int asset_id, 
 												[Out] HAPI_ParmSingleValue[] parm_extra_values, 
-												int count )
+												int start, int length )
 		{
-			int status_code = HAPI_GetParmExtraValues( asset_id, parm_extra_values, count );
+			int status_code = HAPI_GetParmExtraValues( asset_id, parm_extra_values, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -193,17 +191,19 @@ namespace HAPI
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 		/// <param name="parm_choices">
-		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of 
-		/// 	<see cref="HAPI_AssetInfo.parmChoiceCount"/>.
+		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of <paramref name="length"/>.
 		/// </param>
-		/// <param name="count">
-		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmChoiceCount"/>.
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmChoiceCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmChoiceCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void getParmChoiceLists( 	int asset_id, 
 												[Out] HAPI_ParmChoiceInfo[] parm_choices, 
-												int count )
+												int start, int length )
 		{
-			int status_code = HAPI_GetParmChoiceLists( asset_id, parm_choices, count );
+			int status_code = HAPI_GetParmChoiceLists( asset_id, parm_choices, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -215,21 +215,19 @@ namespace HAPI
 		/// </param>
 		/// <param name="parm_infos">
 		/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/> containing the new parameter values.
+		/// 	<paramref name="length"/> containing the new parameter values.
 		/// </param>
 		/// <param name="start">
-		/// 	First parameter index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last parameter index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_AssetInfo.parmCount"/> 
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void setParameters( 		int asset_id, 
 												[Out] HAPI_ParmInfo[] parm_infos, 
-												int start, int end )
+												int start, int length )
 		{
-			int status_code = HAPI_SetParameters( asset_id, parm_infos, start, end );
+			int status_code = HAPI_SetParameters( asset_id, parm_infos, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -240,17 +238,21 @@ namespace HAPI
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 		/// <param name="parm_extra_values">
-		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
-		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of <paramref name="length"/>.
 		/// </param>
-		/// <param name="count">
-		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void setParmExtraValues( 	int asset_id, 
 												[Out] HAPI_ParmSingleValue[] parm_extra_values, 
-												int count )
+												int start, int length )
 		{
-			int status_code = HAPI_SetParmExtraValues( asset_id, parm_extra_values, count );
+			int status_code = HAPI_SetParmExtraValues( asset_id, parm_extra_values, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -261,25 +263,22 @@ namespace HAPI
 		/// </summary>
 	    ///
 	    /// <param name="asset_id">
-	    ///			The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 	    /// <param name ="handle_infos">
-	    ///			Array of <see cref="HAPI_HandleInfo"/> exactly the size of
-	    ///			<see cref="HAPI_AssetInfo.handleCount"/>.
+	    ///		Array of <see cref="HAPI_HandleInfo"/> exactly the size of <paramref name="length"/>.
 		/// </param>
-	    ///	<param name="start">
-	    ///			First object index to begin fill. Must be at least 
-	    ///			0 and at most <paramref name="end"/> - 1.
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.handleCount"/> - 1.
 		/// </param>
-	    /// <param name ="end">
-	    ///			Last object index to fill up to. Must be at least <paramref name="start"/> + 1 and
-	    ///         at most <see cref="HAPI_AssetInfo.handleCount"/>
-	    /// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.handleCount"/> - <paramref name="start"/>.
+		/// </param>
 	    public static void getHandleInfo(	int asset_id, 
 											[Out] HAPI_HandleInfo[] handle_infos,
-											int start, int end )
+											int start, int length )
 		{
-			int status_code = HAPI_GetHandleInfo( asset_id, handle_infos, start, end );
+			int status_code = HAPI_GetHandleInfo( asset_id, handle_infos, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );				
 		}
 	
@@ -290,29 +289,26 @@ namespace HAPI
 		/// </summary>
 	    ///
 	    /// <param name="asset_id">
-	    ///			The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 		/// <param name="handle index">
-	    ///			The index of the handle, from 0 to handleCount - 1 from the call to <see cref="HAPI_Host.loadOTLFile"/>
+	    ///		The index of the handle, from 0 to handleCount - 1 from the call to <see cref="HAPI_Host.loadOTLFile"/>
 		/// </param>		
 		/// <param name ="handle_infos">
-	    ///			Array of <see cref="HAPI_HandleBindingInfo"/> exactly the size of
-	    ///			<see cref="HAPI_HandleInfo.bindingsCount"/>.
+	    ///		Array of <see cref="HAPI_HandleBindingInfo"/> exactly the size of <paramref name="length"/>.
 		/// </param>
-	    ///	<param name="start">
-	    ///			First object index to begin fill. Must be at least 
-	    ///			0 and at most <paramref name="end"/> - 1.
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_HandleInfo.bindingsCount"/> - 1.
 		/// </param>
-	    /// <param name ="end">
-	    ///			Last object index to fill up to. Must be at least <paramref name="start"/> + 1 and
-	    ///         at most <see cref="HAPI_HandleInfo.bindingsCount"/>
-	    /// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_HandleInfo.bindingsCount"/> - <paramref name="start"/>.
+		/// </param>
 	    public static void getHandleBindingInfo(	int asset_id,
 	                                         		int handle_index,
 													[Out] HAPI_HandleBindingInfo[] handle_infos,
-													int start, int end )
+													int start, int length )
 		{
-			int status_code = HAPI_GetHandleBindingInfo( asset_id, handle_index, handle_infos, start, end );
+			int status_code = HAPI_GetHandleBindingInfo( asset_id, handle_index, handle_infos, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -324,22 +320,19 @@ namespace HAPI
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 		/// <param name="object_infos">
-		/// 	Array of <see cref="HAPI_ObjectInfo"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>.
+		/// 	Array of <see cref="HAPI_ObjectInfo"/> at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First object index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - 1.
 		/// </param>
-		/// <param name="end">
-		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and
-		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void getObjects( 			int asset_id, 
 												[Out] HAPI_ObjectInfo[] object_infos, 
-												int start, int end )
+												int start, int length )
 		{
-			int status_code = HAPI_GetObjects( asset_id, object_infos, start, end );
+			int status_code = HAPI_GetObjects( asset_id, object_infos, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -352,27 +345,26 @@ namespace HAPI
 		/// </param>
 		/// <param name="transforms">
 		/// 	Array of <see cref="HAPI_Transform"/> at least the size of 
-		/// 	<paramref name="end"/> - <paramref name="start"/>. The <see cref="HAPI_Transform.id"/> of each will be 
+		/// 	<paramref name="length"/>. The <see cref="HAPI_Transform.id"/> of each will be 
     	/// 	set to the object id as given by <see cref="HAPI_Host.HAPI_GetObjects"/>.
 		/// </param>
-		/// <param name="start">
-		/// 	First object index to begin with. Must be at least 0
-		/// 	and at most <paramref name="end"/> - 1.
-		/// </param>
-		/// <param name="end">
-		/// 	Last object index to use. Must be at least <paramref name="start"/> + 1 and 
-		/// 	at most <see cref="HAPI_AssetInfo.objectCount"/>
-		/// </param>
-		/// <param name="rstOrder">
+		/// <param name="rst_order">
 	    ///		The order of application of translation, rotation and
 	    ///     scale:
 	    ///		TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5	    
 	    /// </param>
-		public static void getObjectTransforms( 		int asset_id, 
-													[Out] HAPI_Transform[] transforms, 
-													int start, int end, HAPI_RSTOrder rstOrder )
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - <paramref name="start"/>.
+		/// </param>
+		public static void getObjectTransforms(	int asset_id, 
+												[Out] HAPI_Transform[] transforms,
+												HAPI_RSTOrder rst_order,
+												int start, int length )
 		{
-			int status_code = HAPI_GetObjectTransforms( asset_id, transforms, start, end, (int) rstOrder );
+			int status_code = HAPI_GetObjectTransforms( asset_id, transforms, (int) rst_order, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -416,9 +408,9 @@ namespace HAPI
 		/// </param>
 		static public void getFaceCounts(		int asset_id, int object_id,
 												[Out] int[] face_counts,
-												int start, int end )
+												int start, int length )
 		{
-			int status_code = HAPI_GetFaceCounts( asset_id, object_id, face_counts, start, end );
+			int status_code = HAPI_GetFaceCounts( asset_id, object_id, face_counts, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -443,9 +435,9 @@ namespace HAPI
 		/// </param>
 		static public void getVertexList(		int asset_id, int object_id,
 												[Out] int[] vertex_list,
-												int start, int end )
+												int start, int length )
 		{
-			int status_code = HAPI_GetVertexList( asset_id, object_id, vertex_list, start, end );
+			int status_code = HAPI_GetVertexList( asset_id, object_id, vertex_list, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -637,7 +629,7 @@ namespace HAPI
 				StringBuilder error_str = new StringBuilder( 200 );
 				HAPI_GetLastErrorString( error_str );
 				Debug.LogError( error_str );
-				Debug.DebugBreak();
+				Debug.Break();
 			}
 		}
 		
@@ -649,48 +641,49 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParameters( 		int asset_id, 
 															[Out] HAPI_ParmInfo[] parm_infos, 
-															int start, int end );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParmExtraValues( 	int asset_id, 
 															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
-															int count );
+															int start, int length );
 		
 	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 	    private static extern int HAPI_GetHandleInfo(		int asset_id, 
 															[Out] HAPI_HandleInfo[] handle_infos,
-															int start, int end );		
+															int start, int length );		
 		
 	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 	    private static extern int HAPI_GetHandleBindingInfo(int asset_id,
 				                                         	int handle_index,
 															[Out] HAPI_HandleBindingInfo[] handle_infos,
-															int start, int end );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetParmChoiceLists( 	int asset_id, 
 															[Out] HAPI_ParmChoiceInfo[] parm_choices, 
-															int count );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetParameters( 		int asset_id, 
 															[Out] HAPI_ParmInfo[] parm_infos, 
-															int start, int end );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetParmExtraValues( 	int asset_id, 
 															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
-															int count );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetObjects( 			int asset_id, 
 															[Out] HAPI_ObjectInfo[] object_infos, 
-															int start, int end );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetObjectTransforms( int asset_id, 
 															[Out] HAPI_Transform[] transforms, 
-															int start, int end, int rstOrder );
+															int rst_order,
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetDetailInfo(		int asset_id, int object_id,
@@ -699,12 +692,12 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetFaceCounts(		int asset_id, int object_id,
 															[Out] int[] face_counts,
-															int start, int end );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetVertexList(		int asset_id, int object_id,
 															[Out] int[] vertex_list,
-															int start, int end );
+															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeInfo(	int asset_id, int object_id,

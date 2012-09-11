@@ -139,11 +139,11 @@ public class HAPI_ObjectControl : MonoBehaviour
 			
 			// Get any parameter extra values.
 			myParmExtraValues = new HAPI_ParmSingleValue[ myParmExtraValueCount ];
-			HAPI_Host.getParmExtraValues( myAssetId, myParmExtraValues, myParmExtraValueCount );
+			HAPI_Host.getParmExtraValues( myAssetId, myParmExtraValues, 0, myParmExtraValueCount );
 			
 			// Get parameter choice lists.
 			myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
-			HAPI_Host.getParmChoiceLists( myAssetId, myParmChoiceLists, myParmChoiceCount );
+			HAPI_Host.getParmChoiceLists( myAssetId, myParmChoiceLists, 0, myParmChoiceCount );
 			
 			// Get exposed handle information.
 			myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
@@ -156,7 +156,8 @@ public class HAPI_ObjectControl : MonoBehaviour
 				
 				HAPI_HandleInfo handleInfo = myHandleInfos[ handle_index ];
 				HAPI_HandleBindingInfo[] handleBindingInfos = new HAPI_HandleBindingInfo[ handleInfo.bindingsCount ];
-				HAPI_Host.getHandleBindingInfo( myAssetId, handle_index, handleBindingInfos, 0, handleInfo.bindingsCount );
+				HAPI_Host.getHandleBindingInfo( myAssetId, handle_index, 
+												handleBindingInfos, 0, handleInfo.bindingsCount );
 				
 				myHandleBindingInfos.Add( handleBindingInfos );
 			}
@@ -170,7 +171,7 @@ public class HAPI_ObjectControl : MonoBehaviour
 			HAPI_Host.setParameters( myAssetId, myParms, 0, myParmCount );
 			
 			// Set extra parameter values.
-			HAPI_Host.setParmExtraValues( myAssetId, myParmExtraValues, myParmExtraValueCount );
+			HAPI_Host.setParmExtraValues( myAssetId, myParmExtraValues, 0, myParmExtraValueCount );
 		}
 					
 		// Clean up.
@@ -180,8 +181,8 @@ public class HAPI_ObjectControl : MonoBehaviour
 		myObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
 		myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
 		
-		HAPI_Host.getObjects( 				myAssetId, myObjects, 0, myObjectCount );
-		HAPI_Host.getObjectTransforms( 	myAssetId, myObjectTransforms, 0, myObjectCount, HAPI_RSTOrder.SRT );
+		HAPI_Host.getObjects( 			myAssetId, myObjects, 0, myObjectCount );
+		HAPI_Host.getObjectTransforms(	myAssetId, myObjectTransforms, HAPI_RSTOrder.SRT, 0, myObjectCount );
 		
 		for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			createObject( object_index );
