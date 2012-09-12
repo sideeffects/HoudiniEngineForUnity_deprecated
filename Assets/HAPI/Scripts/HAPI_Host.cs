@@ -373,16 +373,16 @@ namespace HAPI
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
-		/// <param name="transforms">
-		/// 	Array of <see cref="HAPI_Transform"/> at least the size of 
-		/// 	<paramref name="length"/>. The <see cref="HAPI_Transform.id"/> of each will be 
-    	/// 	set to the object id as given by <see cref="HAPI_Host.HAPI_GetObjects"/>.
-		/// </param>
 		/// <param name="rst_order">
 	    ///		The order of application of translation, rotation and
 	    ///     scale:
 	    ///		TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5	    
 	    /// </param>
+		/// <param name="transforms">
+		/// 	Array of <see cref="HAPI_Transform"/> at least the size of 
+		/// 	<paramref name="length"/>. The <see cref="HAPI_Transform.id"/> of each will be 
+    	/// 	set to the object id as given by <see cref="HAPI_Host.HAPI_GetObjects"/>.
+		/// </param>
 		/// <param name="start">
 		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - 1.
 		/// </param>
@@ -390,11 +390,11 @@ namespace HAPI
 		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void getObjectTransforms(	int asset_id, 
+												int rst_order,
 												[Out] HAPI_Transform[] transforms,
-												HAPI_RSTOrder rst_order,
 												int start, int length )
 		{
-			int status_code = HAPI_GetObjectTransforms( asset_id, transforms, (int) rst_order, start, length );
+			int status_code = HAPI_GetObjectTransforms( asset_id, rst_order, transforms, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
@@ -701,9 +701,8 @@ namespace HAPI
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetObjectTransforms( int asset_id, 
-															[Out] HAPI_Transform[] transforms, 
-															int rst_order,
+		private static extern int HAPI_GetObjectTransforms( int asset_id, int rst_order,
+															[Out] HAPI_Transform[] transforms,
 															int start, int length );
 		
 		// DETAILS --------------------------------------------------------------------------------------------------

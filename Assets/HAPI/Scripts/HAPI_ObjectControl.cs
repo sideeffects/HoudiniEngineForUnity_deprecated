@@ -135,43 +135,41 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 						
 			// Get all parameters.
 			myParms = new HAPI_ParmInfo[ myParmCount ];
-			HAPI_Host.getParameters( myAssetId, myParms, 0, myParmCount );
+			getArray1Id( myAssetId, HAPI_Host.getParameters, myParms, myParmCount );
 			
 			// Get any parameter extra values.
 			myParmExtraValues = new HAPI_ParmSingleValue[ myParmExtraValueCount ];
-			HAPI_Host.getParmExtraValues( myAssetId, myParmExtraValues, 0, myParmExtraValueCount );
+			getArray1Id( myAssetId, HAPI_Host.getParmExtraValues, myParmExtraValues, myParmExtraValueCount );
 			
 			// Get parameter choice lists.
 			myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
-			HAPI_Host.getParmChoiceLists( myAssetId, myParmChoiceLists, 0, myParmChoiceCount );
+			getArray1Id( myAssetId, HAPI_Host.getParmChoiceLists, myParmChoiceLists, myParmChoiceCount );
 			
 			// Get exposed handle information.
 			myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
-			HAPI_Host.getHandleInfo( myAssetId, myHandleInfos, 0, myHandleCount );
+			getArray1Id( myAssetId, HAPI_Host.getHandleInfo, myHandleInfos, myHandleCount );
 			
-			myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( myHandleCount );					
-			
+			// Get handles.
+			myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( myHandleCount );		
 			for ( int handle_index = 0; handle_index < myHandleCount; ++handle_index )
-			{				
+			{			
+				HAPI_HandleInfo handle_info = myHandleInfos[ handle_index ];
+				HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
+				getArray2Id( myAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
+							 binding_infos, handle_info.bindingsCount );
 				
-				HAPI_HandleInfo handleInfo = myHandleInfos[ handle_index ];
-				HAPI_HandleBindingInfo[] handleBindingInfos = new HAPI_HandleBindingInfo[ handleInfo.bindingsCount ];
-				HAPI_Host.getHandleBindingInfo( myAssetId, handle_index, 
-												handleBindingInfos, 0, handleInfo.bindingsCount );
-				
-				myHandleBindingInfos.Add( handleBindingInfos );
+				myHandleBindingInfos.Add( binding_infos );
 			}
-		
 			
 			myAssetPathChanged = false;
 		}
 		else
 		{
 			// Set all parameter values.
-			HAPI_Host.setParameters( myAssetId, myParms, 0, myParmCount );
+			setArray1Id( myAssetId, HAPI_Host.setParameters, myParms, myParmCount );
 			
 			// Set extra parameter values.
-			HAPI_Host.setParmExtraValues( myAssetId, myParmExtraValues, 0, myParmExtraValueCount );
+			setArray1Id( myAssetId, HAPI_Host.setParmExtraValues, myParmExtraValues, myParmExtraValueCount );
 		}
 					
 		// Clean up.
@@ -181,8 +179,9 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		myObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
 		myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
 		
-		HAPI_Host.getObjects( 			myAssetId, myObjects, 0, myObjectCount );
-		HAPI_Host.getObjectTransforms(	myAssetId, myObjectTransforms, HAPI_RSTOrder.SRT, 0, myObjectCount );
+		getArray1Id( myAssetId, HAPI_Host.getObjects, myObjects, myObjectCount );
+		getArray2Id( myAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+					 myObjectTransforms, myObjectCount );
 		
 		for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			createObject( object_index );
@@ -302,11 +301,11 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		
 		// Get Face counts.
 		int[] face_counts = new int[ detail_info.faceCount ];
-		fillArray( myAssetId, object_id, face_counts, HAPI_Host.getFaceCounts, detail_info.faceCount );
+		getArray2Id( myAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, detail_info.faceCount );
 		
 		// Get Vertex list.
 		int[] vertex_list = new int[ detail_info.vertexCount ];
-		fillArray( myAssetId, object_id, vertex_list, HAPI_Host.getVertexList, detail_info.vertexCount );
+		getArray2Id( myAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
 		
 		// Print attribute names.
 		printAllAttributeNames( myAssetId, object_id, detail_info );

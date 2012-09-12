@@ -27,10 +27,192 @@ using HAPI;
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
 /// 	Houdini side.
 /// </summary>
-public partial class HAPI_ObjectControl : MonoBehaviour 
-{	
-	private delegate void fillArrayInputFunc< T >( int asset_id, int object_id, [Out] T[] items, int start, int end );
+public partial class HAPI_ObjectControl : MonoBehaviour
+{
+	// GET ----------------------------------------------------------------------------------------------------------
 	
+	private delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
+	private delegate void getArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
+	private delegate void getArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
+	
+	private void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+								   int count )
+	{
+		getArray( id1, 0, 0, func, null, null, data, count, 1 );
+	}
+	private void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+								   int count, int tuple_size )
+	{
+		getArray( id1, 0, 0, func, null, null, data, count, tuple_size );
+	}
+	
+	private void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+								   int count )
+	{
+		getArray( id1, id2, 0, null, func, null, data, count, 1 );
+	}
+	private void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+								   int count, int tuple_size )
+	{
+		getArray( id1, id2, 0, null, func, null, data, count, tuple_size );
+	}
+	
+	private void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+								   int count )
+	{
+		getArray( id1, id2, id3, null, null, func, data, count, 1 );
+	}
+	private void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+								   int count, int tuple_size )
+	{
+		getArray( id1, id2, id3, null, null, func, data, count, tuple_size );
+	}
+	
+	private void getArray< T >( int id1, int id2, int id3, 
+								getArray1IdDel< T > func_1id, 
+								getArray2IdDel< T > func_2id, 
+								getArray3IdDel< T > func_3id,
+								[Out] T[] data, int count, int tuple_size )
+	{
+		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );
+		
+		int local_count = count;
+		int current_index = 0;
+		
+		while ( local_count > 0 ) 
+		{			
+			int length = 0;
+			if ( local_count > max_array_size ) 
+			{
+				length = max_array_size;
+				local_count -= max_array_size;
+			} 
+			else 
+			{
+				length = local_count;
+				local_count = 0;
+			}
+			
+			T[] local_array = new T[ length * tuple_size ];
+			
+			if ( func_1id != null )
+				func_1id( id1, local_array, current_index, length );
+			else if ( func_2id != null )
+				func_2id( id1, id2, local_array, current_index, length );
+			else if ( func_3id != null )
+				func_3id( id1, id2, id3, local_array, current_index, length );
+			else
+			{
+				Debug.LogError( "No valid delegates given to getArray< T >!" );
+				return;
+			}
+				
+			// Copy data from the temporary array.
+			for ( int i = current_index; i < current_index + length; ++i )
+				for ( int j = 0; j < tuple_size; ++j )
+					data[ i * tuple_size + j ] = local_array[ ( i - current_index ) * tuple_size + j ];
+			
+			current_index += length;
+		}
+	}
+	
+	// SET ----------------------------------------------------------------------------------------------------------
+	
+	private delegate void setArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
+	private delegate void setArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
+	private delegate void setArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
+	
+	private void setArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+								   int count )
+	{
+		setArray( id1, 0, 0, func, null, null, data, count, 1 );
+	}
+	private void setArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+								   int count, int tuple_size )
+	{
+		setArray( id1, 0, 0, func, null, null, data, count, tuple_size );
+	}
+	
+	private void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+								   int count )
+	{
+		setArray( id1, id2, 0, null, func, null, data, count, 1 );
+	}
+	private void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+								   int count, int tuple_size )
+	{
+		setArray( id1, id2, 0, null, func, null, data, count, tuple_size );
+	}
+	
+	private void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+								   int count )
+	{
+		setArray( id1, id2, id3, null, null, func, data, count, 1 );
+	}
+	private void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+								   int count, int tuple_size )
+	{
+		setArray( id1, id2, id3, null, null, func, data, count, tuple_size );
+	}
+	
+	private void setArray< T >( int id1, int id2, int id3, 
+								getArray1IdDel< T > func_1id, 
+								getArray2IdDel< T > func_2id, 
+								getArray3IdDel< T > func_3id,
+								[Out] T[] data, int count, int tuple_size )
+	{
+		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );
+		
+		int local_count = count;
+		int current_index = 0;
+		
+		while ( local_count > 0 ) 
+		{			
+			int length = 0;
+			if ( local_count > max_array_size ) 
+			{
+				length = max_array_size;
+				local_count -= max_array_size;
+			} 
+			else 
+			{
+				length = local_count;
+				local_count = 0;
+			}
+			
+			T[] local_array = new T[ length * tuple_size ];
+			
+			// Copy data from main array to the temporary array.
+			for ( int i = current_index; i < current_index + length; ++i )
+				for ( int j = 0; j < tuple_size; ++j )
+					local_array[ ( i - current_index ) * tuple_size + j ] = data[ i * tuple_size + j ];
+			
+			if ( func_1id != null )
+				func_1id( id1, local_array, current_index, length );
+			else if ( func_2id != null )
+				func_2id( id1, id2, local_array, current_index, length );
+			else if ( func_3id != null )
+				func_3id( id1, id2, id3, local_array, current_index, length );
+			else
+			{
+				Debug.LogError( "No valid delegates given to setArray< T >!" );
+				return;
+			}
+			
+			current_index += length;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private delegate void fillArrayInputFunc< T >( int asset_id, int object_id, [Out] T[] items, int start, int end );	
 	private void fillArray< T >( int asset_id, int object_id, T[] items, fillArrayInputFunc< T > get_func, int count ) 
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / Marshal.SizeOf( typeof( T ) );
