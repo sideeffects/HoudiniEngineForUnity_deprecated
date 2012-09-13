@@ -625,7 +625,7 @@ namespace HAPI
 		{
 			if ( hasCallFailed( code ) )
 			{
-				StringBuilder error_str = new StringBuilder( 200 );
+				StringBuilder error_str = new StringBuilder( 1024 );
 				HAPI_GetLastErrorString( error_str );
 				Debug.LogError( error_str );
 				Debug.Break();
