@@ -523,6 +523,14 @@ public partial class HAPI_Inspector : Editor
 		if ( !parms[ id ].joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
 		
+		if ( myObjectControl.hasProgressBarBeenUsed() && id == myObjectControl.myLastChangedParmId )
+		{
+			// TODO: set the focus back to this control since the progress bar would have stolen it.	
+		}
+		
+		if ( changed )
+			myObjectControl.myLastChangedParmId = id;
+		
 		return changed;
 	}
 	

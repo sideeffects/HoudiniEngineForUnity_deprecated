@@ -25,20 +25,10 @@ using System.Text;
 
 namespace HAPI 
 {	
-	public class HAPI_Error : System.Exception
-	{
-			
-	}
-	
-	public class HAPI_ErrorInitFailed : HAPI_Error
-	{
-			
-	}
-	
-	public class HAPI_ErrorFileLoadFailed : HAPI_Error
-	{
-		
-	}
+	public class HAPI_Error : System.Exception {}	
+	public class HAPI_ErrorInitFailed : HAPI_Error {}
+	public class HAPI_ErrorFileLoadFailed : HAPI_Error {}	
+	public class HAPI_ErrorProgressCancelled : HAPI_Error {}
 	
 	/// <summary>
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the

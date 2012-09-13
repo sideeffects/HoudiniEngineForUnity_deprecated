@@ -26,7 +26,9 @@ namespace HAPI
 	
 	public struct HAPI_Constants
 	{
+		// Unity-only constants.
 		public const int HAPI_MAX_PAGE_SIZE					= 32768;
+		public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 5;
 		
 		public const int HAPI_POSITION_VECTOR_SIZE			= 3;
 		public const int HAPI_SCALE_VECTOR_SIZE				= 3;

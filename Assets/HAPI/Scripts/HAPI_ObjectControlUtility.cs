@@ -202,52 +202,9 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			current_index += length;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	private delegate void fillArrayInputFunc< T >( int asset_id, int object_id, [Out] T[] items, int start, int end );	
-	private void fillArray< T >( int asset_id, int object_id, T[] items, fillArrayInputFunc< T > get_func, int count ) 
-	{
-		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / Marshal.SizeOf( typeof( T ) );
 		
-		int local_count = count;
-		int current_index = 0;
-		
-		while ( local_count > 0 ) 
-		{			
-			int length = 0;
-			if ( local_count > max_array_size ) 
-			{
-				length = max_array_size;
-				local_count -= max_array_size;
-			} 
-			else 
-			{
-				length = local_count;
-				local_count = 0;
-			}
-			
-			T[] local_array = new T[ length ];
-			get_func( asset_id, object_id, local_array, current_index, length );
-			
-			// Copy data from the temporary array.
-			for ( int i = current_index; i < current_index + length; ++i )				
-				items[ i ] = local_array[ i - current_index ];
-			
-			current_index += length;
-		}
-	}
-	
 	private delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
-													   [Out] T[] items, int start, int end );
-	
+													   [Out] T[] items, int start, int end );	
 	private void fillAttrArray< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
 									 T[] items, fillAttrArrayInputFunc< T > get_func, int count ) 
 	{
@@ -354,5 +311,48 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	{
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
 			printAttributeNames( asset_id, object_id, detail_info, (HAPI_AttributeOwner) owner );
-	}	
+	}
+	
+	private void incrementProgressBar()
+	{
+		displayProgressBar( 1 );
+	}
+	private void displayProgressBar()
+	{
+		displayProgressBar( 0 );	
+	}
+	private void displayProgressBar( int increment )
+	{
+		System.DateTime current = System.DateTime.Now;
+		System.TimeSpan delta = current - myProgressBarStartTime;
+		
+		// This delay for displaying the progress bar is so the bar won't flicker for really quick updates
+		// (less than a few seconds). Also, when we do show the progress bar the focus of the current 
+		// inspector control is lost.
+		if ( delta.Seconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
+		{
+			EditorUtility.ClearProgressBar();
+			return;
+		}
+		
+		myProgressBarJustUsed = true;
+				
+		myProgressBarCurrent += increment;
+		string message = myProgressBarMsg + " Item " + myProgressBarCurrent + " of " + myProgressBarTotal;
+		bool result = !EditorUtility.DisplayCancelableProgressBar( myProgressBarTitle, message, 
+												Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
+		
+		if ( !result )
+			throw new HAPI_ErrorProgressCancelled();
+	}
+	public bool hasProgressBarBeenUsed()
+	{
+		return myProgressBarJustUsed;	
+	}
+	private void clearProgressBar()
+	{
+		myProgressBarJustUsed = false;
+		myProgressBarCurrent = 0;
+		EditorUtility.ClearProgressBar();
+	}
 }

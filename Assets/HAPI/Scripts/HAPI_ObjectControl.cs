@@ -53,12 +53,19 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		myShowAssetControls 		= true;
 		myShowObjectControls 		= true;
 		myAutoSelectAssetNode		= true;
+		
+		myLastChangedParmId			= -1;
 				
 		myFolderListSelections 		= new List< int >();
 		myFolderListSelectionIds 	= new List< int >();
 		
 		myFolderListSelections.Add( 0 );
 		myFolderListSelectionIds.Add( -1 );
+		
+		myProgressBarJustUsed 		= false;
+		myProgressBarCurrent		= 0;
+		myProgressBarTitle			= "Building Houdini Asset";
+		myProgressBarMsg			= "";
 	}
 	
 	/// <summary>
@@ -111,80 +118,116 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	/// </summary>
 	public bool build() 
 	{
-		if ( myAssetPathChanged ) 
+		try
 		{
-			HAPI_Host.unloadOTL( myAssetId );
+			myProgressBarStartTime = System.DateTime.Now;
 			
-			try
+			if ( myAssetPathChanged ) 
 			{
-				myAssetInfo = HAPI_Host.loadOTL( myAssetPath );
-			}
-			catch ( HAPI_Error )
-			{
-				// Nothing to build since the load failed.
-				return false; // false for failed :)
-			}
-						
-			// For convinience we copy some asset info properties locally (since they are constant anyway).
-			myAssetId 				= myAssetInfo.id;
-			myObjectCount 			= myAssetInfo.objectCount;
-			myParmCount 			= myAssetInfo.parmCount;
-			myParmExtraValueCount 	= myAssetInfo.parmExtraValueCount;
-			myParmChoiceCount		= myAssetInfo.parmChoiceCount;
-			myHandleCount 			= myAssetInfo.handleCount;
-						
-			// Get all parameters.
-			myParms = new HAPI_ParmInfo[ myParmCount ];
-			getArray1Id( myAssetId, HAPI_Host.getParameters, myParms, myParmCount );
-			
-			// Get any parameter extra values.
-			myParmExtraValues = new HAPI_ParmSingleValue[ myParmExtraValueCount ];
-			getArray1Id( myAssetId, HAPI_Host.getParmExtraValues, myParmExtraValues, myParmExtraValueCount );
-			
-			// Get parameter choice lists.
-			myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
-			getArray1Id( myAssetId, HAPI_Host.getParmChoiceLists, myParmChoiceLists, myParmChoiceCount );
-			
-			// Get exposed handle information.
-			myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
-			getArray1Id( myAssetId, HAPI_Host.getHandleInfo, myHandleInfos, myHandleCount );
-			
-			// Get handles.
-			myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( myHandleCount );		
-			for ( int handle_index = 0; handle_index < myHandleCount; ++handle_index )
-			{			
-				HAPI_HandleInfo handle_info = myHandleInfos[ handle_index ];
-				HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
-				getArray2Id( myAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
-							 binding_infos, handle_info.bindingsCount );
+				HAPI_Host.unloadOTL( myAssetId );
 				
-				myHandleBindingInfos.Add( binding_infos );
+				try
+				{
+					myAssetInfo = HAPI_Host.loadOTL( myAssetPath );
+				}
+				catch ( HAPI_Error )
+				{
+					// Nothing to build since the load failed.
+					return false; // false for failed :(
+				}
+							
+				// For convinience we copy some asset info properties locally (since they are constant anyway).
+				myAssetId 				= myAssetInfo.id;
+				myObjectCount 			= myAssetInfo.objectCount;
+				myParmCount 			= myAssetInfo.parmCount;
+				myParmExtraValueCount 	= myAssetInfo.parmExtraValueCount;
+				myParmChoiceCount		= myAssetInfo.parmChoiceCount;
+				myHandleCount 			= myAssetInfo.handleCount;
+				
+				myProgressBarCurrent	= 0;
+				myProgressBarTotal		= myObjectCount + myParmCount + myParmExtraValueCount + myParmChoiceCount
+										  + myHandleCount;
+							
+				// Get all parameters.
+				myProgressBarMsg = "Loading parameters...";
+				displayProgressBar();
+				myParms = new HAPI_ParmInfo[ myParmCount ];
+				getArray1Id( myAssetId, HAPI_Host.getParameters, myParms, myParmCount );
+				displayProgressBar( myParmCount );
+				
+				// Get any parameter extra values.
+				myParmExtraValues = new HAPI_ParmSingleValue[ myParmExtraValueCount ];
+				getArray1Id( myAssetId, HAPI_Host.getParmExtraValues, myParmExtraValues, myParmExtraValueCount );
+				displayProgressBar( myParmExtraValueCount );
+				
+				// Get parameter choice lists.
+				myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
+				getArray1Id( myAssetId, HAPI_Host.getParmChoiceLists, myParmChoiceLists, myParmChoiceCount );
+				displayProgressBar( myParmChoiceCount );
+				
+				// Get exposed handle information.
+				myProgressBarMsg = "Loading handles...";
+				myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
+				getArray1Id( myAssetId, HAPI_Host.getHandleInfo, myHandleInfos, myHandleCount );
+				
+				// Get handles.
+				myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( myHandleCount );		
+				for ( int handle_index = 0; handle_index < myHandleCount; ++handle_index )
+				{
+					incrementProgressBar();
+					HAPI_HandleInfo handle_info = myHandleInfos[ handle_index ];
+					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
+					getArray2Id( myAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
+								 binding_infos, handle_info.bindingsCount );
+					
+					myHandleBindingInfos.Add( binding_infos );
+				}
+				
+				myAssetPathChanged = false;
+			}
+			else
+			{
+				myProgressBarMsg = "Setting parameters...";
+				displayProgressBar();
+				
+				// Set all parameter values.
+				setArray1Id( myAssetId, HAPI_Host.setParameters, myParms, myParmCount );
+				displayProgressBar( myParmCount );
+				
+				// Set extra parameter values.
+				setArray1Id( myAssetId, HAPI_Host.setParmExtraValues, myParmExtraValues, myParmExtraValueCount );
+				displayProgressBar( myParmExtraValueCount );
+				
+				// Increment non-settable items:
+				myProgressBarCurrent += myParmChoiceCount + myHandleCount;
 			}
 			
-			myAssetPathChanged = false;
-		}
-		else
-		{
-			// Set all parameter values.
-			setArray1Id( myAssetId, HAPI_Host.setParameters, myParms, myParmCount );
+			myProgressBarMsg = "Loading and composing objects...";
 			
-			// Set extra parameter values.
-			setArray1Id( myAssetId, HAPI_Host.setParmExtraValues, myParmExtraValues, myParmExtraValueCount );
+			// Clean up.
+			destroyChildren();
+			
+			// Create local object info caches (transforms need to be stored in a parallel array).
+			myObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
+			myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
+			
+			getArray1Id( myAssetId, HAPI_Host.getObjects, myObjects, myObjectCount );
+			getArray2Id( myAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+						 myObjectTransforms, myObjectCount );
+			
+			for ( int object_index = 0; object_index < myObjectCount; ++object_index )
+			{
+				incrementProgressBar();
+				createObject( object_index );
+			}
+		} 
+		catch
+		{
+			Debug.Log( "Load Cancelled by User" );
 		}
-					
-		// Clean up.
-		destroyChildren();
 		
-		// Create local object info caches (transforms need to be stored in a parallel array).
-		myObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
-		myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
-		
-		getArray1Id( myAssetId, HAPI_Host.getObjects, myObjects, myObjectCount );
-		getArray2Id( myAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
-					 myObjectTransforms, myObjectCount );
-		
-		for ( int object_index = 0; object_index < myObjectCount; ++object_index )
-			createObject( object_index );
+		EditorUtility.ClearProgressBar();
+		myProgressBarCurrent = 0;
 						
 		return true;
 	}
@@ -196,7 +239,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	public int						myParmExtraValueCount;
 	public int						myParmChoiceCount;
 	public int						myHandleCount;
-		
+	
 	public HAPI_AssetInfo 			myAssetInfo;
 	public HAPI_ObjectInfo[] 		myObjects;
 	public HAPI_Transform[] 		myObjectTransforms;
@@ -209,6 +252,8 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	public bool 					myShowObjectControls;
 	public bool 					myShowAssetControls;
 	public bool						myAutoSelectAssetNode;
+	
+	public int						myLastChangedParmId;
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
@@ -387,7 +432,14 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		main_child_mesh.RecalculateBounds();
 		main_child_mesh.RecalculateNormals();
 	}
-			
+	
+	private bool			myProgressBarJustUsed;
+	private	System.DateTime	myProgressBarStartTime;
+	private int				myProgressBarTotal; // Used for the progress bar.
+	private int				myProgressBarCurrent;
+	private string			myProgressBarTitle;
+	private string			myProgressBarMsg;
+	
 #if DEBUG
 	public bool myAssetPathChanged;
 #else
