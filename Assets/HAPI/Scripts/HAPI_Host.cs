@@ -25,10 +25,44 @@ using System.Text;
 
 namespace HAPI 
 {	
-	public class HAPI_Error : System.Exception {}	
+	public class HAPI_Error : System.Exception 
+	{
+		public HAPI_Error() 
+		{
+			myErrorMessage = "Unknown Error";
+		}
+		public HAPI_Error( string msg ) 
+		{
+			myErrorMessage = msg;
+		}
+		
+		public void addMessagePrefix( string prefix )
+		{
+			myErrorMessage = prefix + ": " + myErrorMessage;
+		}
+		
+		public void addMessageDetail( string detail )
+		{
+			myErrorMessage = myErrorMessage + "\n" + detail;	
+		}
+		
+		public virtual string what()
+		{
+			return myErrorMessage;	
+		}
+		
+		private string myErrorMessage;
+	}
+	
 	public class HAPI_ErrorInitFailed : HAPI_Error {}
-	public class HAPI_ErrorFileLoadFailed : HAPI_Error {}	
-	public class HAPI_ErrorProgressCancelled : HAPI_Error {}
+	public class HAPI_ErrorFileLoadFailed : HAPI_Error {}
+	public class HAPI_ErrorProgressCancelled : HAPI_Error 
+	{
+		public override string what()
+		{
+			return "Load Cancelled by User";	
+		}
+	}
 	
 	/// <summary>
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
@@ -635,8 +669,7 @@ namespace HAPI
 			{
 				StringBuilder error_str = new StringBuilder( 1024 );
 				HAPI_GetLastErrorString( error_str );
-				Debug.LogError( error_str );
-				Debug.Break();
+				throw new HAPI_Error( error_str.ToString() );
 			}
 		}
 		

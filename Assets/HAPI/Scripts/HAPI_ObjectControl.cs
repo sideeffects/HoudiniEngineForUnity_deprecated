@@ -224,12 +224,20 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			{
 				incrementProgressBar();
-				createObject( object_index );
+				try
+				{
+					createObject( object_index );
+				}
+				catch ( HAPI_Error error )
+				{
+					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
+					Debug.LogWarning( error.what() );
+				}
 			}
-		} 
-		catch ( HAPI_ErrorProgressCancelled )
+		}
+		catch ( HAPI_Error error )
 		{
-			Debug.Log( "Load Cancelled by User" );
+			Debug.LogError( error.what() );
 		}
 		
 		clearProgressBar();
@@ -302,140 +310,140 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		
 		// Create main underling.
 		GameObject main_child = new GameObject( object_info.name );
-		main_child.transform.parent = transform;
 		
-		// Add required components.
-		main_child.AddComponent( "MeshFilter" );
-		main_child.AddComponent( "MeshRenderer" );
-		main_child.AddComponent( "HAPI_ChildSelectionControl" );
-		
-		// Set Object Control on child selection control so it can read settings from here.
-		main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
-		
-		// Set diffuse material.
-		Material diffuse = new Material( Shader.Find( "Diffuse" ) );		
-		main_child.GetComponent< MeshRenderer >().material = diffuse;
-		
-		// Get or create mesh.
-		MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
-		Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-		if ( main_child_mesh == null ) 
+		try
 		{
-			main_child_mesh_filter.mesh 	= new Mesh();
-			main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-		}
-		
-		main_child_mesh.Clear();
-		
-		// Get transforms.
-		HAPI_Transform trans = myObjectTransforms[ object_id ];
-		
-		// Get Detail info.
-		HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
-		HAPI_Host.getDetailInfo( myAssetId, object_id, out detail_info );
-		Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-			+ "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
-		
-		// Make sure our primitive and vertex numbers are supported by Unity.
-		// TODO: add this limit in a more proper place
-		if ( detail_info.faceCount > 65000 * 3 )
-		{
-			Debug.LogError( "Face count (" + detail_info.faceCount + ") above limit (" + ( 65000 * 3 ) + ")!" );
-			return;
-		}
-		if ( detail_info.vertexCount > 65000 )
-		{
-			Debug.LogError( "Vertex count (" + detail_info.vertexCount + ") above limit (" + 65000 + ")!" );
-			return;
-		}
-		
-		// Get Face counts.
-		int[] face_counts = new int[ detail_info.faceCount ];
-		getArray2Id( myAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, detail_info.faceCount );
-		
-		// Get Vertex list.
-		int[] vertex_list = new int[ detail_info.vertexCount ];
-		getArray2Id( myAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
-		
-		// Print attribute names.
-		printAllAttributeNames( myAssetId, object_id, detail_info );
-		
-		// Get position vertex attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
-		float[] pos_attr = new float[ 0 ];
-		getAttribute( myAssetId, object_id, ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
-		if ( !pos_attr_info.exists )
-		{
-			Debug.LogError( "No position attribute found for object " + object_info.name + " (" + object_id + ")" );
-			return;
-		}
-		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-		{
-			Debug.LogError( "I only understand position as point attributes!" );
-			return;
-		}
-				
-		// Get uv attributes.
-		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
-		uv_attr_info.tupleSize = 2;
-		float[] uv_attr = new float[ 0 ];
-		getAttribute( myAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
-		
-		// Apply object transforms.		
-		main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 
-																trans.position[ 1 ],
-																trans.position[ 2 ] );		
-		main_child.transform.localRotation 	= new Quaternion( 	trans.rotationQuaternion[ 0 ],
-														  		trans.rotationQuaternion[ 1 ],
-																trans.rotationQuaternion[ 2 ],
-																trans.rotationQuaternion[ 3 ] );
-		main_child.transform.localScale = new Vector3( 			trans.scale[ 0 ], 
-													  			trans.scale[ 1 ], 
-													  			trans.scale[ 2 ] );
-				
-		// Create Unity-specific data objects.
-		Vector3[] vertices 	= new Vector3[ detail_info.vertexCount ];
-		int[] triangles 	= new int[ detail_info.faceCount * 3 ];
-		Vector2[] uvs 		= new Vector2[ detail_info.vertexCount ];
-		Vector3[] normals 	= new Vector3[ detail_info.vertexCount ];
-		
-		// Fill Unity-specific data objects with data from the runtime.
-		for ( int i = 0; i < detail_info.vertexCount; ++i ) 
-		{
-			for ( int j = 0; j < 3; ++j ) 
+			main_child.transform.parent = transform;
+			
+			// Add required components.
+			main_child.AddComponent( "MeshFilter" );
+			main_child.AddComponent( "MeshRenderer" );
+			main_child.AddComponent( "HAPI_ChildSelectionControl" );
+			
+			// Set Object Control on child selection control so it can read settings from here.
+			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
+			
+			// Set diffuse material.
+			Material diffuse = new Material( Shader.Find( "Diffuse" ) );		
+			main_child.GetComponent< MeshRenderer >().material = diffuse;
+			
+			// Get or create mesh.
+			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
+			Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
+			if ( main_child_mesh == null ) 
 			{
-				vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
-				//normals[ i ][ j ] 		= raw_vertices[ i ].normal[ j ];
+				main_child_mesh_filter.mesh 	= new Mesh();
+				main_child_mesh 				= main_child_mesh_filter.sharedMesh;
 			}
-			if ( uv_attr_info.exists )
+			
+			main_child_mesh.Clear();
+			
+			// Get transforms.
+			HAPI_Transform trans = myObjectTransforms[ object_id ];
+			
+			// Get Detail info.
+			HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
+			HAPI_Host.getDetailInfo( myAssetId, object_id, out detail_info );
+			Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
+				+ "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
+			
+			// Make sure our primitive and vertex numbers are supported by Unity.
+			// TODO: add this limit in a more proper place
+			if ( detail_info.faceCount > 65000 * 3 )
+				throw new HAPI_Error( "Face count (" + detail_info.faceCount 
+									  + ") above limit (" + ( 65000 * 3 ) + ")!" );
+			if ( detail_info.vertexCount > 65000 )
+				throw new HAPI_Error( "Vertex count (" + detail_info.vertexCount + ") above limit (" + 65000 + ")!" );
+			
+			// Get Face counts.
+			int[] face_counts = new int[ detail_info.faceCount ];
+			getArray2Id( myAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, detail_info.faceCount );
+			
+			// Get Vertex list.
+			int[] vertex_list = new int[ detail_info.vertexCount ];
+			getArray2Id( myAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
+			
+			// Print attribute names.
+			printAllAttributeNames( myAssetId, object_id, detail_info );
+			
+			// Get position vertex attributes.
+			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+			float[] pos_attr = new float[ 0 ];
+			getAttribute( myAssetId, object_id, ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+			if ( !pos_attr_info.exists )
+				throw new HAPI_Error( "No position attribute found." );
+			else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				throw new HAPI_Error( "I only understand position as point attributes!" );
+					
+			// Get uv attributes.
+			HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
+			uv_attr_info.tupleSize = 2;
+			float[] uv_attr = new float[ 0 ];
+			getAttribute( myAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
+			
+			// Apply object transforms.		
+			main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 
+																	trans.position[ 1 ],
+																	trans.position[ 2 ] );		
+			main_child.transform.localRotation 	= new Quaternion( 	trans.rotationQuaternion[ 0 ],
+															  		trans.rotationQuaternion[ 1 ],
+																	trans.rotationQuaternion[ 2 ],
+																	trans.rotationQuaternion[ 3 ] );
+			main_child.transform.localScale = new Vector3( 			trans.scale[ 0 ], 
+														  			trans.scale[ 1 ], 
+														  			trans.scale[ 2 ] );
+					
+			// Create Unity-specific data objects.
+			Vector3[] vertices 	= new Vector3[ detail_info.vertexCount ];
+			int[] triangles 	= new int[ detail_info.faceCount * 3 ];
+			Vector2[] uvs 		= new Vector2[ detail_info.vertexCount ];
+			Vector3[] normals 	= new Vector3[ detail_info.vertexCount ];
+			
+			// Fill Unity-specific data objects with data from the runtime.
+			for ( int i = 0; i < detail_info.vertexCount; ++i ) 
 			{
-				// If the UVs are per vertex just query directly into the UV array we filled above.
-				if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
-					for ( int j = 0; j < 2; ++j )
-						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
-				
-				// If the UVs are per point use the vertex list array point indicies to query into
-				// the UV array we filled above.
-				else if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-					for ( int j = 0; j < 2; ++j )
-						uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
+				for ( int j = 0; j < 3; ++j ) 
+				{
+					vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
+					//normals[ i ][ j ] 		= raw_vertices[ i ].normal[ j ];
+				}
+				if ( uv_attr_info.exists )
+				{
+					// If the UVs are per vertex just query directly into the UV array we filled above.
+					if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+						for ( int j = 0; j < 2; ++j )
+							uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
+					
+					// If the UVs are per point use the vertex list array point indicies to query into
+					// the UV array we filled above.
+					else if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+						for ( int j = 0; j < 2; ++j )
+							uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
+				}
 			}
+			
+			// Triangles are already specified by design. The only thing we need to do is reverse the order
+			// for Unity. We do this with the ( 2 - j ) below.
+			for ( int i = 0; i < detail_info.faceCount; ++i ) 
+				for ( int j = 0; j < 3; ++j )
+					triangles[ i * 3 + j ] 	= i * 3 + ( 2 - j );
+			
+			// Load into vertices and face into mesh.
+			main_child_mesh.vertices 	= vertices;
+			main_child_mesh.triangles 	= triangles;
+			main_child_mesh.uv 			= uvs;
+			main_child_mesh.normals 	= normals;
+			
+			main_child_mesh.RecalculateBounds();
+			main_child_mesh.RecalculateNormals();
 		}
-		
-		// Triangles are already specified by design. The only thing we need to do is reverse the order
-		// for Unity. We do this with the ( 2 - j ) below.
-		for ( int i = 0; i < detail_info.faceCount; ++i ) 
-			for ( int j = 0; j < 3; ++j )
-				triangles[ i * 3 + j ] 	= i * 3 + ( 2 - j );
-		
-		// Load into vertices and face into mesh.
-		main_child_mesh.vertices 	= vertices;
-		main_child_mesh.triangles 	= triangles;
-		main_child_mesh.uv 			= uvs;
-		main_child_mesh.normals 	= normals;
-		
-		main_child_mesh.RecalculateBounds();
-		main_child_mesh.RecalculateNormals();
+		catch ( HAPI_Error error )
+		{
+			DestroyImmediate( main_child );
+			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
+			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
+			throw;
+		}
 	}
 	
 	private bool			myProgressBarJustUsed;

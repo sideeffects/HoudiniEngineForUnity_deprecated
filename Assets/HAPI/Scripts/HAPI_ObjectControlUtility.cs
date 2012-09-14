@@ -331,7 +331,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		// inspector control is lost.
 		if ( delta.Seconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
 		{
-			clearProgressBar();
+			EditorUtility.ClearProgressBar();
 			return;
 		}
 		
