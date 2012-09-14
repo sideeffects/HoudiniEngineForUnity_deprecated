@@ -97,13 +97,11 @@ namespace HAPI
 		{
 			HAPI_StatusCode status_code = 0;			
 			
-			if ( myHoudiniSceneExists ) 
-			{
-				Debug.Log( "Loading OTL: hip already exists" );
-			} 
+			if ( myHoudiniSceneExists )
+				Debug.Log( "Loading OTL: Using Existing Scene" );
 			else 
 			{
-				Debug.Log( "Loading OTL: new hip created" );
+				Debug.Log( "Loading OTL: Creating New Scene" );
 								
 				status_code = (HAPI_StatusCode) HAPI_Initialize();
 				

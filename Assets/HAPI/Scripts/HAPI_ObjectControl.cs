@@ -39,7 +39,8 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	/// </summary>
 	public HAPI_ObjectControl() 
 	{
-		Debug.Log( "HAPI_ObjectControl created!" );
+		if ( myEnableLogging )
+			Debug.Log( "HAPI_ObjectControl created!" );
 		
 		myAssetPath 				= "";
 		myAssetPathChanged 			= true;
@@ -53,6 +54,11 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		myShowAssetControls 		= true;
 		myShowObjectControls 		= true;
 		myAutoSelectAssetNode		= true;
+#if DEBUG
+		myEnableLogging				= true;
+#else
+		myEnableLogging				= false;
+#endif
 		
 		myLastChangedParmId			= -1;
 				
@@ -74,7 +80,8 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	/// </summary>
 	~HAPI_ObjectControl() 
 	{
-		Debug.Log( "HAPI_ObjectControl destroyed!" );
+		if ( myEnableLogging )
+			Debug.Log( "HAPI_ObjectControl destroyed!" );
 		
 		if ( myAssetId > 0 )
 			HAPI_Host.unloadOTL( myAssetId );
@@ -177,10 +184,9 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 					incrementProgressBar();
 					HAPI_HandleInfo handle_info = myHandleInfos[ handle_index ];
 					
-					if(handle_info.handleTypeName != "xform")
-					{
-						Debug.Log("Warning: unsupported handle found " + handle_info.handleName + " of type " + handle_info.handleTypeName);
-					}
+					if ( handle_info.handleTypeName != "xform" )
+						Debug.LogWarning( "Handle " + handle_info.handleName + " of type " 
+								   		  + handle_info.handleTypeName + " is unsupported at this time." );
 					
 					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
 					getArray2Id( myAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
@@ -265,6 +271,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	public bool 					myShowObjectControls;
 	public bool 					myShowAssetControls;
 	public bool						myAutoSelectAssetNode;
+	public bool						myEnableLogging;
 	
 	public int						myLastChangedParmId;
 	
@@ -344,8 +351,9 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			// Get Detail info.
 			HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
 			HAPI_Host.getDetailInfo( myAssetId, object_id, out detail_info );
-			Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-				+ "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
+			if ( myEnableLogging )
+				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
+						   + "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
 			
 			// Make sure our primitive and vertex numbers are supported by Unity.
 			// TODO: add this limit in a more proper place
@@ -364,7 +372,8 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			getArray2Id( myAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
 			
 			// Print attribute names.
-			printAllAttributeNames( myAssetId, object_id, detail_info );
+			if ( myEnableLogging )
+				printAllAttributeNames( myAssetId, object_id, detail_info );
 			
 			// Get position vertex attributes.
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );

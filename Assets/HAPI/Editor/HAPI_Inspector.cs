@@ -99,6 +99,21 @@ public partial class HAPI_Inspector : Editor
 			}
 			EditorGUILayout.EndHorizontal();
 			
+			// Draw Logging Toggle
+			EditorGUILayout.BeginHorizontal(); 
+			{
+				// Add padding for the toggle column.
+				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
+				// Add empty space to align with fields.
+				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
+				
+				// Draw toggle with its label.
+				bool old_value = myObjectControl.myEnableLogging;
+				myObjectControl.myEnableLogging = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
+				EditorGUILayout.SelectableLabel( "Enable Logging", myLineHeightGUI );		
+			}
+			EditorGUILayout.EndHorizontal();
+			
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
