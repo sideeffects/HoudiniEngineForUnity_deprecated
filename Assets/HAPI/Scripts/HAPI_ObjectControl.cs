@@ -176,6 +176,12 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 				{
 					incrementProgressBar();
 					HAPI_HandleInfo handle_info = myHandleInfos[ handle_index ];
+					
+					if(handle_info.handleTypeName != "xform")
+					{
+						Debug.Log("Warning: unsupported handle found " + handle_info.handleName + " of type " + handle_info.handleTypeName);
+					}
+					
 					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
 					getArray2Id( myAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
 								 binding_infos, handle_info.bindingsCount );

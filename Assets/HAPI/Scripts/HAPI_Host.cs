@@ -153,6 +153,14 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		public static void convertMatrix( 	    float[] mat,
+	                                     		int rst_order, int rot_order,
+												ref HAPI_TransformEuler transform_out )
+		{
+			int status_code = HAPI_ConvertMatrix( mat, rst_order, rot_order, ref transform_out );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		/// <summary>
@@ -642,6 +650,11 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ConvertTransform( 	ref HAPI_TransformEuler transform_in_out, 
                                      					 	int rst_order, int rot_order );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConvertMatrix( 		float[] mat,
+                                     					 	int rst_order, int rot_order,
+															ref HAPI_TransformEuler transform_out );
 		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
