@@ -221,13 +221,12 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 				createObject( object_index );
 			}
 		} 
-		catch
+		catch ( HAPI_ErrorProgressCancelled )
 		{
 			Debug.Log( "Load Cancelled by User" );
 		}
 		
-		EditorUtility.ClearProgressBar();
-		myProgressBarCurrent = 0;
+		clearProgressBar();
 						
 		return true;
 	}
