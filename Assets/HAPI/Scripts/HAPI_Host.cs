@@ -54,8 +54,6 @@ namespace HAPI
 		private string myErrorMessage;
 	}
 	
-	public class HAPI_ErrorInitFailed : HAPI_Error {}
-	public class HAPI_ErrorFileLoadFailed : HAPI_Error {}
 	public class HAPI_ErrorProgressCancelled : HAPI_Error 
 	{
 		public override string what()
@@ -106,27 +104,19 @@ namespace HAPI
 				status_code = (HAPI_StatusCode) HAPI_Initialize();
 				
 				if ( status_code != HAPI_StatusCode.HAPI_STATUS_ALREADY_INITIALIZED )
-				{				
 					processStatusCode( status_code );
-					
-					if ( hasCallFailed( status_code ) )
-						throw new HAPI_ErrorInitFailed();
-				}
 				
 				myHoudiniSceneExists = true;
 			}
 			
 			HAPI_AssetInfo asset_info 			= new HAPI_AssetInfo();
 			asset_info.otlFilePath 				= path;
-			asset_info.minVerticesPerPrimitive 	= 3;
-			asset_info.maxVerticesPerPrimitive 	= 3;
+			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
+			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 			
 			status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( ref asset_info );
 			
 			processStatusCode( status_code );
-			
-			if ( hasCallFailed( status_code ) )
-				throw new HAPI_ErrorFileLoadFailed();
 			
 			Debug.Log( "Asset Loaded - Path: " + asset_info.assetInstancePath + ", ID: " + asset_info.id );			
 			return asset_info;
@@ -148,10 +138,13 @@ namespace HAPI
 			
 			int result = HAPI_UnloadOTLFile( asset_id );
 			
-			if ( result > 0 ) 
+			try
 			{
-				Debug.LogError( "OTL File Failed to Unload" );
-				return false;
+				processStatusCode( (HAPI_StatusCode) result );
+			}
+			catch ( HAPI_Error error ) 
+			{				
+				Debug.LogError( "Asset failed to unload: " + error.what() );
 			}
 			
 			return true;	

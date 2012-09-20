@@ -202,6 +202,8 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			current_index += length;
 		}
 	}
+	
+	// ATTRIBUTES ---------------------------------------------------------------------------------------------------
 		
 	private delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
 													   [Out] T[] items, int start, int end );	
@@ -312,15 +314,19 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
 			printAttributeNames( asset_id, object_id, detail_info, (HAPI_AttributeOwner) owner );
 	}
+		
+	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
 	private void incrementProgressBar()
 	{
 		displayProgressBar( 1 );
 	}
+	
 	private void displayProgressBar()
 	{
 		displayProgressBar( 0 );	
 	}
+	
 	private void displayProgressBar( int increment )
 	{
 		System.DateTime current = System.DateTime.Now;
@@ -345,10 +351,12 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		if ( !result )
 			throw new HAPI_ErrorProgressCancelled();
 	}
+	
 	public bool hasProgressBarBeenUsed()
 	{
 		return myProgressBarJustUsed;	
 	}
+	
 	private void clearProgressBar()
 	{
 		myProgressBarJustUsed = false;

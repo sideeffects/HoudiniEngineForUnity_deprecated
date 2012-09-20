@@ -390,6 +390,11 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			float[] uv_attr = new float[ 0 ];
 			getAttribute( myAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
 			
+			// Get normal attributes.
+			HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( "N" );
+			float[] normal_attr = new float[ 0 ];
+			getAttribute( myAssetId, object_id, ref normal_attr_info, ref normal_attr, HAPI_Host.getAttributeFloatData );
+			
 			// Apply object transforms.		
 			main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 
 																	trans.position[ 1 ],
@@ -403,19 +408,19 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 														  			trans.scale[ 2 ] );
 					
 			// Create Unity-specific data objects.
-			Vector3[] vertices 	= new Vector3[ detail_info.vertexCount ];
-			int[] triangles 	= new int[ detail_info.faceCount * 3 ];
-			Vector2[] uvs 		= new Vector2[ detail_info.vertexCount ];
-			Vector3[] normals 	= new Vector3[ detail_info.vertexCount ];
+			Vector3[] vertices 	= new Vector3[ 	detail_info.vertexCount ];
+			int[] triangles 	= new int[ 		detail_info.faceCount * 3 ];
+			Vector2[] uvs 		= new Vector2[ 	detail_info.vertexCount ];
+			Vector3[] normals 	= new Vector3[ 	detail_info.vertexCount ];
 			
 			// Fill Unity-specific data objects with data from the runtime.
 			for ( int i = 0; i < detail_info.vertexCount; ++i ) 
 			{
-				for ( int j = 0; j < 3; ++j ) 
-				{
+				// Fill position information.
+				for ( int j = 0; j < 3; ++j )
 					vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
-					//normals[ i ][ j ] 		= raw_vertices[ i ].normal[ j ];
-				}
+				
+				// Fill UVs.
 				if ( uv_attr_info.exists )
 				{
 					// If the UVs are per vertex just query directly into the UV array we filled above.
@@ -428,6 +433,28 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 					else if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 						for ( int j = 0; j < 2; ++j )
 							uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
+				}
+				
+				// Fill normals.
+				if ( normal_attr_info.exists )
+				{
+					// If the normals are per vertex just query directly into the normals array we filled above.
+					if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+						for ( int j = 0; j < 3; ++j )
+							normals[ i ][ j ] = normal_attr[ i * 3 + j ];
+					
+					// If the normals are per point use the vertex list array point indicies to query into
+					// the normal array we filled above.
+					else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+						for ( int j = 0; j < 3; ++j )
+							normals[ i ][ j ] = normal_attr[ vertex_list[ i ] * 3 + j ];
+					
+					// If the normals are per face divide the vertex index by the number of vertices per face
+					// which should always be HAPI_MAX_VERTICES_PER_FACE.
+					else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+						for ( int j = 0; j < 3; ++j )
+							normals[ i ][ j ] 
+								= normal_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
 				}
 			}
 			
@@ -444,7 +471,9 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			main_child_mesh.normals 	= normals;
 			
 			main_child_mesh.RecalculateBounds();
-			main_child_mesh.RecalculateNormals();
+			
+			if ( !normal_attr_info.exists )
+				main_child_mesh.RecalculateNormals();
 		}
 		catch ( HAPI_Error error )
 		{
