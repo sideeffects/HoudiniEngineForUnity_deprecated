@@ -11,7 +11,6 @@
  *		416-504-9876
  *
  * COMMENTS:
- * 		GUI companion to HAPI_Curve.
  * 
  */
 
