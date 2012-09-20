@@ -66,7 +66,7 @@ namespace HAPI
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
 	/// 	Houdini runtime.
 	/// </summary>
-	public partial class HAPI_Host : MonoBehaviour 
+	public partial class HAPI_Host
 	{
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Public
@@ -168,7 +168,7 @@ namespace HAPI
 			}
 		}
 		
-		static private bool myHoudiniSceneExists = false;		
+		private static bool myHoudiniSceneExists = false;		
 	}
 
 }

@@ -29,7 +29,7 @@ namespace HAPI
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
 	/// 	Houdini runtime.
 	/// </summary>
-	public partial class HAPI_Host : MonoBehaviour 
+	public partial class HAPI_Host
 	{		
 		// GENERICS -------------------------------------------------------------------------------------------------
 		
@@ -66,6 +66,8 @@ namespace HAPI
 		}
 		
 		// STRINGS --------------------------------------------------------------------------------------------------
+		
+		// NOTE: These are private as we want people to use the more abstract methods in HAPI_HostStrings.cs.
 		
 		/// <summary>
 		/// 	Gives back the string length of the string with the given handle.
