@@ -186,6 +186,65 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		// STRINGS --------------------------------------------------------------------------------------------------
+		
+		/// <summary>
+		/// 	Gives back the string length of the string with the given handle.
+		/// </summary>
+		/// <param name="string_handle">
+		/// 	Handle of the string to query.
+		/// </param>
+		/// <param name="string_length">
+		/// 	Length of the queried string.
+		/// </param>
+		private static void getStringLength( 	int string_handle, 
+												out int string_length )
+		{
+			int status_code = HAPI_GetStringLength( string_handle, out string_length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		/// <summary>
+		/// 	Gives back the string value of the string with the given handle.
+		/// </summary>
+		/// <param name="string_handle">
+		/// 	Handle of the string to query.
+		/// </param>
+		/// <param name="string_value">
+		/// 	Actual string value.
+		/// </param>
+		/// <param name="string_length">
+		/// 	Length of the queried string (must match size of <paramref name="string_value">).
+		/// </param>
+		private static void getString(		 	int string_handle,
+												StringBuilder string_value,
+												int string_length )
+		{
+			int status_code = HAPI_GetString( string_handle, string_value, string_length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		/// <summary>
+		/// 	Sets the string value of the string with the given handle.
+		/// </summary>
+		/// <param name="string_handle">
+		/// 	Handle of the string to set. If this is zero then a new string will be added to the string 
+		/// 	table and this handle will be set to the new string's handle.
+		/// </param>
+		/// <param name="string_value">
+		/// 	Actual string value.
+		/// </param>
+		/// <param name="string_length">
+		/// 	Length of the queried string (must match size of <paramref name="string_value">).
+		/// </param>
+		private static void setString( 			ref int string_handle,
+												StringBuilder string_value,
+												int string_length )
+		{
+			int status_code = HAPI_SetString( ref string_handle, string_value, string_length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		/// <summary>
@@ -679,6 +738,22 @@ namespace HAPI
 		private static extern int HAPI_ConvertMatrix( 		float[] mat,
                                      					 	int rst_order, int rot_order,
 															ref HAPI_TransformEuler transform_out );
+		
+		// STRINGS --------------------------------------------------------------------------------------------------
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetStringLength( 	int string_handle, 
+															out int string_length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetString(		 	int string_handle,
+															StringBuilder string_value,
+															int string_length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetString( 			ref int string_handle,
+															StringBuilder string_value,
+															int string_length );
 		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
