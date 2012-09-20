@@ -215,6 +215,10 @@ namespace HAPI
 	{
 		public int id;
 		
+		public int nameSH;			// string handle (SH)
+		public int instancePathSH;	// string handle (SH)
+		public int filePathSH;		// string handle (SH)
+		
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_ASSET_MAX_FILE_PATH_SIZE ) ]
 		public string otlFilePath;
