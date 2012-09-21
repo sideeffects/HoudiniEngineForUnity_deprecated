@@ -345,6 +345,9 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_HandleInfo
 	{
+		public int nameSH;		// string handle (SH)
+		public int typeNameSH;	// string handle (SH)
+		
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
 	    public string handleTypeName;
@@ -360,7 +363,9 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_HandleBindingInfo
 	{	    
-	
+		public int handleParmNameSH;	// string handle (SH)
+		public int assetParmNameSH;		// string handle (SH)
+		
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]	
 	    public string handleParmName;
@@ -378,6 +383,9 @@ namespace HAPI
 	public struct HAPI_ObjectInfo 
 	{
 		public int id;
+		
+		public int nameSH; 					// string handle (SH)
+		public int objectInstancePathSH;	// string handle (SH)
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_OBJ_MAX_NAME_SIZE ) ]
@@ -425,6 +433,7 @@ namespace HAPI
 	{		
 		public HAPI_AttributeInfo( string attr_name )
 		{
+			nameSH		= 0;
 			name 		= attr_name;
 			exists 		= false;
 			owner 		= (int) HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
@@ -432,6 +441,8 @@ namespace HAPI
 			count 		= 0;
 			tupleSize 	= 0;
 		}
+		
+		public int		nameSH;	// string handle (SH)
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_ATTR_MAX_NAME_SIZE ) ]
