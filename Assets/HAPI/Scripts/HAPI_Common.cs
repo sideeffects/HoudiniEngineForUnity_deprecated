@@ -50,9 +50,6 @@ namespace HAPI
 		public const int HAPI_PARM_MAX_STRING_SIZE			= 8192;
 		public const int HAPI_PARM_MAX_STRING_VEC_SIZE		= 1;
 
-		public const int HAPI_OBJ_MAX_NAME_SIZE				= 512;
-		public const int HAPI_OBJ_MAX_PATH_SIZE				= 1024;
-
 		public const int HAPI_GEO_MAX_NAME_SIZE				= 512;
 		public const int HAPI_GEO_MAX_TEX_NAME_SIZE			= 1024;
 		public const int HAPI_GEO_MAX_BUMP_NAME_SIZE		= 1024;
@@ -211,7 +208,7 @@ namespace HAPI
 	}
 	
 	// ASSETS -------------------------------------------------------------------------------------------------------
-	
+		
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_AssetInfo 
 	{
@@ -384,22 +381,20 @@ namespace HAPI
 	{
 		public int id;
 		
-		public int nameSH; 					// string handle (SH)
-		public int objectInstancePathSH;	// string handle (SH)
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_OBJ_MAX_NAME_SIZE ) ]
-		public string name;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_OBJ_MAX_PATH_SIZE ) ]
-		public string objectInstancePath;
+		private int nameSH; 				// string handle (SH)		
+		private int objectInstancePathSH; 	// string handle (SH)
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasTransformChanged;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasGeoChanged;
+		
+		// Getters
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+		public string objectInstancePath
+		{ get { return HAPI_Host.getString( objectInstancePathSH ); } private set {} }
 	}
 	
 	// DETAILS ------------------------------------------------------------------------------------------------------

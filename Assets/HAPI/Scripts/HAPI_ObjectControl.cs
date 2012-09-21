@@ -55,7 +55,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		myShowObjectControls 		= true;
 		myAutoSelectAssetNode		= true;
 #if DEBUG
-		myEnableLogging				= true;
+		myEnableLogging				= false;
 #else
 		myEnableLogging				= false;
 #endif
