@@ -40,10 +40,6 @@ namespace HAPI
 		public const int HAPI_UV_VECTOR_SIZE				= 2;
 		
 		public const int HAPI_GENERIC_MAX_NAME_SIZE			= 256;
-		
-		public const int HAPI_ASSET_MAX_FILE_PATH_SIZE		= 1024;
-		public const int HAPI_ASSET_MAX_NAME_SIZE			= 256;
-		public const int HAPI_ASSET_MAX_INSTANCE_PATH_SIZE	= 256;
 
 		public const int HAPI_PARM_MAX_VECTOR_SIZE			= 4;
 		public const int HAPI_PARM_MAX_NAME_SIZE			= 256;
@@ -214,21 +210,9 @@ namespace HAPI
 	{
 		public int id;
 		
-		public int nameSH;			// string handle (SH)
-		public int instancePathSH;	// string handle (SH)
-		public int filePathSH;		// string handle (SH)
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_ASSET_MAX_FILE_PATH_SIZE ) ]
-		public string otlFilePath;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_ASSET_MAX_NAME_SIZE ) ]		
-		public string assetName;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_ASSET_MAX_INSTANCE_PATH_SIZE ) ]		
-		public string assetInstancePath;
+		private int nameSH;			// string handle (SH)
+		private int instancePathSH;	// string handle (SH)
+		private int filePathSH;		// string handle (SH)
 		
 		public int objectCount;
 		public int parmCount;
@@ -238,6 +222,14 @@ namespace HAPI
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
+		
+		// Accessors
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+		public string instancePath
+		{ get { return HAPI_Host.getString( instancePathSH ); } private set {} }
+		public string filePath
+		{ get { return HAPI_Host.getString( filePathSH ); } set { HAPI_Host.setString( ref filePathSH, value ); } }
 	}
 	
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
@@ -390,7 +382,7 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasGeoChanged;
 		
-		// Getters
+		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 		public string objectInstancePath

@@ -110,7 +110,7 @@ namespace HAPI
 			}
 			
 			HAPI_AssetInfo asset_info 			= new HAPI_AssetInfo();
-			asset_info.otlFilePath 				= path;
+			asset_info.filePath 				= path;
 			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
 			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 			
@@ -118,7 +118,7 @@ namespace HAPI
 			
 			processStatusCode( status_code );
 			
-			Debug.Log( "Asset Loaded - Path: " + asset_info.assetInstancePath + ", ID: " + asset_info.id );			
+			Debug.Log( "Asset Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );			
 			return asset_info;
 		}
 		
