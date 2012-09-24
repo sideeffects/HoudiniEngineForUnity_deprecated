@@ -34,10 +34,11 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 	/// </summary>
 	public void selectParent()
 	{
-		if ( myObjectControl.myAutoSelectAssetNode )
+		
+		if ( myObjectControl != null && myObjectControl.myAutoSelectAssetNode )
 		{
 			GameObject[] selection 	= new GameObject[ 1 ];
-			selection[ 0 ] 			= transform.parent.gameObject;
+			selection[ 0 ] 			= myObjectControl.gameObject;
 			Selection.objects 		= selection;
 		}
 	}

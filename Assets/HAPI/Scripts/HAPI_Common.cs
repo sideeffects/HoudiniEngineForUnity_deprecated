@@ -203,6 +203,56 @@ namespace HAPI
 	    public int     rstOrder;
 	}
 	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_TransformInstance 
+	{
+		public HAPI_TransformInstance(bool initializeFields)
+		{
+			
+			pos = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
+			dir = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
+			scale = 1.0f;
+			scale3 = new float[HAPI_Constants.HAPI_SCALE_VECTOR_SIZE];
+			up = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
+			quat = new float[HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE];
+			tr = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
+		}
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+		public float[] pos;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] dir;
+		
+	    public float scale;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] scale3;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] up;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] quat;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] tr;
+		
+	}
+	
+	
 	// ASSETS -------------------------------------------------------------------------------------------------------
 		
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -219,6 +269,7 @@ namespace HAPI
 		public int handleCount;
 		public int parmExtraValueCount;
 		public int parmChoiceCount;
+		public int instancerCount;
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
@@ -382,11 +433,17 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasGeoChanged;
 		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool isInstancer;
+				
+    	public int objectToInstanceId;
+		
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 		public string objectInstancePath
 		{ get { return HAPI_Host.getString( objectInstancePathSH ); } private set {} }
+
 	}
 	
 	// DETAILS ------------------------------------------------------------------------------------------------------

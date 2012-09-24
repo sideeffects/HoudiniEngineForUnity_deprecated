@@ -34,8 +34,7 @@ namespace HAPI
 		// GENERICS -------------------------------------------------------------------------------------------------
 		
 		/// <summary>	
-		/// 	Fill an array of HAPI_RawInstance structs with vertex 
-	    ///		information from an object's geometry.
+		/// 	Converts a transform to differing TRS order and Euler rotation order	    
 		/// </summary>
 	    ///
 	    /// <param name= "transform_in_out">	    
@@ -56,12 +55,57 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
-		// TODO: comment? Also, do we need this? It's not being used anywhere.
+		
+		/// <summary>	
+		/// 	Converts a 4x4 matrix into its TRS form.  
+		/// </summary>
+	    ///		
+	    /// <param name="mat">
+	    ///                 A 4x4 matrix expressed in a 16 element float array
+	    /// </param>
+	    /// <param name="rst_order">
+	    ///         The desired transform order of the output
+	    ///			TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5    
+		/// </param>
+	    ///	<param name="rot_order">
+	    ///			The desired rotation order of the output        
+	    ///         XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
+	    /// </param>
+	    /// <param name="transform_out">
+	    ///			Used for the output.
+	    /// </param>
 		public static void convertMatrix( 	    float[] mat,
 	                                     		int rst_order, int rot_order,
 												ref HAPI_TransformEuler transform_out )
 		{
 			int status_code = HAPI_ConvertMatrix( mat, rst_order, rot_order, ref transform_out );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		
+		/// <summary>
+		/// 	An utility function that computes a transform based on parameters
+		/// 	typical to instancing.  
+		/// </summary>	    
+	    /// <param name="transform_inst">
+	    ///                 A HAPI_TransformInstance structure describing parameters
+	    ///                 relevant to instancing.  See HAPI_TransformInstance for 
+	    ///                 details
+	    /// </param>
+	    /// <param name="rst_order">
+	    ///                 The desired transform order of the output
+	    ///			TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5        
+		/// </param>
+	    /// <param name="transform_out">
+	    ///			Used for the output.
+		///	</param>
+		public static void computeInstanceTransform( ref HAPI_TransformInstance transform_inst,
+                                             		int rst_order,
+                                             		ref HAPI_Transform transform_out )
+		{
+			int status_code = HAPI_ComputeInstanceTransform( ref transform_inst,
+															 rst_order,
+															 ref transform_out);
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
