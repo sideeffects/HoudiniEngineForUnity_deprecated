@@ -137,8 +137,9 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 				{
 					myAssetInfo = HAPI_Host.loadOTL( myAssetPath );
 				}
-				catch ( HAPI_Error )
+				catch ( HAPI_Error error )
 				{
+					Debug.LogError( error.what() );
 					// Nothing to build since the load failed.
 					return false; // false for failed :(
 				}
