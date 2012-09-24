@@ -163,7 +163,7 @@ namespace HAPI
 		/// 	Length of the queried string (must match size of <paramref name="string_value">).
 		/// </param>
 		private static void setString( 			ref int string_handle,
-												StringBuilder string_value,
+												string string_value,
 												int string_length )
 		{
 			int status_code = HAPI_SetString( ref string_handle, string_value, string_length );

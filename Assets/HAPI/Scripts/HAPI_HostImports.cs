@@ -60,7 +60,7 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetString( 			ref int string_handle,
-															StringBuilder string_value,
+															string string_value,
 															int string_length );
 		
 		// PARAMETERS -----------------------------------------------------------------------------------------------

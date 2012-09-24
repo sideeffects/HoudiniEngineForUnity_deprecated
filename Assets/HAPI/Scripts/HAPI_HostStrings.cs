@@ -41,6 +41,8 @@ namespace HAPI
 			if ( length <= 0 )
 				return "";
 			
+			length++; // For the trailing 0.
+			
 			StringBuilder string_builder = new StringBuilder( length );
 			getString( string_handle, string_builder, length );
 			
@@ -52,9 +54,7 @@ namespace HAPI
 		public static void setString( ref int string_handle, string string_value )
 		{
 			int length = string_value.Length;			
-			StringBuilder string_builder = new StringBuilder( string_value );
-			
-			setString( ref string_handle, string_builder, length );
+			setString( ref string_handle, string_value, length );
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
