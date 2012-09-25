@@ -45,15 +45,7 @@ public partial class HAPI_Inspector : Editor
 	}
 	
 	public override void OnInspectorGUI() 
-	{
-		
-		Event currentEvent = Event.current;
-		if( currentEvent.isMouse )
-		{
-			if(currentEvent.type == EventType.MouseUp)
-				Debug.Log("up! button = " + currentEvent.button);
-		}
-	
+	{		
 		myUndoManager.CheckUndo();
 		
 		myLabelStyle = new GUIStyle( GUI.skin.label );
