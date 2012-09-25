@@ -205,7 +205,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	
 	// ATTRIBUTES ---------------------------------------------------------------------------------------------------
 		
-	private delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
+	public delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
 													   [Out] T[] items, int start, int end );	
 	private void fillAttrArray< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
 									 T[] items, fillAttrArrayInputFunc< T > get_func, int count ) 
@@ -241,7 +241,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		}
 	}
 	
-	private void getAttribute< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, ref T[] data,
+	public void getAttribute< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, ref T[] data,
 									fillAttrArrayInputFunc< T > get_func )
 	{
 		int original_tuple_size = info.tupleSize;		
@@ -263,7 +263,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		fillAttrArray( asset_id, object_id, ref info, data, get_func, info.count );
 	}
 	
-	private string[] getAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info, 
+	public string[] getAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info, 
 										HAPI_AttributeOwner owner )
 	{
 		int attr_count = detail_info.getOwnerCount( owner );

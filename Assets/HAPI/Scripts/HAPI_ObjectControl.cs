@@ -44,7 +44,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		
 		myAssetPath 				= "";
 		myAssetPathChanged 			= true;
-		myAssetId 					= -1;
+		prAssetId 					= -1;
 		
 		myObjectCount 				= 0;
 		myParmCount 				= 0;
@@ -83,8 +83,8 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		if ( myEnableLogging )
 			Debug.Log( "HAPI_ObjectControl destroyed!" );
 		
-		if ( myAssetId > 0 )
-			HAPI_Host.unloadOTL( myAssetId );
+		if ( prAssetId > 0 )
+			HAPI_Host.unloadOTL( prAssetId );
 	}
 	
 	/// <summary>
@@ -131,7 +131,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			
 			if ( myAssetPathChanged ) 
 			{
-				HAPI_Host.unloadOTL( myAssetId );
+				HAPI_Host.unloadOTL( prAssetId );
 				
 				try
 				{
@@ -145,7 +145,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 				}
 							
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
-				myAssetId 				= myAssetInfo.id;
+				prAssetId 				= myAssetInfo.id;
 				myObjectCount 			= myAssetInfo.objectCount;
 				myParmCount 			= myAssetInfo.parmCount;
 				myParmExtraValueCount 	= myAssetInfo.parmExtraValueCount;
@@ -160,23 +160,23 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 				myProgressBarMsg = "Loading parameters...";
 				displayProgressBar();
 				myParms = new HAPI_ParmInfo[ myParmCount ];
-				getArray1Id( myAssetId, HAPI_Host.getParameters, myParms, myParmCount );
+				getArray1Id( prAssetId, HAPI_Host.getParameters, myParms, myParmCount );
 				displayProgressBar( myParmCount );
 				
 				// Get any parameter extra values.
 				myParmExtraValues = new HAPI_ParmSingleValue[ myParmExtraValueCount ];
-				getArray1Id( myAssetId, HAPI_Host.getParmExtraValues, myParmExtraValues, myParmExtraValueCount );
+				getArray1Id( prAssetId, HAPI_Host.getParmExtraValues, myParmExtraValues, myParmExtraValueCount );
 				displayProgressBar( myParmExtraValueCount );
 				
 				// Get parameter choice lists.
 				myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
-				getArray1Id( myAssetId, HAPI_Host.getParmChoiceLists, myParmChoiceLists, myParmChoiceCount );
+				getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, myParmChoiceLists, myParmChoiceCount );
 				displayProgressBar( myParmChoiceCount );
 				
 				// Get exposed handle information.
 				myProgressBarMsg = "Loading handles...";
 				myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
-				getArray1Id( myAssetId, HAPI_Host.getHandleInfo, myHandleInfos, myHandleCount );
+				getArray1Id( prAssetId, HAPI_Host.getHandleInfo, myHandleInfos, myHandleCount );
 				
 				// Get handles.
 				myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( myHandleCount );		
@@ -190,7 +190,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 								   		  + handle_info.handleTypeName + " is unsupported at this time." );
 					
 					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
-					getArray2Id( myAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
+					getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
 								 binding_infos, handle_info.bindingsCount );
 					
 					myHandleBindingInfos.Add( binding_infos );
@@ -204,11 +204,11 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 				displayProgressBar();
 				
 				// Set all parameter values.
-				setArray1Id( myAssetId, HAPI_Host.setParameters, myParms, myParmCount );
+				setArray1Id( prAssetId, HAPI_Host.setParameters, myParms, myParmCount );
 				displayProgressBar( myParmCount );
 				
 				// Set extra parameter values.
-				setArray1Id( myAssetId, HAPI_Host.setParmExtraValues, myParmExtraValues, myParmExtraValueCount );
+				setArray1Id( prAssetId, HAPI_Host.setParmExtraValues, myParmExtraValues, myParmExtraValueCount );
 				displayProgressBar( myParmExtraValueCount );
 				
 				// Increment non-settable items:
@@ -221,12 +221,12 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			destroyChildren();
 			
 			// Create local object info caches (transforms need to be stored in a parallel array).
-			myObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
-			myGameObjects		= new GameObject[ myObjectCount ];
+			prObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
+			prGameObjects		= new GameObject[ myObjectCount ];
 			myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
 			
-			getArray1Id( myAssetId, HAPI_Host.getObjects, myObjects, myObjectCount );
-			getArray2Id( myAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+			getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, myObjectCount );
+			getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
 						 myObjectTransforms, myObjectCount );
 			
 			for ( int object_index = 0; object_index < myObjectCount; ++object_index )
@@ -234,8 +234,8 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 				incrementProgressBar();
 				try
 				{
-					myGameObjects[ object_index ] = null;
-					if( !myObjects[ object_index ].isInstancer )
+					prGameObjects[ object_index ] = null;
+					if( !prObjects[ object_index ].isInstancer )
 						createObject( object_index );
 				}
 				catch ( HAPI_Error error )
@@ -248,7 +248,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			// processing instancers
 			for ( int object_index = 0; object_index < myObjectCount; ++object_index )
 			{			
-				HAPI_ObjectInfo object_info = myObjects[ object_index ];
+				HAPI_ObjectInfo object_info = prObjects[ object_index ];
 				if( object_info.isInstancer )
 				{
 					try
@@ -275,7 +275,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	}
 		
 	public string 					myAssetPath;
-	public int 						myAssetId;
+	public int 						prAssetId { get; set; }
 	public int 						myObjectCount;
 	public int 						myParmCount;
 	public int						myParmExtraValueCount;
@@ -283,8 +283,10 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	public int						myHandleCount;
 	
 	public HAPI_AssetInfo 			myAssetInfo;
-	public HAPI_ObjectInfo[] 		myObjects;
-	public GameObject[]				myGameObjects;
+	public HAPI_ObjectInfo[] 		prObjects { get; set; }
+	
+	public GameObject[]				prGameObjects {	get; set; }
+	
 	public HAPI_Transform[] 		myObjectTransforms;
 	public HAPI_ParmInfo[] 			myParms;
 	public HAPI_ParmSingleValue[]	myParmExtraValues;
@@ -327,131 +329,22 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 		foreach ( GameObject child in children )
 			DestroyImmediate( child );
 	}
-	
+		
 	
 	private void instanceObjects( int object_id )
 	{
-		HAPI_ObjectInfo object_info = myObjects[ object_id ];
+		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		GameObject main_object = new GameObject( object_info.name );
-		
 		main_object.transform.parent = transform;
 		
-		// Get Detail info.
-		HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
-		HAPI_Host.getDetailInfo( myAssetId, object_id, out detail_info );
-		if ( myEnableLogging )
-			Debug.Log( "Instancer #" + object_id + " (" + object_info.name + "): "
-					   + "points: " + detail_info.pointCount );
-				
-		if ( detail_info.pointCount > 65000 )
-			throw new HAPI_Error( "Point count (" + detail_info.pointCount + ") above limit (" + 65000 + ")!" );
-						
-		// Print attribute names.
-		if ( myEnableLogging )
-			printAllAttributeNames( myAssetId, object_id, detail_info );
+		main_object.AddComponent( "HAPI_Instancer" );		
+		HAPI_Instancer instancer = main_object.GetComponent< HAPI_Instancer >();
 		
-		// Get position point attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
-		float[] pos_attr = new float[ 0 ];
-		getAttribute( myAssetId, object_id, ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
-		if ( !pos_attr_info.exists )
-			throw new HAPI_Error( "No position attribute found." );
-		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand position as point attributes!" );
+		instancer.prObjectControl = this;
+		instancer.prObjectId = object_id;
 		
-		if( pos_attr.Length != detail_info.pointCount*3 )
-		{
-			throw new HAPI_Error( "Unexpected point array length found for asset: " + myAssetId + "!" );
-		}
-		
-		// Get direction point attributes.
-		HAPI_AttributeInfo dir_attr_info = new HAPI_AttributeInfo( "N" );
-		float[] dir_attr = new float[ 0 ];
-		getAttribute( myAssetId, object_id, ref dir_attr_info, ref dir_attr, HAPI_Host.getAttributeFloatData );
-		if ( !dir_attr_info.exists )
-			throw new HAPI_Error( "No normal (N) attribute found." );
-		else if ( dir_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand normal as point attributes!" );
-		
-		if( dir_attr.Length != detail_info.pointCount*3 )
-		{
-			throw new HAPI_Error( "Unexpected normal array length found for asset: " + myAssetId + "!" );
-		}
-		
-		
-		// Get up point attributes.
-		HAPI_AttributeInfo up_attr_info = new HAPI_AttributeInfo( "up" );
-		float[] up_attr = new float[ 0 ];
-		getAttribute( myAssetId, object_id, ref up_attr_info, ref up_attr, HAPI_Host.getAttributeFloatData );
-		if ( !up_attr_info.exists )
-			throw new HAPI_Error( "No up attribute found." );
-		else if ( up_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand up as point attributes!" );
-		
-		if( up_attr.Length != detail_info.pointCount*3 )
-		{
-			throw new HAPI_Error( "Unexpected up array length found for asset: " + myAssetId + "!" );
-		}
-		
-		
-		for(int ii = 0; ii < detail_info.pointCount; ii++)
-		{
-			Vector3 pos = new Vector3( pos_attr[ ii*3 ], pos_attr[ ii*3 + 1 ], pos_attr[ ii*3 + 2] );
-			Vector3 dir = new Vector3( dir_attr[ ii*3 ], dir_attr[ ii*3 + 1 ], dir_attr[ ii*3 + 2] );
-			Vector3 up = new Vector3( up_attr[ ii*3 ], up_attr[ ii*3 + 1 ], up_attr[ ii*3 + 2] );
-			
-			GameObject objToInstantiate = myGameObjects[ object_info.objectToInstanceId ];
-			//GameObject obj = PrefabUtility.InstantiatePrefab( myGameObjects[object_id] ) as GameObject;	
-			if( objToInstantiate != null)
-			{
-				HAPI_TransformInstance instInfo = new HAPI_TransformInstance(true);
-				instInfo.pos[0] = pos[0];
-				instInfo.pos[1] = pos[1];
-				instInfo.pos[2] = pos[2];
-				instInfo.dir[0] = dir[0];
-				instInfo.dir[1] = dir[1];
-				instInfo.dir[2] = dir[2];
-				instInfo.up[0] = up[0];
-				instInfo.up[1] = up[1];
-				instInfo.up[2] = up[2];
-				instInfo.scale = 1.0f;
-				instInfo.scale3[0] = 1.0f;
-				instInfo.scale3[1] = 1.0f;
-				instInfo.scale3[2] = 1.0f;
-				instInfo.quat[0] = 0.0f;
-				instInfo.quat[1] = 0.0f;
-				instInfo.quat[2] = 0.0f;
-				instInfo.quat[3] = 1.0f;
-				instInfo.tr[0] = 0.0f;
-				instInfo.tr[1] = 0.0f;
-				instInfo.tr[2] = 0.0f;
-				
-				HAPI_Transform transform_out = new HAPI_Transform();
-				HAPI_Host.computeInstanceTransform( ref instInfo, 
-													(int) HAPI_RSTOrder.SRT,
-													ref transform_out );
-				
-				pos[0] = transform_out.position[0];
-				pos[1] = transform_out.position[1];
-				pos[2] = transform_out.position[2];
-				
-				Quaternion quat = new Quaternion( 	transform_out.rotationQuaternion[ 0 ],
-													transform_out.rotationQuaternion[ 1 ],
-													transform_out.rotationQuaternion[ 2 ],
-													transform_out.rotationQuaternion[ 3 ] );
-				
-				GameObject obj = Instantiate( objToInstantiate, 
-											  pos,  
-											  quat  ) as GameObject;
-				obj.transform.parent = main_object.transform;
-				
-				HAPI_ChildSelectionControl selection_control = obj.GetComponent<HAPI_ChildSelectionControl>();
-				selection_control.setObjectControl( this );
-			}
-			
-			
-		}
+		instancer.instanceObjects();				
 		
 	}
 	
@@ -464,7 +357,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	/// </param>
 	private void createObject( int object_id )
 	{
-		HAPI_ObjectInfo object_info = myObjects[ object_id ];
+		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		// Create main underling.
 		GameObject main_child = new GameObject( object_info.name );
@@ -501,7 +394,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			
 			// Get Detail info.
 			HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
-			HAPI_Host.getDetailInfo( myAssetId, object_id, out detail_info );
+			HAPI_Host.getDetailInfo( prAssetId, object_id, out detail_info );
 			if ( myEnableLogging )
 				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
 						   + "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
@@ -516,20 +409,20 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			
 			// Get Face counts.
 			int[] face_counts = new int[ detail_info.faceCount ];
-			getArray2Id( myAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, detail_info.faceCount );
+			getArray2Id( prAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, detail_info.faceCount );
 			
 			// Get Vertex list.
 			int[] vertex_list = new int[ detail_info.vertexCount ];
-			getArray2Id( myAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
+			getArray2Id( prAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
 			
 			// Print attribute names.
 			if ( myEnableLogging )
-				printAllAttributeNames( myAssetId, object_id, detail_info );
+				printAllAttributeNames( prAssetId, object_id, detail_info );
 			
 			// Get position vertex attributes.
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 			float[] pos_attr = new float[ 0 ];
-			getAttribute( myAssetId, object_id, ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );
 			else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -539,12 +432,12 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
 			uv_attr_info.tupleSize = 2;
 			float[] uv_attr = new float[ 0 ];
-			getAttribute( myAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
 			
 			// Get normal attributes.
 			HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( "N" );
 			float[] normal_attr = new float[ 0 ];
-			getAttribute( myAssetId, object_id, ref normal_attr_info, ref normal_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, ref normal_attr_info, ref normal_attr, HAPI_Host.getAttributeFloatData );
 			
 			// Apply object transforms.		
 			main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 
@@ -626,7 +519,7 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 			if ( !normal_attr_info.exists )
 				main_child_mesh.RecalculateNormals();
 			
-			myGameObjects[ object_id ] = main_child;
+			prGameObjects[ object_id ] = main_child;
 		}
 		catch ( HAPI_Error error )
 		{
