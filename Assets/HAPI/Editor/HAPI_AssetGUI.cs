@@ -11,8 +11,6 @@
  *		416-504-9876
  *
  * COMMENTS:
- * 		Contains HAPI_Inspector, the GUI companion to HAPI_ObjectControl and responsible for generating
- * 		the custom Inspector GUI for an asset game object.
  * 
  */
 
@@ -25,20 +23,20 @@ using System.Collections.Generic;
 using HAPI;
 
 /// <summary>
-/// 	GUI companion to <see cref="HAPI_ObjectControl"/>. Responsible for generating the custom Inspector GUI 
+/// 	GUI companion to <see cref="HAPI_Asset"/>. Responsible for generating the custom Inspector GUI 
 /// 	for an asset game object.
 /// </summary>
-[ CustomEditor( typeof( HAPI_ObjectControl ) ) ]
-public partial class HAPI_Inspector : Editor 
+[ CustomEditor( typeof( HAPI_Asset ) ) ]
+public partial class HAPI_AssetGUI : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
 	public void OnEnable() 
 	{		
-		myObjectControl = target as HAPI_ObjectControl;
+		myObjectControl = target as HAPI_Asset;
 		
-		myUndoManager = new HOEditorUndoManager( myObjectControl, "HAPI_ObjectControl" );
+		myUndoManager = new HOEditorUndoManager( myObjectControl, "HAPI_Asset" );
 		
 		if ( GUI.changed )
 			myObjectControl.build();
@@ -730,5 +728,5 @@ public partial class HAPI_Inspector : Editor
 	private GUIStyle			myLabelStyle;
 	
 	private HOEditorUndoManager myUndoManager;
-	private HAPI_ObjectControl 	myObjectControl;
+	private HAPI_Asset 	myObjectControl;
 }

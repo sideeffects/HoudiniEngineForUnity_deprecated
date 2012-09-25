@@ -11,8 +11,6 @@
  *		416-504-9876
  *
  * COMMENTS:
- * 		Contains HAPI_Inspector, the GUI companion to HAPI_ObjectControl and responsible for generating
- * 		the custom Inspector GUI for an asset game object.
  * 
  */
 

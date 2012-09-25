@@ -43,7 +43,7 @@ public class HAPI_Menu : MonoBehaviour
 	static private void createHAPIObject() 
 	{
 		// Prompt for the absolute path to the .otl file to use.
-		string asset_file_path = HAPI_Inspector.promptForAssetPath( "" );
+		string asset_file_path = HAPI_AssetGUI.promptForAssetPath( "" );
 		if ( asset_file_path.Length == 0 )
 			return; // User pressed Cancel in the dialog so just return.
 				
@@ -51,18 +51,18 @@ public class HAPI_Menu : MonoBehaviour
 		GameObject game_object = new GameObject( myDefaultAssetLabel );
 		
 		// Add HAPI Object Control script component.
-		game_object.AddComponent( "HAPI_ObjectControl" );		
-		HAPI_ObjectControl object_control = game_object.GetComponent< HAPI_ObjectControl >();
+		game_object.AddComponent( "HAPI_Asset" );		
+		HAPI_Asset asset = game_object.GetComponent< HAPI_Asset >();
 		
 		// Set that asset path.
-		object_control.setAssetPath( asset_file_path );
+		asset.setAssetPath( asset_file_path );
 		
 		// Save as a prefab.
 		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/" + myDefaultPrefabLabel + ".prefab" );
 		//PrefabUtility.ReplacePrefab( game_object, prefab, ReplacePrefabOptions.ConnectToPrefab );
 		
 		// Do first build.
-		bool build_result = object_control.build();
+		bool build_result = asset.build();
 		if ( build_result == false ) // Something is not right. Clean up.
 		{
 			DestroyImmediate( game_object );
@@ -70,7 +70,7 @@ public class HAPI_Menu : MonoBehaviour
 		}
 		
 		// Set new object name from asset name.
-		string asset_name		= object_control.myAssetInfo.name;
+		string asset_name		= asset.myAssetInfo.name;
 		game_object.name 		= asset_name;
 		
 		// Select the new houdini asset.

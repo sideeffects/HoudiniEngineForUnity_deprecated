@@ -26,7 +26,7 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 {	
 	public void setObjectControl( MonoBehaviour object_control )
 	{
-		myObjectControl = object_control as HAPI_ObjectControl;
+		myObjectControl = object_control as HAPI_Asset;
 	}
 	
 	/// <summary>
@@ -43,5 +43,5 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 		}
 	}
 
-	private HAPI_ObjectControl	myObjectControl;
+	private HAPI_Asset	myObjectControl;
 }

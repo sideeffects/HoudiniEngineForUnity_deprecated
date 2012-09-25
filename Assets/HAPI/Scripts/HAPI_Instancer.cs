@@ -14,7 +14,7 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public bool prOverrideInstances { get; set; }
 	
-	public HAPI_ObjectControl prObjectControl { get; set; }
+	public HAPI_Asset prObjectControl { get; set; }
 	
 	public int prObjectId { get; set; }		
 	

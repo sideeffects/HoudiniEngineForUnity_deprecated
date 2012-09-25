@@ -29,18 +29,18 @@ using HAPI;
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
 /// 	Houdini side.
 /// </summary>
-public partial class HAPI_ObjectControl : MonoBehaviour 
+public partial class HAPI_Asset : MonoBehaviour 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
 	/// <summary>
-	/// 	Initializes a new instance of the <see cref="HAPI_ObjectControl"/> class.
+	/// 	Initializes a new instance of the <see cref="HAPI_Asset"/> class.
 	/// </summary>
-	public HAPI_ObjectControl() 
+	public HAPI_Asset() 
 	{
 		if ( myEnableLogging )
-			Debug.Log( "HAPI_ObjectControl created!" );
+			Debug.Log( "HAPI_Asset created!" );
 		
 		myAssetPath 				= "";
 		myAssetPathChanged 			= true;
@@ -76,12 +76,12 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 	
 	/// <summary>
 	/// 	Releases unmanaged resources and performs other cleanup operations before the 
-	/// 	<see cref="HAPI_ObjectControl"/> is reclaimed by garbage collection.
+	/// 	<see cref="HAPI_Asset"/> is reclaimed by garbage collection.
 	/// </summary>
-	~HAPI_ObjectControl() 
+	~HAPI_Asset() 
 	{
 		if ( myEnableLogging )
-			Debug.Log( "HAPI_ObjectControl destroyed!" );
+			Debug.Log( "HAPI_Asset destroyed!" );
 		
 		if ( prAssetId > 0 )
 			HAPI_Host.unloadOTL( prAssetId );

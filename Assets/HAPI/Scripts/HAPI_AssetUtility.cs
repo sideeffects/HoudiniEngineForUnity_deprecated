@@ -27,7 +27,7 @@ using HAPI;
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
 /// 	Houdini side.
 /// </summary>
-public partial class HAPI_ObjectControl : MonoBehaviour
+public partial class HAPI_Asset : MonoBehaviour
 {
 	// GET ----------------------------------------------------------------------------------------------------------
 	

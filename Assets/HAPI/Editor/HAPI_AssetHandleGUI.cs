@@ -23,9 +23,9 @@ using System.Collections.Generic;
 using HAPI;
 
 /// <summary>
-/// 	GUI companion to <see cref="HAPI_ObjectControl"/>.
+/// 	GUI companion to <see cref="HAPI_Asset"/>.
 /// </summary>
-public partial class HAPI_Inspector : Editor 
+public partial class HAPI_AssetGUI : Editor 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public	
