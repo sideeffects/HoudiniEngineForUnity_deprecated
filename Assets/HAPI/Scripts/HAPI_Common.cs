@@ -385,36 +385,32 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_HandleInfo
 	{
-		public int nameSH;		// string handle (SH)
-		public int typeNameSH;	// string handle (SH)
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
-	    public string handleTypeName;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]		
-	    public string handleName;
+		private int nameSH;		// string handle (SH)
+		private int typeNameSH;	// string handle (SH)
 		
 	    public int  bindingsCount;
+		
+		// Accessors
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+		public string typeName
+		{ get { return HAPI_Host.getString( typeNameSH ); } private set {} }
 	}
 
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_HandleBindingInfo
 	{	    
-		public int handleParmNameSH;	// string handle (SH)
-		public int assetParmNameSH;		// string handle (SH)
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]	
-	    public string handleParmName;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_GENERIC_MAX_NAME_SIZE ) ]
-	    public string assetParmName;
+		private int handleParmNameSH;	// string handle (SH)
+		private int assetParmNameSH;		// string handle (SH)
 		
 		public int    assetParmId;
+		
+		// Accessors
+		public string handleParmName
+		{ get { return HAPI_Host.getString( handleParmNameSH ); } private set {} }
+		public string assetParmName
+		{ get { return HAPI_Host.getString( assetParmNameSH ); } private set {} }
 	};
 	
 	// OBJECTS ------------------------------------------------------------------------------------------------------

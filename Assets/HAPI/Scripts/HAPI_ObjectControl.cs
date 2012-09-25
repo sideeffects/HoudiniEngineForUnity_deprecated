@@ -185,9 +185,9 @@ public partial class HAPI_ObjectControl : MonoBehaviour
 					incrementProgressBar();
 					HAPI_HandleInfo handle_info = myHandleInfos[ handle_index ];
 					
-					if ( handle_info.handleTypeName != "xform" )
-						Debug.LogWarning( "Handle " + handle_info.handleName + " of type " 
-								   		  + handle_info.handleTypeName + " is unsupported at this time." );
+					if ( handle_info.typeName != "xform" )
+						Debug.LogWarning( "Handle " + handle_info.name + " of type " 
+								   		  + handle_info.typeName + " is unsupported at this time." );
 					
 					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
 					getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
