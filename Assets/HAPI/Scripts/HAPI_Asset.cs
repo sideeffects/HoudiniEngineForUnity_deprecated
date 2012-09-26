@@ -32,6 +32,48 @@ using HAPI;
 public partial class HAPI_Asset : MonoBehaviour 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public Properties
+	
+	public string 					prAssetPath { get; set; }
+	public int 						prAssetId { get; set; }
+	public int 						prObjectCount { get; set; }
+	public int 						prParmCount { get; set; }
+	public int						prParmExtraValueCount { get; set; }
+	public int						prParmChoiceCount;
+	public int						prHandleCount { get; set; }
+	
+	public HAPI_AssetInfo 			prAssetInfo { get; set; }
+	public HAPI_ObjectInfo[] 		prObjects { get; set; }
+	
+	public GameObject[]				prGameObjects {	get; set; }
+	
+	public HAPI_Transform[] 		prObjectTransforms { get; set; }
+	public HAPI_ParmInfo[] 			prParms { get; set; }
+	public HAPI_ParmSingleValue[]	prParmExtraValues { get; set; }
+	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
+	public HAPI_HandleInfo[]		prHandleInfos { get; set; }	
+	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
+	
+	public bool 					prShowObjectControls { get; set; }
+	public bool 					prShowAssetControls { get; set; }
+	public bool						prAutoSelectAssetNode { get; set; }
+	public bool						prEnableLogging { get; set; }
+	
+	public int						prLastChangedParmId { get; set; }
+	
+	/// <summary>
+	/// 	Indices of the currently selected folders in the Inspector.
+	/// 	A 1:1 mapping with myFolderListSelectionIds.
+	/// </summary>
+	public List< int > 				prFolderListSelections { get; set; }
+	
+	/// <summary>
+	/// 	Parameter ids of the currently selected folders in the Inspector. 
+	/// 	A 1:1 mapping with myFolderListSelections.
+	/// </summary>
+	public List< int > 				prFolderListSelectionIds { get; set; }
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
 	/// <summary>
@@ -39,34 +81,34 @@ public partial class HAPI_Asset : MonoBehaviour
 	/// </summary>
 	public HAPI_Asset() 
 	{
-		if ( myEnableLogging )
+		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset created!" );
 		
-		myAssetPath 				= "";
+		prAssetPath 				= "";
 		myAssetPathChanged 			= true;
 		prAssetId 					= -1;
 		
-		myObjectCount 				= 0;
-		myParmCount 				= 0;
-		myParmChoiceCount			= 0;
-		myHandleCount 				= 0;
+		prObjectCount 				= 0;
+		prParmCount 				= 0;
+		prParmChoiceCount			= 0;
+		prHandleCount 				= 0;
 		
-		myShowAssetControls 		= true;
-		myShowObjectControls 		= true;
-		myAutoSelectAssetNode		= true;
+		prShowAssetControls 		= true;
+		prShowObjectControls 		= true;
+		prAutoSelectAssetNode		= true;
 #if DEBUG
-		myEnableLogging				= false;
+		prEnableLogging				= false;
 #else
-		myEnableLogging				= false;
+		prEnableLogging				= false;
 #endif
 		
-		myLastChangedParmId			= -1;
+		prLastChangedParmId			= -1;
 				
-		myFolderListSelections 		= new List< int >();
-		myFolderListSelectionIds 	= new List< int >();
+		prFolderListSelections 		= new List< int >();
+		prFolderListSelectionIds 	= new List< int >();
 		
-		myFolderListSelections.Add( 0 );
-		myFolderListSelectionIds.Add( -1 );
+		prFolderListSelections.Add( 0 );
+		prFolderListSelectionIds.Add( -1 );
 		
 		myProgressBarJustUsed 		= false;
 		myProgressBarCurrent		= 0;
@@ -80,7 +122,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	/// </summary>
 	~HAPI_Asset() 
 	{
-		if ( myEnableLogging )
+		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset destroyed!" );
 		
 		if ( prAssetId > 0 )
@@ -99,9 +141,9 @@ public partial class HAPI_Asset : MonoBehaviour
 	/// </returns>
 	public bool setAssetPath( string path ) 
 	{
-		if ( path != myAssetPath ) 
+		if ( path != prAssetPath ) 
 		{
-			myAssetPath = path;
+			prAssetPath = path;
 			myAssetPathChanged = true;
 		}
 		return myAssetPathChanged;
@@ -115,7 +157,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	/// </returns>
 	public string getAssetPath() 
 	{
-		return myAssetPath;	
+		return prAssetPath;	
 	}
 	
 	/// <summary>
@@ -135,7 +177,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				
 				try
 				{
-					myAssetInfo = HAPI_Host.loadOTL( myAssetPath );
+					prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
 				}
 				catch ( HAPI_Error error )
 				{
@@ -145,45 +187,45 @@ public partial class HAPI_Asset : MonoBehaviour
 				}
 							
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
-				prAssetId 				= myAssetInfo.id;
-				myObjectCount 			= myAssetInfo.objectCount;
-				myParmCount 			= myAssetInfo.parmCount;
-				myParmExtraValueCount 	= myAssetInfo.parmExtraValueCount;
-				myParmChoiceCount		= myAssetInfo.parmChoiceCount;
-				myHandleCount 			= myAssetInfo.handleCount;
+				prAssetId 				= prAssetInfo.id;
+				prObjectCount 			= prAssetInfo.objectCount;
+				prParmCount 			= prAssetInfo.parmCount;
+				prParmExtraValueCount 	= prAssetInfo.parmExtraValueCount;
+				prParmChoiceCount		= prAssetInfo.parmChoiceCount;
+				prHandleCount 			= prAssetInfo.handleCount;
 				
 				myProgressBarCurrent	= 0;
-				myProgressBarTotal		= myObjectCount + myParmCount + myParmExtraValueCount + myParmChoiceCount
-										  + myHandleCount;
+				myProgressBarTotal		= prObjectCount + prParmCount + prParmExtraValueCount + prParmChoiceCount
+										  + prHandleCount;
 							
 				// Get all parameters.
 				myProgressBarMsg = "Loading parameters...";
 				displayProgressBar();
-				myParms = new HAPI_ParmInfo[ myParmCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParameters, myParms, myParmCount );
-				displayProgressBar( myParmCount );
+				prParms = new HAPI_ParmInfo[ prParmCount ];
+				getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
+				displayProgressBar( prParmCount );
 				
 				// Get any parameter extra values.
-				myParmExtraValues = new HAPI_ParmSingleValue[ myParmExtraValueCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParmExtraValues, myParmExtraValues, myParmExtraValueCount );
-				displayProgressBar( myParmExtraValueCount );
+				prParmExtraValues = new HAPI_ParmSingleValue[ prParmExtraValueCount ];
+				getArray1Id( prAssetId, HAPI_Host.getParmExtraValues, prParmExtraValues, prParmExtraValueCount );
+				displayProgressBar( prParmExtraValueCount );
 				
 				// Get parameter choice lists.
-				myParmChoiceLists = new HAPI_ParmChoiceInfo[ myParmChoiceCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, myParmChoiceLists, myParmChoiceCount );
-				displayProgressBar( myParmChoiceCount );
+				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
+				getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
+				displayProgressBar( prParmChoiceCount );
 				
 				// Get exposed handle information.
 				myProgressBarMsg = "Loading handles...";
-				myHandleInfos = new HAPI_HandleInfo[ myHandleCount ];
-				getArray1Id( prAssetId, HAPI_Host.getHandleInfo, myHandleInfos, myHandleCount );
+				prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
+				getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
 				
 				// Get handles.
-				myHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( myHandleCount );		
-				for ( int handle_index = 0; handle_index < myHandleCount; ++handle_index )
+				prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );		
+				for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
 				{
 					incrementProgressBar();
-					HAPI_HandleInfo handle_info = myHandleInfos[ handle_index ];
+					HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
 					
 					if ( handle_info.typeName != "xform" )
 						Debug.LogWarning( "Handle " + handle_info.name + " of type " 
@@ -193,7 +235,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
 								 binding_infos, handle_info.bindingsCount );
 					
-					myHandleBindingInfos.Add( binding_infos );
+					prHandleBindingInfos.Add( binding_infos );
 				}
 				
 				myAssetPathChanged = false;
@@ -204,15 +246,15 @@ public partial class HAPI_Asset : MonoBehaviour
 				displayProgressBar();
 				
 				// Set all parameter values.
-				setArray1Id( prAssetId, HAPI_Host.setParameters, myParms, myParmCount );
-				displayProgressBar( myParmCount );
+				setArray1Id( prAssetId, HAPI_Host.setParameters, prParms, prParmCount );
+				displayProgressBar( prParmCount );
 				
 				// Set extra parameter values.
-				setArray1Id( prAssetId, HAPI_Host.setParmExtraValues, myParmExtraValues, myParmExtraValueCount );
-				displayProgressBar( myParmExtraValueCount );
+				setArray1Id( prAssetId, HAPI_Host.setParmExtraValues, prParmExtraValues, prParmExtraValueCount );
+				displayProgressBar( prParmExtraValueCount );
 				
 				// Increment non-settable items:
-				myProgressBarCurrent += myParmChoiceCount + myHandleCount;
+				myProgressBarCurrent += prParmChoiceCount + prHandleCount;
 			}
 			
 			myProgressBarMsg = "Loading and composing objects...";
@@ -221,15 +263,15 @@ public partial class HAPI_Asset : MonoBehaviour
 			destroyChildren();
 			
 			// Create local object info caches (transforms need to be stored in a parallel array).
-			prObjects 			= new HAPI_ObjectInfo[ myObjectCount ];
-			prGameObjects		= new GameObject[ myObjectCount ];
-			myObjectTransforms 	= new HAPI_Transform[ myObjectCount ];
+			prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];
+			prGameObjects		= new GameObject[ prObjectCount ];
+			prObjectTransforms 	= new HAPI_Transform[ prObjectCount ];
 			
-			getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, myObjectCount );
+			getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
 			getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
-						 myObjectTransforms, myObjectCount );
+						 prObjectTransforms, prObjectCount );
 			
-			for ( int object_index = 0; object_index < myObjectCount; ++object_index )
+			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 			{
 				incrementProgressBar();
 				try
@@ -246,7 +288,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			}
 			
 			// processing instancers
-			for ( int object_index = 0; object_index < myObjectCount; ++object_index )
+			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 			{			
 				HAPI_ObjectInfo object_info = prObjects[ object_index ];
 				if( object_info.isInstancer )
@@ -273,45 +315,7 @@ public partial class HAPI_Asset : MonoBehaviour
 						
 		return true;
 	}
-		
-	public string 					myAssetPath;
-	public int 						prAssetId { get; set; }
-	public int 						myObjectCount;
-	public int 						myParmCount;
-	public int						myParmExtraValueCount;
-	public int						myParmChoiceCount;
-	public int						myHandleCount;
-	
-	public HAPI_AssetInfo 			myAssetInfo;
-	public HAPI_ObjectInfo[] 		prObjects { get; set; }
-	
-	public GameObject[]				prGameObjects {	get; set; }
-	
-	public HAPI_Transform[] 		myObjectTransforms;
-	public HAPI_ParmInfo[] 			myParms;
-	public HAPI_ParmSingleValue[]	myParmExtraValues;
-	public HAPI_ParmChoiceInfo[]	myParmChoiceLists;
-	public HAPI_HandleInfo[]		myHandleInfos;	
-	public List< HAPI_HandleBindingInfo[] > myHandleBindingInfos;
-	
-	public bool 					myShowObjectControls;
-	public bool 					myShowAssetControls;
-	public bool						myAutoSelectAssetNode;
-	public bool						myEnableLogging;
-	
-	public int						myLastChangedParmId;
-	
-	/// <summary>
-	/// 	Indices of the currently selected folders in the Inspector.
-	/// 	A 1:1 mapping with myFolderListSelectionIds.
-	/// </summary>
-	public List< int > 				myFolderListSelections;
-	
-	/// <summary>
-	/// 	Parameter ids of the currently selected folders in the Inspector. 
-	/// 	A 1:1 mapping with myFolderListSelections.
-	/// </summary>
-	public List< int > 				myFolderListSelectionIds;
+			
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
@@ -390,12 +394,12 @@ public partial class HAPI_Asset : MonoBehaviour
 			main_child_mesh.Clear();
 			
 			// Get transforms.
-			HAPI_Transform trans = myObjectTransforms[ object_id ];
+			HAPI_Transform trans = prObjectTransforms[ object_id ];
 			
 			// Get Detail info.
 			HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
 			HAPI_Host.getDetailInfo( prAssetId, object_id, out detail_info );
-			if ( myEnableLogging )
+			if ( prEnableLogging )
 				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
 						   + "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
 			
@@ -416,7 +420,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			getArray2Id( prAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
 			
 			// Print attribute names.
-			if ( myEnableLogging )
+			if ( prEnableLogging )
 				printAllAttributeNames( prAssetId, object_id, detail_info );
 			
 			// Get position vertex attributes.

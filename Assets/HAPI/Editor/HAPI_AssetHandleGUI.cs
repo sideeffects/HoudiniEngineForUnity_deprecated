@@ -48,7 +48,7 @@ public partial class HAPI_AssetGUI : Editor
 		if ( myObjectControl == null )
 			return;
 		
-		HAPI_HandleInfo[] handleInfos = myObjectControl.myHandleInfos;
+		HAPI_HandleInfo[] handleInfos = myObjectControl.prHandleInfos;
 		
 		if ( handleInfos == null )
 			return;				
@@ -64,7 +64,7 @@ public partial class HAPI_AssetGUI : Editor
 				HAPI_RSTOrder rstOrder = HAPI_RSTOrder.SRT;
 				HAPI_XYZOrder xyzOrder = HAPI_XYZOrder.XYZ;
 				
-				HAPI_HandleBindingInfo[] bindingInfos = myObjectControl.myHandleBindingInfos[ ii ];
+				HAPI_HandleBindingInfo[] bindingInfos = myObjectControl.prHandleBindingInfos[ ii ];
 												
 				if ( myTranslateParmId == -1 ||
 					 myRotateParmId == -1 ||
@@ -94,7 +94,7 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myTranslateParmId > 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.myParms[ myTranslateParmId ];
+					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myTranslateParmId ];
 					tx = parmInfo.floatValue[0];
 					ty = parmInfo.floatValue[1];
 					tz = parmInfo.floatValue[2];
@@ -102,7 +102,7 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myRotateParmId > 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.myParms[ myRotateParmId ];
+					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myRotateParmId ];
 					rx = parmInfo.floatValue[0];
 					ry = parmInfo.floatValue[1];
 					rz = parmInfo.floatValue[2];
@@ -110,7 +110,7 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myScaleParmId > 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.myParms[ myScaleParmId ];
+					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myScaleParmId ];
 					sx = parmInfo.floatValue[0];
 					sy = parmInfo.floatValue[1];
 					sz = parmInfo.floatValue[2];
@@ -118,13 +118,13 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myRstOrderParmId > 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.myParms[ myRstOrderParmId ];
+					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myRstOrderParmId ];
 					rstOrder = (HAPI_RSTOrder) parmInfo.intValue[0];
 				}
 				
 				if ( myXyzOrderParmId > 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.myParms[ myXyzOrderParmId ];
+					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myXyzOrderParmId ];
 					xyzOrder = (HAPI_XYZOrder) parmInfo.intValue[0];
 				}				
 				
@@ -201,9 +201,9 @@ public partial class HAPI_AssetGUI : Editor
 							newPos.z = xform.position[2];
 						}
 						
-						myObjectControl.myParms[ myTranslateParmId ].floatValue[ 0 ] = newPos.x;
-						myObjectControl.myParms[ myTranslateParmId ].floatValue[ 1 ] = newPos.y;
-						myObjectControl.myParms[ myTranslateParmId ].floatValue[ 2 ] = newPos.z;
+						myObjectControl.prParms[ myTranslateParmId ].floatValue[ 0 ] = newPos.x;
+						myObjectControl.prParms[ myTranslateParmId ].floatValue[ 1 ] = newPos.y;
+						myObjectControl.prParms[ myTranslateParmId ].floatValue[ 2 ] = newPos.z;
 						
 					}
 				}
@@ -229,9 +229,9 @@ public partial class HAPI_AssetGUI : Editor
 						
 						HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
 						
-						myObjectControl.myParms[ myRotateParmId ].floatValue[ 0 ] = xform.rotationeEuler[ 0 ];
-						myObjectControl.myParms[ myRotateParmId ].floatValue[ 1 ] = xform.rotationeEuler[ 1 ];
-						myObjectControl.myParms[ myRotateParmId ].floatValue[ 2 ] = xform.rotationeEuler[ 2 ];
+						myObjectControl.prParms[ myRotateParmId ].floatValue[ 0 ] = xform.rotationeEuler[ 0 ];
+						myObjectControl.prParms[ myRotateParmId ].floatValue[ 1 ] = xform.rotationeEuler[ 1 ];
+						myObjectControl.prParms[ myRotateParmId ].floatValue[ 2 ] = xform.rotationeEuler[ 2 ];
 					}					
 				}
 				else if ( myManipMode == XformManipMode.Scale )
@@ -239,9 +239,9 @@ public partial class HAPI_AssetGUI : Editor
 					if( myScaleParmId > 0 )
 					{
 						Vector3 newScale = Handles.ScaleHandle( scale, translate, rotate, 1.0f );
-						myObjectControl.myParms[ myScaleParmId ].floatValue[ 0 ] = newScale.x;
-						myObjectControl.myParms[ myScaleParmId ].floatValue[ 1 ] = newScale.y;
-						myObjectControl.myParms[ myScaleParmId ].floatValue[ 2 ] = newScale.z;							
+						myObjectControl.prParms[ myScaleParmId ].floatValue[ 0 ] = newScale.x;
+						myObjectControl.prParms[ myScaleParmId ].floatValue[ 1 ] = newScale.y;
+						myObjectControl.prParms[ myScaleParmId ].floatValue[ 2 ] = newScale.z;							
 					}
 				}
 				

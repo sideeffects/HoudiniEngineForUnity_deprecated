@@ -52,10 +52,10 @@ public partial class HAPI_AssetGUI : Editor
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
-		myObjectControl.myShowObjectControls = 
-			EditorGUILayout.Foldout( myObjectControl.myShowObjectControls, new GUIContent( "Object Controls" ) );
+		myObjectControl.prShowObjectControls = 
+			EditorGUILayout.Foldout( myObjectControl.prShowObjectControls, new GUIContent( "Object Controls" ) );
 		
-		if ( myObjectControl.myShowObjectControls ) 
+		if ( myObjectControl.prShowObjectControls ) 
 		{
 			EditorGUILayout.LabelField( new GUIContent( "OTL Path:" ) );
 			EditorGUILayout.BeginHorizontal(); 
@@ -91,8 +91,8 @@ public partial class HAPI_AssetGUI : Editor
 				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
 				
 				// Draw toggle with its label.
-				bool old_value = myObjectControl.myAutoSelectAssetNode;
-				myObjectControl.myAutoSelectAssetNode = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
+				bool old_value = myObjectControl.prAutoSelectAssetNode;
+				myObjectControl.prAutoSelectAssetNode = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
 				EditorGUILayout.SelectableLabel( "Auto Select Parent", myLineHeightGUI );		
 			}
 			EditorGUILayout.EndHorizontal();
@@ -106,8 +106,8 @@ public partial class HAPI_AssetGUI : Editor
 				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
 				
 				// Draw toggle with its label.
-				bool old_value = myObjectControl.myEnableLogging;
-				myObjectControl.myEnableLogging = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
+				bool old_value = myObjectControl.prEnableLogging;
+				myObjectControl.prEnableLogging = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
 				EditorGUILayout.SelectableLabel( "Enable Logging", myLineHeightGUI );		
 			}
 			EditorGUILayout.EndHorizontal();
@@ -118,11 +118,11 @@ public partial class HAPI_AssetGUI : Editor
 		// Draw Asset Controls
 		
 		EditorGUILayout.Separator();
-		myObjectControl.myShowAssetControls = 
-			EditorGUILayout.Foldout( myObjectControl.myShowAssetControls, new GUIContent( "Asset Controls" ) );
+		myObjectControl.prShowAssetControls = 
+			EditorGUILayout.Foldout( myObjectControl.prShowAssetControls, new GUIContent( "Asset Controls" ) );
 		
 		bool hasAssetChanged = false;
-		if ( myObjectControl.myShowAssetControls )
+		if ( myObjectControl.prShowAssetControls )
 			hasAssetChanged |= generateAssetControls();							
 		
 		if ( hasAssetChanged )
@@ -190,11 +190,11 @@ public partial class HAPI_AssetGUI : Editor
 										ref int current_choice_list_index, 
 									   	ref bool join_last, ref bool no_label_toggle_last ) 
 	{
-		if ( myObjectControl.myParms == null )
+		if ( myObjectControl.prParms == null )
 			return false;
 		
 		bool changed 				= false;
-		HAPI_ParmInfo[] parms 		= myObjectControl.myParms;
+		HAPI_ParmInfo[] parms 		= myObjectControl.prParms;
 		HAPI_ParmType parm_type 	= (HAPI_ParmType) parms[ id ].type;
 		int parm_size				= parms[ id ].size;
 		bool is_string 				= ( parm_type >= HAPI_ParmType.HAPI_PARMTYPE_STR_START 
@@ -248,16 +248,16 @@ public partial class HAPI_AssetGUI : Editor
 				List< int>		values = new List< int >();				
 				
 				// Progress through the choice list until we meet our own choices.
-				while ( myObjectControl.myParmChoiceLists[ current_choice_list_index ].parentParmId != id )
+				while ( myObjectControl.prParmChoiceLists[ current_choice_list_index ].parentParmId != id )
 					current_choice_list_index++;
 				
 				// Go through our choices.
 				for ( int i = 0; i < parms[ id ].choiceCount; ++i )
 				{
-					if ( myObjectControl.myParmChoiceLists[ current_choice_list_index ].parentParmId != id )
+					if ( myObjectControl.prParmChoiceLists[ current_choice_list_index ].parentParmId != id )
 						Debug.LogError( "Parm choice parent parm id not matching current parm id!" );
 					
-					labels.Add( myObjectControl.myParmChoiceLists[ current_choice_list_index ].label );
+					labels.Add( myObjectControl.prParmChoiceLists[ current_choice_list_index ].label );
 					values.Add( i );
 					current_choice_list_index++;
 				}
@@ -290,11 +290,11 @@ public partial class HAPI_AssetGUI : Editor
 						old_value = parms[ id ].intValue[ p ];
 					else
 					{
-						if ( myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId != id )
+						if ( myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId != id )
 							Debug.LogError( "Extra choice parent id (" 
-								+ myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId 
+								+ myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId 
 								+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
-						old_value = myObjectControl.myParmExtraValues[ current_extra_value_index ].intValue;
+						old_value = myObjectControl.prParmExtraValues[ current_extra_value_index ].intValue;
 					}
 					
 					// Draw field.
@@ -326,7 +326,7 @@ public partial class HAPI_AssetGUI : Editor
 						if ( p < contained_size )
 							parms[ id ].intValue[ p ] = new_value;
 						else
-							myObjectControl.myParmExtraValues[ current_extra_value_index ].intValue = new_value;
+							myObjectControl.prParmExtraValues[ current_extra_value_index ].intValue = new_value;
 						changed |= true;
 					}
 					
@@ -358,11 +358,11 @@ public partial class HAPI_AssetGUI : Editor
 					old_value = parms[ id ].floatValue[ p ];
 				else
 				{
-					if ( myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId != id )
+					if ( myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId != id )
 						Debug.LogError( "Extra choice parent id (" 
-							+ myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId 
+							+ myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId 
 							+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
-					old_value = myObjectControl.myParmExtraValues[ current_extra_value_index ].floatValue;
+					old_value = myObjectControl.prParmExtraValues[ current_extra_value_index ].floatValue;
 				}
 				
 				// Draw field.
@@ -394,7 +394,7 @@ public partial class HAPI_AssetGUI : Editor
 					if ( p < contained_size )
 						parms[ id ].floatValue[ p ] = new_value;
 					else
-						myObjectControl.myParmExtraValues[ current_extra_value_index ].floatValue = new_value;
+						myObjectControl.prParmExtraValues[ current_extra_value_index ].floatValue = new_value;
 					changed |= true;
 				}
 				
@@ -425,11 +425,11 @@ public partial class HAPI_AssetGUI : Editor
 					old_value = parms[ id ].stringValue;
 				else
 				{
-					if ( myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId != id )
+					if ( myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId != id )
 						Debug.LogError( "Extra choice parent id (" 
-							+ myObjectControl.myParmExtraValues[ current_extra_value_index ].parentParmId 
+							+ myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId 
 							+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
-					old_value = myObjectControl.myParmExtraValues[ current_extra_value_index ].stringValue;
+					old_value = myObjectControl.prParmExtraValues[ current_extra_value_index ].stringValue;
 				}
 				
 				// Draw field.
@@ -441,7 +441,7 @@ public partial class HAPI_AssetGUI : Editor
 					if ( p < contained_size )
 						parms[ id ].stringValue = new_value;
 					else
-						myObjectControl.myParmExtraValues[ current_extra_value_index ].stringValue = new_value;
+						myObjectControl.prParmExtraValues[ current_extra_value_index ].stringValue = new_value;
 					changed |= true;
 				}
 				
@@ -536,13 +536,13 @@ public partial class HAPI_AssetGUI : Editor
 		if ( !parms[ id ].joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
 		
-		if ( myObjectControl.hasProgressBarBeenUsed() && id == myObjectControl.myLastChangedParmId )
+		if ( myObjectControl.hasProgressBarBeenUsed() && id == myObjectControl.prLastChangedParmId )
 		{
 			// TODO: set the focus back to this control since the progress bar would have stolen it.	
 		}
 		
 		if ( changed )
-			myObjectControl.myLastChangedParmId = id;
+			myObjectControl.prLastChangedParmId = id;
 		
 		return changed;
 	}
@@ -556,14 +556,14 @@ public partial class HAPI_AssetGUI : Editor
 	/// </returns>
 	private bool generateAssetControls() 
 	{
-		if ( myObjectControl.myParms == null )
+		if ( myObjectControl.prParms == null )
 			return false;
 		
 		bool changed 					= false;
 		int current_index 				= 0;
 		int current_extra_value_index	= 0;
 		int current_choice_list_index 	= 0;
-		HAPI_ParmInfo[] parms 			= myObjectControl.myParms;
+		HAPI_ParmInfo[] parms 			= myObjectControl.prParms;
 				
 		bool join_last 					= false;
 		bool no_label_toggle_last 		= false;
@@ -576,7 +576,7 @@ public partial class HAPI_AssetGUI : Editor
 		Stack< int > parent_count_stack 	= new Stack< int >();
 		
 		// Loop through all the parameters.
-		while ( current_index < myObjectControl.myParmCount )
+		while ( current_index < myObjectControl.prParmCount )
 		{
 			int current_parent_id = -1; // The root has parent id -1.
 			
@@ -640,10 +640,10 @@ public partial class HAPI_AssetGUI : Editor
 				// If myObjectControl.myFolderListSelections is smaller than our current depth it means this
 				// is the first GUI generation for this asset (no previous folder selection data) so
 				// increase the size of the selection arrays to accomodate the new depth.
-				if ( myObjectControl.myFolderListSelections.Count <= folder_list_count )
+				if ( myObjectControl.prFolderListSelections.Count <= folder_list_count )
 				{
-					myObjectControl.myFolderListSelections.Add( 0 );
-					myObjectControl.myFolderListSelectionIds.Add( -1 );
+					myObjectControl.prFolderListSelections.Add( 0 );
+					myObjectControl.prFolderListSelectionIds.Add( -1 );
 				}
 				
 				// Generate the list of folders which will be passed to the GUILayout.Toolbar() method.
@@ -664,9 +664,9 @@ public partial class HAPI_AssetGUI : Editor
 				}
 				current_index--; // We decrement the current_index as we incremented one too many in the for loop.
 				
-				int selected_folder 	= myObjectControl.myFolderListSelections[ folder_list_count ];
+				int selected_folder 	= myObjectControl.prFolderListSelections[ folder_list_count ];
 				selected_folder 		= GUILayout.Toolbar( selected_folder, tab_labels.ToArray() );
-				myObjectControl.myFolderListSelections[ folder_list_count ] = selected_folder;
+				myObjectControl.prFolderListSelections[ folder_list_count ] = selected_folder;
 				
 				// Push only the selected folder info to the parent stacks since for this depth and this folder
 				// list only the parameters of the selected folder need to be generated.

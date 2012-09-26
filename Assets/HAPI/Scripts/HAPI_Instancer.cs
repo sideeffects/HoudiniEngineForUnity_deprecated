@@ -39,7 +39,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get Detail info.
 		HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
 		HAPI_Host.getDetailInfo( prObjectControl.prAssetId, prObjectId, out detail_info );
-		//if ( myEnableLogging )
+		//if ( prEnableLogging )
 		//	Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
 		//			   + "points: " + detail_info.pointCount );
 				

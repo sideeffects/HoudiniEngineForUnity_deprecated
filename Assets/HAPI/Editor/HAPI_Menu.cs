@@ -70,7 +70,7 @@ public class HAPI_Menu : MonoBehaviour
 		}
 		
 		// Set new object name from asset name.
-		string asset_name		= asset.myAssetInfo.name;
+		string asset_name		= asset.prAssetInfo.name;
 		game_object.name 		= asset_name;
 		
 		// Select the new houdini asset.
