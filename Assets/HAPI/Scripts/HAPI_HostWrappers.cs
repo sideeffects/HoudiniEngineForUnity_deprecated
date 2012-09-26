@@ -153,8 +153,7 @@ namespace HAPI
 		/// 	Sets the string value of the string with the given handle.
 		/// </summary>
 		/// <param name="string_handle">
-		/// 	Handle of the string to set. If this is zero then a new string will be added to the string 
-		/// 	table and this handle will be set to the new string's handle.
+		/// 	Handle of the string to set.
 		/// </param>
 		/// <param name="string_value">
 		/// 	Actual string value.
@@ -162,11 +161,11 @@ namespace HAPI
 		/// <param name="string_length">
 		/// 	Length of the queried string (must match size of <paramref name="string_value">).
 		/// </param>
-		private static void setString( 			ref int string_handle,
+		private static void setString( 			int string_handle,
 												string string_value,
 												int string_length )
 		{
-			int status_code = HAPI_SetString( ref string_handle, string_value, string_length );
+			int status_code = HAPI_SetString( string_handle, string_value, string_length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		

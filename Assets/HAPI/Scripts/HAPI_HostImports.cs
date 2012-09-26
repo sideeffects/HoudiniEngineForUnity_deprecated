@@ -59,7 +59,7 @@ namespace HAPI
 															int string_length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetString( 			ref int string_handle,
+		private static extern int HAPI_SetString( 			int string_handle,
 															string string_value,
 															int string_length );
 		
@@ -175,7 +175,7 @@ namespace HAPI
 		private static extern int HAPI_GetLastErrorString( 	StringBuilder buffer );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_LoadOTLFile( 		ref HAPI_AssetInfo asset_info );
+		private static extern int HAPI_LoadOTLFile( 		string file_path, ref HAPI_AssetInfo asset_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_UnloadOTLFile( 		int asset_id );

@@ -51,10 +51,10 @@ namespace HAPI
 			return string_value;
 		}
 		
-		public static void setString( ref int string_handle, string string_value )
+		public static void setString( int string_handle, string string_value )
 		{
 			int length = string_value.Length;			
-			setString( ref string_handle, string_value, length );
+			setString( string_handle, string_value, length );
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////

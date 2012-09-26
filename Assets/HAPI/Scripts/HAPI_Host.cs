@@ -110,11 +110,10 @@ namespace HAPI
 			}
 			
 			HAPI_AssetInfo asset_info 			= new HAPI_AssetInfo();
-			asset_info.filePath 				= path;
 			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
 			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 			
-			status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( ref asset_info );
+			status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( path, ref asset_info );
 			
 			processStatusCode( status_code );
 			

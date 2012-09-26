@@ -280,7 +280,7 @@ namespace HAPI
 		public string instancePath
 		{ get { return HAPI_Host.getString( instancePathSH ); } private set {} }
 		public string filePath
-		{ get { return HAPI_Host.getString( filePathSH ); } set { HAPI_Host.setString( ref filePathSH, value ); } }
+		{ get { return HAPI_Host.getString( filePathSH ); } private set {} }
 	}
 	
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
