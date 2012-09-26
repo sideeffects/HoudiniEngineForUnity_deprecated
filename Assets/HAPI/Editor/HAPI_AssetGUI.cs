@@ -66,7 +66,7 @@ public partial class HAPI_AssetGUI : Editor
 		        
 		        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
 				{
-					string prompt_result_path = promptForAssetPath( old_asset_path );
+					string prompt_result_path = HAPI_GUIUtility.promptForOTLPath( old_asset_path );
 					if ( prompt_result_path.Length > 0 )
 						new_asset_path = prompt_result_path;
 		        }
@@ -691,22 +691,7 @@ public partial class HAPI_AssetGUI : Editor
 				
 		return changed;
 	}
-	
-	/// <summary>
-	/// 	Opens the file chooser dialog window set to open .otl files only.
-	/// </summary>
-	/// <param name="location">
-	/// 	Starting location.
-	/// </param>
-	/// <returns>
-	/// 	The absolute path to the .otl file selected.
-	/// </returns>
-	public static string promptForAssetPath( string location ) 
-	{
-		string path = EditorUtility.OpenFilePanel( "Open Houdini OTL", location, "otl" );
-		return path;
-	}
-	
+		
 	private const float			myMaxFieldCountPerLine		= 4;
 	
 	private const float 		myFileChooserButtonWidth 	= 30;

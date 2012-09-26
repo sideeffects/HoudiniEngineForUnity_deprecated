@@ -18,6 +18,8 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
+using System.IO;
+using HAPI;
 
 /// <summary>
 /// 	Only a test class. Not used currently.
@@ -37,29 +39,88 @@ public class HAPI_Window : EditorWindow
 		EditorWindow.GetWindow( typeof( HAPI_Window ) );
 	}
 	
-	public void CreateHAPIObject() 
-	{
-			
-	}
-
 	public void OnGUI() 
 	{
+		string path = Application.dataPath;			
+		DirectoryInfo di = new DirectoryInfo( path );
 		
-		GUILayout.Label( "HAPI Controls", EditorStyles.boldLabel );
+		myShowUtility = EditorGUILayout.Foldout( myShowUtility, new GUIContent( "Utility" ) );
 		
-		GUILayout.Button( "Create HAPI Object" );
+		if ( myShowUtility )
+		{
+			if ( GUILayout.Button( "Load Houdini Asset" ) )
+			{
+				string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
+				HAPI_GUIUtility.instantiateAsset( asset_file_path );
+			}
+			
+			if ( GUILayout.Button( "Instantiate All Assets" ) )
+			{
+				try
+				{
+					if ( !di.Exists )
+						throw new HAPI_Error( "Project/Assets directory does not exist!" );
+					
+					foreach ( FileInfo fi in di.GetFiles() )
+						if ( fi.Extension == ".otl" )
+							loadOTL( fi );
+				}
+				catch ( System.Exception e )
+				{
+					Debug.LogError( "Directory navigation failed: " + e.ToString() );	
+				}
+			}
+		}
 		
+		myShowFileList = EditorGUILayout.Foldout( myShowFileList, new GUIContent( "File List" ) );
 		
-		//GUILayout.BeginHorizontal(
-		
-		//myString = EditorGUILayout.TextField( "HAPI Creation Tools", myString );
+		if ( myShowFileList )
+		{
+			try
+			{
+				if ( !di.Exists )
+					throw new HAPI_Error( "Project/Assets directory does not exist!" );
 				
-		/*
-		groupEnabled = EditorGUILayout.BeginToggleGroup( "Optional Settings", groupEnabled );
-			myBool = EditorGUILayout.Toggle( "Toggle", myBool );
-			myFloat = EditorGUILayout.Slider( "Slider", myFloat, -3, 3 );
-		EditorGUILayout.EndToggleGroup();
-		*/
-		
+				myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
+				
+		        foreach ( FileInfo fi in di.GetFiles() )
+					if ( fi.Extension == ".otl" )
+						genOTLEntry( fi );
+				
+				GUILayout.EndScrollView();
+			}
+			catch ( System.Exception e )
+			{
+				Debug.LogError( "Directory navigation failed: " + e.ToString() );	
+			}
+		}
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
+	private void genOTLEntry( FileInfo fi )
+	{
+		bool load_file = false;
+		EditorGUILayout.BeginHorizontal(); 
+		{
+			load_file = GUILayout.Button( "Instantiate", GUILayout.Width( 100 ) );
+			EditorGUILayout.SelectableLabel( fi.Name, myLineHeightGUI );
+		}
+		EditorGUILayout.EndHorizontal();
+		
+		if ( load_file )
+			loadOTL( fi );
+	}
+	
+	private void loadOTL( FileInfo fi )
+	{
+		HAPI_GUIUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
+	}
+	
+	private static bool				myShowUtility			= true;
+	private static bool				myShowFileList			= true;
+	
+	private static float 			myLineHeight 			= 16;
+	private static GUILayoutOption 	myLineHeightGUI 		= GUILayout.Height( myLineHeight );
+	private static Vector2 			myScrollPosition;
 }

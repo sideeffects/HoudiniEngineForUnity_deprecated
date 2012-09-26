@@ -24,59 +24,18 @@ using HAPI;
 /// 	Main HAPI menu which adds components to the main Unity menu bar.
 /// </summary>
 public class HAPI_Menu : MonoBehaviour 
-{	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Public
-	
-	public const string myMenuName				= "HAPI";
-	public const string myMenuLoadAssetLabel	= "Load Houdini Asset";
-	public const string myDefaultAssetLabel 	= "Houdini Asset";
-	public const string myDefaultPrefabLabel 	= "Houdini Asset";
-	
+{
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 	
 	/// <summary>
 	/// 	Prompts the user for a path to a .otl file and creates a HAPI game object from it.
 	/// </summary>
-	[ MenuItem( myMenuName + "/" + myMenuLoadAssetLabel ) ]
+	[ MenuItem( "HAPI/" + HAPI_GUIUtility.myLoadAssetLabel ) ]
 	static private void createHAPIObject() 
 	{
-		// Prompt for the absolute path to the .otl file to use.
-		string asset_file_path = HAPI_AssetGUI.promptForAssetPath( "" );
-		if ( asset_file_path.Length == 0 )
-			return; // User pressed Cancel in the dialog so just return.
-				
-		// Create game object.
-		GameObject game_object = new GameObject( myDefaultAssetLabel );
-		
-		// Add HAPI Object Control script component.
-		game_object.AddComponent( "HAPI_Asset" );		
-		HAPI_Asset asset = game_object.GetComponent< HAPI_Asset >();
-		
-		// Set that asset path.
-		asset.setAssetPath( asset_file_path );
-		
-		// Save as a prefab.
-		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/" + myDefaultPrefabLabel + ".prefab" );
-		//PrefabUtility.ReplacePrefab( game_object, prefab, ReplacePrefabOptions.ConnectToPrefab );
-		
-		// Do first build.
-		bool build_result = asset.build();
-		if ( build_result == false ) // Something is not right. Clean up.
-		{
-			DestroyImmediate( game_object );
-			return;
-		}
-		
-		// Set new object name from asset name.
-		string asset_name		= asset.prAssetInfo.name;
-		game_object.name 		= asset_name;
-		
-		// Select the new houdini asset.
-		GameObject[] selection 	= new GameObject[ 1 ];
-		selection[ 0 ] 			= game_object;
-		Selection.objects 		= selection;
+		string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
+		HAPI_GUIUtility.instantiateAsset( asset_file_path );
 	}
 	
 }

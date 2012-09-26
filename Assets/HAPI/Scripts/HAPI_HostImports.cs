@@ -28,7 +28,7 @@ namespace HAPI
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
 	/// 	Houdini runtime.
 	/// </summary>
-	public partial class HAPI_Host
+	public static partial class HAPI_Host
 	{		
 		// GENERICS -------------------------------------------------------------------------------------------------
 		
