@@ -249,7 +249,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		for ( int type = 0; type < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
 			info.owner = type;
-			HAPI_Host.getAttributeInfo( asset_id, object_id, type, ref info );
+			HAPI_Host.getAttributeInfo( asset_id, object_id, ref info );
 			if ( info.exists )
 				break;
 		}

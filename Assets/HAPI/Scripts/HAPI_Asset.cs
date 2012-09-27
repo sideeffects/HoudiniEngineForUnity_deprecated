@@ -97,7 +97,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		prShowObjectControls 		= true;
 		prAutoSelectAssetNode		= true;
 #if DEBUG
-		prEnableLogging				= false;
+		prEnableLogging				= true;
 #else
 		prEnableLogging				= false;
 #endif

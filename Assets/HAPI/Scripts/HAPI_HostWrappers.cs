@@ -488,18 +488,14 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
-		/// <param name="attribute_type"/>
-		/// 	The <see cref="HAPI_AttributeType"/> enum value specifying the owner of the attribute.
-		/// </param>
 		/// <param name="attr_info">
 		/// 	<see cref="HAPI_AttributeInfo"/> used as input for which (by name) attribute you want the info 
-		/// 	for and as output for the rest of the information.
+		/// 	for and the owner type and as output for the rest of the information.
 		/// </param>
 		public static void getAttributeInfo(	int asset_id, int object_id,
-												int attribute_type,
 												ref HAPI_AttributeInfo attr_info )
 		{
-			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, attribute_type, ref attr_info );
+			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, ref attr_info );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
