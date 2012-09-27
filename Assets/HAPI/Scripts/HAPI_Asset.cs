@@ -97,7 +97,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		prShowObjectControls 		= true;
 		prAutoSelectAssetNode		= true;
 #if DEBUG
-		prEnableLogging				= true;
+		prEnableLogging				= false;
 #else
 		prEnableLogging				= false;
 #endif
@@ -125,8 +125,12 @@ public partial class HAPI_Asset : MonoBehaviour
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset destroyed!" );
 		
+		// TODO: do this in the OnDisable() method so the reset'ed prAssetId gets serialized.
 		if ( prAssetId > 0 )
+		{
 			HAPI_Host.unloadOTL( prAssetId );
+			prAssetId = 0;
+		}
 	}
 	
 	/// <summary>

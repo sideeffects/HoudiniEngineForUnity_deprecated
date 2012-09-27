@@ -347,6 +347,8 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool labelNone;
 		
+		public int choiceIndex;
+		
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE ) ]
 		public int[] intValue;

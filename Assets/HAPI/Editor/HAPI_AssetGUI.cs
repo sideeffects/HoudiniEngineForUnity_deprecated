@@ -171,9 +171,6 @@ public partial class HAPI_AssetGUI : Editor
 	/// <param name="current_extra_value_index">
 	/// 	Persistant iterator in the extra values array.
 	/// </param>
-	/// <param name="current_choice_list_index">
-	/// 	Persistant iterator in the choice lists array.
-	/// </param>
 	/// <param name="join_last">
 	/// 	Determines if the current control should be put on the same line as the previous one.
 	/// 	Also serves as a return value to be used with the next control.
@@ -187,7 +184,6 @@ public partial class HAPI_AssetGUI : Editor
 	/// </returns>
 	private bool generateAssetControl( 	int id, 
 										ref int current_extra_value_index,
-										ref int current_choice_list_index, 
 									   	ref bool join_last, ref bool no_label_toggle_last ) 
 	{
 		if ( myObjectControl.prParms == null )
@@ -241,25 +237,24 @@ public partial class HAPI_AssetGUI : Editor
 		// Integer Parameter
 		if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_INT )
 		{
-			if ( parms[ id ].choiceCount > 0 )
+			if ( parms[ id ].choiceCount > 0 && parms[ id ].choiceIndex >= 0 )
 			{
 				// Draw popup (menu) field.
 				List< string > 	labels = new List< string >();
-				List< int>		values = new List< int >();				
-				
-				// Progress through the choice list until we meet our own choices.
-				while ( myObjectControl.prParmChoiceLists[ current_choice_list_index ].parentParmId != id )
-					current_choice_list_index++;
+				List< int>		values = new List< int >();
 				
 				// Go through our choices.
 				for ( int i = 0; i < parms[ id ].choiceCount; ++i )
 				{
-					if ( myObjectControl.prParmChoiceLists[ current_choice_list_index ].parentParmId != id )
-						Debug.LogError( "Parm choice parent parm id not matching current parm id!" );
+					if ( myObjectControl.prParmChoiceLists[ parms[ id ].choiceIndex + i ].parentParmId != id )
+						Debug.LogError( "Parm choice parent parm id (" 
+										+ myObjectControl.prParmChoiceLists[ parms[ id ].choiceIndex + i ].parentParmId 
+										+ ") not matching current parm id (" + id + ")!\n"
+										+ "Choice index: " + ( parms[ id ].choiceIndex + i ) + ", "
+										+ "Choice count: " + parms[ id ].choiceCount );
 					
-					labels.Add( myObjectControl.prParmChoiceLists[ current_choice_list_index ].label );
+					labels.Add( myObjectControl.prParmChoiceLists[ parms[ id ].choiceIndex + i ].label );
 					values.Add( i );
-					current_choice_list_index++;
 				}
 				
 				int new_value = EditorGUILayout.IntPopup( parms[ id ].intValue[ 0 ], 
@@ -562,7 +557,6 @@ public partial class HAPI_AssetGUI : Editor
 		bool changed 					= false;
 		int current_index 				= 0;
 		int current_extra_value_index	= 0;
-		int current_choice_list_index 	= 0;
 		HAPI_ParmInfo[] parms 			= myObjectControl.prParms;
 				
 		bool join_last 					= false;
@@ -682,7 +676,6 @@ public partial class HAPI_AssetGUI : Editor
 				
 				changed |= generateAssetControl( current_index,
 												 ref current_extra_value_index,
-												 ref current_choice_list_index, 
 												 ref join_last, ref no_label_toggle_last );
 			}
 			
