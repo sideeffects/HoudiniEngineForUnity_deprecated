@@ -311,6 +311,9 @@ namespace HAPI
 		public int size;
 		public int choiceCount;
 		
+		private int nameSH;
+		private int labelSH;
+		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasMin;
 		
@@ -344,14 +347,6 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool labelNone;
 		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_NAME_SIZE ) ]
-		public string name;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_NAME_SIZE ) ]		
-		public string label;		
-		
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE ) ]
 		public int[] intValue;
@@ -363,7 +358,13 @@ namespace HAPI
 		
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_STRING_SIZE ) ]		
-		public string stringValue;	
+		public string stringValue;
+		
+		// Accessors
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+		public string label
+		{ get { return HAPI_Host.getString( labelSH ); } private set {} }
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
