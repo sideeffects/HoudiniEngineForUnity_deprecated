@@ -524,6 +524,13 @@ public partial class HAPI_Asset : MonoBehaviour
 				main_child_mesh.RecalculateNormals();
 			
 			prGameObjects[ object_id ] = main_child;
+			
+			main_child.AddComponent( "HAPI_MeshToPrefab" );		
+			HAPI_MeshToPrefab mesh_saver = main_child.GetComponent< HAPI_MeshToPrefab >();
+			
+			mesh_saver.prObjectControl = this;
+			mesh_saver.prObjectId = object_id;
+			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + main_child.name;
 		}
 		catch ( HAPI_Error error )
 		{
