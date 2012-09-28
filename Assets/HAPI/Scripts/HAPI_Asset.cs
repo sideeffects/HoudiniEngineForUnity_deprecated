@@ -29,6 +29,7 @@ using HAPI;
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
 /// 	Houdini side.
 /// </summary>
+[ ExecuteInEditMode ]
 public partial class HAPI_Asset : MonoBehaviour 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,9 +77,6 @@ public partial class HAPI_Asset : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	/// <summary>
-	/// 	Initializes a new instance of the <see cref="HAPI_Asset"/> class.
-	/// </summary>
 	public HAPI_Asset() 
 	{
 		if ( prEnableLogging )
@@ -116,20 +114,18 @@ public partial class HAPI_Asset : MonoBehaviour
 		myProgressBarMsg			= "";
 	}
 	
-	/// <summary>
-	/// 	Releases unmanaged resources and performs other cleanup operations before the 
-	/// 	<see cref="HAPI_Asset"/> is reclaimed by garbage collection.
-	/// </summary>
 	~HAPI_Asset() 
 	{
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset destroyed!" );
-		
-		// TODO: do this in the OnDisable() method so the reset'ed prAssetId gets serialized.
-		if ( prAssetId > 0 )
+	}
+	
+	public void OnDestroy()
+	{
+		if ( prAssetId >= 0 )
 		{
 			HAPI_Host.unloadOTL( prAssetId );
-			prAssetId = 0;
+			prAssetId = -1;
 		}
 	}
 	
