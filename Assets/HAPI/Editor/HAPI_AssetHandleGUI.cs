@@ -30,20 +30,22 @@ public partial class HAPI_AssetGUI : Editor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public	
 	public void OnSceneGUI() 
-	{
-		Event current_event = Event.current;		
+	{	
 		
-		if ( current_event.isKey )
+		string currentGlobalManipTool = Tools.current.ToString();
+
+		if( currentGlobalManipTool == "Rotate" )
 		{
-			if ( current_event.keyCode == KeyCode.W )
-				myManipMode = XformManipMode.Translate;
-			
-			else if ( current_event.keyCode == KeyCode.E )
-				myManipMode = XformManipMode.Rotate;
-			
-			else if ( current_event.keyCode == KeyCode.R )
-				myManipMode = XformManipMode.Scale;
+			myManipMode = XformManipMode.Rotate;
 		}
+		else if( currentGlobalManipTool == "Move" )
+		{
+			myManipMode = XformManipMode.Translate;
+		}
+		else if( currentGlobalManipTool == "Scale" )
+		{
+			myManipMode = XformManipMode.Scale;
+		}		
 		
 		if ( myObjectControl == null )
 			return;
