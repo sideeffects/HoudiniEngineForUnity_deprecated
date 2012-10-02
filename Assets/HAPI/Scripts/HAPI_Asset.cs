@@ -16,7 +16,6 @@
  * 
  */
 
-#define DEBUG // since Unity doesn't seem to define it itself
 
 using UnityEngine;
 using UnityEditor;
@@ -35,7 +34,9 @@ public partial class HAPI_Asset : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public string 					prAssetPath { get; set; }
+	public bool 					prAssetPathChanged { get; set; }
+	public string 					prAssetPath { get { return myAssetPath; } set { myAssetPath = value; } }
+	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
 	public int 						prAssetId { get; set; }
 	public int 						prObjectCount { get; set; }
 	public int 						prParmCount { get; set; }
@@ -74,6 +75,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	/// </summary>
 	public List< int > 				prFolderListSelectionIds { get; set; }
 	
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
@@ -83,7 +85,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			Debug.Log( "HAPI_Asset created!" );
 		
 		prAssetPath 				= "";
-		myAssetPathChanged 			= true;
+		prAssetPathChanged 			= true;
 		prAssetId 					= -1;
 		
 		prObjectCount 				= 0;
@@ -94,11 +96,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		prShowAssetControls 		= true;
 		prShowObjectControls 		= true;
 		prAutoSelectAssetNode		= true;
-#if DEBUG
 		prEnableLogging				= false;
-#else
-		prEnableLogging				= false;
-#endif
 		
 		prLastChangedParmId			= -1;
 				
@@ -112,6 +110,8 @@ public partial class HAPI_Asset : MonoBehaviour
 		myProgressBarCurrent		= 0;
 		myProgressBarTitle			= "Building Houdini Asset";
 		myProgressBarMsg			= "";
+		
+		myPreset = null;
 	}
 	
 	~HAPI_Asset() 
@@ -144,9 +144,9 @@ public partial class HAPI_Asset : MonoBehaviour
 		if ( path != prAssetPath ) 
 		{
 			prAssetPath = path;
-			myAssetPathChanged = true;
+			prAssetPathChanged = true;
 		}
-		return myAssetPathChanged;
+		return prAssetPathChanged;
 	}
 	
 	/// <summary>
@@ -171,7 +171,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		{
 			myProgressBarStartTime = System.DateTime.Now;
 			
-			if ( myAssetPathChanged ) 
+			if ( prAssetPathChanged ) 
 			{
 				HAPI_Host.unloadOTL( prAssetId );
 				
@@ -197,6 +197,11 @@ public partial class HAPI_Asset : MonoBehaviour
 				myProgressBarCurrent	= 0;
 				myProgressBarTotal		= prObjectCount + prParmCount + prParmExtraValueCount + prParmChoiceCount
 										  + prHandleCount;
+				
+				if( myPreset != null )
+				{
+					HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
+				}
 							
 				// Get all parameters.
 				myProgressBarMsg = "Loading parameters...";
@@ -238,7 +243,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					prHandleBindingInfos.Add( binding_infos );
 				}
 				
-				myAssetPathChanged = false;
+				prAssetPathChanged = false;
 			}
 			else
 			{
@@ -541,6 +546,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
+	
 	private bool			myProgressBarJustUsed;
 	private	System.DateTime	myProgressBarStartTime;
 	private int				myProgressBarTotal; // Used for the progress bar.
@@ -548,10 +554,14 @@ public partial class HAPI_Asset : MonoBehaviour
 	private string			myProgressBarTitle;
 	private string			myProgressBarMsg;
 	
-#if DEBUG
-	public bool myAssetPathChanged;
-#else
-	pivate bool myAssetPathChanged;
-#endif
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Serialized Data
+	
+	[SerializeField]
+	private string			myAssetPath;
+	[SerializeField]
+	private byte[] 			myPreset;
+	
 	
 }

@@ -346,6 +346,28 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
+		// PRESETS --------------------------------------------------------------------------------------------------
+		
+		
+	    public static void getPreset( 		int asset_id, 
+				       							byte[] preset,
+				       							ref int length )
+		{
+			int status_code = HAPI_GetPreset( asset_id, preset, ref length );
+			if( (HAPI_StatusCode) status_code != HAPI_StatusCode.HAPI_STATUS_INSUFFICIENT_BUFFER_SIZE )
+				processStatusCode( (HAPI_StatusCode) status_code );	
+		}
+
+    	
+    	public static void setPreset( 	int asset_id, 
+			      							byte[] preset,
+			       							int length )
+		{
+			int status_code =  HAPI_SetPreset( asset_id, preset, length );
+			processStatusCode( (HAPI_StatusCode) status_code );	
+		}
+		
+		
 		// OBJECTS --------------------------------------------------------------------------------------------------
 		
 		/// <summary>

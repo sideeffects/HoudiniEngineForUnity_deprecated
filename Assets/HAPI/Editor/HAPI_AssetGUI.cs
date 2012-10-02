@@ -14,7 +14,6 @@
  * 
  */
 
-#define DEBUG // since Unity doesn't seem to define it itself
 
 using UnityEngine;
 using UnityEditor;
@@ -49,6 +48,13 @@ public partial class HAPI_AssetGUI : Editor
 		myLabelStyle = new GUIStyle( GUI.skin.label );
 		myLabelStyle.alignment = TextAnchor.MiddleRight;
 		
+		
+		bool isMouseUp = false;
+		Event curr_event = Event.current;
+		if( curr_event.isMouse && curr_event.type == EventType.MouseUp  )
+		{
+			isMouseUp = true;
+		}
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
@@ -75,10 +81,9 @@ public partial class HAPI_AssetGUI : Editor
 			} 
 			EditorGUILayout.EndHorizontal();
 			
-			if ( GUILayout.Button( "Rebuild" ) ) {
-#if DEBUG
-				myObjectControl.myAssetPathChanged = true;
-#endif
+			if ( GUILayout.Button( "Rebuild" ) ) 
+			{
+				myObjectControl.prAssetPathChanged = true;
 				myObjectControl.build();
 			}
 			
@@ -126,7 +131,20 @@ public partial class HAPI_AssetGUI : Editor
 			hasAssetChanged |= generateAssetControls();							
 		
 		if ( hasAssetChanged )
+		{
 			myObjectControl.build();
+		}
+		
+		if( isMouseUp )
+		{
+			int bufLength = 0;
+			HAPI_Host.getPreset( myObjectControl.prAssetId, myObjectControl.prPreset, ref bufLength );
+			
+			myObjectControl.prPreset = new byte[bufLength];
+			
+			HAPI_Host.getPreset( myObjectControl.prAssetId, myObjectControl.prPreset, ref bufLength );				
+			
+		}
 		
 		myUndoManager.CheckDirty();
 	}

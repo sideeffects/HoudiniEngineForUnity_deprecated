@@ -103,6 +103,20 @@ namespace HAPI
 															[Out] HAPI_HandleBindingInfo[] handle_infos,
 															int start, int length );
 		
+		// PRESETS --------------------------------------------------------------------------------------------------
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	    private static extern int HAPI_GetPreset( int asset_id, 
+				       							  byte[] preset,
+				       							  ref int length );
+
+
+    	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+    	private static extern int HAPI_SetPreset( 	int asset_id, 
+			      									byte[] preset,
+			       									int length );
+		
+		
 		// OBJECTS --------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
