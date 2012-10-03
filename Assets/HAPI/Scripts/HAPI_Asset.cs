@@ -188,7 +188,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				}
 				catch ( HAPI_Error error )
 				{
-					Debug.LogError( error.what() );
+					Debug.LogError( error.ToString() );
 					// Nothing to build since the load failed.
 					return false; // false for failed :(
 				}
@@ -303,7 +303,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				catch ( HAPI_Error error )
 				{
 					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-					Debug.LogWarning( error.what() );
+					Debug.LogWarning( error.ToString() );
 				}
 			}
 			
@@ -325,7 +325,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					catch ( HAPI_Error error )
 					{
 						// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-						Debug.LogWarning( error.what() );
+						Debug.LogWarning( error.ToString() );
 					}
 				}
 			}
@@ -333,7 +333,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 		catch ( HAPI_Error error )
 		{
-			Debug.LogError( error.what() );
+			Debug.LogError( error.ToString() );
 		}
 		
 		clearProgressBar();

@@ -46,9 +46,9 @@ namespace HAPI
 			myErrorMessage = myErrorMessage + "\n" + detail;	
 		}
 		
-		public virtual string what()
+		public override string ToString()
 		{
-			return myErrorMessage;	
+			return myErrorMessage;
 		}
 		
 		private string myErrorMessage;
@@ -56,7 +56,7 @@ namespace HAPI
 	
 	public class HAPI_ErrorProgressCancelled : HAPI_Error 
 	{
-		public override string what()
+		public override string ToString()
 		{
 			return "Load Cancelled by User";	
 		}
@@ -143,7 +143,7 @@ namespace HAPI
 			}
 			catch ( HAPI_Error error ) 
 			{				
-				Debug.LogError( "Asset failed to unload: " + error.what() );
+				Debug.LogError( "Asset failed to unload: " + error.ToString() );
 			}
 			
 			return true;	
