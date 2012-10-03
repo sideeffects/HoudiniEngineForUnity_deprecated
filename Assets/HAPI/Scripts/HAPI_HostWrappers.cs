@@ -175,6 +175,23 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
+		/// <summary>
+		/// 	Fill an array of parameter int values.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="values">
+		/// 	Array of ints at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - <paramref name="start"/>.
+		/// </param>
 		public static void getParmIntValues(	int asset_id, 
 												[Out] int[] values, 
 												int start, int length )
@@ -183,6 +200,23 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary>
+		/// 	Fill an array of parameter float values.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="values">
+		/// 	Array of floats at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - <paramref name="start"/>.
+		/// </param>
 		public static void getParmFloatValues(	int asset_id, 
 												[Out] float[] values, 
 												int start, int length )
@@ -191,6 +225,24 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary>
+		/// 	Fill an array of parameter string handles. These handles must be used in conjunction with 
+		/// 	HAPI_GetString() to get the actual string values.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="values">
+		/// 	Array of ints at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmStringValueCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmStringValueCount"/> - <paramref name="start"/>.
+		/// </param>
 		public static void getParmStringValues(	int asset_id, 
 												[Out] int[] values, 
 												int start, int length )
@@ -223,6 +275,23 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
+		/// <summary>
+		/// 	Set (push) an array of parameter int values.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="values">
+		/// 	Array of ints at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - <paramref name="start"/>.
+		/// </param>
 		public static void setParmIntValues(	int asset_id, 
 												int[] values, 
 												int start, int length )
@@ -231,6 +300,23 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary>
+		/// 	Set (push) an array of parameter float values.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="values">
+		/// 	Array of floats at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most 
+		/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - <paramref name="start"/>.
+		/// </param>
 		public static void setParmFloatValues(	int asset_id, 
 												float[] values, 
 												int start, int length )
@@ -239,6 +325,22 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary>
+		/// 	Set (push) a string value. We can only set a single value at a time because we want to avoid 
+		/// 	fixed size string buffers.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="value">
+		/// 	The string value.
+		/// </param>
+		/// <param name="parm_id">
+		/// 	Parameter id of the parameter being updated.
+		/// </param>
+		/// <param name="index">
+		/// 	Index within the parameter's values tuple.
+		/// </param>
 		public static void setParmStringValue(	int asset_id, 
 												string value, 
 												int parm_id, int index )
