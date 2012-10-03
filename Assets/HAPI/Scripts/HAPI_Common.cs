@@ -435,6 +435,9 @@ namespace HAPI
 				
     	public int objectToInstanceId;
 		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool isVisible;
+		
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }

@@ -297,7 +297,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				try
 				{
 					prGameObjects[ object_index ] = null;
-					if( !prObjects[ object_index ].isInstancer )
+					if( !prObjects[ object_index ].isInstancer && prObjects[ object_index ].isVisible )
 						createObject( object_index );
 				}
 				catch ( HAPI_Error error )
@@ -315,6 +315,11 @@ public partial class HAPI_Asset : MonoBehaviour
 				{
 					try
 					{
+						if( prGameObjects[ object_info.objectToInstanceId ] == null )
+						{
+							createObject( object_info.objectToInstanceId );
+						}
+						
 						instanceObjects( object_index );
 					}
 					catch ( HAPI_Error error )
