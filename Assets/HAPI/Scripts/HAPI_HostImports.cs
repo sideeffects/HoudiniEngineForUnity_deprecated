@@ -58,11 +58,6 @@ namespace HAPI
 															StringBuilder string_value,
 															int string_length );
 		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetString( 			int string_handle,
-															string string_value,
-															int string_length );
-		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -71,8 +66,18 @@ namespace HAPI
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetParmExtraValues( 	int asset_id, 
-															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+		private static extern int HAPI_GetParmIntValues( 	int asset_id, 
+															[Out] int[] values, 
+															int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetParmFloatValues( 	int asset_id, 
+															[Out] float[] values, 
+															int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetParmStringValues( int asset_id, 
+															[Out] int[] values, 
 															int start, int length );
 		
 	    [ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -81,14 +86,19 @@ namespace HAPI
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetParameters( 		int asset_id, 
-															[Out] HAPI_ParmInfo[] parm_infos, 
+		private static extern int HAPI_SetParmIntValues( 	int asset_id, 
+															int[] values, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetParmExtraValues( 	int asset_id, 
-															[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+		private static extern int HAPI_SetParmFloatValues( 	int asset_id, 
+															float[] values, 
 															int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetParmStringValue( 	int asset_id, 
+															string value, 
+															int parm_id, int index );
 		
 		// HANDLES --------------------------------------------------------------------------------------------------
 		

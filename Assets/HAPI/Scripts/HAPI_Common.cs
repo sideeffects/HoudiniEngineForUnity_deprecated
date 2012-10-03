@@ -173,14 +173,14 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_TransformEuler 
 	{
-		public HAPI_TransformEuler(bool initializeFields)
+		public HAPI_TransformEuler( bool initialize_fields )
 		{
-			position = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
-			rotationeEuler = new float[HAPI_Constants.HAPI_EULER_VECTOR_SIZE];
-			scale = new float[HAPI_Constants.HAPI_SCALE_VECTOR_SIZE];
-			id = 0;
-			rotationOrder = 0;
-			rstOrder = 0;
+			position 		= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			rotationEuler 	= new float[ HAPI_Constants.HAPI_EULER_VECTOR_SIZE ];
+			scale 			= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
+			id 				= 0;
+			rotationOrder 	= 0;
+			rstOrder 		= 0;
 		}
 		
 	    public int id;
@@ -193,7 +193,7 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_EULER_VECTOR_SIZE, 
 					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] rotationeEuler;			    
+		public float[] rotationEuler;			    
 		
 		
 	    [ MarshalAs( UnmanagedType.ByValArray, 
@@ -208,16 +208,15 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_TransformInstance 
 	{
-		public HAPI_TransformInstance(bool initializeFields)
+		public HAPI_TransformInstance( bool initializeFields )
 		{
-			
-			pos = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
-			dir = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
-			scale = 1.0f;
-			scale3 = new float[HAPI_Constants.HAPI_SCALE_VECTOR_SIZE];
-			up = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
-			quat = new float[HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE];
-			tr = new float[HAPI_Constants.HAPI_POSITION_VECTOR_SIZE];
+			pos 	= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			dir 	= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			scale 	= 1.0f;
+			scale3 	= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
+			up 		= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			quat 	= new float[ HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE ];
+			tr 		= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 		}
 		
 		[ MarshalAs( UnmanagedType.ByValArray, 
@@ -266,12 +265,14 @@ namespace HAPI
 		private int instancePathSH;	// string handle (SH)
 		private int filePathSH;		// string handle (SH)
 		
-		public int objectCount;
 		public int parmCount;
-		public int handleCount;
-		public int parmExtraValueCount;
+		public int parmIntValueCount;
+		public int parmFloatValueCount;
+		public int parmStringValueCount;
 		public int parmChoiceCount;
-		public int instancerCount;
+		
+		public int objectCount;
+		public int handleCount;
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
@@ -288,24 +289,29 @@ namespace HAPI
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_ParmSingleValue
-	{
-		public int parentParmId;
-		public int vectorIndex;
-		
-		public int intValue;
-		
-		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float floatValue;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_STRING_SIZE ) ]		
-		public string stringValue;	
-	}
-	
-	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ParmInfo
 	{
+		public bool isInt()
+		{
+			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_INT_START &&
+				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_INT_END );
+		}
+		public bool isFloat()
+		{
+			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_FLOAT_START &&
+				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_FLOAT_END );
+		}
+		public bool isString()
+		{
+			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_STR_START &&
+				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_STR_END );
+		}
+		public bool isNonValue()
+		{
+			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_NONVALUE_START &&
+				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_NONVALUE_END );
+		}
+		
 		public int id;
 		public int parentId;
 		
@@ -349,20 +355,10 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool labelNone;
 		
+		public int intValuesIndex;
+		public int floatValuesIndex;
+		public int stringValuesIndex;
 		public int choiceIndex;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE ) ]
-		public int[] intValue;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] floatValue;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_STRING_SIZE ) ]		
-		public string stringValue;
 		
 		// Accessors
 		public string name
@@ -375,14 +371,14 @@ namespace HAPI
 	public struct HAPI_ParmChoiceInfo
 	{
 		public int parentParmId;
+		private int labelSH;		// string handle (SH)
+		private int valueSH;		// string handle (SH)
 		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_NAME_SIZE ) ]		
-		public string label;
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_PARM_MAX_STRING_SIZE ) ]		
-		public string value;
+		// Accessors
+		public string label
+		{ get { return HAPI_Host.getString( labelSH ); } private set {} }
+		public string value
+		{ get { return HAPI_Host.getString( valueSH ); } private set {} }
 	}
 	
 	// HANDLES ------------------------------------------------------------------------------------------------------
@@ -407,9 +403,9 @@ namespace HAPI
 	public struct HAPI_HandleBindingInfo
 	{	    
 		private int handleParmNameSH;	// string handle (SH)
-		private int assetParmNameSH;		// string handle (SH)
+		private int assetParmNameSH;	// string handle (SH)
 		
-		public int    assetParmId;
+		public int 	assetParmId;
 		
 		// Accessors
 		public string handleParmName

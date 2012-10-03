@@ -186,9 +186,6 @@ public partial class HAPI_AssetGUI : Editor
 	/// <param name="id">
 	/// 	Corresponding parameter id as given by <see cref="HAPI_Host.GetParameters"/>.
 	/// </param>
-	/// <param name="current_extra_value_index">
-	/// 	Persistant iterator in the extra values array.
-	/// </param>
 	/// <param name="join_last">
 	/// 	Determines if the current control should be put on the same line as the previous one.
 	/// 	Also serves as a return value to be used with the next control.
@@ -200,23 +197,44 @@ public partial class HAPI_AssetGUI : Editor
 	/// <returns>
 	/// 	<c>true</c> if the parameter value corresponding to this control has changed, <c>false</c> otherwise.
 	/// </returns>
-	private bool generateAssetControl( 	int id, 
-										ref int current_extra_value_index,
-									   	ref bool join_last, ref bool no_label_toggle_last ) 
+	private bool generateAssetControl( 	int id, ref bool join_last, ref bool no_label_toggle_last ) 
 	{
 		if ( myObjectControl.prParms == null )
 			return false;
 		
 		bool changed 				= false;
-		HAPI_ParmInfo[] parms 		= myObjectControl.prParms;
-		HAPI_ParmType parm_type 	= (HAPI_ParmType) parms[ id ].type;
-		int parm_size				= parms[ id ].size;
-		bool is_string 				= ( parm_type >= HAPI_ParmType.HAPI_PARMTYPE_STR_START 
-						   				&& parm_type <= HAPI_ParmType.HAPI_PARMTYPE_STR_END );
 		
-		int max_vector_size 		= ( is_string ? HAPI_Constants.HAPI_PARM_MAX_STRING_VEC_SIZE 
-									  			  : HAPI_Constants.HAPI_PARM_MAX_VECTOR_SIZE );
-		int contained_size 			= Mathf.Min( parm_size, max_vector_size );
+		int asset_id				= myObjectControl.prAssetId;
+		
+		HAPI_ParmInfo[] parms 		= myObjectControl.prParms;
+		HAPI_ParmInfo parm			= parms[ id ];
+		
+		int[] parm_int_values		= myObjectControl.prParmIntValues;
+		float[] parm_float_values	= myObjectControl.prParmFloatValues;
+		int[] parm_string_values	= myObjectControl.prParmStringValues;
+		
+		HAPI_ParmType parm_type 	= (HAPI_ParmType) parm.type;
+		int parm_size				= parm.size;
+		
+		int values_index = -1;
+		if ( parm.isInt() )
+		{
+			if ( parm.intValuesIndex < 0 || parm_int_values == null )
+				return false;
+			values_index 			= parm.intValuesIndex;
+		}
+		else if ( parm.isFloat() )
+		{
+			if ( parm.floatValuesIndex < 0 || parm_float_values == null )
+				return false;
+			values_index			= parm.floatValuesIndex;
+		}
+		else if ( parms[ id ].isString() )
+		{
+			if ( parm.stringValuesIndex < 0 || parm_string_values == null )
+				return false;
+			values_index			= parm.stringValuesIndex;
+		}
 		
 		GUIStyle slider_style 		= new GUIStyle( GUI.skin.horizontalSlider );
 		GUIStyle slider_thumb_style	= new GUIStyle( GUI.skin.horizontalSliderThumb );
@@ -232,14 +250,14 @@ public partial class HAPI_AssetGUI : Editor
 		// Add label first if we're not a toggle.
 		if ( parm_type != HAPI_ParmType.HAPI_PARMTYPE_TOGGLE
 			&& parm_type != HAPI_ParmType.HAPI_PARMTYPE_FOLDER
-			&& !parms[ id ].labelNone )
+			&& !parm.labelNone )
 		{
 			GUILayoutOption label_final_width = myLabelWidthGUI;
 			if ( join_last && !no_label_toggle_last )
 			{
 				float min_width;
 				float max_width;
-				myLabelStyle.CalcMinMaxWidth( new GUIContent( parms[ id ].label ), out min_width, out max_width );
+				myLabelStyle.CalcMinMaxWidth( new GUIContent( parm.label ), out min_width, out max_width );
 				label_final_width = GUILayout.Width( min_width );
 			}
 			else if ( !join_last )
@@ -247,7 +265,7 @@ public partial class HAPI_AssetGUI : Editor
 				// Add padding for the toggle column.
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
 			}
-			EditorGUILayout.SelectableLabel( parms[ id ].label, myLabelStyle, label_final_width, myLineHeightGUI );
+			EditorGUILayout.SelectableLabel( parm.label, myLabelStyle, label_final_width, myLineHeightGUI );
 			no_label_toggle_last = false;
 		}
 		
@@ -255,31 +273,36 @@ public partial class HAPI_AssetGUI : Editor
 		// Integer Parameter
 		if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_INT )
 		{
-			if ( parms[ id ].choiceCount > 0 && parms[ id ].choiceIndex >= 0 )
+			if ( parm.choiceCount > 0 && parm.choiceIndex >= 0 )
 			{
 				// Draw popup (menu) field.
 				List< string > 	labels = new List< string >();
 				List< int>		values = new List< int >();
 				
 				// Go through our choices.
-				for ( int i = 0; i < parms[ id ].choiceCount; ++i )
+				for ( int i = 0; i < parm.choiceCount; ++i )
 				{
-					if ( myObjectControl.prParmChoiceLists[ parms[ id ].choiceIndex + i ].parentParmId != id )
+					if ( myObjectControl.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != id )
 						Debug.LogError( "Parm choice parent parm id (" 
-										+ myObjectControl.prParmChoiceLists[ parms[ id ].choiceIndex + i ].parentParmId 
+										+ myObjectControl.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
 										+ ") not matching current parm id (" + id + ")!\n"
-										+ "Choice index: " + ( parms[ id ].choiceIndex + i ) + ", "
-										+ "Choice count: " + parms[ id ].choiceCount );
+										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
+										+ "Choice count: " + parm.choiceCount );
 					
-					labels.Add( myObjectControl.prParmChoiceLists[ parms[ id ].choiceIndex + i ].label );
+					labels.Add( myObjectControl.prParmChoiceLists[ parm.choiceIndex + i ].label );
 					values.Add( i );
 				}
 				
-				int new_value = EditorGUILayout.IntPopup( parms[ id ].intValue[ 0 ], 
-														  labels.ToArray(), values.ToArray() );
-				if ( new_value != parms[ id ].intValue[ 0 ] )
+				// Get old value.
+				int old_value = parm_int_values[ values_index ];
+				
+				// Draw popup.
+				int new_value = EditorGUILayout.IntPopup( old_value, labels.ToArray(), values.ToArray() );
+				
+				// Determine if value changed and update parameter value.
+				if ( new_value != old_value )
 				{
-					parms[ id ].intValue[ 0 ] = new_value;
+					parm_int_values[ values_index ] = new_value;
 					changed |= true;
 				}
 			}
@@ -298,28 +321,16 @@ public partial class HAPI_AssetGUI : Editor
 					}
 					
 					// Get old value.
-					int old_value = 0;
-					if ( p < contained_size )
-						old_value = parms[ id ].intValue[ p ];
-					else
-					{
-						if ( myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId != id )
-							Debug.LogError( "Extra choice parent id (" 
-								+ myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId 
-								+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
-						old_value = myObjectControl.prParmExtraValues[ current_extra_value_index ].intValue;
-					}
+					int old_value = parm_int_values[ values_index + p ];
 					
 					// Draw field.
 					int new_value = EditorGUILayout.IntField( old_value );
 					
 					// Draw the slider.
-					if ( parm_size == 1 
-						&& !join_last 
-						&& !parms[ id ].joinNext )
+					if ( parm_size == 1 && !join_last && !parm.joinNext )
 					{
-						float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
-						float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
+						float ui_min = ( parm.hasUIMin ? parm.UIMin : 0.0f );
+						float ui_max = ( parm.hasUIMax ? parm.UIMax : 10.0f );
 						Rect lastDoubleRect = getLastDoubleRect();
 						slider_style.stretchWidth = false;
 						slider_style.fixedWidth = lastDoubleRect.width;
@@ -328,27 +339,20 @@ public partial class HAPI_AssetGUI : Editor
 					}
 					
 					// Enforce min/max bounds.
-					if ( parms[ id ].hasMin && new_value < (int) parms[ id ].min )
-						new_value = (int) parms[ id ].min;
-					if ( parms[ id ].hasMax && new_value > (int) parms[ id ].max )
-						new_value = (int) parms[ id ].max;
+					if ( parm.hasMin && new_value < (int) parm.min )
+						new_value = (int) parm.min;
+					if ( parm.hasMax && new_value > (int) parm.max )
+						new_value = (int) parm.max;
 					
 					// Determine if value changed and update parameter value.
 					if ( new_value != old_value )
 					{
-						if ( p < contained_size )
-							parms[ id ].intValue[ p ] = new_value;
-						else
-							myObjectControl.prParmExtraValues[ current_extra_value_index ].intValue = new_value;
+						parm_int_values[ values_index + p ] = new_value;
 						changed |= true;
-					}
-					
-					// Increment extra value index.
-					if ( p >= contained_size )
-						current_extra_value_index++;
-				}
-			}
-		}		
+					} // if
+				} // for
+			} // if parm.choiceCount
+		} // if parm_type is INT
 		///////////////////////////////////////////////////////////////////////
 		// Float Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
@@ -366,28 +370,16 @@ public partial class HAPI_AssetGUI : Editor
 				}
 				
 				// Get old value.
-				float old_value = 0;
-				if ( p < contained_size )
-					old_value = parms[ id ].floatValue[ p ];
-				else
-				{
-					if ( myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId != id )
-						Debug.LogError( "Extra choice parent id (" 
-							+ myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId 
-							+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
-					old_value = myObjectControl.prParmExtraValues[ current_extra_value_index ].floatValue;
-				}
+				float old_value = parm_float_values[ values_index + p ];
 				
 				// Draw field.
 				float new_value = EditorGUILayout.FloatField( old_value );
 				
 				// Draw the slider.
-				if ( parm_size == 1 
-					&& !join_last 
-					&& !parms[ id ].joinNext )
+				if ( parm_size == 1 && !join_last && !parm.joinNext )
 				{
-					float ui_min = ( parms[ id ].hasUIMin ? parms[ id ].UIMin : 0.0f );
-					float ui_max = ( parms[ id ].hasUIMax ? parms[ id ].UIMax : 10.0f );
+					float ui_min = ( parm.hasUIMin ? parm.UIMin : 0.0f );
+					float ui_max = ( parm.hasUIMax ? parm.UIMax : 10.0f );
 					Rect lastDoubleRect = getLastDoubleRect();
 					slider_style.stretchWidth = false;
 					slider_style.fixedWidth = lastDoubleRect.width;
@@ -396,26 +388,19 @@ public partial class HAPI_AssetGUI : Editor
 				}
 				
 				// Enforce min/max bounds.
-				if ( parms[ id ].hasMin && new_value < parms[ id ].min )
-					new_value = parms[ id ].min;
-				if ( parms[ id ].hasMax && new_value > parms[ id ].max )
-					new_value = parms[ id ].max;
+				if ( parm.hasMin && new_value < parm.min )
+					new_value = parm.min;
+				if ( parm.hasMax && new_value > parm.max )
+					new_value = parm.max;
 				
 				// Determine if value changed and update parameter value.
 				if ( new_value != old_value )
 				{					
-					if ( p < contained_size )
-						parms[ id ].floatValue[ p ] = new_value;
-					else
-						myObjectControl.prParmExtraValues[ current_extra_value_index ].floatValue = new_value;
+					parm_float_values[ values_index + p ] = new_value;
 					changed |= true;
-				}
-				
-				// Increment extra value index.
-				if ( p >= contained_size )
-					current_extra_value_index++;
-			}
-		}		
+				} // if
+			} // for
+		} // if parm_type is FLOAT
 		///////////////////////////////////////////////////////////////////////
 		// String Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_STRING )
@@ -433,41 +418,24 @@ public partial class HAPI_AssetGUI : Editor
 				}
 				
 				// Get old value.
-				string old_value = "";
-				if ( p < contained_size )
-					old_value = parms[ id ].stringValue;
-				else
-				{
-					if ( myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId != id )
-						Debug.LogError( "Extra choice parent id (" 
-							+ myObjectControl.prParmExtraValues[ current_extra_value_index ].parentParmId 
-							+ ") not matching current parm (" + parms[ id ].label + ") id (" + id + ")!" );
-					old_value = myObjectControl.prParmExtraValues[ current_extra_value_index ].stringValue;
-				}
+				string old_value = HAPI_Host.getString( parm_string_values[ values_index + p ] );
 				
 				// Draw field.
 				string new_value = EditorGUILayout.TextField( old_value );
 				
-				// Determine if value changed and update parameter value.
+				// Determine if value changed and update parameter value. 
 				if ( new_value != old_value )
-				{					
-					if ( p < contained_size )
-						parms[ id ].stringValue = new_value;
-					else
-						myObjectControl.prParmExtraValues[ current_extra_value_index ].stringValue = new_value;
+				{
+					HAPI_Host.setParmStringValue( asset_id, new_value, id, p );
 					changed |= true;
 				}
-				
-				// Increment extra value index.
-				if ( p >= contained_size )
-					current_extra_value_index++;
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
 		// File Field
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FILE )
 		{
-			string old_path = parms[ id ].stringValue;
+			string old_path = HAPI_Host.getString( parm_string_values[ values_index ] );
 			string new_path = EditorGUILayout.TextField( old_path );
 		        
 	        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
@@ -479,7 +447,7 @@ public partial class HAPI_AssetGUI : Editor
 			
 			if ( new_path != old_path )
 			{
-				parms[ id ].stringValue = new_path;
+				HAPI_Host.setParmStringValue( asset_id, new_path, id, 0 );
 				changed |= true;	
 			}
 		}
@@ -487,7 +455,7 @@ public partial class HAPI_AssetGUI : Editor
 		// Toggle Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
-			if ( !parms[ id ].joinNext )
+			if ( !parm.joinNext )
 			{
 				// Add padding for the toggle column.
 				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
@@ -495,8 +463,11 @@ public partial class HAPI_AssetGUI : Editor
 				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
 			}
 			
+			// Get old value.
+			int old_value = parm_int_values[ values_index ];
+			
 			// Draw toggle with its label.
-			bool toggle_result = EditorGUILayout.Toggle( parms[ id ].intValue[ 0 ] != 0, myToggleWidthGUI );
+			bool toggle_result = EditorGUILayout.Toggle( old_value != 0, myToggleWidthGUI );
 			int new_value = ( toggle_result ? 1 : 0 );
 			if ( !parms[ id ].labelNone )
 				EditorGUILayout.SelectableLabel( parms[ id ].label, myLineHeightGUI );
@@ -504,9 +475,9 @@ public partial class HAPI_AssetGUI : Editor
 				no_label_toggle_last = true;
 			
 			// Determine if value changed and update parameter value.
-			if ( parms[ id ].intValue[ 0 ] != new_value )
+			if ( new_value != old_value )
 			{
-				parms[ id ].intValue[ 0 ] = new_value;
+				parm_int_values[ values_index ] = new_value;
 				changed |= true;
 			}
 		}		
@@ -514,24 +485,24 @@ public partial class HAPI_AssetGUI : Editor
 		// Color Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_COLOUR )
 		{
-			Color color = new Color( parms[ id ].floatValue[ 0 ], 
-									 parms[ id ].floatValue[ 1 ], 
-									 parms[ id ].floatValue[ 2 ] );
-			if ( contained_size > 3 )
-				color.a = parms[ id ].floatValue[ 3 ];
+			Color old_color = new Color( parm_float_values[ values_index + 0 ], 
+									 	 parm_float_values[ values_index + 1 ], 
+									 	 parm_float_values[ values_index + 2 ] );
+			if ( parm_size > 3 )
+				old_color.a = parm_float_values[ values_index + 3 ];
 			
 			// Draw control.
-			Color new_color = EditorGUILayout.ColorField( color );
+			Color new_color = EditorGUILayout.ColorField( old_color );
 			
 			// Determine if value changed and update parameter value.
-			if ( color != new_color )
+			if ( new_color != old_color )
 			{
-				parms[ id ].floatValue[ 0 ] = new_color.r;
-				parms[ id ].floatValue[ 1 ] = new_color.g;
-				parms[ id ].floatValue[ 2 ] = new_color.b;
+				parm_float_values[ values_index + 0 ] = new_color.r;
+				parm_float_values[ values_index + 1 ] = new_color.g;
+				parm_float_values[ values_index + 2 ] = new_color.b;
 				
-				if ( contained_size > 3 )
-					parms[ id ].floatValue[ 3 ] = new_color.a;
+				if ( parm_size > 3 )
+					parm_float_values[ values_index + 3 ] = new_color.a;
 			
 				changed |= true;
 			}
@@ -545,17 +516,36 @@ public partial class HAPI_AssetGUI : Editor
 		
 		// Decide whether to join with the next parameter on the same line or not
 		// but also save our status for the next parameter.
-		join_last = ( parms[ id ].joinNext && parm_size <= 1 );
-		if ( !parms[ id ].joinNext || parm_size > 1 )
+		join_last = ( parm.joinNext && parm_size <= 1 );
+		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
 		
 		if ( myObjectControl.hasProgressBarBeenUsed() && id == myObjectControl.prLastChangedParmId )
 		{
-			// TODO: set the focus back to this control since the progress bar would have stolen it.	
+			// TODO: Set the focus back to this control since the progress bar would have stolen it.	
 		}
 		
 		if ( changed )
+		{
 			myObjectControl.prLastChangedParmId = id;
+		
+			if ( parm.isInt() )
+			{
+				int[] temp_int_values = new int[ parm_size ];
+				for ( int p = 0; p < parm_size; ++p )
+					temp_int_values[ p ] = parm_int_values[ values_index + p ];
+				HAPI_Host.setParmIntValues( asset_id, temp_int_values, values_index, parm_size );
+			}
+			else if ( parm.isFloat() )
+			{
+				float[] temp_float_values = new float[ parm_size ];
+				for ( int p = 0; p < parm_size; ++p )
+					temp_float_values[ p ] = parm_float_values[ values_index + p ];
+				HAPI_Host.setParmFloatValues( asset_id, temp_float_values, values_index, parm_size );
+			}
+			
+			// Note: String parameters update their values themselves so no need to do anything here.
+		}
 		
 		return changed;
 	}
@@ -574,7 +564,6 @@ public partial class HAPI_AssetGUI : Editor
 		
 		bool changed 					= false;
 		int current_index 				= 0;
-		int current_extra_value_index	= 0;
 		HAPI_ParmInfo[] parms 			= myObjectControl.prParms;
 				
 		bool join_last 					= false;
@@ -687,14 +676,12 @@ public partial class HAPI_AssetGUI : Editor
 			}
 			else
 			{
-				// The current parameter is a simple parameters so just draw it.
+				// The current parameter is a simple parameter so just draw it.
 				
 				if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					Debug.LogError( "All folders should have been parsed in the folder list if clause!" );
 				
-				changed |= generateAssetControl( current_index,
-												 ref current_extra_value_index,
-												 ref join_last, ref no_label_toggle_last );
+				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
 			}
 			
 			current_index++;

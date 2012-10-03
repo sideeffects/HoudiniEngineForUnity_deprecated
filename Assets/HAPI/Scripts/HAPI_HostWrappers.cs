@@ -149,26 +149,6 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
-		/// <summary>
-		/// 	Sets the string value of the string with the given handle.
-		/// </summary>
-		/// <param name="string_handle">
-		/// 	Handle of the string to set.
-		/// </param>
-		/// <param name="string_value">
-		/// 	Actual string value.
-		/// </param>
-		/// <param name="string_length">
-		/// 	Length of the queried string (must match size of <paramref name="string_value">).
-		/// </param>
-		private static void setString( 			int string_handle,
-												string string_value,
-												int string_length )
-		{
-			int status_code = HAPI_SetString( string_handle, string_value, string_length );
-			processStatusCode( (HAPI_StatusCode) status_code );
-		}
-		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		/// <summary>
@@ -189,31 +169,34 @@ namespace HAPI
 		/// </param>
 		public static void getParameters( 	int asset_id, 
 											[Out] HAPI_ParmInfo[] parm_infos, 
-											int start, int end )
+											int start, int length )
 		{
-			int status_code = HAPI_GetParameters( asset_id, parm_infos, start, end );
+			int status_code = HAPI_GetParameters( asset_id, parm_infos, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
-		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_extra_values">
-		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of 
-		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
-		/// </param>
-		/// <param name="count">
-		/// 	Sanity check. Must be equal to <see cref="HAPI_AssetInfo.parmExtraValueCount"/>.
-		/// </param>
-		public static void getParmExtraValues( 	int asset_id, 
-												[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+		public static void getParmIntValues(	int asset_id, 
+												[Out] int[] values, 
 												int start, int length )
 		{
-			int status_code = HAPI_GetParmExtraValues( asset_id, parm_extra_values, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );	
+			int status_code = HAPI_GetParmIntValues( asset_id, values, start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		public static void getParmFloatValues(	int asset_id, 
+												[Out] float[] values, 
+												int start, int length )
+		{
+			int status_code = HAPI_GetParmFloatValues( asset_id, values, start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		public static void getParmStringValues(	int asset_id, 
+												[Out] int[] values, 
+												int start, int length )
+		{
+			int status_code = HAPI_GetParmStringValues( asset_id, values, start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
 		/// <summary>
@@ -240,53 +223,28 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 		
-		/// <summary>
-		/// 	Set a subset of parameter values using the given array of <see cref="HAPI_ParmInfo"/>.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_infos">
-		/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of 
-		/// 	<paramref name="length"/> containing the new parameter values.
-		/// </param>
-		/// <param name="start">
-		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - 1.
-		/// </param>
-		/// <param name="length">
-		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - <paramref name="start"/>.
-		/// </param>
-		public static void setParameters( 		int asset_id, 
-												[Out] HAPI_ParmInfo[] parm_infos, 
+		public static void setParmIntValues(	int asset_id, 
+												int[] values, 
 												int start, int length )
 		{
-			int status_code = HAPI_SetParameters( asset_id, parm_infos, start, length );
+			int status_code = HAPI_SetParmIntValues( asset_id, values, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
-		/// <summary>
-		/// 	Set an array of <see cref="HAPI_ParmSingleValue"/> structs with extra parameter vector fields.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
-		/// </param>
-		/// <param name="parm_extra_values">
-		/// 	Array of <see cref="HAPI_ParmSingleValue"/> exactly the size of <paramref name="length"/>.
-		/// </param>
-		/// <param name="start">
-		/// 	First index of range. Must be at least 0 and at most 
-		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/> - 1.
-		/// </param>
-		/// <param name="length">
-		/// 	Must be at least 0 and at most 
-		/// 	<see cref="HAPI_AssetInfo.parmExtraValueCount"/> - <paramref name="start"/>.
-		/// </param>
-		public static void setParmExtraValues( 	int asset_id, 
-												[Out] HAPI_ParmSingleValue[] parm_extra_values, 
+		public static void setParmFloatValues(	int asset_id, 
+												float[] values, 
 												int start, int length )
 		{
-			int status_code = HAPI_SetParmExtraValues( asset_id, parm_extra_values, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );	
+			int status_code = HAPI_SetParmFloatValues( asset_id, values, start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		public static void setParmStringValue(	int asset_id, 
+												string value, 
+												int parm_id, int index )
+		{
+			int status_code = HAPI_SetParmStringValue( asset_id, value, parm_id, index );
+			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
 		// HANDLES --------------------------------------------------------------------------------------------------

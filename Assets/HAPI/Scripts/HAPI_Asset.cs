@@ -38,11 +38,21 @@ public partial class HAPI_Asset : MonoBehaviour
 	public string 					prAssetPath { get { return myAssetPath; } set { myAssetPath = value; } }
 	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
 	public int 						prAssetId { get; set; }
-	public int 						prObjectCount { get; set; }
+	
 	public int 						prParmCount { get; set; }
-	public int						prParmExtraValueCount { get; set; }
-	public int						prParmChoiceCount;
+	public int						prParmIntValueCount { get; set; }
+	public int						prParmFloatValueCount { get; set; }
+	public int						prParmStringValueCount { get; set; }
+	public int						prParmChoiceCount { get; set; }
+	
+	public int 						prObjectCount { get; set; }
 	public int						prHandleCount { get; set; }
+	
+	public HAPI_ParmInfo[] 			prParms { get; set; }
+	public int[]					prParmIntValues { get; set; }
+	public float[]					prParmFloatValues { get; set; }
+	public int[]					prParmStringValues { get; set; } // string handles (SH)
+	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
 	
 	public HAPI_AssetInfo 			prAssetInfo { get; set; }
 	public HAPI_ObjectInfo[] 		prObjects { get; set; }
@@ -50,9 +60,6 @@ public partial class HAPI_Asset : MonoBehaviour
 	public GameObject[]				prGameObjects {	get; set; }
 	
 	public HAPI_Transform[] 		prObjectTransforms { get; set; }
-	public HAPI_ParmInfo[] 			prParms { get; set; }
-	public HAPI_ParmSingleValue[]	prParmExtraValues { get; set; }
-	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
 	public HAPI_HandleInfo[]		prHandleInfos { get; set; }	
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
 	
@@ -188,40 +195,58 @@ public partial class HAPI_Asset : MonoBehaviour
 							
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
-				prObjectCount 			= prAssetInfo.objectCount;
 				prParmCount 			= prAssetInfo.parmCount;
-				prParmExtraValueCount 	= prAssetInfo.parmExtraValueCount;
+				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
+				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
+				prParmStringValueCount	= prAssetInfo.parmStringValueCount;
 				prParmChoiceCount		= prAssetInfo.parmChoiceCount;
+				prObjectCount 			= prAssetInfo.objectCount;
 				prHandleCount 			= prAssetInfo.handleCount;
 				
 				myProgressBarCurrent	= 0;
-				myProgressBarTotal		= prObjectCount + prParmCount + prParmExtraValueCount + prParmChoiceCount
+				myProgressBarTotal		= prParmCount
+										  + prParmIntValueCount
+										  + prParmFloatValueCount
+										  + prParmStringValueCount
+										  + prParmChoiceCount
+										  + prObjectCount
 										  + prHandleCount;
 				
-				if( myPreset != null )
-				{
+				if ( myPreset != null )
 					HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
-				}
-							
-				// Get all parameters.
-				myProgressBarMsg = "Loading parameters...";
+				
 				displayProgressBar();
+				
+				myProgressBarMsg = "Loading parameter information...";
+				
+				// Get all parameters.
 				prParms = new HAPI_ParmInfo[ prParmCount ];
 				getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
 				displayProgressBar( prParmCount );
 				
-				// Get any parameter extra values.
-				prParmExtraValues = new HAPI_ParmSingleValue[ prParmExtraValueCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParmExtraValues, prParmExtraValues, prParmExtraValueCount );
-				displayProgressBar( prParmExtraValueCount );
+				// Get parameter int values.
+				prParmIntValues = new int[ prParmIntValueCount ];
+				getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+				displayProgressBar( prParmIntValueCount );
+				
+				// Get parameter float values.
+				prParmFloatValues = new float[ prParmFloatValueCount ];
+				getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+				displayProgressBar( prParmFloatValueCount );
+				
+				// Get parameter string (handle) values.
+				prParmStringValues = new int[ prParmStringValueCount ];
+				getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
+				displayProgressBar( prParmStringValueCount );
 				
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 				getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
 				displayProgressBar( prParmChoiceCount );
 				
-				// Get exposed handle information.
 				myProgressBarMsg = "Loading handles...";
+				
+				// Get exposed handle information.
 				prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
 				getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
 				
@@ -247,19 +272,9 @@ public partial class HAPI_Asset : MonoBehaviour
 			}
 			else
 			{
-				myProgressBarMsg = "Setting parameters...";
 				displayProgressBar();
 				
-				// Set all parameter values.
-				setArray1Id( prAssetId, HAPI_Host.setParameters, prParms, prParmCount );
-				displayProgressBar( prParmCount );
-				
-				// Set extra parameter values.
-				setArray1Id( prAssetId, HAPI_Host.setParmExtraValues, prParmExtraValues, prParmExtraValueCount );
-				displayProgressBar( prParmExtraValueCount );
-				
-				// Increment non-settable items:
-				myProgressBarCurrent += prParmChoiceCount + prHandleCount;
+				myProgressBarTotal		= prObjectCount;
 			}
 			
 			myProgressBarMsg = "Loading and composing objects...";

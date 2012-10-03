@@ -51,12 +51,6 @@ namespace HAPI
 			return string_value;
 		}
 		
-		public static void setString( int string_handle, string string_value )
-		{
-			int length = string_value.Length;			
-			setString( string_handle, string_value, length );
-		}
-		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
 		

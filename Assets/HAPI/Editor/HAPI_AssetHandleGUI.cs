@@ -50,7 +50,8 @@ public partial class HAPI_AssetGUI : Editor
 		if ( myObjectControl == null )
 			return;
 		
-		HAPI_HandleInfo[] handleInfos = myObjectControl.prHandleInfos;
+		int asset_id					= myObjectControl.prAssetId;
+		HAPI_HandleInfo[] handleInfos 	= myObjectControl.prHandleInfos;
 		
 		if ( handleInfos == null )
 			return;				
@@ -67,7 +68,16 @@ public partial class HAPI_AssetGUI : Editor
 				HAPI_XYZOrder xyzOrder = HAPI_XYZOrder.XYZ;
 				
 				HAPI_HandleBindingInfo[] bindingInfos = myObjectControl.prHandleBindingInfos[ ii ];
-												
+				
+				int[] parm_int_values = myObjectControl.prParmIntValues;
+				float[] parm_float_values = myObjectControl.prParmFloatValues;
+				
+				if ( parm_int_values == null || parm_float_values == null )
+				{
+					Debug.LogError( "No parm int/float values yet handles exist?" );
+					continue;
+				}
+					
 				if ( myTranslateParmId == -1 ||
 					 myRotateParmId == -1 ||
 					 myScaleParmId == -1 ||
@@ -94,60 +104,63 @@ public partial class HAPI_AssetGUI : Editor
 					}
 				}
 				
-				if ( myTranslateParmId > 0 )
+				if ( myTranslateParmId >= 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myTranslateParmId ];
-					tx = parmInfo.floatValue[0];
-					ty = parmInfo.floatValue[1];
-					tz = parmInfo.floatValue[2];
+					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myTranslateParmId ];
+					
+					tx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
+					ty = parm_float_values[ parm_info.floatValuesIndex + 1 ];
+					tz = parm_float_values[ parm_info.floatValuesIndex + 2 ];
 				}
 				
-				if ( myRotateParmId > 0 )
+				if ( myRotateParmId >= 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myRotateParmId ];
-					rx = parmInfo.floatValue[0];
-					ry = parmInfo.floatValue[1];
-					rz = parmInfo.floatValue[2];
+					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myRotateParmId ];
+					
+					rx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
+					ry = parm_float_values[ parm_info.floatValuesIndex + 1 ];
+					rz = parm_float_values[ parm_info.floatValuesIndex + 2 ];
 				}
 				
-				if ( myScaleParmId > 0 )
+				if ( myScaleParmId >= 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myScaleParmId ];
-					sx = parmInfo.floatValue[0];
-					sy = parmInfo.floatValue[1];
-					sz = parmInfo.floatValue[2];
+					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myScaleParmId ];
+					
+					sx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
+					sy = parm_float_values[ parm_info.floatValuesIndex + 1 ];
+					sz = parm_float_values[ parm_info.floatValuesIndex + 2 ];
 				}
 				
-				if ( myRstOrderParmId > 0 )
+				if ( myRstOrderParmId >= 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myRstOrderParmId ];
-					rstOrder = (HAPI_RSTOrder) parmInfo.intValue[0];
+					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myRstOrderParmId ];
+					rstOrder = (HAPI_RSTOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}
 				
-				if ( myXyzOrderParmId > 0 )
+				if ( myXyzOrderParmId >= 0 )
 				{
-					HAPI_ParmInfo parmInfo = myObjectControl.prParms[ myXyzOrderParmId ];
-					xyzOrder = (HAPI_XYZOrder) parmInfo.intValue[0];
+					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myXyzOrderParmId ];
+					xyzOrder = (HAPI_XYZOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}				
 				
-				HAPI_TransformEuler xform = new HAPI_TransformEuler(true);				
+				HAPI_TransformEuler xform = new HAPI_TransformEuler( true );				
 				
-				//This bit is a little tricky.  We will eventually call Handle.PositionHandle
-				//or Handle.RotationHandle to display the translation and rotation handles.
-				//These function take a translation parameter and a rotation parameter in 
-				//order to display the handle in its proper location and orientation.  
-				//These functions have an assumed order that it will put the rotation
-				//and translation back together.  Depending whether the order of translation
-				//and roation matches that of the rstOrder setting, we may, or may not
-				//need to convert the translation parameter for use with the handle.
-				if( rstOrder == HAPI_RSTOrder.TSR || rstOrder == HAPI_RSTOrder.STR || rstOrder == HAPI_RSTOrder.SRT )
+				// This bit is a little tricky.  We will eventually call Handle.PositionHandle
+				// or Handle.RotationHandle to display the translation and rotation handles.
+				// These function take a translation parameter and a rotation parameter in 
+				// order to display the handle in its proper location and orientation.  
+				// These functions have an assumed order that it will put the rotation
+				// and translation back together.  Depending whether the order of translation
+				// and roation matches that of the rstOrder setting, we may, or may not
+				// need to convert the translation parameter for use with the handle.
+				if ( rstOrder == HAPI_RSTOrder.TSR || rstOrder == HAPI_RSTOrder.STR || rstOrder == HAPI_RSTOrder.SRT )
 				{
 					xform.position[0] = tx;
 					xform.position[1] = ty;
 					xform.position[2] = tz;
-					xform.rotationeEuler[0] = rx;
-					xform.rotationeEuler[1] = ry;
-					xform.rotationeEuler[2] = rz;
+					xform.rotationEuler[0] = rx;
+					xform.rotationEuler[1] = ry;
+					xform.rotationEuler[2] = rz;
 					xform.scale[0] = 1;
 					xform.scale[1] = 1;
 					xform.scale[2] = 1;
@@ -159,9 +172,9 @@ public partial class HAPI_AssetGUI : Editor
 					xform.position[0] = 0;
 					xform.position[1] = 0;
 					xform.position[2] = 0;
-					xform.rotationeEuler[0] = rx;
-					xform.rotationeEuler[1] = ry;
-					xform.rotationeEuler[2] = rz;
+					xform.rotationEuler[0] = rx;
+					xform.rotationEuler[1] = ry;
+					xform.rotationEuler[2] = rz;
 					xform.scale[0] = 1;
 					xform.scale[1] = 1;
 					xform.scale[2] = 1;
@@ -173,56 +186,69 @@ public partial class HAPI_AssetGUI : Editor
 				
 				Handles.matrix = myObjectControl.transform.localToWorldMatrix;	
 				
-				Vector3 translate;
+				Vector3 position;
 				
 				if( rstOrder == HAPI_RSTOrder.TSR || rstOrder == HAPI_RSTOrder.STR || rstOrder == HAPI_RSTOrder.SRT )
-					translate = new Vector3( xform.position[ 0 ], xform.position[ 1 ], xform.position[ 2 ] );								
+					position = new Vector3( xform.position[ 0 ], xform.position[ 1 ], xform.position[ 2 ] );								
 				else
-					translate = new Vector3( tx, ty, tz );
+					position = new Vector3( tx, ty, tz );
 				
-				Quaternion rotate = Quaternion.Euler( xform.rotationeEuler[ 0 ], xform.rotationeEuler[ 1 ], 
-													  xform.rotationeEuler[ 2 ] );				
-				Vector3 scale = new Vector3( sx, sy, sz);
+				Quaternion rotation = Quaternion.Euler( xform.rotationEuler[ 0 ], xform.rotationEuler[ 1 ], 
+													    xform.rotationEuler[ 2 ] );
+				Vector3 scale = new Vector3( sx, sy, sz );
 				
 				if ( myManipMode == XformManipMode.Translate )
 				{
-					if ( myTranslateParmId > 0)
-					{
-						Vector3 newPos = Handles.PositionHandle( translate, rotate );
+					if ( myTranslateParmId < 0 )
+						continue;
+					
+					Vector3 new_position = Handles.PositionHandle( position, rotation );
 						
+					if ( GUI.changed )
+					{
 						if ( rstOrder == HAPI_RSTOrder.TSR 
 							 || rstOrder == HAPI_RSTOrder.STR 
 							 || rstOrder == HAPI_RSTOrder.SRT )
 						{
-							xform.position[0] = newPos[0];
-							xform.position[1] = newPos[1];
-							xform.position[2] = newPos[2];							
+							xform.position[ 0 ] = new_position[ 0 ];
+							xform.position[ 1 ] = new_position[ 1 ];
+							xform.position[ 2 ] = new_position[ 2 ];
 							HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
-							newPos.x = xform.position[0];
-							newPos.y = xform.position[1];
-							newPos.z = xform.position[2];
+							new_position.x 		= xform.position[ 0 ];
+							new_position.y 		= xform.position[ 1 ];
+							new_position.z 		= xform.position[ 2 ];
 						}
 						
-						myObjectControl.prParms[ myTranslateParmId ].floatValue[ 0 ] = newPos.x;
-						myObjectControl.prParms[ myTranslateParmId ].floatValue[ 1 ] = newPos.y;
-						myObjectControl.prParms[ myTranslateParmId ].floatValue[ 2 ] = newPos.z;
+						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myTranslateParmId ];
 						
-					}
+						parm_float_values[ parm_info.floatValuesIndex + 0 ] = new_position.x;
+						parm_float_values[ parm_info.floatValuesIndex + 1 ] = new_position.y;
+						parm_float_values[ parm_info.floatValuesIndex + 2 ] = new_position.z;
+						
+						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
+							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
+						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
+													  parm_info.size );
+					} // if changed
 				}
 				else if ( myManipMode == XformManipMode.Rotate )
 				{
-					if ( myRotateParmId > 0 )
-					{
-						Quaternion newRotQuat = Handles.RotationHandle( rotate, translate );
+					if ( myRotateParmId < 0 )
+						continue;
+					
+					Quaternion newRotQuat = Handles.RotationHandle( rotation, position );
 						
+					if ( GUI.changed )
+					{
 						Vector3 newRot = newRotQuat.eulerAngles;
 						
 						xform.position[0] = 0;
 						xform.position[1] = 0;
 						xform.position[2] = 0;
-						xform.rotationeEuler[0] = newRot.x;
-						xform.rotationeEuler[1] = newRot.y;
-						xform.rotationeEuler[2] = newRot.z;
+						xform.rotationEuler[0] = newRot.x;
+						xform.rotationEuler[1] = newRot.y;
+						xform.rotationEuler[2] = newRot.z;
 						xform.scale[0] = 1;
 						xform.scale[1] = 1;
 						xform.scale[2] = 1;
@@ -231,29 +257,46 @@ public partial class HAPI_AssetGUI : Editor
 						
 						HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
 						
-						myObjectControl.prParms[ myRotateParmId ].floatValue[ 0 ] = xform.rotationeEuler[ 0 ];
-						myObjectControl.prParms[ myRotateParmId ].floatValue[ 1 ] = xform.rotationeEuler[ 1 ];
-						myObjectControl.prParms[ myRotateParmId ].floatValue[ 2 ] = xform.rotationeEuler[ 2 ];
-					}					
+						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myRotateParmId ];
+						
+						parm_float_values[ parm_info.floatValuesIndex + 0 ] = xform.rotationEuler[ 0 ];
+						parm_float_values[ parm_info.floatValuesIndex + 1 ] = xform.rotationEuler[ 1 ];
+						parm_float_values[ parm_info.floatValuesIndex + 2 ] = xform.rotationEuler[ 2 ];
+						
+						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
+							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
+						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
+													  parm_info.size );
+					} // if changed			
 				}
 				else if ( myManipMode == XformManipMode.Scale )
 				{
-					if( myScaleParmId > 0 )
+					if ( myScaleParmId < 0 )
+						continue;
+					
+					Vector3 newScale = Handles.ScaleHandle( scale, position, rotation, 1.0f );
+					
+					if ( GUI.changed )
 					{
-						Vector3 newScale = Handles.ScaleHandle( scale, translate, rotate, 1.0f );
-						myObjectControl.prParms[ myScaleParmId ].floatValue[ 0 ] = newScale.x;
-						myObjectControl.prParms[ myScaleParmId ].floatValue[ 1 ] = newScale.y;
-						myObjectControl.prParms[ myScaleParmId ].floatValue[ 2 ] = newScale.z;							
-					}
-				}
-				
-									
-			}
-		}
+						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myScaleParmId ];
+						
+						parm_float_values[ parm_info.floatValuesIndex + 0 ] = newScale.x;
+						parm_float_values[ parm_info.floatValuesIndex + 1 ] = newScale.y;
+						parm_float_values[ parm_info.floatValuesIndex + 2 ] = newScale.z;
+						
+						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
+							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
+						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
+													  parm_info.size );
+					} // if changed
+				} // if myManipMode
+			} // if typeName
+		} // for each handle
 		
 		if ( GUI.changed )
 			myObjectControl.build();
-		
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,13 +309,11 @@ public partial class HAPI_AssetGUI : Editor
 		Scale
 	}
 	
-	private XformManipMode 		myManipMode 				= XformManipMode.Translate;	
+	private XformManipMode myManipMode 	= XformManipMode.Translate;	
 	
-	private int myTranslateParmId = -1;
-	private int myRotateParmId = -1;
-	private int myScaleParmId = -1;
-	private int myRstOrderParmId = -1;
-	private int myXyzOrderParmId = -1;
-					
-	
+	private int myTranslateParmId 		= -1;
+	private int myRotateParmId 			= -1;
+	private int myScaleParmId 			= -1;
+	private int myRstOrderParmId 		= -1;
+	private int myXyzOrderParmId 		= -1;
 }
