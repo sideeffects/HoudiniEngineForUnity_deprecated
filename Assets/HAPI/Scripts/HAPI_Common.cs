@@ -431,12 +431,12 @@ namespace HAPI
 		public bool hasGeoChanged;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool isVisible;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isInstancer;
 				
     	public int objectToInstanceId;
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool isVisible;
 		
 		// Accessors
 		public string name
