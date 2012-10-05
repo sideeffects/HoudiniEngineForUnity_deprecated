@@ -42,7 +42,7 @@ public class HAPI_Window : EditorWindow
 	public void OnGUI() 
 	{
 		string path = Application.dataPath;			
-		DirectoryInfo di = new DirectoryInfo( path );
+		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 		
 		myShowUtility = EditorGUILayout.Foldout( myShowUtility, new GUIContent( "Utility" ) );
 		
@@ -59,7 +59,7 @@ public class HAPI_Window : EditorWindow
 				try
 				{
 					if ( !di.Exists )
-						throw new HAPI_Error( "Project/Assets directory does not exist!" );
+						throw new HAPI_Error( "Project/Assets/OTLs directory does not exist!" );
 					
 					foreach ( FileInfo fi in di.GetFiles() )
 						if ( fi.Extension == ".otl" )
@@ -79,7 +79,7 @@ public class HAPI_Window : EditorWindow
 			try
 			{
 				if ( !di.Exists )
-					throw new HAPI_Error( "Project/Assets directory does not exist!" );
+					throw new HAPI_Error( "Project/Assets/OTLs directory does not exist!" );
 				
 				myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
 				
