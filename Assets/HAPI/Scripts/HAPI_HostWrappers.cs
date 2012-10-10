@@ -409,6 +409,20 @@ namespace HAPI
 		// PRESETS --------------------------------------------------------------------------------------------------
 		
 		
+	    /// <summary>	
+	    /// 	Generates a preset for the given asset.
+	    /// </summary>
+	    ///
+	    /// <param name="asset_id">
+	    ///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+	    /// <param name="buf">
+	    ///			buffer to hold the preset in    
+		/// </param>
+	    /// <param name="length">
+	    ///			the size of the buffer.  If this value is 0, the 
+	    ///                 required length of the buffer will be returned.    
+	    /// </param>
 	    public static void getPreset( 		int asset_id, 
 				       							byte[] preset,
 				       							ref int length )
@@ -418,6 +432,19 @@ namespace HAPI
 		}
 
     	
+		/// <summary>	
+		/// 	Sets a particular asset to a given preset.
+		/// </summary>
+	    ///
+	    /// <param name="asset_id">
+	    ///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+	    /// <param name="buf">
+	    ///			buffer to hold the preset in    
+		/// </param>
+	    /// <param ="length">
+	    ///			the size of the buffer.        
+		/// </param>
     	public static void setPreset( 	int asset_id, 
 			      							byte[] preset,
 			       							int length )
