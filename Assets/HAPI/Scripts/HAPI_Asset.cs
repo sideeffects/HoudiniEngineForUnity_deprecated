@@ -212,7 +212,7 @@ public partial class HAPI_Asset : MonoBehaviour
 										  + prObjectCount
 										  + prHandleCount;
 				
-				if ( myPreset != null )
+				if ( myPreset != null && myPreset.Length > 0)
 					HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
 				
 				displayProgressBar();
