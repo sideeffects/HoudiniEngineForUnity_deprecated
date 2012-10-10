@@ -413,9 +413,8 @@ namespace HAPI
 				       							byte[] preset,
 				       							ref int length )
 		{
-			int status_code = HAPI_GetPreset( asset_id, preset, ref length );
-			if( (HAPI_StatusCode) status_code != HAPI_StatusCode.HAPI_STATUS_INSUFFICIENT_BUFFER_SIZE )
-				processStatusCode( (HAPI_StatusCode) status_code );	
+			int status_code = HAPI_GetPreset( asset_id, preset, ref length );			
+			processStatusCode( (HAPI_StatusCode) status_code );	
 		}
 
     	

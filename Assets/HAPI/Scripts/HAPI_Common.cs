@@ -69,8 +69,8 @@ namespace HAPI
 		HAPI_STATUS_PARM_SET_FAILED			    		= 5,
 		HAPI_STATUS_INVALID_ARGUMENT		    		= 6,
 		HAPI_STATUS_CANT_LOAD_GEO						= 7,
-		HAPI_STATUS_INSUFFICIENT_BUFFER_SIZE   		    = 8,
-    	HAPI_STATUS_CANT_GENERATE_PRESET               	= 9
+		HAPI_STATUS_CANT_GENERATE_PRESET   		  		= 8,
+    	HAPI_STATUS_CANT_LOAD_PRESET               	    = 9
 	};
 	
 	public enum HAPI_ParmType
