@@ -22,6 +22,7 @@ using UnityEditor;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using HAPI;
 
 /// <summary>
@@ -47,6 +48,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	public int 						prObjectCount { get; set; }
 	public int						prHandleCount { get; set; }
+	public int						prMaterialCount { get; set; }
 	
 	public HAPI_ParmInfo[] 			prParms { get; set; }
 	public int[]					prParmIntValues { get; set; }
@@ -56,6 +58,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	public HAPI_AssetInfo 			prAssetInfo { get; set; }
 	public HAPI_ObjectInfo[] 		prObjects { get; set; }
+	public HAPI_MaterialInfo[]		prMaterials { get; set; }
 	
 	public GameObject[]				prGameObjects {	get; set; }
 	
@@ -95,10 +98,15 @@ public partial class HAPI_Asset : MonoBehaviour
 		prAssetPathChanged 			= true;
 		prAssetId 					= -1;
 		
-		prObjectCount 				= 0;
 		prParmCount 				= 0;
+		prParmIntValueCount			= 0;
+		prParmFloatValueCount		= 0;
+		prParmStringValueCount		= 0;
 		prParmChoiceCount			= 0;
+		
+		prObjectCount 				= 0;
 		prHandleCount 				= 0;
+		prMaterialCount				= 0;
 		
 		prShowAssetControls 		= true;
 		prShowObjectControls 		= true;
@@ -195,13 +203,16 @@ public partial class HAPI_Asset : MonoBehaviour
 							
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
+				
 				prParmCount 			= prAssetInfo.parmCount;
 				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
 				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
 				prParmStringValueCount	= prAssetInfo.parmStringValueCount;
 				prParmChoiceCount		= prAssetInfo.parmChoiceCount;
+				
 				prObjectCount 			= prAssetInfo.objectCount;
 				prHandleCount 			= prAssetInfo.handleCount;
+				prMaterialCount			= prAssetInfo.materialCount;
 				
 				myProgressBarCurrent	= 0;
 				myProgressBarTotal		= prParmCount
@@ -210,10 +221,23 @@ public partial class HAPI_Asset : MonoBehaviour
 										  + prParmStringValueCount
 										  + prParmChoiceCount
 										  + prObjectCount
-										  + prHandleCount;
+										  + prHandleCount
+										  + prMaterialCount;
 				
-				if ( myPreset != null && myPreset.Length > 0)
-					HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
+				// Try to load presets.
+				try
+				{
+					if ( myPreset != null && myPreset.Length > 0 )
+						HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
+				}
+				catch ( HAPI_Error error )
+				{
+					Debug.LogWarning( error.ToString() );	
+				}
+				catch
+				{
+					Debug.LogWarning( "Unable to load presets." );	
+				}
 				
 				displayProgressBar();
 				
@@ -268,7 +292,10 @@ public partial class HAPI_Asset : MonoBehaviour
 					prHandleBindingInfos.Add( binding_infos );
 				}
 				
-				prAssetPathChanged = false;
+				// Get materials.
+				prMaterials = new HAPI_MaterialInfo[ prMaterialCount ];
+				getArray1Id ( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
+				displayProgressBar( prMaterialCount );
 			}
 			else
 			{
@@ -311,14 +338,12 @@ public partial class HAPI_Asset : MonoBehaviour
 			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 			{			
 				HAPI_ObjectInfo object_info = prObjects[ object_index ];
-				if( object_info.isInstancer )
+				if ( object_info.isInstancer )
 				{
 					try
 					{
-						if( prGameObjects[ object_info.objectToInstanceId ] == null )
-						{
+						if ( prGameObjects[ object_info.objectToInstanceId ] == null )
 							createObject( object_info.objectToInstanceId );
-						}
 						
 						instanceObjects( object_index );
 					}
@@ -330,14 +355,17 @@ public partial class HAPI_Asset : MonoBehaviour
 				}
 			}
 			
+			prAssetPathChanged = false;
 		}
 		catch ( HAPI_Error error )
 		{
 			Debug.LogError( error.ToString() );
 		}
+		finally
+		{
+			clearProgressBar();
+		}
 		
-		clearProgressBar();
-						
 		return true;
 	}
 			
@@ -406,6 +434,8 @@ public partial class HAPI_Asset : MonoBehaviour
 			// Set diffuse material.
 			Material diffuse = new Material( Shader.Find( "Diffuse" ) );		
 			main_child.GetComponent< MeshRenderer >().material = diffuse;
+			if ( prMaterialCount > 0 )
+				assignTexture( ref diffuse, prMaterials[ 0 ] );
 			
 			// Get or create mesh.
 			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
@@ -415,6 +445,14 @@ public partial class HAPI_Asset : MonoBehaviour
 				main_child_mesh_filter.mesh 	= new Mesh();
 				main_child_mesh 				= main_child_mesh_filter.sharedMesh;
 			}
+			
+			// Add Mesh-to-Prefab component.
+			prGameObjects[ object_id ] = main_child;			
+			main_child.AddComponent( "HAPI_MeshToPrefab" );		
+			HAPI_MeshToPrefab mesh_saver = main_child.GetComponent< HAPI_MeshToPrefab >();			
+			mesh_saver.prObjectControl = this;
+			mesh_saver.prObjectId = object_id;
+			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + main_child.name;
 			
 			main_child_mesh.Clear();
 			
@@ -548,14 +586,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			if ( !normal_attr_info.exists )
 				main_child_mesh.RecalculateNormals();
 			
-			prGameObjects[ object_id ] = main_child;
-			
-			main_child.AddComponent( "HAPI_MeshToPrefab" );		
-			HAPI_MeshToPrefab mesh_saver = main_child.GetComponent< HAPI_MeshToPrefab >();
-			
-			mesh_saver.prObjectControl = this;
-			mesh_saver.prObjectId = object_id;
-			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + main_child.name;
+			AssetDatabase.Refresh();
 		}
 		catch ( HAPI_Error error )
 		{
@@ -566,6 +597,30 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
+	private void assignTexture( ref Material material, HAPI_MaterialInfo material_info )
+	{
+		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
+		string assets_root_path 		= Application.dataPath;
+		string textures_root_path 		= assets_root_path + "/Textures";
+		DirectoryInfo textures_dir 		= new DirectoryInfo( textures_root_path );
+		if ( !textures_dir.Exists )
+			textures_dir.Create();
+		
+		// Figure out the source file path and name.
+		string tex_file_path 		= material_info.textureFilePath.Replace( "\\", "/" );
+		string relative_file_path 	= tex_file_path.Replace( assets_root_path, "Assets" );
+		
+		if ( prAssetPathChanged )
+			AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+		
+		// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths
+		// relative to the project folder.
+		Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+		material.mainTexture = (Texture2D) tex_obj;
+		
+		// Refresh all assets just in case.
+		AssetDatabase.Refresh();
+	}
 	
 	private bool			myProgressBarJustUsed;
 	private	System.DateTime	myProgressBarStartTime;
@@ -573,7 +628,6 @@ public partial class HAPI_Asset : MonoBehaviour
 	private int				myProgressBarCurrent;
 	private string			myProgressBarTitle;
 	private string			myProgressBarMsg;
-	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data

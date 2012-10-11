@@ -93,15 +93,18 @@ namespace HAPI
 		/// </returns>
 		public static HAPI_AssetInfo loadOTL( string path ) 
 		{
-			HAPI_StatusCode status_code = 0;			
+			HAPI_StatusCode status_code = 0;
+			
+			string otls_path = Application.dataPath + "/OTLs";
+			string textures_path = Application.dataPath + "/Textures";
 			
 			if ( myHoudiniSceneExists )
 				Debug.Log( "Loading OTL: Using Existing Scene" );
 			else 
 			{
 				Debug.Log( "Loading OTL: Creating New Scene" );
-								
-				status_code = (HAPI_StatusCode) HAPI_Initialize( Application.dataPath + "/OTLs" );
+				
+				status_code = (HAPI_StatusCode) HAPI_Initialize( otls_path );
 				
 				if ( status_code != HAPI_StatusCode.HAPI_STATUS_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
@@ -113,7 +116,7 @@ namespace HAPI
 			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
 			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 			
-			status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( path, ref asset_info );
+			status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( path, textures_path, ref asset_info );
 			
 			processStatusCode( status_code );
 			

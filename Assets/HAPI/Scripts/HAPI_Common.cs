@@ -262,8 +262,10 @@ namespace HAPI
 		public int id;
 		
 		private int nameSH;			// string handle (SH)
+		private int labelSH;		// string handle (SH)
 		private int instancePathSH;	// string handle (SH)
 		private int filePathSH;		// string handle (SH)
+		private int texturesPathSH;	// string handle (SH)
 		
 		public int parmCount;
 		public int parmIntValueCount;
@@ -273,6 +275,7 @@ namespace HAPI
 		
 		public int objectCount;
 		public int handleCount;
+		public int materialCount;
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
@@ -280,10 +283,14 @@ namespace HAPI
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+		public string label
+		{ get { return HAPI_Host.getString( labelSH ); } private set {} }
 		public string instancePath
 		{ get { return HAPI_Host.getString( instancePathSH ); } private set {} }
 		public string filePath
 		{ get { return HAPI_Host.getString( filePathSH ); } private set {} }
+		public string texturesPath
+		{ get { return HAPI_Host.getString( texturesPathSH ); } private set {} }
 	}
 	
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
@@ -424,6 +431,8 @@ namespace HAPI
 		private int nameSH; 				// string handle (SH)		
 		private int objectInstancePathSH; 	// string handle (SH)
 		
+		private int materialId;
+		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasTransformChanged;
 		
@@ -507,6 +516,20 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.ByValTStr, 
 					 SizeConst = HAPI_Constants.HAPI_ATTR_MAX_STRING_SIZE ) ]
 		public string	value;
+	}
+	
+	// MATERIALS ----------------------------------------------------------------------------------------------------
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_MaterialInfo
+	{
+		public int id;
+		
+		private int textureFilePathSH;	// string handle (SH)
+		
+		// Accessors
+		public string textureFilePath
+		{ get { return HAPI_Host.getString( textureFilePathSH ); } private set {} }
 	}
 	
 }

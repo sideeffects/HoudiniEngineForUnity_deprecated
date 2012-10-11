@@ -150,6 +150,7 @@ public class HAPI_Instancer : MonoBehaviour {
 					obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
 					obj.transform.localPosition = pos;
 					obj.transform.localRotation = quat;
+					//obj.transform.localScale = new Vector3( 0.2f, 0.2f, 0.2f );
 				}
 				
 				obj.transform.parent = transform;
