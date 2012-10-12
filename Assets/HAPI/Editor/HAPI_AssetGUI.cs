@@ -625,10 +625,10 @@ public partial class HAPI_AssetGUI : Editor
 			}
 			
 			HAPI_ParmType parm_type = (HAPI_ParmType) parms[ current_index ].type;
-					
-			if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
+			
+			if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST && !parms[ current_index ].invisible )
 			{
-				// The current parameter is a folder list which means the next parms[ currentIndex ].size
+				// The current parameter is a folder list which means the next parms[ current_index ].size
 				// parameters will be folders belonging to this folder list. Push to the stack a new
 				// folder depth, ready to eat the next few parameters belonging to the folder list's 
 				// selected folder.
@@ -658,6 +658,10 @@ public partial class HAPI_AssetGUI : Editor
 						Debug.LogError( "We should be iterating through folders only here!"
 							+ "\nCurrent Index: " + current_index + ", folder_count: " + folder_count );
 					}
+					
+					// Don't add this folder if it's invisible.
+					if ( parms[ current_index ].invisible )
+						continue;
 					
 					tab_ids.Add( 		parms[ current_index ].id );
 					tab_labels.Add( 	parms[ current_index ].label );
