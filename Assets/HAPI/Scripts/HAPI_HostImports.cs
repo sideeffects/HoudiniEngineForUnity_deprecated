@@ -157,30 +157,34 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeInfo(	int asset_id, int object_id,
+															string name,
 															ref HAPI_AttributeInfo attr_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeNames(	int asset_id, int object_id,
 															int attribute_type,
-															[Out] HAPI_AttributeStrValue[] data,
+															[Out] int[] data,
 															int count );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeIntData( int asset_id, int object_id,
+															string name,
 															ref HAPI_AttributeInfo attr_info,
 															[Out] int[] data,
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeFloatData( int asset_id, int object_id,
+															  string name,
 															  ref HAPI_AttributeInfo attr_info,
 															  [Out] float[] data,
 															  int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAttributeStrData( int asset_id, int object_id,
+															string name,
 															ref HAPI_AttributeInfo attr_info,
-															[Out] HAPI_AttributeStrValue[] data,
+															[Out] int[] data,
 															int start, int length );
 		
 		// MATERIALS ------------------------------------------------------------------------------------------------

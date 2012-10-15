@@ -487,7 +487,6 @@ namespace HAPI
 		public HAPI_AttributeInfo( string attr_name )
 		{
 			nameSH		= 0;
-			name 		= attr_name;
 			exists 		= false;
 			owner 		= (int) HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
 			storage 	= (int) HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
@@ -495,11 +494,7 @@ namespace HAPI
 			tupleSize 	= 0;
 		}
 		
-		public int		nameSH;	// string handle (SH)
-		
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_ATTR_MAX_NAME_SIZE ) ]
-		public string	name;
+		private int		nameSH;	// string handle (SH)
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool		exists;
@@ -508,14 +503,10 @@ namespace HAPI
 		public int		storage; // enum HAPI_StorageType
 		public int		count;
 		public int		tupleSize;
-	}
-	
-	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_AttributeStrValue
-	{
-		[ MarshalAs( UnmanagedType.ByValTStr, 
-					 SizeConst = HAPI_Constants.HAPI_ATTR_MAX_STRING_SIZE ) ]
-		public string	value;
+		
+		// Accessors
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 	}
 	
 	// MATERIALS ----------------------------------------------------------------------------------------------------

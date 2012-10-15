@@ -489,7 +489,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			// Get position vertex attributes.
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 			float[] pos_attr = new float[ 0 ];
-			getAttribute( prAssetId, object_id, ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, "P", ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );
 			else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -499,12 +499,13 @@ public partial class HAPI_Asset : MonoBehaviour
 			HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
 			uv_attr_info.tupleSize = 2;
 			float[] uv_attr = new float[ 0 ];
-			getAttribute( prAssetId, object_id, ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, "uv", ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
 			
 			// Get normal attributes.
 			HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( "N" );
 			float[] normal_attr = new float[ 0 ];
-			getAttribute( prAssetId, object_id, ref normal_attr_info, ref normal_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, "N", ref normal_attr_info, ref normal_attr, 
+						  HAPI_Host.getAttributeFloatData );
 			
 			// Apply object transforms.		
 			main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 

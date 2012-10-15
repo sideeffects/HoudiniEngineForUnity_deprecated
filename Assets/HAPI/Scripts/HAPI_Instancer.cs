@@ -49,8 +49,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get position point attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 		float[] pos_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 
-				 	  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "P",
+				 	  				  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 		if ( !pos_attr_info.exists )
 			throw new HAPI_Error( "No position attribute found." );
 		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -64,8 +64,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get direction point attributes.
 		HAPI_AttributeInfo dir_attr_info = new HAPI_AttributeInfo( "N" );
 		float[] dir_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 
-					  ref dir_attr_info, ref dir_attr, HAPI_Host.getAttributeFloatData );
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "N",
+					  				  ref dir_attr_info, ref dir_attr, HAPI_Host.getAttributeFloatData );
 		if ( !dir_attr_info.exists )
 			throw new HAPI_Error( "No normal (N) attribute found." );
 		else if ( dir_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -80,8 +80,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get up point attributes.
 		HAPI_AttributeInfo up_attr_info = new HAPI_AttributeInfo( "up" );
 		float[] up_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 
-					ref up_attr_info, ref up_attr, HAPI_Host.getAttributeFloatData );
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "up",
+									  ref up_attr_info, ref up_attr, HAPI_Host.getAttributeFloatData );
 		if ( !up_attr_info.exists )
 			throw new HAPI_Error( "No up attribute found." );
 		else if ( up_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )

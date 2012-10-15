@@ -205,9 +205,10 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// ATTRIBUTES ---------------------------------------------------------------------------------------------------
 		
-	public delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
-													   [Out] T[] items, int start, int end );	
-	private void fillAttrArray< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, 
+	public delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, string name,
+													  ref HAPI_AttributeInfo info, 
+													  [Out] T[] items, int start, int end );	
+	private void fillAttrArray< T >( int asset_id, int object_id, string name, ref HAPI_AttributeInfo info, 
 									 T[] items, fillAttrArrayInputFunc< T > get_func, int count ) 
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
@@ -230,7 +231,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			}
 			
 			T[] local_array = new T[ length * info.tupleSize ];
-			get_func( asset_id, object_id, ref info, local_array, current_index, length );
+			get_func( asset_id, object_id, name, ref info, local_array, current_index, length );
 			
 			// Copy data from the temporary array.
 			for ( int i = current_index; i < current_index + length; ++i )
@@ -241,7 +242,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
-	public void getAttribute< T >( int asset_id, int object_id, ref HAPI_AttributeInfo info, ref T[] data,
+	public void getAttribute< T >( int asset_id, int object_id, string name, ref HAPI_AttributeInfo info, ref T[] data,
 									fillAttrArrayInputFunc< T > get_func )
 	{
 		int original_tuple_size = info.tupleSize;		
@@ -249,7 +250,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		for ( int type = 0; type < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
 			info.owner = type;
-			HAPI_Host.getAttributeInfo( asset_id, object_id, ref info );
+			HAPI_Host.getAttributeInfo( asset_id, object_id, name, ref info );
 			if ( info.exists )
 				break;
 		}
@@ -260,20 +261,21 @@ public partial class HAPI_Asset : MonoBehaviour
 			info.tupleSize = original_tuple_size;
 		
 		data = new T[ info.count * info.tupleSize ];
-		fillAttrArray( asset_id, object_id, ref info, data, get_func, info.count );
+		fillAttrArray( asset_id, object_id, name, ref info, data, get_func, info.count );
 	}
 	
 	public string[] getAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info, 
-										HAPI_AttributeOwner owner )
+									   HAPI_AttributeOwner owner )
 	{
 		int attr_count = detail_info.getOwnerCount( owner );
 			
 		string[] names = new string[ attr_count ];
 		
-		HAPI_AttributeStrValue[] attr_names = new HAPI_AttributeStrValue[ attr_count ];
+		int[] attr_names = new int[ attr_count ]; // string handles (SH)
+		
 		HAPI_Host.getAttributeNames( asset_id, object_id, (int) owner, attr_names, attr_count );
 		for ( int ii = 0; ii < attr_count; ++ii )
-			names[ ii ] = attr_names[ ii ].value;
+			names[ ii ] = HAPI_Host.getString( attr_names[ ii ] );
 		
 		return names;
 	}

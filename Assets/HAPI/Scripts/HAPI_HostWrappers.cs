@@ -583,10 +583,10 @@ namespace HAPI
 		/// 	<see cref="HAPI_AttributeInfo"/> used as input for which (by name) attribute you want the info
 		/// 	for and the owner type and as output for the rest of the information.
 		/// </param>
-		public static void getAttributeInfo(	int asset_id, int object_id,
+		public static void getAttributeInfo(	int asset_id, int object_id, string name,
 												ref HAPI_AttributeInfo attr_info )
 		{
-			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, ref attr_info );
+			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, name, ref attr_info );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -613,7 +613,7 @@ namespace HAPI
 		/// </param>
 		public static void getAttributeNames(	int asset_id, int object_id,
 												int attribute_type,
-												[Out] HAPI_AttributeStrValue[] data,
+												[Out] int[] data,
 												int count )
 		{
 			int status_code = HAPI_GetAttributeNames( asset_id, object_id, attribute_type, data, count );
@@ -643,12 +643,12 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getAttributeIntData( int asset_id, int object_id,
+		public static void getAttributeIntData( int asset_id, int object_id, string name,
 												ref HAPI_AttributeInfo attr_info,
 												[Out] int[] data,
 												int start, int length )
 		{
-			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, ref attr_info, data, start, length );
+			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, name, ref attr_info, data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -675,12 +675,13 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getAttributeFloatData(	int asset_id, int object_id,
+		public static void getAttributeFloatData(	int asset_id, int object_id, string name,
 													ref HAPI_AttributeInfo attr_info,
 													[Out] float[] data,
 													int start, int length )
 		{
-			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, ref attr_info, data, start, length );
+			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, name, ref attr_info, 
+														  data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -699,7 +700,7 @@ namespace HAPI
 		/// 	the same struct returned by <see cref="HAPI_Host.getAttributeInfo"/>.
 		/// </param>
 		/// <param name="data">
-		/// 	An string (<see cref="HAPI_AttributeStrValue"/>) array at least the size of <paramref name="length"/>.
+		/// 	An int (string handles) array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
 		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
@@ -707,12 +708,12 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getAttributeStrData( int asset_id, int object_id,
+		public static void getAttributeStrData( int asset_id, int object_id, string name,
 												ref HAPI_AttributeInfo attr_info,
-												[Out] HAPI_AttributeStrValue[] data,
+												[Out] int[] data,
 												int start, int length )
 		{
-			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, ref attr_info, data, start, length );
+			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, name, ref attr_info, data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
