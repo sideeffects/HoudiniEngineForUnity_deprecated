@@ -667,7 +667,7 @@ public partial class HAPI_AssetGUI : Editor
 				// selected folder.
 				
 				folder_list_count++;
-				bool folder_list_invisible	= parms[ current_index ].invisible;
+				//bool folder_list_invisible	= parms[ current_index ].invisible;
 				int folder_count 			= parms[ current_index ].size;
 				int first_folder_index 		= current_index + 1;
 				int last_folder_index 		= current_index + folder_count;
@@ -685,7 +685,7 @@ public partial class HAPI_AssetGUI : Editor
 				List< int > 	tab_ids 	= new List< int >();
 				List< string > 	tab_labels 	= new List< string >();
 				List< int > 	tab_sizes 	= new List< int >();
-				bool has_visible_folders	= false;
+				//bool has_visible_folders	= false;
 				for ( current_index = first_folder_index; current_index <= last_folder_index; ++current_index )
 				{
 					if ( parms[ current_index ].type != (int) HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
@@ -695,10 +695,10 @@ public partial class HAPI_AssetGUI : Editor
 					}
 					
 					// Don't add this folder if it's invisible.
-					if ( parms[ current_index ].invisible || folder_list_invisible )
-						continue;
-					else
-						has_visible_folders = true;
+					//if ( parms[ current_index ].invisible || folder_list_invisible )
+						//continue;
+					//else
+						//has_visible_folders = true;
 					
 					tab_ids.Add( 		parms[ current_index ].id );
 					tab_labels.Add( 	parms[ current_index ].label );
@@ -707,8 +707,8 @@ public partial class HAPI_AssetGUI : Editor
 				current_index--; // We decrement the current_index as we incremented one too many in the for loop.
 				
 				// If there are no folders visible in this folder list, don't even append the folder stacks.
-				if ( has_visible_folders )
-				{
+				//if ( has_visible_folders )
+				//{
 					int selected_folder 	= myObjectControl.prFolderListSelections[ folder_list_count ];
 					selected_folder 		= GUILayout.Toolbar( selected_folder, tab_labels.ToArray() );
 					myObjectControl.prFolderListSelections[ folder_list_count ] = selected_folder;
@@ -717,7 +717,7 @@ public partial class HAPI_AssetGUI : Editor
 					// list only the parameters of the selected folder need to be generated.
 					parent_id_stack.Push( 		tab_ids[ selected_folder ] );
 					parent_count_stack.Push( 	tab_sizes[ selected_folder ] );
-				}
+				//}
 			}
 			else
 			{
