@@ -434,8 +434,8 @@ public partial class HAPI_Asset : MonoBehaviour
 			// Set diffuse material.
 			Material diffuse = new Material( Shader.Find( "Diffuse" ) );		
 			main_child.GetComponent< MeshRenderer >().material = diffuse;
-			if ( prMaterialCount > 0 )
-				assignTexture( ref diffuse, prMaterials[ 0 ] );
+			if ( prMaterialCount > 0 && object_info.materialId >= 0 )
+				assignTexture( ref diffuse, prMaterials[ object_info.materialId ] );
 			
 			// Get or create mesh.
 			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();

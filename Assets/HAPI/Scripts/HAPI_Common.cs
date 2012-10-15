@@ -431,7 +431,7 @@ namespace HAPI
 		private int nameSH; 				// string handle (SH)		
 		private int objectInstancePathSH; 	// string handle (SH)
 		
-		private int materialId;
+		public int materialId;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasTransformChanged;
