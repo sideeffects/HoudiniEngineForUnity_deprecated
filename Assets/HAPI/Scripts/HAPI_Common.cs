@@ -38,22 +38,8 @@ namespace HAPI
 		public const int HAPI_QUATERNION_VECTOR_SIZE		= 4;
 		public const int HAPI_EULER_VECTOR_SIZE				= 3;		
 		public const int HAPI_UV_VECTOR_SIZE				= 2;
-		
-		public const int HAPI_GENERIC_MAX_NAME_SIZE			= 256;
-
-		public const int HAPI_PARM_MAX_VECTOR_SIZE			= 4;
-		public const int HAPI_PARM_MAX_NAME_SIZE			= 256;
-		public const int HAPI_PARM_MAX_STRING_SIZE			= 8192;
-		public const int HAPI_PARM_MAX_STRING_VEC_SIZE		= 1;
-
-		public const int HAPI_GEO_MAX_NAME_SIZE				= 512;
-		public const int HAPI_GEO_MAX_TEX_NAME_SIZE			= 1024;
-		public const int HAPI_GEO_MAX_BUMP_NAME_SIZE		= 1024;
 
 		public const int HAPI_PRIM_MAX_VERTEX_COUNT			= 16;
-		
-		public const int HAPI_ATTR_MAX_NAME_SIZE			= 64;
-		public const int HAPI_ATTR_MAX_STRING_SIZE			= 128;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -510,15 +496,12 @@ namespace HAPI
 	{		
 		public HAPI_AttributeInfo( string attr_name )
 		{
-			nameSH		= 0;
 			exists 		= false;
 			owner 		= (int) HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
 			storage 	= (int) HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
 			count 		= 0;
 			tupleSize 	= 0;
 		}
-		
-		private int		nameSH;	// string handle (SH)
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool		exists;
@@ -527,10 +510,6 @@ namespace HAPI
 		public int		storage; // enum HAPI_StorageType
 		public int		count;
 		public int		tupleSize;
-		
-		// Accessors
-		public string name
-		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 	}
 	
 	// MATERIALS ----------------------------------------------------------------------------------------------------

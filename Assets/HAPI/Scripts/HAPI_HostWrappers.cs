@@ -400,6 +400,7 @@ namespace HAPI
 		}
 
 		// PRESETS --------------------------------------------------------------------------------------------------
+		
 		/// <summary>
 		/// 	Generates a preset for the given asset.
 		/// </summary>
@@ -578,9 +579,12 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
+		/// <param name="name">
+		/// 	Attribute name.
+		/// </param>
 		/// <param name="attr_info">
-		/// 	<see cref="HAPI_AttributeInfo"/> used as input for which (by name) attribute you want the info
-		/// 	for and the owner type and as output for the rest of the information.
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for owner type and as output for the rest of 
+		/// 	the information.
 		/// </param>
 		public static void getAttributeInfo(	int asset_id, int object_id, string name,
 												ref HAPI_AttributeInfo attr_info )
@@ -602,7 +606,7 @@ namespace HAPI
 		/// 	The <see cref="HAPI_AttributeType"/> enum value specifying the owner of the attribute.
 		/// </param>
 		/// <param name="data">
-		/// 	Array of strings (<see cref="HAPI_AttributeStrValue"/>) to house the attribute names.
+		/// 	Array of ints (string handles) to house the attribute names.
 		/// 	Should be exactly the size of the appropriate attribute owner type count
 		/// 	in <see cref="HAPI_DetailInfo"/>.
 		/// </param>
@@ -628,11 +632,13 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
-		/// <param name="attr_info">
-		/// 	<see cref="HAPI_AttributeInfo"/> used as input for which attribute you want the data for and
-		/// 	in what tuple size. Also contains some sanity checks like data type. Generally should be
-		/// 	the same struct returned by <see cref="HAPI_Host.getAttributeInfo"/>.
+		/// <param name="name">
+		/// 	Attribute name.
 		/// </param>
+		/// <param name="attr_info">
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
+		/// 	like data type. Generally should be the same struct returned by 
+		/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
 		/// <param name="data">
 		/// 	An integer array at least the size of <paramref name="length"/>.
 		/// </param>
@@ -660,11 +666,13 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
-		/// <param name="attr_info">
-		/// 	<see cref="HAPI_AttributeInfo"/> used as input for which attribute you want the data for and
-		/// 	in what tuple size. Also contains some sanity checks like data type. Generally should be
-		/// 	the same struct returned by <see cref="HAPI_Host.getAttributeInfo"/>.
+		/// <param name="name">
+		/// 	Attribute name.
 		/// </param>
+		/// <param name="attr_info">
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
+		/// 	like data type. Generally should be the same struct returned by 
+		/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
 		/// <param name="data">
 		/// 	An float array at least the size of <paramref name="length"/>.
 		/// </param>
@@ -693,10 +701,13 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
+		/// <param name="name">
+		/// 	Attribute name.
+		/// </param>
 		/// <param name="attr_info">
-		/// 	<see cref="HAPI_AttributeInfo"/> used as input for which attribute you want the data for and
-		/// 	in what tuple size. Also contains some sanity checks like data type. Generally should be
-		/// 	the same struct returned by <see cref="HAPI_Host.getAttributeInfo"/>.
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
+		/// 	like data type. Generally should be the same struct returned by 
+		/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
 		/// </param>
 		/// <param name="data">
 		/// 	An int (string handles) array at least the size of <paramref name="length"/>.
@@ -716,11 +727,11 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		// GEOMETRY INPUT -------------------------------------------------------------------------------------------
 		
 		/// <summary> 
 		/// 	Set a file as input to an asset.
 		/// </summary>
-		///
 		/// <param name="asset_id">
 		///		The asset id returned by HAPI_LoadOTLFile().
 		/// </param>
@@ -728,7 +739,7 @@ namespace HAPI
 		///		The index of the input - 0 for an asset that has just
 		///	</param>		
 		/// <param name="file_name">
-		///		name of the file to use as input to the given asset
+		///		Name of the file to use as input to the given asset
 		/// </param>
 		public static void setFileInput( int asset_id, int input_idx, string file_name )
 		{

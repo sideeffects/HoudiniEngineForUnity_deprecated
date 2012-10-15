@@ -693,8 +693,8 @@ public partial class HAPI_AssetGUI : Editor
 					}
 					
 					// Don't add this folder if it's invisible.
-					if ( parms[ current_index ].invisible )
-						continue;
+					//if ( parms[ current_index ].invisible )
+						//continue;
 					
 					tab_ids.Add( 		parms[ current_index ].id );
 					tab_labels.Add( 	parms[ current_index ].label );
