@@ -39,6 +39,10 @@ public partial class HAPI_Asset : MonoBehaviour
 	public string 					prAssetPath { get { return myAssetPath; } set { myAssetPath = value; } }
 	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
 	public int 						prAssetId { get; set; }
+	public HAPI_AssetType			prAssetType { get; set; }
+	public int 						prMinInputCount { get; set; }
+	public int 						prMaxInputCount { get; set; }
+	public List<string>				prFileInputs { get; set; }
 	
 	public int 						prParmCount { get; set; }
 	public int						prParmIntValueCount { get; set; }
@@ -68,6 +72,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	public bool 					prShowObjectControls { get; set; }
 	public bool 					prShowAssetControls { get; set; }
+	public bool						prShowInputControls { get; set; }
 	public bool						prAutoSelectAssetNode { get; set; }
 	public bool						prEnableLogging { get; set; }
 	
@@ -97,6 +102,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		prAssetPath 				= "";
 		prAssetPathChanged 			= true;
 		prAssetId 					= -1;
+		prAssetType					= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		
 		prParmCount 				= 0;
 		prParmIntValueCount			= 0;
@@ -107,6 +113,11 @@ public partial class HAPI_Asset : MonoBehaviour
 		prObjectCount 				= 0;
 		prHandleCount 				= 0;
 		prMaterialCount				= 0;
+		
+		prMinInputCount				= 0;
+		prMaxInputCount				= 0;
+		prFileInputs				= new List<string>();
+		prShowInputControls			= true;
 		
 		prShowAssetControls 		= true;
 		prShowObjectControls 		= true;
@@ -203,7 +214,9 @@ public partial class HAPI_Asset : MonoBehaviour
 							
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
-				
+				prAssetType				= (HAPI_AssetType) prAssetInfo.assetType;
+				prMinInputCount			= prAssetInfo.minInputCount;
+				prMaxInputCount			= prAssetInfo.maxInputCount;
 				prParmCount 			= prAssetInfo.parmCount;
 				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
 				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
@@ -238,6 +251,15 @@ public partial class HAPI_Asset : MonoBehaviour
 				{
 					Debug.LogWarning( "Unable to load presets." );	
 				}
+				
+				if( prMaxInputCount > 0 && prFileInputs.Count <= 0 )
+				{					
+					for (int ii=0; ii< prMaxInputCount ; ii++)
+					{
+						prFileInputs.Add("");
+					}
+				}
+				
 				
 				displayProgressBar();
 				
@@ -296,6 +318,34 @@ public partial class HAPI_Asset : MonoBehaviour
 				prMaterials = new HAPI_MaterialInfo[ prMaterialCount ];
 				getArray1Id ( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
 				displayProgressBar( prMaterialCount );
+				
+				
+				if( prMinInputCount > 0 )
+				{
+					int numValidInputs = 0;
+					for (int ii=0; ii< prMaxInputCount ; ii++)
+					{
+						if( prFileInputs[ ii ] != "" )
+						{
+							numValidInputs++;
+						}
+					}
+					
+					if( numValidInputs < prMinInputCount )
+					{
+						Debug.LogWarning( "InSufficent Inputs to Asset. Please provide inputs in the Inputs section." );	
+						return true;
+					}
+					
+					for (int ii=0; ii< prMaxInputCount ; ii++)
+					{
+						if( prFileInputs[ ii ] != "" )
+						{
+							HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
+						}
+					}
+					
+				}
 			}
 			else
 			{

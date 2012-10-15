@@ -144,6 +144,26 @@ namespace HAPI
 		HAPI_STORAGETYPE_MAX
 	}
 	
+	public enum HAPI_AssetType
+	{
+		HAPI_ASSETTYPE_INVALID = -1,
+		HAPI_ASSETTYPE_OBJ = 0,
+		HAPI_ASSETTYPE_SOP,
+		HAPI_ASSETTYPE_POPNET,
+		HAPI_ASSETTYPE_POP,
+		HAPI_ASSETTYPE_CHOPNET,
+		HAPI_ASSETTYPE_CHOP,
+		HAPI_ASSETTYPE_ROP,
+		HAPI_ASSETTYPE_SHOP,
+		HAPI_ASSETTYPE_COP2,
+		HAPI_ASSETTYPE_COPNET,
+		HAPI_ASSETTYPE_VOP,
+		HAPI_ASSETTYPE_VOPNET,
+		HAPI_ASSETTYPE_DOP,
+		HAPI_ASSETTYPE_MGR,
+		HAPI_ASSETTYPE_DIR
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Main API Structs
 	
@@ -260,6 +280,7 @@ namespace HAPI
 	public struct HAPI_AssetInfo 
 	{
 		public int id;
+		public int assetType;
 		
 		private int nameSH;			// string handle (SH)
 		private int labelSH;		// string handle (SH)
@@ -275,7 +296,10 @@ namespace HAPI
 		
 		public int objectCount;
 		public int handleCount;
+		public int minInputCount;
+		public int maxInputCount;
 		public int materialCount;
+
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;

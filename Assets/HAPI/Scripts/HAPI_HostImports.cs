@@ -187,6 +187,11 @@ namespace HAPI
 															[Out] int[] data,
 															int start, int length );
 		
+		// GEOMETRY INPUT -------------------------------------------------------------------------------------------
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetFileInput( int asset_id, int input_idx, string file_name );
+		
+		
 		// MATERIALS ------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

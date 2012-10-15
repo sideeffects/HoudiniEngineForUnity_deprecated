@@ -25,6 +25,13 @@ public class HAPI_GUIUtility : Editor {
 		return new_path;
 	}
 	
+	public static string promptForFileInputPath( string old_path )
+	{		
+		// Prompt for the absolute path to the .otl file to use.
+		string new_path = EditorUtility.OpenFilePanel( "Open File", old_path, "*.*" );
+		return new_path;
+	}
+	
 	public static void instantiateAsset( string file_path )
 	{
 		if ( file_path.Length <= 0 )

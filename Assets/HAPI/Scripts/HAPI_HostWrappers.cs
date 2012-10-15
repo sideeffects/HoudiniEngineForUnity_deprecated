@@ -400,7 +400,6 @@ namespace HAPI
 		}
 
 		// PRESETS --------------------------------------------------------------------------------------------------
-
 		/// <summary>
 		/// 	Generates a preset for the given asset.
 		/// </summary>
@@ -714,6 +713,26 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, name, ref attr_info, data, start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		
+		/// <summary> 
+		/// 	Set a file as input to an asset.
+		/// </summary>
+		///
+		/// <param name="asset_id">
+		///		The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="input_idx">
+		///		The index of the input - 0 for an asset that has just
+		///	</param>		
+		/// <param name="file_name">
+		///		name of the file to use as input to the given asset
+		/// </param>
+		public static void setFileInput( int asset_id, int input_idx, string file_name )
+		{
+			int status_code = HAPI_SetFileInput( asset_id, input_idx, file_name );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 

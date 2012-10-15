@@ -119,6 +119,38 @@ public partial class HAPI_AssetGUI : Editor
 			
 		} // if
 		
+		
+		if( myObjectControl.prMaxInputCount > 0 && 
+			myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
+		{
+			myObjectControl.prShowInputControls = 
+				EditorGUILayout.Foldout( myObjectControl.prShowInputControls, new GUIContent( "Inputs" ) );			
+			
+			if( myObjectControl.prShowInputControls )
+			{
+				for( int ii=0; ii< myObjectControl.prMaxInputCount; ii++ )
+				{
+					EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
+					EditorGUILayout.BeginHorizontal(); 
+					{
+						string old_file_path = myObjectControl.prFileInputs[ii];
+						string new_file_path = "";
+						new_file_path = EditorGUILayout.TextField( old_file_path );
+						
+						if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+						{
+							string prompt_result_path = HAPI_GUIUtility.promptForFileInputPath( old_file_path );
+							if ( prompt_result_path.Length > 0 )
+								new_file_path = prompt_result_path;
+						}
+						
+						myObjectControl.prFileInputs[ ii ] = new_file_path;
+					} 
+					EditorGUILayout.EndHorizontal();
+				}
+			}
+		}
+		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Asset Controls
 		
@@ -575,6 +607,7 @@ public partial class HAPI_AssetGUI : Editor
 		// parameters are still contained in the current folder.
 		Stack< int > parent_id_stack 		= new Stack< int >();
 		Stack< int > parent_count_stack 	= new Stack< int >();
+		
 		
 		// Loop through all the parameters.
 		while ( current_index < myObjectControl.prParmCount )
