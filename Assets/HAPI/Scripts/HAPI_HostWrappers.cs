@@ -594,7 +594,8 @@ namespace HAPI
 		}
 
 		/// <summary>
-		/// 	Get list of attribute names by attribute owner.
+		/// 	Get list of attribute names by attribute owner. Note that the name string handles are only valid 
+		/// 	until the next time this function is called.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
@@ -693,7 +694,8 @@ namespace HAPI
 		}
 
 		/// <summary>
-		/// 	Get attribute string data.
+		/// 	Get attribute string data. Note that the string handles returned are only valid until the next 
+		/// 	time this function is called.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.

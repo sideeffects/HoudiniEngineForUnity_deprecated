@@ -211,7 +211,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					// Nothing to build since the load failed.
 					return false; // false for failed :(
 				}
-							
+				
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
 				prAssetType				= (HAPI_AssetType) prAssetInfo.assetType;
@@ -251,15 +251,6 @@ public partial class HAPI_Asset : MonoBehaviour
 				{
 					Debug.LogWarning( "Unable to load presets." );	
 				}
-				
-				if( prMaxInputCount > 0 && prFileInputs.Count <= 0 )
-				{					
-					for (int ii=0; ii< prMaxInputCount ; ii++)
-					{
-						prFileInputs.Add("");
-					}
-				}
-				
 				
 				displayProgressBar();
 				
@@ -319,39 +310,35 @@ public partial class HAPI_Asset : MonoBehaviour
 				getArray1Id ( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
 				displayProgressBar( prMaterialCount );
 				
+				// Add input fields.
+				if ( prMaxInputCount > 0 && prFileInputs.Count <= 0 )
+					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+						prFileInputs.Add( "" );
 				
-				if( prMinInputCount > 0 )
+				// Check for min input fields set.
+				if ( prMinInputCount > 0 )
 				{
 					int numValidInputs = 0;
-					for (int ii=0; ii< prMaxInputCount ; ii++)
-					{
-						if( prFileInputs[ ii ] != "" )
-						{
+					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+						if ( prFileInputs[ ii ] != "" )
 							numValidInputs++;
-						}
-					}
 					
-					if( numValidInputs < prMinInputCount )
+					if ( numValidInputs < prMinInputCount )
 					{
-						Debug.LogWarning( "InSufficent Inputs to Asset. Please provide inputs in the Inputs section." );	
+						Debug.LogError( "Insufficent Inputs to Asset. Please provide inputs in the Inputs section." );	
 						return true;
 					}
 					
-					for (int ii=0; ii< prMaxInputCount ; ii++)
-					{
-						if( prFileInputs[ ii ] != "" )
-						{
+					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+						if ( prFileInputs[ ii ] != "" )
 							HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
-						}
-					}
-					
 				}
 			}
 			else
 			{
 				displayProgressBar();
 				
-				myProgressBarTotal		= prObjectCount;
+				myProgressBarTotal = prObjectCount;
 			}
 			
 			myProgressBarMsg = "Loading and composing objects...";
@@ -384,7 +371,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				}
 			}
 			
-			// processing instancers
+			// Processing instancers.
 			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 			{			
 				HAPI_ObjectInfo object_info = prObjects[ object_index ];

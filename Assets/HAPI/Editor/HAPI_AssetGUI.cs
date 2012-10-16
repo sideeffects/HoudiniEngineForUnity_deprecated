@@ -35,16 +35,12 @@ public partial class HAPI_AssetGUI : Editor
 	{		
 		myObjectControl = target as HAPI_Asset;
 		
-		myUndoManager = new HOEditorUndoManager( myObjectControl, "HAPI_Asset" );
-		
 		if ( GUI.changed )
 			myObjectControl.build();
 	}
 	
 	public override void OnInspectorGUI() 
-	{		
-		myUndoManager.CheckUndo();
-		
+	{
 		myLabelStyle = new GUIStyle( GUI.skin.label );
 		myLabelStyle.alignment = TextAnchor.MiddleRight;
 		
@@ -119,21 +115,20 @@ public partial class HAPI_AssetGUI : Editor
 			
 		} // if
 		
-		
-		if( myObjectControl.prMaxInputCount > 0 && 
-			myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
+		if ( myObjectControl.prMaxInputCount > 0 && 
+			 myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
 		{
 			myObjectControl.prShowInputControls = 
 				EditorGUILayout.Foldout( myObjectControl.prShowInputControls, new GUIContent( "Inputs" ) );			
 			
-			if( myObjectControl.prShowInputControls )
+			if ( myObjectControl.prShowInputControls )
 			{
-				for( int ii=0; ii< myObjectControl.prMaxInputCount; ii++ )
+				for ( int ii = 0; ii < myObjectControl.prMaxInputCount; ++ii )
 				{
 					EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
 					EditorGUILayout.BeginHorizontal(); 
 					{
-						string old_file_path = myObjectControl.prFileInputs[ii];
+						string old_file_path = myObjectControl.prFileInputs[ ii ];
 						string new_file_path = "";
 						new_file_path = EditorGUILayout.TextField( old_file_path );
 						
@@ -147,9 +142,9 @@ public partial class HAPI_AssetGUI : Editor
 						myObjectControl.prFileInputs[ ii ] = new_file_path;
 					} 
 					EditorGUILayout.EndHorizontal();
-				}
-			}
-		}
+				} // for
+			} // if
+		} // if
 		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Asset Controls
@@ -163,9 +158,7 @@ public partial class HAPI_AssetGUI : Editor
 			hasAssetChanged |= generateAssetControls();							
 		
 		if ( hasAssetChanged )
-		{
 			myObjectControl.build();
-		}
 		
 		if( isMouseUp )
 		{
@@ -177,8 +170,6 @@ public partial class HAPI_AssetGUI : Editor
 			HAPI_Host.getPreset( myObjectControl.prAssetId, myObjectControl.prPreset, ref bufLength );				
 			
 		}
-		
-		myUndoManager.CheckDirty();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -666,26 +657,16 @@ public partial class HAPI_AssetGUI : Editor
 				// folder depth, ready to eat the next few parameters belonging to the folder list's 
 				// selected folder.
 				
-				folder_list_count++;
-				//bool folder_list_invisible	= parms[ current_index ].invisible;
+				bool folder_list_invisible	= parms[ current_index ].invisible;
 				int folder_count 			= parms[ current_index ].size;
 				int first_folder_index 		= current_index + 1;
 				int last_folder_index 		= current_index + folder_count;
-				
-				// If myObjectControl.myFolderListSelections is smaller than our current depth it means this
-				// is the first GUI generation for this asset (no previous folder selection data) so
-				// increase the size of the selection arrays to accomodate the new depth.
-				if ( myObjectControl.prFolderListSelections.Count <= folder_list_count )
-				{
-					myObjectControl.prFolderListSelections.Add( 0 );
-					myObjectControl.prFolderListSelectionIds.Add( -1 );
-				}
 				
 				// Generate the list of folders which will be passed to the GUILayout.Toolbar() method.
 				List< int > 	tab_ids 	= new List< int >();
 				List< string > 	tab_labels 	= new List< string >();
 				List< int > 	tab_sizes 	= new List< int >();
-				//bool has_visible_folders	= false;
+				bool has_visible_folders	= false;
 				for ( current_index = first_folder_index; current_index <= last_folder_index; ++current_index )
 				{
 					if ( parms[ current_index ].type != (int) HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
@@ -695,10 +676,10 @@ public partial class HAPI_AssetGUI : Editor
 					}
 					
 					// Don't add this folder if it's invisible.
-					//if ( parms[ current_index ].invisible || folder_list_invisible )
-						//continue;
-					//else
-						//has_visible_folders = true;
+					if ( parms[ current_index ].invisible || folder_list_invisible )
+						continue;
+					else
+						has_visible_folders = true;
 					
 					tab_ids.Add( 		parms[ current_index ].id );
 					tab_labels.Add( 	parms[ current_index ].label );
@@ -707,8 +688,19 @@ public partial class HAPI_AssetGUI : Editor
 				current_index--; // We decrement the current_index as we incremented one too many in the for loop.
 				
 				// If there are no folders visible in this folder list, don't even append the folder stacks.
-				//if ( has_visible_folders )
-				//{
+				if ( has_visible_folders )
+				{
+					folder_list_count++;
+					
+					// If myObjectControl.myFolderListSelections is smaller than our current depth it means this
+					// is the first GUI generation for this asset (no previous folder selection data) so
+					// increase the size of the selection arrays to accomodate the new depth.
+					if ( myObjectControl.prFolderListSelections.Count <= folder_list_count )
+					{
+						myObjectControl.prFolderListSelections.Add( 0 );
+						myObjectControl.prFolderListSelectionIds.Add( -1 );
+					}
+					
 					int selected_folder 	= myObjectControl.prFolderListSelections[ folder_list_count ];
 					selected_folder 		= GUILayout.Toolbar( selected_folder, tab_labels.ToArray() );
 					myObjectControl.prFolderListSelections[ folder_list_count ] = selected_folder;
@@ -717,7 +709,7 @@ public partial class HAPI_AssetGUI : Editor
 					// list only the parameters of the selected folder need to be generated.
 					parent_id_stack.Push( 		tab_ids[ selected_folder ] );
 					parent_count_stack.Push( 	tab_sizes[ selected_folder ] );
-				//}
+				}
 			}
 			else
 			{
@@ -755,6 +747,5 @@ public partial class HAPI_AssetGUI : Editor
 	
 	private GUIStyle			myLabelStyle;
 	
-	private HOEditorUndoManager myUndoManager;
-	private HAPI_Asset 	myObjectControl;
+	private HAPI_Asset 			myObjectControl;
 }

@@ -34,8 +34,6 @@ public class HAPI_CurveGUI : Editor
 	{		
 		myCurve = target as HAPI_Curve;
 		
-		myUndoManager = new HOEditorUndoManager( myCurve, "HAPI_Curve" );
-		
 		myCurrentlyActivePoint = -1;
 	}
 	
@@ -121,9 +119,8 @@ public class HAPI_CurveGUI : Editor
 			myCurrentlyActivePoint = -1;
 	}
 	
-	public override void OnInspectorGUI() {
-		myUndoManager.CheckUndo();
-		
+	public override void OnInspectorGUI() 
+	{
 		if ( GUILayout.Button( "Add Point" ) )
 			myCurve.addPoint( Vector3.zero );
 		
@@ -145,8 +142,6 @@ public class HAPI_CurveGUI : Editor
 					
 		if ( GUI.changed )
 			HandleUtility.Repaint();
-		
-		myUndoManager.CheckDirty();	
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,8 +162,7 @@ public class HAPI_CurveGUI : Editor
 		
 		return p;
 	}
-		
-	private HOEditorUndoManager 	myUndoManager;
+	
 	private HAPI_Curve 				myCurve;
 	
 	private int 					myCurrentlyActivePoint;
