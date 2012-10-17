@@ -324,10 +324,7 @@ public partial class HAPI_Asset : MonoBehaviour
 							numValidInputs++;
 					
 					if ( numValidInputs < prMinInputCount )
-					{
-						Debug.LogError( "Insufficent Inputs to Asset. Please provide inputs in the Inputs section." );	
-						return true;
-					}
+						Debug.LogWarning( "Insufficent Inputs to Asset. Please provide inputs in the Inputs section." );
 					
 					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
 						if ( prFileInputs[ ii ] != "" )
@@ -472,7 +469,18 @@ public partial class HAPI_Asset : MonoBehaviour
 			Material diffuse = new Material( Shader.Find( "Diffuse" ) );		
 			main_child.GetComponent< MeshRenderer >().material = diffuse;
 			if ( prMaterialCount > 0 && object_info.materialId >= 0 )
-				assignTexture( ref diffuse, prMaterials[ object_info.materialId ] );
+			{
+				bool do_import = prAssetPathChanged;
+				if ( object_info.hasMaterialChanged )
+				{
+					HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
+					HAPI_Host.getMaterials( prAssetId, material, object_info.materialId, 1 );
+					prMaterials[ object_info.materialId ] = material[ 0 ];
+					object_info.hasMaterialChanged = false;
+					do_import = true;
+				}
+				assignTexture( ref diffuse, prMaterials[ object_info.materialId ], do_import );
+			}
 			
 			// Get or create mesh.
 			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
@@ -635,7 +643,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
-	private void assignTexture( ref Material material, HAPI_MaterialInfo material_info )
+	private void assignTexture( ref Material material, HAPI_MaterialInfo material_info, bool do_import )
 	{
 		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
 		string assets_root_path 		= Application.dataPath;
@@ -648,7 +656,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		string tex_file_path 		= material_info.textureFilePath.Replace( "\\", "/" );
 		string relative_file_path 	= tex_file_path.Replace( assets_root_path, "Assets" );
 		
-		if ( prAssetPathChanged )
+		if ( do_import )
 			AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
 		
 		// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths

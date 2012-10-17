@@ -285,7 +285,6 @@ namespace HAPI
 		public int minInputCount;
 		public int maxInputCount;
 		public int materialCount;
-
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
@@ -448,6 +447,9 @@ namespace HAPI
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasGeoChanged;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasMaterialChanged;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isVisible;
