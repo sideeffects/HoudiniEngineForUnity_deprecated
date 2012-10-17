@@ -375,8 +375,10 @@ public partial class HAPI_Asset : MonoBehaviour
 				if ( object_info.isInstancer )
 				{
 					try
-					{
-						if ( prGameObjects[ object_info.objectToInstanceId ] == null )
+					{												
+						
+						if ( object_info.objectToInstanceId >= 0 && 
+							 prGameObjects[ object_info.objectToInstanceId ] == null )
 							createObject( object_info.objectToInstanceId );
 						
 						instanceObjects( object_index );
@@ -401,6 +403,20 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 		
 		return true;
+	}
+	
+	
+	public int findObjectByName( string object_name )
+	{
+		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+		{			
+			HAPI_ObjectInfo object_info = prObjects[ object_index ];
+			if( object_info.name == object_name )
+			{
+				return object_index;
+			}
+		}
+		return -1;
 	}
 			
 	

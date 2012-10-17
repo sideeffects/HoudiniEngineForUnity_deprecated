@@ -39,9 +39,9 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get Detail info.
 		HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
 		HAPI_Host.getDetailInfo( prObjectControl.prAssetId, prObjectId, out detail_info );
-		//if ( prEnableLogging )
-		//	Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
-		//			   + "points: " + detail_info.pointCount );
+		if ( prObjectControl.prEnableLogging )
+			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
+					   + "points: " + detail_info.pointCount );
 				
 		if ( detail_info.pointCount > 65000 )
 			throw new HAPI_Error( "Point count (" + detail_info.pointCount + ") above limit (" + 65000 + ")!" );
@@ -92,6 +92,37 @@ public class HAPI_Instancer : MonoBehaviour {
 			throw new HAPI_Error( "Unexpected up array length found for asset: " + prObjectControl.prAssetId + "!" );
 		}
 		
+				
+		// Get string point attributes.
+		/*HAPI_AttributeInfo instancehint_attr_info = new HAPI_AttributeInfo( "instance_hint" );
+		int[] instancehint_attr = new int[ 0 ];
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "instance_hint", 
+					ref instancehint_attr_info, ref instancehint_attr, HAPI_Host.getAttributeStrData );
+		if ( !instancehint_attr_info.exists )
+			throw new HAPI_Error( "No instance_hint attribute found." );
+		else if ( instancehint_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+			throw new HAPI_Error( "I only understand instance_hint as point attributes!" );
+		
+		if( instancehint_attr.Length != detail_info.pointCount )
+		{
+			throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
+								+ prObjectControl.prAssetId + "!" );
+		}*/	
+		
+		
+		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
+		int[] instance_attr = new int[ 0 ];
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "instance", 
+					ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
+		
+		if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+			throw new HAPI_Error( "I only understand instance as point attributes!" );
+		
+		if( instance_attr_info.exists && instance_attr.Length != detail_info.pointCount )
+		{
+			throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
+								+ prObjectControl.prAssetId + "!" );
+		}
 		
 		for(int ii = 0; ii < detail_info.pointCount; ii++)
 		{
@@ -99,7 +130,34 @@ public class HAPI_Instancer : MonoBehaviour {
 			Vector3 dir = new Vector3( dir_attr[ ii*3 ], dir_attr[ ii*3 + 1 ], dir_attr[ ii*3 + 2] );
 			Vector3 up = new Vector3( up_attr[ ii*3 ], up_attr[ ii*3 + 1 ], up_attr[ ii*3 + 2] );
 			
-			GameObject objToInstantiate = prObjectControl.prGameObjects[ object_info.objectToInstanceId ];
+			GameObject objToInstantiate = null;
+			
+			if( object_info.objectToInstanceId >= 0 )
+			{
+				objToInstantiate = prObjectControl.prGameObjects[ object_info.objectToInstanceId ];
+			}
+			else
+			{
+				if( instance_attr_info.exists )
+				{
+					string instanceObjectPath = HAPI_Host.getString( instance_attr[ ii ] );
+					string[] pathItems = instanceObjectPath.Split('/');
+					string instanceObjectName = pathItems[ pathItems.Length - 1 ];
+					
+					int objectIndex = prObjectControl.findObjectByName( instanceObjectName );
+					if( objectIndex >= 0 )
+					{
+						objToInstantiate = prObjectControl.prGameObjects[ objectIndex ];
+					}
+				}
+				
+			}
+			
+			
+			//string instance_hint = HAPI_Host.getString( instancehint_attr[ ii ] );
+			//Debug.Log( "instance hint: " + instance_hint );
+			
+			
 			//GameObject obj = PrefabUtility.InstantiatePrefab( prGameObjects[prObjectId] ) as GameObject;	
 			if( objToInstantiate != null)
 			{
