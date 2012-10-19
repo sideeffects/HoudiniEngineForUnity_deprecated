@@ -486,16 +486,14 @@ public partial class HAPI_Asset : MonoBehaviour
 			main_child.GetComponent< MeshRenderer >().material = diffuse;
 			if ( prMaterialCount > 0 && object_info.materialId >= 0 )
 			{
-				bool do_import = prAssetPathChanged;
 				if ( object_info.hasMaterialChanged )
 				{
 					HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
 					HAPI_Host.getMaterials( prAssetId, material, object_info.materialId, 1 );
 					prMaterials[ object_info.materialId ] = material[ 0 ];
 					object_info.hasMaterialChanged = false;
-					do_import = true;
 				}
-				assignTexture( ref diffuse, prMaterials[ object_info.materialId ], do_import );
+				assignTexture( ref diffuse, prMaterials[ object_info.materialId ] );
 			}
 			
 			// Get or create mesh.
@@ -659,7 +657,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
-	private void assignTexture( ref Material material, HAPI_MaterialInfo material_info, bool do_import )
+	private void assignTexture( ref Material material, HAPI_MaterialInfo material_info )
 	{
 		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
 		string assets_root_path 		= Application.dataPath;
@@ -672,12 +670,17 @@ public partial class HAPI_Asset : MonoBehaviour
 		string tex_file_path 		= material_info.textureFilePath.Replace( "\\", "/" );
 		string relative_file_path 	= tex_file_path.Replace( assets_root_path, "Assets" );
 		
-		if ( do_import )
-			AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
-		
 		// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths
 		// relative to the project folder.
 		Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+		if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+		{
+			// Asset has not been imported yet so import and try again.
+			AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+			tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+		}
+		
+		// Assign main texture.
 		material.mainTexture = (Texture2D) tex_obj;
 		
 		// Refresh all assets just in case.
