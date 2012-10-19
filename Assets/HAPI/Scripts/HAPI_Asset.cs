@@ -440,6 +440,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	private void instanceObjects( int object_id )
 	{
+		
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		GameObject main_object = new GameObject( object_info.name );
@@ -567,13 +568,27 @@ public partial class HAPI_Asset : MonoBehaviour
 						  HAPI_Host.getAttributeFloatData );
 			
 			// Apply object transforms.		
-			main_child.transform.localPosition 	= new Vector3( 		trans.position[ 0 ], 
+			//
+			// Axis and Rotation conversions:
+			// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
+			// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
+			// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
+			// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
+			// causes a double negative - yeah, I know).
+			main_child.transform.localPosition 	= new Vector3(		-trans.position[ 0 ], 
 																	trans.position[ 1 ],
-																	trans.position[ 2 ] );		
-			main_child.transform.localRotation 	= new Quaternion( 	trans.rotationQuaternion[ 0 ],
-															  		trans.rotationQuaternion[ 1 ],
-																	trans.rotationQuaternion[ 2 ],
-																	trans.rotationQuaternion[ 3 ] );
+																	trans.position[ 2 ] );
+			
+			Quaternion quat = new Quaternion(	trans.rotationQuaternion[ 0 ],
+												trans.rotationQuaternion[ 1 ],
+												trans.rotationQuaternion[ 2 ],
+												trans.rotationQuaternion[ 3 ] );
+			Vector3 euler = quat.eulerAngles;
+			euler.y = -euler.y;
+			euler.z = -euler.z;
+			
+			//UnityEngine.Quaternion 
+			main_child.transform.localRotation 	= Quaternion.Euler( euler );
 			main_child.transform.localScale = new Vector3( 			trans.scale[ 0 ], 
 														  			trans.scale[ 1 ], 
 														  			trans.scale[ 2 ] );
@@ -589,7 +604,12 @@ public partial class HAPI_Asset : MonoBehaviour
 			{
 				// Fill position information.
 				for ( int j = 0; j < 3; ++j )
+				{
 					vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
+					//flip the x coordinate - see note above about axis and coordinate conversions
+					if( j == 0 )					
+						vertices[ i ][ j ] *= -1;					
+				}
 				
 				// Fill UVs.
 				if ( uv_attr_info.exists )
@@ -612,28 +632,43 @@ public partial class HAPI_Asset : MonoBehaviour
 					// If the normals are per vertex just query directly into the normals array we filled above.
 					if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 						for ( int j = 0; j < 3; ++j )
+						{
 							normals[ i ][ j ] = normal_attr[ i * 3 + j ];
+							//flip the x coordinate - see note above about axis and coordinate conversions
+							if( j == 0 )							
+								normals[ i ][ j ] *= -1;							
+							
+						}
 					
 					// If the normals are per point use the vertex list array point indicies to query into
 					// the normal array we filled above.
 					else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 						for ( int j = 0; j < 3; ++j )
+						{
 							normals[ i ][ j ] = normal_attr[ vertex_list[ i ] * 3 + j ];
+							//flip the x coordinate - see note above about axis and coordinate conversions
+							if( j == 0 )							
+								normals[ i ][ j ] *= -1;							
+						}
 					
 					// If the normals are per face divide the vertex index by the number of vertices per face
 					// which should always be HAPI_MAX_VERTICES_PER_FACE.
 					else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
 						for ( int j = 0; j < 3; ++j )
+						{
 							normals[ i ][ j ] 
 								= normal_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
+							//flip the x coordinate - see note above about axis and coordinate conversions
+							if( j == 0 )							
+								normals[ i ][ j ] *= -1;							
+						}
 				}
 			}
 			
-			// Triangles are already specified by design. The only thing we need to do is reverse the order
-			// for Unity. We do this with the ( 2 - j ) below.
+			
 			for ( int i = 0; i < detail_info.faceCount; ++i ) 
 				for ( int j = 0; j < 3; ++j )
-					triangles[ i * 3 + j ] 	= i * 3 + ( 2 - j );
+					triangles[ i * 3 + j ] 	= i * 3 + j;
 			
 			// Load into vertices and face into mesh.
 			main_child_mesh.vertices 	= vertices;

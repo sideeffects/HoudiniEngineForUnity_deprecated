@@ -184,6 +184,19 @@ public partial class HAPI_AssetGUI : Editor
 				
 				HAPI_Host.convertTransform( ref xform, (int) HAPI_RSTOrder.SRT, (int) HAPI_XYZOrder.ZXY );
 				
+				// Axis and Rotation conversions:
+				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
+				// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
+				// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
+				// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
+				// causes a double negative - yeah, I know).
+				
+				xform.position[ 0 ] = -xform.position[ 0 ];
+				xform.rotationEuler[ 1 ] = -xform.rotationEuler[ 1 ];
+				xform.rotationEuler[ 2 ] = -xform.rotationEuler[ 2 ];
+				tx = -tx;
+				
+				
 				Handles.matrix = myObjectControl.transform.localToWorldMatrix;	
 				
 				Vector3 position;
@@ -212,7 +225,8 @@ public partial class HAPI_AssetGUI : Editor
 						{
 							xform.position[ 0 ] = new_position[ 0 ];
 							xform.position[ 1 ] = new_position[ 1 ];
-							xform.position[ 2 ] = new_position[ 2 ];
+							xform.position[ 2 ] = new_position[ 2 ];														
+							
 							HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
 							new_position.x 		= xform.position[ 0 ];
 							new_position.y 		= xform.position[ 1 ];
@@ -221,7 +235,8 @@ public partial class HAPI_AssetGUI : Editor
 						
 						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myTranslateParmId ];
 						
-						parm_float_values[ parm_info.floatValuesIndex + 0 ] = new_position.x;
+						// the - in the x coordinate is to convert back to "Houdini" coordinates
+						parm_float_values[ parm_info.floatValuesIndex + 0 ] = -new_position.x; 
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = new_position.y;
 						parm_float_values[ parm_info.floatValuesIndex + 2 ] = new_position.z;
 						
@@ -260,8 +275,9 @@ public partial class HAPI_AssetGUI : Editor
 						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myRotateParmId ];
 						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = xform.rotationEuler[ 0 ];
-						parm_float_values[ parm_info.floatValuesIndex + 1 ] = xform.rotationEuler[ 1 ];
-						parm_float_values[ parm_info.floatValuesIndex + 2 ] = xform.rotationEuler[ 2 ];
+						// the - in the y & z coordinate is to convert back to "Houdini" coordinates
+						parm_float_values[ parm_info.floatValuesIndex + 1 ] = -xform.rotationEuler[ 1 ];
+						parm_float_values[ parm_info.floatValuesIndex + 2 ] = -xform.rotationEuler[ 2 ];
 						
 						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
