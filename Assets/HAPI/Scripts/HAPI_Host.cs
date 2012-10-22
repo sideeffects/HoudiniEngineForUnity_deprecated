@@ -104,7 +104,7 @@ namespace HAPI
 			{
 				Debug.Log( "Loading OTL: Creating New Scene" );
 				
-				status_code = (HAPI_StatusCode) HAPI_Initialize( otls_path );
+				status_code = (HAPI_StatusCode) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, otls_path );
 				
 				if ( status_code != HAPI_StatusCode.HAPI_STATUS_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
@@ -173,4 +173,4 @@ namespace HAPI
 		private static bool myHoudiniSceneExists = false;		
 	}
 
-}
+} // namespace HAPI

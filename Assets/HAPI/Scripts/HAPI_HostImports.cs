@@ -204,7 +204,8 @@ namespace HAPI
 		// None-exposed API calls: ----------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_Initialize( 			string otl_search_path );
+		private static extern int HAPI_Initialize( 			string houdini_install_path,
+															string otl_search_path );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Cleanup();
