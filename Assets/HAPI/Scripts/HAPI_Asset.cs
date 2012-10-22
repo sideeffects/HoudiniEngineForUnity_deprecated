@@ -24,6 +24,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using HAPI;
+using Microsoft.Win32;
 
 /// <summary>
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
@@ -98,6 +99,8 @@ public partial class HAPI_Asset : MonoBehaviour
 	{
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset created!" );
+		
+		setDLLPath();
 		
 		prAssetPath 				= "";
 		prAssetPathChanged 			= true;
@@ -193,6 +196,12 @@ public partial class HAPI_Asset : MonoBehaviour
 	/// </summary>
 	public bool build() 
 	{
+		if ( !myDLLPathSet )
+		{
+			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
+			return false;
+		}
+		
 		try
 		{
 			myProgressBarStartTime = System.DateTime.Now;
@@ -396,6 +405,10 @@ public partial class HAPI_Asset : MonoBehaviour
 		catch ( HAPI_Error error )
 		{
 			Debug.LogError( error.ToString() );
+		}
+		catch ( System.Exception error )
+		{
+			Debug.LogError( error.ToString() );	
 		}
 		finally
 		{
@@ -722,12 +735,86 @@ public partial class HAPI_Asset : MonoBehaviour
 		AssetDatabase.Refresh();
 	}
 	
+	private void setDLLPath()
+	{		
+		if ( !myDLLPathSet )
+		{
+			string houdini_app_path = "";
+			string hapi_path = System.Environment.GetEnvironmentVariable( "HAPI_PATH", 
+																		  System.EnvironmentVariableTarget.Machine );
+			if ( hapi_path == null || hapi_path.Length == 0 )
+				hapi_path = System.Environment.GetEnvironmentVariable( "HAPI_PATH", 
+																	   System.EnvironmentVariableTarget.User );
+			if ( hapi_path == null || hapi_path.Length == 0 )
+				hapi_path = System.Environment.GetEnvironmentVariable( "HAPI_PATH", 
+																	   System.EnvironmentVariableTarget.Process );
+			
+			if ( hapi_path != null && hapi_path.Length > 0 )
+			{
+				Debug.Log( "Using Custom Houdini Path: " + hapi_path );
+				houdini_app_path = hapi_path;
+			}
+			else
+			{
+				RegistryKey local_machine = Registry.LocalMachine;
+				
+				RegistryKey sesi_key = local_machine.OpenSubKey( "Software\\Side Effects Software" );
+				if ( sesi_key == null )
+				{
+					Debug.LogError( "No 32-bit Houdini installation found!" );
+					return;
+				}
+				
+				string active_version = (string) sesi_key.GetValue( "ActiveVersion" );
+				if ( active_version == null )
+				{
+					Debug.LogError( "No 32-bit Houdini active version registry found!" );
+					return;
+				}
+				
+				RegistryKey active_houdini_key = sesi_key.OpenSubKey( "Houdini " + active_version );
+				if ( active_houdini_key == null )
+				{
+					Debug.LogError( "Specified active 32-bit Houdini version is not installed!" );
+					return;
+				}
+				
+				string install_path = (string) active_houdini_key.GetValue( "InstallPath" );
+				if ( install_path == null || install_path.Length == 0 )
+				{
+					Debug.LogError( "Specified active 32-bit Houdini install path not valid!" );
+					return;
+				}
+				
+				Debug.Log( "Active Houdini Version: " + active_version );
+				Debug.Log( "Active Houdini Install Path: " + install_path );
+				
+				houdini_app_path = install_path;
+			}
+			
+			string houdini_bin_path = houdini_app_path + "/bin";
+			string path = System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Machine );
+			
+			if ( path != "" )
+				path = houdini_bin_path + ";" + path;
+			else
+				path = houdini_bin_path;
+			
+			System.Environment.SetEnvironmentVariable( "PATH", path, System.EnvironmentVariableTarget.Process );
+			Debug.Log( "DLL search path set to: " + path );
+			
+			myDLLPathSet = true;
+		}	
+	}
+	
 	private bool			myProgressBarJustUsed;
 	private	System.DateTime	myProgressBarStartTime;
 	private int				myProgressBarTotal; // Used for the progress bar.
 	private int				myProgressBarCurrent;
 	private string			myProgressBarTitle;
 	private string			myProgressBarMsg;
+	
+	private static bool		myDLLPathSet = false;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data
