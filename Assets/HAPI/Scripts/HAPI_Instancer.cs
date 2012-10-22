@@ -92,6 +92,20 @@ public class HAPI_Instancer : MonoBehaviour {
 			throw new HAPI_Error( "Unexpected up array length found for asset: " + prObjectControl.prAssetId + "!" );
 		}
 		
+		
+		// Get scale point attributes.
+		HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
+		float[] scale_attr = new float[ 0 ];
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "scale",
+									  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
+		
+		if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+			throw new HAPI_Error( "I only understand up as point attributes!" );
+		
+		if( scale_attr_info.exists && scale_attr.Length != detail_info.pointCount*3 )
+		{
+			throw new HAPI_Error( "Unexpected up array length found for asset: " + prObjectControl.prAssetId + "!" );
+		}
 				
 		// Get string point attributes.
 		/*HAPI_AttributeInfo instancehint_attr_info = new HAPI_AttributeInfo( "instance_hint" );
@@ -127,7 +141,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		for(int ii = 0; ii < detail_info.pointCount; ii++)
 		{
 			Vector3 pos = new Vector3( pos_attr[ ii*3 ], pos_attr[ ii*3 + 1 ], pos_attr[ ii*3 + 2] );
-			Vector3 dir = new Vector3( dir_attr[ ii*3 ], dir_attr[ ii*3 + 1 ], dir_attr[ ii*3 + 2] );
+			Vector3 dir = new Vector3( dir_attr[ ii*3 ], dir_attr[ ii*3 + 1 ], dir_attr[ ii*3 + 2] );			
 			Vector3 up = new Vector3( up_attr[ ii*3 ], up_attr[ ii*3 + 1 ], up_attr[ ii*3 + 2] );
 			
 			GameObject objToInstantiate = null;
@@ -162,19 +176,32 @@ public class HAPI_Instancer : MonoBehaviour {
 			if( objToInstantiate != null)
 			{
 				HAPI_TransformInstance instInfo = new HAPI_TransformInstance(true);
-				instInfo.pos[0] = pos[0];
+				instInfo.pos[0] = -pos[0];
 				instInfo.pos[1] = pos[1];
 				instInfo.pos[2] = pos[2];
-				instInfo.dir[0] = dir[0];
+				instInfo.dir[0] = -dir[0];
 				instInfo.dir[1] = dir[1];
 				instInfo.dir[2] = dir[2];
-				instInfo.up[0] = up[0];
+				instInfo.up[0] = -up[0];
 				instInfo.up[1] = up[1];
 				instInfo.up[2] = up[2];
 				instInfo.scale = 1.0f;
-				instInfo.scale3[0] = 1.0f;
-				instInfo.scale3[1] = 1.0f;
-				instInfo.scale3[2] = 1.0f;
+				
+				if( scale_attr_info.exists )
+				{
+					Vector3 scale = new Vector3( scale_attr[ ii*3 ], scale_attr[ ii*3 + 1 ], scale_attr[ ii*3 + 2] );			
+					instInfo.scale3[0] = scale.x;
+					instInfo.scale3[1] = scale.y;
+					instInfo.scale3[2] = scale.z;
+										
+				}
+				else
+				{
+					instInfo.scale3[0] = 1.0f;
+					instInfo.scale3[1] = 1.0f;
+					instInfo.scale3[2] = 1.0f;
+				}
+				
 				instInfo.quat[0] = 0.0f;
 				instInfo.quat[1] = 0.0f;
 				instInfo.quat[2] = 0.0f;
@@ -202,13 +229,16 @@ public class HAPI_Instancer : MonoBehaviour {
 				if( !prOverrideInstances )
 				{
 					obj = Instantiate( objToInstantiate, pos, quat ) as GameObject;
+					obj.transform.localScale = new Vector3( transform_out.scale[0], 
+															transform_out.scale[1], transform_out.scale[2] );
 				}
 				else
 				{
 					obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
 					obj.transform.localPosition = pos;
 					obj.transform.localRotation = quat;
-					//obj.transform.localScale = new Vector3( 0.2f, 0.2f, 0.2f );
+					obj.transform.localScale = new Vector3( transform_out.scale[0], 
+															transform_out.scale[1], transform_out.scale[2] );
 				}
 				
 				obj.transform.parent = transform;
