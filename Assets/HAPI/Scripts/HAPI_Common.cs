@@ -38,6 +38,7 @@ namespace HAPI
 		public const int HAPI_QUATERNION_VECTOR_SIZE		= 4;
 		public const int HAPI_EULER_VECTOR_SIZE				= 3;		
 		public const int HAPI_UV_VECTOR_SIZE				= 2;
+		public const int HAPI_COLOR_VECTOR_SIZE				= 4;
 
 		public const int HAPI_PRIM_MAX_VERTEX_COUNT			= 16;
 	}
@@ -522,6 +523,23 @@ namespace HAPI
 		public int id;
 		
 		private int textureFilePathSH;	// string handle (SH)
+		
+		public float roughness; // inverse of shininess
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_COLOR_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] ambient;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_COLOR_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] diffuse;
+		
+		[ MarshalAs( UnmanagedType.ByValArray, 
+					 SizeConst = HAPI_Constants.HAPI_COLOR_VECTOR_SIZE, 
+					 ArraySubType = UnmanagedType.R4 ) ]
+	    public float[] specular;
 		
 		// Accessors
 		public string textureFilePath

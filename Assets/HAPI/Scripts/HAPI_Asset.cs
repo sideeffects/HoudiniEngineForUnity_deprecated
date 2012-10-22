@@ -496,7 +496,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
 			
 			// Set diffuse material.
-			Material diffuse = new Material( Shader.Find( "Diffuse" ) );		
+			Material diffuse = new Material( Shader.Find( "Specular" ) );		
 			main_child.GetComponent< MeshRenderer >().material = diffuse;
 			if ( prMaterialCount > 0 && object_info.materialId >= 0 )
 			{
@@ -730,6 +730,17 @@ public partial class HAPI_Asset : MonoBehaviour
 		
 		// Assign main texture.
 		material.mainTexture = (Texture2D) tex_obj;
+		
+		// Assign shader properties.
+		material.SetFloat( "_Shininess", 1.0f - material_info.roughness );
+		material.SetColor( "_Color", new Color( material_info.diffuse[ 0 ], 
+												material_info.diffuse[ 1 ],
+												material_info.diffuse[ 2 ],
+												material_info.diffuse[ 3 ] ) );
+		material.SetColor( "_SpecColor", new Color( material_info.specular[ 0 ], 
+													material_info.specular[ 1 ],
+													material_info.specular[ 2 ],
+													material_info.specular[ 3 ] ) );
 		
 		// Refresh all assets just in case.
 		AssetDatabase.Refresh();
