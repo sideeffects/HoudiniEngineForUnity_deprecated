@@ -748,6 +748,24 @@ namespace HAPI
 			int status_code = HAPI_SetFileInput( asset_id, input_idx, file_name );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
+		
+		/// <summary> 
+		/// 	Create a geometry input node.
+		/// </summary>
+		/// <param name="asset_id">
+		///		The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="input_idx">
+		///		The index of the input - 0 for an asset that has just one input.
+		///	</param>		
+		/// <param name="object_id">
+		///		Object id corresponding to created input node. Use this id to push geometry to this input.
+		/// </param>
+		public static void createGeometryInput( int asset_id, int input_idx, out int object_id )
+		{
+			int status_code = HAPI_CreateGeometryInput( asset_id, input_idx, out object_id );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
 
 		// MATERIALS ------------------------------------------------------------------------------------------------
 
