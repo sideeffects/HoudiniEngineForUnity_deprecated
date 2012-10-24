@@ -37,14 +37,14 @@ public class HAPI_Instancer : MonoBehaviour {
 		HAPI_ObjectInfo object_info = prObjectControl.prObjects[ prObjectId ];
 		
 		// Get Detail info.
-		HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
-		HAPI_Host.getDetailInfo( prObjectControl.prAssetId, prObjectId, out detail_info );
+		HAPI_GeometryInfo geo_info = new HAPI_GeometryInfo();
+		HAPI_Host.getGeometryInfo( prObjectControl.prAssetId, prObjectId, out geo_info );
 		if ( prObjectControl.prEnableLogging )
 			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
-					   + "points: " + detail_info.pointCount );
+					   + "points: " + geo_info.pointCount );
 				
-		if ( detail_info.pointCount > 65000 )
-			throw new HAPI_Error( "Point count (" + detail_info.pointCount + ") above limit (" + 65000 + ")!" );
+		if ( geo_info.pointCount > 65000 )
+			throw new HAPI_Error( "Point count (" + geo_info.pointCount + ") above limit (" + 65000 + ")!" );
 										
 		// Get position point attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
@@ -56,10 +56,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand position as point attributes!" );
 		
-		if( pos_attr.Length != detail_info.pointCount*3 )
-		{
+		if ( pos_attr.Length != geo_info.pointCount * 3 )
 			throw new HAPI_Error( "Unexpected point array length found for asset: " + prObjectControl.prAssetId + "!" );
-		}
 		
 		// Get direction point attributes.
 		HAPI_AttributeInfo dir_attr_info = new HAPI_AttributeInfo( "N" );
@@ -71,11 +69,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		else if ( dir_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand normal as point attributes!" );
 		
-		if( dir_attr.Length != detail_info.pointCount*3 )
-		{
+		if ( dir_attr.Length != geo_info.pointCount * 3 )
 			throw new HAPI_Error( "Unexpected normal array length found for asset:" + prObjectControl.prAssetId + "!" );
-		}
-		
 		
 		// Get up point attributes.
 		HAPI_AttributeInfo up_attr_info = new HAPI_AttributeInfo( "up" );
@@ -87,11 +82,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		else if ( up_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand up as point attributes!" );
 		
-		if( up_attr.Length != detail_info.pointCount*3 )
-		{
+		if ( up_attr.Length != geo_info.pointCount * 3 )
 			throw new HAPI_Error( "Unexpected up array length found for asset: " + prObjectControl.prAssetId + "!" );
-		}
-		
 		
 		// Get scale point attributes.
 		HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
@@ -102,10 +94,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand up as point attributes!" );
 		
-		if( scale_attr_info.exists && scale_attr.Length != detail_info.pointCount*3 )
-		{
+		if ( scale_attr_info.exists && scale_attr.Length != geo_info.pointCount * 3 )
 			throw new HAPI_Error( "Unexpected up array length found for asset: " + prObjectControl.prAssetId + "!" );
-		}
 				
 		// Get string point attributes.
 		/*HAPI_AttributeInfo instancehint_attr_info = new HAPI_AttributeInfo( "instance_hint" );
@@ -117,12 +107,11 @@ public class HAPI_Instancer : MonoBehaviour {
 		else if ( instancehint_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand instance_hint as point attributes!" );
 		
-		if( instancehint_attr.Length != detail_info.pointCount )
+		if( instancehint_attr.Length != geo_info.pointCount )
 		{
 			throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
 								+ prObjectControl.prAssetId + "!" );
 		}*/	
-		
 		
 		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
 		int[] instance_attr = new int[ 0 ];
@@ -132,13 +121,11 @@ public class HAPI_Instancer : MonoBehaviour {
 		if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand instance as point attributes!" );
 		
-		if( instance_attr_info.exists && instance_attr.Length != detail_info.pointCount )
-		{
+		if ( instance_attr_info.exists && instance_attr.Length != geo_info.pointCount )
 			throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
-								+ prObjectControl.prAssetId + "!" );
-		}
+								  + prObjectControl.prAssetId + "!" );
 		
-		for(int ii = 0; ii < detail_info.pointCount; ii++)
+		for(int ii = 0; ii < geo_info.pointCount; ii++)
 		{
 			Vector3 pos = new Vector3( pos_attr[ ii*3 ], pos_attr[ ii*3 + 1 ], pos_attr[ ii*3 + 2] );
 			Vector3 dir = new Vector3( dir_attr[ ii*3 ], dir_attr[ ii*3 + 1 ], dir_attr[ ii*3 + 2] );			
@@ -167,15 +154,13 @@ public class HAPI_Instancer : MonoBehaviour {
 				
 			}
 			
-			
 			//string instance_hint = HAPI_Host.getString( instancehint_attr[ ii ] );
 			//Debug.Log( "instance hint: " + instance_hint );
 			
-			
 			//GameObject obj = PrefabUtility.InstantiatePrefab( prGameObjects[prObjectId] ) as GameObject;	
-			if( objToInstantiate != null)
+			if ( objToInstantiate != null )
 			{
-				HAPI_TransformInstance instInfo = new HAPI_TransformInstance(true);
+				HAPI_TransformInstance instInfo = new HAPI_TransformInstance( true );
 				instInfo.pos[0] = -pos[0];
 				instInfo.pos[1] = pos[1];
 				instInfo.pos[2] = pos[2];
@@ -193,7 +178,6 @@ public class HAPI_Instancer : MonoBehaviour {
 					instInfo.scale3[0] = scale.x;
 					instInfo.scale3[1] = scale.y;
 					instInfo.scale3[2] = scale.z;
-										
 				}
 				else
 				{
@@ -226,7 +210,7 @@ public class HAPI_Instancer : MonoBehaviour {
 				
 				GameObject obj;
 				
-				if( !prOverrideInstances )
+				if ( !prOverrideInstances )
 				{
 					obj = Instantiate( objToInstantiate, pos, quat ) as GameObject;
 					obj.transform.localScale = new Vector3( transform_out.scale[0], 
@@ -237,21 +221,21 @@ public class HAPI_Instancer : MonoBehaviour {
 					obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
 					obj.transform.localPosition = pos;
 					obj.transform.localRotation = quat;
-					obj.transform.localScale = new Vector3( transform_out.scale[0], 
-															transform_out.scale[1], transform_out.scale[2] );
+					obj.transform.localScale = new Vector3( transform_out.scale[ 0 ], 
+															transform_out.scale[ 1 ], 
+															transform_out.scale[ 2 ] );
 				}
 				
 				obj.transform.parent = transform;
 				
-				
-				HAPI_ChildSelectionControl selection_control = obj.GetComponent<HAPI_ChildSelectionControl>();
-				if(selection_control == null)
+				HAPI_ChildSelectionControl selection_control = obj.GetComponent< HAPI_ChildSelectionControl >();
+				if ( selection_control == null )
 				{
-					obj.AddComponent("HAPI_ChildSelectionControl");
-					selection_control = obj.GetComponent<HAPI_ChildSelectionControl>();
+					obj.AddComponent( "HAPI_ChildSelectionControl" );
+					selection_control = obj.GetComponent< HAPI_ChildSelectionControl >();
 				}
 				
-				if(selection_control != null)
+				if ( selection_control != null )
 					selection_control.setObjectControl( prObjectControl );
 			}
 			

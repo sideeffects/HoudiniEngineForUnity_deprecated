@@ -468,10 +468,10 @@ namespace HAPI
 
 	}
 	
-	// DETAILS ------------------------------------------------------------------------------------------------------
+	// GEOMETRY -----------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_DetailInfo
+	public struct HAPI_GeometryInfo
 	{
 		public int		getOwnerCount( HAPI_AttributeOwner owner )
 		{

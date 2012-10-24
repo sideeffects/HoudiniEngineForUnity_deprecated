@@ -533,31 +533,31 @@ public partial class HAPI_Asset : MonoBehaviour
 			HAPI_Transform trans = prObjectTransforms[ object_id ];
 			
 			// Get Detail info.
-			HAPI_DetailInfo detail_info = new HAPI_DetailInfo();
-			HAPI_Host.getDetailInfo( prAssetId, object_id, out detail_info );
+			HAPI_GeometryInfo geo_info = new HAPI_GeometryInfo();
+			HAPI_Host.getGeometryInfo( prAssetId, object_id, out geo_info );
 			if ( prEnableLogging )
 				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-						   + "verts: " + detail_info.vertexCount + " faces: " + detail_info.faceCount );
+						   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
 			
 			// Make sure our primitive and vertex numbers are supported by Unity.
 			// TODO: add this limit in a more proper place
-			if ( detail_info.faceCount > 65000 * 3 )
-				throw new HAPI_Error( "Face count (" + detail_info.faceCount 
+			if ( geo_info.faceCount > 65000 * 3 )
+				throw new HAPI_Error( "Face count (" + geo_info.faceCount 
 									  + ") above limit (" + ( 65000 * 3 ) + ")!" );
-			if ( detail_info.vertexCount > 65000 )
-				throw new HAPI_Error( "Vertex count (" + detail_info.vertexCount + ") above limit (" + 65000 + ")!" );
+			if ( geo_info.vertexCount > 65000 )
+				throw new HAPI_Error( "Vertex count (" + geo_info.vertexCount + ") above limit (" + 65000 + ")!" );
 			
 			// Get Face counts.
-			int[] face_counts = new int[ detail_info.faceCount ];
-			getArray2Id( prAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, detail_info.faceCount );
+			int[] face_counts = new int[ geo_info.faceCount ];
+			getArray2Id( prAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, geo_info.faceCount );
 			
 			// Get Vertex list.
-			int[] vertex_list = new int[ detail_info.vertexCount ];
-			getArray2Id( prAssetId, object_id, HAPI_Host.getVertexList, vertex_list, detail_info.vertexCount );
+			int[] vertex_list = new int[ geo_info.vertexCount ];
+			getArray2Id( prAssetId, object_id, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
 			
 			// Print attribute names.
 			if ( prEnableLogging )
-				printAllAttributeNames( prAssetId, object_id, detail_info );
+				printAllAttributeNames( prAssetId, object_id, geo_info );
 			
 			// Get position vertex attributes.
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
@@ -607,13 +607,13 @@ public partial class HAPI_Asset : MonoBehaviour
 														  			trans.scale[ 2 ] );
 					
 			// Create Unity-specific data objects.
-			Vector3[] vertices 	= new Vector3[ 	detail_info.vertexCount ];
-			int[] triangles 	= new int[ 		detail_info.faceCount * 3 ];
-			Vector2[] uvs 		= new Vector2[ 	detail_info.vertexCount ];
-			Vector3[] normals 	= new Vector3[ 	detail_info.vertexCount ];
+			Vector3[] vertices 	= new Vector3[ 	geo_info.vertexCount ];
+			int[] triangles 	= new int[ 		geo_info.faceCount * 3 ];
+			Vector2[] uvs 		= new Vector2[ 	geo_info.vertexCount ];
+			Vector3[] normals 	= new Vector3[ 	geo_info.vertexCount ];
 			
 			// Fill Unity-specific data objects with data from the runtime.
-			for ( int i = 0; i < detail_info.vertexCount; ++i ) 
+			for ( int i = 0; i < geo_info.vertexCount; ++i ) 
 			{
 				// Fill position information.
 				for ( int j = 0; j < 3; ++j )
@@ -679,7 +679,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			}
 			
 			
-			for ( int i = 0; i < detail_info.faceCount; ++i ) 
+			for ( int i = 0; i < geo_info.faceCount; ++i ) 
 				for ( int j = 0; j < 3; ++j )
 					triangles[ i * 3 + j ] 	= i * 3 + j;
 			

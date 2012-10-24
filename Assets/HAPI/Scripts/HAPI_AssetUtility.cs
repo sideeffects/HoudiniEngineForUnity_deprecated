@@ -264,7 +264,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		fillAttrArray( asset_id, object_id, name, ref info, data, get_func, info.count );
 	}
 	
-	public string[] getAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info, 
+	public string[] getAttributeNames( int asset_id, int object_id, HAPI_GeometryInfo detail_info, 
 									   HAPI_AttributeOwner owner )
 	{
 		int attr_count = detail_info.getOwnerCount( owner );
@@ -280,10 +280,10 @@ public partial class HAPI_Asset : MonoBehaviour
 		return names;
 	}
 	
-	private void printAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info,
+	private void printAttributeNames( int asset_id, int object_id, HAPI_GeometryInfo geometry_info,
 									  HAPI_AttributeOwner owner )
 	{
-		string[] names = getAttributeNames( asset_id, object_id, detail_info, owner );
+		string[] names = getAttributeNames( asset_id, object_id, geometry_info, owner );
 		
 		string msg = "A" + asset_id + "O" + object_id + " - ";
 		
@@ -311,10 +311,10 @@ public partial class HAPI_Asset : MonoBehaviour
 		Debug.Log( msg );
 	}
 	
-	private void printAllAttributeNames( int asset_id, int object_id, HAPI_DetailInfo detail_info )
+	private void printAllAttributeNames( int asset_id, int object_id, HAPI_GeometryInfo geometry_info )
 	{
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
-			printAttributeNames( asset_id, object_id, detail_info, (HAPI_AttributeOwner) owner );
+			printAttributeNames( asset_id, object_id, geometry_info, (HAPI_AttributeOwner) owner );
 	}
 		
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------

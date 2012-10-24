@@ -139,11 +139,11 @@ namespace HAPI
 															[Out] HAPI_Transform[] transforms,
 															int start, int length );
 		
-		// DETAILS --------------------------------------------------------------------------------------------------
+		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetDetailInfo(		int asset_id, int object_id,
-															out HAPI_DetailInfo detail_info );
+		private static extern int HAPI_GetGeometryInfo(		int asset_id, int object_id,
+															out HAPI_GeometryInfo detail_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetFaceCounts(		int asset_id, int object_id,
