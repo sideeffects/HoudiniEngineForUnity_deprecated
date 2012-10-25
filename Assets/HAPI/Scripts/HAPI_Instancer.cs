@@ -37,8 +37,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		HAPI_ObjectInfo object_info = prObjectControl.prObjects[ prObjectId ];
 		
 		// Get Detail info.
-		HAPI_GeometryInfo geo_info = new HAPI_GeometryInfo();
-		HAPI_Host.getGeometryInfo( prObjectControl.prAssetId, prObjectId, out geo_info );
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HAPI_Host.getGeoInfo( prObjectControl.prAssetId, prObjectId, out geo_info );
 		if ( prObjectControl.prEnableLogging )
 			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
 					   + "points: " + geo_info.pointCount );

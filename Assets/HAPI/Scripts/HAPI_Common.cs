@@ -471,7 +471,7 @@ namespace HAPI
 	// GEOMETRY -----------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_GeometryInfo
+	public struct HAPI_GeoInfo
 	{
 		public int		getOwnerCount( HAPI_AttributeOwner owner )
 		{

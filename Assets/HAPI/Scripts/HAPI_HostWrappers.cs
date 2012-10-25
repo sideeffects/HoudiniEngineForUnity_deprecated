@@ -498,7 +498,7 @@ namespace HAPI
 		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 
 		/// <summary>
-		/// 	Get the main geometry info struct (<see cref="HAPI_GeometryInfo"/>).
+		/// 	Get the main geometry info struct (<see cref="HAPI_GeoInfo"/>).
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
@@ -506,13 +506,13 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
-		/// <param name="geometry_info">
-		/// 	<see cref="HAPI_GeometryInfo"/> out parameter.
+		/// <param name="geo_info">
+		/// 	<see cref="HAPI_GeoInfo"/> out parameter.
 		/// </param>
-		public static void getGeometryInfo(		int asset_id, int object_id,
-												out HAPI_GeometryInfo geometry_info )
+		public static void getGeoInfo(			int asset_id, int object_id,
+												out HAPI_GeoInfo geo_info )
 		{
-			int status_code = HAPI_GetGeometryInfo( asset_id, object_id, out geometry_info );
+			int status_code = HAPI_GetGeoInfo( asset_id, object_id, out geo_info );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -530,10 +530,10 @@ namespace HAPI
 		/// 	An integer array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeometryInfo.faceCount"/> - 1.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - 1.
 		/// </param>
 		/// <param name="length">
-		/// 	Must be at least 0 and at most <see cref="HAPI_GeometryInfo.faceCount"/> - <paramref name="start"/>.
+		/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void getFaceCounts(		int asset_id, int object_id,
 												[Out] int[] face_counts,
@@ -557,10 +557,10 @@ namespace HAPI
 		/// 	An integer array at least the size of <paramref name="length"/>.
 		/// </param>
 		/// <param name="start">
-		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeometryInfo.vertexCount"/> - 1.
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - 1.
 		/// </param>
 		/// <param name="length">
-		/// 	Must be at least 0 and at most <see cref="HAPI_GeometryInfo.vertexCount"/> - <paramref name="start"/>.
+		/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - <paramref name="start"/>.
 		/// </param>
 		public static void getVertexList(		int asset_id, int object_id,
 												[Out] int[] vertex_list,
@@ -609,11 +609,11 @@ namespace HAPI
 		/// <param name="data">
 		/// 	Array of ints (string handles) to house the attribute names.
 		/// 	Should be exactly the size of the appropriate attribute owner type count
-		/// 	in <see cref="HAPI_GeometryInfo"/>.
+		/// 	in <see cref="HAPI_GeoInfo"/>.
 		/// </param>
 		/// <param name="count">
 		/// 	Sanity check count. Must be equal to the appropriate attribute owner type count
-		/// 	in <see cref="HAPI_GeometryInfo"/>.
+		/// 	in <see cref="HAPI_GeoInfo"/>.
 		/// </param>
 		public static void getAttributeNames(	int asset_id, int object_id,
 												int attribute_type,

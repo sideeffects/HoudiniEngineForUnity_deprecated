@@ -533,8 +533,8 @@ public partial class HAPI_Asset : MonoBehaviour
 			HAPI_Transform trans = prObjectTransforms[ object_id ];
 			
 			// Get Detail info.
-			HAPI_GeometryInfo geo_info = new HAPI_GeometryInfo();
-			HAPI_Host.getGeometryInfo( prAssetId, object_id, out geo_info );
+			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+			HAPI_Host.getGeoInfo( prAssetId, object_id, out geo_info );
 			if ( prEnableLogging )
 				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
 						   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );

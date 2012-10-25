@@ -142,8 +142,8 @@ namespace HAPI
 		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetGeometryInfo(		int asset_id, int object_id,
-															out HAPI_GeometryInfo detail_info );
+		private static extern int HAPI_GetGeoInfo(			int asset_id, int object_id,
+															out HAPI_GeoInfo geo_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetFaceCounts(		int asset_id, int object_id,
