@@ -620,8 +620,8 @@ public partial class HAPI_Asset : MonoBehaviour
 				{
 					vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
 					//flip the x coordinate - see note above about axis and coordinate conversions
-					if( j == 0 )					
-						vertices[ i ][ j ] *= -1;					
+					if( j == 0 )
+						vertices[ i ][ j ] *= -1;
 				}
 				
 				// Fill UVs.
@@ -648,8 +648,8 @@ public partial class HAPI_Asset : MonoBehaviour
 						{
 							normals[ i ][ j ] = normal_attr[ i * 3 + j ];
 							//flip the x coordinate - see note above about axis and coordinate conversions
-							if( j == 0 )							
-								normals[ i ][ j ] *= -1;							
+							if( j == 0 )
+								normals[ i ][ j ] *= -1;
 							
 						}
 					
@@ -660,8 +660,8 @@ public partial class HAPI_Asset : MonoBehaviour
 						{
 							normals[ i ][ j ] = normal_attr[ vertex_list[ i ] * 3 + j ];
 							//flip the x coordinate - see note above about axis and coordinate conversions
-							if( j == 0 )							
-								normals[ i ][ j ] *= -1;							
+							if( j == 0 )
+								normals[ i ][ j ] *= -1;
 						}
 					
 					// If the normals are per face divide the vertex index by the number of vertices per face
@@ -672,8 +672,8 @@ public partial class HAPI_Asset : MonoBehaviour
 							normals[ i ][ j ] 
 								= normal_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
 							//flip the x coordinate - see note above about axis and coordinate conversions
-							if( j == 0 )							
-								normals[ i ][ j ] *= -1;							
+							if( j == 0 )
+								normals[ i ][ j ] *= -1;
 						}
 				}
 			}
