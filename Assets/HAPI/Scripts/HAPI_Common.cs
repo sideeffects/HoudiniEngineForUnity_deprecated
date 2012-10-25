@@ -485,13 +485,23 @@ namespace HAPI
 			}
 		}
 		
-		public int	    faceCount;
-		public int	    vertexCount;
+		public int		id;
+		
+		public int 		materialId;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool		hasGeoChanged;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool		hasMaterialChanged;
+		
+		public int		faceCount;
+		public int		vertexCount;
 		public int		pointCount;
-		public int	    pointAttributeCount;
-		public int	    faceAttributeCount;
-		public int	    vertexAttributeCount;
-		public int	    detailAttributeCount;
+		public int		pointAttributeCount;
+		public int		faceAttributeCount;
+		public int		vertexAttributeCount;
+		public int		detailAttributeCount;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
