@@ -509,10 +509,10 @@ namespace HAPI
 		/// <param name="geo_info">
 		/// 	<see cref="HAPI_GeoInfo"/> out parameter.
 		/// </param>
-		public static void getGeoInfo(			int asset_id, int object_id,
+		public static void getGeoInfo(			int asset_id, int object_id, int geo_id,
 												out HAPI_GeoInfo geo_info )
 		{
-			int status_code = HAPI_GetGeoInfo( asset_id, object_id, out geo_info );
+			int status_code = HAPI_GetGeoInfo( asset_id, object_id, geo_id, out geo_info );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -535,11 +535,11 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getFaceCounts(		int asset_id, int object_id,
+		public static void getFaceCounts(		int asset_id, int object_id, int geo_id,
 												[Out] int[] face_counts,
 												int start, int length )
 		{
-			int status_code = HAPI_GetFaceCounts( asset_id, object_id, face_counts, start, length );
+			int status_code = HAPI_GetFaceCounts( asset_id, object_id, geo_id, face_counts, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -562,11 +562,11 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getVertexList(		int asset_id, int object_id,
+		public static void getVertexList(		int asset_id, int object_id, int geo_id,
 												[Out] int[] vertex_list,
 												int start, int length )
 		{
-			int status_code = HAPI_GetVertexList( asset_id, object_id, vertex_list, start, length );
+			int status_code = HAPI_GetVertexList( asset_id, object_id, geo_id, vertex_list, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -586,10 +586,10 @@ namespace HAPI
 		/// 	<see cref="HAPI_AttributeInfo"/> used as input for owner type and as output for the rest of 
 		/// 	the information.
 		/// </param>
-		public static void getAttributeInfo(	int asset_id, int object_id, string name,
+		public static void getAttributeInfo(	int asset_id, int object_id, int geo_id, string name,
 												ref HAPI_AttributeInfo attr_info )
 		{
-			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, name, ref attr_info );
+			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, geo_id, name, ref attr_info );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -615,12 +615,12 @@ namespace HAPI
 		/// 	Sanity check count. Must be equal to the appropriate attribute owner type count
 		/// 	in <see cref="HAPI_GeoInfo"/>.
 		/// </param>
-		public static void getAttributeNames(	int asset_id, int object_id,
+		public static void getAttributeNames(	int asset_id, int object_id, int geo_id,
 												int attribute_type,
 												[Out] int[] data,
 												int count )
 		{
-			int status_code = HAPI_GetAttributeNames( asset_id, object_id, attribute_type, data, count );
+			int status_code = HAPI_GetAttributeNames( asset_id, object_id, geo_id, attribute_type, data, count );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -649,12 +649,13 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getAttributeIntData( int asset_id, int object_id, string name,
+		public static void getAttributeIntData( int asset_id, int object_id, int geo_id, string name,
 												ref HAPI_AttributeInfo attr_info,
 												[Out] int[] data,
 												int start, int length )
 		{
-			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, name, ref attr_info, data, start, length );
+			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, geo_id, name, ref attr_info, data, 
+														start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -683,12 +684,12 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getAttributeFloatData(	int asset_id, int object_id, string name,
+		public static void getAttributeFloatData(	int asset_id, int object_id, int geo_id, string name,
 													ref HAPI_AttributeInfo attr_info,
 													[Out] float[] data,
 													int start, int length )
 		{
-			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, name, ref attr_info, 
+			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, geo_id, name, ref attr_info, 
 														  data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
@@ -720,12 +721,13 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getAttributeStrData( int asset_id, int object_id, string name,
+		public static void getAttributeStrData( int asset_id, int object_id, int geo_id, string name,
 												ref HAPI_AttributeInfo attr_info,
 												[Out] int[] data,
 												int start, int length )
 		{
-			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, name, ref attr_info, data, start, length );
+			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, geo_id, name, ref attr_info, data, 
+														start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		

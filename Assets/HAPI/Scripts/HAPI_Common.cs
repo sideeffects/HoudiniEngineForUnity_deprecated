@@ -438,19 +438,11 @@ namespace HAPI
 	{
 		public int id;
 		
-		private int nameSH; 				// string handle (SH)		
+		private int nameSH; 				// string handle (SH)
 		private int objectInstancePathSH; 	// string handle (SH)
-		
-		public int materialId;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasTransformChanged;
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool hasGeoChanged;
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool hasMaterialChanged;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isVisible;

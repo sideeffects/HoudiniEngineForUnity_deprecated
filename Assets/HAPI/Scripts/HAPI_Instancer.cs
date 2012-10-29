@@ -38,7 +38,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 		// Get Detail info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Host.getGeoInfo( prObjectControl.prAssetId, prObjectId, out geo_info );
+		HAPI_Host.getGeoInfo( prObjectControl.prAssetId, prObjectId, 0, out geo_info );
 		if ( prObjectControl.prEnableLogging )
 			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
 					   + "points: " + geo_info.pointCount );
@@ -49,7 +49,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get position point attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 		float[] pos_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "P",
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "P",
 				 	  				  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 		if ( !pos_attr_info.exists )
 			throw new HAPI_Error( "No position attribute found." );
@@ -62,7 +62,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get direction point attributes.
 		HAPI_AttributeInfo dir_attr_info = new HAPI_AttributeInfo( "N" );
 		float[] dir_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "N",
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "N",
 					  				  ref dir_attr_info, ref dir_attr, HAPI_Host.getAttributeFloatData );
 		if ( !dir_attr_info.exists )
 			throw new HAPI_Error( "No normal (N) attribute found." );
@@ -75,7 +75,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get up point attributes.
 		HAPI_AttributeInfo up_attr_info = new HAPI_AttributeInfo( "up" );
 		float[] up_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "up",
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "up",
 									  ref up_attr_info, ref up_attr, HAPI_Host.getAttributeFloatData );
 		if ( !up_attr_info.exists )
 			throw new HAPI_Error( "No up attribute found." );
@@ -88,7 +88,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get scale point attributes.
 		HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
 		float[] scale_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "scale",
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "scale",
 									  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
 		
 		if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -115,7 +115,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
 		int[] instance_attr = new int[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "instance", 
+		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "instance", 
 					ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
 		
 		if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -172,9 +172,9 @@ public class HAPI_Instancer : MonoBehaviour {
 				instInfo.up[2] = up[2];
 				instInfo.scale = 1.0f;
 				
-				if( scale_attr_info.exists )
+				if ( scale_attr_info.exists )
 				{
-					Vector3 scale = new Vector3( scale_attr[ ii*3 ], scale_attr[ ii*3 + 1 ], scale_attr[ ii*3 + 2] );			
+					Vector3 scale = new Vector3( scale_attr[ ii*3 ], scale_attr[ ii*3 + 1 ], scale_attr[ ii*3 + 2] );
 					instInfo.scale3[0] = scale.x;
 					instInfo.scale3[1] = scale.y;
 					instInfo.scale3[2] = scale.z;

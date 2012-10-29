@@ -384,8 +384,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				if ( object_info.isInstancer )
 				{
 					try
-					{												
-						
+					{
 						if ( object_info.objectToInstanceId >= 0 && 
 							 prGameObjects[ object_info.objectToInstanceId ] == null )
 							createObject( object_info.objectToInstanceId );
@@ -495,21 +494,6 @@ public partial class HAPI_Asset : MonoBehaviour
 			// Set Object Control on child selection control so it can read settings from here.
 			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
 			
-			// Set diffuse material.
-			Material diffuse = new Material( Shader.Find( "Specular" ) );		
-			main_child.GetComponent< MeshRenderer >().material = diffuse;
-			if ( prMaterialCount > 0 && object_info.materialId >= 0 )
-			{
-				if ( object_info.hasMaterialChanged )
-				{
-					HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
-					HAPI_Host.getMaterials( prAssetId, material, object_info.materialId, 1 );
-					prMaterials[ object_info.materialId ] = material[ 0 ];
-					object_info.hasMaterialChanged = false;
-				}
-				assignTexture( ref diffuse, prMaterials[ object_info.materialId ] );
-			}
-			
 			// Get or create mesh.
 			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
 			Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
@@ -534,10 +518,25 @@ public partial class HAPI_Asset : MonoBehaviour
 			
 			// Get Detail info.
 			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-			HAPI_Host.getGeoInfo( prAssetId, object_id, out geo_info );
+			HAPI_Host.getGeoInfo( prAssetId, object_id, 0, out geo_info );
 			if ( prEnableLogging )
 				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
 						   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
+			
+			// Set diffuse material.
+			Material diffuse = new Material( Shader.Find( "Specular" ) );		
+			main_child.GetComponent< MeshRenderer >().material = diffuse;
+			if ( prMaterialCount > 0 && geo_info.materialId >= 0 )
+			{
+				if ( geo_info.hasMaterialChanged )
+				{
+					HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
+					HAPI_Host.getMaterials( prAssetId, material, geo_info.materialId, 1 );
+					prMaterials[ geo_info.materialId ] = material[ 0 ];
+					geo_info.hasMaterialChanged = false;
+				}
+				assignTexture( ref diffuse, prMaterials[ geo_info.materialId ] );
+			}
 			
 			// Make sure our primitive and vertex numbers are supported by Unity.
 			// TODO: add this limit in a more proper place
@@ -549,20 +548,21 @@ public partial class HAPI_Asset : MonoBehaviour
 			
 			// Get Face counts.
 			int[] face_counts = new int[ geo_info.faceCount ];
-			getArray2Id( prAssetId, object_id, HAPI_Host.getFaceCounts, face_counts, geo_info.faceCount );
+			getArray3Id( prAssetId, object_id, 0, HAPI_Host.getFaceCounts, face_counts, geo_info.faceCount );
 			
 			// Get Vertex list.
 			int[] vertex_list = new int[ geo_info.vertexCount ];
-			getArray2Id( prAssetId, object_id, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
+			getArray3Id( prAssetId, object_id, 0, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
 			
 			// Print attribute names.
 			if ( prEnableLogging )
-				printAllAttributeNames( prAssetId, object_id, geo_info );
+				printAllAttributeNames( prAssetId, object_id, 0, geo_info );
 			
 			// Get position vertex attributes.
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 			float[] pos_attr = new float[ 0 ];
-			getAttribute( prAssetId, object_id, "P", ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, 0, "P", ref pos_attr_info, ref pos_attr, 
+						  HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );
 			else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -572,12 +572,13 @@ public partial class HAPI_Asset : MonoBehaviour
 			HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
 			uv_attr_info.tupleSize = 2;
 			float[] uv_attr = new float[ 0 ];
-			getAttribute( prAssetId, object_id, "uv", ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
+			getAttribute( prAssetId, object_id, 0, "uv", ref uv_attr_info, ref uv_attr, 
+						  HAPI_Host.getAttributeFloatData );
 			
 			// Get normal attributes.
 			HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( "N" );
 			float[] normal_attr = new float[ 0 ];
-			getAttribute( prAssetId, object_id, "N", ref normal_attr_info, ref normal_attr, 
+			getAttribute( prAssetId, object_id, 0, "N", ref normal_attr_info, ref normal_attr, 
 						  HAPI_Host.getAttributeFloatData );
 			
 			// Apply object transforms.		

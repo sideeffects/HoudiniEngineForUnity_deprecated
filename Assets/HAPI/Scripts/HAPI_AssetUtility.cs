@@ -205,10 +205,10 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// ATTRIBUTES ---------------------------------------------------------------------------------------------------
 		
-	public delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, string name,
+	public delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
 													  ref HAPI_AttributeInfo info, 
 													  [Out] T[] items, int start, int end );	
-	private void fillAttrArray< T >( int asset_id, int object_id, string name, ref HAPI_AttributeInfo info, 
+	private void fillAttrArray< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
 									 T[] items, fillAttrArrayInputFunc< T > get_func, int count ) 
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
@@ -231,7 +231,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			}
 			
 			T[] local_array = new T[ length * info.tupleSize ];
-			get_func( asset_id, object_id, name, ref info, local_array, current_index, length );
+			get_func( asset_id, object_id, geo_id, name, ref info, local_array, current_index, length );
 			
 			// Copy data from the temporary array.
 			for ( int i = current_index; i < current_index + length; ++i )
@@ -242,15 +242,15 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
-	public void getAttribute< T >( int asset_id, int object_id, string name, ref HAPI_AttributeInfo info, ref T[] data,
-									fillAttrArrayInputFunc< T > get_func )
+	public void getAttribute< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
+								   ref T[] data, fillAttrArrayInputFunc< T > get_func )
 	{
 		int original_tuple_size = info.tupleSize;		
 		
 		for ( int type = 0; type < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
 			info.owner = type;
-			HAPI_Host.getAttributeInfo( asset_id, object_id, name, ref info );
+			HAPI_Host.getAttributeInfo( asset_id, object_id, geo_id, name, ref info );
 			if ( info.exists )
 				break;
 		}
@@ -261,10 +261,10 @@ public partial class HAPI_Asset : MonoBehaviour
 			info.tupleSize = original_tuple_size;
 		
 		data = new T[ info.count * info.tupleSize ];
-		fillAttrArray( asset_id, object_id, name, ref info, data, get_func, info.count );
+		fillAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
 	}
 	
-	public string[] getAttributeNames( int asset_id, int object_id, HAPI_GeoInfo geo_info, 
+	public string[] getAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info, 
 									   HAPI_AttributeOwner owner )
 	{
 		int attr_count = geo_info.getOwnerCount( owner );
@@ -273,17 +273,17 @@ public partial class HAPI_Asset : MonoBehaviour
 		
 		int[] attr_names = new int[ attr_count ]; // string handles (SH)
 		
-		HAPI_Host.getAttributeNames( asset_id, object_id, (int) owner, attr_names, attr_count );
+		HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, (int) owner, attr_names, attr_count );
 		for ( int ii = 0; ii < attr_count; ++ii )
 			names[ ii ] = HAPI_Host.getString( attr_names[ ii ] );
 		
 		return names;
 	}
 	
-	private void printAttributeNames( int asset_id, int object_id, HAPI_GeoInfo geo_info,
+	private void printAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info,
 									  HAPI_AttributeOwner owner )
 	{
-		string[] names = getAttributeNames( asset_id, object_id, geo_info, owner );
+		string[] names = getAttributeNames( asset_id, object_id, geo_id, geo_info, owner );
 		
 		string msg = "A" + asset_id + "O" + object_id + " - ";
 		
@@ -311,10 +311,10 @@ public partial class HAPI_Asset : MonoBehaviour
 		Debug.Log( msg );
 	}
 	
-	private void printAllAttributeNames( int asset_id, int object_id, HAPI_GeoInfo geo_info )
+	private void printAllAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info )
 	{
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
-			printAttributeNames( asset_id, object_id, geo_info, (HAPI_AttributeOwner) owner );
+			printAttributeNames( asset_id, object_id, geo_id, geo_info, (HAPI_AttributeOwner) owner );
 	}
 		
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
