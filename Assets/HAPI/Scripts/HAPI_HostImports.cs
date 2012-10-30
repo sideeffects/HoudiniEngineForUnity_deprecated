@@ -194,8 +194,8 @@ namespace HAPI
 															string file_name );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_CreateGeometryInput( int asset_id, int input_idx, 
-															out int object_id );
+		private static extern int HAPI_CreateGeoInput( 		int asset_id, int input_idx, 
+															out int geo_id );
 		
 		// MATERIALS ------------------------------------------------------------------------------------------------
 		

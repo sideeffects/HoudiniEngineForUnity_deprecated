@@ -760,12 +760,12 @@ namespace HAPI
 		/// <param name="input_idx">
 		///		The index of the input - 0 for an asset that has just one input.
 		///	</param>		
-		/// <param name="object_id">
-		///		Object id corresponding to created input node. Use this id to push geometry to this input.
+		/// <param name="geo_id">
+		///		Geometry id corresponding to created input node. Use this id to push geometry to this input.
 		/// </param>
-		public static void createGeometryInput( int asset_id, int input_idx, out int object_id )
+		public static void createGeoInput( int asset_id, int input_idx, out int geo_id )
 		{
-			int status_code = HAPI_CreateGeometryInput( asset_id, input_idx, out object_id );
+			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out geo_id );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
