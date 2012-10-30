@@ -187,6 +187,41 @@ namespace HAPI
 															[Out] int[] data,
 															int start, int length );
 		
+		// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetGeoInfo(			int asset_id, int object_id, int geo_id,
+															out HAPI_GeoInfo geo_info );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetFaceCounts(		int asset_id, int object_id, int geo_id,
+															int[] face_counts,
+															int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetVertexList(		int asset_id, int object_id, int geo_id,
+															int[] vertex_list,
+															int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_AddAttribute(		int asset_id, int object_id, int geo_id,
+															string name,
+															ref HAPI_AttributeInfo attr_info );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetAttributeIntData( int asset_id, int object_id, int geo_id,
+															string name,
+															ref HAPI_AttributeInfo attr_info,
+															int[] data,
+															int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetAttributeFloatData( int asset_id, int object_id, int geo_id,
+															  string name,
+															  ref HAPI_AttributeInfo attr_info,
+															  float[] data,
+															  int start, int length );
+		
 		// GEOMETRY INPUT -------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

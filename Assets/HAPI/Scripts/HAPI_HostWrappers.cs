@@ -494,7 +494,7 @@ namespace HAPI
 			int status_code = HAPI_GetObjectTransforms( asset_id, rst_order, transforms, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
-
+		
 		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 
 		/// <summary>
@@ -505,6 +505,9 @@ namespace HAPI
 		/// </param>
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
 		/// </param>
 		/// <param name="geo_info">
 		/// 	<see cref="HAPI_GeoInfo"/> out parameter.
@@ -525,6 +528,9 @@ namespace HAPI
 		/// </param>
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
 		/// </param>
 		/// <param name="face_counts">
 		/// 	An integer array at least the size of <paramref name="length"/>.
@@ -553,6 +559,9 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
 		/// <param name="vertex_list">
 		/// 	An integer array at least the size of <paramref name="length"/>.
 		/// </param>
@@ -579,6 +588,9 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
 		/// <param name="name">
 		/// 	Attribute name.
 		/// </param>
@@ -602,6 +614,9 @@ namespace HAPI
 		/// </param>
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
 		/// </param>
 		/// <param name="attribute_type"/>
 		/// 	The <see cref="HAPI_AttributeType"/> enum value specifying the owner of the attribute.
@@ -632,6 +647,9 @@ namespace HAPI
 		/// </param>
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
 		/// </param>
 		/// <param name="name">
 		/// 	Attribute name.
@@ -667,6 +685,9 @@ namespace HAPI
 		/// </param>
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
 		/// </param>
 		/// <param name="name">
 		/// 	Attribute name.
@@ -704,6 +725,9 @@ namespace HAPI
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
 		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
 		/// <param name="name">
 		/// 	Attribute name.
 		/// </param>
@@ -728,6 +752,192 @@ namespace HAPI
 		{
 			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, geo_id, name, ref attr_info, data, 
 														start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
+
+		/// <summary>
+		/// 	Set the main geometry info struct (<see cref="HAPI_GeoInfo"/>).
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="geo_info">
+		/// 	<see cref="HAPI_GeoInfo"/> out parameter.
+		/// </param>
+		public static void setGeoInfo(			int asset_id, int object_id, int geo_id,
+												out HAPI_GeoInfo geo_info )
+		{
+			int status_code = HAPI_SetGeoInfo( asset_id, object_id, geo_id, out geo_info );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
+		/// <summary>
+		/// 	Set the array of faces where the nth integer in the array is the number of vertices
+		/// 	the nth face has.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="face_counts">
+		/// 	An integer array at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - <paramref name="start"/>.
+		/// </param>
+		public static void setFaceCounts(		int asset_id, int object_id, int geo_id,
+												int[] face_counts,
+												int start, int length )
+		{
+			int status_code = HAPI_SetFaceCounts( asset_id, object_id, geo_id, face_counts, start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
+		/// <summary>
+		/// 	Set array containing the vertex-point associations where the ith element in the array is
+		/// 	the point index the ith vertex associates with.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="vertex_list">
+		/// 	An integer array at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - <paramref name="start"/>.
+		/// </param>
+		public static void setVertexList(		int asset_id, int object_id, int geo_id,
+												int[] vertex_list,
+												int start, int length )
+		{
+			int status_code = HAPI_SetVertexList( asset_id, object_id, geo_id, vertex_list, start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
+		/// <summary>
+		/// 	Add an attribute.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="name">
+		/// 	Attribute name.
+		/// </param>
+		/// <param name="attr_info">
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for owner type and as output for the rest of 
+		/// 	the information.
+		/// </param>
+		public static void addAttribute(	int asset_id, int object_id, int geo_id, string name,
+											ref HAPI_AttributeInfo attr_info )
+		{
+			int status_code = HAPI_AddAttribute( asset_id, object_id, geo_id, name, ref attr_info );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
+		/// <summary>
+		/// 	Set attribute integer data.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="name">
+		/// 	Attribute name.
+		/// </param>
+		/// <param name="attr_info">
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
+		/// 	like data type. Generally should be the same struct returned by 
+		/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
+		/// <param name="data">
+		/// 	An integer array at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
+		/// </param>
+		public static void setAttributeIntData( int asset_id, int object_id, int geo_id, string name,
+												ref HAPI_AttributeInfo attr_info,
+												int[] data,
+												int start, int length )
+		{
+			int status_code = HAPI_SetAttributeIntData( asset_id, object_id, geo_id, name, ref attr_info, data, 
+														start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
+		/// <summary>
+		/// 	Set attribute float data.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="name">
+		/// 	Attribute name.
+		/// </param>
+		/// <param name="attr_info">
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
+		/// 	like data type. Generally should be the same struct returned by 
+		/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
+		/// <param name="data">
+		/// 	An float array at least the size of <paramref name="length"/>.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
+		/// </param>
+		public static void setAttributeFloatData(	int asset_id, int object_id, int geo_id, string name,
+													ref HAPI_AttributeInfo attr_info,
+													float[] data,
+													int start, int length )
+		{
+			int status_code = HAPI_SetAttributeFloatData( asset_id, object_id, geo_id, name, ref attr_info, 
+														  data, start, length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
