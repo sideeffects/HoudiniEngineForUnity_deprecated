@@ -44,6 +44,9 @@ public partial class HAPI_Asset : MonoBehaviour
 	public int 						prMinInputCount { get; set; }
 	public int 						prMaxInputCount { get; set; }
 	public List<string>				prFileInputs { get; set; }
+	public List < HAPI_Asset >		prDownStreamAssets { get; set; }
+	public List < HAPI_Asset >		prUpStreamAssets { get; set; }
+	public List < GameObject >		prUpStreamObjects { get; set; }
 	
 	public int 						prParmCount { get; set; }
 	public int						prParmIntValueCount { get; set; }
@@ -132,6 +135,10 @@ public partial class HAPI_Asset : MonoBehaviour
 		prFolderListSelections 		= new List< int >();
 		prFolderListSelectionIds 	= new List< int >();
 		
+		prDownStreamAssets = new List<HAPI_Asset>();
+		prUpStreamAssets = new List<HAPI_Asset>();
+		prUpStreamObjects = new List<GameObject>();
+		
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
 		
@@ -149,10 +156,103 @@ public partial class HAPI_Asset : MonoBehaviour
 			Debug.Log( "HAPI_Asset destroyed!" );
 	}
 	
+	
+	public bool AddAssetAsInput( HAPI_Asset asset, int index )
+	{		
+		
+		if( prUpStreamAssets[ index ] == asset )
+			return false;
+		
+		prUpStreamAssets[ index ] = asset;
+		HAPI_Host.connectAsset( asset.prAssetId, prAssetId, index );
+		asset.AddDownstreamAsset( this );
+		build ();
+		return true;
+	}
+	
+	public void RemoveInput( int index )
+	{
+		if( prUpStreamAssets[ index ] != null )
+		{
+			prUpStreamAssets[ index ].RemoveDownstreamAsset( this );
+			//TODO: add disconnectAsset call here.
+			prUpStreamAssets[ index ] = null;
+			build ();			
+		}				
+		
+	}
+	
+	public bool RemoveAssetAsInput( HAPI_Asset asset )
+	{
+		for ( int ii = 0; ii < prUpStreamAssets.Count; ii++ )
+		{
+			if( prUpStreamAssets[ii] == asset )
+			{
+				prUpStreamAssets[ ii ] = null;
+				//TODO: add disconnectAsset call here.
+				
+				asset.RemoveDownstreamAsset( this );
+				build ();
+				return true;			
+			}
+		}
+		
+		return false;
+	}
+	
+	public int GetAssetConnectionIndex( HAPI_Asset asset )
+	{
+		for ( int ii = 0; ii < prUpStreamAssets.Count; ii++ )
+		{
+			if( prUpStreamAssets[ii] == asset )
+			{
+				return ii;
+			}
+		}
+		return -1;
+	}
+	
+	public bool AddDownstreamAsset( HAPI_Asset asset )
+	{		
+		foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+		{
+			if( downstream_asset == asset )
+				return false;			
+		}
+		prDownStreamAssets.Add( asset );
+		return true;
+	}
+	
+	public void RemoveDownstreamAsset( HAPI_Asset asset )
+	{			
+		prDownStreamAssets.Remove( asset );		
+		
+	}
+	
 	public void OnDestroy()
 	{
 		if ( prAssetId >= 0 )
 		{
+			foreach ( HAPI_Asset upstream_asset in prUpStreamAssets )
+			{
+				if( upstream_asset != null )
+					upstream_asset.RemoveDownstreamAsset( this );
+			} 
+			
+			List< HAPI_Asset > downstream_asset_list = new List<HAPI_Asset>();
+			foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+			{
+				downstream_asset_list.Add( downstream_asset );
+			}
+			
+			foreach ( HAPI_Asset downstream_asset in downstream_asset_list )
+			{
+				downstream_asset.RemoveAssetAsInput( this );
+			}
+			
+			prUpStreamAssets.Clear();
+			prDownStreamAssets.Clear();
+			
 			HAPI_Host.unloadOTL( prAssetId );
 			prAssetId = -1;
 		}
@@ -288,7 +388,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 				getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-				displayProgressBar( prParmChoiceCount );
+				displayProgressBar( prParmChoiceCount );								
 				
 				myProgressBarMsg = "Loading handles...";
 				
@@ -322,30 +422,51 @@ public partial class HAPI_Asset : MonoBehaviour
 				// Add input fields.
 				if ( prMaxInputCount > 0 && prFileInputs.Count <= 0 )
 					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+					{
 						prFileInputs.Add( "" );
+						prUpStreamAssets.Add( null );
+						prUpStreamObjects.Add( null );
+					}
+				
+				
 				
 				// Check for min input fields set.
-				if ( prMinInputCount > 0 )
+				
+				int numValidInputs = 0;
+				for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+					if ( prFileInputs[ ii ] != "" )
+						numValidInputs++;
+				
+				if ( numValidInputs < prMinInputCount )
+					Debug.LogWarning( "Insufficent Inputs to Asset. Please provide inputs in the Inputs section." );
+				
+				for ( int ii = 0; ii < prMaxInputCount ; ++ii )
 				{
-					int numValidInputs = 0;
-					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						if ( prFileInputs[ ii ] != "" )
-							numValidInputs++;
+					if ( prFileInputs[ ii ] != "" )
+					{
+						HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
+					}
 					
-					if ( numValidInputs < prMinInputCount )
-						Debug.LogWarning( "Insufficent Inputs to Asset. Please provide inputs in the Inputs section." );
-					
-					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						if ( prFileInputs[ ii ] != "" )
-							HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
+					if ( prUpStreamAssets[ ii ] != null )
+					{
+						HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );						
+					}
 				}
+				
+				foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+				{
+					int index = downstream_asset.GetAssetConnectionIndex( this );
+					if( index >=0 )
+						HAPI_Host.connectAsset( prAssetId, downstream_asset.prAssetId, index );
+				}
+				
 			}
 			else
 			{
 				displayProgressBar();
 				
 				myProgressBarTotal = prObjectCount;
-			}
+			}						
 			
 			myProgressBarMsg = "Loading and composing objects...";
 			
@@ -399,6 +520,12 @@ public partial class HAPI_Asset : MonoBehaviour
 				}
 			}
 			
+			// process dependent assets.
+			foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+			{
+				downstream_asset.build();
+			}
+			
 			prAssetPathChanged = false;
 		}
 		catch ( HAPI_Error error )
@@ -413,6 +540,12 @@ public partial class HAPI_Asset : MonoBehaviour
 		{
 			clearProgressBar();
 		}
+		/*
+		int length = 0;
+		HAPI_Host.getPreset( prAssetId, new byte[0], ref length );
+		byte[] buf = new byte[length];
+		HAPI_Host.getPreset( prAssetId, buf, ref length );
+		*/
 		
 		return true;
 	}

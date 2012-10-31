@@ -145,6 +145,8 @@ public class HAPI_Instancer : MonoBehaviour {
 					string[] pathItems = instanceObjectPath.Split('/');
 					string instanceObjectName = pathItems[ pathItems.Length - 1 ];
 					
+					Debug.Log("instance = " + instanceObjectName );
+					
 					int objectIndex = prObjectControl.findObjectByName( instanceObjectName );
 					if( objectIndex >= 0 )
 					{
@@ -213,7 +215,8 @@ public class HAPI_Instancer : MonoBehaviour {
 				if ( !prOverrideInstances )
 				{
 					obj = Instantiate( objToInstantiate, pos, quat ) as GameObject;
-					obj.transform.localScale = new Vector3( transform_out.scale[0], 
+					if( scale_attr_info.exists )
+						obj.transform.localScale = new Vector3( transform_out.scale[0], 
 															transform_out.scale[1], transform_out.scale[2] );
 				}
 				else
@@ -221,7 +224,8 @@ public class HAPI_Instancer : MonoBehaviour {
 					obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
 					obj.transform.localPosition = pos;
 					obj.transform.localRotation = quat;
-					obj.transform.localScale = new Vector3( transform_out.scale[ 0 ], 
+					if( scale_attr_info.exists )
+						obj.transform.localScale = new Vector3( transform_out.scale[ 0 ], 
 															transform_out.scale[ 1 ], 
 															transform_out.scale[ 2 ] );
 				}

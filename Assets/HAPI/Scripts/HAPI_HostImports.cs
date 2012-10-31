@@ -232,6 +232,20 @@ namespace HAPI
 		private static extern int HAPI_CreateGeoInput( 		int asset_id, int input_idx, 
 															out int geo_id );
 		
+		// INTER ASSET ----------------------------------------------------------------------------------------------
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConnectAsset( int asset_id_from, 
+													 int asset_id_to, 
+													 int input_idx );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConnectAssetGeometry( int asset_id_from, 
+															 int object_id_from,
+															 int group_id_from,
+															 int asset_id_to, 
+															 int input_idx );
+		
 		// MATERIALS ------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

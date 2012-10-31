@@ -961,6 +961,71 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		
+		// Inter Asset ---------------------------------------------------------------------------------------------
+		
+		/// <summary>	Connect two assets of compatible types together.  For 
+		///		example we can connect two object level assets or
+		///		two sop level assets together.  Note this method does
+		///		not give you the fine grained control over the exact
+		///		piece of geometry to connect in the case of SOP assets,
+		///		it will connect the entire geometry from 1 SOP to another.
+		///		For fine grained control please use HAPI_ConnectAssetGeometry
+		///		which allows you to specify groups.
+		/// </summary>
+		///
+		/// <param name="asset_id_from">
+		///			The asset id of the source asset
+		/// </param>
+		/// <param name="asset_id_to">
+		///			The asset id of the destination asset
+		/// </param>
+		/// <param name="input_idx">
+		///			The index on the destination asset where the connection
+		///			should be made.
+		/// </param>		
+		
+		public static void connectAsset( int asset_id_from, int asset_id_to, int input_idx )
+		{
+			int status_code = HAPI_ConnectAsset( asset_id_from, asset_id_to, input_idx );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
+
+		/// <summary>	Connect the geometry of two assets together.  For 
+		///		example we can connect a particular piece of geometry from
+		///		an object level asset to a sop level asset or even another
+		///		object level asset.  This method gives you the fine grained 
+		///		control over the exact piece of geometry to connect by allowing
+		///		you to specify the exact object and group of the geometry you
+		///		are trying to connect.
+		/// </summary>
+		///
+		/// <param name="asset_id_from">
+		///			The asset id of the source asset
+		/// </param>
+		/// <param name="object_id_from">
+		///			The object within the asset that contains the geometry
+		///			to send.
+		/// </param>
+		/// <param name="group_id_from">
+		///			The id of the group within the object 
+		/// </param>
+		/// <param name="asset_id_to">
+		///			The asset id of the destination asset
+		/// </param>
+		/// <param name="input_idx">
+		///			The index on the destination asset where the connection
+		///			should be made.
+		/// </param>		
+		public static void connectAssetGeometry( int asset_id_from, int object_id_from,	int group_id_from,
+													int asset_id_to, int input_idx )
+		{
+			int status_code = HAPI_ConnectAssetGeometry( asset_id_from, object_id_from, group_id_from, 
+														 asset_id_to, input_idx );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		/// <summary> 
 		/// 	Create a geometry input node.
 		/// </summary>

@@ -285,6 +285,8 @@ namespace HAPI
 		public int handleCount;
 		public int minInputCount;
 		public int maxInputCount;
+		public int minGeoInputCount;
+		public int maxGeoInputCount;
 		public int materialCount;
 		
 		public int minVerticesPerPrimitive;

@@ -115,8 +115,7 @@ public partial class HAPI_AssetGUI : Editor
 			
 		} // if
 		
-		if ( myObjectControl.prMaxInputCount > 0 && 
-			 myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
+		if ( myObjectControl.prMaxInputCount > 0 )
 		{
 			myObjectControl.prShowInputControls = 
 				EditorGUILayout.Foldout( myObjectControl.prShowInputControls, new GUIContent( "Inputs" ) );			
@@ -125,25 +124,47 @@ public partial class HAPI_AssetGUI : Editor
 			{
 				for ( int ii = 0; ii < myObjectControl.prMaxInputCount; ++ii )
 				{
-					EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
-					EditorGUILayout.BeginHorizontal(); 
+					myObjectControl.prUpStreamObjects[ii] = EditorGUILayout.ObjectField( "Object To Input", 
+									myObjectControl.prUpStreamObjects[ii], typeof(GameObject), true ) as GameObject;
+															
+					if( myObjectControl.prUpStreamObjects[ii] != null )
 					{
-						string old_file_path = myObjectControl.prFileInputs[ ii ];
-						string new_file_path = "";
-						new_file_path = EditorGUILayout.TextField( old_file_path );
-						
-						if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+						HAPI_Asset inputAsset = (HAPI_Asset) 
+												myObjectControl.prUpStreamObjects[ii].GetComponent("HAPI_Asset");
+						if( inputAsset != null )
 						{
-							string prompt_result_path = HAPI_GUIUtility.promptForFileInputPath( old_file_path );
-							if ( prompt_result_path.Length > 0 )
-								new_file_path = prompt_result_path;
+							myObjectControl.AddAssetAsInput( inputAsset, ii );
 						}
-						
-						myObjectControl.prFileInputs[ ii ] = new_file_path;
-					} 
-					EditorGUILayout.EndHorizontal();
+					}
+					else
+					{
+						myObjectControl.RemoveInput( ii );
+					}
+					
+					if( myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
+					{
+						EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
+						EditorGUILayout.BeginHorizontal(); 
+						{
+							string old_file_path = myObjectControl.prFileInputs[ ii ];
+							string new_file_path = "";
+							new_file_path = EditorGUILayout.TextField( old_file_path );
+							
+							if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+							{
+								string prompt_result_path = HAPI_GUIUtility.promptForFileInputPath( old_file_path );
+								if ( prompt_result_path.Length > 0 )
+									new_file_path = prompt_result_path;
+							}
+							
+							myObjectControl.prFileInputs[ ii ] = new_file_path;
+						} 
+						EditorGUILayout.EndHorizontal();
+					}
 				} // for
 			} // if
+		
+		
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
