@@ -133,12 +133,12 @@ public partial class HAPI_AssetGUI : Editor
 												myObjectControl.prUpStreamObjects[ii].GetComponent("HAPI_Asset");
 						if( inputAsset != null )
 						{
-							myObjectControl.AddAssetAsInput( inputAsset, ii );
+							myObjectControl.addAssetAsInput( inputAsset, ii );
 						}
 					}
 					else
 					{
-						myObjectControl.RemoveInput( ii );
+						myObjectControl.removeInput( ii );
 					}
 					
 					if( myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )

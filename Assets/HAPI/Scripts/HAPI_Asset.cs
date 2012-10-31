@@ -157,7 +157,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	}
 	
 	
-	public bool AddAssetAsInput( HAPI_Asset asset, int index )
+	public bool addAssetAsInput( HAPI_Asset asset, int index )
 	{		
 		
 		if( prUpStreamAssets[ index ] == asset )
@@ -165,16 +165,16 @@ public partial class HAPI_Asset : MonoBehaviour
 		
 		prUpStreamAssets[ index ] = asset;
 		HAPI_Host.connectAsset( asset.prAssetId, prAssetId, index );
-		asset.AddDownstreamAsset( this );
+		asset.addDownstreamAsset( this );
 		build ();
 		return true;
 	}
 	
-	public void RemoveInput( int index )
+	public void removeInput( int index )
 	{
 		if( prUpStreamAssets[ index ] != null )
 		{
-			prUpStreamAssets[ index ].RemoveDownstreamAsset( this );
+			prUpStreamAssets[ index ].removeDownstreamAsset( this );
 			//TODO: add disconnectAsset call here.
 			prUpStreamAssets[ index ] = null;
 			build ();			
@@ -182,7 +182,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		
 	}
 	
-	public bool RemoveAssetAsInput( HAPI_Asset asset )
+	public bool removeAssetAsInput( HAPI_Asset asset )
 	{
 		for ( int ii = 0; ii < prUpStreamAssets.Count; ii++ )
 		{
@@ -191,7 +191,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				prUpStreamAssets[ ii ] = null;
 				//TODO: add disconnectAsset call here.
 				
-				asset.RemoveDownstreamAsset( this );
+				asset.removeDownstreamAsset( this );
 				build ();
 				return true;			
 			}
@@ -200,7 +200,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		return false;
 	}
 	
-	public int GetAssetConnectionIndex( HAPI_Asset asset )
+	public int getAssetConnectionIndex( HAPI_Asset asset )
 	{
 		for ( int ii = 0; ii < prUpStreamAssets.Count; ii++ )
 		{
@@ -212,7 +212,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		return -1;
 	}
 	
-	public bool AddDownstreamAsset( HAPI_Asset asset )
+	public bool addDownstreamAsset( HAPI_Asset asset )
 	{		
 		foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
 		{
@@ -223,7 +223,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		return true;
 	}
 	
-	public void RemoveDownstreamAsset( HAPI_Asset asset )
+	public void removeDownstreamAsset( HAPI_Asset asset )
 	{			
 		prDownStreamAssets.Remove( asset );		
 		
@@ -236,7 +236,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			foreach ( HAPI_Asset upstream_asset in prUpStreamAssets )
 			{
 				if( upstream_asset != null )
-					upstream_asset.RemoveDownstreamAsset( this );
+					upstream_asset.removeDownstreamAsset( this );
 			} 
 			
 			List< HAPI_Asset > downstream_asset_list = new List<HAPI_Asset>();
@@ -247,7 +247,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			
 			foreach ( HAPI_Asset downstream_asset in downstream_asset_list )
 			{
-				downstream_asset.RemoveAssetAsInput( this );
+				downstream_asset.removeAssetAsInput( this );
 			}
 			
 			prUpStreamAssets.Clear();
@@ -455,7 +455,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				
 				foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
 				{
-					int index = downstream_asset.GetAssetConnectionIndex( this );
+					int index = downstream_asset.getAssetConnectionIndex( this );
 					if( index >=0 )
 						HAPI_Host.connectAsset( prAssetId, downstream_asset.prAssetId, index );
 				}
