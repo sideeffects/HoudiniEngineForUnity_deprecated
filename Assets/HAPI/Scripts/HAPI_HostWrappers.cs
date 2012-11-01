@@ -990,7 +990,25 @@ namespace HAPI
 			int status_code = HAPI_ConnectAsset( asset_id_from, asset_id_to, input_idx );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
-
+		
+		
+		/// <summary> 
+		/// 	Break an existing connection
+		/// </summary>	
+		///
+		/// <param name ="asset_id">
+		///			The asset id of the asset
+		/// </param>
+		/// <param name="input_idx">
+		///			The index on the asset where the connection
+		///			should be broken.
+		///	</param>
+		
+		public static void disconnectAsset( int asset_id, int input_idx )
+		{
+			int status_code = HAPI_DisconnectAsset( asset_id, input_idx );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
 
 		/// <summary>	Connect the geometry of two assets together.  For 
 		///		example we can connect a particular piece of geometry from

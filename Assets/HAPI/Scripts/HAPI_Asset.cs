@@ -175,7 +175,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		if( prUpStreamAssets[ index ] != null )
 		{
 			prUpStreamAssets[ index ].removeDownstreamAsset( this );
-			//TODO: add disconnectAsset call here.
+			HAPI_Host.disconnectAsset( prAssetId, index );
 			prUpStreamAssets[ index ] = null;
 			build ();			
 		}				
@@ -189,7 +189,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			if( prUpStreamAssets[ii] == asset )
 			{
 				prUpStreamAssets[ ii ] = null;
-				//TODO: add disconnectAsset call here.
+				HAPI_Host.disconnectAsset( prAssetId, ii );
 				
 				asset.removeDownstreamAsset( this );
 				build ();
