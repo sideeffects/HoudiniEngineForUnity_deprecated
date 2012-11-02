@@ -26,6 +26,7 @@ using System.IO;
 using HAPI;
 using Microsoft.Win32;
 
+
 /// <summary>
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
 /// 	Houdini side.
@@ -43,10 +44,17 @@ public partial class HAPI_Asset : MonoBehaviour
 	public HAPI_AssetType			prAssetType { get; set; }
 	public int 						prMinInputCount { get; set; }
 	public int 						prMaxInputCount { get; set; }
+	public int 						prMinGeoInputCount { get; set; }
+	public int						prMaxGeoInputCount { get; set; }
 	public List<string>				prFileInputs { get; set; }
-	public List < HAPI_Asset >		prDownStreamAssets { get; set; }
-	public List < HAPI_Asset >		prUpStreamAssets { get; set; }
-	public List < GameObject >		prUpStreamObjects { get; set; }
+	
+	public List < HAPI_Asset >		prDownStreamTransformAssets { get; set; }
+	public List < HAPI_Asset >		prUpStreamTransformAssets { get; set; }
+	public List < GameObject >		prUpStreamTransformObjects { get; set; }
+	
+	public List < HAPI_Asset >		prDownStreamGeoAssets { get; set; }
+	public List < HAPI_Asset >		prUpStreamGeoAssets { get; set; }
+	public List < GameObject >		prUpStreamGeoObjects { get; set; }
 	
 	public int 						prParmCount { get; set; }
 	public int						prParmIntValueCount { get; set; }
@@ -123,6 +131,8 @@ public partial class HAPI_Asset : MonoBehaviour
 		
 		prMinInputCount				= 0;
 		prMaxInputCount				= 0;
+		prMinGeoInputCount			= 0;
+		prMaxGeoInputCount			= 0;
 		prFileInputs				= new List<string>();
 		prShowInputControls			= true;
 		
@@ -136,9 +146,14 @@ public partial class HAPI_Asset : MonoBehaviour
 		prFolderListSelections 		= new List< int >();
 		prFolderListSelectionIds 	= new List< int >();
 		
-		prDownStreamAssets 			= new List<HAPI_Asset>();
-		prUpStreamAssets 			= new List<HAPI_Asset>();
-		prUpStreamObjects 			= new List<GameObject>();
+
+		prDownStreamTransformAssets = new List<HAPI_Asset>();
+		prUpStreamTransformAssets = new List<HAPI_Asset>();
+		prUpStreamTransformObjects = new List<GameObject>();
+		
+		prDownStreamGeoAssets = new List<HAPI_Asset>();
+		prUpStreamGeoAssets = new List<HAPI_Asset>();
+		prUpStreamGeoObjects = new List<GameObject>();
 		
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
@@ -158,41 +173,43 @@ public partial class HAPI_Asset : MonoBehaviour
 	}
 	
 	
-	public bool addAssetAsInput( HAPI_Asset asset, int index )
+	// Transform related connection methods -------------------------------------------------------
+	
+	public bool addAssetAsTransformInput( HAPI_Asset asset, int index )
 	{		
 		
-		if( prUpStreamAssets[ index ] == asset )
+		if( prUpStreamTransformAssets[ index ] == asset )
 			return false;
 		
-		prUpStreamAssets[ index ] = asset;
+		prUpStreamTransformAssets[ index ] = asset;
 		HAPI_Host.connectAsset( asset.prAssetId, prAssetId, index );
-		asset.addDownstreamAsset( this );
+		asset.addDownstreamTransformAsset( this );
 		build ();
 		return true;
 	}
 	
-	public void removeInput( int index )
+	public void removeTransformInput( int index )
 	{
-		if( prUpStreamAssets[ index ] != null )
+		if( prUpStreamTransformAssets[ index ] != null )
 		{
-			prUpStreamAssets[ index ].removeDownstreamAsset( this );
+			prUpStreamTransformAssets[ index ].removeDownstreamTransformAsset( this );
 			HAPI_Host.disconnectAsset( prAssetId, index );
-			prUpStreamAssets[ index ] = null;
+			prUpStreamTransformAssets[ index ] = null;
 			build ();			
 		}				
 		
 	}
 	
-	public bool removeAssetAsInput( HAPI_Asset asset )
+	public bool removeAssetAsTransformInput( HAPI_Asset asset )
 	{
-		for ( int ii = 0; ii < prUpStreamAssets.Count; ii++ )
+		for ( int ii = 0; ii < prUpStreamTransformAssets.Count; ii++ )
 		{
-			if( prUpStreamAssets[ii] == asset )
+			if( prUpStreamTransformAssets[ii] == asset )
 			{
-				prUpStreamAssets[ ii ] = null;
+				prUpStreamTransformAssets[ ii ] = null;
 				HAPI_Host.disconnectAsset( prAssetId, ii );
 				
-				asset.removeDownstreamAsset( this );
+				asset.removeDownstreamTransformAsset( this );
 				build ();
 				return true;			
 			}
@@ -201,11 +218,11 @@ public partial class HAPI_Asset : MonoBehaviour
 		return false;
 	}
 	
-	public int getAssetConnectionIndex( HAPI_Asset asset )
+	public int getAssetTransformConnectionIndex( HAPI_Asset asset )
 	{
-		for ( int ii = 0; ii < prUpStreamAssets.Count; ii++ )
+		for ( int ii = 0; ii < prUpStreamTransformAssets.Count; ii++ )
 		{
-			if( prUpStreamAssets[ii] == asset )
+			if( prUpStreamTransformAssets[ii] == asset )
 			{
 				return ii;
 			}
@@ -213,46 +230,108 @@ public partial class HAPI_Asset : MonoBehaviour
 		return -1;
 	}
 	
-	public bool addDownstreamAsset( HAPI_Asset asset )
+	public bool addDownstreamTransformAsset( HAPI_Asset asset )
 	{		
-		foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+		foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 		{
 			if( downstream_asset == asset )
 				return false;			
 		}
-		prDownStreamAssets.Add( asset );
+		prDownStreamTransformAssets.Add( asset );
 		return true;
 	}
 	
-	public void removeDownstreamAsset( HAPI_Asset asset )
+	public void removeDownstreamTransformAsset( HAPI_Asset asset )
 	{			
-		prDownStreamAssets.Remove( asset );		
+		prDownStreamTransformAssets.Remove( asset );		
 		
+	}
+	
+	// Geometry related connection methods -------------------------------------------------------
+	public bool addAssetAsGeoInput( HAPI_Asset asset, int index )
+	{
+		//TODO: This is the really simplistic version.  Must handle non-sop assets next.
+		
+		if( asset.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP &&
+			asset.prAssetType == prAssetType )
+		{
+		
+			if( prUpStreamGeoAssets[ index ] == asset )
+				return false;
+			
+			prUpStreamGeoAssets[ index ] = asset;
+			HAPI_Host.connectAsset( asset.prAssetId, prAssetId, index );
+			asset.addDownstreamGeoAsset( this );
+			build ();
+			return true;
+		}
+		else if( asset.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
+		{
+			if( prUpStreamGeoAssets[ index ] == asset )
+				return false;
+			
+			prUpStreamGeoAssets[ index ] = asset;
+			HAPI_Host.connectAssetGeometry( asset.prAssetId, 0, 0, prAssetId, index );
+			asset.addDownstreamGeoAsset( this );
+			build ();
+			return true;				
+		}
+		return false;
+			
+		
+	}
+						
+	public void removeGeoInput( int index )
+	{
+		if( prUpStreamGeoAssets[ index ] != null )
+		{
+			prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
+			HAPI_Host.disconnectAsset( prAssetId, index );
+			prUpStreamGeoAssets[ index ] = null;
+			build ();			
+		}	
+	}
+	
+	public void removeDownstreamGeoAsset( HAPI_Asset asset )
+	{			
+		prDownStreamGeoAssets.Remove( asset );		
+		
+	}
+		
+	public bool addDownstreamGeoAsset( HAPI_Asset asset )
+	{		
+		foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+		{
+			if( downstream_asset == asset )
+				return false;			
+		}
+		prDownStreamGeoAssets.Add( asset );
+		return true;
 	}
 	
 	public void OnDestroy()
 	{
 		if ( prAssetId >= 0 )
 		{
-			foreach ( HAPI_Asset upstream_asset in prUpStreamAssets )
+			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
 			{
 				if( upstream_asset != null )
-					upstream_asset.removeDownstreamAsset( this );
+					upstream_asset.removeDownstreamTransformAsset( this );
 			} 
 			
 			List< HAPI_Asset > downstream_asset_list = new List<HAPI_Asset>();
-			foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 			{
 				downstream_asset_list.Add( downstream_asset );
 			}
 			
 			foreach ( HAPI_Asset downstream_asset in downstream_asset_list )
 			{
-				downstream_asset.removeAssetAsInput( this );
+				downstream_asset.removeAssetAsTransformInput( this );
 			}
 			
-			prUpStreamAssets.Clear();
-			prDownStreamAssets.Clear();
+			prUpStreamTransformAssets.Clear();
+			prDownStreamTransformAssets.Clear();
 			
 			HAPI_Host.unloadOTL( prAssetId );
 			prAssetId = -1;
@@ -327,6 +406,8 @@ public partial class HAPI_Asset : MonoBehaviour
 				prAssetType				= (HAPI_AssetType) prAssetInfo.assetType;
 				prMinInputCount			= prAssetInfo.minInputCount;
 				prMaxInputCount			= prAssetInfo.maxInputCount;
+				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
+				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
 				prParmCount 			= prAssetInfo.parmCount;
 				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
 				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
@@ -421,42 +502,75 @@ public partial class HAPI_Asset : MonoBehaviour
 				displayProgressBar( prMaterialCount );
 				
 				// Add input fields.
-				if ( prMaxInputCount > 0 && prFileInputs.Count <= 0 )
-					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+				if( prAssetInfo.assetType == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				{
+					if ( prMaxInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
+						for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+						{							
+							prUpStreamTransformAssets.Add( null );	
+							prUpStreamTransformObjects.Add( null );
+						}
+				}
+				
+				
+				if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
+					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 					{
 						prFileInputs.Add( "" );
-						prUpStreamAssets.Add( null );
-						prUpStreamObjects.Add( null );
+						prUpStreamGeoAssets.Add( null );
+						prUpStreamGeoObjects.Add( null );
 					}
 				
-				
-				
 				// Check for min input fields set.
+				if( prAssetInfo.assetType == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				{
+					int numValidTransformInputs = 0;
+					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+						if ( prUpStreamTransformAssets[ ii ] != null )
+							numValidTransformInputs++;
+					
+					if ( numValidTransformInputs < prMinInputCount )
+						Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
+										  "Please provide inputs in the Inputs section." );
+				}
 				
-				int numValidInputs = 0;
-				for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+				
+				int numValidGeoInputs = 0;
+				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 					if ( prFileInputs[ ii ] != "" )
-						numValidInputs++;
+						numValidGeoInputs++;
 				
-				if ( numValidInputs < prMinInputCount )
-					Debug.LogWarning( "Insufficent Inputs to Asset. Please provide inputs in the Inputs section." );
+				if ( numValidGeoInputs < prMinGeoInputCount )
+					Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
 				
-				for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+				if( prAssetInfo.assetType == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				{
+					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+					{												
+						if ( prUpStreamTransformAssets[ ii ] != null )
+						{
+							HAPI_Host.connectAsset( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );						
+						}
+					}
+				}
+				
+				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 				{
 					if ( prFileInputs[ ii ] != "" )
 					{
 						HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
 					}
 					
-					if ( prUpStreamAssets[ ii ] != null )
-					{
-						HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );						
-					}
+					//TODO: handle restoring geometry connections
+					//if ( prUpStreamGeoAssets[ ii ] != null )
+					//{
+					//	HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );						
+					//}
 				}
 				
-				foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 				{
-					int index = downstream_asset.getAssetConnectionIndex( this );
+					int index = downstream_asset.getAssetTransformConnectionIndex( this );
 					if( index >=0 )
 						HAPI_Host.connectAsset( prAssetId, downstream_asset.prAssetId, index );
 				}
@@ -522,7 +636,12 @@ public partial class HAPI_Asset : MonoBehaviour
 			}
 			
 			// process dependent assets.
-			foreach ( HAPI_Asset downstream_asset in prDownStreamAssets )
+			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+			{
+				downstream_asset.build();
+			}
+			
+			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
 			{
 				downstream_asset.build();
 			}

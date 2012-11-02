@@ -115,53 +115,65 @@ public partial class HAPI_AssetGUI : Editor
 			
 		} // if
 		
-		if ( myObjectControl.prMaxInputCount > 0 )
+		if ( myObjectControl.prMaxInputCount > 0 || myObjectControl.prMaxGeoInputCount > 0 )
 		{
 			myObjectControl.prShowInputControls = 
 				EditorGUILayout.Foldout( myObjectControl.prShowInputControls, new GUIContent( "Inputs" ) );			
 			
 			if ( myObjectControl.prShowInputControls )
 			{
-				for ( int ii = 0; ii < myObjectControl.prMaxInputCount; ++ii )
+				if( myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 				{
-					myObjectControl.prUpStreamObjects[ii] = EditorGUILayout.ObjectField( "Object To Input", 
-									myObjectControl.prUpStreamObjects[ii], typeof(GameObject), true ) as GameObject;
+				
+					for ( int ii = 0; ii < myObjectControl.prMaxInputCount; ++ii )
+					{
+						setTransformInput( ii );
+												
+					} // for
+				}				
+				
+				
+				for ( int ii = 0; ii < myObjectControl.prMaxGeoInputCount; ++ii )
+				{
+					myObjectControl.prUpStreamGeoObjects[ii] = EditorGUILayout.ObjectField( "Geometry Input", 
+									myObjectControl.prUpStreamGeoObjects[ii], typeof(GameObject), true ) as GameObject;
 															
-					if( myObjectControl.prUpStreamObjects[ii] != null )
+					if( myObjectControl.prUpStreamGeoObjects[ii] != null )
 					{
 						HAPI_Asset inputAsset = (HAPI_Asset) 
-												myObjectControl.prUpStreamObjects[ii].GetComponent("HAPI_Asset");
+												myObjectControl.prUpStreamGeoObjects[ii].GetComponent("HAPI_Asset");
 						if( inputAsset != null )
 						{
-							myObjectControl.addAssetAsInput( inputAsset, ii );
+							myObjectControl.addAssetAsGeoInput( inputAsset, ii );
 						}
 					}
 					else
 					{
-						myObjectControl.removeInput( ii );
+						myObjectControl.removeGeoInput( ii );
 					}
 					
-					if( myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
+					
+					EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
+					EditorGUILayout.BeginHorizontal(); 
 					{
-						EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
-						EditorGUILayout.BeginHorizontal(); 
+						string old_file_path = myObjectControl.prFileInputs[ ii ];
+						string new_file_path = "";
+						new_file_path = EditorGUILayout.TextField( old_file_path );
+						
+						if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
 						{
-							string old_file_path = myObjectControl.prFileInputs[ ii ];
-							string new_file_path = "";
-							new_file_path = EditorGUILayout.TextField( old_file_path );
-							
-							if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
-							{
-								string prompt_result_path = HAPI_GUIUtility.promptForFileInputPath( old_file_path );
-								if ( prompt_result_path.Length > 0 )
-									new_file_path = prompt_result_path;
-							}
-							
-							myObjectControl.prFileInputs[ ii ] = new_file_path;
-						} 
-						EditorGUILayout.EndHorizontal();
-					}
+							string prompt_result_path = HAPI_GUIUtility.promptForFileInputPath( old_file_path );
+							if ( prompt_result_path.Length > 0 )
+								new_file_path = prompt_result_path;
+						}
+						
+						myObjectControl.prFileInputs[ ii ] = new_file_path;
+					} 
+					EditorGUILayout.EndHorizontal();
+					
 				} // for
+				
+				
 			} // if
 		
 		
@@ -222,6 +234,31 @@ public partial class HAPI_AssetGUI : Editor
 		Rect last_double_rect = new Rect( xMin, yMin, width + width2, height );
 		
 		return last_double_rect;
+	}
+	
+	private void setTransformInput( int index )
+	{
+		myObjectControl.prUpStreamTransformObjects[index] = EditorGUILayout.ObjectField( "Transform Input", 
+						myObjectControl.prUpStreamTransformObjects[index], typeof(GameObject), true ) as GameObject;
+												
+		if( myObjectControl.prUpStreamTransformObjects[index] != null )
+		{
+			HAPI_Asset inputAsset = (HAPI_Asset) 
+									myObjectControl.prUpStreamTransformObjects[index].GetComponent("HAPI_Asset");
+			if( inputAsset != null )
+			{
+				
+				myObjectControl.addAssetAsTransformInput( inputAsset, index );
+			}
+			else
+			{
+				myObjectControl.removeTransformInput( index );
+			}
+		}
+		else
+		{
+			myObjectControl.removeTransformInput( index );
+		}
 	}
 	
 	/// <summary>
