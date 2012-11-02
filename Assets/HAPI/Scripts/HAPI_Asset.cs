@@ -110,6 +110,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		prAssetId 					= -1;
 		prAssetType					= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		
+		prParms						= null;
 		prParmCount 				= 0;
 		prParmIntValueCount			= 0;
 		prParmFloatValueCount		= 0;
@@ -135,9 +136,9 @@ public partial class HAPI_Asset : MonoBehaviour
 		prFolderListSelections 		= new List< int >();
 		prFolderListSelectionIds 	= new List< int >();
 		
-		prDownStreamAssets = new List<HAPI_Asset>();
-		prUpStreamAssets = new List<HAPI_Asset>();
-		prUpStreamObjects = new List<GameObject>();
+		prDownStreamAssets 			= new List<HAPI_Asset>();
+		prUpStreamAssets 			= new List<HAPI_Asset>();
+		prUpStreamObjects 			= new List<GameObject>();
 		
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
@@ -147,7 +148,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		myProgressBarTitle			= "Building Houdini Asset";
 		myProgressBarMsg			= "";
 		
-		myPreset = null;
+		myPreset 					= null;
 	}
 	
 	~HAPI_Asset() 

@@ -941,6 +941,25 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary>
+		/// 	Commit the current input geometry to the cook engine. Nodes that use this geometry node will 
+		/// 	re-cook using the input geometry given through the geometry setter API calls.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		public static void commitGeo( int asset_id, int object_id, int geo_id )
+		{
+			int status_code = HAPI_CommitGeo( asset_id, object_id, geo_id );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		// GEOMETRY INPUT -------------------------------------------------------------------------------------------
 		
 		/// <summary> 
@@ -961,6 +980,23 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary> 
+		/// 	Create a geometry input node.
+		/// </summary>
+		/// <param name="asset_id">
+		///		The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="input_idx">
+		///		The index of the input - 0 for an asset that has just one input.
+		///	</param>		
+		/// <param name="geo_id">
+		///		Geometry id corresponding to created input node. Use this id to push geometry to this input.
+		/// </param>
+		public static void createGeoInput( int asset_id, int input_idx, out int geo_id )
+		{
+			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out geo_id );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
 		
 		// Inter Asset ---------------------------------------------------------------------------------------------
 		
@@ -1041,24 +1077,6 @@ namespace HAPI
 		{
 			int status_code = HAPI_ConnectAssetGeometry( asset_id_from, object_id_from, group_id_from, 
 														 asset_id_to, input_idx );
-			processStatusCode( (HAPI_StatusCode) status_code );
-		}
-		
-		/// <summary> 
-		/// 	Create a geometry input node.
-		/// </summary>
-		/// <param name="asset_id">
-		///		The asset id returned by HAPI_LoadOTLFile().
-		/// </param>
-		/// <param name="input_idx">
-		///		The index of the input - 0 for an asset that has just one input.
-		///	</param>		
-		/// <param name="geo_id">
-		///		Geometry id corresponding to created input node. Use this id to push geometry to this input.
-		/// </param>
-		public static void createGeoInput( int asset_id, int input_idx, out int geo_id )
-		{
-			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out geo_id );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
