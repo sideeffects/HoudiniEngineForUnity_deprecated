@@ -21,6 +21,7 @@ using UnityEditor;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using HAPI;
 
 /// <summary>
@@ -205,11 +206,11 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// ATTRIBUTES ---------------------------------------------------------------------------------------------------
 		
-	public delegate void fillAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
-													  ref HAPI_AttributeInfo info, 
-													  [Out] T[] items, int start, int end );	
-	private void fillAttrArray< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
-									 T[] items, fillAttrArrayInputFunc< T > get_func, int count ) 
+	public delegate void getAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
+													 ref HAPI_AttributeInfo info, 
+													 [Out] T[] items, int start, int end );
+	private void getAttrArray< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
+									 T[] items, getAttrArrayInputFunc< T > get_func, int count ) 
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
 		
@@ -242,8 +243,46 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
+	public delegate void setAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
+												  	 ref HAPI_AttributeInfo info, 
+													 T[] items, int start, int end );
+	private void setAttrArray< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
+									 T[] items, setAttrArrayInputFunc< T > set_func, int count ) 
+	{
+		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
+		
+		int local_count = count;
+		int current_index = 0;
+		
+		while ( local_count > 0 ) 
+		{			
+			int length = 0;
+			if ( local_count > max_array_size ) 
+			{
+				length = max_array_size;
+				local_count -= max_array_size;
+			} 
+			else 
+			{
+				length = local_count;
+				local_count = 0;
+			}
+			
+			T[] local_array = new T[ length * info.tupleSize ];
+			
+			// Copy data from the temporary array.
+			for ( int i = current_index; i < current_index + length; ++i )
+				for ( int j = 0; j < info.tupleSize; ++j )
+					local_array[ ( i - current_index ) * info.tupleSize + j ] = items[ i * info.tupleSize + j ];
+			
+			set_func( asset_id, object_id, geo_id, name, ref info, local_array, current_index, length );
+			
+			current_index += length;
+		}
+	}
+	
 	public void getAttribute< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
-								   ref T[] data, fillAttrArrayInputFunc< T > get_func )
+								   ref T[] data, getAttrArrayInputFunc< T > get_func )
 	{
 		int original_tuple_size = info.tupleSize;		
 		
@@ -261,7 +300,13 @@ public partial class HAPI_Asset : MonoBehaviour
 			info.tupleSize = original_tuple_size;
 		
 		data = new T[ info.count * info.tupleSize ];
-		fillAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
+		getAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
+	}
+	
+	public void setAttribute< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
+								   ref T[] data, setAttrArrayInputFunc< T > get_func )
+	{
+		setAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
 	}
 	
 	public string[] getAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info, 
@@ -365,4 +410,244 @@ public partial class HAPI_Asset : MonoBehaviour
 		myProgressBarCurrent = 0;
 		EditorUtility.ClearProgressBar();
 	}
+	
+	// TEXTURES -----------------------------------------------------------------------------------------------------
+	
+	private void assignTexture( ref Material material, HAPI_MaterialInfo material_info )
+	{
+		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
+		string assets_root_path 		= Application.dataPath;
+		string textures_root_path 		= assets_root_path + "/Textures";
+		DirectoryInfo textures_dir 		= new DirectoryInfo( textures_root_path );
+		if ( !textures_dir.Exists )
+			textures_dir.Create();
+		
+		// Figure out the source file path and name.
+		string tex_file_path 		= material_info.textureFilePath.Replace( "\\", "/" );
+		string relative_file_path 	= tex_file_path.Replace( assets_root_path, "Assets" );
+		
+		// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths
+		// relative to the project folder.
+		Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+		if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+		{
+			// Asset has not been imported yet so import and try again.
+			AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+			tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+		}
+		
+		// Assign main texture.
+		material.mainTexture = (Texture2D) tex_obj;
+		
+		// Assign shader properties.
+		material.SetFloat( "_Shininess", 1.0f - material_info.roughness );
+		material.SetColor( "_Color", new Color( material_info.diffuse[ 0 ], 
+												material_info.diffuse[ 1 ],
+												material_info.diffuse[ 2 ],
+												material_info.diffuse[ 3 ] ) );
+		material.SetColor( "_SpecColor", new Color( material_info.specular[ 0 ], 
+													material_info.specular[ 1 ],
+													material_info.specular[ 2 ],
+													material_info.specular[ 3 ] ) );
+		
+		// Refresh all assets just in case.
+		AssetDatabase.Refresh();
+	}
+	
+	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
+	
+	private void getMesh( int asset_id, int object_id, int geo_id, Mesh mesh )
+	{
+		// Get Detail info.
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HAPI_Host.getGeoInfo( asset_id, object_id, geo_id, out geo_info );
+		
+		// Make sure our primitive and vertex numbers are supported by Unity.
+		// TODO: add this limit in a more proper place
+		if ( geo_info.faceCount > 65000 * 3 )
+			throw new HAPI_Error( "Face count (" + geo_info.faceCount 
+								  + ") above limit (" + ( 65000 * 3 ) + ")!" );
+		if ( geo_info.vertexCount > 65000 )
+			throw new HAPI_Error( "Vertex count (" + geo_info.vertexCount + ") above limit (" + 65000 + ")!" );
+		
+		// Get Face counts.
+		int[] face_counts = new int[ geo_info.faceCount ];
+		getArray3Id( asset_id, object_id, geo_id, HAPI_Host.getFaceCounts, face_counts, geo_info.faceCount );
+		
+		// Get Vertex list.
+		int[] vertex_list = new int[ geo_info.vertexCount ];
+		getArray3Id( asset_id, object_id, geo_id, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
+		
+		// Print attribute names.
+		if ( prEnableLogging )
+			printAllAttributeNames( asset_id, object_id, geo_id, geo_info );
+		
+		// Get position attributes.
+		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+		float[] pos_attr = new float[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
+					  HAPI_Host.getAttributeFloatData );
+		if ( !pos_attr_info.exists )
+			throw new HAPI_Error( "No position attribute found." );
+		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+			throw new HAPI_Error( "I only understand position as point attributes!" );
+				
+		// Get uv attributes.
+		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
+		uv_attr_info.tupleSize = 2;
+		float[] uv_attr = new float[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, "uv", ref uv_attr_info, ref uv_attr, 
+					  HAPI_Host.getAttributeFloatData );
+		
+		// Get normal attributes.
+		HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( "N" );
+		float[] normal_attr = new float[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, "N", ref normal_attr_info, ref normal_attr, 
+					  HAPI_Host.getAttributeFloatData );
+				
+		// Create Unity-specific data objects.
+		Vector3[] vertices 	= new Vector3[ 	geo_info.vertexCount ];
+		int[] triangles 	= new int[ 		geo_info.faceCount * 3 ];
+		Vector2[] uvs 		= new Vector2[ 	geo_info.vertexCount ];
+		Vector3[] normals 	= new Vector3[ 	geo_info.vertexCount ];
+		
+		// Fill Unity-specific data objects with data from the runtime.
+		for ( int i = 0; i < geo_info.vertexCount; ++i ) 
+		{
+			// Fill position information.
+			for ( int j = 0; j < 3; ++j )
+			{
+				vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
+				//flip the x coordinate - see note above about axis and coordinate conversions
+				if ( j == 0 )
+					vertices[ i ][ j ] *= -1;
+			}
+			
+			// Fill UVs.
+			if ( uv_attr_info.exists )
+			{
+				// If the UVs are per vertex just query directly into the UV array we filled above.
+				if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+					for ( int j = 0; j < 2; ++j )
+						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
+				
+				// If the UVs are per point use the vertex list array point indicies to query into
+				// the UV array we filled above.
+				else if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					for ( int j = 0; j < 2; ++j )
+						uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
+			}
+			
+			// Fill normals.
+			if ( normal_attr_info.exists )
+			{
+				// If the normals are per vertex just query directly into the normals array we filled above.
+				if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+					for ( int j = 0; j < 3; ++j )
+					{
+						normals[ i ][ j ] = normal_attr[ i * 3 + j ];
+						//flip the x coordinate - see note above about axis and coordinate conversions
+						if ( j == 0 )
+							normals[ i ][ j ] *= -1;
+						
+					}
+				
+				// If the normals are per point use the vertex list array point indicies to query into
+				// the normal array we filled above.
+				else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					for ( int j = 0; j < 3; ++j )
+					{
+						normals[ i ][ j ] = normal_attr[ vertex_list[ i ] * 3 + j ];
+						//flip the x coordinate - see note above about axis and coordinate conversions
+						if ( j == 0 )
+							normals[ i ][ j ] *= -1;
+					}
+				
+				// If the normals are per face divide the vertex index by the number of vertices per face
+				// which should always be HAPI_MAX_VERTICES_PER_FACE.
+				else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+					for ( int j = 0; j < 3; ++j )
+					{
+						normals[ i ][ j ] 
+							= normal_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
+						//flip the x coordinate - see note above about axis and coordinate conversions
+						if ( j == 0 )
+							normals[ i ][ j ] *= -1;
+					}
+			}
+		}
+		
+		for ( int i = 0; i < geo_info.faceCount; ++i ) 
+			for ( int j = 0; j < 3; ++j )
+				triangles[ i * 3 + j ] 	= i * 3 + j;
+		
+		// Load into vertices and face into mesh.
+		mesh.vertices 	= vertices;
+		mesh.triangles 	= triangles;
+		mesh.uv 		= uvs;
+		mesh.normals 	= normals;
+		
+		mesh.RecalculateBounds();
+		
+		if ( !normal_attr_info.exists )
+			mesh.RecalculateNormals();
+	}
+	
+	private void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh )
+	{
+		Vector3[] vertices 				= mesh.vertices;
+		int[] triangles 				= mesh.triangles;
+		Vector2[] uvs 					= mesh.uv;
+		Vector3[] normals 				= mesh.normals;
+		
+		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
+		HAPI_Host.getGeoInfo( asset_id, object_id, geo_id, out geo_info );
+		
+		geo_info.id 					= geo_id;
+		geo_info.materialId 			= -1;
+		geo_info.faceCount 				= triangles.Length / 3;
+		geo_info.vertexCount 			= vertices.Length;
+		geo_info.pointCount 			= vertices.Length;
+		
+		geo_info.pointAttributeCount 	= 1;
+		geo_info.vertexAttributeCount 	= 0;
+		geo_info.faceAttributeCount 	= 0;
+		geo_info.detailAttributeCount 	= 0;
+		
+		/* Not yet supported.
+		if ( uvs != null )
+			geo_info.vertexAttributeCount++;
+		if ( normals != null )
+			geo_info.vertexAttributeCount++;
+		*/
+		
+		// Set Face counts.
+		int[] face_counts = new int[ geo_info.faceCount ];
+		for ( int i = 0; i < geo_info.faceCount; ++i )
+			face_counts[ i ] = 3;
+		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.getFaceCounts, face_counts, geo_info.faceCount );
+		
+		// Set Vertex list.
+		int[] vertex_list = new int[ geo_info.vertexCount ];
+		for ( int i = 0; i < geo_info.vertexCount; ++i )
+			vertex_list[ i ] = i;
+		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
+		
+		// Set position attributes.
+		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+		pos_attr_info.exists 		= true;
+		pos_attr_info.owner 		= (int) HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+		pos_attr_info.storage 		= (int) HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+		pos_attr_info.count 		= geo_info.pointCount;
+		pos_attr_info.tupleSize 	= 3;
+		HAPI_Host.addAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info );
+		
+		float[] pos_attr = new float[ geo_info.vertexCount * 3 ];
+		for ( int i = 0; i < geo_info.vertexCount; ++i )
+			for ( int j = 0; j < 3; ++j )
+				pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
+		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
+					  HAPI_Host.setAttributeFloatData );
+	}
+	
 }
