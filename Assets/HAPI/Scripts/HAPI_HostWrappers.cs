@@ -941,6 +941,47 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		
+		/// <summary>	
+		/// 	Fill an array of HAPI_Transform structs with the transforms
+		///		of each instance of this instancer object
+		/// </summary>
+		///
+		/// <param="asset_id">
+		///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param="object_id">
+		///			The object id returned by HAPI_GetObjects().
+		/// </param>
+		/// <param name="geo_id">
+		///			The geometry id.
+		///	</param>
+		/// <param name="rstOrder">
+		///			The order of application of translation, rotation and
+		///			scale:
+		///			TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5  
+		/// </param>
+		/// <param="transforms">
+		///			Array of HAPI_Transform at least the size of
+		///			#length.
+		/// </param>
+		///	<param="start">
+		///			First index of range. Must be at least 0 and at 
+		///			most HAPI_GeoInfo::pointCount - 1.
+		/// </param>
+		/// <param="length">
+		///			Must be at least 0 and at most 
+		///			HAPI_GeoInfo::pointCount - #start.  
+		/// </param>
+		public static void getInstanceTransforms( int asset_id, int object_id, int geo_id,
+												  int rstOrder, [Out] HAPI_Transform[] transforms,
+												  int start, int length )
+		{
+			int status_code = HAPI_GetInstanceTransforms( asset_id, object_id, geo_id, rstOrder, transforms, 
+														  start, length );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		/// <summary>
 		/// 	Commit the current input geometry to the cook engine. Nodes that use this geometry node will 
 		/// 	re-cook using the input geometry given through the geometry setter API calls.

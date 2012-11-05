@@ -35,44 +35,57 @@ public partial class HAPI_Asset : MonoBehaviour
 	private delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
 	private delegate void getArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
 	private delegate void getArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
+	public delegate void getArray4IdDel< T >( int id1, int id2, int id3, int id4, [Out] T[] data, int start, int end );
 	
 	private void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
 								   int count )
 	{
-		getArray( id1, 0, 0, func, null, null, data, count, 1 );
+		getArray( id1, 0, 0, 0, func, null, null, null, data, count, 1 );
 	}
 	private void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
 								   int count, int tuple_size )
 	{
-		getArray( id1, 0, 0, func, null, null, data, count, tuple_size );
+		getArray( id1, 0, 0, 0, func, null, null, null, data, count, tuple_size );
 	}
 	
 	private void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
 								   int count )
 	{
-		getArray( id1, id2, 0, null, func, null, data, count, 1 );
+		getArray( id1, id2, 0, 0, null, func, null, null, data, count, 1 );
 	}
 	private void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
 								   int count, int tuple_size )
 	{
-		getArray( id1, id2, 0, null, func, null, data, count, tuple_size );
+		getArray( id1, id2, 0, 0, null, func, null, null, data, count, tuple_size );
 	}
 	
 	private void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
 								   int count )
 	{
-		getArray( id1, id2, id3, null, null, func, data, count, 1 );
+		getArray( id1, id2, id3, 0, null, null, func, null, data, count, 1 );
 	}
 	private void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
 								   int count, int tuple_size )
 	{
-		getArray( id1, id2, id3, null, null, func, data, count, tuple_size );
+		getArray( id1, id2, id3, 0, null, null, func, null, data, count, tuple_size );
 	}
 	
-	private void getArray< T >( int id1, int id2, int id3, 
+	public void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
+								   int count )
+	{
+		getArray( id1, id2, id3, id4, null, null, null, func, data, count, 1 );
+	}
+	public void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
+								   int count, int tuple_size )
+	{
+		getArray( id1, id2, id3, id4, null, null, null, func, data, count, tuple_size );
+	}
+	
+	private void getArray< T >( int id1, int id2, int id3, int id4,
 								getArray1IdDel< T > func_1id, 
 								getArray2IdDel< T > func_2id, 
 								getArray3IdDel< T > func_3id,
+								getArray4IdDel< T > func_4id,
 								[Out] T[] data, int count, int tuple_size )
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );
@@ -102,6 +115,8 @@ public partial class HAPI_Asset : MonoBehaviour
 				func_2id( id1, id2, local_array, current_index, length );
 			else if ( func_3id != null )
 				func_3id( id1, id2, id3, local_array, current_index, length );
+			else if ( func_4id != null )
+				func_4id( id1, id2, id3, id4, local_array, current_index, length );
 			else
 			{
 				Debug.LogError( "No valid delegates given to getArray< T >!" );

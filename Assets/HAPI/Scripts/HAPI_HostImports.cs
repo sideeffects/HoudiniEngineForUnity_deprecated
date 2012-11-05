@@ -223,6 +223,11 @@ namespace HAPI
 															  int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetInstanceTransforms( int asset_id, int object_id, int geo_id,
+															  int rstOrder, [Out] HAPI_Transform[] transforms,
+															  int start, int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_CommitGeo( int asset_id, int object_id, int geo_id );
 		
 		// GEOMETRY INPUT -------------------------------------------------------------------------------------------

@@ -46,44 +46,9 @@ public class HAPI_Instancer : MonoBehaviour {
 		if ( geo_info.pointCount > 65000 )
 			throw new HAPI_Error( "Point count (" + geo_info.pointCount + ") above limit (" + 65000 + ")!" );
 										
-		// Get position point attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
-		float[] pos_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "P",
-				 	  				  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
-		if ( !pos_attr_info.exists )
-			throw new HAPI_Error( "No position attribute found." );
-		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand position as point attributes!" );
-		
-		if ( pos_attr.Length != geo_info.pointCount * 3 )
-			throw new HAPI_Error( "Unexpected point array length found for asset: " + prObjectControl.prAssetId + "!" );
-		
-		// Get direction point attributes.
-		HAPI_AttributeInfo dir_attr_info = new HAPI_AttributeInfo( "N" );
-		float[] dir_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "N",
-					  				  ref dir_attr_info, ref dir_attr, HAPI_Host.getAttributeFloatData );
-		if ( !dir_attr_info.exists )
-			throw new HAPI_Error( "No normal (N) attribute found." );
-		else if ( dir_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand normal as point attributes!" );
-		
-		if ( dir_attr.Length != geo_info.pointCount * 3 )
-			throw new HAPI_Error( "Unexpected normal array length found for asset:" + prObjectControl.prAssetId + "!" );
-		
-		// Get up point attributes.
-		HAPI_AttributeInfo up_attr_info = new HAPI_AttributeInfo( "up" );
-		float[] up_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "up",
-									  ref up_attr_info, ref up_attr, HAPI_Host.getAttributeFloatData );
-		if ( !up_attr_info.exists )
-			throw new HAPI_Error( "No up attribute found." );
-		else if ( up_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand up as point attributes!" );
-		
-		if ( up_attr.Length != geo_info.pointCount * 3 )
-			throw new HAPI_Error( "Unexpected up array length found for asset: " + prObjectControl.prAssetId + "!" );
+		HAPI_Transform[] instance_transforms = new HAPI_Transform[ geo_info.pointCount ];
+		prObjectControl.getArray4Id( prObjectControl.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.SRT, 
+									 HAPI_Host.getInstanceTransforms, instance_transforms, geo_info.pointCount );
 		
 		// Get scale point attributes.
 		HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
@@ -126,10 +91,7 @@ public class HAPI_Instancer : MonoBehaviour {
 								  + prObjectControl.prAssetId + "!" );
 		
 		for(int ii = 0; ii < geo_info.pointCount; ii++)
-		{
-			Vector3 pos = new Vector3( pos_attr[ ii*3 ], pos_attr[ ii*3 + 1 ], pos_attr[ ii*3 + 2] );
-			Vector3 dir = new Vector3( dir_attr[ ii*3 ], dir_attr[ ii*3 + 1 ], dir_attr[ ii*3 + 2] );			
-			Vector3 up = new Vector3( up_attr[ ii*3 ], up_attr[ ii*3 + 1 ], up_attr[ ii*3 + 2] );
+		{			
 			
 			GameObject objToInstantiate = null;
 			
@@ -143,9 +105,7 @@ public class HAPI_Instancer : MonoBehaviour {
 				{
 					string instanceObjectPath = HAPI_Host.getString( instance_attr[ ii ] );
 					string[] pathItems = instanceObjectPath.Split('/');
-					string instanceObjectName = pathItems[ pathItems.Length - 1 ];
-					
-					Debug.Log("instance = " + instanceObjectName );
+					string instanceObjectName = pathItems[ pathItems.Length - 1 ];									
 					
 					int objectIndex = prObjectControl.findObjectByName( instanceObjectName );
 					if( objectIndex >= 0 )
@@ -162,72 +122,49 @@ public class HAPI_Instancer : MonoBehaviour {
 			//GameObject obj = PrefabUtility.InstantiatePrefab( prGameObjects[prObjectId] ) as GameObject;	
 			if ( objToInstantiate != null )
 			{
-				HAPI_TransformInstance instInfo = new HAPI_TransformInstance( true );
-				instInfo.pos[0] = -pos[0];
-				instInfo.pos[1] = pos[1];
-				instInfo.pos[2] = pos[2];
-				instInfo.dir[0] = -dir[0];
-				instInfo.dir[1] = dir[1];
-				instInfo.dir[2] = dir[2];
-				instInfo.up[0] = -up[0];
-				instInfo.up[1] = up[1];
-				instInfo.up[2] = up[2];
-				instInfo.scale = 1.0f;
+				Vector3 pos = new Vector3();
 				
-				if ( scale_attr_info.exists )
-				{
-					Vector3 scale = new Vector3( scale_attr[ ii*3 ], scale_attr[ ii*3 + 1 ], scale_attr[ ii*3 + 2] );
-					instInfo.scale3[0] = scale.x;
-					instInfo.scale3[1] = scale.y;
-					instInfo.scale3[2] = scale.z;
-				}
-				else
-				{
-					instInfo.scale3[0] = 1.0f;
-					instInfo.scale3[1] = 1.0f;
-					instInfo.scale3[2] = 1.0f;
-				}
+				// Apply object transforms.		
+				//
+				// Axis and Rotation conversions:
+				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
+				// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
+				// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
+				// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
+				// causes a double negative - yeah, I know).												
 				
-				instInfo.quat[0] = 0.0f;
-				instInfo.quat[1] = 0.0f;
-				instInfo.quat[2] = 0.0f;
-				instInfo.quat[3] = 1.0f;
-				instInfo.tr[0] = 0.0f;
-				instInfo.tr[1] = 0.0f;
-				instInfo.tr[2] = 0.0f;
+				pos[0] = -instance_transforms[ ii ].position[0];
+				pos[1] = instance_transforms[ ii ].position[1];
+				pos[2] = instance_transforms[ ii ].position[2];
 				
-				HAPI_Transform transform_out = new HAPI_Transform();
-				HAPI_Host.computeInstanceTransform( ref instInfo, 
-													(int) HAPI_RSTOrder.SRT,
-													ref transform_out );
+				Quaternion quat = new Quaternion( 	instance_transforms[ ii ].rotationQuaternion[ 0 ],
+													instance_transforms[ ii ].rotationQuaternion[ 1 ],
+													instance_transforms[ ii ].rotationQuaternion[ 2 ],
+													instance_transforms[ ii ].rotationQuaternion[ 3 ] );
 				
-				pos[0] = transform_out.position[0];
-				pos[1] = transform_out.position[1];
-				pos[2] = transform_out.position[2];
-				
-				Quaternion quat = new Quaternion( 	transform_out.rotationQuaternion[ 0 ],
-													transform_out.rotationQuaternion[ 1 ],
-													transform_out.rotationQuaternion[ 2 ],
-													transform_out.rotationQuaternion[ 3 ] );
+				Vector3 euler = quat.eulerAngles;
+				euler.y = -euler.y;
+				euler.z = -euler.z;
 				
 				GameObject obj;
 				
 				if ( !prOverrideInstances )
 				{
-					obj = Instantiate( objToInstantiate, pos, quat ) as GameObject;
+					obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
 					if( scale_attr_info.exists )
-						obj.transform.localScale = new Vector3( transform_out.scale[0], 
-															transform_out.scale[1], transform_out.scale[2] );
+						obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[0], 
+															instance_transforms[ ii ].scale[1], 
+															instance_transforms[ ii ].scale[2] );
 				}
 				else
 				{
 					obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
 					obj.transform.localPosition = pos;
-					obj.transform.localRotation = quat;
+					obj.transform.localRotation = Quaternion.Euler( euler );
 					if( scale_attr_info.exists )
-						obj.transform.localScale = new Vector3( transform_out.scale[ 0 ], 
-															transform_out.scale[ 1 ], 
-															transform_out.scale[ 2 ] );
+						obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[ 0 ], 
+															instance_transforms[ ii ].scale[ 1 ], 
+															instance_transforms[ ii ].scale[ 2 ] );
 				}
 				
 				obj.transform.parent = transform;
