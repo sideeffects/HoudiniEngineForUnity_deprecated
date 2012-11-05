@@ -42,11 +42,6 @@ namespace HAPI
 															ref HAPI_TransformEuler transform_out );
 		
 		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_ComputeInstanceTransform( ref HAPI_TransformInstance transform_inst,
-                                             				int rst_order,
-                                             				ref HAPI_Transform transform_out );
-		
 		// STRINGS --------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
