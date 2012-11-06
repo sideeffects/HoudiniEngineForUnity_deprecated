@@ -23,6 +23,7 @@ using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
 using HAPI;
+using Utility = HAPI_AssetUtility;
 
 /// <summary>
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
@@ -274,7 +275,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		MeshFilter asset_mesh_filter 	= asset.GetComponent< MeshFilter >();
 		Mesh mesh 						= asset_mesh_filter.sharedMesh;
 		
-		setMesh( prAssetId, object_id, geo_id, ref mesh );
+		Utility.setMesh( prAssetId, object_id, geo_id, ref mesh );
 		build();
 	}
 	
@@ -446,34 +447,34 @@ public partial class HAPI_Asset : MonoBehaviour
 				
 				// Get all parameters.
 				prParms = new HAPI_ParmInfo[ prParmCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
 				displayProgressBar( prParmCount );
 				
 				// Get parameter int values.
 				prParmIntValues = new int[ prParmIntValueCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
 				displayProgressBar( prParmIntValueCount );
 				
 				// Get parameter float values.
 				prParmFloatValues = new float[ prParmFloatValueCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
 				displayProgressBar( prParmFloatValueCount );
 				
 				// Get parameter string (handle) values.
 				prParmStringValues = new int[ prParmStringValueCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
 				displayProgressBar( prParmStringValueCount );
 				
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-				getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
 				displayProgressBar( prParmChoiceCount );								
 				
 				myProgressBarMsg = "Loading handles...";
 				
 				// Get exposed handle information.
 				prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
-				getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
 				
 				// Get handles.
 				prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );		
@@ -487,15 +488,15 @@ public partial class HAPI_Asset : MonoBehaviour
 								   		  + handle_info.typeName + " is unsupported at this time." );
 					
 					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
-					getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
-								 binding_infos, handle_info.bindingsCount );
+					Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
+								 		 binding_infos, handle_info.bindingsCount );
 					
 					prHandleBindingInfos.Add( binding_infos );
 				}
 				
 				// Get materials.
 				prMaterials = new HAPI_MaterialInfo[ prMaterialCount ];
-				getArray1Id ( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
 				displayProgressBar( prMaterialCount );
 				
 				// Add input fields.
@@ -591,9 +592,9 @@ public partial class HAPI_Asset : MonoBehaviour
 			prGameObjects		= new GameObject[ prObjectCount ];
 			prObjectTransforms 	= new HAPI_Transform[ prObjectCount ];
 			
-			getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
-			getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
-						 prObjectTransforms, prObjectCount );
+			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
+			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+						 		 prObjectTransforms, prObjectCount );
 			
 			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 			{
@@ -699,7 +700,6 @@ public partial class HAPI_Asset : MonoBehaviour
 		foreach ( GameObject child in children )
 			DestroyImmediate( child );
 	}
-		
 	
 	private void instanceObjects( int object_id )
 	{
@@ -756,7 +756,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			main_child_mesh.Clear();
 			
 			// Get mesh.
-			getMesh( prAssetId, object_id, 0, main_child_mesh );
+			Utility.getMesh( prAssetId, object_id, 0, main_child_mesh );
 			
 			// Add Mesh-to-Prefab component.
 			prGameObjects[ object_id ] = main_child;			
@@ -788,7 +788,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					prMaterials[ geo_info.materialId ] = material[ 0 ];
 					geo_info.hasMaterialChanged = false;
 				}
-				assignTexture( ref diffuse, prMaterials[ geo_info.materialId ] );
+				Utility.assignTexture( ref diffuse, prMaterials[ geo_info.materialId ] );
 			}
 			
 			// Apply object transforms.		
@@ -825,6 +825,55 @@ public partial class HAPI_Asset : MonoBehaviour
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;
 		}
+	}
+	
+	// PROGRESS BAR -------------------------------------------------------------------------------------------------
+	
+	private void incrementProgressBar()
+	{
+		displayProgressBar( 1 );
+	}
+	
+	private void displayProgressBar()
+	{
+		displayProgressBar( 0 );	
+	}
+	
+	private void displayProgressBar( int increment )
+	{
+		System.DateTime current = System.DateTime.Now;
+		System.TimeSpan delta = current - myProgressBarStartTime;
+		
+		// This delay for displaying the progress bar is so the bar won't flicker for really quick updates
+		// (less than a few seconds). Also, when we do show the progress bar the focus of the current 
+		// inspector control is lost.
+		if ( delta.Seconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
+		{
+			EditorUtility.ClearProgressBar();
+			return;
+		}
+		
+		myProgressBarJustUsed = true;
+				
+		myProgressBarCurrent += increment;
+		string message = myProgressBarMsg + " Item " + myProgressBarCurrent + " of " + myProgressBarTotal;
+		bool result = !EditorUtility.DisplayCancelableProgressBar( myProgressBarTitle, message, 
+												Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
+		
+		if ( !result )
+			throw new HAPI_ErrorProgressCancelled();
+	}
+	
+	public bool hasProgressBarBeenUsed()
+	{
+		return myProgressBarJustUsed;	
+	}
+	
+	private void clearProgressBar()
+	{
+		myProgressBarJustUsed = false;
+		myProgressBarCurrent = 0;
+		EditorUtility.ClearProgressBar();
 	}
 	
 	private bool			myProgressBarJustUsed;

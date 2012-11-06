@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
+using Utility = HAPI_AssetUtility;
 
 using HAPI;
 
@@ -10,24 +11,19 @@ public class HAPI_Instancer : MonoBehaviour {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public GameObject prObjToInstantiate { get; set; }
-	
-	public bool prOverrideInstances { get; set; }
-	
-	public HAPI_Asset prObjectControl { get; set; }
-	
-	public int prObjectId { get; set; }		
-	
+	public GameObject 	prObjToInstantiate { get; set; }
+	public bool 		prOverrideInstances { get; set; }
+	public HAPI_Asset 	prObjectControl { get; set; }
+	public int 			prObjectId { get; set; }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Public Methods			
+	// Public Methods
 	
 	public HAPI_Instancer () 
 	{
 		prObjectControl = null;
 		prOverrideInstances = false;
 		prObjectId = -1;
-			
 	}
 	
 	public void instanceObjects( )
@@ -47,14 +43,14 @@ public class HAPI_Instancer : MonoBehaviour {
 			throw new HAPI_Error( "Point count (" + geo_info.pointCount + ") above limit (" + 65000 + ")!" );
 										
 		HAPI_Transform[] instance_transforms = new HAPI_Transform[ geo_info.pointCount ];
-		prObjectControl.getArray4Id( prObjectControl.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.SRT, 
-									 HAPI_Host.getInstanceTransforms, instance_transforms, geo_info.pointCount );
+		Utility.getArray4Id( prObjectControl.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.SRT, 
+							 HAPI_Host.getInstanceTransforms, instance_transforms, geo_info.pointCount );
 		
 		// Get scale point attributes.
 		HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
 		float[] scale_attr = new float[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "scale",
-									  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
+		Utility.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "scale",
+							  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
 		
 		if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand up as point attributes!" );
@@ -80,8 +76,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
 		int[] instance_attr = new int[ 0 ];
-		prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "instance", 
-					ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
+		Utility.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "instance", 
+							  ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
 		
 		if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand instance as point attributes!" );
@@ -184,13 +180,6 @@ public class HAPI_Instancer : MonoBehaviour {
 		}
 		
 	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Overrides
-	
-	// Use this for initialization
-	
-	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Members

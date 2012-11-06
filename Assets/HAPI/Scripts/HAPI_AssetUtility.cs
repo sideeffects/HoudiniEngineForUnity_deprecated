@@ -28,65 +28,65 @@ using HAPI;
 /// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
 /// 	Houdini side.
 /// </summary>
-public partial class HAPI_Asset : MonoBehaviour
+public class HAPI_AssetUtility
 {
 	// GET ----------------------------------------------------------------------------------------------------------
 	
-	private delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
-	private delegate void getArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
-	private delegate void getArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
+	public delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
+	public delegate void getArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
+	public delegate void getArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
 	public delegate void getArray4IdDel< T >( int id1, int id2, int id3, int id4, [Out] T[] data, int start, int end );
 	
-	private void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
-								   int count )
+	public static void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+										 int count )
 	{
 		getArray( id1, 0, 0, 0, func, null, null, null, data, count, 1 );
 	}
-	private void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
-								   int count, int tuple_size )
+	public static void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+										 int count, int tuple_size )
 	{
 		getArray( id1, 0, 0, 0, func, null, null, null, data, count, tuple_size );
 	}
 	
-	private void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
-								   int count )
+	public static void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+										 int count )
 	{
 		getArray( id1, id2, 0, 0, null, func, null, null, data, count, 1 );
 	}
-	private void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
-								   int count, int tuple_size )
+	public static void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+										 int count, int tuple_size )
 	{
 		getArray( id1, id2, 0, 0, null, func, null, null, data, count, tuple_size );
 	}
 	
-	private void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
-								   int count )
+	public static void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+										 int count )
 	{
 		getArray( id1, id2, id3, 0, null, null, func, null, data, count, 1 );
 	}
-	private void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
-								   int count, int tuple_size )
+	public static void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+										 int count, int tuple_size )
 	{
 		getArray( id1, id2, id3, 0, null, null, func, null, data, count, tuple_size );
 	}
 	
-	public void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
-								   int count )
+	public static void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
+										 int count )
 	{
 		getArray( id1, id2, id3, id4, null, null, null, func, data, count, 1 );
 	}
-	public void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
-								   int count, int tuple_size )
+	public static void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
+										 int count, int tuple_size )
 	{
 		getArray( id1, id2, id3, id4, null, null, null, func, data, count, tuple_size );
 	}
 	
-	private void getArray< T >( int id1, int id2, int id3, int id4,
-								getArray1IdDel< T > func_1id, 
-								getArray2IdDel< T > func_2id, 
-								getArray3IdDel< T > func_3id,
-								getArray4IdDel< T > func_4id,
-								[Out] T[] data, int count, int tuple_size )
+	private static void getArray< T >( int id1, int id2, int id3, int id4,
+									   getArray1IdDel< T > func_1id, 
+									   getArray2IdDel< T > func_2id, 
+									   getArray3IdDel< T > func_3id,
+									   getArray4IdDel< T > func_4id,
+									   [Out] T[] data, int count, int tuple_size )
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );
 		
@@ -134,48 +134,48 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// SET ----------------------------------------------------------------------------------------------------------
 	
-	private delegate void setArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
-	private delegate void setArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
-	private delegate void setArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
+	public delegate void setArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
+	public delegate void setArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
+	public delegate void setArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
 	
-	private void setArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
-								   int count )
+	public static void setArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+										 int count )
 	{
 		setArray( id1, 0, 0, func, null, null, data, count, 1 );
 	}
-	private void setArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
-								   int count, int tuple_size )
+	public static void setArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
+										 int count, int tuple_size )
 	{
 		setArray( id1, 0, 0, func, null, null, data, count, tuple_size );
 	}
 	
-	private void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
-								   int count )
+	public static void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+										 int count )
 	{
 		setArray( id1, id2, 0, null, func, null, data, count, 1 );
 	}
-	private void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
-								   int count, int tuple_size )
+	public static void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+										 int count, int tuple_size )
 	{
 		setArray( id1, id2, 0, null, func, null, data, count, tuple_size );
 	}
 	
-	private void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
-								   int count )
+	public static void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+										 int count )
 	{
 		setArray( id1, id2, id3, null, null, func, data, count, 1 );
 	}
-	private void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
-								   int count, int tuple_size )
+	public static void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+										 int count, int tuple_size )
 	{
 		setArray( id1, id2, id3, null, null, func, data, count, tuple_size );
 	}
 	
-	private void setArray< T >( int id1, int id2, int id3, 
-								getArray1IdDel< T > func_1id, 
-								getArray2IdDel< T > func_2id, 
-								getArray3IdDel< T > func_3id,
-								[Out] T[] data, int count, int tuple_size )
+	private static void setArray< T >( int id1, int id2, int id3, 
+									   getArray1IdDel< T > func_1id, 
+									   getArray2IdDel< T > func_2id, 
+									   getArray3IdDel< T > func_3id,
+									   [Out] T[] data, int count, int tuple_size )
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );
 		
@@ -224,8 +224,9 @@ public partial class HAPI_Asset : MonoBehaviour
 	public delegate void getAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
 													 ref HAPI_AttributeInfo info, 
 													 [Out] T[] items, int start, int end );
-	private void getAttrArray< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
-									 T[] items, getAttrArrayInputFunc< T > get_func, int count ) 
+	public static void getAttrArray< T >( int asset_id, int object_id, int geo_id, string name, 
+										  ref HAPI_AttributeInfo info, T[] items,
+									 	  getAttrArrayInputFunc< T > get_func, int count ) 
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
 		
@@ -261,8 +262,9 @@ public partial class HAPI_Asset : MonoBehaviour
 	public delegate void setAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
 												  	 ref HAPI_AttributeInfo info, 
 													 T[] items, int start, int end );
-	private void setAttrArray< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
-									 T[] items, setAttrArrayInputFunc< T > set_func, int count ) 
+	public static void setAttrArray< T >( int asset_id, int object_id, int geo_id, string name, 
+										  ref HAPI_AttributeInfo info, T[] items, 
+										  setAttrArrayInputFunc< T > set_func, int count ) 
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
 		
@@ -296,8 +298,9 @@ public partial class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
-	public void getAttribute< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
-								   ref T[] data, getAttrArrayInputFunc< T > get_func )
+	public static void getAttribute< T >( int asset_id, int object_id, int geo_id, string name, 
+										  ref HAPI_AttributeInfo info, ref T[] data,
+										  getAttrArrayInputFunc< T > get_func )
 	{
 		int original_tuple_size = info.tupleSize;		
 		
@@ -318,14 +321,15 @@ public partial class HAPI_Asset : MonoBehaviour
 		getAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
 	}
 	
-	public void setAttribute< T >( int asset_id, int object_id, int geo_id, string name, ref HAPI_AttributeInfo info, 
-								   ref T[] data, setAttrArrayInputFunc< T > get_func )
+	public static void setAttribute< T >( int asset_id, int object_id, int geo_id, string name, 
+										  ref HAPI_AttributeInfo info, ref T[] data, 
+										  setAttrArrayInputFunc< T > get_func )
 	{
 		setAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
 	}
 	
-	public string[] getAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info, 
-									   HAPI_AttributeOwner owner )
+	public static string[] getAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info, 
+											  HAPI_AttributeOwner owner )
 	{
 		int attr_count = geo_info.getOwnerCount( owner );
 			
@@ -340,8 +344,8 @@ public partial class HAPI_Asset : MonoBehaviour
 		return names;
 	}
 	
-	private void printAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info,
-									  HAPI_AttributeOwner owner )
+	public static void printAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info,
+											HAPI_AttributeOwner owner )
 	{
 		string[] names = getAttributeNames( asset_id, object_id, geo_id, geo_info, owner );
 		
@@ -371,64 +375,15 @@ public partial class HAPI_Asset : MonoBehaviour
 		Debug.Log( msg );
 	}
 	
-	private void printAllAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info )
+	public static void printAllAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info )
 	{
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
 			printAttributeNames( asset_id, object_id, geo_id, geo_info, (HAPI_AttributeOwner) owner );
 	}
-		
-	// PROGRESS BAR -------------------------------------------------------------------------------------------------
-	
-	private void incrementProgressBar()
-	{
-		displayProgressBar( 1 );
-	}
-	
-	private void displayProgressBar()
-	{
-		displayProgressBar( 0 );	
-	}
-	
-	private void displayProgressBar( int increment )
-	{
-		System.DateTime current = System.DateTime.Now;
-		System.TimeSpan delta = current - myProgressBarStartTime;
-		
-		// This delay for displaying the progress bar is so the bar won't flicker for really quick updates
-		// (less than a few seconds). Also, when we do show the progress bar the focus of the current 
-		// inspector control is lost.
-		if ( delta.Seconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
-		{
-			EditorUtility.ClearProgressBar();
-			return;
-		}
-		
-		myProgressBarJustUsed = true;
-				
-		myProgressBarCurrent += increment;
-		string message = myProgressBarMsg + " Item " + myProgressBarCurrent + " of " + myProgressBarTotal;
-		bool result = !EditorUtility.DisplayCancelableProgressBar( myProgressBarTitle, message, 
-												Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
-		
-		if ( !result )
-			throw new HAPI_ErrorProgressCancelled();
-	}
-	
-	public bool hasProgressBarBeenUsed()
-	{
-		return myProgressBarJustUsed;	
-	}
-	
-	private void clearProgressBar()
-	{
-		myProgressBarJustUsed = false;
-		myProgressBarCurrent = 0;
-		EditorUtility.ClearProgressBar();
-	}
 	
 	// TEXTURES -----------------------------------------------------------------------------------------------------
 	
-	private void assignTexture( ref Material material, HAPI_MaterialInfo material_info )
+	public static void assignTexture( ref Material material, HAPI_MaterialInfo material_info )
 	{
 		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
 		string assets_root_path 		= Application.dataPath;
@@ -471,7 +426,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 	
-	private void getMesh( int asset_id, int object_id, int geo_id, Mesh mesh )
+	public static void getMesh( int asset_id, int object_id, int geo_id, Mesh mesh )
 	{
 		// Get Detail info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
@@ -494,8 +449,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		getArray3Id( asset_id, object_id, geo_id, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
 		
 		// Print attribute names.
-		if ( prEnableLogging )
-			printAllAttributeNames( asset_id, object_id, geo_id, geo_info );
+		//printAllAttributeNames( asset_id, object_id, geo_id, geo_info );
 		
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
@@ -608,7 +562,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			mesh.RecalculateNormals();
 	}
 	
-	private void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh )
+	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh )
 	{
 		Vector3[] vertices 				= mesh.vertices;
 		int[] triangles 				= mesh.triangles;
