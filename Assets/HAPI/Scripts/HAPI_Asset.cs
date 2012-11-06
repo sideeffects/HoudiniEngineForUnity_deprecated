@@ -179,7 +179,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			return false;
 		
 		prUpStreamTransformAssets[ index ] = asset;
-		HAPI_Host.connectAsset( asset.prAssetId, prAssetId, index );
+		HAPI_Host.connectAssetTransform( asset.prAssetId, prAssetId, index );
 		asset.addDownstreamTransformAsset( this );
 		build ();
 		return true;
@@ -190,7 +190,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		if( prUpStreamTransformAssets[ index ] != null )
 		{
 			prUpStreamTransformAssets[ index ].removeDownstreamTransformAsset( this );
-			HAPI_Host.disconnectAsset( prAssetId, index );
+			HAPI_Host.disconnectAssetTransform( prAssetId, index );
 			prUpStreamTransformAssets[ index ] = null;
 			build ();			
 		}				
@@ -204,7 +204,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			if( prUpStreamTransformAssets[ii] == asset )
 			{
 				prUpStreamTransformAssets[ ii ] = null;
-				HAPI_Host.disconnectAsset( prAssetId, ii );
+				HAPI_Host.disconnectAssetTransform( prAssetId, ii );
 				
 				asset.removeDownstreamTransformAsset( this );
 				build ();
@@ -246,35 +246,15 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// Geometry related connection methods -------------------------------------------------------
 	public bool addAssetAsGeoInput( HAPI_Asset asset, int index )
-	{
-		//TODO: This is the really simplistic version.  Must handle non-sop assets next.
+	{		
+		if( prUpStreamGeoAssets[ index ] == asset )
+			return false;
 		
-		if( asset.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP &&
-			asset.prAssetType == prAssetType )
-		{
-		
-			if( prUpStreamGeoAssets[ index ] == asset )
-				return false;
-			
-			prUpStreamGeoAssets[ index ] = asset;
-			HAPI_Host.connectAsset( asset.prAssetId, prAssetId, index );
-			asset.addDownstreamGeoAsset( this );
-			build ();
-			return true;
-		}
-		else if( asset.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_SOP )
-		{
-			if( prUpStreamGeoAssets[ index ] == asset )
-				return false;
-			
-			prUpStreamGeoAssets[ index ] = asset;
-			HAPI_Host.connectAssetGeometry( asset.prAssetId, 0, 0, prAssetId, index );
-			asset.addDownstreamGeoAsset( this );
-			build ();
-			return true;				
-		}
-		return false;
-			
+		prUpStreamGeoAssets[ index ] = asset;
+		HAPI_Host.connectAssetGeometry( asset.prAssetId, 0, 0, prAssetId, index );
+		asset.addDownstreamGeoAsset( this );
+		build ();
+		return true;
 		
 	}
 						
@@ -283,7 +263,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		if( prUpStreamGeoAssets[ index ] != null )
 		{
 			prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
-			HAPI_Host.disconnectAsset( prAssetId, index );
+			HAPI_Host.disconnectAssetGeometry( prAssetId, index );
 			prUpStreamGeoAssets[ index ] = null;
 			build ();			
 		}	
@@ -546,7 +526,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					{												
 						if ( prUpStreamTransformAssets[ ii ] != null )
 						{
-							HAPI_Host.connectAsset( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );						
+							HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );						
 						}
 					}
 				}
@@ -569,7 +549,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				{
 					int index = downstream_asset.getAssetTransformConnectionIndex( this );
 					if( index >=0 )
-						HAPI_Host.connectAsset( prAssetId, downstream_asset.prAssetId, index );
+						HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
 				}
 				
 			}

@@ -1038,15 +1038,15 @@ namespace HAPI
 		///			should be made.
 		/// </param>		
 		
-		public static void connectAsset( int asset_id_from, int asset_id_to, int input_idx )
+		public static void connectAssetTransform( int asset_id_from, int asset_id_to, int input_idx )
 		{
-			int status_code = HAPI_ConnectAsset( asset_id_from, asset_id_to, input_idx );
+			int status_code = HAPI_ConnectAssetTransform( asset_id_from, asset_id_to, input_idx );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
 		
 		/// <summary> 
-		/// 	Break an existing connection
+		/// 	Break an existing connection on transforms
 		/// </summary>	
 		///
 		/// <param name ="asset_id">
@@ -1057,9 +1057,9 @@ namespace HAPI
 		///			should be broken.
 		///	</param>
 		
-		public static void disconnectAsset( int asset_id, int input_idx )
+		public static void disconnectAssetTransform( int asset_id, int input_idx )
 		{
-			int status_code = HAPI_DisconnectAsset( asset_id, input_idx );
+			int status_code = HAPI_DisconnectAssetTransform( asset_id, input_idx );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -1094,6 +1094,24 @@ namespace HAPI
 		{
 			int status_code = HAPI_ConnectAssetGeometry( asset_id_from, object_id_from, group_id_from, 
 														 asset_id_to, input_idx );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		/// <summary> 
+		/// 	Break an existing connection on geometry
+		/// </summary>	
+		///
+		/// <param name ="asset_id">
+		///			The asset id of the asset
+		/// </param>
+		/// <param name="input_idx">
+		///			The index on the asset where the connection
+		///			should be broken.
+		///	</param>
+		
+		public static void disconnectAssetGeometry( int asset_id, int input_idx )
+		{
+			int status_code = HAPI_DisconnectAssetGeometry( asset_id, input_idx );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
