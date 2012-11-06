@@ -749,9 +749,9 @@ namespace HAPI
 		/// 	<see cref="HAPI_GeoInfo"/> out parameter.
 		/// </param>
 		public static void setGeoInfo(			int asset_id, int object_id, int geo_id,
-												out HAPI_GeoInfo geo_info )
+												ref HAPI_GeoInfo geo_info )
 		{
-			int status_code = HAPI_SetGeoInfo( asset_id, object_id, geo_id, out geo_info );
+			int status_code = HAPI_SetGeoInfo( asset_id, object_id, geo_id, ref geo_info );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -922,7 +922,6 @@ namespace HAPI
 		/// 	Fill an array of HAPI_Transform structs with the transforms
 		///		of each instance of this instancer object
 		/// </summary>
-		///
 		/// <param="asset_id">
 		///			The asset id returned by HAPI_LoadOTLFile().
 		/// </param>
@@ -1005,13 +1004,18 @@ namespace HAPI
 		/// </param>
 		/// <param name="input_idx">
 		///		The index of the input - 0 for an asset that has just one input.
-		///	</param>		
+		///	</param>
+		/// <param name="object_id">
+		///		Object id corresponding to created input node. Use this id to push geometry to this input. Note 
+		///		that this id will usually be 0 if geometry is piped to a geometry type asset but will could be 
+		///		non-zero if geometry is piped to an object type asset.
+		/// </param>
 		/// <param name="geo_id">
 		///		Geometry id corresponding to created input node. Use this id to push geometry to this input.
 		/// </param>
-		public static void createGeoInput( int asset_id, int input_idx, out int geo_id )
+		public static void createGeoInput( int asset_id, int input_idx, out int object_id, out int geo_id )
 		{
-			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out geo_id );
+			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out object_id, out geo_id );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
@@ -1047,8 +1051,7 @@ namespace HAPI
 		
 		/// <summary> 
 		/// 	Break an existing connection on transforms
-		/// </summary>	
-		///
+		/// </summary>
 		/// <param name ="asset_id">
 		///			The asset id of the asset
 		/// </param>
@@ -1071,7 +1074,6 @@ namespace HAPI
 		///		you to specify the exact object and group of the geometry you
 		///		are trying to connect.
 		/// </summary>
-		///
 		/// <param name="asset_id_from">
 		///			The asset id of the source asset
 		/// </param>

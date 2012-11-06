@@ -146,6 +146,8 @@ public partial class HAPI_AssetGUI : Editor
 						{
 							myObjectControl.addAssetAsGeoInput( inputAsset, ii );
 						}
+						else
+							myObjectControl.addGeoAsGeoInput( myObjectControl.prUpStreamGeoObjects[ii], ii );
 					}
 					else
 					{

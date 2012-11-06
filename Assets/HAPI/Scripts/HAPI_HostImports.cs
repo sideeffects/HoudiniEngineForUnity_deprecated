@@ -186,7 +186,7 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetGeoInfo(			int asset_id, int object_id, int geo_id,
-															out HAPI_GeoInfo geo_info );
+															ref HAPI_GeoInfo geo_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetFaceCounts(		int asset_id, int object_id, int geo_id,
@@ -233,7 +233,7 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_CreateGeoInput( 		int asset_id, int input_idx, 
-															out int geo_id );
+															out int object_id, out int geo_id );
 		
 		// INTER ASSET ----------------------------------------------------------------------------------------------
 		

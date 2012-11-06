@@ -533,7 +533,7 @@ public partial class HAPI_Asset : MonoBehaviour
 			for ( int j = 0; j < 3; ++j )
 			{
 				vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
-				//flip the x coordinate - see note above about axis and coordinate conversions
+				// Flip the x coordinate.
 				if ( j == 0 )
 					vertices[ i ][ j ] *= -1;
 			}
@@ -561,7 +561,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					for ( int j = 0; j < 3; ++j )
 					{
 						normals[ i ][ j ] = normal_attr[ i * 3 + j ];
-						//flip the x coordinate - see note above about axis and coordinate conversions
+						// Flip the x coordinate.
 						if ( j == 0 )
 							normals[ i ][ j ] *= -1;
 						
@@ -573,7 +573,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					for ( int j = 0; j < 3; ++j )
 					{
 						normals[ i ][ j ] = normal_attr[ vertex_list[ i ] * 3 + j ];
-						//flip the x coordinate - see note above about axis and coordinate conversions
+						// Flip the x coordinate.
 						if ( j == 0 )
 							normals[ i ][ j ] *= -1;
 					}
@@ -585,7 +585,7 @@ public partial class HAPI_Asset : MonoBehaviour
 					{
 						normals[ i ][ j ] 
 							= normal_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
-						//flip the x coordinate - see note above about axis and coordinate conversions
+						// Flip the x coordinate.
 						if ( j == 0 )
 							normals[ i ][ j ] *= -1;
 					}
@@ -612,16 +612,15 @@ public partial class HAPI_Asset : MonoBehaviour
 	{
 		Vector3[] vertices 				= mesh.vertices;
 		int[] triangles 				= mesh.triangles;
-		Vector2[] uvs 					= mesh.uv;
-		Vector3[] normals 				= mesh.normals;
+		//Vector2[] uvs 					= mesh.uv;
+		//Vector3[] normals 				= mesh.normals;
 		
 		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
-		HAPI_Host.getGeoInfo( asset_id, object_id, geo_id, out geo_info );
 		
 		geo_info.id 					= geo_id;
 		geo_info.materialId 			= -1;
 		geo_info.faceCount 				= triangles.Length / 3;
-		geo_info.vertexCount 			= vertices.Length;
+		geo_info.vertexCount 			= triangles.Length;
 		geo_info.pointCount 			= vertices.Length;
 		
 		geo_info.pointAttributeCount 	= 1;
@@ -636,17 +635,20 @@ public partial class HAPI_Asset : MonoBehaviour
 			geo_info.vertexAttributeCount++;
 		*/
 		
+		HAPI_Host.setGeoInfo( asset_id, object_id, geo_id, ref geo_info );
+		
 		// Set Face counts.
 		int[] face_counts = new int[ geo_info.faceCount ];
 		for ( int i = 0; i < geo_info.faceCount; ++i )
 			face_counts[ i ] = 3;
-		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.getFaceCounts, face_counts, geo_info.faceCount );
+		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setFaceCounts, face_counts, geo_info.faceCount );
 		
 		// Set Vertex list.
 		int[] vertex_list = new int[ geo_info.vertexCount ];
-		for ( int i = 0; i < geo_info.vertexCount; ++i )
-			vertex_list[ i ] = i;
-		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
+		for ( int i = 0; i < geo_info.faceCount; ++i )
+			for ( int j = 0; j < 3; ++j )
+				vertex_list[ i * 3 + j ] = triangles[ i * 3 + ( 2 - j ) ];
+		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, geo_info.vertexCount );
 		
 		// Set position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
@@ -657,12 +659,14 @@ public partial class HAPI_Asset : MonoBehaviour
 		pos_attr_info.tupleSize 	= 3;
 		HAPI_Host.addAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info );
 		
-		float[] pos_attr = new float[ geo_info.vertexCount * 3 ];
-		for ( int i = 0; i < geo_info.vertexCount; ++i )
+		float[] pos_attr = new float[ geo_info.pointCount * 3 ];
+		for ( int i = 0; i < geo_info.pointCount; ++i )
 			for ( int j = 0; j < 3; ++j )
 				pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
 		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
 					  HAPI_Host.setAttributeFloatData );
+		
+		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
 	}
 	
 }

@@ -43,15 +43,16 @@ public partial class HAPI_Asset : MonoBehaviour
 	public int 						prMaxInputCount { get; set; }
 	public int 						prMinGeoInputCount { get; set; }
 	public int						prMaxGeoInputCount { get; set; }
-	public List<string>				prFileInputs { get; set; }
+	public List< string >			prFileInputs { get; set; }
 	
-	public List < HAPI_Asset >		prDownStreamTransformAssets { get; set; }
-	public List < HAPI_Asset >		prUpStreamTransformAssets { get; set; }
-	public List < GameObject >		prUpStreamTransformObjects { get; set; }
+	public List< HAPI_Asset >		prDownStreamTransformAssets { get; set; }
+	public List< HAPI_Asset >		prUpStreamTransformAssets { get; set; }
+	public List< GameObject >		prUpStreamTransformObjects { get; set; }
 	
-	public List < HAPI_Asset >		prDownStreamGeoAssets { get; set; }
-	public List < HAPI_Asset >		prUpStreamGeoAssets { get; set; }
-	public List < GameObject >		prUpStreamGeoObjects { get; set; }
+	public List< HAPI_Asset >		prDownStreamGeoAssets { get; set; }
+	public List< HAPI_Asset >		prUpStreamGeoAssets { get; set; }
+	public List< GameObject >		prUpStreamGeoObjects { get; set; }
+	public List< bool >				prUpStreamGeoAdded { get; set; }
 	
 	public int 						prParmCount { get; set; }
 	public int						prParmIntValueCount { get; set; }
@@ -144,13 +145,14 @@ public partial class HAPI_Asset : MonoBehaviour
 		prFolderListSelectionIds 	= new List< int >();
 		
 
-		prDownStreamTransformAssets = new List<HAPI_Asset>();
-		prUpStreamTransformAssets = new List<HAPI_Asset>();
-		prUpStreamTransformObjects = new List<GameObject>();
+		prDownStreamTransformAssets = new List< HAPI_Asset >();
+		prUpStreamTransformAssets 	= new List< HAPI_Asset >();
+		prUpStreamTransformObjects 	= new List< GameObject >();
 		
-		prDownStreamGeoAssets = new List<HAPI_Asset>();
-		prUpStreamGeoAssets = new List<HAPI_Asset>();
-		prUpStreamGeoObjects = new List<GameObject>();
+		prDownStreamGeoAssets 		= new List< HAPI_Asset >();
+		prUpStreamGeoAssets 		= new List< HAPI_Asset >();
+		prUpStreamGeoObjects 		= new List< GameObject >();
+		prUpStreamGeoAdded 			= new List< bool >();
 		
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
@@ -245,6 +247,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	}
 	
 	// Geometry related connection methods -------------------------------------------------------
+	
 	public bool addAssetAsGeoInput( HAPI_Asset asset, int index )
 	{		
 		if( prUpStreamGeoAssets[ index ] == asset )
@@ -255,9 +258,26 @@ public partial class HAPI_Asset : MonoBehaviour
 		asset.addDownstreamGeoAsset( this );
 		build ();
 		return true;
-		
 	}
-						
+	
+	public void addGeoAsGeoInput( GameObject asset, int index )
+	{
+		if ( prUpStreamGeoAdded[ index ] )
+			return;
+		
+		prUpStreamGeoAdded[ index ] = true;
+		
+		int object_id;
+		int geo_id;
+		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id );
+		
+		MeshFilter asset_mesh_filter 	= asset.GetComponent< MeshFilter >();
+		Mesh mesh 						= asset_mesh_filter.sharedMesh;
+		
+		setMesh( prAssetId, object_id, geo_id, ref mesh );
+		build();
+	}
+	
 	public void removeGeoInput( int index )
 	{
 		if( prUpStreamGeoAssets[ index ] != null )
@@ -265,13 +285,13 @@ public partial class HAPI_Asset : MonoBehaviour
 			prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
 			HAPI_Host.disconnectAssetGeometry( prAssetId, index );
 			prUpStreamGeoAssets[ index ] = null;
-			build ();			
-		}	
+			build();
+		}
 	}
 	
 	public void removeDownstreamGeoAsset( HAPI_Asset asset )
-	{			
-		prDownStreamGeoAssets.Remove( asset );		
+	{
+		prDownStreamGeoAssets.Remove( asset );
 		
 	}
 		
@@ -496,6 +516,7 @@ public partial class HAPI_Asset : MonoBehaviour
 						prFileInputs.Add( "" );
 						prUpStreamGeoAssets.Add( null );
 						prUpStreamGeoObjects.Add( null );
+						prUpStreamGeoAdded.Add( false );
 					}
 				
 				// Check for min input fields set.
