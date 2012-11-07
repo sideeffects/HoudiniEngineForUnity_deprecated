@@ -48,6 +48,15 @@ public class HAPI_Window : EditorWindow
 		
 		if ( myShowUtility )
 		{
+			if ( GUILayout.Button( "Save Current Houdini Scene" ) )
+			{
+				string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
+				if ( hip_file_path != "" && HAPI_Host.hasScene() )
+					HAPI_Host.saveScene( hip_file_path );
+				else
+					Debug.LogError( "Nothing to save." );
+			}
+			
 			if ( GUILayout.Button( "Load Houdini Asset" ) )
 			{
 				string asset_file_path = HAPI_GUIUtility.promptForOTLPath();

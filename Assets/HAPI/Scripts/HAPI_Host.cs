@@ -82,6 +82,11 @@ namespace HAPI
 			return myHoudiniSceneExists;
 		}
 		
+		public static void saveScene( string file_name )
+		{
+			HAPI_SaveHIPFile( file_name );
+		}
+		
 		/// <summary>
 		/// 	Load and instantiate an asset from a .otl file.
 		/// </summary>
