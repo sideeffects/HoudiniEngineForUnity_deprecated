@@ -118,42 +118,34 @@ public partial class HAPI_AssetGUI : Editor
 		if ( myObjectControl.prMaxInputCount > 0 || myObjectControl.prMaxGeoInputCount > 0 )
 		{
 			myObjectControl.prShowInputControls = 
-				EditorGUILayout.Foldout( myObjectControl.prShowInputControls, new GUIContent( "Inputs" ) );			
+				EditorGUILayout.Foldout( myObjectControl.prShowInputControls, new GUIContent( "Inputs" ) );
 			
 			if ( myObjectControl.prShowInputControls )
 			{
-				if( myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-				{
-				
+				if ( myObjectControl.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					for ( int ii = 0; ii < myObjectControl.prMaxInputCount; ++ii )
-					{
 						setTransformInput( ii );
-												
-					} // for
-				}				
-				
 				
 				for ( int ii = 0; ii < myObjectControl.prMaxGeoInputCount; ++ii )
 				{
-					myObjectControl.prUpStreamGeoObjects[ii] = EditorGUILayout.ObjectField( "Geometry Input", 
-									myObjectControl.prUpStreamGeoObjects[ii], typeof(GameObject), true ) as GameObject;
-															
-					if( myObjectControl.prUpStreamGeoObjects[ii] != null )
-					{
-						HAPI_Asset inputAsset = (HAPI_Asset) 
-												myObjectControl.prUpStreamGeoObjects[ii].GetComponent("HAPI_Asset");
-						if( inputAsset != null )
-						{
-							myObjectControl.addAssetAsGeoInput( inputAsset, ii );
-						}
-						else
-							myObjectControl.addGeoAsGeoInput( myObjectControl.prUpStreamGeoObjects[ii], ii );
-					}
-					else
-					{
-						myObjectControl.removeGeoInput( ii );
-					}
+					GameObject old_object = myObjectControl.prUpStreamGeoObjects[ ii ];
+					GameObject new_object = EditorGUILayout.ObjectField( "Geometry Input", old_object, 
+																		 typeof( GameObject ), true ) as GameObject;
 					
+					if ( new_object != old_object )
+					{
+						myObjectControl.prUpStreamGeoObjects[ ii ] = new_object;
+						if ( !new_object )
+							myObjectControl.removeGeoInput( ii );
+						else
+						{
+							HAPI_Asset asset_component = new_object.GetComponent< HAPI_Asset >();
+							if ( asset_component )
+								myObjectControl.addAssetAsGeoInput( asset_component, ii );
+							else
+								myObjectControl.addGeoAsGeoInput( new_object, ii );
+						}
+					}
 					
 					EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
 					EditorGUILayout.BeginHorizontal(); 
@@ -174,11 +166,7 @@ public partial class HAPI_AssetGUI : Editor
 					EditorGUILayout.EndHorizontal();
 					
 				} // for
-				
-				
 			} // if
-		
-		
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////

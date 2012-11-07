@@ -175,70 +175,63 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// Transform related connection methods -------------------------------------------------------
 	
-	public bool addAssetAsTransformInput( HAPI_Asset asset, int index )
+	public void addAssetAsTransformInput( HAPI_Asset asset, int index )
 	{		
 		
-		if( prUpStreamTransformAssets[ index ] == asset )
-			return false;
+		if ( prUpStreamTransformAssets[ index ] == asset )
+			return;
 		
 		prUpStreamTransformAssets[ index ] = asset;
 		HAPI_Host.connectAssetTransform( asset.prAssetId, prAssetId, index );
 		asset.addDownstreamTransformAsset( this );
-		build ();
-		return true;
+		build();
+		return;
 	}
 	
 	public void removeTransformInput( int index )
 	{
-		if( prUpStreamTransformAssets[ index ] != null )
+		if ( prUpStreamTransformAssets[ index ] != null )
 		{
 			prUpStreamTransformAssets[ index ].removeDownstreamTransformAsset( this );
 			HAPI_Host.disconnectAssetTransform( prAssetId, index );
 			prUpStreamTransformAssets[ index ] = null;
-			build ();			
-		}				
+			build();
+		}
 		
 	}
 	
-	public bool removeAssetAsTransformInput( HAPI_Asset asset )
+	public void removeAssetAsTransformInput( HAPI_Asset asset )
 	{
-		for ( int ii = 0; ii < prUpStreamTransformAssets.Count; ii++ )
+		for ( int ii = 0; ii < prUpStreamTransformAssets.Count; ++ii )
 		{
-			if( prUpStreamTransformAssets[ii] == asset )
+			if ( prUpStreamTransformAssets[ii] == asset )
 			{
 				prUpStreamTransformAssets[ ii ] = null;
 				HAPI_Host.disconnectAssetTransform( prAssetId, ii );
 				
 				asset.removeDownstreamTransformAsset( this );
-				build ();
-				return true;			
+				build();
+				return;
 			}
 		}
-		
-		return false;
 	}
 	
 	public int getAssetTransformConnectionIndex( HAPI_Asset asset )
 	{
 		for ( int ii = 0; ii < prUpStreamTransformAssets.Count; ii++ )
-		{
-			if( prUpStreamTransformAssets[ii] == asset )
-			{
+			if ( prUpStreamTransformAssets[ii] == asset )
 				return ii;
-			}
-		}
+		
 		return -1;
 	}
 	
-	public bool addDownstreamTransformAsset( HAPI_Asset asset )
+	public void addDownstreamTransformAsset( HAPI_Asset asset )
 	{		
 		foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-		{
-			if( downstream_asset == asset )
-				return false;			
-		}
+			if ( downstream_asset == asset )
+				return;
+		
 		prDownStreamTransformAssets.Add( asset );
-		return true;
 	}
 	
 	public void removeDownstreamTransformAsset( HAPI_Asset asset )
@@ -249,23 +242,19 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	// Geometry related connection methods -------------------------------------------------------
 	
-	public bool addAssetAsGeoInput( HAPI_Asset asset, int index )
+	public void addAssetAsGeoInput( HAPI_Asset asset, int index )
 	{		
 		if( prUpStreamGeoAssets[ index ] == asset )
-			return false;
+			return;
 		
 		prUpStreamGeoAssets[ index ] = asset;
 		HAPI_Host.connectAssetGeometry( asset.prAssetId, 0, 0, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
-		build ();
-		return true;
+		build();
 	}
 	
 	public void addGeoAsGeoInput( GameObject asset, int index )
 	{
-		if ( prUpStreamGeoAdded[ index ] )
-			return;
-		
 		prUpStreamGeoAdded[ index ] = true;
 		
 		int object_id;
@@ -281,11 +270,18 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	public void removeGeoInput( int index )
 	{
-		if( prUpStreamGeoAssets[ index ] != null )
+		if ( prUpStreamGeoAssets[ index ] )
 		{
 			prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
 			HAPI_Host.disconnectAssetGeometry( prAssetId, index );
 			prUpStreamGeoAssets[ index ] = null;
+			build();
+		}
+		
+		if ( prUpStreamGeoAdded[ index ] )
+		{
+			HAPI_Host.disconnectAssetGeometry( prAssetId, index );
+			prUpStreamGeoAdded[ index ] = false;
 			build();
 		}
 	}
@@ -293,18 +289,15 @@ public partial class HAPI_Asset : MonoBehaviour
 	public void removeDownstreamGeoAsset( HAPI_Asset asset )
 	{
 		prDownStreamGeoAssets.Remove( asset );
-		
 	}
-		
-	public bool addDownstreamGeoAsset( HAPI_Asset asset )
+	
+	public void addDownstreamGeoAsset( HAPI_Asset asset )
 	{		
 		foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-		{
-			if( downstream_asset == asset )
-				return false;			
-		}
+			if ( downstream_asset == asset )
+				return;
+		
 		prDownStreamGeoAssets.Add( asset );
-		return true;
 	}
 	
 	public void OnDestroy()
@@ -312,21 +305,16 @@ public partial class HAPI_Asset : MonoBehaviour
 		if ( prAssetId >= 0 )
 		{
 			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
-			{
-				if( upstream_asset != null )
+				if ( upstream_asset != null )
 					upstream_asset.removeDownstreamTransformAsset( this );
-			} 
 			
-			List< HAPI_Asset > downstream_asset_list = new List<HAPI_Asset>();
+			List< HAPI_Asset > downstream_asset_list = new List< HAPI_Asset >();
+			
 			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-			{
 				downstream_asset_list.Add( downstream_asset );
-			}
 			
 			foreach ( HAPI_Asset downstream_asset in downstream_asset_list )
-			{
 				downstream_asset.removeAssetAsTransformInput( this );
-			}
 			
 			prUpStreamTransformAssets.Clear();
 			prDownStreamTransformAssets.Clear();

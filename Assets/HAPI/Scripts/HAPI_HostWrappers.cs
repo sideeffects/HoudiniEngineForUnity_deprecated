@@ -748,8 +748,8 @@ namespace HAPI
 		/// <param name="geo_info">
 		/// 	<see cref="HAPI_GeoInfo"/> out parameter.
 		/// </param>
-		public static void setGeoInfo(			int asset_id, int object_id, int geo_id,
-												ref HAPI_GeoInfo geo_info )
+		public static void setGeoInfo(	int asset_id, int object_id, int geo_id,
+										ref HAPI_GeoInfo geo_info )
 		{
 			int status_code = HAPI_SetGeoInfo( asset_id, object_id, geo_id, ref geo_info );
 			processStatusCode( (HAPI_StatusCode) status_code );
