@@ -389,7 +389,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
-				prAssetType				= (HAPI_AssetType) prAssetInfo.assetType;
+				prAssetType				= (HAPI_AssetType) prAssetInfo.type;
 				prMinInputCount			= prAssetInfo.minInputCount;
 				prMaxInputCount			= prAssetInfo.maxInputCount;
 				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
@@ -450,13 +450,14 @@ public partial class HAPI_Asset : MonoBehaviour
 				
 				// Get parameter string (handle) values.
 				prParmStringValues = new int[ prParmStringValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
+									 prParmStringValueCount );
 				displayProgressBar( prParmStringValueCount );
 				
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-				displayProgressBar( prParmChoiceCount );								
+				displayProgressBar( prParmChoiceCount );
 				
 				myProgressBarMsg = "Loading handles...";
 				
@@ -465,7 +466,7 @@ public partial class HAPI_Asset : MonoBehaviour
 				Utility.getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
 				
 				// Get handles.
-				prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );		
+				prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
 				for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
 				{
 					incrementProgressBar();
@@ -475,7 +476,7 @@ public partial class HAPI_Asset : MonoBehaviour
 						Debug.LogWarning( "Handle " + handle_info.name + " of type " 
 								   		  + handle_info.typeName + " is unsupported at this time." );
 					
-					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];				
+					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
 					Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
 								 		 binding_infos, handle_info.bindingsCount );
 					
@@ -488,12 +489,12 @@ public partial class HAPI_Asset : MonoBehaviour
 				displayProgressBar( prMaterialCount );
 				
 				// Add input fields.
-				if( prAssetInfo.assetType == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 				{
 					if ( prMaxInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
 						for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						{							
-							prUpStreamTransformAssets.Add( null );	
+						{
+							prUpStreamTransformAssets.Add( null );
 							prUpStreamTransformObjects.Add( null );
 						}
 				}
@@ -509,11 +510,11 @@ public partial class HAPI_Asset : MonoBehaviour
 					}
 				
 				// Check for min input fields set.
-				if( prAssetInfo.assetType == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 				{
 					int numValidTransformInputs = 0;
 					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						if ( prUpStreamTransformAssets[ ii ] != null )
+						if ( prUpStreamTransformAssets[ ii ] )
 							numValidTransformInputs++;
 					
 					if ( numValidTransformInputs < prMinInputCount )
@@ -530,13 +531,13 @@ public partial class HAPI_Asset : MonoBehaviour
 				if ( numValidGeoInputs < prMinGeoInputCount )
 					Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
 				
-				if( prAssetInfo.assetType == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 				{
 					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-					{												
+					{
 						if ( prUpStreamTransformAssets[ ii ] != null )
 						{
-							HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );						
+							HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
 						}
 					}
 				}
@@ -544,31 +545,28 @@ public partial class HAPI_Asset : MonoBehaviour
 				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 				{
 					if ( prFileInputs[ ii ] != "" )
-					{
 						HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
-					}
 					
 					//TODO: handle restoring geometry connections
 					//if ( prUpStreamGeoAssets[ ii ] != null )
 					//{
-					//	HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );						
+					//	HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );
 					//}
 				}
 				
 				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 				{
 					int index = downstream_asset.getAssetTransformConnectionIndex( this );
-					if( index >=0 )
+					if ( index >= 0 )
 						HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
 				}
-				
 			}
 			else
 			{
 				displayProgressBar();
 				
 				myProgressBarTotal = prObjectCount;
-			}						
+			}
 			
 			myProgressBarMsg = "Loading and composing objects...";
 			

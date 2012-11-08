@@ -92,24 +92,33 @@ namespace HAPI
 		HAPI_PARMTYPE_NONVALUE_END		= HAPI_PARMTYPE_SEPARATOR
 	}
 	
-	public enum HAPI_RSTOrder
+	public enum HAPI_AssetType
 	{
-		TRS = 0, 
-		TSR, 
-		RTS, 
-		RST, 
-		STR,
-		SRT
+		HAPI_ASSETTYPE_INVALID = -1,
+		HAPI_ASSETTYPE_OBJ = 0,
+		HAPI_ASSETTYPE_SOP,
+		HAPI_ASSETTYPE_POPNET,
+		HAPI_ASSETTYPE_POP,
+		HAPI_ASSETTYPE_CHOPNET,
+		HAPI_ASSETTYPE_CHOP,
+		HAPI_ASSETTYPE_ROP,
+		HAPI_ASSETTYPE_SHOP,
+		HAPI_ASSETTYPE_COP2,
+		HAPI_ASSETTYPE_COPNET,
+		HAPI_ASSETTYPE_VOP,
+		HAPI_ASSETTYPE_VOPNET,
+		HAPI_ASSETTYPE_DOP,
+		HAPI_ASSETTYPE_MGR,
+		HAPI_ASSETTYPE_DIR,
+		HAPI_ASSETTYPE_MAX
 	}
 	
-	public enum HAPI_XYZOrder
+	public enum HAPI_AssetSubType
 	{
-		XYZ = 0, 
-		XZY, 
-		YXZ, 
-		YZX, 
-		ZXY, 
-		ZYX
+		HAPI_ASSETSUBTYPE_INVALID = -1,
+		HAPI_ASSETSUBTYPE_DEFAULT,
+		HAPI_ASSETSUBTYPE_CURVE,
+		HAPI_ASSETSUBTYPE_MAX
 	}
 	
 	public enum HAPI_AttributeOwner
@@ -131,24 +140,24 @@ namespace HAPI
 		HAPI_STORAGETYPE_MAX
 	}
 	
-	public enum HAPI_AssetType
+	public enum HAPI_RSTOrder
 	{
-		HAPI_ASSETTYPE_INVALID = -1,
-		HAPI_ASSETTYPE_OBJ = 0,
-		HAPI_ASSETTYPE_SOP,
-		HAPI_ASSETTYPE_POPNET,
-		HAPI_ASSETTYPE_POP,
-		HAPI_ASSETTYPE_CHOPNET,
-		HAPI_ASSETTYPE_CHOP,
-		HAPI_ASSETTYPE_ROP,
-		HAPI_ASSETTYPE_SHOP,
-		HAPI_ASSETTYPE_COP2,
-		HAPI_ASSETTYPE_COPNET,
-		HAPI_ASSETTYPE_VOP,
-		HAPI_ASSETTYPE_VOPNET,
-		HAPI_ASSETTYPE_DOP,
-		HAPI_ASSETTYPE_MGR,
-		HAPI_ASSETTYPE_DIR
+		TRS = 0, 
+		TSR, 
+		RTS, 
+		RST, 
+		STR,
+		SRT
+	}
+	
+	public enum HAPI_XYZOrder
+	{
+		XYZ = 0, 
+		XZY, 
+		YXZ, 
+		YZX, 
+		ZXY, 
+		ZYX
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +228,8 @@ namespace HAPI
 	public struct HAPI_AssetInfo 
 	{
 		public int id;
-		public int assetType;
+		public int type;
+		public int subType;
 		
 		private int nameSH;			// string handle (SH)
 		private int labelSH;		// string handle (SH)
@@ -235,11 +245,12 @@ namespace HAPI
 		
 		public int objectCount;
 		public int handleCount;
+		public int materialCount;
+		
 		public int minInputCount;
 		public int maxInputCount;
 		public int minGeoInputCount;
 		public int maxGeoInputCount;
-		public int materialCount;
 		
 		public int minVerticesPerPrimitive;
 		public int maxVerticesPerPrimitive;
