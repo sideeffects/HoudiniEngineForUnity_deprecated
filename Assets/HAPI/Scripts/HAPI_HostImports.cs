@@ -284,6 +284,9 @@ namespace HAPI
 															ref HAPI_AssetInfo asset_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_CreateCurve( ref HAPI_AssetInfo asset_info );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_UnloadOTLFile( 		int asset_id );
 		
 	}
