@@ -24,6 +24,16 @@ using System.Collections;
 /// </summary>
 public class HAPI_ChildSelectionControl : MonoBehaviour 
 {	
+	public int prObjectId { get; set; }
+	
+	public HAPI_Asset prAsset 
+	{ 
+		get
+		{
+			return myObjectControl;
+		}
+	}
+	
 	public void setObjectControl( MonoBehaviour object_control )
 	{
 		myObjectControl = object_control as HAPI_Asset;

@@ -139,9 +139,23 @@ public partial class HAPI_AssetGUI : Editor
 							myObjectControl.removeGeoInput( ii );
 						else
 						{
-							HAPI_Asset asset_component = new_object.GetComponent< HAPI_Asset >();
+							HAPI_Asset asset_component = null;
+							HAPI_ChildSelectionControl 
+								child_selection_control = new_object.GetComponent< HAPI_ChildSelectionControl >(); 
+							
+							int object_index = 0;
+							if ( child_selection_control != null )
+							{
+								object_index = child_selection_control.prObjectId;
+								asset_component = child_selection_control.prAsset;
+							}
+							else
+							{
+								asset_component = new_object.GetComponent< HAPI_Asset >();
+							}
+							
 							if ( asset_component )
-								myObjectControl.addAssetAsGeoInput( asset_component, ii );
+								myObjectControl.addAssetAsGeoInput( asset_component, object_index, ii );
 							else
 								myObjectControl.addGeoAsGeoInput( new_object, ii );
 						}

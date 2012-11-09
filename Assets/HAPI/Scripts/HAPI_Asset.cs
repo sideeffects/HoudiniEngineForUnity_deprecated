@@ -243,13 +243,15 @@ public class HAPI_Asset : MonoBehaviour
 	
 	// Geometry related connection methods -------------------------------------------------------
 	
-	public void addAssetAsGeoInput( HAPI_Asset asset, int index )
+	public void addAssetAsGeoInput( HAPI_Asset asset, int object_index, int index )
 	{		
 		if( prUpStreamGeoAssets[ index ] == asset )
 			return;
 		
 		prUpStreamGeoAssets[ index ] = asset;
-		HAPI_Host.connectAssetGeometry( asset.prAssetId, 0, 0, prAssetId, index );
+		
+		//TODO: It's hard coded to be the 0th group - fix this!
+		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, 0, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 		build();
 	}
@@ -725,6 +727,8 @@ public class HAPI_Asset : MonoBehaviour
 			
 			// Set Object Control on child selection control so it can read settings from here.
 			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
+			
+			main_child.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
 			
 			// Get or create mesh.
 			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
