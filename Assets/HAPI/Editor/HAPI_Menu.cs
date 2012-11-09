@@ -38,4 +38,34 @@ public class HAPI_Menu : MonoBehaviour
 		HAPI_GUIUtility.instantiateAsset( asset_file_path );
 	}
 	
+	[ MenuItem( "HAPI/Create Curve" ) ]
+	static private void createCurve()
+	{
+		// Create game object.
+		GameObject game_object = new GameObject( "curve" );
+		
+		// Add HAPI Object Control script component.
+		game_object.AddComponent( "HAPI_Asset" );		
+		HAPI_Asset asset = game_object.GetComponent< HAPI_Asset >();
+		
+		asset.prAssetSubType = (int) HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
+		
+		// Do first build.
+		bool build_result = asset.build();
+		if ( build_result == false ) // Something is not right. Clean up.
+		{
+			DestroyImmediate( game_object );
+			return;
+		}
+		
+		// Set new object name from asset name.
+		string asset_name		= asset.prAssetInfo.name;
+		game_object.name 		= asset_name;
+		
+		// Select the new houdini asset.
+		GameObject[] selection 	= new GameObject[ 1 ];
+		selection[ 0 ] 			= game_object;
+		Selection.objects 		= selection;
+	}
+	
 }

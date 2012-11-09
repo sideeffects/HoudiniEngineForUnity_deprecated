@@ -178,20 +178,23 @@ public partial class HAPI_AssetGUI : Editor
 		
 		bool hasAssetChanged = false;
 		if ( myObjectControl.prShowAssetControls )
-			hasAssetChanged |= generateAssetControls();							
+			hasAssetChanged |= generateAssetControls();
 		
 		if ( hasAssetChanged )
 			myObjectControl.build();
 		
-		if( isMouseUp )
+		if ( isMouseUp )
 		{
-			int bufLength = 0;
-			HAPI_Host.getPreset( myObjectControl.prAssetId, myObjectControl.prPreset, ref bufLength );
-			
-			myObjectControl.prPreset = new byte[bufLength];
-			
-			HAPI_Host.getPreset( myObjectControl.prAssetId, myObjectControl.prPreset, ref bufLength );				
-			
+			try
+			{
+				int bufLength = 0;
+				HAPI_Host.getPreset( myObjectControl.prAssetId, myObjectControl.prPreset, ref bufLength );
+				
+				myObjectControl.prPreset = new byte[bufLength];
+				
+				HAPI_Host.getPreset( myObjectControl.prAssetId, myObjectControl.prPreset, ref bufLength );
+			}
+			catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
 		}
 	}
 	

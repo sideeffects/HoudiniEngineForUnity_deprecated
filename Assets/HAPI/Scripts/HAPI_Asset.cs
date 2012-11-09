@@ -30,7 +30,7 @@ using Utility = HAPI_AssetUtility;
 /// 	Houdini side.
 /// </summary>
 [ ExecuteInEditMode ]
-public partial class HAPI_Asset : MonoBehaviour 
+public class HAPI_Asset : MonoBehaviour 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -40,6 +40,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
 	public int 						prAssetId { get; set; }
 	public HAPI_AssetType			prAssetType { get; set; }
+	public int						prAssetSubType { get { return myAssetSubType; } set { myAssetSubType = value; } }
 	public int 						prMinInputCount { get; set; }
 	public int 						prMaxInputCount { get; set; }
 	public int 						prMinGeoInputCount { get; set; }
@@ -71,7 +72,7 @@ public partial class HAPI_Asset : MonoBehaviour
 	public int[]					prParmStringValues { get; set; } // string handles (SH)
 	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
 	
-	public HAPI_AssetInfo 			prAssetInfo { get; set; }
+	public HAPI_AssetInfo 			prAssetInfo { get { return myAssetInfo; } set { myAssetInfo = value; } }
 	public HAPI_ObjectInfo[] 		prObjects { get; set; }
 	public HAPI_MaterialInfo[]		prMaterials { get; set; }
 	
@@ -378,11 +379,15 @@ public partial class HAPI_Asset : MonoBehaviour
 				
 				try
 				{
-					prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
+					Debug.Log( "Asset Sub Type: " + prAssetSubType );
+					if ( prAssetSubType == (int) HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
+						prAssetInfo = HAPI_Host.createCurve();
+					else
+						prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
 				}
 				catch ( HAPI_Error error )
 				{
-					Debug.LogError( error.ToString() );
+					Debug.LogError( "Asset not loaded: " + error.ToString() );
 					// Nothing to build since the load failed.
 					return false; // false for failed :(
 				}
@@ -499,7 +504,6 @@ public partial class HAPI_Asset : MonoBehaviour
 						}
 				}
 				
-				
 				if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
 					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 					{
@@ -522,7 +526,6 @@ public partial class HAPI_Asset : MonoBehaviour
 										  "Please provide inputs in the Inputs section." );
 				}
 				
-				
 				int numValidGeoInputs = 0;
 				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 					if ( prFileInputs[ ii ] != "" )
@@ -531,16 +534,10 @@ public partial class HAPI_Asset : MonoBehaviour
 				if ( numValidGeoInputs < prMinGeoInputCount )
 					Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
 				
-				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-				{
+				if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-					{
-						if ( prUpStreamTransformAssets[ ii ] != null )
-						{
+						if ( prUpStreamTransformAssets[ ii ] )
 							HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
-						}
-					}
-				}
 				
 				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 				{
@@ -689,7 +686,6 @@ public partial class HAPI_Asset : MonoBehaviour
 	
 	private void instanceObjects( int object_id )
 	{
-		
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		GameObject main_object = new GameObject( object_info.name );
@@ -701,8 +697,7 @@ public partial class HAPI_Asset : MonoBehaviour
 		instancer.prObjectControl = this;
 		instancer.prObjectId = object_id;
 		
-		instancer.instanceObjects();				
-		
+		instancer.instanceObjects();
 	}
 	
 	/// <summary>
@@ -876,6 +871,9 @@ public partial class HAPI_Asset : MonoBehaviour
 	private string			myAssetPath;
 	[SerializeField]
 	private byte[] 			myPreset;
-	
+	[SerializeField]
+	private HAPI_AssetInfo	myAssetInfo;
+	[SerializeField]
+	private int				myAssetSubType;
 	
 }
