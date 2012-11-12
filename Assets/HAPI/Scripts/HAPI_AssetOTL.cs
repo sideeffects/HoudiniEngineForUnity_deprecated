@@ -300,7 +300,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				try
 				{
 					prGameObjects[ object_index ] = null;
-					if( !prObjects[ object_index ].isInstancer && prObjects[ object_index ].isVisible )
+					if ( !prObjects[ object_index ].isInstancer && prObjects[ object_index ].isVisible )
 						createObject( object_index );
 				}
 				catch ( HAPI_Error error )

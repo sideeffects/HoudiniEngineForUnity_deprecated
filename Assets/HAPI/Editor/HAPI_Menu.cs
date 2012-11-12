@@ -45,14 +45,14 @@ public class HAPI_Menu : MonoBehaviour
 		GameObject game_object = new GameObject( "curve" );
 		
 		// Add HAPI Object Control script component.
-		game_object.AddComponent( "HAPI_Asset" );		
+		game_object.AddComponent( "HAPI_Asset" );
 		HAPI_Asset asset = game_object.GetComponent< HAPI_Asset >();
 		
 		asset.prAssetSubType = (int) HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
 		
 		// Do first build.
 		bool build_result = asset.build();
-		if ( build_result == false ) // Something is not right. Clean up.
+		if ( !build_result ) // Something is not right. Clean up.
 		{
 			DestroyImmediate( game_object );
 			return;

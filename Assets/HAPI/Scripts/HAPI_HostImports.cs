@@ -134,6 +134,11 @@ namespace HAPI
 															[Out] HAPI_Transform[] transforms,
 															int start, int length );
 		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetInstanceTransforms( int asset_id, int object_id, int geo_id,
+															  int rstOrder, [Out] HAPI_Transform[] transforms,
+															  int start, int length );
+		
 		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -215,11 +220,6 @@ namespace HAPI
 															  string name,
 															  ref HAPI_AttributeInfo attr_info,
 															  float[] data,
-															  int start, int length );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetInstanceTransforms( int asset_id, int object_id, int geo_id,
-															  int rstOrder, [Out] HAPI_Transform[] transforms,
 															  int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

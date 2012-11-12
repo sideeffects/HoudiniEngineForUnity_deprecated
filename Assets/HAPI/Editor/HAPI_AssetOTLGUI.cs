@@ -33,6 +33,8 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 		
 		myAssetOTL = target as HAPI_AssetOTL;
 		
+		myUnbuiltChanges = false;
+		
 		if ( GUI.changed )
 			myAssetOTL.build();
 	}
@@ -48,6 +50,10 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 		Event curr_event = Event.current;
 		if ( curr_event.isMouse && curr_event.type == EventType.MouseUp )
 			isMouseUp = true;
+		
+		bool commitChanges = false;
+		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
+			commitChanges = true;
 		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
@@ -92,7 +98,7 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 				// Draw toggle with its label.
 				bool old_value = myAssetOTL.prAutoSelectAssetNode;
 				myAssetOTL.prAutoSelectAssetNode = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
-				EditorGUILayout.SelectableLabel( "Auto Select Parent", myLineHeightGUI );		
+				EditorGUILayout.SelectableLabel( "Auto Select Parent", myLineHeightGUI );
 			}
 			EditorGUILayout.EndHorizontal();
 			
@@ -107,7 +113,7 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 				// Draw toggle with its label.
 				bool old_value = myAssetOTL.prEnableLogging;
 				myAssetOTL.prEnableLogging = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
-				EditorGUILayout.SelectableLabel( "Enable Logging", myLineHeightGUI );		
+				EditorGUILayout.SelectableLabel( "Enable Logging", myLineHeightGUI );
 			}
 			EditorGUILayout.EndHorizontal();
 			
@@ -121,13 +127,19 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 			EditorGUILayout.Foldout( myAssetOTL.prShowAssetControls, new GUIContent( "Asset Controls" ) );
 		
 		bool hasAssetChanged = false;
+		myDelayBuild = false;
 		if ( myAssetOTL.prShowAssetControls )
 			hasAssetChanged |= generateAssetControls();
 		
-		if ( hasAssetChanged )
+		if ( ( hasAssetChanged && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
+		{
 			myAssetOTL.build();
+			myUnbuiltChanges = false;
+		}
+		else if ( hasAssetChanged )
+			myUnbuiltChanges = true;
 		
-		if ( isMouseUp )
+		if ( isMouseUp || commitChanges )
 		{
 			try
 			{
@@ -318,6 +330,8 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 					
 					// Draw field.
 					int new_value = EditorGUILayout.IntField( old_value );
+					if ( new_value != old_value ) // Check if the field is being used instead of the slider.
+						myDelayBuild = true;
 					
 					// Draw the slider.
 					if ( parm_size == 1 && !join_last && !parm.joinNext )
@@ -367,6 +381,8 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 				
 				// Draw field.
 				float new_value = EditorGUILayout.FloatField( old_value );
+				if ( new_value != old_value ) // Check if the field is being used instead of the slider.
+					myDelayBuild = true;
 				
 				// Draw the slider.
 				if ( parm_size == 1 && !join_last && !parm.joinNext )
@@ -388,7 +404,7 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 				
 				// Determine if value changed and update parameter value.
 				if ( new_value != old_value )
-				{					
+				{
 					parm_float_values[ values_index + p ] = new_value;
 					changed |= true;
 				} // if
@@ -415,6 +431,8 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 				
 				// Draw field.
 				string new_value = EditorGUILayout.TextField( old_value );
+				if ( new_value != old_value ) // Check if the field is being used instead of the slider.
+					myDelayBuild = true;
 				
 				// Determine if value changed and update parameter value. 
 				if ( new_value != old_value )
@@ -430,18 +448,20 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 		{
 			string old_path = HAPI_Host.getString( parm_string_values[ values_index ] );
 			string new_path = EditorGUILayout.TextField( old_path );
-		        
-	        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+			if ( new_path != old_path ) // Check if the field is being used instead of the slider.
+				myDelayBuild = true;
+			
+			if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
 			{
 				string prompt_path = EditorUtility.OpenFilePanel( "Select File", old_path, "*" );;
 				if ( prompt_path.Length > 0 )
 					new_path = prompt_path;
-	        }
+			}
 			
 			if ( new_path != old_path )
 			{
 				HAPI_Host.setParmStringValue( asset_id, new_path, id, 0 );
-				changed |= true;	
+				changed |= true;
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
@@ -698,4 +718,6 @@ public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI
 	}
 
 	private HAPI_AssetOTL	myAssetOTL;
+	private bool			myDelayBuild;
+	private bool			myUnbuiltChanges;
 }
