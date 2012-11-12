@@ -23,30 +23,30 @@ using HAPI;
 using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
-public class HAPI_AssetOTL : HAPI_Asset 
+public class HAPI_AssetCurve : HAPI_Asset 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public bool 					prAssetPathChanged { get; set; }
-	public string 					prAssetPath { get { return myAssetPath; } set { myAssetPath = value; } }
-	
-	public HAPI_HandleInfo[]		prHandleInfos { get; set; }
-	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
+	public bool 			prFullRebuild { get; set; }
+	public List< Vector3 > 	prPoints { get; set; }
+	public Vector3[]		prVertices { get; set; }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_AssetOTL() 
+	public HAPI_AssetCurve() 
 	{
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset created!" );
 		
-		prAssetPath 				= "";
-		prAssetPathChanged 			= true;
+		prFullRebuild = true;
+		
+		prPoints = new List< Vector3 >();
+		prVertices = new Vector3[ 0 ];
 	}
 	
-	~HAPI_AssetOTL() 
+	~HAPI_AssetCurve()
 	{
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset destroyed!" );
@@ -61,19 +61,36 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 	}
 	
-	public bool setAssetPath( string path ) 
+	public void addPoint( Vector3 pos )
 	{
-		if ( path != prAssetPath ) 
-		{
-			prAssetPath = path;
-			prAssetPathChanged = true;
-		}
-		return prAssetPathChanged;
+		prPoints.Add( pos );
+		
+		updatePoints();
 	}
 	
-	public string getAssetPath() 
+	public void updatePoint( int index, Vector3 pos )
 	{
-		return prAssetPath;	
+		prPoints[ index ] = pos;
+		
+		updatePoints();
+	}
+	
+	public void updatePoints()
+	{
+		string parm = "";
+		for ( int i = 0; i < prPoints.Count; ++i )
+		{
+			parm += prPoints[ i ][ 0 ];
+			parm += ",";
+			parm += prPoints[ i ][ 1 ];
+			parm += ",";
+			parm += prPoints[ i ][ 2 ];
+			parm += " ";
+		}
+		
+		HAPI_Host.setParmStringValue( prAssetId, parm, 2, 0 );
+		
+		build();
 	}
 	
 	public override bool build() 
@@ -92,13 +109,13 @@ public class HAPI_AssetOTL : HAPI_Asset
 		{
 			myProgressBarStartTime = System.DateTime.Now;
 			
-			if ( prAssetPathChanged ) 
+			if ( prFullRebuild )
 			{
 				HAPI_Host.unloadOTL( prAssetId );
-				
+					
 				try
 				{
-					prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
+					prAssetInfo = HAPI_Host.createCurve();
 				}
 				catch ( HAPI_Error error )
 				{
@@ -180,33 +197,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 				displayProgressBar( prParmChoiceCount );
 				
 				myProgressBarMsg = "Loading handles...";
-				
-				// Get exposed handle information.
-				prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
-				
-				// Get handles.
-				prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
-				for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
-				{
-					incrementProgressBar();
-					HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
-					
-					if ( handle_info.typeName != "xform" )
-						Debug.LogWarning( "Handle " + handle_info.name + " of type " 
-								   		  + handle_info.typeName + " is unsupported at this time." );
-					
-					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
-					Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
-								 		 binding_infos, handle_info.bindingsCount );
-					
-					prHandleBindingInfos.Add( binding_infos );
-				}
-				
-				// Get materials.
-				prMaterials = new HAPI_MaterialInfo[ prMaterialCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
-				displayProgressBar( prMaterialCount );
 				
 				// Add input fields.
 				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
@@ -303,32 +293,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 					if ( !prObjects[ object_index ].isInstancer && prObjects[ object_index ].isVisible )
 						createObject( object_index );
 				}
-				catch ( HAPI_Error error )
+				catch ( HAPI_Error )
 				{
 					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-					Debug.LogWarning( error.ToString() );
-				}
-			}
-			
-			// Processing instancers.
-			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-			{
-				HAPI_ObjectInfo object_info = prObjects[ object_index ];
-				if ( object_info.isInstancer )
-				{
-					try
-					{
-						if ( object_info.objectToInstanceId >= 0 && 
-							 prGameObjects[ object_info.objectToInstanceId ] == null )
-							createObject( object_info.objectToInstanceId );
-						
-						instanceObjects( object_index );
-					}
-					catch ( HAPI_Error error )
-					{
-						// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-						Debug.LogWarning( error.ToString() );
-					}
+					//Debug.LogWarning( error.ToString() );
 				}
 			}
 			
@@ -339,7 +307,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
 				downstream_asset.build();
 			
-			prAssetPathChanged = false;
+			prFullRebuild = false;
 		}
 		catch ( HAPI_Error error )
 		{
@@ -360,22 +328,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
 	
-	private void instanceObjects( int object_id )
-	{
-		HAPI_ObjectInfo object_info = prObjects[ object_id ];
-		
-		GameObject main_object = new GameObject( object_info.name );
-		main_object.transform.parent = transform;
-		
-		main_object.AddComponent( "HAPI_Instancer" );		
-		HAPI_Instancer instancer = main_object.GetComponent< HAPI_Instancer >();
-		
-		instancer.prObjectControl = this;
-		instancer.prObjectId = object_id;
-		
-		instancer.instanceObjects();
-	}
-	
 	/// <summary>
 	/// 	Instantiate a game object corresponding to a Houdini object of this asset, get geometry information
 	/// 	on the object and re-create the geometry on the Unity side.
@@ -395,59 +347,45 @@ public class HAPI_AssetOTL : HAPI_Asset
 			main_child.transform.parent = transform;
 			
 			// Add required components.
-			main_child.AddComponent( "MeshFilter" );
-			main_child.AddComponent( "MeshRenderer" );
 			main_child.AddComponent( "HAPI_ChildSelectionControl" );
 			
 			// Set Object Control on child selection control so it can read settings from here.
 			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
 			main_child.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
 			
-			// Get or create mesh.
-			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
-			Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			if ( main_child_mesh == null ) 
-			{
-				main_child_mesh_filter.mesh 	= new Mesh();
-				main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			}
-			main_child_mesh.Clear();
-			
-			// Get mesh.
-			Utility.getMesh( prAssetId, object_id, 0, main_child_mesh );
-			
-			// Add Mesh-to-Prefab component.
-			prGameObjects[ object_id ] = main_child;
-			main_child.AddComponent( "HAPI_MeshToPrefab" );
-			HAPI_MeshToPrefab mesh_saver = main_child.GetComponent< HAPI_MeshToPrefab >();
-			mesh_saver.prObjectControl = this;
-			mesh_saver.prObjectId = object_id;
-			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + main_child.name;
-			
-			// Get transforms.
-			HAPI_Transform trans = prObjectTransforms[ object_id ];
-			
 			// Get Detail info.
 			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 			HAPI_Host.getGeoInfo( prAssetId, object_id, 0, out geo_info );
 			if ( prEnableLogging )
-			Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-					   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
+				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
+						   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
 			
-			// Set diffuse material.
-			Material diffuse = new Material( Shader.Find( "Specular" ) );		
-			main_child.GetComponent< MeshRenderer >().material = diffuse;
-			if ( prMaterialCount > 0 && geo_info.materialId >= 0 )
-			{
-				if ( geo_info.hasMaterialChanged )
-				{
-					HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
-					HAPI_Host.getMaterials( prAssetId, material, geo_info.materialId, 1 );
-					prMaterials[ geo_info.materialId ] = material[ 0 ];
-					geo_info.hasMaterialChanged = false;
-				}
-				Utility.assignTexture( ref diffuse, prMaterials[ geo_info.materialId ] );
-			}
+			// Make sure our primitive and vertex numbers are supported by Unity.
+			// TODO: add this limit in a more proper place
+			if ( geo_info.faceCount > 65000 * 3 )
+				throw new HAPI_Error( "Face count (" + geo_info.faceCount 
+									  + ") above limit (" + ( 65000 * 3 ) + ")!" );
+			if ( geo_info.vertexCount > 65000 )
+				throw new HAPI_Error( "Vertex count (" + geo_info.vertexCount + ") above limit (" + 65000 + ")!" );
+			
+			// Print attribute names.
+			//printAllAttributeNames( asset_id, object_id, geo_id, geo_info );
+			
+			// Get position attributes.
+			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+			float[] pos_attr = new float[ 0 ];
+			Utility.getAttribute( prAssetId, object_id, 0, "P", ref pos_attr_info, ref pos_attr, 
+								  HAPI_Host.getAttributeFloatData );
+			if ( !pos_attr_info.exists )
+				throw new HAPI_Error( "No position attribute found." );
+			
+			prVertices = new Vector3[ pos_attr_info.count ];
+			for ( int i = 0; i < pos_attr_info.count; ++i )
+				for ( int j = 0; j < 3; ++j )
+					prVertices[ i ][ j ] = pos_attr[ i * 3 + j ];
+			
+			// Get transforms.
+			HAPI_Transform trans = prObjectTransforms[ object_id ];
 			
 			// Apply object transforms.		
 			//

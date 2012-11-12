@@ -45,8 +45,8 @@ public class HAPI_Menu : MonoBehaviour
 		GameObject game_object = new GameObject( "curve" );
 		
 		// Add HAPI Object Control script component.
-		game_object.AddComponent( "HAPI_Asset" );
-		HAPI_Asset asset = game_object.GetComponent< HAPI_Asset >();
+		game_object.AddComponent( "HAPI_AssetCurve" );
+		HAPI_AssetCurve asset = game_object.GetComponent< HAPI_AssetCurve >();
 		
 		asset.prAssetSubType = (int) HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
 		

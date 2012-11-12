@@ -19,12 +19,8 @@ using UnityEditor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using HAPI;
 
-/// <summary>
-/// 	GUI companion to <see cref="HAPI_Asset"/>.
-/// </summary>
 public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +193,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				Vector3 position;
 				
 				if( rstOrder == HAPI_RSTOrder.TSR || rstOrder == HAPI_RSTOrder.STR || rstOrder == HAPI_RSTOrder.SRT )
-					position = new Vector3( xform.position[ 0 ], xform.position[ 1 ], xform.position[ 2 ] );								
+					position = new Vector3( xform.position[ 0 ], xform.position[ 1 ], xform.position[ 2 ] );
 				else
 					position = new Vector3( tx, ty, tz );
 				
@@ -220,7 +216,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						{
 							xform.position[ 0 ] = new_position[ 0 ];
 							xform.position[ 1 ] = new_position[ 1 ];
-							xform.position[ 2 ] = new_position[ 2 ];														
+							xform.position[ 2 ] = new_position[ 2 ];
 							
 							HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
 							new_position.x 		= xform.position[ 0 ];
