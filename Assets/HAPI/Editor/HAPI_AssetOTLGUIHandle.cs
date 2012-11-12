@@ -25,36 +25,31 @@ using HAPI;
 /// <summary>
 /// 	GUI companion to <see cref="HAPI_Asset"/>.
 /// </summary>
-public partial class HAPI_AssetGUI : Editor 
-{	
+public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI 
+{
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Public	
-	public void OnSceneGUI() 
-	{	
-		
+	// Public
+	public void OnSceneGUI()
+	{
 		string currentGlobalManipTool = Tools.current.ToString();
 
-		if( currentGlobalManipTool == "Rotate" )
-		{
+		if ( currentGlobalManipTool == "Rotate" )
 			myManipMode = XformManipMode.Rotate;
-		}
-		else if( currentGlobalManipTool == "Move" )
-		{
-			myManipMode = XformManipMode.Translate;
-		}
-		else if( currentGlobalManipTool == "Scale" )
-		{
-			myManipMode = XformManipMode.Scale;
-		}		
 		
-		if ( myObjectControl == null )
+		else if ( currentGlobalManipTool == "Move" )
+			myManipMode = XformManipMode.Translate;
+		
+		else if ( currentGlobalManipTool == "Scale" )
+			myManipMode = XformManipMode.Scale;
+		
+		if ( myAssetOTL == null )
 			return;
 		
-		int asset_id					= myObjectControl.prAssetId;
-		HAPI_HandleInfo[] handleInfos 	= myObjectControl.prHandleInfos;
+		int asset_id					= myAssetOTL.prAssetId;
+		HAPI_HandleInfo[] handleInfos 	= myAssetOTL.prHandleInfos;
 		
 		if ( handleInfos == null )
-			return;				
+			return;
 		
 		for ( int ii = 0; ii < handleInfos.Length; ++ii )
 		{
@@ -67,10 +62,10 @@ public partial class HAPI_AssetGUI : Editor
 				HAPI_RSTOrder rstOrder = HAPI_RSTOrder.SRT;
 				HAPI_XYZOrder xyzOrder = HAPI_XYZOrder.XYZ;
 				
-				HAPI_HandleBindingInfo[] bindingInfos = myObjectControl.prHandleBindingInfos[ ii ];
+				HAPI_HandleBindingInfo[] bindingInfos = myAssetOTL.prHandleBindingInfos[ ii ];
 				
-				int[] parm_int_values = myObjectControl.prParmIntValues;
-				float[] parm_float_values = myObjectControl.prParmFloatValues;
+				int[] parm_int_values = myAssetOTL.prParmIntValues;
+				float[] parm_float_values = myAssetOTL.prParmFloatValues;
 				
 				if ( parm_int_values == null || parm_float_values == null )
 				{
@@ -88,11 +83,11 @@ public partial class HAPI_AssetGUI : Editor
 					{
 						string parm_name = bindingInfo.handleParmName;
 						if ( parm_name == "tx" )
-							myTranslateParmId = bindingInfo.assetParmId;							
-																												
+							myTranslateParmId = bindingInfo.assetParmId;
+							
 						else if ( parm_name == "rx" )
 							myRotateParmId = bindingInfo.assetParmId;
-																		
+							
 						else if ( parm_name == "sx" )
 							myScaleParmId = bindingInfo.assetParmId;
 						
@@ -106,7 +101,7 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myTranslateParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myTranslateParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myTranslateParmId ];
 					
 					tx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					ty = parm_float_values[ parm_info.floatValuesIndex + 1 ];
@@ -115,7 +110,7 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myRotateParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myRotateParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myRotateParmId ];
 					
 					rx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					ry = parm_float_values[ parm_info.floatValuesIndex + 1 ];
@@ -124,7 +119,7 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myScaleParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myScaleParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myScaleParmId ];
 					
 					sx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					sy = parm_float_values[ parm_info.floatValuesIndex + 1 ];
@@ -133,13 +128,13 @@ public partial class HAPI_AssetGUI : Editor
 				
 				if ( myRstOrderParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myRstOrderParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myRstOrderParmId ];
 					rstOrder = (HAPI_RSTOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}
 				
 				if ( myXyzOrderParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myObjectControl.prParms[ myXyzOrderParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myXyzOrderParmId ];
 					xyzOrder = (HAPI_XYZOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}				
 				
@@ -197,7 +192,7 @@ public partial class HAPI_AssetGUI : Editor
 				tx = -tx;
 				
 				
-				Handles.matrix = myObjectControl.transform.localToWorldMatrix;	
+				Handles.matrix = myAssetOTL.transform.localToWorldMatrix;	
 				
 				Vector3 position;
 				
@@ -233,7 +228,7 @@ public partial class HAPI_AssetGUI : Editor
 							new_position.z 		= xform.position[ 2 ];
 						}
 						
-						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myTranslateParmId ];
+						HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myTranslateParmId ];
 						
 						// the - in the x coordinate is to convert back to "Houdini" coordinates
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = -new_position.x; 
@@ -272,7 +267,7 @@ public partial class HAPI_AssetGUI : Editor
 						
 						HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
 						
-						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myRotateParmId ];
+						HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myRotateParmId ];
 						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = xform.rotationEuler[ 0 ];
 						// the - in the y & z coordinate is to convert back to "Houdini" coordinates
@@ -295,7 +290,7 @@ public partial class HAPI_AssetGUI : Editor
 					
 					if ( GUI.changed )
 					{
-						HAPI_ParmInfo parm_info = myObjectControl.prParms[ myScaleParmId ];
+						HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myScaleParmId ];
 						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = newScale.x;
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = newScale.y;
@@ -312,7 +307,7 @@ public partial class HAPI_AssetGUI : Editor
 		} // for each handle
 		
 		if ( GUI.changed )
-			myObjectControl.build();
+			myAssetOTL.build();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -312,7 +312,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			
 			// Processing instancers.
 			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-			{			
+			{
 				HAPI_ObjectInfo object_info = prObjects[ object_index ];
 				if ( object_info.isInstancer )
 				{
@@ -332,16 +332,12 @@ public class HAPI_AssetOTL : HAPI_Asset
 				}
 			}
 			
-			// process dependent assets.
+			// Process dependent assets.
 			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-			{
 				downstream_asset.build();
-			}
 			
 			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-			{
 				downstream_asset.build();
-			}
 			
 			prAssetPathChanged = false;
 		}
@@ -357,12 +353,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 		{
 			clearProgressBar();
 		}
-		/*
-		int length = 0;
-		HAPI_Host.getPreset( prAssetId, new byte[0], ref length );
-		byte[] buf = new byte[length];
-		HAPI_Host.getPreset( prAssetId, buf, ref length );
-		*/
 		
 		return true;
 	}
