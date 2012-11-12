@@ -165,7 +165,7 @@ namespace HAPI
 		
 		private static void initialize()
 		{
-			string otls_path = Application.dataPath + "/OTLs";
+			string otls_path = Application.dataPath + "/OTLs/Scanned";
 			
 			if ( myHoudiniSceneExists )
 				Debug.Log( "Loading OTL: Using Existing Scene" );
