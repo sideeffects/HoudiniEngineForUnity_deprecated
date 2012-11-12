@@ -25,7 +25,7 @@ using HAPI;
 /// <summary>
 /// 	GUI companion to <see cref="HAPI_Asset"/>.
 /// </summary>
-public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI 
+public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public

@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using HAPI;
 
 [ CustomEditor( typeof( HAPI_AssetOTL ) ) ]
-public partial class HAPI_AssetOTLGUI : HAPI_AssetGUI 
+public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
