@@ -41,8 +41,8 @@ public class HAPI_GUIUtility : Editor {
 		GameObject game_object = new GameObject( myDefaultAssetLabel );
 		
 		// Add HAPI Object Control script component.
-		game_object.AddComponent( "HAPI_Asset" );		
-		HAPI_Asset asset = game_object.GetComponent< HAPI_Asset >();
+		game_object.AddComponent( "HAPI_AssetOTL" );		
+		HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
 		
 		// Set that asset path.
 		asset.setAssetPath( file_path );

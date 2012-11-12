@@ -11,11 +11,8 @@
  *		416-504-9876
  *
  * COMMENTS:
- * 		Contains the main script attached to a Unity game object that corresponds to a Houdini asset instance on the 
- *		Houdini side. 
  * 
  */
-
 
 using UnityEngine;
 using UnityEditor;
@@ -25,18 +22,13 @@ using System.Collections.Generic;
 using HAPI;
 using Utility = HAPI_AssetUtility;
 
-/// <summary>
-/// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
-/// 	Houdini side.
-/// </summary>
 [ ExecuteInEditMode ]
 public class HAPI_Asset : MonoBehaviour 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public bool 					prAssetPathChanged { get; set; }
-	public string 					prAssetPath { get { return myAssetPath; } set { myAssetPath = value; } }
+	public HAPI_AssetInfo 			prAssetInfo { get { return myAssetInfo; } set { myAssetInfo = value; } }
 	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
 	public int 						prAssetId { get; set; }
 	public HAPI_AssetType			prAssetType { get; set; }
@@ -66,21 +58,18 @@ public class HAPI_Asset : MonoBehaviour
 	public int						prHandleCount { get; set; }
 	public int						prMaterialCount { get; set; }
 	
-	public HAPI_ParmInfo[] 			prParms { get; set; }
-	public int[]					prParmIntValues { get; set; }
-	public float[]					prParmFloatValues { get; set; }
-	public int[]					prParmStringValues { get; set; } // string handles (SH)
-	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
-	
-	public HAPI_AssetInfo 			prAssetInfo { get { return myAssetInfo; } set { myAssetInfo = value; } }
 	public HAPI_ObjectInfo[] 		prObjects { get; set; }
 	public HAPI_MaterialInfo[]		prMaterials { get; set; }
 	
 	public GameObject[]				prGameObjects {	get; set; }
 	
 	public HAPI_Transform[] 		prObjectTransforms { get; set; }
-	public HAPI_HandleInfo[]		prHandleInfos { get; set; }	
-	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
+	
+	public HAPI_ParmInfo[] 			prParms { get; set; }
+	public int[]					prParmIntValues { get; set; }
+	public float[]					prParmFloatValues { get; set; }
+	public int[]					prParmStringValues { get; set; } // string handles (SH)
+	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
 	
 	public bool 					prShowObjectControls { get; set; }
 	public bool 					prShowAssetControls { get; set; }
@@ -113,8 +102,6 @@ public class HAPI_Asset : MonoBehaviour
 		
 		HAPI.HAPI_SetPath.setPath();
 		
-		prAssetPath 				= "";
-		prAssetPathChanged 			= true;
 		prAssetId 					= -1;
 		prAssetType					= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		
@@ -173,6 +160,16 @@ public class HAPI_Asset : MonoBehaviour
 			Debug.Log( "HAPI_Asset destroyed!" );
 	}
 	
+	public int findObjectByName( string object_name )
+	{
+		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+		{
+			HAPI_ObjectInfo object_info = prObjects[ object_index ];
+			if ( object_info.name == object_name )
+				return object_index;
+		}
+		return -1;
+	}
 	
 	// Transform related connection methods -------------------------------------------------------
 	
@@ -303,7 +300,7 @@ public class HAPI_Asset : MonoBehaviour
 		prDownStreamGeoAssets.Add( asset );
 	}
 	
-	public void OnDestroy()
+	public virtual void OnDestroy()
 	{
 		if ( prAssetId >= 0 )
 		{
@@ -327,43 +324,7 @@ public class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
-	/// <summary>
-	/// 	Sets the asset path.
-	/// </summary>
-	/// <param name="path">
-	/// 	New asset path (absolute path to the .otl file).
-	/// </param>
-	/// <returns>
-	/// 	Whether the path was changed or not. If the new path is the same as the old path, no change will
-	/// 	be made and <c>false</c> will be returned.
-	/// </returns>
-	public bool setAssetPath( string path ) 
-	{
-		if ( path != prAssetPath ) 
-		{
-			prAssetPath = path;
-			prAssetPathChanged = true;
-		}
-		return prAssetPathChanged;
-	}
-	
-	/// <summary>
-	/// 	Gets the asset .otl path.
-	/// </summary>
-	/// <returns>
-	/// 	The asset .otl path.
-	/// </returns>
-	public string getAssetPath() 
-	{
-		return prAssetPath;	
-	}
-	
-	/// <summary>
-	/// 	If the asset path has changed, unload the current asset and re-load from the new file along with
-	/// 	all parameter information. Either way, push parameter values back to Houdini and rebuild
-	///		all object geometries.
-	/// </summary>
-	public bool build() 
+	public virtual bool build() 
 	{
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
 		{
@@ -371,311 +332,16 @@ public class HAPI_Asset : MonoBehaviour
 			return false;
 		}
 		
-		try
-		{
-			myProgressBarStartTime = System.DateTime.Now;
-			
-			if ( prAssetPathChanged ) 
-			{
-				HAPI_Host.unloadOTL( prAssetId );
-				
-				try
-				{
-					Debug.Log( "Asset Sub Type: " + prAssetSubType );
-					if ( prAssetSubType == (int) HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
-						prAssetInfo = HAPI_Host.createCurve();
-					else
-						prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
-				}
-				catch ( HAPI_Error error )
-				{
-					Debug.LogError( "Asset not loaded: " + error.ToString() );
-					// Nothing to build since the load failed.
-					return false; // false for failed :(
-				}
-				
-				// For convinience we copy some asset info properties locally (since they are constant anyway).
-				prAssetId 				= prAssetInfo.id;
-				prAssetType				= (HAPI_AssetType) prAssetInfo.type;
-				prMinInputCount			= prAssetInfo.minInputCount;
-				prMaxInputCount			= prAssetInfo.maxInputCount;
-				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
-				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
-				prParmCount 			= prAssetInfo.parmCount;
-				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
-				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
-				prParmStringValueCount	= prAssetInfo.parmStringValueCount;
-				prParmChoiceCount		= prAssetInfo.parmChoiceCount;
-				
-				prObjectCount 			= prAssetInfo.objectCount;
-				prHandleCount 			= prAssetInfo.handleCount;
-				prMaterialCount			= prAssetInfo.materialCount;
-				
-				myProgressBarCurrent	= 0;
-				myProgressBarTotal		= prParmCount
-										  + prParmIntValueCount
-										  + prParmFloatValueCount
-										  + prParmStringValueCount
-										  + prParmChoiceCount
-										  + prObjectCount
-										  + prHandleCount
-										  + prMaterialCount;
-				
-				// Try to load presets.
-				try
-				{
-					if ( myPreset != null && myPreset.Length > 0 )
-						HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
-				}
-				catch ( HAPI_Error error )
-				{
-					Debug.LogWarning( error.ToString() );	
-				}
-				catch
-				{
-					Debug.LogWarning( "Unable to load presets." );	
-				}
-				
-				displayProgressBar();
-				
-				myProgressBarMsg = "Loading parameter information...";
-				
-				// Get all parameters.
-				prParms = new HAPI_ParmInfo[ prParmCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
-				displayProgressBar( prParmCount );
-				
-				// Get parameter int values.
-				prParmIntValues = new int[ prParmIntValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
-				displayProgressBar( prParmIntValueCount );
-				
-				// Get parameter float values.
-				prParmFloatValues = new float[ prParmFloatValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
-				displayProgressBar( prParmFloatValueCount );
-				
-				// Get parameter string (handle) values.
-				prParmStringValues = new int[ prParmStringValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
-									 prParmStringValueCount );
-				displayProgressBar( prParmStringValueCount );
-				
-				// Get parameter choice lists.
-				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-				displayProgressBar( prParmChoiceCount );
-				
-				myProgressBarMsg = "Loading handles...";
-				
-				// Get exposed handle information.
-				prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
-				
-				// Get handles.
-				prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
-				for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
-				{
-					incrementProgressBar();
-					HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
-					
-					if ( handle_info.typeName != "xform" )
-						Debug.LogWarning( "Handle " + handle_info.name + " of type " 
-								   		  + handle_info.typeName + " is unsupported at this time." );
-					
-					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
-					Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
-								 		 binding_infos, handle_info.bindingsCount );
-					
-					prHandleBindingInfos.Add( binding_infos );
-				}
-				
-				// Get materials.
-				prMaterials = new HAPI_MaterialInfo[ prMaterialCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
-				displayProgressBar( prMaterialCount );
-				
-				// Add input fields.
-				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-				{
-					if ( prMaxInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
-						for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						{
-							prUpStreamTransformAssets.Add( null );
-							prUpStreamTransformObjects.Add( null );
-						}
-				}
-				
-				if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
-					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-					{
-						prFileInputs.Add( "" );
-						prUpStreamGeoAssets.Add( null );
-						prUpStreamGeoObjects.Add( null );
-						prUpStreamGeoAdded.Add( false );
-					}
-				
-				// Check for min input fields set.
-				if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-				{
-					int numValidTransformInputs = 0;
-					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						if ( prUpStreamTransformAssets[ ii ] )
-							numValidTransformInputs++;
-					
-					if ( numValidTransformInputs < prMinInputCount )
-						Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
-										  "Please provide inputs in the Inputs section." );
-				}
-				
-				int numValidGeoInputs = 0;
-				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-					if ( prFileInputs[ ii ] != "" )
-						numValidGeoInputs++;
-				
-				if ( numValidGeoInputs < prMinGeoInputCount )
-					Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
-				
-				if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						if ( prUpStreamTransformAssets[ ii ] )
-							HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
-				
-				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-				{
-					if ( prFileInputs[ ii ] != "" )
-						HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
-					
-					//TODO: handle restoring geometry connections
-					//if ( prUpStreamGeoAssets[ ii ] != null )
-					//{
-					//	HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );
-					//}
-				}
-				
-				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-				{
-					int index = downstream_asset.getAssetTransformConnectionIndex( this );
-					if ( index >= 0 )
-						HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
-				}
-			}
-			else
-			{
-				displayProgressBar();
-				
-				myProgressBarTotal = prObjectCount;
-			}
-			
-			myProgressBarMsg = "Loading and composing objects...";
-			
-			// Clean up.
-			destroyChildren();
-			
-			// Create local object info caches (transforms need to be stored in a parallel array).
-			prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];
-			prGameObjects		= new GameObject[ prObjectCount ];
-			prObjectTransforms 	= new HAPI_Transform[ prObjectCount ];
-			
-			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
-			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
-						 		 prObjectTransforms, prObjectCount );
-			
-			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-			{
-				incrementProgressBar();
-				try
-				{
-					prGameObjects[ object_index ] = null;
-					if( !prObjects[ object_index ].isInstancer && prObjects[ object_index ].isVisible )
-						createObject( object_index );
-				}
-				catch ( HAPI_Error error )
-				{
-					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-					Debug.LogWarning( error.ToString() );
-				}
-			}
-			
-			// Processing instancers.
-			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-			{			
-				HAPI_ObjectInfo object_info = prObjects[ object_index ];
-				if ( object_info.isInstancer )
-				{
-					try
-					{
-						if ( object_info.objectToInstanceId >= 0 && 
-							 prGameObjects[ object_info.objectToInstanceId ] == null )
-							createObject( object_info.objectToInstanceId );
-						
-						instanceObjects( object_index );
-					}
-					catch ( HAPI_Error error )
-					{
-						// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-						Debug.LogWarning( error.ToString() );
-					}
-				}
-			}
-			
-			// process dependent assets.
-			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-			{
-				downstream_asset.build();
-			}
-			
-			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-			{
-				downstream_asset.build();
-			}
-			
-			prAssetPathChanged = false;
-		}
-		catch ( HAPI_Error error )
-		{
-			Debug.LogError( error.ToString() );
-		}
-		catch ( System.Exception error )
-		{
-			Debug.LogError( error.ToString() );	
-		}
-		finally
-		{
-			clearProgressBar();
-		}
-		/*
-		int length = 0;
-		HAPI_Host.getPreset( prAssetId, new byte[0], ref length );
-		byte[] buf = new byte[length];
-		HAPI_Host.getPreset( prAssetId, buf, ref length );
-		*/
-		
 		return true;
 	}
 	
-	
-	public int findObjectByName( string object_name )
-	{
-		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-		{			
-			HAPI_ObjectInfo object_info = prObjects[ object_index ];
-			if( object_info.name == object_name )
-			{
-				return object_index;
-			}
-		}
-		return -1;
-	}
-			
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private Methods
+	// Protected Methods
 	
 	/// <summary>
 	/// 	Recursively delete all children of this Unity asset.
 	/// </summary>
-	private void destroyChildren() 
+	protected virtual void destroyChildren() 
 	{
 		List< GameObject > children = new List< GameObject >();
 		
@@ -686,145 +352,19 @@ public class HAPI_Asset : MonoBehaviour
 			DestroyImmediate( child );
 	}
 	
-	private void instanceObjects( int object_id )
-	{
-		HAPI_ObjectInfo object_info = prObjects[ object_id ];
-		
-		GameObject main_object = new GameObject( object_info.name );
-		main_object.transform.parent = transform;
-		
-		main_object.AddComponent( "HAPI_Instancer" );		
-		HAPI_Instancer instancer = main_object.GetComponent< HAPI_Instancer >();
-		
-		instancer.prObjectControl = this;
-		instancer.prObjectId = object_id;
-		
-		instancer.instanceObjects();
-	}
-	
-	/// <summary>
-	/// 	Instantiate a game object corresponding to a Houdini object of this asset, get geometry information
-	/// 	on the object and re-create the geometry on the Unity side.
-	/// </summary>
-	/// <param name="object_id">
-	/// 	Object_id as returned by <see cref="GetObjects"/>.
-	/// </param>
-	private void createObject( int object_id )
-	{
-		HAPI_ObjectInfo object_info = prObjects[ object_id ];
-		
-		// Create main underling.
-		GameObject main_child = new GameObject( object_info.name );
-		
-		try
-		{
-			main_child.transform.parent = transform;
-			
-			// Add required components.
-			main_child.AddComponent( "MeshFilter" );
-			main_child.AddComponent( "MeshRenderer" );
-			main_child.AddComponent( "HAPI_ChildSelectionControl" );
-			
-			// Set Object Control on child selection control so it can read settings from here.
-			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
-			
-			main_child.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
-			
-			// Get or create mesh.
-			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
-			Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			if ( main_child_mesh == null ) 
-			{
-				main_child_mesh_filter.mesh 	= new Mesh();
-				main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			}
-			main_child_mesh.Clear();
-			
-			// Get mesh.
-			Utility.getMesh( prAssetId, object_id, 0, main_child_mesh );
-			
-			// Add Mesh-to-Prefab component.
-			prGameObjects[ object_id ] = main_child;			
-			main_child.AddComponent( "HAPI_MeshToPrefab" );		
-			HAPI_MeshToPrefab mesh_saver = main_child.GetComponent< HAPI_MeshToPrefab >();			
-			mesh_saver.prObjectControl = this;
-			mesh_saver.prObjectId = object_id;
-			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + main_child.name;
-			
-			// Get transforms.
-			HAPI_Transform trans = prObjectTransforms[ object_id ];
-			
-			// Get Detail info.
-			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-			HAPI_Host.getGeoInfo( prAssetId, object_id, 0, out geo_info );
-			if ( prEnableLogging )
-			Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-					   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
-			
-			// Set diffuse material.
-			Material diffuse = new Material( Shader.Find( "Specular" ) );		
-			main_child.GetComponent< MeshRenderer >().material = diffuse;
-			if ( prMaterialCount > 0 && geo_info.materialId >= 0 )
-			{
-				if ( geo_info.hasMaterialChanged )
-				{
-					HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
-					HAPI_Host.getMaterials( prAssetId, material, geo_info.materialId, 1 );
-					prMaterials[ geo_info.materialId ] = material[ 0 ];
-					geo_info.hasMaterialChanged = false;
-				}
-				Utility.assignTexture( ref diffuse, prMaterials[ geo_info.materialId ] );
-			}
-			
-			// Apply object transforms.		
-			//
-			// Axis and Rotation conversions:
-			// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
-			// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
-			// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
-			// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
-			// causes a double negative - yeah, I know).
-			
-			main_child.transform.localPosition 	= new Vector3( -trans.position[ 0 ], 
-																trans.position[ 1 ],
-																trans.position[ 2 ] );
-			
-			Quaternion quat = new Quaternion(	trans.rotationQuaternion[ 0 ],
-												trans.rotationQuaternion[ 1 ],
-												trans.rotationQuaternion[ 2 ],
-												trans.rotationQuaternion[ 3 ] );
-			
-			Vector3 euler = quat.eulerAngles;
-			euler.y = -euler.y;
-			euler.z = -euler.z;
-			
-			main_child.transform.localRotation 	= Quaternion.Euler( euler );
-			main_child.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
-			
-			AssetDatabase.Refresh();
-		}
-		catch ( HAPI_Error error )
-		{
-			DestroyImmediate( main_child );
-			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
-			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
-			throw;
-		}
-	}
-	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
-	private void incrementProgressBar()
+	protected void incrementProgressBar()
 	{
 		displayProgressBar( 1 );
 	}
 	
-	private void displayProgressBar()
+	protected void displayProgressBar()
 	{
-		displayProgressBar( 0 );	
+		displayProgressBar( 0 );
 	}
 	
-	private void displayProgressBar( int increment )
+	protected void displayProgressBar( int increment )
 	{
 		System.DateTime current = System.DateTime.Now;
 		System.TimeSpan delta = current - myProgressBarStartTime;
@@ -854,30 +394,27 @@ public class HAPI_Asset : MonoBehaviour
 		return myProgressBarJustUsed;	
 	}
 	
-	private void clearProgressBar()
+	protected void clearProgressBar()
 	{
 		myProgressBarJustUsed = false;
 		myProgressBarCurrent = 0;
 		EditorUtility.ClearProgressBar();
 	}
 	
-	private bool			myProgressBarJustUsed;
-	private	System.DateTime	myProgressBarStartTime;
-	private int				myProgressBarTotal; // Used for the progress bar.
-	private int				myProgressBarCurrent;
-	private string			myProgressBarTitle;
-	private string			myProgressBarMsg;
+	protected bool				myProgressBarJustUsed;
+	protected System.DateTime	myProgressBarStartTime;
+	protected int				myProgressBarTotal; // Used for the progress bar.
+	protected int				myProgressBarCurrent;
+	protected string			myProgressBarTitle;
+	protected string			myProgressBarMsg;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data
 	
 	[SerializeField]
-	private string			myAssetPath;
+	protected byte[] 			myPreset;
 	[SerializeField]
-	private byte[] 			myPreset;
+	protected HAPI_AssetInfo	myAssetInfo;
 	[SerializeField]
-	private HAPI_AssetInfo	myAssetInfo;
-	[SerializeField]
-	private int				myAssetSubType;
-	
+	protected int				myAssetSubType;
 }
