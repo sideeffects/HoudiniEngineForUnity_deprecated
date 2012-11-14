@@ -45,9 +45,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	{
 		base.OnInspectorGUI();
 		
-		myLabelStyle = new GUIStyle( GUI.skin.label );
-		myLabelStyle.alignment = TextAnchor.MiddleRight;
-		
 		bool isMouseUp = false;
 		Event curr_event = Event.current;
 		if ( curr_event.isMouse && curr_event.type == EventType.MouseUp )
@@ -70,7 +67,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.prFullRebuild = true;
 				myAssetCurve.build();
 			}
-			
+			/*
 			// Draw Auto Select Asset Node Toggle
 			EditorGUILayout.BeginHorizontal(); 
 			{
@@ -100,7 +97,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				EditorGUILayout.SelectableLabel( "Enable Logging", myLineHeightGUI );
 			}
 			EditorGUILayout.EndHorizontal();
-			
+			*/
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
@@ -351,11 +348,23 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( changed )
 		{
 			myAssetCurve.prLastChangedParmId = id;
+		
+			if ( parm.isInt() )
+			{
+				int[] temp_int_values = new int[ parm_size ];
+				for ( int p = 0; p < parm_size; ++p )
+					temp_int_values[ p ] = parm_int_values[ values_index + p ];
+				HAPI_Host.setParmIntValues( asset_id, temp_int_values, values_index, parm_size );
+			}
+			else if ( parm.isFloat() )
+			{
+				float[] temp_float_values = new float[ parm_size ];
+				for ( int p = 0; p < parm_size; ++p )
+					temp_float_values[ p ] = parm_float_values[ values_index + p ];
+				HAPI_Host.setParmFloatValues( asset_id, temp_float_values, values_index, parm_size );
+			}
 			
-			int[] temp_int_values = new int[ parm_size ];
-			for ( int p = 0; p < parm_size; ++p )
-				temp_int_values[ p ] = parm_int_values[ values_index + p ];
-			HAPI_Host.setParmIntValues( asset_id, temp_int_values, values_index, parm_size );
+			// Note: String parameters update their values themselves so no need to do anything here.
 		}
 		
 		return changed;
@@ -511,7 +520,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			
 			current_index++;
 		}
-				
+		
 		return changed;
 	}
 

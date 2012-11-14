@@ -37,9 +37,6 @@ public class HAPI_AssetGUI : Editor
 	
 	public override void OnInspectorGUI() 
 	{
-		myLabelStyle = new GUIStyle( GUI.skin.label );
-		myLabelStyle.alignment = TextAnchor.MiddleRight;
-		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
@@ -94,7 +91,7 @@ public class HAPI_AssetGUI : Editor
 						string new_file_path = "";
 						new_file_path = EditorGUILayout.TextField( old_file_path );
 						
-						if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+						if ( GUILayout.Button( "..." ) ) 
 						{
 							string prompt_result_path = HAPI_GUIUtility.promptForFileInputPath( old_file_path );
 							if ( prompt_result_path.Length > 0 )
@@ -127,26 +124,6 @@ public class HAPI_AssetGUI : Editor
 		else
 			myAsset.removeTransformInput( index );
 	}
-	
-	protected const float		myMaxFieldCountPerLine		= 4;
-	
-	protected const float 		myFileChooserButtonWidth 	= 30;
-	protected const float 		myLineHeight 				= 16;
-	protected const float 		myLabelWidth 				= 120;
-	protected const float 		myToggleWidth 				= 12;
-	protected const float		myDummyLabelMinWidth		= 20;
-	
-	protected const float 		myDefaultUIMin 				= 0.0f;
-	protected const float 		myDefaultUIMax 				= 10.0f;
-	
-	protected GUILayoutOption 	myLineHeightGUI 			= GUILayout.Height( myLineHeight );
-	protected GUILayoutOption 	myLabelWidthGUI 			= GUILayout.Width( myLabelWidth );
-	protected GUILayoutOption 	myToggleWidthGUI 			= GUILayout.Width( myToggleWidth );
-	protected GUILayoutOption	myDummyLabelMinWidthGUI		= GUILayout.MinWidth( myDummyLabelMinWidth );
-	
-	protected GUIContent 		myNullContent 				= new GUIContent( "" );
-	
-	protected GUIStyle			myLabelStyle;
 	
 	protected HAPI_Asset 		myAsset;
 }

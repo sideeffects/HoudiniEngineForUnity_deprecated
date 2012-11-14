@@ -106,40 +106,39 @@ public class HAPI_Window : EditorWindow
 				{
 					OTLDirectory otlDir = null;
 					
-					foreach( OTLDirectory existingOTLDir in myOTLDirectories )
+					foreach ( OTLDirectory existingOTLDir in myOTLDirectories )
 					{
-						if( existingOTLDir.myDirectoryName == child_directory.Name )
+						if ( existingOTLDir.myDirectoryName == child_directory.Name )
 						{
 							otlDir = existingOTLDir;
 							break;
 						}
 					}
 					
-					if( otlDir == null )
+					if ( otlDir == null )
 					{
 						otlDir = new OTLDirectory();
 						otlDir.myDirectoryName = child_directory.Name;
 						otlDir.myDirectoryPath = child_directory.FullName;
-						otlDir.myExpanded = true;
+						otlDir.myExpanded = false;
 						myOTLDirectories.Add( otlDir );
 					}
-										
+					
 					otlDir.myExpanded = 
 								EditorGUILayout.Foldout( otlDir.myExpanded, new GUIContent( otlDir.myDirectoryName ) );
 					
-					if( otlDir.myDirectoryName == "Core" )
+					if ( otlDir.myDirectoryName == "Core" )
 						otlDir.myExpanded = true;
 					
-					if( otlDir.myExpanded )
+					if ( otlDir.myExpanded )
 					{
 						DirectoryInfo dirContents = new DirectoryInfo( otlDir.myDirectoryPath );
 						
 						foreach ( FileInfo fi in dirContents.GetFiles() )
 						if ( fi.Extension == ".otl" )
 							genOTLEntry( fi );
-						
 					}
-				}								
+				}
 				
 				GUILayout.EndScrollView();
 			}
