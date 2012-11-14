@@ -206,54 +206,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 	
-	/// <summary>
-	/// 	Creates two empty label fields, gets the rectangles from each, and combines it to create
-	/// 	the last double rectangle. This is used for <see cref="GUI.HorizontalSlider"/> which
-	/// 	uses absolute positioning and needs a rectangle to know it's size and position.
-	/// 	This way, we can insert sliders within the relative positioning of the Inspector GUI elements.
-	/// </summary>
-	/// <returns>
-	/// 	The last double rectangle.
-	/// </returns>
-	private Rect getLastDoubleRect()
-	{		
-		// Draw first empty label field. 
-		EditorGUILayout.LabelField( myNullContent, myDummyLabelMinWidthGUI );
-		float xMin = GUILayoutUtility.GetLastRect().xMin;
-		float yMin = GUILayoutUtility.GetLastRect().yMin;
-		float width = GUILayoutUtility.GetLastRect().width;
-		float height = GUILayoutUtility.GetLastRect().height;
-		
-		// Draw second empty label field.
-		EditorGUILayout.LabelField( myNullContent, myDummyLabelMinWidthGUI );
-		float width2 = GUILayoutUtility.GetLastRect().width;
-		
-		// Create the double rectangle from the two above.
-		Rect last_double_rect = new Rect( xMin, yMin, width + width2, height );
-		
-		return last_double_rect;
-	}
-	
-	/// <summary>
-	/// 	Draws a single asset control.
-	/// </summary>
-	/// <param name="id">
-	/// 	Corresponding parameter id as given by <see cref="HAPI_Host.GetParameters"/>.
-	/// </param>
-	/// <param name="join_last">
-	/// 	Determines if the current control should be put on the same line as the previous one.
-	/// 	Also serves as a return value to be used with the next control.
-	/// </param>
-	/// <param name="no_label_toggle_last">
-	/// 	Determines if the current control should not have its label drawn.
-	/// 	Also serves as a return value to be used with the next control.
-	/// </param>
-	/// <returns>
-	/// 	<c>true</c> if the parameter value corresponding to this control has changed, <c>false</c> otherwise.
-	/// </returns>
-	private bool generateAssetControl( 	int id, ref bool join_last, ref bool no_label_toggle_last ) 
+	private bool generateAssetControl( int id, ref bool join_last, ref bool no_label_toggle_last )
 	{
 		if ( myAssetCurve.prParms == null )
+			return false;
+		
+		if ( myAssetCurve.prParms[ id ].invisible )
 			return false;
 		
 		bool changed 				= false;
@@ -270,57 +228,27 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		HAPI_ParmType parm_type 	= (HAPI_ParmType) parm.type;
 		int parm_size				= parm.size;
 		
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm();
+		gui_parm.copyParmInfo( parm );
+		
 		int values_index = -1;
 		if ( parm.isInt() )
 		{
 			if ( parm.intValuesIndex < 0 || parm_int_values == null )
 				return false;
-			values_index 			= parm.intValuesIndex;
+			values_index = parm.intValuesIndex;
 		}
 		else if ( parm.isFloat() )
 		{
 			if ( parm.floatValuesIndex < 0 || parm_float_values == null )
 				return false;
-			values_index			= parm.floatValuesIndex;
+			values_index = parm.floatValuesIndex;
 		}
 		else if ( parms[ id ].isString() )
 		{
 			if ( parm.stringValuesIndex < 0 || parm_string_values == null )
 				return false;
-			values_index			= parm.stringValuesIndex;
-		}
-		
-		GUIStyle slider_style 		= new GUIStyle( GUI.skin.horizontalSlider );
-		GUIStyle slider_thumb_style	= new GUIStyle( GUI.skin.horizontalSliderThumb );
-				
-		if ( parms[ id ].invisible )
-			return changed;
-						
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
-		if ( !join_last || parm_size > 1 )
-			EditorGUILayout.BeginHorizontal();
-		
-		// Add label first if we're not a toggle.
-		if ( parm_type != HAPI_ParmType.HAPI_PARMTYPE_TOGGLE
-			&& parm_type != HAPI_ParmType.HAPI_PARMTYPE_FOLDER
-			&& !parm.labelNone )
-		{
-			GUILayoutOption label_final_width = myLabelWidthGUI;
-			if ( join_last && !no_label_toggle_last )
-			{
-				float min_width;
-				float max_width;
-				myLabelStyle.CalcMinMaxWidth( new GUIContent( parm.label ), out min_width, out max_width );
-				label_final_width = GUILayout.Width( min_width );
-			}
-			else if ( !join_last )
-			{
-				// Add padding for the toggle column.
-				EditorGUILayout.LabelField( "", myToggleWidthGUI );
-			}
-			EditorGUILayout.SelectableLabel( parm.label, myLabelStyle, label_final_width, myLineHeightGUI );
-			no_label_toggle_last = false;
+			values_index = parm.stringValuesIndex;
 		}
 		
 		///////////////////////////////////////////////////////////////////////
@@ -347,240 +275,73 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					values.Add( i );
 				}
 				
-				// Get old value.
-				int old_value = parm_int_values[ values_index ];
-				
-				// Draw popup.
-				int new_value = EditorGUILayout.IntPopup( old_value, labels.ToArray(), values.ToArray() );
-				
-				// Determine if value changed and update parameter value.
-				if ( new_value != old_value )
-				{
-					parm_int_values[ values_index ] = new_value;
-					changed |= true;
-				}
+				changed = HAPI_GUI.dropdown( ref gui_parm, ref parm_int_values,
+											 labels.ToArray(), values.ToArray(),
+											 ref join_last, ref no_label_toggle_last );
 			}
 			else
 			{
-				int per_line = 0;
-				for ( int p = 0; p < parm_size; ++p, ++per_line )
-				{
-					if ( per_line >= myMaxFieldCountPerLine )
-					{
-						EditorGUILayout.EndHorizontal();
-						EditorGUILayout.BeginHorizontal();
-						EditorGUILayout.LabelField( "", myToggleWidthGUI );
-						EditorGUILayout.LabelField( "", myLabelWidthGUI );
-						per_line = 0;
-					}
-					
-					// Get old value.
-					int old_value = parm_int_values[ values_index + p ];
-					
-					// Draw field.
-					int new_value = EditorGUILayout.IntField( old_value );
-					if ( new_value != old_value ) // Check if the field is being used instead of the slider.
-						myDelayBuild = true;
-					
-					// Draw the slider.
-					if ( parm_size == 1 && !join_last && !parm.joinNext )
-					{
-						float ui_min = ( parm.hasUIMin ? parm.UIMin : 0.0f );
-						float ui_max = ( parm.hasUIMax ? parm.UIMax : 10.0f );
-						Rect lastDoubleRect = getLastDoubleRect();
-						slider_style.stretchWidth = false;
-						slider_style.fixedWidth = lastDoubleRect.width;
-						new_value = (int) GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
-																slider_style, slider_thumb_style );
-					}
-					
-					// Enforce min/max bounds.
-					if ( parm.hasMin && new_value < (int) parm.min )
-						new_value = (int) parm.min;
-					if ( parm.hasMax && new_value > (int) parm.max )
-						new_value = (int) parm.max;
-					
-					// Determine if value changed and update parameter value.
-					if ( new_value != old_value )
-					{
-						parm_int_values[ values_index + p ] = new_value;
-						changed |= true;
-					} // if
-				} // for
+				changed = HAPI_GUI.intField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
+											 ref join_last, ref no_label_toggle_last );
 			} // if parm.choiceCount
 		} // if parm_type is INT
 		///////////////////////////////////////////////////////////////////////
 		// Float Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
-			int per_line = 0;
-			for ( int p = 0; p < parm_size; ++p, ++per_line )
-			{
-				if ( per_line >= myMaxFieldCountPerLine )
-				{
-					EditorGUILayout.EndHorizontal();
-					EditorGUILayout.BeginHorizontal();
-					EditorGUILayout.LabelField( "", myToggleWidthGUI );
-					EditorGUILayout.LabelField( "", myLabelWidthGUI );
-					per_line = 0;
-				}
-				
-				// Get old value.
-				float old_value = parm_float_values[ values_index + p ];
-				
-				// Draw field.
-				float new_value = EditorGUILayout.FloatField( old_value );
-				if ( new_value != old_value ) // Check if the field is being used instead of the slider.
-					myDelayBuild = true;
-				
-				// Draw the slider.
-				if ( parm_size == 1 && !join_last && !parm.joinNext )
-				{
-					float ui_min = ( parm.hasUIMin ? parm.UIMin : 0.0f );
-					float ui_max = ( parm.hasUIMax ? parm.UIMax : 10.0f );
-					Rect lastDoubleRect = getLastDoubleRect();
-					slider_style.stretchWidth = false;
-					slider_style.fixedWidth = lastDoubleRect.width;
-					new_value = GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
-													  slider_style, slider_thumb_style );
-				}
-				
-				// Enforce min/max bounds.
-				if ( parm.hasMin && new_value < parm.min )
-					new_value = parm.min;
-				if ( parm.hasMax && new_value > parm.max )
-					new_value = parm.max;
-				
-				// Determine if value changed and update parameter value.
-				if ( new_value != old_value )
-				{
-					parm_float_values[ values_index + p ] = new_value;
-					changed |= true;
-				} // if
-			} // for
+			changed = HAPI_GUI.floatField( ref gui_parm, ref myDelayBuild, ref parm_float_values, 
+										   ref join_last, ref no_label_toggle_last );
 		} // if parm_type is FLOAT
 		///////////////////////////////////////////////////////////////////////
 		// String Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_STRING )
-		{			
-			int per_line = 0;
-			for ( int p = 0; p < parm_size; ++p, ++per_line )
-			{
-				if ( per_line >= myMaxFieldCountPerLine )
-				{
-					EditorGUILayout.EndHorizontal();
-					EditorGUILayout.BeginHorizontal();
-					EditorGUILayout.LabelField( "", myToggleWidthGUI );
-					EditorGUILayout.LabelField( "", myLabelWidthGUI );
-					per_line = 0;
-				}
-				
-				// Get old value.
-				string old_value = HAPI_Host.getString( parm_string_values[ values_index + p ] );
-				
-				// Draw field.
-				string new_value = EditorGUILayout.TextField( old_value );
-				if ( new_value != old_value ) // Check if the field is being used instead of the slider.
-					myDelayBuild = true;
-				
-				// Determine if value changed and update parameter value. 
-				if ( new_value != old_value )
-				{
-					HAPI_Host.setParmStringValue( asset_id, new_value, id, p );
-					changed |= true;
-				}
-			}
+		{
+			string[] values = new string[ parm_size ];
+			for ( int p = 0; p < parm_size; ++p )
+				values[ p ] = HAPI_Host.getString( parm_string_values[ values_index + p ] );
+			
+			// The given string array is only for this parm so we need to set the values index to 0.
+			gui_parm.valuesIndex = 0;
+			
+			changed = HAPI_GUI.stringField( ref gui_parm, ref myDelayBuild, ref values,
+											ref join_last, ref no_label_toggle_last );
+			
+			if ( changed )
+				for ( int p = 0; p < parm_size; ++p )
+					HAPI_Host.setParmStringValue( asset_id, values[ p ], id, p );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// File Field
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FILE )
 		{
-			string old_path = HAPI_Host.getString( parm_string_values[ values_index ] );
-			string new_path = EditorGUILayout.TextField( old_path );
-			if ( new_path != old_path ) // Check if the field is being used instead of the slider.
-				myDelayBuild = true;
+			string path = HAPI_Host.getString( parm_string_values[ values_index ] );
 			
-			if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
-			{
-				string prompt_path = EditorUtility.OpenFilePanel( "Select File", old_path, "*" );;
-				if ( prompt_path.Length > 0 )
-					new_path = prompt_path;
-			}
+			changed = HAPI_GUI.fileField( ref gui_parm, ref myDelayBuild, ref path,
+										  ref join_last, ref no_label_toggle_last );
 			
-			if ( new_path != old_path )
-			{
-				HAPI_Host.setParmStringValue( asset_id, new_path, id, 0 );
-				changed |= true;
-			}
+			if ( changed )
+				HAPI_Host.setParmStringValue( asset_id, path, id, 0 );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
-			if ( !parm.joinNext )
-			{
-				// Add padding for the toggle column.
-				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
-				// Add empty space to align with fields.
-				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
-			}
-			
-			// Get old value.
-			int old_value = parm_int_values[ values_index ];
-			
-			// Draw toggle with its label.
-			bool toggle_result = EditorGUILayout.Toggle( old_value != 0, myToggleWidthGUI );
-			int new_value = ( toggle_result ? 1 : 0 );
-			if ( !parms[ id ].labelNone )
-				EditorGUILayout.SelectableLabel( parms[ id ].label, myLineHeightGUI );
-			else
-				no_label_toggle_last = true;
-			
-			// Determine if value changed and update parameter value.
-			if ( new_value != old_value )
-			{
-				parm_int_values[ values_index ] = new_value;
-				changed |= true;
-			}
-		}		
+			changed = HAPI_GUI.toggle( ref gui_parm, ref parm_int_values,
+									   ref join_last, ref no_label_toggle_last );
+		}
 		///////////////////////////////////////////////////////////////////////
 		// Color Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_COLOUR )
 		{
-			Color old_color = new Color( parm_float_values[ values_index + 0 ], 
-									 	 parm_float_values[ values_index + 1 ], 
-									 	 parm_float_values[ values_index + 2 ] );
-			if ( parm_size > 3 )
-				old_color.a = parm_float_values[ values_index + 3 ];
-			
-			// Draw control.
-			Color new_color = EditorGUILayout.ColorField( old_color );
-			
-			// Determine if value changed and update parameter value.
-			if ( new_color != old_color )
-			{
-				parm_float_values[ values_index + 0 ] = new_color.r;
-				parm_float_values[ values_index + 1 ] = new_color.g;
-				parm_float_values[ values_index + 2 ] = new_color.b;
-				
-				if ( parm_size > 3 )
-					parm_float_values[ values_index + 3 ] = new_color.a;
-			
-				changed |= true;
-			}
-		}		
+			changed = HAPI_GUI.colourField( ref gui_parm, ref myDelayBuild, ref parm_float_values,
+											ref join_last, ref no_label_toggle_last );
+		}
 		///////////////////////////////////////////////////////////////////////
 		// Separator
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_SEPARATOR )
 		{
-			EditorGUILayout.Separator();
+			HAPI_GUI.separator();
 		}
-		
-		// Decide whether to join with the next parameter on the same line or not
-		// but also save our status for the next parameter.
-		join_last = ( parm.joinNext && parm_size <= 1 );
-		if ( !parm.joinNext || parm_size > 1 )
-			EditorGUILayout.EndHorizontal();
 		
 		if ( myAssetCurve.hasProgressBarBeenUsed() && id == myAssetCurve.prLastChangedParmId )
 		{
@@ -590,23 +351,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( changed )
 		{
 			myAssetCurve.prLastChangedParmId = id;
-		
-			if ( parm.isInt() )
-			{
-				int[] temp_int_values = new int[ parm_size ];
-				for ( int p = 0; p < parm_size; ++p )
-					temp_int_values[ p ] = parm_int_values[ values_index + p ];
-				HAPI_Host.setParmIntValues( asset_id, temp_int_values, values_index, parm_size );
-			}
-			else if ( parm.isFloat() )
-			{
-				float[] temp_float_values = new float[ parm_size ];
-				for ( int p = 0; p < parm_size; ++p )
-					temp_float_values[ p ] = parm_float_values[ values_index + p ];
-				HAPI_Host.setParmFloatValues( asset_id, temp_float_values, values_index, parm_size );
-			}
 			
-			// Note: String parameters update their values themselves so no need to do anything here.
+			int[] temp_int_values = new int[ parm_size ];
+			for ( int p = 0; p < parm_size; ++p )
+				temp_int_values[ p ] = parm_int_values[ values_index + p ];
+			HAPI_Host.setParmIntValues( asset_id, temp_int_values, values_index, parm_size );
 		}
 		
 		return changed;

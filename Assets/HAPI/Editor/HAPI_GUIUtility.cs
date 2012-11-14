@@ -2,14 +2,14 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-public class HAPI_GUIUtility : Editor {
-	
+public class HAPI_GUIUtility : Editor 
+{
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
 	public static string promptForOTLPath()
 	{
-		return promptForOTLPath( "" );	
+		return promptForOTLPath( "" );
 	}
 	public static string promptForOTLPath( string old_path )
 	{		

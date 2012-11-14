@@ -343,6 +343,10 @@ namespace HAPI
 		public int choiceIndex;
 		
 		// Accessors
+		public int getNameSH()
+		{ return nameSH; }
+		public int getLabelSH()
+		{ return labelSH; }
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 		public string label
