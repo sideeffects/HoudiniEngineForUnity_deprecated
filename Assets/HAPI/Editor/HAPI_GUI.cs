@@ -4,7 +4,35 @@ using System.Collections;
 
 public struct HAPI_GUIParm
 {
-	public void copyParmInfo( HAPI.HAPI_ParmInfo info )
+	public HAPI_GUIParm( string name, string label )
+		: this( name, label, 1 )
+	{}
+	
+	public HAPI_GUIParm( string name, string label, int size )
+	{
+		this.size		= size;
+		choiceCount 	= 0;
+		
+		this.name 		= name;
+		this.label 		= label;
+		
+		hasMin 			= false;
+		hasMax 			= false;
+		hasUIMin 		= false;
+		hasUIMax 		= false;
+		
+		min 			= 0.0f;
+		max 			= 0.0f;
+		UIMin 			= 0.0f;
+		UIMax 			= 0.0f;
+		
+		joinNext 		= false;
+		labelNone 		= false;
+		
+		valuesIndex = 0;
+	}
+	
+	public HAPI_GUIParm( HAPI.HAPI_ParmInfo info )
 	{
 		size 			= info.size;
 		choiceCount 	= info.choiceCount;
@@ -319,6 +347,46 @@ public class HAPI_GUI : Editor
 				values[ parm.valuesIndex + p ] = new_value;
 				changed |= true;
 			}
+		}
+		
+		// Decide whether to join with the next parameter on the same line or not
+		// but also save our status for the next parameter.
+		join_last = ( parm.joinNext && parm_size <= 1 );
+		if ( !parm.joinNext || parm_size > 1 )
+			EditorGUILayout.EndHorizontal();
+		
+		return changed;
+	}
+	
+	public static bool objectField( ref HAPI_GUIParm parm,
+									ref Object obj )
+	{
+		bool join_last = false; bool no_label_toggle_last = false;
+		return objectField( ref parm, ref obj, ref join_last, ref no_label_toggle_last );
+	}
+	public static bool objectField( ref HAPI_GUIParm parm,
+									ref Object obj,
+									ref bool join_last, ref bool no_label_toggle_last )
+	{
+		initializeConstants();
+		
+		bool changed = false;
+		int parm_size = parm.size;
+		
+		// Decide whether to join with the previous parameter on the same 
+		// line or not.
+		if ( !join_last || parm_size > 1 )
+			EditorGUILayout.BeginHorizontal();
+		
+		label( ref parm, ref join_last, ref no_label_toggle_last );
+		
+		Object old_obj = obj;
+		Object new_obj = EditorGUILayout.ObjectField( old_obj, typeof( Object ), true );
+		
+		if ( new_obj != old_obj )
+		{
+			obj = new_obj;
+			changed |= true;
 		}
 		
 		// Decide whether to join with the next parameter on the same line or not

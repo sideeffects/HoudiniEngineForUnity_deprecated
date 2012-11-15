@@ -270,19 +270,26 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public void removeGeoInput( int index )
 	{
-		if ( prUpStreamGeoAssets[ index ] )
+		try
 		{
-			prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
-			HAPI_Host.disconnectAssetGeometry( prAssetId, index );
-			prUpStreamGeoAssets[ index ] = null;
-			build();
+			if ( prUpStreamGeoAssets[ index ] )
+			{
+				prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
+				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
+				prUpStreamGeoAssets[ index ] = null;
+				build();
+			}
+			
+			if ( prUpStreamGeoAdded[ index ] )
+			{
+				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
+				prUpStreamGeoAdded[ index ] = false;
+				build();
+			}
 		}
-		
-		if ( prUpStreamGeoAdded[ index ] )
+		catch ( HAPI_Error error )
 		{
-			HAPI_Host.disconnectAssetGeometry( prAssetId, index );
-			prUpStreamGeoAdded[ index ] = false;
-			build();
+			Debug.LogError( error.ToString() );
 		}
 	}
 	

@@ -33,8 +33,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		
 		myAssetCurve = target as HAPI_AssetCurve;
 		
-		myUnbuiltChanges = false;
-		
 		myCurrentlyActivePoint = -1;
 		
 		if ( GUI.changed )
@@ -225,8 +223,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		HAPI_ParmType parm_type 	= (HAPI_ParmType) parm.type;
 		int parm_size				= parm.size;
 		
-		HAPI_GUIParm gui_parm = new HAPI_GUIParm();
-		gui_parm.copyParmInfo( parm );
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( parm );
 		
 		int values_index = -1;
 		if ( parm.isInt() )
@@ -525,8 +522,5 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	}
 
 	private HAPI_AssetCurve	myAssetCurve;
-	private bool			myDelayBuild;
-	private bool			myUnbuiltChanges;
-	
 	private int 			myCurrentlyActivePoint;
 }

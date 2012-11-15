@@ -29,7 +29,9 @@ public class HAPI_AssetGUI : Editor
 	
 	public virtual void OnEnable() 
 	{
-		myAsset = target as HAPI_Asset;
+		myAsset 			= target as HAPI_Asset;
+		
+		myUnbuiltChanges 	= false;
 		
 		if ( GUI.changed )
 			myAsset.build();
@@ -37,6 +39,8 @@ public class HAPI_AssetGUI : Editor
 	
 	public override void OnInspectorGUI() 
 	{
+		bool changed = false;
+		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
@@ -53,20 +57,26 @@ public class HAPI_AssetGUI : Editor
 				
 				for ( int ii = 0; ii < myAsset.prMaxGeoInputCount; ++ii )
 				{
-					GameObject old_object = myAsset.prUpStreamGeoObjects[ ii ];
-					GameObject new_object = EditorGUILayout.ObjectField( "Geometry Input", old_object, 
-																		 typeof( GameObject ), true ) as GameObject;
+					HAPI_GUIParm obj_input = new HAPI_GUIParm( "obj_input_" + ii, "Object Input " + ii );
+					Object obj = (Object) myAsset.prUpStreamGeoObjects[ ii ];
+					changed |= HAPI_GUI.objectField( ref obj_input, ref obj );
 					
-					if ( new_object != old_object )
+					if ( changed )
 					{
-						myAsset.prUpStreamGeoObjects[ ii ] = new_object;
-						if ( !new_object )
+						if ( !obj )
+						{
+							myAsset.prUpStreamGeoObjects[ ii ] = null;
 							myAsset.removeGeoInput( ii );
+						}
 						else
 						{
+							GameObject new_obj = (GameObject) obj;
+							
+							myAsset.prUpStreamGeoObjects[ ii ] = new_obj;
+							
 							HAPI_Asset asset_component = null;
 							HAPI_ChildSelectionControl 
-								child_selection_control = new_object.GetComponent< HAPI_ChildSelectionControl >(); 
+								child_selection_control = new_obj.GetComponent< HAPI_ChildSelectionControl >(); 
 							
 							int object_index = 0;
 							if ( child_selection_control )
@@ -75,32 +85,18 @@ public class HAPI_AssetGUI : Editor
 								asset_component = child_selection_control.prAsset;
 							}
 							else
-								asset_component = new_object.GetComponent< HAPI_Asset >();
+								asset_component = new_obj.GetComponent< HAPI_Asset >();
 							
 							if ( asset_component )
 								myAsset.addAssetAsGeoInput( asset_component, object_index, ii );
 							else
-								myAsset.addGeoAsGeoInput( new_object, ii );
+								myAsset.addGeoAsGeoInput( new_obj, ii );
 						}
 					}
 					
-					EditorGUILayout.LabelField( new GUIContent( "File Input " + ii + ":" ) );
-					EditorGUILayout.BeginHorizontal(); 
-					{
-						string old_file_path = myAsset.prFileInputs[ ii ];
-						string new_file_path = "";
-						new_file_path = EditorGUILayout.TextField( old_file_path );
-						
-						if ( GUILayout.Button( "..." ) ) 
-						{
-							string prompt_result_path = HAPI_GUIUtility.promptForFileInputPath( old_file_path );
-							if ( prompt_result_path.Length > 0 )
-								new_file_path = prompt_result_path;
-						}
-						
-						myAsset.prFileInputs[ ii ] = new_file_path;
-					} 
-					EditorGUILayout.EndHorizontal();
+					HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + ii, "File Input " + ii );
+					string file_path = myAsset.prFileInputs[ ii ];
+					changed |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path );
 					
 				} // for
 			} // if
@@ -125,5 +121,7 @@ public class HAPI_AssetGUI : Editor
 			myAsset.removeTransformInput( index );
 	}
 	
-	protected HAPI_Asset 		myAsset;
+	protected HAPI_Asset 	myAsset;
+	protected bool			myDelayBuild;
+	protected bool			myUnbuiltChanges;
 }

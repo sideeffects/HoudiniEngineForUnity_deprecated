@@ -33,8 +33,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		myAssetOTL = target as HAPI_AssetOTL;
 		
-		myUnbuiltChanges = false;
-		
 		if ( GUI.changed )
 			myAssetOTL.build();
 	}
@@ -176,8 +174,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		HAPI_ParmType parm_type 	= (HAPI_ParmType) parm.type;
 		int parm_size				= parm.size;
 		
-		HAPI_GUIParm gui_parm = new HAPI_GUIParm();
-		gui_parm.copyParmInfo( parm );
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( parm );
 		
 		int values_index = -1;
 		if ( parm.isInt() )
@@ -475,6 +472,4 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	}
 
 	private HAPI_AssetOTL	myAssetOTL;
-	private bool			myDelayBuild;
-	private bool			myUnbuiltChanges;
 }
