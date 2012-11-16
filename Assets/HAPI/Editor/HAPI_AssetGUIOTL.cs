@@ -72,37 +72,21 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			if ( myParmChanges )
 				myAssetOTL.prAssetPath = path;
 			
-			/*
+			// These don't affect the asset directly so they don't trigger rebuilds.
+			
 			// Draw Auto Select Asset Node Toggle
-			EditorGUILayout.BeginHorizontal(); 
 			{
-				// Add padding for the toggle column.
-				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
-				// Add empty space to align with fields.
-				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
-				
-				// Draw toggle with its label.
-				bool old_value = myAssetOTL.prAutoSelectAssetNode;
-				myAssetOTL.prAutoSelectAssetNode = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
-				EditorGUILayout.SelectableLabel( "Auto Select Parent", myLineHeightGUI );
+				bool value = myAsset.prAutoSelectAssetNode;
+				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
+				myAsset.prAutoSelectAssetNode = value;
 			}
-			EditorGUILayout.EndHorizontal();
 			
 			// Draw Logging Toggle
-			EditorGUILayout.BeginHorizontal(); 
 			{
-				// Add padding for the toggle column.
-				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
-				// Add empty space to align with fields.
-				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
-				
-				// Draw toggle with its label.
-				bool old_value = myAssetOTL.prEnableLogging;
-				myAssetOTL.prEnableLogging = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
-				EditorGUILayout.SelectableLabel( "Enable Logging", myLineHeightGUI );
+				bool value = myAsset.prEnableLogging;
+				HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
+				myAsset.prEnableLogging = value;
 			}
-			EditorGUILayout.EndHorizontal();
-			*/
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////

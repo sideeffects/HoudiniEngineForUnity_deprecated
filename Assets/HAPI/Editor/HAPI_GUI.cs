@@ -358,6 +358,11 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
+	public static bool objectField( string name, string label, ref Object obj, System.Type type )
+	{
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
+		return objectField( ref gui_parm, ref obj, type );
+	}
 	public static bool objectField( ref HAPI_GUIParm parm,
 									ref Object obj, System.Type type )
 	{
@@ -456,6 +461,15 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
+	public static bool toggle( string name, string label, ref bool value )
+	{
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
+		int[] values = new int[ 1 ];
+		values[ 0 ] = ( value ? 1 : 0 );
+		bool result = toggle( ref gui_parm, ref values );
+		value = ( values[ 0 ] == 1 ?  true : false );
+		return result;
+	}
 	public static bool toggle( ref HAPI_GUIParm parm,
 							   ref int[] values )
 	{

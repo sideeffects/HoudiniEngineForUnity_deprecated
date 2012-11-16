@@ -67,37 +67,20 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.prFullBuild = true;
 				myAssetCurve.build();
 			}
-			/*
+			
 			// Draw Auto Select Asset Node Toggle
-			EditorGUILayout.BeginHorizontal(); 
 			{
-				// Add padding for the toggle column.
-				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
-				// Add empty space to align with fields.
-				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
-				
-				// Draw toggle with its label.
-				bool old_value = myAssetCurve.prAutoSelectAssetNode;
-				myAssetCurve.prAutoSelectAssetNode = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
-				EditorGUILayout.SelectableLabel( "Auto Select Parent", myLineHeightGUI );
+				bool value = myAsset.prAutoSelectAssetNode;
+				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
+				myAsset.prAutoSelectAssetNode = value;
 			}
-			EditorGUILayout.EndHorizontal();
 			
 			// Draw Logging Toggle
-			EditorGUILayout.BeginHorizontal(); 
 			{
-				// Add padding for the toggle column.
-				EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
-				// Add empty space to align with fields.
-				EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
-				
-				// Draw toggle with its label.
-				bool old_value = myAssetCurve.prEnableLogging;
-				myAssetCurve.prEnableLogging = EditorGUILayout.Toggle( old_value, myToggleWidthGUI );
-				EditorGUILayout.SelectableLabel( "Enable Logging", myLineHeightGUI );
+				bool value = myAsset.prEnableLogging;
+				HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
+				myAsset.prEnableLogging = value;
 			}
-			EditorGUILayout.EndHorizontal();
-			*/
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////

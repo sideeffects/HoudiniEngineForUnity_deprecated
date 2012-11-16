@@ -13,9 +13,6 @@
  * COMMENTS:
  * 
  */
-
-#define DEBUG // since Unity doesn't seem to define it itself
-
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -33,25 +30,31 @@ public class HAPI_InstancerGUI : Editor
 	// Public
 	
 	public void OnEnable() 
-	{		
+	{
 		myInstancer = target as HAPI_Instancer;
-		
 	}
 	
 	public override void OnInspectorGUI() 
 	{
+		bool changed = false;
 		
-		myInstancer.prOverrideInstances = GUILayout.Toggle(myInstancer.prOverrideInstances, "Override Instance Object");
-				
-		myInstancer.prObjToInstantiate = EditorGUILayout.ObjectField( "Object To Instantiate", 
-										myInstancer.prObjToInstantiate, typeof(GameObject), true ) as GameObject; 
-				
-		if ( GUILayout.Button( "Recreate Instances" ) ) 
 		{
-			myInstancer.instanceObjects();
+			Object obj = (Object) myInstancer.prObjToInstantiate;
+			changed |= HAPI_GUI.objectField( "object_to_instantiate", "Object To Instantiate", 
+											 ref obj, typeof( GameObject ) );
+			myInstancer.prObjToInstantiate = (GameObject) obj;
 		}
 		
-	}
+		{
+			bool value = myInstancer.prOverrideInstances;
+			changed |= HAPI_GUI.toggle( "override_instance_object", "Override Instance Object", ref value );
+			myInstancer.prOverrideInstances = value;
+		}
 		
+		if ( changed )
+			myInstancer.instanceObjects();
+		
+	}
+	
 	private HAPI_Instancer	 	myInstancer;
 }
