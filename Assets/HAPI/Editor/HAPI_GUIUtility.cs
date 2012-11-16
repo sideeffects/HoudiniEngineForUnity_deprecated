@@ -45,7 +45,7 @@ public class HAPI_GUIUtility : Editor
 		HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
 		
 		// Set that asset path.
-		asset.setAssetPath( file_path );
+		asset.prAssetPath = file_path;
 		
 		// Save as a prefab.
 		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/" + myDefaultPrefabLabel + ".prefab" );

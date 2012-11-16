@@ -39,6 +39,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	public override void OnInspectorGUI() 
 	{
+		myParmChanges = false;
+		myDelayBuild = false;
+		
 		base.OnInspectorGUI();
 		
 		bool isMouseUp = false;
@@ -58,29 +61,17 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		if ( myAssetOTL.prShowObjectControls ) 
 		{
-			EditorGUILayout.LabelField( new GUIContent( "OTL Path:" ) );
-			EditorGUILayout.BeginHorizontal(); 
-			{
-				string old_asset_path = myAssetOTL.getAssetPath();
-				string new_asset_path = "";
-				new_asset_path = EditorGUILayout.TextField( old_asset_path );
-				
-				if ( GUILayout.Button( "..." ) ) 
-				{
-					string prompt_result_path = HAPI_GUIUtility.promptForOTLPath( old_asset_path );
-					if ( prompt_result_path.Length > 0 )
-						new_asset_path = prompt_result_path;
-				}
-				
-				myAssetOTL.setAssetPath( new_asset_path );
-			} 
-			EditorGUILayout.EndHorizontal();
-			
 			if ( GUILayout.Button( "Rebuild" ) ) 
 			{
-				myAssetOTL.prAssetPathChanged = true;
+				myAssetOTL.prFullBuild = true;
 				myAssetOTL.build();
 			}
+			
+			string path = myAssetOTL.prAssetPath;
+			myParmChanges |= HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
+			if ( myParmChanges )
+				myAssetOTL.prAssetPath = path;
+			
 			/*
 			// Draw Auto Select Asset Node Toggle
 			EditorGUILayout.BeginHorizontal(); 
@@ -121,17 +112,16 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		myAssetOTL.prShowAssetControls = 
 			EditorGUILayout.Foldout( myAssetOTL.prShowAssetControls, new GUIContent( "Asset Controls" ) );
 		
-		bool hasAssetChanged = false;
-		myDelayBuild = false;
 		if ( myAssetOTL.prShowAssetControls )
-			hasAssetChanged |= generateAssetControls();
+			myParmChanges |= generateAssetControls();
 		
-		if ( ( hasAssetChanged && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
+		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
 		{
 			myAssetOTL.build();
 			myUnbuiltChanges = false;
+			myParmChanges = false;
 		}
-		else if ( hasAssetChanged )
+		else if ( myParmChanges )
 			myUnbuiltChanges = true;
 		
 		if ( isMouseUp || commitChanges )

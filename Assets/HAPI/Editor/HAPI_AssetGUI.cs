@@ -31,6 +31,7 @@ public class HAPI_AssetGUI : Editor
 	{
 		myAsset 			= target as HAPI_Asset;
 		
+		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
 		
 		if ( GUI.changed )
@@ -39,7 +40,8 @@ public class HAPI_AssetGUI : Editor
 	
 	public override void OnInspectorGUI() 
 	{
-		bool changed = false;
+		myDelayBuild = false;
+		myParmChanges = false;
 		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
@@ -53,15 +55,15 @@ public class HAPI_AssetGUI : Editor
 			{
 				if ( myAsset.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					for ( int ii = 0; ii < myAsset.prMaxInputCount; ++ii )
-						setTransformInput( ii );
+						myParmChanges |= setTransformInput( ii );
 				
 				for ( int ii = 0; ii < myAsset.prMaxGeoInputCount; ++ii )
 				{
-					HAPI_GUIParm obj_input = new HAPI_GUIParm( "obj_input_" + ii, "Object Input " + ii );
+					HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + ii, "Geometry Input " + ii );
 					Object obj = (Object) myAsset.prUpStreamGeoObjects[ ii ];
-					changed |= HAPI_GUI.objectField( ref obj_input, ref obj );
+					myParmChanges |= HAPI_GUI.objectField( ref geo_input, ref obj, typeof( GameObject ) );
 					
-					if ( changed )
+					if ( myParmChanges )
 					{
 						if ( !obj )
 						{
@@ -96,32 +98,45 @@ public class HAPI_AssetGUI : Editor
 					
 					HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + ii, "File Input " + ii );
 					string file_path = myAsset.prFileInputs[ ii ];
-					changed |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path );
+					myParmChanges |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path );
 					
 				} // for
 			} // if
 		} // if
 	}
 	
-	protected void setTransformInput( int index )
+	protected bool setTransformInput( int index )
 	{
-		myAsset.prUpStreamTransformObjects[ index ] = 
-			EditorGUILayout.ObjectField( "Transform Input", myAsset.prUpStreamTransformObjects[ index ], 
-										 typeof( GameObject ), true ) as GameObject;
+		bool changed = false;
 		
-		if ( myAsset.prUpStreamTransformObjects[ index ] )
+		HAPI_GUIParm trans_input = new HAPI_GUIParm( "trans_input_" + index, "Transform Input " + index );
+		Object obj = (Object) myAsset.prUpStreamTransformObjects[ index ];
+		changed |= HAPI_GUI.objectField( ref trans_input, ref obj, typeof( GameObject ) );
+		
+		if ( changed )
 		{
-			HAPI_Asset inputAsset = myAsset.prUpStreamTransformObjects[ index ].GetComponent< HAPI_Asset >();
-			if ( inputAsset )
-				myAsset.addAssetAsTransformInput( inputAsset, index );
-			else
+			if ( !obj )
+			{
+				myAsset.prUpStreamTransformObjects[ index ] = null;
 				myAsset.removeTransformInput( index );
+			}
+			else
+			{
+				GameObject game_obj = (GameObject) obj;
+				myAsset.prUpStreamTransformObjects[ index ] = game_obj;
+				HAPI_Asset input_asset = game_obj.GetComponent< HAPI_Asset >();
+				if ( input_asset )
+					myAsset.addAssetAsTransformInput( input_asset, index );
+				else
+					myAsset.removeTransformInput( index );
+			}
 		}
-		else
-			myAsset.removeTransformInput( index );
+		
+		return changed;
 	}
 	
 	protected HAPI_Asset 	myAsset;
 	protected bool			myDelayBuild;
+	protected bool			myParmChanges;
 	protected bool			myUnbuiltChanges;
 }

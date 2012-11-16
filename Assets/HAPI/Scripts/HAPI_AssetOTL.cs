@@ -28,9 +28,19 @@ public class HAPI_AssetOTL : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public bool 					prAssetPathChanged { get; set; }
-	public string 					prAssetPath { get { return myAssetPath; } set { myAssetPath = value; } }
+	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 	
+	public string 					prAssetPath { 
+										get { return myAssetPath; } 
+										set 
+										{
+											if ( value != prAssetPath ) 
+											{
+												myAssetPath = value;
+												prFullBuild = true;
+											}
+										}
+									}
 	public HAPI_HandleInfo[]		prHandleInfos { get; set; }
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
 	
@@ -42,8 +52,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset created!" );
 		
-		prAssetPath 				= "";
-		prAssetPathChanged 			= true;
+		// These variables need to keep between asset reloads.
+		prAssetPath = "";
+		
+		reset();
 	}
 	
 	~HAPI_AssetOTL() 
@@ -61,19 +73,14 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 	}
 	
-	public bool setAssetPath( string path ) 
+	public override void reset()
 	{
-		if ( path != prAssetPath ) 
-		{
-			prAssetPath = path;
-			prAssetPathChanged = true;
-		}
-		return prAssetPathChanged;
-	}
-	
-	public string getAssetPath() 
-	{
-		return prAssetPath;	
+		base.reset();
+		
+		// Please keep these in the same order and grouping as their declarations at the top.
+		
+		prHandleInfos 				= new HAPI_HandleInfo[ 0 ];
+		prHandleBindingInfos 		= null;
 	}
 	
 	public override bool build() 
@@ -82,17 +89,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 		if ( !base_built )
 			return false;
 		
-		if ( !HAPI.HAPI_SetPath.prIsPathSet )
-		{
-			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
-			return false;
-		}
-		
 		try
 		{
 			myProgressBarStartTime = System.DateTime.Now;
 			
-			if ( prAssetPathChanged ) 
+			if ( prFullBuild ) 
 			{
 				HAPI_Host.unloadOTL( prAssetId );
 				
@@ -104,6 +105,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 				{
 					Debug.LogError( "Asset not loaded: " + error.ToString() );
 					// Nothing to build since the load failed.
+					
+					// Clean up.
+					reset();
+					
 					return false; // false for failed :(
 				}
 				
@@ -339,7 +344,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
 				downstream_asset.build();
 			
-			prAssetPathChanged = false;
+			prFullBuild = false;
 		}
 		catch ( HAPI_Error error )
 		{

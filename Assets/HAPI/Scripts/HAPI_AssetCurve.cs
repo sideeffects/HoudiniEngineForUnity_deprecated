@@ -28,7 +28,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public bool 			prFullRebuild { get; set; }
+	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
+	
 	public List< Vector3 > 	prPoints { get; set; }
 	public Vector3[]		prVertices { get; set; }
 	
@@ -40,10 +41,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset created!" );
 		
-		prFullRebuild = true;
-		
-		prPoints = new List< Vector3 >();
-		prVertices = new Vector3[ 0 ];
+		reset();
 	}
 	
 	~HAPI_AssetCurve()
@@ -93,23 +91,27 @@ public class HAPI_AssetCurve : HAPI_Asset
 		build();
 	}
 	
+	public override void reset()
+	{
+		base.reset();
+		
+		// Please keep these in the same order and grouping as their declarations at the top.
+		
+		prPoints 		= new List< Vector3 >();
+		prVertices 		= new Vector3[ 0 ];
+	}
+	
 	public override bool build() 
 	{
 		bool base_built = base.build();
 		if ( !base_built )
 			return false;
 		
-		if ( !HAPI.HAPI_SetPath.prIsPathSet )
-		{
-			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
-			return false;
-		}
-		
 		try
 		{
 			myProgressBarStartTime = System.DateTime.Now;
 			
-			if ( prFullRebuild )
+			if ( prFullBuild )
 			{
 				HAPI_Host.unloadOTL( prAssetId );
 					
@@ -121,6 +123,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 				{
 					Debug.LogError( "Asset not loaded: " + error.ToString() );
 					// Nothing to build since the load failed.
+					
+					// Clean up.
+					reset();
+					
 					return false; // false for failed :(
 				}
 				
@@ -307,7 +313,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
 				downstream_asset.build();
 			
-			prFullRebuild = false;
+			prFullBuild = false;
 		}
 		catch ( HAPI_Error error )
 		{

@@ -41,6 +41,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	
 	public override void OnInspectorGUI() 
 	{
+		myParmChanges = false;
+		
 		base.OnInspectorGUI();
 		
 		bool isMouseUp = false;
@@ -62,7 +64,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		{	
 			if ( GUILayout.Button( "Rebuild" ) ) 
 			{
-				myAssetCurve.prFullRebuild = true;
+				myAssetCurve.prFullBuild = true;
 				myAssetCurve.build();
 			}
 			/*
@@ -105,21 +107,20 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myAssetCurve.prShowAssetControls = 
 			EditorGUILayout.Foldout( myAssetCurve.prShowAssetControls, new GUIContent( "Asset Controls" ) );
 		
-		bool hasAssetChanged = false;
 		myDelayBuild = false;
 		if ( myAssetCurve.prShowAssetControls )
 		{
 			if ( GUILayout.Button( "Add Point" ) )
 				myAssetCurve.addPoint( Vector3.zero );
-			hasAssetChanged |= generateAssetControls();
+			myParmChanges |= generateAssetControls();
 		}
 		
-		if ( ( hasAssetChanged && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
+		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
 		{
 			myAssetCurve.build();
 			myUnbuiltChanges = false;
 		}
-		else if ( hasAssetChanged )
+		else if ( myParmChanges )
 			myUnbuiltChanges = true;
 		
 		if ( isMouseUp || commitChanges )

@@ -28,11 +28,19 @@ public class HAPI_Asset : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
+	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
+	
+	// Assets -------------------------------------------------------------------------------------------------------
+	
 	public HAPI_AssetInfo 			prAssetInfo { get { return myAssetInfo; } set { myAssetInfo = value; } }
 	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
 	public int 						prAssetId { get; set; }
 	public HAPI_AssetType			prAssetType { get; set; }
 	public int						prAssetSubType { get { return myAssetSubType; } set { myAssetSubType = value; } }
+	public bool						prFullBuild { get; set; }
+	
+	// Inputs -------------------------------------------------------------------------------------------------------
+	
 	public int 						prMinInputCount { get; set; }
 	public int 						prMaxInputCount { get; set; }
 	public int 						prMinGeoInputCount { get; set; }
@@ -48,11 +56,21 @@ public class HAPI_Asset : MonoBehaviour
 	public List< GameObject >		prUpStreamGeoObjects { get; set; }
 	public List< bool >				prUpStreamGeoAdded { get; set; }
 	
+	// Parameters ---------------------------------------------------------------------------------------------------
+	
 	public int 						prParmCount { get; set; }
 	public int						prParmIntValueCount { get; set; }
 	public int						prParmFloatValueCount { get; set; }
 	public int						prParmStringValueCount { get; set; }
 	public int						prParmChoiceCount { get; set; }
+	
+	public HAPI_ParmInfo[] 			prParms { get; set; }
+	public int[]					prParmIntValues { get; set; }
+	public float[]					prParmFloatValues { get; set; }
+	public int[]					prParmStringValues { get; set; } // string handles (SH)
+	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
+	
+	// Objects ------------------------------------------------------------------------------------------------------
 	
 	public int 						prObjectCount { get; set; }
 	public int						prHandleCount { get; set; }
@@ -62,14 +80,9 @@ public class HAPI_Asset : MonoBehaviour
 	public HAPI_MaterialInfo[]		prMaterials { get; set; }
 	
 	public GameObject[]				prGameObjects {	get; set; }
-	
 	public HAPI_Transform[] 		prObjectTransforms { get; set; }
 	
-	public HAPI_ParmInfo[] 			prParms { get; set; }
-	public int[]					prParmIntValues { get; set; }
-	public float[]					prParmFloatValues { get; set; }
-	public int[]					prParmStringValues { get; set; } // string handles (SH)
-	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
+	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	public bool 					prShowObjectControls { get; set; }
 	public bool 					prShowAssetControls { get; set; }
@@ -102,56 +115,7 @@ public class HAPI_Asset : MonoBehaviour
 		
 		HAPI.HAPI_SetPath.setPath();
 		
-		prAssetId 					= -1;
-		prAssetType					= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
-		
-		prParms						= null;
-		prParmCount 				= 0;
-		prParmIntValueCount			= 0;
-		prParmFloatValueCount		= 0;
-		prParmStringValueCount		= 0;
-		prParmChoiceCount			= 0;
-		
-		prObjectCount 				= 0;
-		prHandleCount 				= 0;
-		prMaterialCount				= 0;
-		
-		prMinInputCount				= 0;
-		prMaxInputCount				= 0;
-		prMinGeoInputCount			= 0;
-		prMaxGeoInputCount			= 0;
-		prFileInputs				= new List<string>();
-		prShowInputControls			= true;
-		
-		prShowAssetControls 		= true;
-		prShowObjectControls 		= true;
-		prAutoSelectAssetNode		= true;
-		prEnableLogging				= false;
-		
-		prLastChangedParmId			= -1;
-				
-		prFolderListSelections 		= new List< int >();
-		prFolderListSelectionIds 	= new List< int >();
-		
-
-		prDownStreamTransformAssets = new List< HAPI_Asset >();
-		prUpStreamTransformAssets 	= new List< HAPI_Asset >();
-		prUpStreamTransformObjects 	= new List< GameObject >();
-		
-		prDownStreamGeoAssets 		= new List< HAPI_Asset >();
-		prUpStreamGeoAssets 		= new List< HAPI_Asset >();
-		prUpStreamGeoObjects 		= new List< GameObject >();
-		prUpStreamGeoAdded 			= new List< bool >();
-		
-		prFolderListSelections.Add( 0 );
-		prFolderListSelectionIds.Add( -1 );
-		
-		myProgressBarJustUsed 		= false;
-		myProgressBarCurrent		= 0;
-		myProgressBarTitle			= "Building Houdini Asset";
-		myProgressBarMsg			= "";
-		
-		myPreset 					= null;
+		reset();
 	}
 	
 	~HAPI_Asset() 
@@ -329,6 +293,84 @@ public class HAPI_Asset : MonoBehaviour
 			HAPI_Host.unloadOTL( prAssetId );
 			prAssetId = -1;
 		}
+	}
+	
+	public virtual void reset()
+	{
+		// Please keep these in the same order and grouping as their declarations at the top.
+		
+		// Assets ---------------------------------------------------------------------------------------------------
+		
+		prAssetInfo 				= new HAPI_AssetInfo();
+		prPreset 					= null;
+		prAssetId 					= -1;
+		prAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
+		prAssetSubType 				= 0;
+		prFullBuild					= true;
+		
+		// Inputs ---------------------------------------------------------------------------------------------------
+		
+		prMinInputCount 			= 0;
+		prMaxInputCount 			= 0;
+		prMinGeoInputCount 			= 0;
+		prMaxGeoInputCount 			= 0;
+		prFileInputs 				= new List< string >();
+		
+		prDownStreamTransformAssets = new List< HAPI_Asset >();
+		prUpStreamTransformAssets 	= new List< HAPI_Asset >();
+		prUpStreamTransformObjects 	= new List< GameObject >();
+		
+		prDownStreamGeoAssets 		= new List< HAPI_Asset >();
+		prUpStreamGeoAssets 		= new List< HAPI_Asset >();
+		prUpStreamGeoObjects 		= new List< GameObject >();
+		prUpStreamGeoAdded 			= new List< bool >();
+		
+		// Parameters -----------------------------------------------------------------------------------------------
+		
+		prParmCount 				= 0;
+		prParmIntValueCount 		= 0;
+		prParmFloatValueCount 		= 0;
+		prParmStringValueCount 		= 0;
+		prParmChoiceCount 			= 0;
+		
+		prParms 					= null;
+		prParmIntValues 			= new int[ 0 ];
+		prParmFloatValues 			= new float[ 0 ];
+		prParmStringValues 			= new int[ 0 ]; // string handles (SH)
+		prParmChoiceLists 			= new HAPI_ParmChoiceInfo[ 0 ];
+		
+		// Objects --------------------------------------------------------------------------------------------------
+		
+		prObjectCount 				= 0;
+		prHandleCount 				= 0;
+		prMaterialCount 			= 0;
+		
+		prObjects 					= new HAPI_ObjectInfo[ 0 ];
+		prMaterials 				= new HAPI_MaterialInfo[ 0 ];
+		
+		prGameObjects 				= new GameObject[ 0 ];		
+		prObjectTransforms 			= new HAPI_Transform[ 0 ];
+		
+		// GUI ------------------------------------------------------------------------------------------------------
+		
+		prShowObjectControls 		= true;
+		prShowAssetControls 		= true;
+		prShowInputControls 		= true;
+		prAutoSelectAssetNode 		= true;
+		prEnableLogging				= false;
+		
+		prLastChangedParmId 		= -1;
+		
+		prFolderListSelections 		= new List< int >();
+		prFolderListSelectionIds 	= new List< int >();
+		prFolderListSelections.Add( 0 );
+		prFolderListSelectionIds.Add( -1 );
+		
+		myProgressBarJustUsed 		= false;
+		myProgressBarTotal			= 0;
+		myProgressBarCurrent		= 0;
+		myProgressBarTitle			= "Building Houdini Asset";
+		myProgressBarMsg			= "";
 	}
 	
 	public virtual bool build() 

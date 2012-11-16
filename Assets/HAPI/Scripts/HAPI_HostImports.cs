@@ -273,6 +273,9 @@ namespace HAPI
 		private static extern int HAPI_PrintNetwork( 		StringBuilder buffer );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetLastErrorStringLength( out int length );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetLastErrorString( 	StringBuilder buffer );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

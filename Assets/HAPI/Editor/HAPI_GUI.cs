@@ -359,13 +359,13 @@ public class HAPI_GUI : Editor
 	}
 	
 	public static bool objectField( ref HAPI_GUIParm parm,
-									ref Object obj )
+									ref Object obj, System.Type type )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return objectField( ref parm, ref obj, ref join_last, ref no_label_toggle_last );
+		return objectField( ref parm, ref obj, type, ref join_last, ref no_label_toggle_last );
 	}
 	public static bool objectField( ref HAPI_GUIParm parm,
-									ref Object obj,
+									ref Object obj, System.Type type,
 									ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
@@ -381,7 +381,7 @@ public class HAPI_GUI : Editor
 		label( ref parm, ref join_last, ref no_label_toggle_last );
 		
 		Object old_obj = obj;
-		Object new_obj = EditorGUILayout.ObjectField( old_obj, typeof( Object ), true );
+		Object new_obj = EditorGUILayout.ObjectField( old_obj, type, true );
 		
 		if ( new_obj != old_obj )
 		{
@@ -398,6 +398,13 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
+	public static bool fileField( string name, string label,
+								  ref bool delay_build,
+								  ref string path )
+	{
+		HAPI_GUIParm parm = new HAPI_GUIParm( name, label );
+		return fileField( ref parm, ref delay_build, ref path );
+	}
 	public static bool fileField( ref HAPI_GUIParm parm,
 								  ref bool delay_build,
 								  ref string path )

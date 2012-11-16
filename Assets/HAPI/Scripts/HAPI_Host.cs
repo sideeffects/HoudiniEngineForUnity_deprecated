@@ -185,20 +185,22 @@ namespace HAPI
 		
 		private static bool hasCallFailed( HAPI_StatusCode code )
 		{
-			return ( (int) code > 0 );	
+			return ( (int) code > 0 );
 		}
 		
 		private static void processStatusCode( HAPI_StatusCode code )
 		{
 			if ( hasCallFailed( code ) )
 			{
-				StringBuilder error_str = new StringBuilder( 1024 );
+				int length = 4000;
+				HAPI_GetLastErrorStringLength( out length );
+				StringBuilder error_str = new StringBuilder( length );
 				HAPI_GetLastErrorString( error_str );
 				throw new HAPI_Error( error_str.ToString() );
 			}
 		}
 		
-		private static bool myHoudiniSceneExists = false;		
+		private static bool myHoudiniSceneExists = false;
 	}
 
 } // namespace HAPI
