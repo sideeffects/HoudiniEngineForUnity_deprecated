@@ -67,20 +67,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.prFullBuild = true;
 				myAssetCurve.build();
 			}
-			
-			// Draw Auto Select Asset Node Toggle
-			{
-				bool value = myAsset.prAutoSelectAssetNode;
-				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
-				myAsset.prAutoSelectAssetNode = value;
-			}
-			
-			// Draw Logging Toggle
-			{
-				bool value = myAsset.prEnableLogging;
-				HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
-				myAsset.prEnableLogging = value;
-			}
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
@@ -94,7 +80,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( myAssetCurve.prShowAssetControls )
 		{
 			if ( GUILayout.Button( "Add Point" ) )
-				myAssetCurve.addPoint( Vector3.zero );
+				myAssetCurve.addPoint( Vector3.left ); // Don't set to zero as that's where the center asset gizmo is.
 			myParmChanges |= generateAssetControls();
 		}
 		
@@ -128,20 +114,24 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		int point_count 			= myAssetCurve.prPoints.Count;
 		int pressed_point_index 	= -1;
 		Vector3 previous_position 	= Vector3.zero;
+
+		// Rebuilding geometry here to make sure the dummy line geometry is visible at any zoom level.
+		myAssetCurve.buildDummyMesh();
+
+		// Set appropriate handles matrix.
+		Handles.matrix = myAssetCurve.prMainChild.transform.localToWorldMatrix;
 		
 		Vector3[] vertices = myAssetCurve.prVertices;
 		for ( int i = 0; vertices != null && i < vertices.Length; ++i )
 		{
 			Vector3 position = vertices[ i ];
 			
-			if ( i == 0 )
+			if ( i > 0 )
 			{
-				previous_position = position;
-				continue;
+				Handles.color = Color.black;
+				Handles.DrawLine( previous_position, position );
 			}
-			
-			Handles.color = Color.grey;
-			Handles.DrawLine( previous_position, position );
+
 			previous_position = position;
 		}
 			
@@ -162,6 +152,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			
 			Handles.Label( position, new GUIContent( "p" + i ) );
 			
+			if ( i > 0 )
+			{
+				Handles.color = Color.grey;
+				Handles.DrawLine( previous_position, position );
+			}
+
 			previous_position = position;
 		}
 		

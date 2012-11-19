@@ -187,8 +187,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				xform.rotationEuler[ 2 ] = -xform.rotationEuler[ 2 ];
 				tx = -tx;
 				
-				
-				Handles.matrix = myAssetOTL.transform.localToWorldMatrix;	
+				Handles.matrix = myAssetOTL.transform.localToWorldMatrix;
 				
 				Vector3 position;
 				

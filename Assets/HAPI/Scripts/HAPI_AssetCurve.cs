@@ -32,6 +32,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 	
 	public List< Vector3 > 	prPoints { get; set; }
 	public Vector3[]		prVertices { get; set; }
+	public GameObject		prMainChild { get; set; }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -78,7 +79,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		string parm = "";
 		for ( int i = 0; i < prPoints.Count; ++i )
 		{
-			parm += prPoints[ i ][ 0 ];
+			parm += -prPoints[ i ][ 0 ];
 			parm += ",";
 			parm += prPoints[ i ][ 1 ];
 			parm += ",";
@@ -99,6 +100,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		prPoints 		= new List< Vector3 >();
 		prVertices 		= new Vector3[ 0 ];
+		prMainChild		= null;
 	}
 	
 	public override bool build() 
@@ -330,6 +332,79 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		return true;
 	}
+
+	public void buildDummyMesh()
+	{
+		if ( prMainChild == null )
+			return;
+
+		int vertex_count = prVertices.Length;
+
+		// Set mesh counts.
+		int mesh_vertex_count	= vertex_count * 2;
+		int mesh_uv_count		= mesh_vertex_count;
+		int mesh_triangle_count = ( vertex_count - 1 ) * 4; // Two triangles per side (double-sided).
+
+		// Create mesh arrays.
+		Vector3[] vertices 	= new Vector3[ 	mesh_vertex_count ];
+		Vector2[] uvs		= new Vector2[  mesh_uv_count ];
+		int[] triangles 	= new int[ 		mesh_triangle_count * 3 ];
+
+		for ( int i = 0; i < vertex_count; ++i )
+		{
+			vertices[ i * 2 ] = prVertices[ i ];
+			vertices[ i * 2 + 1 ] = prVertices[ i ];
+			vertices[ i * 2 + 1 ].y += HandleUtility.GetHandleSize( prVertices[ i ] ) * myDummyLineWidthMod;
+
+			uvs[ i * 2 + 0 ][ 0 ] = 0.0f;
+			uvs[ i * 2 + 1 ][ 1 ] = 0.0f;
+
+			if ( i < vertex_count - 1 )
+			{
+				// Side one.
+					
+				// Triangle 1.
+				triangles[ i * 12 + 0  ] = i * 2 + 0;
+				triangles[ i * 12 + 1  ] = i * 2 + 1;
+				triangles[ i * 12 + 2  ] = i * 2 + 2;
+
+				// Triangle 2.
+				triangles[ i * 12 + 3  ] = i * 2 + 1;
+				triangles[ i * 12 + 4  ] = i * 2 + 3;
+				triangles[ i * 12 + 5  ] = i * 2 + 2;
+
+				// Side two.
+
+				// Triangle 3.
+				triangles[ i * 12 + 6  ] = i * 2 + 2;
+				triangles[ i * 12 + 7  ] = i * 2 + 1;
+				triangles[ i * 12 + 8  ] = i * 2 + 0;
+
+				// Triangle 4.
+				triangles[ i * 12 + 9  ] = i * 2 + 2;
+				triangles[ i * 12 + 10 ] = i * 2 + 3;
+				triangles[ i * 12 + 11 ] = i * 2 + 1;
+			}
+		}
+
+		// Load into vertices and face into mesh.
+		// Get or create mesh.
+		MeshFilter main_child_mesh_filter 	= prMainChild.GetComponent< MeshFilter >();
+		Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
+		if ( main_child_mesh == null ) 
+		{
+			main_child_mesh_filter.mesh 	= new Mesh();
+			main_child_mesh 				= main_child_mesh_filter.sharedMesh;
+		}
+		main_child_mesh.Clear();
+		
+		main_child_mesh.vertices	= vertices;
+		main_child_mesh.uv			= uvs;
+		main_child_mesh.triangles	= triangles;
+
+		main_child_mesh.RecalculateBounds();
+		main_child_mesh.RecalculateNormals();
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
@@ -346,49 +421,57 @@ public class HAPI_AssetCurve : HAPI_Asset
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		// Create main underling.
-		GameObject main_child = new GameObject( object_info.name );
+		prMainChild = new GameObject( object_info.name );
 		
 		try
 		{
-			main_child.transform.parent = transform;
+			prMainChild.transform.parent = transform;
 			
 			// Add required components.
-			main_child.AddComponent( "HAPI_ChildSelectionControl" );
+			prMainChild.AddComponent( "MeshFilter" );
+			prMainChild.AddComponent( "MeshRenderer" );
+			prMainChild.AddComponent( "HAPI_ChildSelectionControl" );
 			
 			// Set Object Control on child selection control so it can read settings from here.
-			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
-			main_child.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
-			
-			// Get Detail info.
-			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-			HAPI_Host.getGeoInfo( prAssetId, object_id, 0, out geo_info );
-			if ( prEnableLogging )
-				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-						   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
-			
-			// Make sure our primitive and vertex numbers are supported by Unity.
-			// TODO: add this limit in a more proper place
-			if ( geo_info.faceCount > 65000 * 3 )
-				throw new HAPI_Error( "Face count (" + geo_info.faceCount 
-									  + ") above limit (" + ( 65000 * 3 ) + ")!" );
-			if ( geo_info.vertexCount > 65000 )
-				throw new HAPI_Error( "Vertex count (" + geo_info.vertexCount + ") above limit (" + 65000 + ")!" );
+			prMainChild.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
+			prMainChild.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
+
+			// Set generic texture so it's not pink.
+			Material decal = new Material( Shader.Find( "Decal" ) );
+			prMainChild.GetComponent< MeshRenderer >().material = decal;
+			decal.SetColor( "_Color", new Color( 0.0f, 0.0f, 0.0f ) );
+
+			// Get or create mesh.
+			MeshFilter main_child_mesh_filter 	= prMainChild.GetComponent< MeshFilter >();
+			Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
+			if ( main_child_mesh == null ) 
+			{
+				main_child_mesh_filter.mesh 	= new Mesh();
+				main_child_mesh 				= main_child_mesh_filter.sharedMesh;
+			}
+			main_child_mesh.Clear();
 			
 			// Print attribute names.
 			//printAllAttributeNames( asset_id, object_id, geo_id, geo_info );
 			
-			// Get position attributes.
+			// Get position attributes (this is all we get for the curve's geometry).
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 			float[] pos_attr = new float[ 0 ];
 			Utility.getAttribute( prAssetId, object_id, 0, "P", ref pos_attr_info, ref pos_attr, 
 								  HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );
+
+			int vertex_count = pos_attr_info.count;
 			
-			prVertices = new Vector3[ pos_attr_info.count ];
-			for ( int i = 0; i < pos_attr_info.count; ++i )
+			// Add vertices to the vertices array for guides.
+			prVertices = new Vector3[ vertex_count ];
+			for ( int i = 0; i < vertex_count; ++i )
+			{
 				for ( int j = 0; j < 3; ++j )
 					prVertices[ i ][ j ] = pos_attr[ i * 3 + j ];
+				prVertices[ i ].x = -prVertices[ i ].x;
+			}
 			
 			// Get transforms.
 			HAPI_Transform trans = prObjectTransforms[ object_id ];
@@ -402,7 +485,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
 			// causes a double negative - yeah, I know).
 			
-			main_child.transform.localPosition 	= new Vector3( -trans.position[ 0 ], 
+			prMainChild.transform.localPosition = new Vector3( -trans.position[ 0 ], 
 																trans.position[ 1 ],
 																trans.position[ 2 ] );
 			
@@ -415,24 +498,29 @@ public class HAPI_AssetCurve : HAPI_Asset
 			euler.y = -euler.y;
 			euler.z = -euler.z;
 			
-			main_child.transform.localRotation 	= Quaternion.Euler( euler );
-			main_child.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
-			
+			prMainChild.transform.localRotation = Quaternion.Euler( euler );
+			prMainChild.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
+
+			// Create guide mesh (for when the asset is not selected).
+			buildDummyMesh();
+
 			AssetDatabase.Refresh();
 		}
 		catch ( HAPI_Error error )
 		{
-			DestroyImmediate( main_child );
+			DestroyImmediate( prMainChild );
 			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;
 		}
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private Data
+
+	private static float myDummyLineWidthMod = 0.05f;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data
-	
-	[SerializeField]
-	private string			myAssetPath;
 	
 }

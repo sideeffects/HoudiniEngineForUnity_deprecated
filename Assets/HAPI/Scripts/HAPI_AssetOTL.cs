@@ -440,8 +440,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 					   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
 			
 			// Set diffuse material.
-			Material diffuse = new Material( Shader.Find( "Specular" ) );		
-			main_child.GetComponent< MeshRenderer >().material = diffuse;
+			Material specular = new Material( Shader.Find( "Specular" ) );
+			main_child.GetComponent< MeshRenderer >().material = specular;
 			if ( prMaterialCount > 0 && geo_info.materialId >= 0 )
 			{
 				if ( geo_info.hasMaterialChanged )
@@ -451,7 +451,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 					prMaterials[ geo_info.materialId ] = material[ 0 ];
 					geo_info.hasMaterialChanged = false;
 				}
-				Utility.assignTexture( ref diffuse, prMaterials[ geo_info.materialId ] );
+				Utility.assignTexture( ref specular, prMaterials[ geo_info.materialId ] );
 			}
 			
 			// Apply object transforms.		
