@@ -139,6 +139,14 @@ namespace HAPI
 		HAPI_STORAGETYPE_STR,
 		HAPI_STORAGETYPE_MAX
 	}
+
+	public enum HAPI_GeoType
+	{
+		HAPI_GEOTYPE_DEFAULT = 0,
+		HAPI_GEOTYPE_EXPOSED_EDIT,
+		HAPI_GEOTYPE_INPUT,
+		HAPI_GEOTYPE_MAX
+	};
 	
 	public enum HAPI_RSTOrder
 	{
@@ -418,7 +426,9 @@ namespace HAPI
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isInstancer;
-				
+
+		public int geoCount;
+
     	public int objectToInstanceId;
 		
 		// Accessors
@@ -447,6 +457,7 @@ namespace HAPI
 		}
 		
 		public int		id;
+		public int		type;
 		
 		public int 		materialId;
 		

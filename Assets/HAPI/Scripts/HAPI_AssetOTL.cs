@@ -381,6 +381,67 @@ public class HAPI_AssetOTL : HAPI_Asset
 		instancer.instanceObjects();
 	}
 	
+	private void createGeo( int object_id, int geo_id, GameObject container, Transform parent )
+	{
+		HAPI_ObjectInfo object_info = prObjects[ object_id ];
+		
+		container.transform.parent = parent;
+			
+		// Add required components.
+		container.AddComponent( "MeshFilter" );
+		container.AddComponent( "MeshRenderer" );
+		container.AddComponent( "HAPI_ChildSelectionControl" );
+		
+		// Set Object Control on child selection control so it can read settings from here.
+		container.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
+		container.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
+		
+		// Get or create mesh.
+		MeshFilter container_mesh_filter 	= container.GetComponent< MeshFilter >();
+		Mesh container_mesh 				= container_mesh_filter.sharedMesh;
+		if ( container_mesh == null ) 
+		{
+			container_mesh_filter.mesh 	= new Mesh();
+			container_mesh 				= container_mesh_filter.sharedMesh;
+		}
+		container_mesh.Clear();
+		
+		// Get mesh.
+		Utility.getMesh( prAssetId, object_id, geo_id, container_mesh );
+		
+		// Add Mesh-to-Prefab component.		
+		container.AddComponent( "HAPI_MeshToPrefab" );
+		HAPI_MeshToPrefab mesh_saver = container.GetComponent< HAPI_MeshToPrefab >();
+		mesh_saver.prObjectControl = this;
+		mesh_saver.prGameObject = container;
+		mesh_saver.prMeshName = this.prAssetInfo.name + "_" + container.name;
+				
+		
+		// Get Detail info.
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
+		if ( prEnableLogging )
+		Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
+				   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
+		
+		// Set specular material.
+		Material specular = new Material( Shader.Find( "Specular" ) );		
+		container.GetComponent< MeshRenderer >().material = specular;
+		if ( prMaterialCount > 0 && geo_info.materialId >= 0 )
+		{
+			if ( geo_info.hasMaterialChanged )
+			{
+				HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
+				HAPI_Host.getMaterials( prAssetId, material, geo_info.materialId, 1 );
+				prMaterials[ geo_info.materialId ] = material[ 0 ];
+				geo_info.hasMaterialChanged = false;
+			}
+			Utility.assignTexture( ref specular, prMaterials[ geo_info.materialId ] );
+		}
+								
+		
+	}
+	
 	/// <summary>
 	/// 	Instantiate a game object corresponding to a Houdini object of this asset, get geometry information
 	/// 	on the object and re-create the geometry on the Unity side.
@@ -397,62 +458,23 @@ public class HAPI_AssetOTL : HAPI_Asset
 		
 		try
 		{
-			main_child.transform.parent = transform;
-			
-			// Add required components.
-			main_child.AddComponent( "MeshFilter" );
-			main_child.AddComponent( "MeshRenderer" );
-			main_child.AddComponent( "HAPI_ChildSelectionControl" );
-			
-			// Set Object Control on child selection control so it can read settings from here.
-			main_child.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
-			main_child.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
-			
-			// Get or create mesh.
-			MeshFilter main_child_mesh_filter 	= main_child.GetComponent< MeshFilter >();
-			Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			if ( main_child_mesh == null ) 
-			{
-				main_child_mesh_filter.mesh 	= new Mesh();
-				main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			}
-			main_child_mesh.Clear();
-			
-			// Get mesh.
-			Utility.getMesh( prAssetId, object_id, 0, main_child_mesh );
-			
-			// Add Mesh-to-Prefab component.
 			prGameObjects[ object_id ] = main_child;
-			main_child.AddComponent( "HAPI_MeshToPrefab" );
-			HAPI_MeshToPrefab mesh_saver = main_child.GetComponent< HAPI_MeshToPrefab >();
-			mesh_saver.prObjectControl = this;
-			mesh_saver.prObjectId = object_id;
-			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + main_child.name;
+			if( object_info.geoCount == 1 )
+			{
+				createGeo( object_id, 0, main_child, transform );
+			}
+			else
+			{				
+				main_child.transform.parent = transform;
+				for( int ii = 0; ii < object_info.geoCount; ii++ )
+				{
+					GameObject sub_child = new GameObject( object_info.name + "_Geo" + ii);
+					createGeo( object_id, ii, sub_child, main_child.transform );
+				}
+			}
 			
 			// Get transforms.
 			HAPI_Transform trans = prObjectTransforms[ object_id ];
-			
-			// Get Detail info.
-			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-			HAPI_Host.getGeoInfo( prAssetId, object_id, 0, out geo_info );
-			if ( prEnableLogging )
-			Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-					   + "verts: " + geo_info.vertexCount + " faces: " + geo_info.faceCount );
-			
-			// Set diffuse material.
-			Material specular = new Material( Shader.Find( "Specular" ) );
-			main_child.GetComponent< MeshRenderer >().material = specular;
-			if ( prMaterialCount > 0 && geo_info.materialId >= 0 )
-			{
-				if ( geo_info.hasMaterialChanged )
-				{
-					HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
-					HAPI_Host.getMaterials( prAssetId, material, geo_info.materialId, 1 );
-					prMaterials[ geo_info.materialId ] = material[ 0 ];
-					geo_info.hasMaterialChanged = false;
-				}
-				Utility.assignTexture( ref specular, prMaterials[ geo_info.materialId ] );
-			}
 			
 			// Apply object transforms.		
 			//
@@ -480,10 +502,12 @@ public class HAPI_AssetOTL : HAPI_Asset
 			main_child.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
 			
 			AssetDatabase.Refresh();
+			
 		}
 		catch ( HAPI_Error error )
 		{
 			DestroyImmediate( main_child );
+			prGameObjects[ object_id ] = null;
 			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;

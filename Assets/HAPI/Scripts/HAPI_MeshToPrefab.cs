@@ -12,7 +12,7 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	
 	public HAPI_Asset prObjectControl { get; set; }
 	
-	public int prObjectId { get; set; }	
+	public GameObject prGameObject { get; set; }	
 	public string prMeshName { get; set; }
 	public string prPathToPrefab { get; set; }
 		
@@ -22,7 +22,7 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	public HAPI_MeshToPrefab () 
 	{
 		prObjectControl = null;
-		prObjectId = -1;
+		prGameObject = null;
 		prPathToPrefab = "Assets/";
 	}
 		
@@ -59,7 +59,7 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	        prefab = PrefabUtility.CreateEmptyPrefab( prPathToPrefab );
 	    }
 		
-		GameObject targetGameObj = prObjectControl.prGameObjects[prObjectId];
+		GameObject targetGameObj = prGameObject;
 		
 		Mesh inputMesh =  targetGameObj.GetComponent<MeshFilter>().sharedMesh;
 		
