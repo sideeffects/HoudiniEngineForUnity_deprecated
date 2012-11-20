@@ -234,7 +234,7 @@ public class HAPI_AssetUtility
 		int current_index = 0;
 		
 		while ( local_count > 0 ) 
-		{			
+		{
 			int length = 0;
 			if ( local_count > max_array_size ) 
 			{

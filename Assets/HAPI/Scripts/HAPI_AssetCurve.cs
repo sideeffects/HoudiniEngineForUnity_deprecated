@@ -23,7 +23,7 @@ using HAPI;
 using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
-public class HAPI_AssetCurve : HAPI_Asset 
+public class HAPI_AssetCurve : HAPI_Asset
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -91,7 +91,41 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		build();
 	}
-	
+
+	public void syncPointsWithParm()
+	{
+		// Find the parm.
+		string point_list = null;
+		for ( int i = 0; i < prParmCount; ++i )
+			if ( prParms[ i ].name == "coords" )
+				point_list = HAPI_Host.getString( prParmStringValues[ prParms[ i ].stringValuesIndex ] );
+
+		if ( point_list == null )
+			return;
+
+		// Clear all existing points.
+		prPoints.Clear();
+
+		// Parse parm value for the points.
+		string [] point_split = point_list.Split( new char [] { ' ' } );
+		for ( int i = 0; i < point_split.Length; ++i )
+		{
+			string vec_str = point_split[ i ];
+			string [] vec_split = vec_str.Split( new char [] { ',' } );
+
+			if ( vec_split.Length == 3 )
+			{
+				Vector3 vec = new Vector3();
+
+				vec.x = (float) -System.Convert.ToDouble( vec_split [ 0 ] );
+				vec.y = (float) System.Convert.ToDouble( vec_split [ 1 ] );
+				vec.z = (float) System.Convert.ToDouble( vec_split [ 2 ] );
+
+				prPoints.Add( vec );
+			}
+		}
+	}
+
 	public override void reset()
 	{
 		base.reset();
@@ -285,27 +319,20 @@ public class HAPI_AssetCurve : HAPI_Asset
 			
 			// Create local object info caches (transforms need to be stored in a parallel array).
 			prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];
-			prGameObjects		= new GameObject[ prObjectCount ];
 			prObjectTransforms 	= new HAPI_Transform[ prObjectCount ];
 			
 			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
 			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
 						 		 prObjectTransforms, prObjectCount );
-			
-			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+
+			try
 			{
-				incrementProgressBar();
-				try
-				{
-					prGameObjects[ object_index ] = null;
-					if ( !prObjects[ object_index ].isInstancer && prObjects[ object_index ].isVisible )
-						createObject( object_index );
-				}
-				catch ( HAPI_Error )
-				{
-					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-					//Debug.LogWarning( error.ToString() );
-				}
+				createObject( 0 );
+			}
+			catch ( HAPI_Error )
+			{
+				// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
+				//Debug.LogWarning( error.ToString() );
 			}
 			
 			// Process dependent assets.

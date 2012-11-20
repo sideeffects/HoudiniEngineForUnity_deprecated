@@ -41,6 +41,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	
 	public override void OnInspectorGUI() 
 	{
+		if ( myAssetCurve == null )
+			return;
+
 		myParmChanges = false;
 		
 		base.OnInspectorGUI();
@@ -83,9 +86,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.addPoint( Vector3.left ); // Don't set to zero as that's where the center asset gizmo is.
 			myParmChanges |= generateAssetControls();
 		}
-		
+
 		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
 		{
+			myAssetCurve.syncPointsWithParm();
 			myAssetCurve.build();
 			myUnbuiltChanges = false;
 		}
@@ -109,6 +113,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	
 	public void OnSceneGUI() 
 	{
+		if ( myAssetCurve == null || myAssetCurve.prMainChild == null )
+			return;
+
 		Event current_event 		= Event.current;
 		
 		int point_count 			= myAssetCurve.prPoints.Count;
@@ -362,7 +369,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		bool changed 					= false;
 		int current_index 				= 0;
 		HAPI_ParmInfo[] parms 			= myAssetCurve.prParms;
-				
+		
 		bool join_last 					= false;
 		bool no_label_toggle_last 		= false;
 		
