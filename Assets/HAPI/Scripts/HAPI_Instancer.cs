@@ -13,7 +13,7 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public GameObject 	prObjToInstantiate { get; set; }
 	public bool 		prOverrideInstances { get; set; }
-	public HAPI_Asset 	prObjectControl { get; set; }
+	public HAPI_Asset 	prAsset { get; set; }
 	public int 			prObjectId { get; set; }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public HAPI_Instancer () 
 	{
-		prObjectControl = null;
+		prAsset = null;
 		prOverrideInstances = false;
 		prObjectId = -1;
 	}
@@ -30,33 +30,35 @@ public class HAPI_Instancer : MonoBehaviour {
 	{
 		destroyChildren();
 		
-		HAPI_ObjectInfo object_info = prObjectControl.prObjects[ prObjectId ];
+		HAPI_ObjectInfo object_info = prAsset.prObjects[ prObjectId ];
 		
 		// Get Detail info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Host.getGeoInfo( prObjectControl.prAssetId, prObjectId, 0, out geo_info );
-		if ( prObjectControl.prEnableLogging )
+		HAPI_Host.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Host.getPartInfo( prAsset.prAssetId, prObjectId, 0, 0, out part_info );
+		if ( prAsset.prEnableLogging )
 			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
-					   + "points: " + geo_info.pointCount );
+					   + "points: " + part_info.pointCount );
 				
-		if ( geo_info.pointCount > 65000 )
-			throw new HAPI_Error( "Point count (" + geo_info.pointCount + ") above limit (" + 65000 + ")!" );
+		if ( part_info.pointCount > 65000 )
+			throw new HAPI_Error( "Point count (" + part_info.pointCount + ") above limit (" + 65000 + ")!" );
 										
-		HAPI_Transform[] instance_transforms = new HAPI_Transform[ geo_info.pointCount ];
-		Utility.getArray4Id( prObjectControl.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.SRT, 
-							 HAPI_Host.getInstanceTransforms, instance_transforms, geo_info.pointCount );
+		HAPI_Transform[] instance_transforms = new HAPI_Transform[ part_info.pointCount ];
+		Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.SRT, 
+							 HAPI_Host.getInstanceTransforms, instance_transforms, part_info.pointCount );
 		
 		// Get scale point attributes.
 		HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
 		float[] scale_attr = new float[ 0 ];
-		Utility.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "scale",
+		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "scale",
 							  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
 		
 		if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand up as point attributes!" );
 		
-		if ( scale_attr_info.exists && scale_attr.Length != geo_info.pointCount * 3 )
-			throw new HAPI_Error( "Unexpected up array length found for asset: " + prObjectControl.prAssetId + "!" );
+		if ( scale_attr_info.exists && scale_attr.Length != part_info.pointCount * 3 )
+			throw new HAPI_Error( "Unexpected up array length found for asset: " + prAsset.prAssetId + "!" );
 				
 		// Get string point attributes.
 		/*HAPI_AttributeInfo instancehint_attr_info = new HAPI_AttributeInfo( "instance_hint" );
@@ -76,40 +78,31 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
 		int[] instance_attr = new int[ 0 ];
-		Utility.getAttribute( prObjectControl.prAssetId, prObjectId, 0, "instance", 
+		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "instance", 
 							  ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
 		
 		if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_Error( "I only understand instance as point attributes!" );
 		
-		if ( instance_attr_info.exists && instance_attr.Length != geo_info.pointCount )
+		if ( instance_attr_info.exists && instance_attr.Length != part_info.pointCount )
 			throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
-								  + prObjectControl.prAssetId + "!" );
+								  + prAsset.prAssetId + "!" );
 		
-		for(int ii = 0; ii < geo_info.pointCount; ii++)
-		{			
-			
+		for (int ii = 0; ii < part_info.pointCount; ++ii )
+		{
 			GameObject objToInstantiate = null;
 			
-			if( object_info.objectToInstanceId >= 0 )
+			if ( object_info.objectToInstanceId >= 0 )
+				objToInstantiate = prAsset.prGameObjects[ object_info.objectToInstanceId ];
+			else if ( instance_attr_info.exists )
 			{
-				objToInstantiate = prObjectControl.prGameObjects[ object_info.objectToInstanceId ];
-			}
-			else
-			{
-				if( instance_attr_info.exists )
-				{
-					string instanceObjectPath = HAPI_Host.getString( instance_attr[ ii ] );
-					string[] pathItems = instanceObjectPath.Split('/');
-					string instanceObjectName = pathItems[ pathItems.Length - 1 ];									
+				string instanceObjectPath	= HAPI_Host.getString( instance_attr[ ii ] );
+				string[] pathItems			= instanceObjectPath.Split('/');
+				string instanceObjectName	= pathItems[ pathItems.Length - 1 ];
 					
-					int objectIndex = prObjectControl.findObjectByName( instanceObjectName );
-					if( objectIndex >= 0 )
-					{
-						objToInstantiate = prObjectControl.prGameObjects[ objectIndex ];
-					}
-				}
-				
+				int objectIndex = prAsset.findObjectByName( instanceObjectName );
+				if ( objectIndex >= 0 )
+					objToInstantiate = prAsset.prGameObjects[ objectIndex ];
 			}
 			
 			//string instance_hint = HAPI_Host.getString( instancehint_attr[ ii ] );
@@ -120,7 +113,7 @@ public class HAPI_Instancer : MonoBehaviour {
 			{
 				Vector3 pos = new Vector3();
 				
-				// Apply object transforms.		
+				// Apply object transforms.
 				//
 				// Axis and Rotation conversions:
 				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
@@ -172,13 +165,10 @@ public class HAPI_Instancer : MonoBehaviour {
 					selection_control = obj.GetComponent< HAPI_ChildSelectionControl >();
 				}
 				
-				if ( selection_control != null )
-					selection_control.setObjectControl( prObjectControl );
+				if ( selection_control )
+					selection_control.setAsset( prAsset );
 			}
-			
-			
 		}
-		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

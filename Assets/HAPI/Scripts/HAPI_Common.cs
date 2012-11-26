@@ -444,7 +444,22 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_GeoInfo
 	{
-		public int		getOwnerCount( HAPI_AttributeOwner owner )
+		public int		id;
+		public int		type;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool		hasGeoChanged;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool		hasMaterialChanged;
+
+		public int		partCount;
+	}
+
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_PartInfo
+	{
+		public int getOwnerCount( HAPI_AttributeOwner owner )
 		{
 			switch ( owner )
 			{
@@ -455,17 +470,10 @@ namespace HAPI
 				default: return 0;
 			}
 		}
-		
+
 		public int		id;
-		public int		type;
-		
+
 		public int 		materialId;
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool		hasGeoChanged;
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool		hasMaterialChanged;
 		
 		public int		faceCount;
 		public int		vertexCount;

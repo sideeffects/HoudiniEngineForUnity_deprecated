@@ -460,7 +460,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			prMainChild.AddComponent( "HAPI_ChildSelectionControl" );
 			
 			// Set Object Control on child selection control so it can read settings from here.
-			prMainChild.GetComponent< HAPI_ChildSelectionControl >().setObjectControl( this );
+			prMainChild.GetComponent< HAPI_ChildSelectionControl >().setAsset( this );
 			prMainChild.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
 
 			// Set generic texture so it's not pink.
@@ -484,7 +484,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			// Get position attributes (this is all we get for the curve's geometry).
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 			float[] pos_attr = new float[ 0 ];
-			Utility.getAttribute( prAssetId, object_id, 0, "P", ref pos_attr_info, ref pos_attr, 
+			Utility.getAttribute( prAssetId, object_id, 0, 0, "P", ref pos_attr_info, ref pos_attr, 
 								  HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );

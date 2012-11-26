@@ -36,56 +36,70 @@ public class HAPI_AssetUtility
 	public delegate void getArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
 	public delegate void getArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
 	public delegate void getArray4IdDel< T >( int id1, int id2, int id3, int id4, [Out] T[] data, int start, int end );
-	
+	public delegate void getArray5IdDel< T >( int id1, int id2, int id3, int id4, int id5, 
+											  [Out] T[] data, int start, int end );
+
 	public static void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
 										 int count )
 	{
-		getArray( id1, 0, 0, 0, func, null, null, null, data, count, 1 );
+		getArray( id1, 0, 0, 0, 0, func, null, null, null, null, data, count, 1 );
 	}
 	public static void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
-		getArray( id1, 0, 0, 0, func, null, null, null, data, count, tuple_size );
+		getArray( id1, 0, 0, 0, 0, func, null, null, null, null, data, count, tuple_size );
 	}
 	
 	public static void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
 										 int count )
 	{
-		getArray( id1, id2, 0, 0, null, func, null, null, data, count, 1 );
+		getArray( id1, id2, 0, 0, 0, null, func, null, null, null, data, count, 1 );
 	}
 	public static void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
-		getArray( id1, id2, 0, 0, null, func, null, null, data, count, tuple_size );
+		getArray( id1, id2, 0, 0, 0, null, func, null, null, null, data, count, tuple_size );
 	}
 	
 	public static void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
 										 int count )
 	{
-		getArray( id1, id2, id3, 0, null, null, func, null, data, count, 1 );
+		getArray( id1, id2, id3, 0, 0, null, null, func, null, null, data, count, 1 );
 	}
 	public static void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
-		getArray( id1, id2, id3, 0, null, null, func, null, data, count, tuple_size );
+		getArray( id1, id2, id3, 0, 0, null, null, func, null, null, data, count, tuple_size );
 	}
 	
 	public static void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
 										 int count )
 	{
-		getArray( id1, id2, id3, id4, null, null, null, func, data, count, 1 );
+		getArray( id1, id2, id3, id4, 0, null, null, null, func, null, data, count, 1 );
 	}
 	public static void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
-		getArray( id1, id2, id3, id4, null, null, null, func, data, count, tuple_size );
+		getArray( id1, id2, id3, id4, 0, null, null, null, func, null, data, count, tuple_size );
+	}
+
+	public static void getArray5Id< T >( int id1, int id2, int id3, int id4, int id5, 
+										 getArray5IdDel<T> func, [Out] T [] data, int count )
+	{
+		getArray( id1, id2, id3, id4, id5, null, null, null, null, func, data, count, 1 );
+	}
+	public static void getArray5Id< T >( int id1, int id2, int id3, int id4, int id5, 
+										 getArray5IdDel<T> func, [Out] T [] data, int count, int tuple_size )
+	{
+		getArray( id1, id2, id3, id4, id5, null, null, null, null, func, data, count, tuple_size );
 	}
 	
-	private static void getArray< T >( int id1, int id2, int id3, int id4,
+	private static void getArray< T >( int id1, int id2, int id3, int id4, int id5,
 									   getArray1IdDel< T > func_1id, 
 									   getArray2IdDel< T > func_2id, 
 									   getArray3IdDel< T > func_3id,
 									   getArray4IdDel< T > func_4id,
+									   getArray5IdDel< T > func_5id,
 									   [Out] T[] data, int count, int tuple_size )
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );
@@ -117,6 +131,8 @@ public class HAPI_AssetUtility
 				func_3id( id1, id2, id3, local_array, current_index, length );
 			else if ( func_4id != null )
 				func_4id( id1, id2, id3, id4, local_array, current_index, length );
+			else if ( func_5id != null )
+				func_5id( id1, id2, id3, id4, id5, local_array, current_index, length );
 			else
 			{
 				Debug.LogError( "No valid delegates given to getArray< T >!" );
@@ -221,11 +237,11 @@ public class HAPI_AssetUtility
 	
 	// ATTRIBUTES ---------------------------------------------------------------------------------------------------
 		
-	public delegate void getAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
-													 ref HAPI_AttributeInfo info, 
+	public delegate void getAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, int part_id, 
+													 string name, ref HAPI_AttributeInfo info, 
 													 [Out] T[] items, int start, int end );
-	public static void getAttrArray< T >( int asset_id, int object_id, int geo_id, string name, 
-										  ref HAPI_AttributeInfo info, T[] items,
+	public static void getAttrArray< T >( int asset_id, int object_id, int geo_id, int part_id, 
+										  string name, ref HAPI_AttributeInfo info, T[] items,
 									 	  getAttrArrayInputFunc< T > get_func, int count ) 
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
@@ -248,7 +264,7 @@ public class HAPI_AssetUtility
 			}
 			
 			T[] local_array = new T[ length * info.tupleSize ];
-			get_func( asset_id, object_id, geo_id, name, ref info, local_array, current_index, length );
+			get_func( asset_id, object_id, geo_id, part_id, name, ref info, local_array, current_index, length );
 			
 			// Copy data from the temporary array.
 			for ( int i = current_index; i < current_index + length; ++i )
@@ -298,7 +314,7 @@ public class HAPI_AssetUtility
 		}
 	}
 	
-	public static void getAttribute< T >( int asset_id, int object_id, int geo_id, string name, 
+	public static void getAttribute< T >( int asset_id, int object_id, int geo_id, int part_id, string name, 
 										  ref HAPI_AttributeInfo info, ref T[] data,
 										  getAttrArrayInputFunc< T > get_func )
 	{
@@ -307,7 +323,7 @@ public class HAPI_AssetUtility
 		for ( int type = 0; type < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
 			info.owner = type;
-			HAPI_Host.getAttributeInfo( asset_id, object_id, geo_id, name, ref info );
+			HAPI_Host.getAttributeInfo( asset_id, object_id, geo_id, part_id, name, ref info );
 			if ( info.exists )
 				break;
 		}
@@ -318,7 +334,7 @@ public class HAPI_AssetUtility
 			info.tupleSize = original_tuple_size;
 		
 		data = new T[ info.count * info.tupleSize ];
-		getAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
+		getAttrArray( asset_id, object_id, geo_id, part_id, name, ref info, data, get_func, info.count );
 	}
 	
 	public static void setAttribute< T >( int asset_id, int object_id, int geo_id, string name, 
@@ -328,26 +344,26 @@ public class HAPI_AssetUtility
 		setAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
 	}
 	
-	public static string[] getAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info, 
-											  HAPI_AttributeOwner owner )
+	public static string[] getAttributeNames( int asset_id, int object_id, int geo_id, int part_id, 
+											  HAPI_PartInfo part_info, HAPI_AttributeOwner owner )
 	{
-		int attr_count = geo_info.getOwnerCount( owner );
+		int attr_count = part_info.getOwnerCount( owner );
 			
 		string[] names = new string[ attr_count ];
 		
 		int[] attr_names = new int[ attr_count ]; // string handles (SH)
 		
-		HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, (int) owner, attr_names, attr_count );
+		HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, part_id, (int) owner, attr_names, attr_count );
 		for ( int ii = 0; ii < attr_count; ++ii )
 			names[ ii ] = HAPI_Host.getString( attr_names[ ii ] );
 		
 		return names;
 	}
 	
-	public static void printAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info,
-											HAPI_AttributeOwner owner )
+	public static void printAttributeNames( int asset_id, int object_id, int geo_id, int part_id, 
+											HAPI_PartInfo part_info, HAPI_AttributeOwner owner )
 	{
-		string[] names = getAttributeNames( asset_id, object_id, geo_id, geo_info, owner );
+		string[] names = getAttributeNames( asset_id, object_id, geo_id, part_id, part_info, owner );
 		
 		string msg = "A" + asset_id + "O" + object_id + " - ";
 		
@@ -375,10 +391,11 @@ public class HAPI_AssetUtility
 		Debug.Log( msg );
 	}
 	
-	public static void printAllAttributeNames( int asset_id, int object_id, int geo_id, HAPI_GeoInfo geo_info )
+	public static void printAllAttributeNames( int asset_id, int object_id, int geo_id, int part_id, 
+											   HAPI_PartInfo part_info )
 	{
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
-			printAttributeNames( asset_id, object_id, geo_id, geo_info, (HAPI_AttributeOwner) owner );
+			printAttributeNames( asset_id, object_id, geo_id, part_id, part_info, (HAPI_AttributeOwner) owner );
 	}
 	
 	// TEXTURES -----------------------------------------------------------------------------------------------------
@@ -426,35 +443,37 @@ public class HAPI_AssetUtility
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 	
-	public static void getMesh( int asset_id, int object_id, int geo_id, Mesh mesh )
+	public static void getMesh( int asset_id, int object_id, int geo_id, int part_id, Mesh mesh )
 	{
 		// Get Detail info.
-		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Host.getGeoInfo( asset_id, object_id, geo_id, out geo_info );
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Host.getPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
 		
 		// Make sure our primitive and vertex numbers are supported by Unity.
 		// TODO: add this limit in a more proper place
-		if ( geo_info.faceCount > 65000 * 3 )
-			throw new HAPI_Error( "Face count (" + geo_info.faceCount 
+		if ( part_info.faceCount > 65000 * 3 )
+			throw new HAPI_Error( "Face count (" + part_info.faceCount 
 								  + ") above limit (" + ( 65000 * 3 ) + ")!" );
-		if ( geo_info.vertexCount > 65000 )
-			throw new HAPI_Error( "Vertex count (" + geo_info.vertexCount + ") above limit (" + 65000 + ")!" );
+		if ( part_info.vertexCount > 65000 )
+			throw new HAPI_Error( "Vertex count (" + part_info.vertexCount + ") above limit (" + 65000 + ")!" );
 		
 		// Get Face counts.
-		int[] face_counts = new int[ geo_info.faceCount ];
-		getArray3Id( asset_id, object_id, geo_id, HAPI_Host.getFaceCounts, face_counts, geo_info.faceCount );
+		int[] face_counts = new int[ part_info.faceCount ];
+		getArray4Id( asset_id, object_id, geo_id, part_id, HAPI_Host.getFaceCounts, 
+					 face_counts, part_info.faceCount );
 		
 		// Get Vertex list.
-		int[] vertex_list = new int[ geo_info.vertexCount ];
-		getArray3Id( asset_id, object_id, geo_id, HAPI_Host.getVertexList, vertex_list, geo_info.vertexCount );
+		int[] vertex_list = new int[ part_info.vertexCount ];
+		getArray4Id( asset_id, object_id, geo_id, part_id, HAPI_Host.getVertexList, 
+					 vertex_list, part_info.vertexCount );
 		
 		// Print attribute names.
-		//printAllAttributeNames( asset_id, object_id, geo_id, geo_info );
+		printAllAttributeNames( asset_id, object_id, geo_id, part_id, part_info );
 		
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 		float[] pos_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
+		getAttribute( asset_id, object_id, geo_id, part_id, "P", ref pos_attr_info, ref pos_attr, 
 					  HAPI_Host.getAttributeFloatData );
 		if ( !pos_attr_info.exists )
 			throw new HAPI_Error( "No position attribute found." );
@@ -465,23 +484,23 @@ public class HAPI_AssetUtility
 		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
 		uv_attr_info.tupleSize = 2;
 		float[] uv_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, "uv", ref uv_attr_info, ref uv_attr, 
+		getAttribute( asset_id, object_id, geo_id, part_id, "uv", ref uv_attr_info, ref uv_attr, 
 					  HAPI_Host.getAttributeFloatData );
 		
 		// Get normal attributes.
 		HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( "N" );
 		float[] normal_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, "N", ref normal_attr_info, ref normal_attr, 
+		getAttribute( asset_id, object_id, geo_id, part_id, "N", ref normal_attr_info, ref normal_attr, 
 					  HAPI_Host.getAttributeFloatData );
 				
 		// Create Unity-specific data objects.
-		Vector3[] vertices 	= new Vector3[ 	geo_info.vertexCount ];
-		int[] triangles 	= new int[ 		geo_info.faceCount * 3 ];
-		Vector2[] uvs 		= new Vector2[ 	geo_info.vertexCount ];
-		Vector3[] normals 	= new Vector3[ 	geo_info.vertexCount ];
+		Vector3[] vertices 	= new Vector3[ 	part_info.vertexCount ];
+		int[] triangles 	= new int[ 		part_info.faceCount * 3 ];
+		Vector2[] uvs 		= new Vector2[ 	part_info.vertexCount ];
+		Vector3[] normals 	= new Vector3[ 	part_info.vertexCount ];
 		
 		// Fill Unity-specific data objects with data from the runtime.
-		for ( int i = 0; i < geo_info.vertexCount; ++i ) 
+		for ( int i = 0; i < part_info.vertexCount; ++i ) 
 		{
 			// Fill position information.
 			for ( int j = 0; j < 3; ++j )
@@ -546,7 +565,7 @@ public class HAPI_AssetUtility
 			}
 		}
 		
-		for ( int i = 0; i < geo_info.faceCount; ++i ) 
+		for ( int i = 0; i < part_info.faceCount; ++i ) 
 			for ( int j = 0; j < 3; ++j )
 				triangles[ i * 3 + j ] 	= i * 3 + j;
 		
@@ -570,51 +589,53 @@ public class HAPI_AssetUtility
 		//Vector3[] normals 				= mesh.normals;
 		
 		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
-		
 		geo_info.id 					= geo_id;
-		geo_info.materialId 			= -1;
-		geo_info.faceCount 				= triangles.Length / 3;
-		geo_info.vertexCount 			= triangles.Length;
-		geo_info.pointCount 			= vertices.Length;
+
+		HAPI_PartInfo part_info			= new HAPI_PartInfo();
+		part_info.materialId 			= -1;
+		part_info.faceCount 			= triangles.Length / 3;
+		part_info.vertexCount 			= triangles.Length;
+		part_info.pointCount 			= vertices.Length;
 		
-		geo_info.pointAttributeCount 	= 1;
-		geo_info.vertexAttributeCount 	= 0;
-		geo_info.faceAttributeCount 	= 0;
-		geo_info.detailAttributeCount 	= 0;
+		part_info.pointAttributeCount 	= 1;
+		part_info.vertexAttributeCount 	= 0;
+		part_info.faceAttributeCount 	= 0;
+		part_info.detailAttributeCount 	= 0;
 		
 		/* Not yet supported.
 		if ( uvs != null )
-			geo_info.vertexAttributeCount++;
+			part_info.vertexAttributeCount++;
 		if ( normals != null )
-			geo_info.vertexAttributeCount++;
+			part_info.vertexAttributeCount++;
 		*/
 		
 		HAPI_Host.setGeoInfo( asset_id, object_id, geo_id, ref geo_info );
+		HAPI_Host.setPartInfo( asset_id, object_id, geo_id, ref part_info );
 		
 		// Set Face counts.
-		int[] face_counts = new int[ geo_info.faceCount ];
-		for ( int i = 0; i < geo_info.faceCount; ++i )
+		int[] face_counts = new int[ part_info.faceCount ];
+		for ( int i = 0; i < part_info.faceCount; ++i )
 			face_counts[ i ] = 3;
-		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setFaceCounts, face_counts, geo_info.faceCount );
+		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setFaceCounts, face_counts, part_info.faceCount );
 		
 		// Set Vertex list.
-		int[] vertex_list = new int[ geo_info.vertexCount ];
-		for ( int i = 0; i < geo_info.faceCount; ++i )
+		int[] vertex_list = new int[ part_info.vertexCount ];
+		for ( int i = 0; i < part_info.faceCount; ++i )
 			for ( int j = 0; j < 3; ++j )
 				vertex_list[ i * 3 + j ] = triangles[ i * 3 + ( 2 - j ) ];
-		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, geo_info.vertexCount );
+		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
 		
 		// Set position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 		pos_attr_info.exists 		= true;
 		pos_attr_info.owner 		= (int) HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 		pos_attr_info.storage 		= (int) HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
-		pos_attr_info.count 		= geo_info.pointCount;
+		pos_attr_info.count 		= part_info.pointCount;
 		pos_attr_info.tupleSize 	= 3;
 		HAPI_Host.addAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info );
 		
-		float[] pos_attr = new float[ geo_info.pointCount * 3 ];
-		for ( int i = 0; i < geo_info.pointCount; ++i )
+		float[] pos_attr = new float[ part_info.pointCount * 3 ];
+		for ( int i = 0; i < part_info.pointCount; ++i )
 			for ( int j = 0; j < 3; ++j )
 				pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
 		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 

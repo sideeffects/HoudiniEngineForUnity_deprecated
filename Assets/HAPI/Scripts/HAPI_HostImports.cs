@@ -144,44 +144,48 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetGeoInfo(			int asset_id, int object_id, int geo_id,
 															out HAPI_GeoInfo geo_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetPartInfo(			int asset_id, int object_id, int geo_id, int part_id,
+															out HAPI_PartInfo part_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetFaceCounts(		int asset_id, int object_id, int geo_id,
+		private static extern int HAPI_GetFaceCounts(		int asset_id, int object_id, int geo_id, int part_id,
 															[Out] int[] face_counts,
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetVertexList(		int asset_id, int object_id, int geo_id,
+		private static extern int HAPI_GetVertexList(		int asset_id, int object_id, int geo_id, int part_id,
 															[Out] int[] vertex_list,
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAttributeInfo(	int asset_id, int object_id, int geo_id,
+		private static extern int HAPI_GetAttributeInfo(	int asset_id, int object_id, int geo_id, int part_id,
 															string name,
 															ref HAPI_AttributeInfo attr_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAttributeNames(	int asset_id, int object_id, int geo_id,
+		private static extern int HAPI_GetAttributeNames(	int asset_id, int object_id, int geo_id, int part_id,
 															int attribute_type,
 															[Out] int[] data,
 															int count );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAttributeIntData( int asset_id, int object_id, int geo_id,
+		private static extern int HAPI_GetAttributeIntData( int asset_id, int object_id, int geo_id, int part_id,
 															string name,
 															ref HAPI_AttributeInfo attr_info,
 															[Out] int[] data,
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAttributeFloatData( int asset_id, int object_id, int geo_id,
+		private static extern int HAPI_GetAttributeFloatData( int asset_id, int object_id, int geo_id, int part_id,
 															  string name,
 															  ref HAPI_AttributeInfo attr_info,
 															  [Out] float[] data,
 															  int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAttributeStrData( int asset_id, int object_id, int geo_id,
+		private static extern int HAPI_GetAttributeStrData( int asset_id, int object_id, int geo_id, int part_id,
 															string name,
 															ref HAPI_AttributeInfo attr_info,
 															[Out] int[] data,
@@ -192,6 +196,10 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetGeoInfo(			int asset_id, int object_id, int geo_id,
 															ref HAPI_GeoInfo geo_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetPartInfo(			int asset_id, int object_id, int geo_id,
+															ref HAPI_PartInfo part_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetFaceCounts(		int asset_id, int object_id, int geo_id,

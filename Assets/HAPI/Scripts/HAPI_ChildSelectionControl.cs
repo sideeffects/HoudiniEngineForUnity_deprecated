@@ -30,13 +30,13 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 	{ 
 		get
 		{
-			return myObjectControl;
+			return myAsset;
 		}
 	}
 	
-	public void setObjectControl( MonoBehaviour object_control )
+	public void setAsset( MonoBehaviour asset )
 	{
-		myObjectControl = object_control as HAPI_Asset;
+		myAsset = asset as HAPI_Asset;
 	}
 	
 	/// <summary>
@@ -45,13 +45,13 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 	public void selectParent()
 	{
 		
-		if ( myObjectControl != null && myObjectControl.prAutoSelectAssetNode )
+		if ( myAsset != null && myAsset.prAutoSelectAssetNode )
 		{
 			GameObject[] selection 	= new GameObject[ 1 ];
-			selection[ 0 ] 			= myObjectControl.gameObject;
+			selection[ 0 ] 			= myAsset.gameObject;
 			Selection.objects 		= selection;
 		}
 	}
 
-	private HAPI_Asset	myObjectControl;
+	private HAPI_Asset	myAsset;
 }
