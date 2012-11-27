@@ -380,8 +380,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 		
 		instancer.instanceObjects();
 	}
-	
-	private void createGeo( int object_id, int geo_id, GameObject container, Transform parent )
+
+	private void createPart( int object_id, int geo_id, int part_id,
+							 GameObject container, Transform parent )
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
@@ -404,7 +405,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 		// Get Part info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Host.getPartInfo( prAssetId, object_id, geo_id, 0, out part_info );
+		HAPI_Host.getPartInfo( prAssetId, object_id, geo_id, part_id, out part_info );
 		if ( prEnableLogging )
 		Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
 				   + "verts: " + part_info.vertexCount + " faces: " + part_info.faceCount );
@@ -420,9 +421,17 @@ public class HAPI_AssetOTL : HAPI_Asset
 		container_mesh.Clear();
 		
 		// Get mesh.
-		Utility.getMesh( prAssetId, object_id, geo_id, 0, container_mesh );
+		try
+		{
+			Utility.getMesh( prAssetId, object_id, geo_id, part_id, container_mesh );
+		}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogWarning( error.ToString() );
+			return;
+		}
 		
-		// Add Mesh-to-Prefab component.		
+		// Add Mesh-to-Prefab component.
 		container.AddComponent( "HAPI_MeshToPrefab" );
 		HAPI_MeshToPrefab mesh_saver = container.GetComponent< HAPI_MeshToPrefab >();
 		mesh_saver.prObjectControl = this;
@@ -445,6 +454,30 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 	}
 	
+	private void createGeo( int object_id, int geo_id, GameObject container, Transform parent )
+	{
+		// Get Geo info.
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
+		if ( geo_info.partCount == 0 )
+		{
+			Debug.LogError( "no geo?" );
+			return;
+		}
+
+		if ( geo_info.partCount == 1 )
+			createPart( object_id, geo_id, 0, container, parent );
+		else
+		{				
+			container.transform.parent = transform;
+			for ( int ii = 0; ii < geo_info.partCount; ii++ )
+			{
+				GameObject sub_geo_child = new GameObject( "part" + ii );
+				createPart( object_id, geo_id, ii, sub_geo_child, container.transform );
+			}
+		}
+	}
+	
 	/// <summary>
 	/// 	Instantiate a game object corresponding to a Houdini object of this asset, get geometry information
 	/// 	on the object and re-create the geometry on the Unity side.
@@ -462,14 +495,12 @@ public class HAPI_AssetOTL : HAPI_Asset
 		try
 		{
 			prGameObjects[ object_id ] = main_child;
-			if( object_info.geoCount == 1 )
-			{
+			if ( object_info.geoCount == 1 )
 				createGeo( object_id, 0, main_child, transform );
-			}
 			else
 			{				
 				main_child.transform.parent = transform;
-				for( int ii = 0; ii < object_info.geoCount; ii++ )
+				for ( int ii = 0; ii < object_info.geoCount; ii++ )
 				{
 					GameObject sub_child = new GameObject( object_info.name + "_Geo" + ii);
 					createGeo( object_id, ii, sub_child, main_child.transform );

@@ -468,7 +468,7 @@ public class HAPI_AssetUtility
 					 vertex_list, part_info.vertexCount );
 		
 		// Print attribute names.
-		printAllAttributeNames( asset_id, object_id, geo_id, part_id, part_info );
+		//printAllAttributeNames( asset_id, object_id, geo_id, part_id, part_info );
 		
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );

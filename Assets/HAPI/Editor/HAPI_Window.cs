@@ -43,8 +43,8 @@ public class HAPI_Window : EditorWindow
 	[ MenuItem( "Window/HAPI" ) ]
 	public static void ShowWindow() 
 	{
-		//Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow( typeof( HAPI_Window ) );
+		// Show existing window instance. If one doesn't exist, make one.
+		EditorWindow.GetWindow< HAPI_Window >( false, "HAPI Debug" );
 	}
 	
 	public void OnGUI() 
