@@ -35,6 +35,12 @@ public class HAPI_Instancer : MonoBehaviour {
 		// Get Detail info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
+		if ( geo_info.partCount == 0 )
+		{
+			Debug.LogError( "Instancer has no geometry." );
+			return;
+		}
+		
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HAPI_Host.getPartInfo( prAsset.prAssetId, prObjectId, 0, 0, out part_info );
 		if ( prAsset.prEnableLogging )

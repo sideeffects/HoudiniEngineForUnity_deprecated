@@ -459,13 +459,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 		// Get Geo info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
-		if ( geo_info.partCount == 0 )
-		{
-			Debug.LogError( "no geo?" );
-			return;
-		}
 
-		if ( geo_info.partCount == 1 )
+		if ( geo_info.partCount <= 1 )
 			createPart( object_id, geo_id, 0, container, parent );
 		else
 		{				
