@@ -36,10 +36,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
 		if ( geo_info.partCount == 0 )
-		{
-			Debug.LogError( "Instancer has no geometry." );
 			return;
-		}
 		
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HAPI_Host.getPartInfo( prAsset.prAssetId, prObjectId, 0, 0, out part_info );
@@ -61,10 +58,10 @@ public class HAPI_Instancer : MonoBehaviour {
 							  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
 		
 		if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand up as point attributes!" );
+			throw new HAPI_Error( "I only understand scale as point attributes!" );
 		
 		if ( scale_attr_info.exists && scale_attr.Length != part_info.pointCount * 3 )
-			throw new HAPI_Error( "Unexpected up array length found for asset: " + prAsset.prAssetId + "!" );
+			throw new HAPI_Error( "Unexpected scale array length found for asset: " + prAsset.prAssetId + "!" );
 				
 		// Get string point attributes.
 		/*HAPI_AttributeInfo instancehint_attr_info = new HAPI_AttributeInfo( "instance_hint" );

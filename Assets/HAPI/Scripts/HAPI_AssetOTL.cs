@@ -59,10 +59,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 	}
 	
 	~HAPI_AssetOTL() 
-	{
-		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset destroyed!" );
-	}
+	{}
 	
 	public override void OnDestroy()
 	{
@@ -277,6 +274,14 @@ public class HAPI_AssetOTL : HAPI_Asset
 					if ( index >= 0 )
 						HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
 				}
+
+				// Clean up.
+				destroyChildren( transform );
+
+				// Create local object info caches (transforms need to be stored in a parallel array).
+				prObjects = new HAPI_ObjectInfo [ prObjectCount ];
+				prGameObjects = new GameObject [ prObjectCount ];
+				prObjectTransforms = new HAPI_Transform [ prObjectCount ];
 			}
 			else
 			{
@@ -287,14 +292,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 			
 			myProgressBarMsg = "Loading and composing objects...";
 			
-			// Clean up.
-			destroyChildren();
-			
-			// Create local object info caches (transforms need to be stored in a parallel array).
-			prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];
-			prGameObjects		= new GameObject[ prObjectCount ];
-			prObjectTransforms 	= new HAPI_Transform[ prObjectCount ];
-			
 			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
 			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
 						 		 prObjectTransforms, prObjectCount );
@@ -304,9 +301,13 @@ public class HAPI_AssetOTL : HAPI_Asset
 				incrementProgressBar();
 				try
 				{
-					prGameObjects[ object_index ] = null;
-					if ( !prObjects[ object_index ].isInstancer && prObjects[ object_index ].isVisible )
+					if ( !prObjects[ object_index ].isInstancer && 
+						 prObjects[ object_index ].isVisible &&
+						 ( prFullBuild || prObjects[ object_index ].hasTransformChanged
+									   || prObjects[ object_index ].haveGeosChanged ) )
+					{
 						createObject( object_index );
+					}
 				}
 				catch ( HAPI_Error error )
 				{
@@ -381,161 +382,192 @@ public class HAPI_AssetOTL : HAPI_Asset
 		instancer.instanceObjects();
 	}
 
-	private void createPart( int object_id, int geo_id, int part_id,
-							 GameObject container, Transform parent )
+	private void createPart( int object_id, int geo_id, int part_id, ref HAPI_GeoInfo geo_info, GameObject part_node)
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
-		
-		container.transform.parent = parent;
-			
-		// Add required components.
-		container.AddComponent( "MeshFilter" );
-		container.AddComponent( "MeshRenderer" );
-		container.AddComponent( "HAPI_ChildSelectionControl" );
-		
-		// Get Geo info.
-		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
-		if ( geo_info.partCount == 0 )
-			return;
-			
-		HAPI_ChildSelectionControl child_control = container.GetComponent< HAPI_ChildSelectionControl >();
-		// Set Object Control on child selection control so it can read settings from here.
-		child_control.setAsset( this );
-		child_control.prObjectId = object_id;
-		child_control.prGeoId = geo_id;
-		child_control.prGeoType = geo_info.type;
-		child_control.prPartId = part_id;
-
-		// Get Part info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Host.getPartInfo( prAssetId, object_id, geo_id, part_id, out part_info );
-		if ( prEnableLogging )
-		Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
-				   + "verts: " + part_info.vertexCount + " faces: " + part_info.faceCount );
 		
-		// Get or create mesh.
-		MeshFilter container_mesh_filter 	= container.GetComponent< MeshFilter >();
-		Mesh container_mesh 				= container_mesh_filter.sharedMesh;
-		if ( container_mesh == null ) 
+		if ( prFullBuild || geo_info.hasGeoChanged || geo_info.hasMaterialChanged )
 		{
-			container_mesh_filter.mesh 	= new Mesh();
-			container_mesh 				= container_mesh_filter.sharedMesh;
+			// Get Part info.
+			HAPI_Host.getPartInfo( prAssetId, object_id, geo_id, part_id, out part_info );
+			if ( prEnableLogging )
+			Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
+					   + "verts: " + part_info.vertexCount + " faces: " + part_info.faceCount );
 		}
-		container_mesh.Clear();
-		
-		// Get mesh.
-		try
+
+		if ( prFullBuild || geo_info.hasGeoChanged )
 		{
-			Utility.getMesh( prAssetId, object_id, geo_id, part_id, container_mesh, child_control );
-		}
-		catch ( HAPI_Error error )
-		{
-			Debug.LogWarning( error.ToString() );
-			return;
+			// Add required components.
+			part_node.AddComponent( "MeshFilter" );
+			part_node.AddComponent( "MeshRenderer" );
+			part_node.AddComponent( "HAPI_ChildSelectionControl" );
+
+			HAPI_ChildSelectionControl child_control = part_node.GetComponent< HAPI_ChildSelectionControl >();
+			// Set Object Control on child selection control so it can read settings from here.
+			child_control.setAsset( this );
+			child_control.prObjectId	= object_id;
+			child_control.prGeoId		= geo_id;
+			child_control.prGeoType		= geo_info.type;
+			child_control.prPartId		= part_id;
+		
+			// Get or create mesh.
+			MeshFilter part_mesh_filter 	= part_node.GetComponent< MeshFilter >();
+			Mesh part_mesh 					= part_mesh_filter.sharedMesh;
+			if ( part_mesh == null ) 
+			{
+				part_mesh_filter.mesh 	= new Mesh();
+				part_mesh 				= part_mesh_filter.sharedMesh;
+			}
+			part_mesh.Clear();
+		
+			// Get mesh.
+			try
+			{
+				Utility.getMesh( prAssetId, object_id, geo_id, part_id, part_mesh, child_control );
+			}
+			catch ( HAPI_Error error )
+			{
+				Debug.LogWarning( error.ToString() );
+				return;
+			}
+		
+			// Add Mesh-to-Prefab component.
+			part_node.AddComponent( "HAPI_MeshToPrefab" );
+			HAPI_MeshToPrefab mesh_saver = part_node.GetComponent< HAPI_MeshToPrefab >();
+			mesh_saver.prObjectControl = this;
+			mesh_saver.prGameObject = part_node;
+			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + part_node.name;
 		}
 		
-		// Add Mesh-to-Prefab component.
-		container.AddComponent( "HAPI_MeshToPrefab" );
-		HAPI_MeshToPrefab mesh_saver = container.GetComponent< HAPI_MeshToPrefab >();
-		mesh_saver.prObjectControl = this;
-		mesh_saver.prGameObject = container;
-		mesh_saver.prMeshName = this.prAssetInfo.name + "_" + container.name;
-		
-		// Set specular material.
-		Material specular = new Material( Shader.Find( "Specular" ) );
-		container.GetComponent< MeshRenderer >().material = specular;
+		// Set material.
+		if ( part_node.GetComponent<MeshRenderer>().sharedMaterial == null )
+			part_node.GetComponent<MeshRenderer>().sharedMaterial = new Material( Shader.Find( "Specular" ) );
 		if ( prMaterialCount > 0 && part_info.materialId >= 0 )
 		{
-			if ( geo_info.hasMaterialChanged )
+			if ( prFullBuild || geo_info.hasMaterialChanged )
 			{
-				HAPI_MaterialInfo[] material = new HAPI_MaterialInfo[ 1 ];
+				HAPI_MaterialInfo[] material = new HAPI_MaterialInfo [ 1 ];
 				HAPI_Host.getMaterials( prAssetId, material, part_info.materialId, 1 );
 				prMaterials[ part_info.materialId ] = material[ 0 ];
-				geo_info.hasMaterialChanged = false;
 			}
-			Utility.assignTexture( ref specular, prMaterials[ part_info.materialId ] );
+
+			Material mat = part_node.GetComponent< MeshRenderer >().sharedMaterial;
+			Utility.assignTexture( ref mat, prMaterials[ part_info.materialId ] );
 		}
 	}
 	
-	private void createGeo( int object_id, int geo_id, GameObject container, Transform parent )
+	private void createGeo( int object_id, int geo_id, GameObject geo_node )
 	{
 		// Get Geo info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
 
-		if ( geo_info.partCount <= 1 )
-			createPart( object_id, geo_id, 0, container, parent );
-		else
-		{				
-			container.transform.parent = transform;
+		if ( !prFullBuild && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
+		{
+			Debug.LogError( "Shouldn't be possible for object's haveGeosChanged " + "" +
+							"to be true while the geo to not be changed!" );
+			return;
+		}
+
+		if ( prFullBuild || geo_node.transform.childCount == 0 || geo_info.hasGeoChanged )
+		{
+			destroyChildren( geo_node.transform );
 			for ( int ii = 0; ii < geo_info.partCount; ii++ )
 			{
-				GameObject sub_geo_child = new GameObject( "part" + ii );
-				createPart( object_id, geo_id, ii, sub_geo_child, container.transform );
+				GameObject part_node = new GameObject( "part" + ii );
+				part_node.transform.parent = geo_node.transform;
+
+				// Need to reset position here because the assignment above will massage the child's
+				// position in order to be in the same place it was in the global namespace.
+				part_node.transform.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
 			}
+			
+			geo_info.hasGeoChanged = true;
 		}
+
+		// I'm assuming here the object order is maintained and will match their ids.
+		int part_id = 0;
+		foreach ( Transform part_trans in geo_node.transform )
+		{
+			part_trans.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
+			createPart( object_id, geo_id, part_id, ref geo_info, part_trans.gameObject );
+			part_id++;
+		}
+
+		geo_info.hasMaterialChanged = false;
 	}
 	
-	/// <summary>
-	/// 	Instantiate a game object corresponding to a Houdini object of this asset, get geometry information
-	/// 	on the object and re-create the geometry on the Unity side.
-	/// </summary>
-	/// <param name="object_id">
-	/// 	Object_id as returned by <see cref="GetObjects"/>.
-	/// </param>
 	private void createObject( int object_id )
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		// Create main underling.
-		GameObject main_child = new GameObject( object_info.name );
+		if ( prGameObjects[ object_id ] == null )
+		{
+			prGameObjects[ object_id ] = new GameObject( object_info.name + "_obj" );
+			prGameObjects[ object_id ].transform.parent = transform;
+		}
+		GameObject main_child = prGameObjects[ object_id ];
 		
 		try
 		{
-			prGameObjects[ object_id ] = main_child;
-			if ( object_info.geoCount == 1 )
-				createGeo( object_id, 0, main_child, transform );
-			else
-			{				
-				main_child.transform.parent = transform;
-				for ( int ii = 0; ii < object_info.geoCount; ii++ )
+			if ( prFullBuild || object_info.haveGeosChanged )
+			{
+				if ( prFullBuild || object_info.geoCount != main_child.transform.childCount )
 				{
-					GameObject sub_child = new GameObject( object_info.name + "_Geo" + ii);
-					createGeo( object_id, ii, sub_child, main_child.transform );
+					destroyChildren( main_child.transform );
+					for ( int ii = 0; ii < object_info.geoCount; ii++ )
+					{
+						GameObject geo_child = new GameObject( object_info.name + "_geo" + ii );
+						geo_child.transform.parent = main_child.transform;
+						
+						// Need to reset position here because the assignment above will massage the child's
+						// position in order to be in the same place it was in the global namespace.
+						geo_child.transform.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
+					}
+				}
+	
+				// I'm assuming here the object order is maintained and will match their ids.
+				int geo_id = 0;
+				foreach ( Transform geo_trans in main_child.transform )
+				{
+					geo_trans.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
+					createGeo( object_id, geo_id, geo_trans.gameObject );
+					geo_id++;
 				}
 			}
 			
-			// Get transforms.
-			HAPI_Transform trans = prObjectTransforms[ object_id ];
-			
-			// Apply object transforms.		
-			//
-			// Axis and Rotation conversions:
-			// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
-			// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
-			// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
-			// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
-			// causes a double negative - yeah, I know).
-			
-			main_child.transform.localPosition 	= new Vector3( -trans.position[ 0 ], 
-																trans.position[ 1 ],
-																trans.position[ 2 ] );
-			
-			Quaternion quat = new Quaternion(	trans.rotationQuaternion[ 0 ],
-												trans.rotationQuaternion[ 1 ],
-												trans.rotationQuaternion[ 2 ],
-												trans.rotationQuaternion[ 3 ] );
-			
-			Vector3 euler = quat.eulerAngles;
-			euler.y = -euler.y;
-			euler.z = -euler.z;
-			
-			main_child.transform.localRotation 	= Quaternion.Euler( euler );
-			main_child.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
-			
-			AssetDatabase.Refresh();
-			
+			if ( prFullBuild || object_info.hasTransformChanged )
+			{
+				// Get transforms.
+				HAPI_Transform trans = prObjectTransforms[ object_id ];
+				
+				// Apply object transforms.		
+				//
+				// Axis and Rotation conversions:
+				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
+				// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
+				// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
+				// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
+				// causes a double negative - yeah, I know).
+				
+				main_child.transform.localPosition 	= new Vector3( -trans.position[ 0 ], 
+																	trans.position[ 1 ],
+																	trans.position[ 2 ] );
+				
+				Quaternion quat = new Quaternion(	trans.rotationQuaternion[ 0 ],
+													trans.rotationQuaternion[ 1 ],
+													trans.rotationQuaternion[ 2 ],
+													trans.rotationQuaternion[ 3 ] );
+				
+				Vector3 euler = quat.eulerAngles;
+				euler.y = -euler.y;
+				euler.z = -euler.z;
+				
+				main_child.transform.localRotation 	= Quaternion.Euler( euler );
+				main_child.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
+			}
 		}
 		catch ( HAPI_Error error )
 		{

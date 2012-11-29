@@ -33,9 +33,6 @@ public class HAPI_AssetGUI : Editor
 		
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
-		
-		if ( GUI.changed )
-			myAsset.build();
 	}
 	
 	public override void OnInspectorGUI() 

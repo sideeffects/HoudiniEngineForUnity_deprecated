@@ -493,11 +493,11 @@ public class HAPI_AssetUtility
 		float[] normal_attr = new float[ 0 ];
 		getAttribute( asset_id, object_id, geo_id, part_id, "N", ref normal_attr_info, ref normal_attr, 
 					  HAPI_Host.getAttributeFloatData );
-				
 		
-		child_control.prVertexList = vertex_list;
-		child_control.prUVAttrInfo = uv_attr_info;
-		child_control.prNormalAttrInfo = normal_attr_info;
+		// Save properties.
+		child_control.prVertexList			= vertex_list;
+		child_control.prUVAttrInfo			= uv_attr_info;
+		child_control.prNormalAttrInfo		= normal_attr_info;
 		
 		// Create Unity-specific data objects.
 		Vector3[] vertices 	= new Vector3[ 	part_info.vertexCount ];
@@ -654,14 +654,14 @@ public class HAPI_AssetUtility
 	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh, 
 								HAPI_ChildSelectionControl child_control )
 	{
-		if( child_control == null )
+		if ( child_control == null )
 		{
+			// TODO: This needs to be refactored! There should be no need for two such functions.
 			setMeshRaw( asset_id, object_id, geo_id, ref mesh );
 			return;
 		}
 				
 		Vector3[] vertices 				= mesh.vertices;
-		int[] triangles 				= mesh.triangles;
 		//Vector2[] uvs 					= mesh.uv;
 		//Vector3[] normals 				= mesh.normals;
 		
@@ -674,9 +674,9 @@ public class HAPI_AssetUtility
 		part_info.vertexCount 			= child_control.prVertexList.Length;
 		
 		int pointCount = 0;
-		for( int ii = 0; ii < child_control.prVertexList.Length ; ii++ )
+		for ( int ii = 0; ii < child_control.prVertexList.Length ; ii++ )
 		{
-			if( child_control.prVertexList[ ii ] > pointCount )
+			if ( child_control.prVertexList[ ii ] > pointCount )
 				pointCount = child_control.prVertexList[ ii ];
 		}		
 		//the values calculated from the loop are indices, so + 1 to get the count
@@ -726,7 +726,6 @@ public class HAPI_AssetUtility
 			pos_attr[ point_index ] = -vertices[ ii ][0];
 			pos_attr[ point_index + 1 ] = vertices[ ii ][1];
 			pos_attr[ point_index + 2 ] = vertices[ ii ][2];
-			
 		}
 		
 		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 

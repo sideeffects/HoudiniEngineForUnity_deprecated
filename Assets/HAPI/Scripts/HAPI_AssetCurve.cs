@@ -46,10 +46,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 	}
 	
 	~HAPI_AssetCurve()
-	{
-		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset destroyed!" );
-	}
+	{}
 	
 	public override void OnDestroy()
 	{
@@ -315,7 +312,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			myProgressBarMsg = "Loading and composing objects...";
 			
 			// Clean up.
-			destroyChildren();
+			destroyChildren( transform );
 			
 			// Create local object info caches (transforms need to be stored in a parallel array).
 			prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];

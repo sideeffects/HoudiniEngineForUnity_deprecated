@@ -418,6 +418,8 @@ namespace HAPI
 		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object
 		/// 	in the scene that has a SOP network (is not a sub-network).
+		/// 	Note that this function will reset all the objects' <see cref="HAPI_ObjectInfo.haveGeosChanged"/>
+		/// 	flags to false after it returns the original flag values.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
@@ -442,6 +444,8 @@ namespace HAPI
 		/// <summary>
 		/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object
 		/// 	in the scene that has a SOP network (is not a sub-network).
+		/// 	Note that this function will reset all the objects' <see cref="HAPI_ObjectInfo.hasTransformChanged"/>
+		/// 	flags to false after it returns the original flag values.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
@@ -514,6 +518,8 @@ namespace HAPI
 
 		/// <summary>
 		/// 	Get the main geometry info struct (<see cref="HAPI_GeoInfo"/>).
+		/// 	Note that this function will reset all the geos' <see cref="HAPI_GeoInfo.hasGeoChanged"/>
+		/// 	flags to false after it returns the original flag values.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.

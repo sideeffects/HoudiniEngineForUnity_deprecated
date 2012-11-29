@@ -32,9 +32,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		base.OnEnable();
 		
 		myAssetOTL = target as HAPI_AssetOTL;
-		
-		if ( GUI.changed )
-			myAssetOTL.build();
 	}
 	
 	public override void OnInspectorGUI() 

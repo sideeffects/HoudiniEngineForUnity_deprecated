@@ -358,7 +358,7 @@ public class HAPI_Asset : MonoBehaviour
 		prShowAssetControls 		= true;
 		prShowInputControls 		= true;
 		prAutoSelectAssetNode 		= true;
-		prEnableLogging				= false;
+		prEnableLogging				= true;
 		
 		prLastChangedParmId 		= -1;
 		
@@ -391,11 +391,11 @@ public class HAPI_Asset : MonoBehaviour
 	/// <summary>
 	/// 	Recursively delete all children of this Unity asset.
 	/// </summary>
-	protected virtual void destroyChildren() 
+	protected virtual void destroyChildren( Transform trans ) 
 	{
 		List< GameObject > children = new List< GameObject >();
 		
-		foreach ( Transform child in transform )
+		foreach ( Transform child in trans )
 			children.Add( child.gameObject );
 		
 		foreach ( GameObject child in children )

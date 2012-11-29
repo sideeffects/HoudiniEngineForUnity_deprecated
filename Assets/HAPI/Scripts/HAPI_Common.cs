@@ -420,6 +420,9 @@ namespace HAPI
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasTransformChanged;
+
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool haveGeosChanged;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isVisible;
