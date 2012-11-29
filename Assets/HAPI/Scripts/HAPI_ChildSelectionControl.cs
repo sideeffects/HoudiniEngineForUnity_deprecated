@@ -19,6 +19,8 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
+using HAPI;
+
 /// <summary>
 /// 	Controls selection behaviour of asset game object children.
 /// </summary>
@@ -26,12 +28,29 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 {	
 	public int prObjectId { get; set; }
 	
+	public int prGeoId { get; set; }
+	
+	public int prGeoType { get; set; }
+	
+	public int prPartId { get; set; }
+	
+	public int[] prVertexList { get; set; }
+	
+	public HAPI_AttributeInfo prNormalAttrInfo { get; set; }
+	
+	public HAPI_AttributeInfo prUVAttrInfo { get; set; }
+	
 	public HAPI_Asset prAsset 
 	{ 
 		get
 		{
 			return myAsset;
 		}
+	}
+	
+	public HAPI_ChildSelectionControl()
+	{
+		prVertexList = null;
 	}
 	
 	public void setAsset( MonoBehaviour asset )

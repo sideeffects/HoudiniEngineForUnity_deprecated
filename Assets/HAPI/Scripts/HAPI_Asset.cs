@@ -227,8 +227,9 @@ public class HAPI_Asset : MonoBehaviour
 		
 		MeshFilter asset_mesh_filter 	= asset.GetComponent< MeshFilter >();
 		Mesh mesh 						= asset_mesh_filter.sharedMesh;
+		HAPI_ChildSelectionControl child_control = asset.GetComponent< HAPI_ChildSelectionControl >();
 		
-		Utility.setMesh( prAssetId, object_id, geo_id, ref mesh );
+		Utility.setMesh( prAssetId, object_id, geo_id, ref mesh, child_control );
 		build();
 	}
 	

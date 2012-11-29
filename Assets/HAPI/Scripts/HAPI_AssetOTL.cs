@@ -393,15 +393,19 @@ public class HAPI_AssetOTL : HAPI_Asset
 		container.AddComponent( "MeshRenderer" );
 		container.AddComponent( "HAPI_ChildSelectionControl" );
 		
-		// Set Object Control on child selection control so it can read settings from here.
-		container.GetComponent< HAPI_ChildSelectionControl >().setAsset( this );
-		container.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
-
 		// Get Geo info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
 		if ( geo_info.partCount == 0 )
 			return;
+			
+		HAPI_ChildSelectionControl child_control = container.GetComponent< HAPI_ChildSelectionControl >();
+		// Set Object Control on child selection control so it can read settings from here.
+		child_control.setAsset( this );
+		child_control.prObjectId = object_id;
+		child_control.prGeoId = geo_id;
+		child_control.prGeoType = geo_info.type;
+		child_control.prPartId = part_id;
 
 		// Get Part info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
@@ -423,7 +427,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		// Get mesh.
 		try
 		{
-			Utility.getMesh( prAssetId, object_id, geo_id, part_id, container_mesh );
+			Utility.getMesh( prAssetId, object_id, geo_id, part_id, container_mesh, child_control );
 		}
 		catch ( HAPI_Error error )
 		{
