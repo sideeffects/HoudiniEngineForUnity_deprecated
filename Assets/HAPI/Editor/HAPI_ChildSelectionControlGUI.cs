@@ -61,6 +61,16 @@ public class HAPI_ChildSelectionControlGUI : Editor
 				myChildSelectionControl.prAsset.prFullBuild = false;
 				myChildSelectionControl.prAsset.build();
 			}
+			
+			if ( GUILayout.Button( "Revert Edit" ) ) 
+			{
+				HAPI_Host.revertGeo( myChildSelectionControl.prAsset.prAssetId,
+									 myChildSelectionControl.prObjectId,
+									 myChildSelectionControl.prGeoId );
+				
+				myChildSelectionControl.prAsset.prFullBuild = false;
+				myChildSelectionControl.prAsset.build();
+			}
 		}
 		
 	}

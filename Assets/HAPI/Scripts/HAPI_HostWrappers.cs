@@ -1044,6 +1044,27 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 		
+		/// <summary>	
+		/// 	Remove all changes that have been committed to this
+		///		geometry.  Only applies to geometry nodes that are
+		///		exposed edit nodes.
+		/// </summary>
+		/// <param name="asset_id">
+		///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="object_id">
+		///			The object id returned by HAPI_GetObjects().
+		/// </param>
+		/// <param name="geo_id">
+		///			The geometry id.
+		/// </param>
+		/// 
+		public static void revertGeo( int asset_id, int object_id, int geo_id )
+		{
+			int status_code = HAPI_RevertGeo( asset_id, object_id, geo_id );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 		// GEOMETRY INPUT -------------------------------------------------------------------------------------------
 		
 		/// <summary> 
