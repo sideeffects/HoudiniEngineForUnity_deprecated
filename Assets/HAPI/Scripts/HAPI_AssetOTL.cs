@@ -464,11 +464,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
 
 		if ( !prFullBuild && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
-		{
-			Debug.LogError( "Shouldn't be possible for object's haveGeosChanged " + "" +
-							"to be true while the geo to not be changed!" );
 			return;
-		}
 
 		if ( prFullBuild || geo_node.transform.childCount == 0 || geo_info.hasGeoChanged )
 		{

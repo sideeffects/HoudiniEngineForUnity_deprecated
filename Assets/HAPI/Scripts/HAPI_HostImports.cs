@@ -52,6 +52,14 @@ namespace HAPI
 		private static extern int HAPI_GetString(		 	int string_handle,
 															StringBuilder string_value,
 															int string_length );
+
+		// TIME -----------------------------------------------------------------------------------------------------
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetTime( 			out float time );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetTime( 			float time );
 		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		

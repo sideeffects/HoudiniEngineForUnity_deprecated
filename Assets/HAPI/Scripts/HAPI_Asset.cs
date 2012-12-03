@@ -358,7 +358,7 @@ public class HAPI_Asset : MonoBehaviour
 		prShowAssetControls 		= true;
 		prShowInputControls 		= true;
 		prAutoSelectAssetNode 		= true;
-		prEnableLogging				= true;
+		prEnableLogging				= false;
 		
 		prLastChangedParmId 		= -1;
 		

@@ -121,6 +121,32 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
+		// TIME -----------------------------------------------------------------------------------------------------
+
+		/// <summary>
+		/// 	Gets the global time of the scene. All API calls deal with this time to cook.
+		/// </summary>
+		/// <param name="time">
+		/// 	Time as a float in seconds.
+		/// </param>
+		public static void getTime(		 	out float time )
+		{
+			int status_code = HAPI_GetTime( out time );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
+		/// <summary>
+		/// 	Sets the global time of the scene. All API calls will deal with this time to cook.
+		/// </summary>
+		/// <param name="time">
+		/// 	Time as a float in seconds.
+		/// </param>
+		public static void setTime(		 	float time )
+		{
+			int status_code = HAPI_SetTime( time );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 
 		/// <summary>

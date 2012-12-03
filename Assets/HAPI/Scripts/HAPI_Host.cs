@@ -159,29 +159,29 @@ namespace HAPI
 			
 			return true;	
 		}
-		
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Private
-		
-		private static void initialize()
+
+		public static void initialize()
 		{
 			string otls_path = Application.dataPath + "/OTLs/Scanned";
-			
+
 			if ( myHoudiniSceneExists )
 				Debug.Log( "Loading OTL: Using Existing Scene" );
-			else 
+			else
 			{
 				Debug.Log( "Loading OTL: Creating New Scene" );
-				
+
 				HAPI_StatusCode status_code;
 				status_code = (HAPI_StatusCode) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, otls_path );
-				
+
 				if ( status_code != HAPI_StatusCode.HAPI_STATUS_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
-				
+
 				myHoudiniSceneExists = true;
 			}
 		}
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Private
 		
 		private static bool hasCallFailed( HAPI_StatusCode code )
 		{

@@ -45,6 +45,9 @@ public class HAPI_Window : EditorWindow
 	{
 		// Show existing window instance. If one doesn't exist, make one.
 		EditorWindow.GetWindow< HAPI_Window >( false, "HAPI Debug" );
+		float time = 0.0f;
+		HAPI_Host.getTime( out time );
+		HAPI_Window.myTime = time;
 	}
 	
 	public void OnGUI() 
@@ -87,6 +90,28 @@ public class HAPI_Window : EditorWindow
 				catch ( System.Exception e )
 				{
 					Debug.LogError( "Directory navigation failed: " + e.ToString() );	
+				}
+			}
+
+			if ( HAPI_GUI.floatField( "global_time", "Global Time", ref myTime ) )
+			{
+				try
+				{
+					if ( !HAPI.HAPI_SetPath.prIsPathSet )
+					{
+						HAPI.HAPI_SetPath.setPath();
+						if ( !HAPI.HAPI_SetPath.prIsPathSet )
+						{
+							Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
+							return;
+						}
+						HAPI_Host.initialize();
+					}
+					HAPI_Host.setTime( myTime );
+				}
+				catch ( HAPI_Error error )
+				{
+					Debug.LogError( error.ToString() );
 				}
 			}
 		}
@@ -178,4 +203,6 @@ public class HAPI_Window : EditorWindow
 	private static float 			myLineHeight 			= 16;
 	private static GUILayoutOption 	myLineHeightGUI 		= GUILayout.Height( myLineHeight );
 	private static Vector2 			myScrollPosition;
+
+	private static float			myTime;
 }

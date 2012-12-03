@@ -217,7 +217,17 @@ public class HAPI_GUI : Editor
 		
 		return changed;
 	}
-	
+
+	public static bool floatField( string name, string label, ref float value )
+	{
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
+		float[] values = new float[ 1 ];
+		values[ 0 ] = value;
+		bool delay_build = false;
+		bool changed = floatField( ref gui_parm, ref delay_build, ref values );
+		value = values[ 0 ];
+		return changed;
+	}
 	public static bool floatField( ref HAPI_GUIParm parm,
 								   ref bool delay_build,
 								   ref float[] values )
