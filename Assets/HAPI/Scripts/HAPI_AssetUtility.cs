@@ -628,7 +628,7 @@ public class HAPI_AssetUtility
 		int[] vertex_list = new int[ part_info.vertexCount ];
 		for ( int i = 0; i < part_info.faceCount; ++i )
 			for ( int j = 0; j < 3; ++j )
-				vertex_list[ i * 3 + j ] = triangles[ i * 3 + ( 2 - j ) ];
+				vertex_list[ i * 3 + j ] = triangles[ i * 3 + j ];
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
 		
 		// Set position attributes.
@@ -643,7 +643,12 @@ public class HAPI_AssetUtility
 		float[] pos_attr = new float[ part_info.pointCount * 3 ];
 		for ( int i = 0; i < part_info.pointCount; ++i )
 			for ( int j = 0; j < 3; ++j )
-				pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
+			{
+				if ( j != 0 )
+					pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
+				else
+					pos_attr[ i * 3 + j ] = -vertices[ i ][ j ];
+			}
 		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
 					  HAPI_Host.setAttributeFloatData );
 		
