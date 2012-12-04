@@ -452,6 +452,16 @@ public class HAPI_AssetOTL : HAPI_Asset
 				prMaterials[ part_info.materialId ] = material[ 0 ];
 			}
 
+			// Assign the transparency shader if this material is transparent or unassign it otherwise.
+			if ( prMaterials[ part_info.materialId ].isTransparent() &&
+				 part_node.GetComponent< MeshRenderer >().sharedMaterial.name == "Specular" )
+				part_node.GetComponent< MeshRenderer >().sharedMaterial = 
+					new Material( Shader.Find( "Transparent/Specular" ) );
+			else if ( !prMaterials[ part_info.materialId ].isTransparent() &&
+					  part_node.GetComponent< MeshRenderer >().sharedMaterial.name == "Transparent/Specular" )
+				part_node.GetComponent< MeshRenderer >().sharedMaterial =
+					new Material( Shader.Find( "Specular" ) );
+
 			Material mat = part_node.GetComponent< MeshRenderer >().sharedMaterial;
 			Utility.assignTexture( ref mat, prMaterials[ part_info.materialId ] );
 		}

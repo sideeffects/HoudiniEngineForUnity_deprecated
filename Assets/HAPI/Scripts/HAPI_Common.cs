@@ -513,6 +513,11 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_MaterialInfo
 	{
+		public bool isTransparent()
+		{
+			return ( diffuse[ 3 ] < 0.95f ); // True if alpha of the diffuse is less than 1.0
+		}
+
 		public int id;
 		
 		private int textureFilePathSH;	// string handle (SH)

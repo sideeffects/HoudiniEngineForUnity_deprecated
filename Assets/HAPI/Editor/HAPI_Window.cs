@@ -22,9 +22,6 @@ using System.Collections.Generic;
 using System.IO;
 using HAPI;
 
-/// <summary>
-/// 	Only a test class. Not used currently.
-/// </summary>
 public class HAPI_Window : EditorWindow 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +86,7 @@ public class HAPI_Window : EditorWindow
 				}
 				catch ( System.Exception e )
 				{
-					Debug.LogError( "Directory navigation failed: " + e.ToString() );	
+					Debug.LogError( "Directory navigation failed: " + e.ToString() );
 				}
 			}
 
