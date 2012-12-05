@@ -64,6 +64,17 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				myAssetOTL.build();
 			}
 			
+			if ( GUILayout.Button( "Export To Hip File..." ) ) 
+			{				
+				string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
+				if ( hip_file_path != "" && HAPI_Host.hasScene() )
+				{					
+					HAPI_Host.exportAssetToHIPFile( myAssetOTL.prAssetId, hip_file_path );
+				}
+				else
+					Debug.LogError( "Nothing to save." );
+			}
+			
 			string path = myAssetOTL.prAssetPath;
 			myParmChanges |= HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
 			if ( myParmChanges )

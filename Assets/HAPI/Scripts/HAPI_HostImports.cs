@@ -279,6 +279,13 @@ namespace HAPI
 															[Out] HAPI_MaterialInfo[] material_infos,
 															int start, int length );
 		
+		// HIP FILES ------------------------------------------------------------------------------------------------
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ExportAssetToHIPFile( int asset_id, string file_name );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ReplaceAssetFromHIPFile( int asset_id, string file_name );
+		
 		// None-exposed API calls: ----------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

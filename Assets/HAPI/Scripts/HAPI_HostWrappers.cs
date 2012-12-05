@@ -346,6 +346,41 @@ namespace HAPI
 			int status_code = HAPI_SetParmStringValue( asset_id, value, parm_id, index );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
+		
+		// HIP Files-------------------------------------------------------------------------------------------------
+		/// <summary>	
+		/// 	exports an asset into a hip file.
+		/// </summary>
+		///
+		/// <param name="asset_id">
+		///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="file_name">
+		///			Absolute path to the .hip file to be exported.
+		/// </param>
+		public static void exportAssetToHIPFile( int asset_id, string file_name )
+		{
+			int status_code = HAPI_ExportAssetToHIPFile( asset_id, file_name );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
+		/// <summary>	
+		/// 	Replaces an asset in the current scene with the instance of
+		///		the same asset found in the hip file.
+		/// </summary>
+		/// <param name="asset_id">
+		///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="file_name">
+		///			Absolute path to the .hip file where the asset instance
+		///			is to be found.
+		///  </param>
+		public static void replaceAssetFromHIPFile( int asset_id, string file_name )
+		{
+			int status_code = HAPI_ReplaceAssetFromHIPFile( asset_id, file_name );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+		
 
 		// HANDLES --------------------------------------------------------------------------------------------------
 
