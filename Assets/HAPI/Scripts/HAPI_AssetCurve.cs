@@ -178,7 +178,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 				
 				prObjectCount 			= prAssetInfo.objectCount;
 				prHandleCount 			= prAssetInfo.handleCount;
-				prMaterialCount			= prAssetInfo.materialCount;
 				
 				myProgressBarCurrent	= 0;
 				myProgressBarTotal		= prParmCount
@@ -187,8 +186,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 										  + prParmStringValueCount
 										  + prParmChoiceCount
 										  + prObjectCount
-										  + prHandleCount
-										  + prMaterialCount;
+										  + prHandleCount;
 				
 				// Try to load presets.
 				try

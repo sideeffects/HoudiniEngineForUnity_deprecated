@@ -74,10 +74,8 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public int 						prObjectCount { get; set; }
 	public int						prHandleCount { get; set; }
-	public int						prMaterialCount { get; set; }
 	
 	public HAPI_ObjectInfo[] 		prObjects { get; set; }
-	public HAPI_MaterialInfo[]		prMaterials { get; set; }
 	
 	public GameObject[]				prGameObjects {	get; set; }
 	public HAPI_Transform[] 		prObjectTransforms { get; set; }
@@ -344,10 +342,8 @@ public class HAPI_Asset : MonoBehaviour
 		
 		prObjectCount 				= 0;
 		prHandleCount 				= 0;
-		prMaterialCount 			= 0;
 		
 		prObjects 					= new HAPI_ObjectInfo[ 0 ];
-		prMaterials 				= new HAPI_MaterialInfo[ 0 ];
 		
 		prGameObjects 				= new GameObject[ 0 ];		
 		prObjectTransforms 			= new HAPI_Transform[ 0 ];

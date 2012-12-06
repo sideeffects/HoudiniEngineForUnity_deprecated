@@ -33,10 +33,7 @@ public class HAPI_Window : EditorWindow
 		public string myDirectoryName;
 		public string myDirectoryPath;
 	}
-	
-	/// <summary>
-	/// 	Add menu item named "My Window" to the Window menu.
-	/// </summary>
+
 	[ MenuItem( "Window/HAPI" ) ]
 	public static void ShowWindow() 
 	{
@@ -49,7 +46,7 @@ public class HAPI_Window : EditorWindow
 	
 	public void OnGUI() 
 	{
-		string path = Application.dataPath;			
+		string path = Application.dataPath;
 		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 		
 		myShowUtility = EditorGUILayout.Foldout( myShowUtility, new GUIContent( "Utility" ) );

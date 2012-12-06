@@ -124,7 +124,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 				
 				prObjectCount 			= prAssetInfo.objectCount;
 				prHandleCount 			= prAssetInfo.handleCount;
-				prMaterialCount			= prAssetInfo.materialCount;
 				
 				myProgressBarCurrent	= 0;
 				myProgressBarTotal		= prParmCount
@@ -133,8 +132,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 										  + prParmStringValueCount
 										  + prParmChoiceCount
 										  + prObjectCount
-										  + prHandleCount
-										  + prMaterialCount;
+										  + prHandleCount;
 				
 				// Try to load presets.
 				try
@@ -204,11 +202,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 					
 					prHandleBindingInfos.Add( binding_infos );
 				}
-				
-				// Get materials.
-				prMaterials = new HAPI_MaterialInfo[ prMaterialCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getMaterials, prMaterials, prMaterialCount );
-				displayProgressBar( prMaterialCount );
 				
 				// Add input fields.
 				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
@@ -353,7 +346,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 		catch ( System.Exception error )
 		{
-			Debug.LogError( error.ToString() );	
+			Debug.LogError( error.ToString() );
 		}
 		finally
 		{
@@ -441,29 +434,26 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 		
 		// Set material.
-		if ( part_node.GetComponent<MeshRenderer>().sharedMaterial == null )
-			part_node.GetComponent<MeshRenderer>().sharedMaterial = new Material( Shader.Find( "Specular" ) );
-		if ( prMaterialCount > 0 && part_info.materialId >= 0 )
+		if ( part_node.GetComponent< MeshRenderer >().sharedMaterial == null )
+			part_node.GetComponent< MeshRenderer >().sharedMaterial = new Material( Shader.Find( "Specular" ) );
+		if ( part_info.materialId >= 0 && ( prFullBuild || geo_info.hasMaterialChanged ) )
 		{
-			if ( prFullBuild || geo_info.hasMaterialChanged )
-			{
-				HAPI_MaterialInfo[] material = new HAPI_MaterialInfo [ 1 ];
-				HAPI_Host.getMaterials( prAssetId, material, part_info.materialId, 1 );
-				prMaterials[ part_info.materialId ] = material[ 0 ];
-			}
+			HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
+			HAPI_Host.getMaterials( prAssetId, materials, part_info.materialId, 1 );
+			HAPI_MaterialInfo material = materials[ 0 ];
 
 			// Assign the transparency shader if this material is transparent or unassign it otherwise.
-			if ( prMaterials[ part_info.materialId ].isTransparent() &&
+			if ( material.isTransparent() && 
 				 part_node.GetComponent< MeshRenderer >().sharedMaterial.name == "Specular" )
 				part_node.GetComponent< MeshRenderer >().sharedMaterial = 
 					new Material( Shader.Find( "Transparent/Specular" ) );
-			else if ( !prMaterials[ part_info.materialId ].isTransparent() &&
+			else if ( !material.isTransparent() &&
 					  part_node.GetComponent< MeshRenderer >().sharedMaterial.name == "Transparent/Specular" )
 				part_node.GetComponent< MeshRenderer >().sharedMaterial =
 					new Material( Shader.Find( "Specular" ) );
 
 			Material mat = part_node.GetComponent< MeshRenderer >().sharedMaterial;
-			Utility.assignTexture( ref mat, prMaterials[ part_info.materialId ] );
+			Utility.assignTexture( ref mat, material );
 		}
 	}
 	
