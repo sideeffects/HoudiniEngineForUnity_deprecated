@@ -587,8 +587,11 @@ public class HAPI_AssetUtility
 			mesh.RecalculateNormals();
 	}
 	
-	private static void setMeshRaw( int asset_id, int object_id, int geo_id, ref Mesh mesh )
+	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh, 
+								HAPI_ChildSelectionControl child_control )
 	{
+		bool setting_raw_mesh = ( child_control == null );
+
 		Vector3[] vertices 				= mesh.vertices;
 		int[] triangles 				= mesh.triangles;
 		//Vector2[] uvs 					= mesh.uv;
@@ -599,9 +602,27 @@ public class HAPI_AssetUtility
 
 		HAPI_PartInfo part_info			= new HAPI_PartInfo();
 		part_info.materialId 			= -1;
-		part_info.faceCount 			= triangles.Length / 3;
-		part_info.vertexCount 			= triangles.Length;
-		part_info.pointCount 			= vertices.Length;
+
+		if ( setting_raw_mesh )
+		{
+			part_info.faceCount = triangles.Length / 3;
+			part_info.vertexCount = triangles.Length;
+			part_info.pointCount = vertices.Length;
+		}
+		else
+		{
+			part_info.faceCount = child_control.prVertexList.Length / 3;
+			part_info.vertexCount = child_control.prVertexList.Length;
+
+			int pointCount = 0;
+			for ( int ii = 0; ii < child_control.prVertexList.Length; ii++ )
+			{
+				if ( child_control.prVertexList[ ii ] > pointCount )
+					pointCount = child_control.prVertexList[ ii ];
+			}
+			//the values calculated from the loop are indices, so + 1 to get the count
+			part_info.pointCount = pointCount + 1;
+		}
 		
 		part_info.pointAttributeCount 	= 1;
 		part_info.vertexAttributeCount 	= 0;
@@ -626,9 +647,12 @@ public class HAPI_AssetUtility
 		
 		// Set Vertex list.
 		int[] vertex_list = new int[ part_info.vertexCount ];
-		for ( int i = 0; i < part_info.faceCount; ++i )
-			for ( int j = 0; j < 3; ++j )
-				vertex_list[ i * 3 + j ] = triangles[ i * 3 + j ];
+		if ( setting_raw_mesh )
+			for ( int i = 0; i < part_info.faceCount; ++i )
+				for ( int j = 0; j < 3; ++j )
+					vertex_list[ i * 3 + j ] = triangles[ i * 3 + j ];
+		else
+			vertex_list = child_control.prVertexList;
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
 		
 		// Set position attributes.
@@ -641,103 +665,34 @@ public class HAPI_AssetUtility
 		HAPI_Host.addAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info );
 		
 		float[] pos_attr = new float[ part_info.pointCount * 3 ];
-		for ( int i = 0; i < part_info.pointCount; ++i )
-			for ( int j = 0; j < 3; ++j )
+		
+		if ( setting_raw_mesh )
+		{
+			for ( int i = 0; i < part_info.pointCount; ++i )
+				for ( int j = 0; j < 3; ++j )
+				{
+					if ( j != 0 )
+						pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
+					else
+						pos_attr[ i * 3 + j ] = -vertices[ i ][ j ];
+				}
+		}
+		else
+		{
+			for ( int ii = 0; ii < child_control.prVertexList.Length; ii++ )
 			{
-				if ( j != 0 )
-					pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
-				else
-					pos_attr[ i * 3 + j ] = -vertices[ i ][ j ];
-			}
-		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
-					  HAPI_Host.setAttributeFloatData );
-		
-		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
-	}
-		
-	
-	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh, 
-								HAPI_ChildSelectionControl child_control )
-	{
-		if ( child_control == null )
-		{
-			// TODO: This needs to be refactored! There should be no need for two such functions.
-			setMeshRaw( asset_id, object_id, geo_id, ref mesh );
-			return;
-		}
-				
-		Vector3[] vertices 				= mesh.vertices;
-		//Vector2[] uvs 					= mesh.uv;
-		//Vector3[] normals 				= mesh.normals;
-		
-		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
-		geo_info.id 					= geo_id;
+				int point_index = child_control.prVertexList[ ii ] * 3;
 
-		HAPI_PartInfo part_info			= new HAPI_PartInfo();
-		part_info.materialId 			= -1;
-		part_info.faceCount 			= child_control.prVertexList.Length / 3;
-		part_info.vertexCount 			= child_control.prVertexList.Length;
-		
-		int pointCount = 0;
-		for ( int ii = 0; ii < child_control.prVertexList.Length ; ii++ )
-		{
-			if ( child_control.prVertexList[ ii ] > pointCount )
-				pointCount = child_control.prVertexList[ ii ];
-		}		
-		//the values calculated from the loop are indices, so + 1 to get the count
-		part_info.pointCount 			= pointCount + 1;	
-		
-		part_info.pointAttributeCount 	= 1;
-		part_info.vertexAttributeCount 	= 0;
-		part_info.faceAttributeCount 	= 0;
-		part_info.detailAttributeCount 	= 0;
-		
-		/* Not yet supported.
-		if ( uvs != null )
-			part_info.vertexAttributeCount++;
-		if ( normals != null )
-			part_info.vertexAttributeCount++;
-		*/
-		
-		HAPI_Host.setGeoInfo( asset_id, object_id, geo_id, ref geo_info );
-		HAPI_Host.setPartInfo( asset_id, object_id, geo_id, ref part_info );
-		
-		// Set Face counts.
-		int[] face_counts = new int[ part_info.faceCount ];
-		for ( int i = 0; i < part_info.faceCount; ++i )
-			face_counts[ i ] = 3;
-		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setFaceCounts, face_counts, part_info.faceCount );
-		
-		// Set Vertex list.
-		int[] vertex_list = child_control.prVertexList;
-		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
-		
-		// Set position attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
-		pos_attr_info.exists 		= true;
-		pos_attr_info.owner 		= (int) HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
-		pos_attr_info.storage 		= (int) HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
-		pos_attr_info.count 		= part_info.pointCount;
-		pos_attr_info.tupleSize 	= 3;
-		HAPI_Host.addAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info );
-		
-		float[] pos_attr = new float[ part_info.pointCount * 3 ];
-		
-		for( int ii = 0; ii < child_control.prVertexList.Length ; ii++ )
-		{
-			
-			int point_index = child_control.prVertexList[ ii ] * 3;
-			
-			pos_attr[ point_index ] = -vertices[ ii ][0];
-			pos_attr[ point_index + 1 ] = vertices[ ii ][1];
-			pos_attr[ point_index + 2 ] = vertices[ ii ][2];
+				pos_attr[ point_index ] = -vertices[ ii ][ 0 ];
+				pos_attr[ point_index + 1 ] = vertices[ ii ][ 1 ];
+				pos_attr[ point_index + 2 ] = vertices[ ii ][ 2 ];
+			}
 		}
 		
 		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
 					  HAPI_Host.setAttributeFloatData );
 		
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
-		
 	}
 	
 }
