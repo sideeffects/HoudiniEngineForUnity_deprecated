@@ -38,6 +38,7 @@ public class HAPI_Asset : MonoBehaviour
 	public HAPI_AssetType			prAssetType { get; set; }
 	public int						prAssetSubType { get { return myAssetSubType; } set { myAssetSubType = value; } }
 	public bool						prFullBuild { get; set; }
+	public bool 					prUnloadAssetInFullBuild { get; set; }
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
@@ -303,6 +304,7 @@ public class HAPI_Asset : MonoBehaviour
 		prAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 				= 0;
 		prFullBuild					= true;
+		prUnloadAssetInFullBuild	= true;
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		

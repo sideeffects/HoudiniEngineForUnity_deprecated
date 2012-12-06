@@ -64,16 +64,44 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				myAssetOTL.build();
 			}
 			
-			if ( GUILayout.Button( "Export To Hip File..." ) ) 
-			{				
-				string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
-				if ( hip_file_path != "" && HAPI_Host.hasScene() )
-				{					
-					HAPI_Host.exportAssetToHIPFile( myAssetOTL.prAssetId, hip_file_path );
+			EditorGUILayout.BeginHorizontal(); 
+			{
+				if ( GUILayout.Button( "Export To Hip File..." ) ) 
+				{				
+					string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
+					if ( hip_file_path != "" && HAPI_Host.hasScene() )
+					{					
+						HAPI_Host.exportAssetToHIPFile( myAssetOTL.prAssetId, hip_file_path );
+					}
+					else
+						Debug.LogError( "Nothing to save." );
 				}
-				else
-					Debug.LogError( "Nothing to save." );
-			}
+				
+				if ( GUILayout.Button( "Replace From Hip File..." ) ) 
+				{				
+					string hip_file_path = EditorUtility.OpenFilePanel( "Import HIP File", "", "hip" );
+					if ( hip_file_path != "" && HAPI_Host.hasScene() )
+					{		
+						try
+						{
+							HAPI_Host.replaceAssetFromHIPFile ( myAssetOTL.prAssetId, hip_file_path );
+						}
+						catch ( HAPI_Error error )
+						{
+							Debug.LogError( error.ToString() );
+						}
+						
+						myAssetOTL.prFullBuild = true;
+						myAssetOTL.prUnloadAssetInFullBuild = false;
+						myAssetOTL.build();
+						myAssetOTL.prUnloadAssetInFullBuild = true;
+					}
+					else
+						Debug.LogError( "Nothing to save." );
+				}
+				
+			} 
+			EditorGUILayout.EndHorizontal();			
 			
 			string path = myAssetOTL.prAssetPath;
 			myParmChanges |= HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );

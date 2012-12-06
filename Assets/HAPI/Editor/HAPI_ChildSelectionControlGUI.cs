@@ -62,7 +62,7 @@ public class HAPI_ChildSelectionControlGUI : Editor
 				myChildSelectionControl.prAsset.build();
 			}
 			
-			if ( GUILayout.Button( "Revert Edit" ) ) 
+			if ( GUILayout.Button( "Clear Edits" ) ) 
 			{
 				HAPI_Host.revertGeo( myChildSelectionControl.prAsset.prAssetId,
 									 myChildSelectionControl.prObjectId,

@@ -92,11 +92,13 @@ public class HAPI_AssetOTL : HAPI_Asset
 			
 			if ( prFullBuild ) 
 			{
-				HAPI_Host.unloadOTL( prAssetId );
+				if( prUnloadAssetInFullBuild )
+					HAPI_Host.unloadOTL( prAssetId );
 				
 				try
 				{
-					prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
+					if ( prUnloadAssetInFullBuild )
+						prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
 				}
 				catch ( HAPI_Error error )
 				{
@@ -137,7 +139,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				// Try to load presets.
 				try
 				{
-					if ( myPreset != null && myPreset.Length > 0 )
+					if ( myPreset != null && myPreset.Length > 0 && prUnloadAssetInFullBuild )
 						HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
 				}
 				catch ( HAPI_Error error )
