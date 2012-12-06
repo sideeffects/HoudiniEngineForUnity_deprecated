@@ -186,7 +186,7 @@ public class HAPI_Asset : MonoBehaviour
 	}
 	
 	public void addDownstreamTransformAsset( HAPI_Asset asset )
-	{		
+	{
 		foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 			if ( downstream_asset == asset )
 				return;
@@ -195,18 +195,14 @@ public class HAPI_Asset : MonoBehaviour
 	}
 	
 	public void removeDownstreamTransformAsset( HAPI_Asset asset )
-	{			
-		prDownStreamTransformAssets.Remove( asset );		
-		
+	{
+		prDownStreamTransformAssets.Remove( asset );
 	}
 	
 	// Geometry related connection methods -------------------------------------------------------
 	
 	public void addAssetAsGeoInput( HAPI_Asset asset, int object_index, int index )
-	{		
-		if( prUpStreamGeoAssets[ index ] == asset )
-			return;
-		
+	{
 		prUpStreamGeoAssets[ index ] = asset;
 		
 		//TODO: It's hard coded to be the 0th group - fix this!
@@ -217,6 +213,7 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public void addGeoAsGeoInput( GameObject asset, int index )
 	{
+		prUpStreamGeoAssets[ index ] = null;
 		prUpStreamGeoAdded[ index ] = true;
 		
 		int object_id;

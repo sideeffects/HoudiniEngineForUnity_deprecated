@@ -65,6 +65,7 @@ public class HAPI_AssetGUI : Editor
 						if ( !obj )
 						{
 							myAsset.prUpStreamGeoObjects[ ii ] = null;
+							myAsset.prUpStreamGeoAssets[ ii ] = null;
 							myAsset.removeGeoInput( ii );
 						}
 						else
@@ -87,7 +88,10 @@ public class HAPI_AssetGUI : Editor
 								asset_component = new_obj.GetComponent< HAPI_Asset >();
 							
 							if ( asset_component )
-								myAsset.addAssetAsGeoInput( asset_component, object_index, ii );
+								if ( myAsset == asset_component )
+									Debug.LogError( "Can't connect an asset to itself!" );
+								else
+									myAsset.addAssetAsGeoInput( asset_component, object_index, ii );
 							else
 								myAsset.addGeoAsGeoInput( new_obj, ii );
 						}

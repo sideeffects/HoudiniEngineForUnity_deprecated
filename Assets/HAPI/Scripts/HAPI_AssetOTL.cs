@@ -463,6 +463,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAssetId, object_id, geo_id, out geo_info );
 
+		if ( geo_info.type == (int) HAPI.HAPI_GeoType.HAPI_GEOTYPE_INPUT )
+			return;
+
 		if ( !prFullBuild && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
 			return;
 
