@@ -283,6 +283,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 				displayProgressBar();
 				
 				myProgressBarTotal = prObjectCount;
+
+				HAPI_Host.cookAsset( prAssetId );
 			}
 			
 			myProgressBarMsg = "Loading and composing objects...";

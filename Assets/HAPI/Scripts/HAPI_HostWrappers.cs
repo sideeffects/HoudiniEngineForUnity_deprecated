@@ -147,6 +147,21 @@ namespace HAPI
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
+		// ASSETS ---------------------------------------------------------------------------------------------------
+
+		/// <summary>
+		/// 	Initiate a cook on this asset. Note that this may trigger cooks on other assets if they 
+		/// 	are connected.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		public static void cookAsset( int asset_id )
+		{
+			int status_code = HAPI_CookAsset( asset_id );
+			processStatusCode( (HAPI_StatusCode) status_code );
+		}
+
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 
 		/// <summary>

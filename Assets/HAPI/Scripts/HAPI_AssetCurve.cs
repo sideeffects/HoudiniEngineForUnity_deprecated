@@ -305,6 +305,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 				displayProgressBar();
 				
 				myProgressBarTotal = prObjectCount;
+
+				HAPI_Host.cookAsset( prAssetId );
 			}
 			
 			myProgressBarMsg = "Loading and composing objects...";

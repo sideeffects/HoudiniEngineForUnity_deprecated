@@ -60,6 +60,11 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetTime( 			float time );
+
+		// ASSETS ---------------------------------------------------------------------------------------------------
+
+		[DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl )]
+		private static extern int HAPI_CookAsset(			int asset_id );
 		
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
