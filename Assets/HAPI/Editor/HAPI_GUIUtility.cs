@@ -32,6 +32,44 @@ public class HAPI_GUIUtility : Editor
 		return new_path;
 	}
 	
+	public static void loadHipFile( string file_path )
+	{
+		if ( file_path.Length <= 0 )
+			return;
+		
+		// Create game object.
+		GameObject game_object = new GameObject( myDefaultAssetLabel );
+		
+		// Add HAPI Object Control script component.
+		game_object.AddComponent( "HAPI_AssetOTL" );		
+		HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
+		
+		asset.prAssetType = HAPI_Asset.AssetType.TYPE_HIP;
+		// Set that asset path.
+		asset.prAssetPath = file_path;
+		
+		// Save as a prefab.
+		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/" + myDefaultPrefabLabel + ".prefab" );
+		//PrefabUtility.ReplacePrefab( game_object, prefab, ReplacePrefabOptions.ConnectToPrefab );
+		
+		// Do first build.
+		bool build_result = asset.build();
+		if ( build_result == false ) // Something is not right. Clean up.
+		{
+			DestroyImmediate( game_object );
+			return;
+		}
+		
+		// Set new object name from asset name.
+		string asset_name		= asset.prAssetInfo.name;
+		game_object.name 		= asset_name;
+		
+		// Select the new houdini asset.
+		GameObject[] selection 	= new GameObject[ 1 ];
+		selection[ 0 ] 			= game_object;
+		Selection.objects 		= selection;
+	}
+	
 	public static void instantiateAsset( string file_path )
 	{
 		if ( file_path.Length <= 0 )
@@ -44,6 +82,7 @@ public class HAPI_GUIUtility : Editor
 		game_object.AddComponent( "HAPI_AssetOTL" );		
 		HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
 		
+		asset.prAssetType = HAPI_Asset.AssetType.TYPE_OTL;
 		// Set that asset path.
 		asset.prAssetPath = file_path;
 		

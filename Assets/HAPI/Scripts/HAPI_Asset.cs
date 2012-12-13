@@ -25,6 +25,15 @@ using Utility = HAPI_AssetUtility;
 [ ExecuteInEditMode ]
 public class HAPI_Asset : MonoBehaviour 
 {	
+	
+	public enum AssetType
+	{
+		TYPE_OTL = 0,
+		TYPE_HIP,
+		TYPE_CURVE,
+		TYPE_INVALID
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -34,8 +43,9 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public HAPI_AssetInfo 			prAssetInfo { get { return myAssetInfo; } set { myAssetInfo = value; } }
 	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
-	public int 						prAssetId { get; set; }
-	public HAPI_AssetType			prAssetType { get; set; }
+	public int 						prAssetId { get; set; }	
+	public AssetType				prAssetType { get; set; }
+	public HAPI_AssetType			prHAPIAssetType { get; set; }
 	public int						prAssetSubType { get { return myAssetSubType; } set { myAssetSubType = value; } }
 	public bool						prFullBuild { get; set; }
 	public bool 					prUnloadAssetInFullBuild { get; set; }
@@ -301,7 +311,8 @@ public class HAPI_Asset : MonoBehaviour
 		prAssetInfo 				= new HAPI_AssetInfo();
 		prPreset 					= null;
 		prAssetId 					= -1;
-		prAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
+		prAssetType					= AssetType.TYPE_INVALID;
+		prHAPIAssetType 			= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 				= 0;
 		prFullBuild					= true;
 		prUnloadAssetInFullBuild	= true;

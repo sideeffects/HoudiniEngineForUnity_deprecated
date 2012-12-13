@@ -92,13 +92,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 			
 			if ( prFullBuild ) 
 			{
-				if( prUnloadAssetInFullBuild )
+				if( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL )
 					HAPI_Host.unloadOTL( prAssetId );
 				
 				try
 				{
-					if ( prUnloadAssetInFullBuild )
+					if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL )
 						prAssetInfo = HAPI_Host.loadOTL( prAssetPath );
+					else if ( prAssetType == HAPI_Asset.AssetType.TYPE_HIP )
+						prAssetInfo = HAPI_Host.loadHip( prAssetPath );
 				}
 				catch ( HAPI_Error error )
 				{
@@ -113,7 +115,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
-				prAssetType				= (HAPI_AssetType) prAssetInfo.type;
+				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
 				prMinInputCount			= prAssetInfo.minInputCount;
 				prMaxInputCount			= prAssetInfo.maxInputCount;
 				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;

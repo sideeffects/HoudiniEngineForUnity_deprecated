@@ -290,6 +290,7 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ReplaceAssetFromHIPFile( int asset_id, string file_name );
+				
 		
 		// None-exposed API calls: ----------------------------------------------------------------------------------
 		
@@ -316,6 +317,11 @@ namespace HAPI
 		private static extern int HAPI_LoadOTLFile(			string file_path, 
 															string textures_path,
 															ref HAPI_AssetInfo asset_info );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_LoadHIPFile(	string file_name,
+													string textures_path,
+													ref HAPI_AssetInfo asset_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_CreateCurve( ref HAPI_AssetInfo asset_info );

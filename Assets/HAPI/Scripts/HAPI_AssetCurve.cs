@@ -163,9 +163,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 					return false; // false for failed :(
 				}
 				
+				prAssetType = AssetType.TYPE_CURVE;
 				// For convinience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
-				prAssetType				= (HAPI_AssetType) prAssetInfo.type;
+				prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
 				prMinInputCount			= prAssetInfo.minInputCount;
 				prMaxInputCount			= prAssetInfo.maxInputCount;
 				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;

@@ -115,6 +115,26 @@ namespace HAPI
 			return asset_info;
 		}
 		
+		
+		public static HAPI_AssetInfo loadHip( string path ) 
+		{
+			initialize();
+			
+			string textures_path = Application.dataPath + "/Textures";
+			
+			HAPI_AssetInfo asset_info 			= new HAPI_AssetInfo();
+			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
+			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
+			
+			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_LoadHIPFile( path, textures_path, ref asset_info );
+			
+			processStatusCode( status_code );
+			
+			Debug.Log( "Hip File Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
+			
+			return asset_info;
+		}
+		
 		public static HAPI_AssetInfo createCurve()
 		{
 			initialize();

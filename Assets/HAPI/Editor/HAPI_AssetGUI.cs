@@ -50,7 +50,7 @@ public class HAPI_AssetGUI : Editor
 			
 			if ( myAsset.prShowInputControls )
 			{
-				if ( myAsset.prAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				if ( myAsset.prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					for ( int ii = 0; ii < myAsset.prMaxInputCount; ++ii )
 						myParmChanges |= setTransformInput( ii );
 				

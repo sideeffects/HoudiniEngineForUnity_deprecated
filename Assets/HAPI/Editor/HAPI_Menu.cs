@@ -38,6 +38,13 @@ public class HAPI_Menu : MonoBehaviour
 		HAPI_GUIUtility.instantiateAsset( asset_file_path );
 	}
 	
+	[ MenuItem( "HAPI/Load Hip File..." ) ]
+	static private void loadHipFile() 
+	{
+		string hip_file_path = HAPI_GUIUtility.promptForOTLPath();
+		HAPI_GUIUtility.loadHipFile( hip_file_path );
+	}
+	
 	[ MenuItem( "HAPI/Create Curve" ) ]
 	static private void createCurve()
 	{
