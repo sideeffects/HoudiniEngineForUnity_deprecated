@@ -45,13 +45,13 @@ namespace HAPI
 		// STRINGS --------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetStringLength( 	int string_handle, 
-															out int string_length );
+		private static extern int HAPI_GetStringBufLength( 	int string_handle, 
+															out int buffer_length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetString(		 	int string_handle,
 															StringBuilder string_value,
-															int string_length );
+															int buffer_length );
 
 		// TIME -----------------------------------------------------------------------------------------------------
 

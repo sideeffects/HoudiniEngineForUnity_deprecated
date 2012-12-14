@@ -91,13 +91,13 @@ namespace HAPI
 		/// <param name="string_handle">
 		/// 	Handle of the string to query.
 		/// </param>
-		/// <param name="string_length">
-		/// 	Length of the queried string.
+		/// <param name="buffer_length">
+		/// 	Buffer length of the queried string (including NULL terminator).
 		/// </param>
-		private static void getStringLength( 	int string_handle,
-												out int string_length )
+		private static void getStringBufLength( int string_handle,
+												out int buffer_length )
 		{
-			int status_code = HAPI_GetStringLength( string_handle, out string_length );
+			int status_code = HAPI_GetStringBufLength( string_handle, out buffer_length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 
@@ -110,14 +110,15 @@ namespace HAPI
 		/// <param name="string_value">
 		/// 	Actual string value.
 		/// </param>
-		/// <param name="string_length">
-		/// 	Length of the queried string (must match size of <paramref name="string_value">).
+		/// <param name="buffer_length">
+		/// 	Length of the string buffer (must match size of <paramref name="string_value" - 
+		/// 	so including NULL terminator).
 		/// </param>
 		private static void getString(		 	int string_handle,
 												StringBuilder string_value,
-												int string_length )
+												int buffer_length )
 		{
-			int status_code = HAPI_GetString( string_handle, string_value, string_length );
+			int status_code = HAPI_GetString( string_handle, string_value, buffer_length );
 			processStatusCode( (HAPI_StatusCode) status_code );
 		}
 

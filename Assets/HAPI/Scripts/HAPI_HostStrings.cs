@@ -36,12 +36,10 @@ namespace HAPI
 		public static string getString( int string_handle )
 		{
 			int length = 0;
-			getStringLength( string_handle, out length );
+			getStringBufLength( string_handle, out length );
 			
 			if ( length <= 0 )
 				return "";
-			
-			length++; // For the trailing 0.
 			
 			StringBuilder string_builder = new StringBuilder( length );
 			getString( string_handle, string_builder, length );
