@@ -280,11 +280,12 @@ namespace HAPI
 		// MATERIALS ------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetMaterials( 		int asset_id, 
-															[Out] HAPI_MaterialInfo[] material_infos,
-															int start, int length );
+		private static extern int HAPI_GetMaterials(	int asset_id, 
+														[Out] HAPI_MaterialInfo[] material_infos,
+														int start, int length );
 		
 		// HIP FILES ------------------------------------------------------------------------------------------------
+		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ExportAssetToHIPFile( int asset_id, string file_name );
 		
@@ -295,8 +296,10 @@ namespace HAPI
 		// None-exposed API calls: ----------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_Initialize(			string houdini_install_path,
-															string otl_search_path );
+		private static extern int HAPI_Initialize(	string houdini_install_path,
+													string otl_search_path,
+													[ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
+													int cooking_thread_stack_size );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Cleanup();
@@ -314,20 +317,25 @@ namespace HAPI
 		private static extern int HAPI_SaveHIPFile( string file_name );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_LoadOTLFile(			string file_path, 
-															string textures_path,
-															ref HAPI_AssetInfo asset_info );
+		private static extern int HAPI_LoadOTLFile(	string file_path, 
+													string textures_path,
+													int min_vertices_per_primitive,
+													int max_vertices_per_primitive,
+													ref int asset_id );
 		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_CreateCurve( ref int asset_id );
+
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_LoadHIPFile(	string file_name,
 													string textures_path,
 													ref HAPI_AssetInfo asset_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_CreateCurve( ref HAPI_AssetInfo asset_info );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_UnloadOTLFile( 		int asset_id );
+		private static extern int HAPI_UnloadOTLFile( int asset_id );
+
+		[DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl )]
+		private static extern int HAPI_GetAssetInfo( int asset_id, ref HAPI_AssetInfo asset_info );
 		
 	}
 

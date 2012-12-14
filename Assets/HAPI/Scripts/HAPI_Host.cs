@@ -102,14 +102,17 @@ namespace HAPI
 			
 			string textures_path = Application.dataPath + "/Textures";
 			
-			HAPI_AssetInfo asset_info 			= new HAPI_AssetInfo();
-			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
-			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
-			
-			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( path, textures_path, ref asset_info );
-			
+			int asset_id = -1;
+			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( path, textures_path, 
+																			  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
+																			  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
+																			  ref asset_id );
 			processStatusCode( status_code );
 			
+			HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
+			status_code = (HAPI_StatusCode) HAPI_GetAssetInfo( asset_id, ref asset_info );
+			processStatusCode( status_code );
+
 			Debug.Log( "Asset Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
 			
 			return asset_info;
@@ -139,12 +142,12 @@ namespace HAPI
 		{
 			initialize();
 			
-			HAPI_AssetInfo asset_info 			= new HAPI_AssetInfo();
-			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
-			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
-			
-			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_CreateCurve( ref asset_info );
-			
+			int asset_id = -1;
+			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_CreateCurve( ref asset_id );
+			processStatusCode( status_code );
+
+			HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
+			status_code = (HAPI_StatusCode) HAPI_GetAssetInfo( asset_id, ref asset_info );
 			processStatusCode( status_code );
 			
 			Debug.Log( "Asset Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
@@ -191,7 +194,9 @@ namespace HAPI
 				Debug.Log( "Loading OTL: Creating New Scene" );
 
 				HAPI_StatusCode status_code;
-				status_code = (HAPI_StatusCode) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, otls_path );
+				status_code = (HAPI_StatusCode) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, 
+																 otls_path,
+																 true, -1 );
 
 				if ( status_code != HAPI_StatusCode.HAPI_STATUS_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
