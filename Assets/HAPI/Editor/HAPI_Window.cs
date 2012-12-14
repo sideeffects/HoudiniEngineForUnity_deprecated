@@ -40,6 +40,18 @@ public class HAPI_Window : EditorWindow
 		// Show existing window instance. If one doesn't exist, make one.
 		EditorWindow.GetWindow< HAPI_Window >( false, "HAPI Debug" );
 		float time = 0.0f;
+
+		if ( !HAPI.HAPI_SetPath.prIsPathSet )
+		{
+			HAPI.HAPI_SetPath.setPath();
+			if ( !HAPI.HAPI_SetPath.prIsPathSet )
+			{
+				Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
+				return;
+			}
+			HAPI_Host.initialize();
+		}
+
 		HAPI_Host.getTime( out time );
 		HAPI_Window.myTime = time;
 	}

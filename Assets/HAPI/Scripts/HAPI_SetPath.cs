@@ -96,11 +96,13 @@ namespace HAPI
 			Debug.Log( "DLL search path set to: " + path );
 			
 			prHoudiniPath = houdini_app_path;			
-			prIsPathSet = true;
+			myIsPathSet = true;
 		}
 		
-		public static bool prIsPathSet { get; private set; }
+		public static bool prIsPathSet { get { return myIsPathSet; } private set {} }
 		public static string prHoudiniPath { get; private set; }
+
+		private static bool myIsPathSet = false;
 	}
 	
 } // namespace HAPI
