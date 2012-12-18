@@ -85,6 +85,31 @@ namespace HAPI
 			return string_value;
 		}
 
+		/// <summary>
+		/// 	Get total number of nodes that need to cook in the current session.
+		/// </summary>
+		public static int getCookingTotalCount()
+		{
+			int count = 0;
+			int status_code = HAPI_GetCookingTotalCount( out count );
+			processStatusCode( (HAPI_Result) status_code );
+			return count;
+		}
+
+		/// <summary>
+		/// 	Get current number of nodes that have already cooked in the current session. Note that this is a 
+		/// 	very crude approximation of the cooking progress - it may never make it to 100% or it 
+		///		might spend another hour at 100%. Use HAPI_GetStatusString to get a better idea of progress if 
+		///		this number gets stuck.
+		/// </summary>
+		public static int getCookingCurrentCount()
+		{
+			int count = 0;
+			int status_code = HAPI_GetCookingCurrentCount( out count );
+			processStatusCode( (HAPI_Result) status_code );
+			return count;
+		}
+
 		// UTILITY --------------------------------------------------------------------------------------------------
 
 		/// <summary>

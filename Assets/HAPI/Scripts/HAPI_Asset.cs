@@ -415,14 +415,26 @@ public class HAPI_Asset : MonoBehaviour
 	
 	protected void statusCheckLoop()
 	{
-		int state = (int) HAPI_State.HAPI_STATE_STARTING_LOAD;
+		HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 		myProgressBarCurrent = 0;
 		myProgressBarTotal = 100;
-		while ( state != (int) HAPI_State.HAPI_STATE_READY )
+		while ( state != HAPI_State.HAPI_STATE_READY )
 		{
-			state = HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+			state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+
+			if ( state == HAPI_State.HAPI_STATE_COOKING )
+			{
+				myProgressBarCurrent = HAPI_Host.getCookingCurrentCount();
+				myProgressBarTotal = HAPI_Host.getCookingTotalCount();
+			}
+			else
+			{
+				myProgressBarCurrent = ( System.DateTime.Now - myProgressBarStartTime ).Seconds;
+				myProgressBarTotal = 100;
+			}
+
 			myProgressBarMsg = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
-			displayProgressBar( ( System.DateTime.Now - myProgressBarStartTime ).Seconds );
+			displayProgressBar();
 		}
 	}
 
