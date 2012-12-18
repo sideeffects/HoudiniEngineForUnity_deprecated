@@ -456,9 +456,19 @@ public class HAPI_Asset : MonoBehaviour
 		myProgressBarJustUsed = true;
 		
 		myProgressBarCurrent = value;
+		string message = "";
+		if ( delta.Hours > 0 )
+			message = delta.Hours + "h " + delta.Minutes + "m " + delta.Seconds + "s - " + myProgressBarMsg;
+		else if ( delta.Minutes > 0 )
+			message = delta.Minutes + "m " + delta.Seconds + "s - " + myProgressBarMsg;
+		else if ( delta.Seconds > 0 )
+			message = delta.Seconds + "s - " + myProgressBarMsg;
+		else
+			message = myProgressBarMsg;
+
 		bool result = 
 			!EditorUtility.DisplayCancelableProgressBar( 
-				myProgressBarTitle, myProgressBarMsg, Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
+				myProgressBarTitle, message, Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
 		
 		if ( !result )
 			throw new HAPI_ErrorProgressCancelled();
