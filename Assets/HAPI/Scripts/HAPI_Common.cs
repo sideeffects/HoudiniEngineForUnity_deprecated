@@ -28,7 +28,7 @@ namespace HAPI
 	{
 		// Unity-only constants.
 		public const int HAPI_MAX_PAGE_SIZE					= 32768;
-		public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 5;
+		public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 3;
 		public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 		public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
 		

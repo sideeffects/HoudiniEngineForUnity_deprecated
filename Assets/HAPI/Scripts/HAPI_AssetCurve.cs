@@ -150,7 +150,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 					
 				try
 				{
-					prAssetInfo = HAPI_Host.createCurve();
+					int asset_id = HAPI_Host.createCurve();
+
+					statusCheckLoop();
+
+					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
+					Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
 				}
 				catch ( HAPI_Error error )
 				{
@@ -164,9 +169,9 @@ public class HAPI_AssetCurve : HAPI_Asset
 				}
 				
 				prAssetType = AssetType.TYPE_CURVE;
-				// For convinience we copy some asset info properties locally (since they are constant anyway).
+				// For convenience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
-				prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
+				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
 				prMinInputCount			= prAssetInfo.minInputCount;
 				prMaxInputCount			= prAssetInfo.maxInputCount;
 				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
@@ -211,28 +216,28 @@ public class HAPI_AssetCurve : HAPI_Asset
 				// Get all parameters.
 				prParms = new HAPI_ParmInfo[ prParmCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
-				displayProgressBar( prParmCount );
+				incrementProgressBar( prParmCount );
 				
 				// Get parameter int values.
 				prParmIntValues = new int[ prParmIntValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
-				displayProgressBar( prParmIntValueCount );
+				incrementProgressBar( prParmIntValueCount );
 				
 				// Get parameter float values.
 				prParmFloatValues = new float[ prParmFloatValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
-				displayProgressBar( prParmFloatValueCount );
+				incrementProgressBar( prParmFloatValueCount );
 				
 				// Get parameter string (handle) values.
 				prParmStringValues = new int[ prParmStringValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
 									 prParmStringValueCount );
-				displayProgressBar( prParmStringValueCount );
+				incrementProgressBar( prParmStringValueCount );
 				
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-				displayProgressBar( prParmChoiceCount );
+				incrementProgressBar( prParmChoiceCount );
 				
 				myProgressBarMsg = "Loading handles...";
 				
@@ -265,7 +270,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 							numValidTransformInputs++;
 					
 					if ( numValidTransformInputs < prMinInputCount )
-						Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
+						Debug.LogWarning( "Insufficient Transform Inputs to Asset. " +
 										  "Please provide inputs in the Inputs section." );
 				}
 				
@@ -275,7 +280,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 						numValidGeoInputs++;
 				
 				if ( numValidGeoInputs < prMinGeoInputCount )
-					Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
+					Debug.LogWarning( "Insufficient Geo Inputs to Asset. Please provide inputs in the Inputs section." );
 				
 				if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
@@ -308,6 +313,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 				myProgressBarTotal = prObjectCount;
 
 				HAPI_Host.cookAsset( prAssetId );
+
+				statusCheckLoop();
 			}
 			
 			myProgressBarMsg = "Loading and composing objects...";

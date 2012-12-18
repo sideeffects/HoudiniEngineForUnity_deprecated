@@ -71,12 +71,6 @@ namespace HAPI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Public
 		
-		/// <summary>
-		/// 	Ask if the singleton Houdini scene has already been created.
-		/// </summary>
-		/// <returns>
-		/// 	Whether the singleton Houdini scene has been created yet or not.
-		/// </returns>
 		public static bool hasScene() 
 		{
 			return myHoudiniSceneExists;
@@ -87,39 +81,24 @@ namespace HAPI
 			HAPI_SaveHIPFile( file_name );
 		}
 		
-		/// <summary>
-		/// 	Load and instantiate an asset from a .otl file.
-		/// </summary>
-		/// <param name="path">
-		/// 	Absolute path to the .otl file.
-		/// </param>
-		/// <returns>
-		/// 	An initialized <see cref="HAPI_AssetInfo"/>.
-		/// </returns>
-		public static HAPI_AssetInfo loadOTL( string path ) 
+		public static int loadOTL( string path ) 
 		{
 			initialize();
 			
 			string textures_path = Application.dataPath + "/Textures";
 			
 			int asset_id = -1;
-			HAPI_Result status_code = (HAPI_Result) HAPI_LoadOTLFile( path, textures_path, 
-																			  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
-																			  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
-																			  ref asset_id );
-			processStatusCode( status_code );
-			
-			HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-			status_code = (HAPI_Result) HAPI_GetAssetInfo( asset_id, ref asset_info );
+			HAPI_Result status_code = (HAPI_Result) HAPI_LoadOTLFile( path, textures_path,
+																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
+																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
+																	  ref asset_id );
 			processStatusCode( status_code );
 
-			Debug.Log( "Asset Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
-			
-			return asset_info;
+			return asset_id;
 		}
 		
 		
-		public static HAPI_AssetInfo loadHip( string path ) 
+		public static int loadHip( string path ) 
 		{
 			initialize();
 			
@@ -135,10 +114,10 @@ namespace HAPI
 			
 			Debug.Log( "Hip File Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
 			
-			return asset_info;
+			return asset_info.id;
 		}
 		
-		public static HAPI_AssetInfo createCurve()
+		public static int createCurve()
 		{
 			initialize();
 			
@@ -146,24 +125,9 @@ namespace HAPI
 			HAPI_Result status_code = (HAPI_Result) HAPI_CreateCurve( ref asset_id );
 			processStatusCode( status_code );
 
-			HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-			status_code = (HAPI_Result) HAPI_GetAssetInfo( asset_id, ref asset_info );
-			processStatusCode( status_code );
-			
-			Debug.Log( "Asset Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
-			
-			return asset_info;
+			return asset_id;
 		}
 		
-		/// <summary>
-		/// 	Delete the asset Houdini instance in the scene and unload the OTL definition.
-		/// </summary>
-		/// <param name="asset_id">
-		/// 	Asset_id as returned by <see cref="HAPI_Host.LoadOTLFile"/>.
-		/// </param>
-		/// <returns>
-		/// 	<c>true</c> if successfully unload the asset, <c>false</c> otherwise.
-		/// </returns>
 		public static bool unloadOTL( int asset_id ) 
 		{
 			if ( asset_id < 0 )
@@ -194,9 +158,8 @@ namespace HAPI
 				Debug.Log( "Loading OTL: Creating New Scene" );
 
 				HAPI_Result status_code;
-				status_code = (HAPI_Result) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, 
-																 otls_path,
-																 true, -1 );
+				status_code = (HAPI_Result) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, otls_path,
+															 true, -1 );
 
 				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );

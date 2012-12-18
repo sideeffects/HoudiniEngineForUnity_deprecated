@@ -410,17 +410,36 @@ public class HAPI_Asset : MonoBehaviour
 	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
+	protected void statusCheckLoop()
+	{
+		int state = (int) HAPI_State.HAPI_STATE_STARTING_LOAD;
+		myProgressBarCurrent = 0;
+		myProgressBarTotal = 100;
+		while ( state != (int) HAPI_State.HAPI_STATE_READY )
+		{
+			state = HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+			myProgressBarMsg = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
+			displayProgressBar( ( System.DateTime.Now - myProgressBarStartTime ).Seconds );
+		}
+	}
+
 	protected void incrementProgressBar()
 	{
-		displayProgressBar( 1 );
+		incrementProgressBar( 1 );
+	}
+
+	protected void incrementProgressBar( int increment )
+	{
+		myProgressBarCurrent += increment;
+		displayProgressBar( myProgressBarCurrent );
 	}
 	
 	protected void displayProgressBar()
 	{
-		displayProgressBar( 0 );
+		displayProgressBar( myProgressBarCurrent );
 	}
-	
-	protected void displayProgressBar( int increment )
+
+	protected void displayProgressBar( int value )
 	{
 		System.DateTime current = System.DateTime.Now;
 		System.TimeSpan delta = current - myProgressBarStartTime;
@@ -435,11 +454,11 @@ public class HAPI_Asset : MonoBehaviour
 		}
 		
 		myProgressBarJustUsed = true;
-				
-		myProgressBarCurrent += increment;
-		string message = myProgressBarMsg + " Item " + myProgressBarCurrent + " of " + myProgressBarTotal;
-		bool result = !EditorUtility.DisplayCancelableProgressBar( myProgressBarTitle, message, 
-												Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
+		
+		myProgressBarCurrent = value;
+		bool result = 
+			!EditorUtility.DisplayCancelableProgressBar( 
+				myProgressBarTitle, myProgressBarMsg, Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
 		
 		if ( !result )
 			throw new HAPI_ErrorProgressCancelled();

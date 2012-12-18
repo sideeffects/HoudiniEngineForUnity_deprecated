@@ -39,13 +39,12 @@ namespace HAPI
 		/// <param name="status_type">
 		/// 	On of <see cref="HAPI_StatusType"/>.
 		/// </param>
-		/// <param name="status">
-		///		Actual status code for the status type given.
-		/// </param>
-		public static void getStatus( HAPI_StatusType status_type, out int status )
+		public static int getStatus( HAPI_StatusType status_type )
 		{
+			int status;
 			int status_code = HAPI_GetStatus( (int) status_type, out status );
 			processStatusCode( (HAPI_Result) status_code );
+			return status;
 		}
 
 		/// <summary>
@@ -57,7 +56,7 @@ namespace HAPI
 		/// <param name="buffer_size">
 		///		Length of buffer char array ready to be filled.
 		/// </param>
-		public static void getStatusStringBufLength( HAPI_StatusType status_type, out int buffer_size )
+		private static void getStatusStringBufLength( HAPI_StatusType status_type, out int buffer_size )
 		{
 			int status_code = HAPI_GetStatusStringBufLength( (int) status_type, out buffer_size );
 			processStatusCode( (HAPI_Result) status_code );
@@ -69,13 +68,21 @@ namespace HAPI
 		/// <param name="status_type">
 		/// 	On of <see cref="HAPI_StatusType"/>.
 		/// </param>
-		/// <param name="buffer">
-		///		Buffer char array ready to be filled.
-		/// </param>
-		public static void getStatusString( HAPI_StatusType status_type, StringBuilder buffer )
+		public static string getStatusString( HAPI_StatusType status_type )
 		{
-			int status_code = HAPI_GetStatusString( (int) status_type, buffer );
+			int buffer_size = 0;
+			getStatusStringBufLength( status_type, out buffer_size );
+
+			if ( buffer_size <= 0 )
+				return "";
+
+			StringBuilder string_builder = new StringBuilder( buffer_size );
+			int status_code = HAPI_GetStatusString( (int) status_type, string_builder );
 			processStatusCode( (HAPI_Result) status_code );
+
+			string string_value = string_builder.ToString();
+			
+			return string_value;
 		}
 
 		// UTILITY --------------------------------------------------------------------------------------------------
@@ -194,6 +201,20 @@ namespace HAPI
 		}
 
 		// ASSETS ---------------------------------------------------------------------------------------------------------
+
+		/// <summary>
+		/// 	Get an asset_info struct.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		public static HAPI_AssetInfo getAssetInfo( int asset_id )
+		{
+			HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
+			int status_code = HAPI_GetAssetInfo( asset_id, ref asset_info );
+			processStatusCode( (HAPI_Result) status_code );
+			return asset_info;
+		}
 
 		/// <summary>
 		/// 	Initiate a cook on this asset. Note that this may trigger cooks on other assets if they 
