@@ -378,6 +378,9 @@ public class HAPI_Asset : MonoBehaviour
 		myProgressBarCurrent		= 0;
 		myProgressBarTitle			= "Building Houdini Asset";
 		myProgressBarMsg			= "";
+
+		myProgressBarLastValue		= -1;
+		myProgressBarLastMsg		= "";
 	}
 	
 	public virtual bool build() 
@@ -441,13 +444,17 @@ public class HAPI_Asset : MonoBehaviour
 
 	protected void displayProgressBar( int value )
 	{
+		// If there are no changes to the progress bar value or message don't re-display it again.
+		if ( value == myProgressBarLastValue && myProgressBarMsg == myProgressBarLastMsg )
+			return;
+
 		System.DateTime current = System.DateTime.Now;
 		System.TimeSpan delta = current - myProgressBarStartTime;
 		
 		// This delay for displaying the progress bar is so the bar won't flicker for really quick updates
 		// (less than a few seconds). Also, when we do show the progress bar the focus of the current 
 		// inspector control is lost.
-		if ( delta.Seconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
+		if ( delta.TotalSeconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
 		{
 			EditorUtility.ClearProgressBar();
 			return;
@@ -471,7 +478,16 @@ public class HAPI_Asset : MonoBehaviour
 				myProgressBarTitle, message, Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
 		
 		if ( !result )
+		{
+			myProgressBarLastValue = -1;
+			myProgressBarLastMsg = "";
 			throw new HAPI_ErrorProgressCancelled();
+		}
+		else
+		{
+			myProgressBarLastValue = value;
+			myProgressBarLastMsg = myProgressBarMsg;
+		}
 	}
 	
 	public bool hasProgressBarBeenUsed()
@@ -492,6 +508,10 @@ public class HAPI_Asset : MonoBehaviour
 	protected int				myProgressBarCurrent;
 	protected string			myProgressBarTitle;
 	protected string			myProgressBarMsg;
+	
+	// Used to reduce the update frequency of the progress bar so it doesn't flicker.
+	private int					myProgressBarLastValue;
+	private string				myProgressBarLastMsg;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data
