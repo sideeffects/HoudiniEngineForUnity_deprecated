@@ -46,18 +46,36 @@ namespace HAPI
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Enums
 	
-	public enum HAPI_StatusCode 
+	public enum HAPI_StatusType
 	{
-		HAPI_STATUS_SUCCESS				    			= 0,
-		HAPI_STATUS_FAILURE				    			= 1,
-		HAPI_STATUS_ALREADY_INITIALIZED		    		= 2,
-		HAPI_STATUS_NOT_INITIALIZED			    		= 3,
-		HAPI_STATUS_CANT_LOADFILE			    		= 4,
-		HAPI_STATUS_PARM_SET_FAILED			    		= 5,
-		HAPI_STATUS_INVALID_ARGUMENT		    		= 6,
-		HAPI_STATUS_CANT_LOAD_GEO						= 7,
-		HAPI_STATUS_CANT_GENERATE_PRESET   		  		= 8,
-    	HAPI_STATUS_CANT_LOAD_PRESET               	    = 9
+		HAPI_STATUS_RESULT,
+		HAPI_STATUS_WARNING,
+		HAPI_STATUS_STATE,
+		HAPI_STATUS_MAX
+	};
+
+	public enum HAPI_Result 
+	{
+		HAPI_RESULT_SUCCESS						= 0,
+		HAPI_RESULT_FAILURE						= 1,
+		HAPI_RESULT_ALREADY_INITIALIZED			= 2,
+		HAPI_RESULT_NOT_INITIALIZED				= 3,
+		HAPI_RESULT_CANT_LOADFILE				= 4,
+		HAPI_RESULT_PARM_SET_FAILED				= 5,
+		HAPI_RESULT_INVALID_ARGUMENT			= 6,
+		HAPI_RESULT_CANT_LOAD_GEO				= 7,
+		HAPI_RESULT_CANT_GENERATE_PRESET		= 8,
+		HAPI_RESULT_CANT_LOAD_PRESET			= 9
+	};
+
+	public enum HAPI_State
+	{
+		HAPI_STATE_READY,
+		HAPI_STATE_STARTING_COOK,
+		HAPI_STATE_COOKING,
+		HAPI_STATE_STARTING_LOAD,
+		HAPI_STATE_LOADING,
+		HAPI_STATE_MAX
 	};
 	
 	public enum HAPI_ParmType

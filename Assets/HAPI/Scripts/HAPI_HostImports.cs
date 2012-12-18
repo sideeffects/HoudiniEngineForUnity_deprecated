@@ -29,8 +29,33 @@ namespace HAPI
 	/// 	Houdini runtime.
 	/// </summary>
 	public static partial class HAPI_Host
-	{		
-		// GENERICS -------------------------------------------------------------------------------------------------
+	{
+		// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_Initialize( string houdini_install_path,
+													string otl_search_path,
+													[MarshalAs( UnmanagedType.U1 )] bool use_cooking_thread,
+												   int cooking_thread_stack_size );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_Cleanup();
+
+		// DIAGNOSTICS ----------------------------------------------------------------------------------------------
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_PrintNetwork( StringBuilder buffer );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetStatus( int status_code, out int status );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetStatusStringBufLength( int status_code, out int buffer_size );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetStatusString( int status_code, StringBuilder buffer );
+
+		// UTILITY --------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ConvertTransform( 	ref HAPI_TransformEuler transform_in_out, 
@@ -63,9 +88,41 @@ namespace HAPI
 
 		// ASSETS ---------------------------------------------------------------------------------------------------
 
-		[DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl )]
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_LoadOTLFile( string file_path,
+													string textures_path,
+													int min_vertices_per_primitive,
+													int max_vertices_per_primitive,
+													ref int asset_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_CreateCurve( ref int asset_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_UnloadOTLFile( int asset_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAssetInfo( int asset_id, ref HAPI_AssetInfo asset_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_CookAsset(			int asset_id );
-		
+
+		// HIP FILES ------------------------------------------------------------------------------------------------
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_LoadHIPFile( string file_name,
+													string textures_path,
+													ref HAPI_AssetInfo asset_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SaveHIPFile( string file_name );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ExportAssetToHIPFile( int asset_id, string file_name );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ReplaceAssetFromHIPFile( int asset_id, string file_name );
+
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -283,59 +340,6 @@ namespace HAPI
 		private static extern int HAPI_GetMaterials(	int asset_id, 
 														[Out] HAPI_MaterialInfo[] material_infos,
 														int start, int length );
-		
-		// HIP FILES ------------------------------------------------------------------------------------------------
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_ExportAssetToHIPFile( int asset_id, string file_name );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_ReplaceAssetFromHIPFile( int asset_id, string file_name );
-				
-		
-		// None-exposed API calls: ----------------------------------------------------------------------------------
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_Initialize(	string houdini_install_path,
-													string otl_search_path,
-													[ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
-													int cooking_thread_stack_size );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_Cleanup();
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_PrintNetwork( 		StringBuilder buffer );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetLastErrorStringLength( out int length );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetLastErrorString( 	StringBuilder buffer );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SaveHIPFile( string file_name );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_LoadOTLFile(	string file_path, 
-													string textures_path,
-													int min_vertices_per_primitive,
-													int max_vertices_per_primitive,
-													ref int asset_id );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_CreateCurve( ref int asset_id );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_LoadHIPFile(	string file_name,
-													string textures_path,
-													ref HAPI_AssetInfo asset_info );
-		
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_UnloadOTLFile( int asset_id );
-
-		[DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl )]
-		private static extern int HAPI_GetAssetInfo( int asset_id, ref HAPI_AssetInfo asset_info );
 		
 	}
 

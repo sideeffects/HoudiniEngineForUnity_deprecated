@@ -31,7 +31,54 @@ namespace HAPI
 	/// </summary>
 	public static partial class HAPI_Host
 	{
-		// GENERICS -------------------------------------------------------------------------------------------------
+		// DIAGNOSTICS ----------------------------------------------------------------------------------------------
+
+		/// <summary>
+		/// 	Gives back the status code for a specific status type.
+		/// </summary>
+		/// <param name="status_type">
+		/// 	On of <see cref="HAPI_StatusType"/>.
+		/// </param>
+		/// <param name="status">
+		///		Actual status code for the status type given.
+		/// </param>
+		public static void getStatus( HAPI_StatusType status_type, out int status )
+		{
+			int status_code = HAPI_GetStatus( (int) status_type, out status );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
+		/// 	Return length of string buffer storing status string message.
+		/// </summary>
+		/// <param name="status_type">
+		/// 	On of <see cref="HAPI_StatusType"/>.
+		/// </param>
+		/// <param name="buffer_size">
+		///		Length of buffer char array ready to be filled.
+		/// </param>
+		public static void getStatusStringBufLength( HAPI_StatusType status_type, out int buffer_size )
+		{
+			int status_code = HAPI_GetStatusStringBufLength( (int) status_type, out buffer_size );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
+		/// 	Return status string message.
+		/// </summary>
+		/// <param name="status_type">
+		/// 	On of <see cref="HAPI_StatusType"/>.
+		/// </param>
+		/// <param name="buffer">
+		///		Buffer char array ready to be filled.
+		/// </param>
+		public static void getStatusString( HAPI_StatusType status_type, StringBuilder buffer )
+		{
+			int status_code = HAPI_GetStatusString( (int) status_type, buffer );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		// UTILITY --------------------------------------------------------------------------------------------------
 
 		/// <summary>
 		/// 	Converts a transform to differing TRS order and Euler rotation order.
@@ -51,9 +98,8 @@ namespace HAPI
 												int rst_order, int rot_order )
 		{
 			int status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
-
 
 		/// <summary>
 		/// 	Converts a 4x4 matrix into its TRS form.
@@ -77,9 +123,8 @@ namespace HAPI
 											ref HAPI_TransformEuler transform_out )
 		{
 			int status_code = HAPI_ConvertMatrix( mat, rst_order, rot_order, ref transform_out );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
-
 
 		// STRINGS --------------------------------------------------------------------------------------------------
 
@@ -98,7 +143,7 @@ namespace HAPI
 												out int buffer_length )
 		{
 			int status_code = HAPI_GetStringBufLength( string_handle, out buffer_length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -119,7 +164,7 @@ namespace HAPI
 												int buffer_length )
 		{
 			int status_code = HAPI_GetString( string_handle, string_value, buffer_length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		// TIME -----------------------------------------------------------------------------------------------------
@@ -133,7 +178,7 @@ namespace HAPI
 		public static void getTime(		 	out float time )
 		{
 			int status_code = HAPI_GetTime( out time );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -145,10 +190,10 @@ namespace HAPI
 		public static void setTime(		 	float time )
 		{
 			int status_code = HAPI_SetTime( time );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
-		// ASSETS ---------------------------------------------------------------------------------------------------
+		// ASSETS ---------------------------------------------------------------------------------------------------------
 
 		/// <summary>
 		/// 	Initiate a cook on this asset. Note that this may trigger cooks on other assets if they 
@@ -160,10 +205,45 @@ namespace HAPI
 		public static void cookAsset( int asset_id )
 		{
 			int status_code = HAPI_CookAsset( asset_id );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
-		// PARAMETERS -----------------------------------------------------------------------------------------------
+		// HIP FILES ------------------------------------------------------------------------------------------------------
+
+		/// <summary>	
+		/// 	exports an asset into a hip file.
+		/// </summary>
+		///
+		/// <param name="asset_id">
+		///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="file_name">
+		///			Absolute path to the .hip file to be exported.
+		/// </param>
+		public static void exportAssetToHIPFile( int asset_id, string file_name )
+		{
+			int status_code = HAPI_ExportAssetToHIPFile( asset_id, file_name );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>	
+		/// 	Replaces an asset in the current scene with the instance of
+		///		the same asset found in the hip file.
+		/// </summary>
+		/// <param name="asset_id">
+		///			The asset id returned by HAPI_LoadOTLFile().
+		/// </param>
+		/// <param name="file_name">
+		///			Absolute path to the .hip file where the asset instance
+		///			is to be found.
+		///  </param>
+		public static void replaceAssetFromHIPFile( int asset_id, string file_name )
+		{
+			int status_code = HAPI_ReplaceAssetFromHIPFile( asset_id, file_name );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		// PARAMETERS -----------------------------------------------------------------------------------------------------
 
 		/// <summary>
 		/// 	Fill an array of HAPI_ParmInfo structs with parameter information from the asset instance node.
@@ -186,7 +266,7 @@ namespace HAPI
 											int start, int length )
 		{
 			int status_code = HAPI_GetParameters( asset_id, parm_infos, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -211,7 +291,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetParmIntValues( asset_id, values, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -236,7 +316,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetParmFloatValues( asset_id, values, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -262,7 +342,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetParmStringValues( asset_id, values, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -286,7 +366,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetParmChoiceLists( asset_id, parm_choices, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -311,7 +391,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_SetParmIntValues( asset_id, values, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -336,7 +416,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_SetParmFloatValues( asset_id, values, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -360,44 +440,9 @@ namespace HAPI
 												int parm_id, int index )
 		{
 			int status_code = HAPI_SetParmStringValue( asset_id, value, parm_id, index );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
-		// HIP Files-------------------------------------------------------------------------------------------------
-		/// <summary>	
-		/// 	exports an asset into a hip file.
-		/// </summary>
-		///
-		/// <param name="asset_id">
-		///			The asset id returned by HAPI_LoadOTLFile().
-		/// </param>
-		/// <param name="file_name">
-		///			Absolute path to the .hip file to be exported.
-		/// </param>
-		public static void exportAssetToHIPFile( int asset_id, string file_name )
-		{
-			int status_code = HAPI_ExportAssetToHIPFile( asset_id, file_name );
-			processStatusCode( (HAPI_StatusCode) status_code );
-		}
-		
-		/// <summary>	
-		/// 	Replaces an asset in the current scene with the instance of
-		///		the same asset found in the hip file.
-		/// </summary>
-		/// <param name="asset_id">
-		///			The asset id returned by HAPI_LoadOTLFile().
-		/// </param>
-		/// <param name="file_name">
-		///			Absolute path to the .hip file where the asset instance
-		///			is to be found.
-		///  </param>
-		public static void replaceAssetFromHIPFile( int asset_id, string file_name )
-		{
-			int status_code = HAPI_ReplaceAssetFromHIPFile( asset_id, file_name );
-			processStatusCode( (HAPI_StatusCode) status_code );
-		}
-		
-
 		// HANDLES --------------------------------------------------------------------------------------------------
 
 		/// <summary>
@@ -421,7 +466,7 @@ namespace HAPI
 											int start, int length )
 		{
 			int status_code = HAPI_GetHandleInfo( asset_id, handle_infos, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -449,7 +494,7 @@ namespace HAPI
 													int start, int length )
 		{
 			int status_code = HAPI_GetHandleBindingInfo( asset_id, handle_index, handle_infos, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		// PRESETS --------------------------------------------------------------------------------------------------
@@ -469,7 +514,7 @@ namespace HAPI
 		public static void getPreset( int asset_id, byte[] preset, ref int length )
 		{
 			int status_code = HAPI_GetPreset( asset_id, preset, ref length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -487,7 +532,7 @@ namespace HAPI
 		public static void setPreset( int asset_id, byte[] preset, int length )
 		{
 			int status_code = HAPI_SetPreset( asset_id, preset, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		// OBJECTS --------------------------------------------------------------------------------------------------
@@ -515,7 +560,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetObjects( asset_id, object_infos, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -549,7 +594,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetObjectTransforms( asset_id, rst_order, transforms, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		/// <summary>	
@@ -588,7 +633,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_GetInstanceTransforms( asset_id, object_id, geo_id, rstOrder, transforms, 
 														  start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
@@ -614,7 +659,7 @@ namespace HAPI
 												out HAPI_GeoInfo geo_info )
 		{
 			int status_code = HAPI_GetGeoInfo( asset_id, object_id, geo_id, out geo_info );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -639,7 +684,7 @@ namespace HAPI
 												out HAPI_PartInfo part_info )
 		{
 			int status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -672,7 +717,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetFaceCounts( asset_id, object_id, geo_id, part_id, face_counts, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -705,7 +750,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_GetVertexList( asset_id, object_id, geo_id, part_id, vertex_list, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -734,7 +779,7 @@ namespace HAPI
 												ref HAPI_AttributeInfo attr_info )
 		{
 			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, geo_id, part_id, name, ref attr_info );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -772,7 +817,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_GetAttributeNames( asset_id, object_id, geo_id, part_id, 
 													  attribute_type, data, count );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -813,7 +858,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_GetAttributeIntData( asset_id, object_id, geo_id, part_id, name, 
 														ref attr_info, data, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -854,7 +899,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_GetAttributeFloatData( asset_id, object_id, geo_id, part_id, name, ref attr_info, 
 														  data, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -897,7 +942,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_GetAttributeStrData( asset_id, object_id, geo_id, part_id, name, 
 														ref attr_info, data, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
@@ -921,7 +966,7 @@ namespace HAPI
 										ref HAPI_GeoInfo geo_info )
 		{
 			int status_code = HAPI_SetGeoInfo( asset_id, object_id, geo_id, ref geo_info );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -943,7 +988,7 @@ namespace HAPI
 										ref HAPI_PartInfo part_info )
 		{
 			int status_code = HAPI_SetPartInfo( asset_id, object_id, geo_id, ref part_info );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -973,7 +1018,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_SetFaceCounts( asset_id, object_id, geo_id, face_counts, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -1003,7 +1048,7 @@ namespace HAPI
 												int start, int length )
 		{
 			int status_code = HAPI_SetVertexList( asset_id, object_id, geo_id, vertex_list, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -1029,7 +1074,7 @@ namespace HAPI
 											ref HAPI_AttributeInfo attr_info )
 		{
 			int status_code = HAPI_AddAttribute( asset_id, object_id, geo_id, name, ref attr_info );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -1067,7 +1112,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_SetAttributeIntData( asset_id, object_id, geo_id, name, ref attr_info, data, 
 														start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
@@ -1105,7 +1150,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_SetAttributeFloatData( asset_id, object_id, geo_id, name, ref attr_info, 
 														  data, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		/// <summary>
@@ -1124,7 +1169,7 @@ namespace HAPI
 		public static void commitGeo( int asset_id, int object_id, int geo_id )
 		{
 			int status_code = HAPI_CommitGeo( asset_id, object_id, geo_id );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		/// <summary>	
@@ -1145,7 +1190,7 @@ namespace HAPI
 		public static void revertGeo( int asset_id, int object_id, int geo_id )
 		{
 			int status_code = HAPI_RevertGeo( asset_id, object_id, geo_id );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		// GEOMETRY INPUT -------------------------------------------------------------------------------------------
@@ -1165,7 +1210,7 @@ namespace HAPI
 		public static void setFileInput( int asset_id, int input_idx, string file_name )
 		{
 			int status_code = HAPI_SetFileInput( asset_id, input_idx, file_name );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		/// <summary> 
@@ -1188,7 +1233,7 @@ namespace HAPI
 		public static void createGeoInput( int asset_id, int input_idx, out int object_id, out int geo_id )
 		{
 			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out object_id, out geo_id );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		// Inter Asset ---------------------------------------------------------------------------------------------
@@ -1217,7 +1262,7 @@ namespace HAPI
 		public static void connectAssetTransform( int asset_id_from, int asset_id_to, int input_idx )
 		{
 			int status_code = HAPI_ConnectAssetTransform( asset_id_from, asset_id_to, input_idx );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		
@@ -1235,7 +1280,7 @@ namespace HAPI
 		public static void disconnectAssetTransform( int asset_id, int input_idx )
 		{
 			int status_code = HAPI_DisconnectAssetTransform( asset_id, input_idx );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>	Connect the geometry of two assets together.  For 
@@ -1268,7 +1313,7 @@ namespace HAPI
 		{
 			int status_code = HAPI_ConnectAssetGeometry( asset_id_from, object_id_from, group_id_from, 
 														 asset_id_to, input_idx );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 		
 		/// <summary> 
@@ -1286,7 +1331,7 @@ namespace HAPI
 		public static void disconnectAssetGeometry( int asset_id, int input_idx )
 		{
 			int status_code = HAPI_DisconnectAssetGeometry( asset_id, input_idx );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		// MATERIALS ------------------------------------------------------------------------------------------------
@@ -1311,7 +1356,7 @@ namespace HAPI
 										 int start, int length )
 		{
 			int status_code = HAPI_GetMaterials( asset_id, material_infos, start, length );
-			processStatusCode( (HAPI_StatusCode) status_code );
+			processStatusCode( (HAPI_Result) status_code );
 		}
 	}
 

@@ -103,14 +103,14 @@ namespace HAPI
 			string textures_path = Application.dataPath + "/Textures";
 			
 			int asset_id = -1;
-			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_LoadOTLFile( path, textures_path, 
+			HAPI_Result status_code = (HAPI_Result) HAPI_LoadOTLFile( path, textures_path, 
 																			  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
 																			  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
 																			  ref asset_id );
 			processStatusCode( status_code );
 			
 			HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-			status_code = (HAPI_StatusCode) HAPI_GetAssetInfo( asset_id, ref asset_info );
+			status_code = (HAPI_Result) HAPI_GetAssetInfo( asset_id, ref asset_info );
 			processStatusCode( status_code );
 
 			Debug.Log( "Asset Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
@@ -129,7 +129,7 @@ namespace HAPI
 			asset_info.minVerticesPerPrimitive 	= HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE;
 			asset_info.maxVerticesPerPrimitive 	= HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 			
-			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_LoadHIPFile( path, textures_path, ref asset_info );
+			HAPI_Result status_code = (HAPI_Result) HAPI_LoadHIPFile( path, textures_path, ref asset_info );
 			
 			processStatusCode( status_code );
 			
@@ -143,11 +143,11 @@ namespace HAPI
 			initialize();
 			
 			int asset_id = -1;
-			HAPI_StatusCode status_code = (HAPI_StatusCode) HAPI_CreateCurve( ref asset_id );
+			HAPI_Result status_code = (HAPI_Result) HAPI_CreateCurve( ref asset_id );
 			processStatusCode( status_code );
 
 			HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-			status_code = (HAPI_StatusCode) HAPI_GetAssetInfo( asset_id, ref asset_info );
+			status_code = (HAPI_Result) HAPI_GetAssetInfo( asset_id, ref asset_info );
 			processStatusCode( status_code );
 			
 			Debug.Log( "Asset Loaded - Path: " + asset_info.instancePath + ", ID: " + asset_info.id );
@@ -173,7 +173,7 @@ namespace HAPI
 			
 			try
 			{
-				processStatusCode( (HAPI_StatusCode) result );
+				processStatusCode( (HAPI_Result) result );
 			}
 			catch ( HAPI_Error error ) 
 			{
@@ -193,12 +193,12 @@ namespace HAPI
 			{
 				Debug.Log( "Loading OTL: Creating New Scene" );
 
-				HAPI_StatusCode status_code;
-				status_code = (HAPI_StatusCode) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, 
+				HAPI_Result status_code;
+				status_code = (HAPI_Result) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, 
 																 otls_path,
 																 true, -1 );
 
-				if ( status_code != HAPI_StatusCode.HAPI_STATUS_ALREADY_INITIALIZED )
+				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
 
 				myHoudiniSceneExists = true;
@@ -208,19 +208,19 @@ namespace HAPI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
 		
-		private static bool hasCallFailed( HAPI_StatusCode code )
+		private static bool hasCallFailed( HAPI_Result code )
 		{
 			return ( (int) code > 0 );
 		}
 		
-		private static void processStatusCode( HAPI_StatusCode code )
+		private static void processStatusCode( HAPI_Result code )
 		{
 			if ( hasCallFailed( code ) )
 			{
-				int length = 4000;
-				HAPI_GetLastErrorStringLength( out length );
-				StringBuilder error_str = new StringBuilder( length );
-				HAPI_GetLastErrorString( error_str );
+				int buffer_size = 4000;
+				HAPI_GetStatusStringBufLength( (int) HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
+				StringBuilder error_str = new StringBuilder( buffer_size );
+				HAPI_GetStatusString( (int) HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
 				throw new HAPI_Error( error_str.ToString() );
 			}
 		}
