@@ -111,7 +111,10 @@ namespace HAPI
 		private static extern int HAPI_GetAssetInfo( int asset_id, ref HAPI_AssetInfo asset_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_CookAsset(			int asset_id );
+		private static extern int HAPI_CookAsset( int asset_id );
+
+		[DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl )]
+		private static extern int HAPI_Interrupt();
 
 		// HIP FILES ------------------------------------------------------------------------------------------------
 

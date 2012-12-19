@@ -254,6 +254,15 @@ namespace HAPI
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
+		/// <summary>
+		///		Interrupt a cook or load operation.
+		/// </summary>
+		public static void interrupt()
+		{
+			int status_code = HAPI_Interrupt();
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
 		// HIP FILES ------------------------------------------------------------------------------------------------------
 
 		/// <summary>	

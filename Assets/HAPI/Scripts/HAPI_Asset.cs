@@ -493,6 +493,7 @@ public class HAPI_Asset : MonoBehaviour
 		{
 			myProgressBarLastValue = -1;
 			myProgressBarLastMsg = "";
+			HAPI_Host.interrupt();
 			throw new HAPI_ErrorProgressCancelled();
 		}
 		else
@@ -504,7 +505,7 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public bool hasProgressBarBeenUsed()
 	{
-		return myProgressBarJustUsed;	
+		return myProgressBarJustUsed;
 	}
 	
 	protected void clearProgressBar()
