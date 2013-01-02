@@ -377,12 +377,22 @@ public class HAPI_AssetOTL : HAPI_Asset
 	private void instanceObjects( int object_id )
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
+		HAPI_Instancer instancer = null;
 		
-		GameObject main_object = new GameObject( object_info.name );
-		main_object.transform.parent = transform;
-		
-		main_object.AddComponent( "HAPI_Instancer" );		
-		HAPI_Instancer instancer = main_object.GetComponent< HAPI_Instancer >();
+		// Delete existing instanced objects.
+		Transform old_instancer_transform = transform.Find( object_info.name );
+		if ( old_instancer_transform && old_instancer_transform.gameObject.GetComponent< HAPI_Instancer >() )
+		{
+			instancer = old_instancer_transform.gameObject.GetComponent< HAPI_Instancer >();
+		}
+		else
+		{
+			GameObject main_object = new GameObject( object_info.name );
+			main_object.transform.parent = transform;
+
+			main_object.AddComponent( "HAPI_Instancer" );
+			instancer = main_object.GetComponent< HAPI_Instancer >();
+		}
 		
 		instancer.prAsset = this;
 		instancer.prObjectId = object_id;
