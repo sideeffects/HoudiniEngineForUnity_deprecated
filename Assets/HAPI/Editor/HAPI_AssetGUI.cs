@@ -34,11 +34,11 @@ public class HAPI_AssetGUI : Editor
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
 	}
-	
+
 	public override void OnInspectorGUI() 
 	{
-		myDelayBuild = false;
-		myParmChanges = false;
+		myDelayBuild	= false;
+		myParmChanges	= false;
 		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls

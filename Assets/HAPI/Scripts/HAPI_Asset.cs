@@ -393,13 +393,19 @@ public class HAPI_Asset : MonoBehaviour
 		
 		return true;
 	}
+
+	public virtual void Update()
+	{
+		int t = findParm( "t" );
+		if ( t < 0 )
+			return;
+
+
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected Methods
 	
-	/// <summary>
-	/// 	Recursively delete all children of this Unity asset.
-	/// </summary>
 	protected virtual void destroyChildren( Transform trans ) 
 	{
 		List< GameObject > children = new List< GameObject >();
@@ -411,6 +417,16 @@ public class HAPI_Asset : MonoBehaviour
 			DestroyImmediate( child );
 	}
 	
+	protected virtual int findParm( string name )
+	{
+		for ( int i = 0; i < prParms.Length; ++i )
+		{
+			if ( prParms[ i ].name == name )
+				return i;
+		}
+		return -1;
+	}
+
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
 	protected void statusCheckLoop()
