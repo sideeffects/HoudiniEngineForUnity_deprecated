@@ -113,8 +113,12 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_CookAsset( int asset_id );
 
-		[DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl )]
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Interrupt();
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetAssetTransform( int asset_id, 
+														  ref HAPI_TransformEuler transform );
 
 		// HIP FILES ------------------------------------------------------------------------------------------------
 

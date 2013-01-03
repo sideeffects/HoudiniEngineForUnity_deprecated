@@ -134,7 +134,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					xyzOrder = (HAPI_XYZOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}				
 				
-				HAPI_TransformEuler xform = new HAPI_TransformEuler( true );				
+				HAPI_TransformEuler xform = new HAPI_TransformEuler( true );
 				
 				// This bit is a little tricky.  We will eventually call Handle.PositionHandle
 				// or Handle.RotationHandle to display the translation and rotation handles.

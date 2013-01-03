@@ -379,7 +379,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		HAPI_Instancer instancer = null;
 		
-		// Delete existing instanced objects.
 		Transform old_instancer_transform = transform.Find( object_info.name );
 		if ( old_instancer_transform && old_instancer_transform.gameObject.GetComponent< HAPI_Instancer >() )
 		{
@@ -567,11 +566,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 				// Get transforms.
 				HAPI_Transform trans = prObjectTransforms[ object_id ];
 				
-				// Apply object transforms.		
+				// Apply object transforms.
 				//
 				// Axis and Rotation conversions:
 				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
-				// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
+				// rotation is right handed, whereas Unity is left handed. To account for this, we need to invert
 				// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
 				// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
 				// causes a double negative - yeah, I know).
@@ -589,7 +588,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				euler.y = -euler.y;
 				euler.z = -euler.z;
 				
-				main_child.transform.localRotation 	= Quaternion.Euler( euler );
+				main_child.transform.localRotation = Quaternion.Euler( euler );
 				main_child.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
 			}
 		}

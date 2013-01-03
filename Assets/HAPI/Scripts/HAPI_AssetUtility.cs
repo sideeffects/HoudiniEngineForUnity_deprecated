@@ -30,6 +30,59 @@ using HAPI;
 /// </summary>
 public class HAPI_AssetUtility
 {
+	// TRANSFORMS ------------------------------------------------------------------------------------------------------
+
+	public static Quaternion getQuaternion( Matrix4x4 m )
+	{
+		return Quaternion.LookRotation( m.GetColumn( 2 ), m.GetColumn( 1 ) );
+	}
+
+	public static Vector3 getPosition( Matrix4x4 m )
+	{
+		return m.GetColumn( 3 );
+	}
+
+	public static Vector3 getScale( Matrix4x4 m )
+	{
+		var x = Mathf.Sqrt( m.m00 * m.m00 + m.m01 * m.m01 + m.m02 * m.m02 );
+		var y = Mathf.Sqrt( m.m10 * m.m10 + m.m11 * m.m11 + m.m12 * m.m12 );
+		var z = Mathf.Sqrt( m.m20 * m.m20 + m.m21 * m.m21 + m.m22 * m.m22 );
+
+		return new Vector3( x, y, z );
+	}
+
+	public static HAPI_TransformEuler getHapiTransform( Matrix4x4 m )
+	{
+		Quaternion q = getQuaternion( m );
+		Vector3 p = getPosition( m );
+		Vector3 s = getScale( m );
+
+		// Adjust for the difference in handedness.
+		p.x = -p.x;
+		Vector3 r = q.eulerAngles;
+		r.y = -r.y;
+		r.z = -r.z;
+
+		HAPI_TransformEuler transform = new HAPI_TransformEuler( true );
+
+		transform.position[ 0 ] = p[ 0 ];
+		transform.position[ 1 ] = p[ 1 ];
+		transform.position[ 2 ] = p[ 2 ];
+
+		transform.rotationEuler[ 0 ] = r[ 0 ];
+		transform.rotationEuler[ 1 ] = r[ 1 ];
+		transform.rotationEuler[ 2 ] = r[ 2 ];
+
+		transform.scale[ 0 ] = s[ 0 ];
+		transform.scale[ 1 ] = s[ 1 ];
+		transform.scale[ 2 ] = s[ 2 ];
+
+		transform.rotationOrder = (int) HAPI_XYZOrder.ZXY;
+		transform.rstOrder = (int) HAPI_RSTOrder.SRT;
+
+		return transform;
+	}
+
 	// GET ----------------------------------------------------------------------------------------------------------
 	
 	public delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );

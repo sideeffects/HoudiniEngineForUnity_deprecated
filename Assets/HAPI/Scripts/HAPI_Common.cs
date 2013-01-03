@@ -36,7 +36,7 @@ namespace HAPI
 		public const int HAPI_SCALE_VECTOR_SIZE				= 3;
 		public const int HAPI_NORMAL_VECTOR_SIZE			= 3;
 		public const int HAPI_QUATERNION_VECTOR_SIZE		= 4;
-		public const int HAPI_EULER_VECTOR_SIZE				= 3;		
+		public const int HAPI_EULER_VECTOR_SIZE				= 3;
 		public const int HAPI_UV_VECTOR_SIZE				= 2;
 		public const int HAPI_COLOR_VECTOR_SIZE				= 4;
 
@@ -194,6 +194,14 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Transform 
 	{
+		public HAPI_Transform( int id_in )
+		{
+			id = id_in;
+			position = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			rotationQuaternion = new float[ HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE ];
+			scale = new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
+		}
+
 		public int id;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, 

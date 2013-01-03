@@ -263,9 +263,24 @@ namespace HAPI
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
+		/// <summary>
+		/// 	Set the transform of an asset to match the transform of the asset on the client side.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="transform">
+		/// 	The actual transform struct.
+		/// </param>
+		public static void setAssetTransform( int asset_id, ref HAPI_TransformEuler transform )
+		{
+			int status_code = HAPI_SetAssetTransform( asset_id, ref transform );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
 		// HIP FILES ------------------------------------------------------------------------------------------------------
 
-		/// <summary>	
+		/// <summary>
 		/// 	exports an asset into a hip file.
 		/// </summary>
 		///
@@ -281,7 +296,7 @@ namespace HAPI
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
-		/// <summary>	
+		/// <summary>
 		/// 	Replaces an asset in the current scene with the instance of
 		///		the same asset found in the hip file.
 		/// </summary>
