@@ -70,6 +70,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.prFullBuild = true;
 				myAssetCurve.build();
 			}
+
+			// Sync Asset Transform Toggle
+			{
+				bool value = myAsset.prSyncAssetTransform;
+				HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
+				myAsset.prSyncAssetTransform = value;
+			}
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////

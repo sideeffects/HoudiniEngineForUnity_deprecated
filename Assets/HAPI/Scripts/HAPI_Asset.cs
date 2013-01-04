@@ -98,6 +98,7 @@ public class HAPI_Asset : MonoBehaviour
 	public bool						prShowInputControls { get; set; }
 	public bool						prAutoSelectAssetNode { get; set; }
 	public bool						prEnableLogging { get; set; }
+	public bool						prSyncAssetTransform { get; set; }
 	
 	public int						prLastChangedParmId { get; set; }
 	
@@ -365,6 +366,7 @@ public class HAPI_Asset : MonoBehaviour
 		prShowInputControls 		= true;
 		prAutoSelectAssetNode 		= true;
 		prEnableLogging				= false;
+		prSyncAssetTransform		= true;
 		
 		prLastChangedParmId 		= -1;
 		
@@ -396,6 +398,9 @@ public class HAPI_Asset : MonoBehaviour
 
 	public virtual void Update()
 	{
+		if ( !prSyncAssetTransform )
+			return;
+
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
 		HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
 		HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );

@@ -123,6 +123,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
 				myAsset.prEnableLogging = value;
 			}
+
+			// Sync Asset Transform Toggle
+			{
+				bool value = myAsset.prSyncAssetTransform;
+				HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
+				myAsset.prSyncAssetTransform = value;
+			}
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
