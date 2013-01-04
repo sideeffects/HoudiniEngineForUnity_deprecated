@@ -317,6 +317,11 @@ public class HAPI_AssetCurve : HAPI_Asset
 				statusCheckLoop();
 			}
 			
+			// Set asset's transform.
+			HAPI_Transform hapi_transform;
+			HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, out hapi_transform );
+			Utility.applyTransform( hapi_transform, transform );
+
 			myProgressBarMsg = "Loading and composing objects...";
 			
 			// Clean up.

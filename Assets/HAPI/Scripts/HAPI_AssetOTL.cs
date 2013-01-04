@@ -297,6 +297,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 				statusCheckLoop();
 			}
+
+			// Set asset's transform.
+			HAPI_Transform hapi_transform;
+			HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, out hapi_transform );
+			Utility.applyTransform( hapi_transform, transform );
 			
 			myProgressBarMsg = "Loading and composing objects...";
 			
@@ -565,31 +570,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			{
 				// Get transforms.
 				HAPI_Transform trans = prObjectTransforms[ object_id ];
-				
-				// Apply object transforms.
-				//
-				// Axis and Rotation conversions:
-				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
-				// rotation is right handed, whereas Unity is left handed. To account for this, we need to invert
-				// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
-				// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
-				// causes a double negative - yeah, I know).
-				
-				main_child.transform.localPosition 	= new Vector3( -trans.position[ 0 ], 
-																	trans.position[ 1 ],
-																	trans.position[ 2 ] );
-				
-				Quaternion quat = new Quaternion(	trans.rotationQuaternion[ 0 ],
-													trans.rotationQuaternion[ 1 ],
-													trans.rotationQuaternion[ 2 ],
-													trans.rotationQuaternion[ 3 ] );
-				
-				Vector3 euler = quat.eulerAngles;
-				euler.y = -euler.y;
-				euler.z = -euler.z;
-				
-				main_child.transform.localRotation = Quaternion.Euler( euler );
-				main_child.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
+				Utility.applyTransform( trans, main_child.transform );
 			}
 		}
 		catch ( HAPI_Error error )

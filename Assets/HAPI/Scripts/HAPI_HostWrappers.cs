@@ -264,6 +264,25 @@ namespace HAPI
 		}
 
 		/// <summary>
+		/// 	Get the transform of an asset to match the transform of the asset on the client side.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="rst_order">
+		/// 	The order of application of translation, rotation and scale:
+		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
+		/// </param>
+		/// <param name="transform">
+		/// 	The actual transform struct.
+		/// </param>
+		public static void getAssetTransform( int asset_id, int rst_order, out HAPI_Transform transform )
+		{
+			int status_code = HAPI_GetAssetTransform( asset_id, rst_order, out transform );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
 		/// 	Set the transform of an asset to match the transform of the asset on the client side.
 		/// </summary>
 		/// <param name="asset_id">
@@ -643,8 +662,7 @@ namespace HAPI
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 		/// <param name="rst_order">
-		/// 	The order of application of translation, rotation and
-		/// 	scale:
+		/// 	The order of application of translation, rotation and scale:
 		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
 		/// </param>
 		/// <param name="transforms">
@@ -681,9 +699,8 @@ namespace HAPI
 		///			The geometry id.
 		///	</param>
 		/// <param name="rstOrder">
-		///			The order of application of translation, rotation and
-		///			scale:
-		///			TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5  
+		///			The order of application of translation, rotation and scale:
+		///			TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
 		/// </param>
 		/// <param="transforms">
 		///			Array of HAPI_Transform at least the size of

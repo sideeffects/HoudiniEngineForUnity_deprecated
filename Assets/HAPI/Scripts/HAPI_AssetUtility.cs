@@ -83,6 +83,35 @@ public class HAPI_AssetUtility
 		return transform;
 	}
 
+	public static void applyTransform( HAPI_Transform hapi_transform, Transform transform )
+	{
+		// Apply object transforms.
+		//
+		// Axis and Rotation conversions:
+		// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
+		// rotation is right handed, whereas Unity is left handed. To account for this, we need to invert
+		// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
+		// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
+		// causes a double negative - yeah, I know).
+				
+		transform.localPosition = new Vector3( -hapi_transform.position[ 0 ], 
+												hapi_transform.position[ 1 ],
+												hapi_transform.position[ 2 ] );
+		Quaternion quat = new Quaternion(		hapi_transform.rotationQuaternion[ 0 ],
+												hapi_transform.rotationQuaternion[ 1 ],
+												hapi_transform.rotationQuaternion[ 2 ],
+												hapi_transform.rotationQuaternion[ 3 ] );
+				
+		Vector3 euler = quat.eulerAngles;
+		euler.y = -euler.y;
+		euler.z = -euler.z;
+				
+		transform.localRotation = Quaternion.Euler( euler );
+		transform.localScale = new Vector3( hapi_transform.scale[ 0 ], 
+											hapi_transform.scale[ 1 ], 
+											hapi_transform.scale[ 2 ] );
+	}
+
 	// GET ----------------------------------------------------------------------------------------------------------
 	
 	public delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
