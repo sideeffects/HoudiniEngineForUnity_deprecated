@@ -54,33 +54,54 @@ public class HAPI_AssetUtility
 	public static HAPI_TransformEuler getHapiTransform( Matrix4x4 m )
 	{
 		Quaternion q = getQuaternion( m );
+		Vector3 r = q.eulerAngles;
+
 		Vector3 p = getPosition( m );
 		Vector3 s = getScale( m );
 
-		// Adjust for the difference in handedness.
-		p.x = -p.x;
-		Vector3 r = q.eulerAngles;
-		r.y = -r.y;
-		r.z = -r.z;
-
 		HAPI_TransformEuler transform = new HAPI_TransformEuler( true );
 
-		transform.position[ 0 ] = p[ 0 ];
-		transform.position[ 1 ] = p[ 1 ];
-		transform.position[ 2 ] = p[ 2 ];
+		transform.position[ 0 ] = -p[ 0 ];
+		transform.position[ 1 ] =  p[ 1 ];
+		transform.position[ 2 ] =  p[ 2 ];
 
-		transform.rotationEuler[ 0 ] = r[ 0 ];
-		transform.rotationEuler[ 1 ] = r[ 1 ];
-		transform.rotationEuler[ 2 ] = r[ 2 ];
+		transform.rotationEuler[ 0 ] =  r[ 0 ];
+		transform.rotationEuler[ 1 ] = -r[ 1 ];
+		transform.rotationEuler[ 2 ] = -r[ 2 ];
 
 		transform.scale[ 0 ] = s[ 0 ];
 		transform.scale[ 1 ] = s[ 1 ];
 		transform.scale[ 2 ] = s[ 2 ];
 
-		transform.rotationOrder = (int) HAPI_XYZOrder.ZXY;
-		transform.rstOrder = (int) HAPI_RSTOrder.SRT;
+		transform.rotationOrder		= (int) HAPI_XYZOrder.ZXY;
+		transform.rstOrder			= (int) HAPI_RSTOrder.SRT;
 
 		return transform;
+	}
+
+	public static void applyTransform( HAPI_TransformEuler hapi_transform, Transform transform )
+	{
+		// Apply object transforms.
+		//
+		// Axis and Rotation conversions:
+		// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
+		// rotation is right handed, whereas Unity is left handed. To account for this, we need to invert
+		// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
+		// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
+		// causes a double negative - yeah, I know).
+				
+		transform.localPosition = new Vector3( -hapi_transform.position[ 0 ], 
+												hapi_transform.position[ 1 ],
+												hapi_transform.position[ 2 ] );
+
+		Quaternion quat = Quaternion.Euler( new Vector3(  hapi_transform.rotationEuler[ 0 ],
+														 -hapi_transform.rotationEuler[ 1 ],
+														 -hapi_transform.rotationEuler[ 2 ] ) );
+
+		transform.localRotation = quat;
+		transform.localScale = new Vector3( hapi_transform.scale[ 0 ], 
+											hapi_transform.scale[ 1 ], 
+											hapi_transform.scale[ 2 ] );
 	}
 
 	public static void applyTransform( HAPI_Transform hapi_transform, Transform transform )

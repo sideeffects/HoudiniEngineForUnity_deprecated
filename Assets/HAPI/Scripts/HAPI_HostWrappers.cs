@@ -273,12 +273,16 @@ namespace HAPI
 		/// 	The order of application of translation, rotation and scale:
 		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
 		/// </param>
+		///	<param name="rot_order">
+		/// 	The desired rotation order of the output.
+		/// 	XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
+		/// </param>
 		/// <param name="transform">
 		/// 	The actual transform struct.
 		/// </param>
-		public static void getAssetTransform( int asset_id, int rst_order, out HAPI_Transform transform )
+		public static void getAssetTransform( int asset_id, int rst_order, int rot_order, out HAPI_TransformEuler transform )
 		{
-			int status_code = HAPI_GetAssetTransform( asset_id, rst_order, out transform );
+			int status_code = HAPI_GetAssetTransform( asset_id, rst_order, rot_order, out transform );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 

@@ -117,8 +117,8 @@ namespace HAPI
 		private static extern int HAPI_Interrupt();
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAssetTransform( int asset_id, int rst_order,
-														  out HAPI_Transform transform );
+		private static extern int HAPI_GetAssetTransform( int asset_id, int rst_order, int rot_order,
+														  out HAPI_TransformEuler transform );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetAssetTransform( int asset_id, 

@@ -301,8 +301,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 			// Set asset's transform.
 			if ( prSyncAssetTransform )
 			{
-				HAPI_Transform hapi_transform;
-				HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, out hapi_transform );
+				HAPI_TransformEuler hapi_transform;
+				HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, 
+											 (int) HAPI_XYZOrder.ZXY, out hapi_transform );
 				Utility.applyTransform( hapi_transform, transform );
 			}
 			
