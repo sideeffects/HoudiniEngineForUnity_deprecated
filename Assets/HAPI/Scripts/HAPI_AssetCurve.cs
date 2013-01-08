@@ -364,7 +364,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		}
 		catch ( System.Exception error )
 		{
-			Debug.LogError( error.ToString() );	
+			Debug.LogError( error.ToString() );
 		}
 		finally
 		{

@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using HAPI;
 
+[ ExecuteInEditMode ]
 [ CustomEditor( typeof( HAPI_AssetCurve ) ) ]
 public class HAPI_AssetGUICurve : HAPI_AssetGUI 
 {
@@ -34,6 +35,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myAssetCurve = target as HAPI_AssetCurve;
 		
 		myCurrentlyActivePoint = -1;
+
+		myIsAddingPoints = false;
+		myAddPointButtonLabel = "Add Points";
 		
 		if ( GUI.changed )
 			myAssetCurve.build();
@@ -43,7 +47,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	{
 		if ( myAssetCurve == null )
 			return;
-
+		
 		myParmChanges = false;
 		
 		base.OnInspectorGUI();
@@ -67,6 +71,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		{	
 			if ( GUILayout.Button( "Rebuild" ) ) 
 			{
+				myIsAddingPoints = false;
 				myAssetCurve.prFullBuild = true;
 				myAssetCurve.build();
 			}
@@ -89,9 +94,19 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myDelayBuild = false;
 		if ( myAssetCurve.prShowAssetControls )
 		{
-			if ( GUILayout.Button( "Add Point" ) )
-				myAssetCurve.addPoint( Vector3.left ); // Don't set to zero as that's where the center asset gizmo is.
+			if ( GUILayout.Button( myAddPointButtonLabel ) )
+			{
+				//myAssetCurve.addPoint( Vector3.left ); // Don't set to zero as that's where the center asset gizmo is.
+				myIsAddingPoints = !myIsAddingPoints;
+				if ( myIsAddingPoints )
+					myAddPointButtonLabel = "Stop Adding Points";
+				else
+					myAddPointButtonLabel = "Add Points";
+			}
+
+			GUI.enabled = !myIsAddingPoints;
 			myParmChanges |= generateAssetControls();
+			GUI.enabled = true;
 		}
 
 		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
@@ -120,7 +135,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	
 	public void OnSceneGUI() 
 	{
-		if ( myAssetCurve == null || myAssetCurve.prMainChild == null )
+		if ( myAssetCurve == null )
 			return;
 
 		Event current_event 		= Event.current;
@@ -133,8 +148,37 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myAssetCurve.buildDummyMesh();
 
 		// Set appropriate handles matrix.
-		Handles.matrix = myAssetCurve.prMainChild.transform.localToWorldMatrix;
-		
+		Handles.matrix = myAssetCurve.transform.localToWorldMatrix;
+
+		// Add points.
+		if ( myIsAddingPoints && !current_event.alt )
+		{
+			Vector3 position	= Vector3.zero;
+			float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
+			bool buttonPress 	= Handles.Button( 	position, 
+													Quaternion.LookRotation( Camera.current.transform.position - position ),
+													handle_size,
+													handle_size,
+													Handles.RectangleCap );
+
+			if ( buttonPress )
+			{
+				Vector3 mouse_position = current_event.mousePosition;
+				mouse_position.y = Screen.height - mouse_position.y;
+				Ray ray = Camera.current.ScreenPointToRay( mouse_position );
+				Plane plane = new Plane();
+				plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
+				float enter = 0.0f;
+				plane.Raycast( ray, out enter );
+ 				Vector3 intersection = ray.origin + ray.direction * enter;
+				
+				myAssetCurve.addPoint( intersection );
+
+				Debug.Log( "Click" );
+			}
+		}
+
+		// Draw current curve.
 		Vector3[] vertices = myAssetCurve.prVertices;
 		for ( int i = 0; vertices != null && i < vertices.Length; ++i )
 		{
@@ -148,7 +192,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 			previous_position = position;
 		}
-			
+		
+		// Determine which control point was pressed for modification.
 		for ( int i = 0; i < point_count; ++i ) 
 		{
 			Vector3 position 	= myAssetCurve.prPoints[ i ];
@@ -156,10 +201,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			
 			Handles.color 		= Color.cyan;
 			bool buttonPress 	= Handles.Button( 	position, 
-													Quaternion.LookRotation( Camera.current.transform.position ),
+													Quaternion.LookRotation( Camera.current.transform.position - position ),
 													handle_size,
 													handle_size,
-													Handles.CircleCap );
+													Handles.RectangleCap );
 			
 			if ( buttonPress )
 				pressed_point_index = i;
@@ -175,9 +220,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			previous_position = position;
 		}
 		
+		// Set active control point.
 		if ( pressed_point_index >= 0 )
 			myCurrentlyActivePoint = pressed_point_index;
-		
+
+		// Update active control point.
 		if ( myCurrentlyActivePoint >= 0 ) 
 		{
 			Vector3 old_position = myAssetCurve.prPoints[ myCurrentlyActivePoint ];
@@ -188,8 +235,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.updatePoint( myCurrentlyActivePoint, new_position );
 		}
 		
+		// Deactivate all control points.
 		if ( current_event.isKey && current_event.keyCode == KeyCode.Escape )
+		{
 			myCurrentlyActivePoint = -1;
+			myIsAddingPoints = false;
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -517,4 +568,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 	private HAPI_AssetCurve	myAssetCurve;
 	private int 			myCurrentlyActivePoint;
+	private bool			myIsAddingPoints;
+	private string			myAddPointButtonLabel;
 }
