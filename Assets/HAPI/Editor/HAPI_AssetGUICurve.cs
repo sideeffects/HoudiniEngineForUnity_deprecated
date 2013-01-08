@@ -38,6 +38,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		myIsAddingPoints = false;
 		myAddPointButtonLabel = "Add Points";
+		myTarget = null;
 		
 		if ( GUI.changed )
 			myAssetCurve.build();
@@ -105,7 +106,14 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			}
 
 			GUI.enabled = !myIsAddingPoints;
+
+			Object target = (Object) myTarget;
+			if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
+			{
+				myTarget = (GameObject) target;
+			}
 			myParmChanges |= generateAssetControls();
+			
 			GUI.enabled = true;
 		}
 
@@ -166,11 +174,24 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				Vector3 mouse_position = current_event.mousePosition;
 				mouse_position.y = Screen.height - mouse_position.y;
 				Ray ray = Camera.current.ScreenPointToRay( mouse_position );
-				Plane plane = new Plane();
-				plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
-				float enter = 0.0f;
-				plane.Raycast( ray, out enter );
- 				Vector3 intersection = ray.origin + ray.direction * enter;
+
+				Vector3 intersection = new Vector3();
+
+				if ( myTarget == null )
+				{
+					Plane plane = new Plane();
+					plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
+					float enter = 0.0f;
+					plane.Raycast( ray, out enter );
+ 					intersection = ray.origin + ray.direction * enter;
+				}
+				else if ( myTarget.GetComponent< MeshCollider >() )
+				{
+					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
+					RaycastHit hit_info;
+					collider.Raycast( ray, out hit_info, 1000.0f );
+					intersection = hit_info.point;
+				}
 				
 				myAssetCurve.addPoint( intersection );
 
@@ -570,4 +591,5 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	private int 			myCurrentlyActivePoint;
 	private bool			myIsAddingPoints;
 	private string			myAddPointButtonLabel;
+	private GameObject		myTarget;
 }
