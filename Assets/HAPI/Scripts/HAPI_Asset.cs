@@ -376,13 +376,7 @@ public class HAPI_Asset : MonoBehaviour
 		prFolderListSelectionIds.Add( -1 );
 		
 		myProgressBarJustUsed 		= false;
-		myProgressBarTotal			= 0;
-		myProgressBarCurrent		= 0;
-		myProgressBarTitle			= "Building Houdini Asset";
-		myProgressBarMsg			= "";
-
-		myProgressBarLastValue		= -1;
-		myProgressBarLastMsg		= "";
+				
 	}
 	
 	public virtual bool build() 
@@ -455,122 +449,15 @@ public class HAPI_Asset : MonoBehaviour
 				return i;
 		}
 		return -1;
-	}
-
+	}	
+	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
-	
-	protected void statusCheckLoop()
-	{
-		HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
-		myProgressBarCurrent = 0;
-		myProgressBarTotal = 100;
-		while ( state != HAPI_State.HAPI_STATE_READY )
-		{
-			state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
-
-			if ( state == HAPI_State.HAPI_STATE_COOKING )
-			{
-				myProgressBarCurrent = HAPI_Host.getCookingCurrentCount();
-				myProgressBarTotal = HAPI_Host.getCookingTotalCount();
-			}
-			else
-			{
-				myProgressBarCurrent = ( System.DateTime.Now - myProgressBarStartTime ).Seconds;
-				myProgressBarTotal = 100;
-			}
-
-			myProgressBarMsg = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
-			displayProgressBar();
-		}
-	}
-
-	protected void incrementProgressBar()
-	{
-		incrementProgressBar( 1 );
-	}
-
-	protected void incrementProgressBar( int increment )
-	{
-		myProgressBarCurrent += increment;
-		displayProgressBar( myProgressBarCurrent );
-	}
-	
-	protected void displayProgressBar()
-	{
-		displayProgressBar( myProgressBarCurrent );
-	}
-
-	protected void displayProgressBar( int value )
-	{
-		// If there are no changes to the progress bar value or message don't re-display it again.
-		if ( value == myProgressBarLastValue && myProgressBarMsg == myProgressBarLastMsg )
-			return;
-
-		System.DateTime current = System.DateTime.Now;
-		System.TimeSpan delta = current - myProgressBarStartTime;
-		
-		// This delay for displaying the progress bar is so the bar won't flicker for really quick updates
-		// (less than a few seconds). Also, when we do show the progress bar the focus of the current 
-		// inspector control is lost.
-		if ( delta.TotalSeconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
-		{
-			EditorUtility.ClearProgressBar();
-			return;
-		}
-		
-		myProgressBarJustUsed = true;
-		
-		myProgressBarCurrent = value;
-		string message = "";
-		if ( delta.Hours > 0 )
-			message = delta.Hours + "h " + delta.Minutes + "m " + delta.Seconds + "s - " + myProgressBarMsg;
-		else if ( delta.Minutes > 0 )
-			message = delta.Minutes + "m " + delta.Seconds + "s - " + myProgressBarMsg;
-		else if ( delta.Seconds > 0 )
-			message = delta.Seconds + "s - " + myProgressBarMsg;
-		else
-			message = myProgressBarMsg;
-
-		bool result = 
-			!EditorUtility.DisplayCancelableProgressBar( 
-				myProgressBarTitle, message, Mathf.InverseLerp( 0, myProgressBarTotal, myProgressBarCurrent ) );
-		
-		if ( !result )
-		{
-			myProgressBarLastValue = -1;
-			myProgressBarLastMsg = "";
-			HAPI_Host.interrupt();
-			throw new HAPI_ErrorProgressCancelled();
-		}
-		else
-		{
-			myProgressBarLastValue = value;
-			myProgressBarLastMsg = myProgressBarMsg;
-		}
-	}
-	
 	public bool hasProgressBarBeenUsed()
 	{
 		return myProgressBarJustUsed;
 	}
 	
-	protected void clearProgressBar()
-	{
-		myProgressBarJustUsed = false;
-		myProgressBarCurrent = 0;
-		EditorUtility.ClearProgressBar();
-	}
-	
 	protected bool				myProgressBarJustUsed;
-	protected System.DateTime	myProgressBarStartTime;
-	protected int				myProgressBarTotal; // Used for the progress bar.
-	protected int				myProgressBarCurrent;
-	protected string			myProgressBarTitle;
-	protected string			myProgressBarMsg;
-	
-	// Used to reduce the update frequency of the progress bar so it doesn't flicker.
-	private int					myProgressBarLastValue;
-	private string				myProgressBarLastMsg;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data

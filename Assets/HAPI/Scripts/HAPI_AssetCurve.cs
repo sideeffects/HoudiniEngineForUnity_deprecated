@@ -140,9 +140,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 		if ( !base_built )
 			return false;
 		
+		HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
 		try
 		{
-			myProgressBarStartTime = System.DateTime.Now;
+			progressBar.prProgressBarStartTime = System.DateTime.Now;
 			
 			if ( prFullBuild )
 			{
@@ -152,7 +153,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 				{
 					int asset_id = HAPI_Host.createCurve();
 
-					statusCheckLoop();
+					progressBar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
 					Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
@@ -185,8 +186,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 				prObjectCount 			= prAssetInfo.objectCount;
 				prHandleCount 			= prAssetInfo.handleCount;
 				
-				myProgressBarCurrent	= 0;
-				myProgressBarTotal		= prParmCount
+				progressBar.prProgressBarCurrent	= 0;
+				progressBar.prProgressBarTotal		= prParmCount
 										  + prParmIntValueCount
 										  + prParmFloatValueCount
 										  + prParmStringValueCount
@@ -209,37 +210,38 @@ public class HAPI_AssetCurve : HAPI_Asset
 					Debug.LogWarning( "Unable to load presets." );	
 				}
 				
-				displayProgressBar();
+				progressBar.displayProgressBar();
+				myProgressBarJustUsed = true;
 				
-				myProgressBarMsg = "Loading parameter information...";
+				progressBar.prProgressBarMsg = "Loading parameter information...";
 				
 				// Get all parameters.
 				prParms = new HAPI_ParmInfo[ prParmCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
-				incrementProgressBar( prParmCount );
+				progressBar.incrementProgressBar( prParmCount );
 				
 				// Get parameter int values.
 				prParmIntValues = new int[ prParmIntValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
-				incrementProgressBar( prParmIntValueCount );
+				progressBar.incrementProgressBar( prParmIntValueCount );
 				
 				// Get parameter float values.
 				prParmFloatValues = new float[ prParmFloatValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
-				incrementProgressBar( prParmFloatValueCount );
+				progressBar.incrementProgressBar( prParmFloatValueCount );
 				
 				// Get parameter string (handle) values.
 				prParmStringValues = new int[ prParmStringValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
 									 prParmStringValueCount );
-				incrementProgressBar( prParmStringValueCount );
+				progressBar.incrementProgressBar( prParmStringValueCount );
 				
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-				incrementProgressBar( prParmChoiceCount );
+				progressBar.incrementProgressBar( prParmChoiceCount );
 				
-				myProgressBarMsg = "Loading handles...";
+				progressBar.prProgressBarMsg = "Loading handles...";
 				
 				// Add input fields.
 				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
@@ -308,13 +310,14 @@ public class HAPI_AssetCurve : HAPI_Asset
 			}
 			else
 			{
-				displayProgressBar();
+				progressBar.displayProgressBar();
+				myProgressBarJustUsed = true;
 				
-				myProgressBarTotal = prObjectCount;
+				progressBar.prProgressBarTotal = prObjectCount;
 
 				HAPI_Host.cookAsset( prAssetId );
 
-				statusCheckLoop();
+				progressBar.statusCheckLoop();
 			}
 			
 			// Set asset's transform.
@@ -326,7 +329,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 				Utility.applyTransform( hapi_transform, transform );
 			}
 
-			myProgressBarMsg = "Loading and composing objects...";
+			progressBar.prProgressBarMsg = "Loading and composing objects...";
 			
 			// Clean up.
 			destroyChildren( transform );
@@ -368,7 +371,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 		}
 		finally
 		{
-			clearProgressBar();
+			progressBar.clearProgressBar();
+			myProgressBarJustUsed = false;
 		}
 		
 		return true;
