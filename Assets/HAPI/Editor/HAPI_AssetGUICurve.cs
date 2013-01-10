@@ -53,11 +53,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		
 		base.OnInspectorGUI();
 		
-		bool isMouseUp = false;
 		Event curr_event = Event.current;
-		if ( curr_event.isMouse && curr_event.type == EventType.MouseUp )
-			isMouseUp = true;
-		
 		bool commitChanges = false;
 		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
 			commitChanges = true;
@@ -74,6 +70,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			{
 				myIsAddingPoints = false;
 				myAssetCurve.prFullBuild = true;
+				myAssetCurve.build();
+
+				myAssetCurve.syncPointsWithParm();
 				myAssetCurve.build();
 			}
 
@@ -122,23 +121,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myAssetCurve.syncPointsWithParm();
 			myAssetCurve.build();
 			myUnbuiltChanges = false;
+			
+			myAssetCurve.savePreset();
 		}
 		else if ( myParmChanges )
 			myUnbuiltChanges = true;
-		
-		if ( isMouseUp || commitChanges )
-		{
-			try
-			{
-				int bufLength = 0;
-				HAPI_Host.getPreset( myAssetCurve.prAssetId, myAssetCurve.prPreset, ref bufLength );
-				
-				myAssetCurve.prPreset = new byte[ bufLength ];
-				
-				HAPI_Host.getPreset( myAssetCurve.prAssetId, myAssetCurve.prPreset, ref bufLength );
-			}
-			catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
-		}
 	}
 	
 	public void OnSceneGUI() 
@@ -163,13 +150,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		{
 			Vector3 position	= Vector3.zero;
 			float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
-			bool buttonPress 	= Handles.Button( 	position, 
-													Quaternion.LookRotation( Camera.current.transform.position - position ),
+			bool button_press 	= Handles.Button( 	position, 
+													HAPI_AssetUtility.getQuaternion( Camera.current.transform.localToWorldMatrix ),
 													handle_size,
 													handle_size,
 													Handles.RectangleCap );
 
-			if ( buttonPress )
+			if ( button_press )
 			{
 				Vector3 mouse_position = current_event.mousePosition;
 				
@@ -181,7 +168,14 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 				Vector3 intersection = new Vector3();
 
-				if ( myTarget == null )
+				if ( myTarget != null && myTarget.GetComponent< MeshCollider >() )
+				{
+					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
+					RaycastHit hit_info;
+					collider.Raycast( ray, out hit_info, 1000.0f );
+					intersection = hit_info.point;
+				}
+				else
 				{
 					Plane plane = new Plane();
 					plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
@@ -189,17 +183,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					plane.Raycast( ray, out enter );
  					intersection = ray.origin + ray.direction * enter;
 				}
-				else if ( myTarget.GetComponent< MeshCollider >() )
-				{
-					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
-					RaycastHit hit_info;
-					collider.Raycast( ray, out hit_info, 1000.0f );
-					intersection = hit_info.point;
-				}
 				
 				myAssetCurve.addPoint( intersection );
-
-				Debug.Log( "Click" );
 			}
 		}
 
@@ -222,11 +207,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		for ( int i = 0; i < point_count; ++i ) 
 		{
 			Vector3 position 	= myAssetCurve.prPoints[ i ];
-			float handle_size 	= HandleUtility.GetHandleSize( position ) * 0.2f;
+			float handle_size 	= HandleUtility.GetHandleSize( position ) * 0.06f;
 			
 			Handles.color 		= Color.cyan;
 			bool buttonPress 	= Handles.Button( 	position, 
-													Quaternion.LookRotation( Camera.current.transform.position - position ),
+													HAPI_AssetUtility.getQuaternion( Camera.current.transform.localToWorldMatrix ),
 													handle_size,
 													handle_size,
 													Handles.RectangleCap );
@@ -591,9 +576,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		return changed;
 	}
 
+	[SerializeField]
 	private HAPI_AssetCurve	myAssetCurve;
+
 	private int 			myCurrentlyActivePoint;
 	private bool			myIsAddingPoints;
 	private string			myAddPointButtonLabel;
+
+	[SerializeField]
 	private GameObject		myTarget;
 }

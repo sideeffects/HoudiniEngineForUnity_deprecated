@@ -426,6 +426,37 @@ public class HAPI_Asset : MonoBehaviour
 				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
 		}
 	}
+
+	public void loadPreset()
+	{
+		try
+		{
+			if ( myPreset != null && myPreset.Length > 0 && prUnloadAssetInFullBuild )
+				HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
+		}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogWarning( error.ToString() );
+		}
+		catch
+		{
+			Debug.LogWarning( "Unable to load presets." );
+		}
+	}
+
+	public void savePreset()
+	{
+		try
+		{
+			int buf_length = 0;
+			HAPI_Host.getPreset( prAssetId, myPreset, ref buf_length );
+				
+			myPreset = new byte[ buf_length ];
+				
+			HAPI_Host.getPreset( prAssetId, myPreset, ref buf_length );
+		}
+		catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected Methods
@@ -449,9 +480,10 @@ public class HAPI_Asset : MonoBehaviour
 				return i;
 		}
 		return -1;
-	}	
+	}
 	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
+	
 	public bool hasProgressBarBeenUsed()
 	{
 		return myProgressBarJustUsed;

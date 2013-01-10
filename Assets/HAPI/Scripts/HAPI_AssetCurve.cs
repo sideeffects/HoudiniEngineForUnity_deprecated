@@ -87,15 +87,19 @@ public class HAPI_AssetCurve : HAPI_Asset
 		HAPI_Host.setParmStringValue( prAssetId, parm, 2, 0 );
 		
 		build();
+
+		savePreset();
 	}
 
 	public void syncPointsWithParm()
 	{
 		// Find the parm.
-		string point_list = null;
-		for ( int i = 0; i < prParmCount; ++i )
-			if ( prParms[ i ].name == "coords" )
-				point_list = HAPI_Host.getString( prParmStringValues[ prParms[ i ].stringValuesIndex ] );
+		int coords_parm_id = findParm( "coords" );
+		if ( coords_parm_id < 0 )
+			return;
+
+		string point_list = 
+			HAPI_Host.getString( prParmStringValues[ prParms[ coords_parm_id ].stringValuesIndex ] );
 
 		if ( point_list == null )
 			return;
@@ -115,8 +119,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 				Vector3 vec = new Vector3();
 
 				vec.x = (float) -System.Convert.ToDouble( vec_split [ 0 ] );
-				vec.y = (float) System.Convert.ToDouble( vec_split [ 1 ] );
-				vec.z = (float) System.Convert.ToDouble( vec_split [ 2 ] );
+				vec.y = (float)  System.Convert.ToDouble( vec_split [ 1 ] );
+				vec.z = (float)  System.Convert.ToDouble( vec_split [ 2 ] );
 
 				prPoints.Add( vec );
 			}
@@ -141,6 +145,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			return false;
 		
 		HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
+
 		try
 		{
 			progressBar.prProgressBarStartTime = System.DateTime.Now;
@@ -196,19 +201,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 										  + prHandleCount;
 				
 				// Try to load presets.
-				try
-				{
-					if ( myPreset != null && myPreset.Length > 0 )
-						HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
-				}
-				catch ( HAPI_Error error )
-				{
-					Debug.LogWarning( error.ToString() );	
-				}
-				catch
-				{
-					Debug.LogWarning( "Unable to load presets." );	
-				}
+				loadPreset();
 				
 				progressBar.displayProgressBar();
 				myProgressBarJustUsed = true;

@@ -41,11 +41,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		base.OnInspectorGUI();
 		
-		bool isMouseUp = false;
 		Event curr_event = Event.current;
-		if ( curr_event.isMouse && curr_event.type == EventType.MouseUp )
-			isMouseUp = true;
-		
 		bool commitChanges = false;
 		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
 			commitChanges = true;
@@ -101,7 +97,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				}
 				
 			} 
-			EditorGUILayout.EndHorizontal();			
+			EditorGUILayout.EndHorizontal();
 			
 			string path = myAssetOTL.prAssetPath;
 			myParmChanges |= HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
@@ -147,23 +143,11 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			myAssetOTL.build();
 			myUnbuiltChanges = false;
 			myParmChanges = false;
+
+			myAssetOTL.savePreset();
 		}
 		else if ( myParmChanges )
 			myUnbuiltChanges = true;
-		
-		if ( isMouseUp || commitChanges )
-		{
-			try
-			{
-				int bufLength = 0;
-				HAPI_Host.getPreset( myAssetOTL.prAssetId, myAssetOTL.prPreset, ref bufLength );
-				
-				myAssetOTL.prPreset = new byte[ bufLength ];
-				
-				HAPI_Host.getPreset( myAssetOTL.prAssetId, myAssetOTL.prPreset, ref bufLength );
-			}
-			catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
-		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

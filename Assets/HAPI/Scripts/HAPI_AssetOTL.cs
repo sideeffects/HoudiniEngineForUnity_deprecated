@@ -147,19 +147,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 													  + prHandleCount;
 				
 				// Try to load presets.
-				try
-				{
-					if ( myPreset != null && myPreset.Length > 0 && prUnloadAssetInFullBuild )
-						HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
-				}
-				catch ( HAPI_Error error )
-				{
-					Debug.LogWarning( error.ToString() );	
-				}
-				catch
-				{
-					Debug.LogWarning( "Unable to load presets." );	
-				}
+				loadPreset();
 				
 				progressBar.displayProgressBar();
 				myProgressBarJustUsed = true;
