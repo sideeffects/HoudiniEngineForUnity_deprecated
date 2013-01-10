@@ -172,8 +172,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			if ( buttonPress )
 			{
 				Vector3 mouse_position = current_event.mousePosition;
-				mouse_position.y = Screen.height - mouse_position.y;
+				
+				// Camera.current.pixelHeight != Screen.height for some reason.
+				mouse_position.y = Camera.current.pixelHeight - mouse_position.y;
+				
 				Ray ray = Camera.current.ScreenPointToRay( mouse_position );
+				ray.origin = Camera.current.transform.position;
 
 				Vector3 intersection = new Vector3();
 
