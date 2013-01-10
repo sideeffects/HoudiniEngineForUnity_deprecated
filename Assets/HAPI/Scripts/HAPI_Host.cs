@@ -98,23 +98,31 @@ namespace HAPI
 		}
 		
 		
-		public static int loadHip( string path ) 
+		public static void loadHip( string path ) 
 		{
 			initialize();
 			
 			string textures_path = Application.dataPath + "/Textures";
-							
+																
+			HAPI_Result status_code = (HAPI_Result) HAPI_LoadHIPFile( path, textures_path, 
+																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
+																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE );
+			
+			processStatusCode( status_code );						
+						
+		}
+		
+		public static int getAssetCountFromLoadHip() 
+		{
 			
 			int num_assets = 0;
 			
-			HAPI_Result status_code = (HAPI_Result) HAPI_LoadHIPFile( path, textures_path, 
-																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
-																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
-																	  ref num_assets );
+			HAPI_Result status_code = (HAPI_Result) HAPI_GetAssetCountFromLoadHIPFile( ref num_assets );
 			
-			processStatusCode( status_code );						
+			processStatusCode( status_code );
 			
 			return num_assets;
+						
 		}
 		
 		public static void getAssetIdsFromLoadHIPFile( int [] assetIds )

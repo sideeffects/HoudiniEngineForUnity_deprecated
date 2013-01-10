@@ -50,7 +50,17 @@ public class HAPI_GUIUtility : Editor
 		if ( file_path.Length <= 0 )
 			return;			
 		
-		int num_assets = HAPI_Host.loadHip( file_path );
+		HAPI_Host.loadHip( file_path );
+		
+		HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
+		
+		while ( state != HAPI_State.HAPI_STATE_READY )
+		{
+			state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+			
+		}
+		
+		int num_assets = HAPI_Host.getAssetCountFromLoadHip();
 		
 		int [] asset_ids = new int[ num_assets ];
 		HAPI_Host.getAssetIdsFromLoadHIPFile( asset_ids );
