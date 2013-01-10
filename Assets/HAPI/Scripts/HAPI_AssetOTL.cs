@@ -101,7 +101,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 					if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL )
 						asset_id = HAPI_Host.loadOTL( prAssetPath );
 					else if ( prAssetType == HAPI_Asset.AssetType.TYPE_HIP )
-						asset_id = HAPI_Host.loadHip( prAssetPath );
+						asset_id = prAssetId;
 
 					statusCheckLoop();
 

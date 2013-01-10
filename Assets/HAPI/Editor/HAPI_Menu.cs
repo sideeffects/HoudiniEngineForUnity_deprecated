@@ -41,7 +41,7 @@ public class HAPI_Menu : MonoBehaviour
 	[ MenuItem( "HAPI/Load Hip File..." ) ]
 	static private void loadHipFile() 
 	{
-		string hip_file_path = HAPI_GUIUtility.promptForOTLPath();
+		string hip_file_path = HAPI_GUIUtility.promptForHIPPath();
 		HAPI_GUIUtility.loadHipFile( hip_file_path );
 	}
 	

@@ -129,7 +129,13 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_LoadHIPFile( string file_name,
 													string textures_path,
-													ref HAPI_AssetInfo asset_info );
+													int min_vertices_per_primitive,
+													int max_vertices_per_primitive,			
+													ref int num_assets );
+		
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAssetIdsFromLoadHIPFile( [Out] int[] asset_ids );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SaveHIPFile( string file_name );
