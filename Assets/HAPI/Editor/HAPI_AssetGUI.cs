@@ -37,73 +37,81 @@ public class HAPI_AssetGUI : Editor
 
 	public override void OnInspectorGUI() 
 	{
-		myDelayBuild	= false;
-		myParmChanges	= false;
-		
-		///////////////////////////////////////////////////////////////////////
-		// Draw Game Object Controls
-		
-		if ( myAsset.prMaxInputCount > 0 || myAsset.prMaxGeoInputCount > 0 )
+		try
 		{
-			myAsset.prShowInputControls = 
-				EditorGUILayout.Foldout( myAsset.prShowInputControls, new GUIContent( "Inputs" ) );
-			
-			if ( myAsset.prShowInputControls )
+
+			myDelayBuild	= false;
+			myParmChanges	= false;
+		
+			///////////////////////////////////////////////////////////////////////
+			// Draw Game Object Controls
+		
+			if ( myAsset.prMaxInputCount > 0 || myAsset.prMaxGeoInputCount > 0 )
 			{
-				if ( myAsset.prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-					for ( int ii = 0; ii < myAsset.prMaxInputCount; ++ii )
-						myParmChanges |= setTransformInput( ii );
-				
-				for ( int ii = 0; ii < myAsset.prMaxGeoInputCount; ++ii )
+				myAsset.prShowInputControls = 
+					EditorGUILayout.Foldout( myAsset.prShowInputControls, new GUIContent( "Inputs" ) );
+			
+				if ( myAsset.prShowInputControls )
 				{
-					HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + ii, "Geometry Input " + ii );
-					Object obj = (Object) myAsset.prUpStreamGeoObjects[ ii ];
-					myParmChanges |= HAPI_GUI.objectField( ref geo_input, ref obj, typeof( GameObject ) );
-					
-					if ( myParmChanges )
+					if ( myAsset.prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+						for ( int ii = 0; ii < myAsset.prMaxInputCount; ++ii )
+							myParmChanges |= setTransformInput( ii );
+				
+					for ( int ii = 0; ii < myAsset.prMaxGeoInputCount; ++ii )
 					{
-						if ( !obj )
+						HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + ii, "Geometry Input " + ii );
+						Object obj = (Object) myAsset.prUpStreamGeoObjects[ ii ];
+						myParmChanges |= HAPI_GUI.objectField( ref geo_input, ref obj, typeof( GameObject ) );
+					
+						if ( myParmChanges )
 						{
-							myAsset.prUpStreamGeoObjects[ ii ] = null;
-							myAsset.prUpStreamGeoAssets[ ii ] = null;
-							myAsset.removeGeoInput( ii );
-						}
-						else
-						{
-							GameObject new_obj = (GameObject) obj;
-							
-							myAsset.prUpStreamGeoObjects[ ii ] = new_obj;
-							
-							HAPI_Asset asset_component = null;
-							HAPI_ChildSelectionControl 
-								child_selection_control = new_obj.GetComponent< HAPI_ChildSelectionControl >(); 
-							
-							int object_index = 0;
-							if ( child_selection_control )
+							if ( !obj )
 							{
-								object_index = child_selection_control.prObjectId;
-								asset_component = child_selection_control.prAsset;
+								myAsset.prUpStreamGeoObjects[ ii ] = null;
+								myAsset.prUpStreamGeoAssets[ ii ] = null;
+								myAsset.removeGeoInput( ii );
 							}
 							else
-								asset_component = new_obj.GetComponent< HAPI_Asset >();
+							{
+								GameObject new_obj = (GameObject) obj;
 							
-							if ( asset_component )
-								if ( myAsset == asset_component )
-									Debug.LogError( "Can't connect an asset to itself!" );
+								myAsset.prUpStreamGeoObjects[ ii ] = new_obj;
+							
+								HAPI_Asset asset_component = null;
+								HAPI_ChildSelectionControl 
+									child_selection_control = new_obj.GetComponent< HAPI_ChildSelectionControl >(); 
+							
+								int object_index = 0;
+								if ( child_selection_control )
+								{
+									object_index = child_selection_control.prObjectId;
+									asset_component = child_selection_control.prAsset;
+								}
 								else
-									myAsset.addAssetAsGeoInput( asset_component, object_index, ii );
-							else
-								myAsset.addGeoAsGeoInput( new_obj, ii );
+									asset_component = new_obj.GetComponent< HAPI_Asset >();
+							
+								if ( asset_component )
+									if ( myAsset == asset_component )
+										Debug.LogError( "Can't connect an asset to itself!" );
+									else
+										myAsset.addAssetAsGeoInput( asset_component, object_index, ii );
+								else
+									myAsset.addGeoAsGeoInput( new_obj, ii );
+							}
 						}
-					}
 					
-					HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + ii, "File Input " + ii );
-					string file_path = myAsset.prFileInputs[ ii ];
-					myParmChanges |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path );
+						HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + ii, "File Input " + ii );
+						string file_path = myAsset.prFileInputs[ ii ];
+						myParmChanges |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path );
 					
-				} // for
+					} // for
+				} // if
 			} // if
-		} // if
+		}
+		catch ( HAPI_Error e )
+		{
+			Debug.LogError( e.ToString() );
+		}
 	}
 	
 	protected bool setTransformInput( int index )
