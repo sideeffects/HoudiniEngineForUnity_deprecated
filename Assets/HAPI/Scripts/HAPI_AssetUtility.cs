@@ -708,9 +708,9 @@ public class HAPI_AssetUtility
 
 		if ( setting_raw_mesh )
 		{
-			part_info.faceCount = triangles.Length / 3;
-			part_info.vertexCount = triangles.Length;
-			part_info.pointCount = vertices.Length;
+			part_info.faceCount			= triangles.Length / 3;
+			part_info.vertexCount		= triangles.Length;
+			part_info.pointCount		= vertices.Length;
 		}
 		else
 		{

@@ -118,9 +118,9 @@ public class HAPI_AssetCurve : HAPI_Asset
 			{
 				Vector3 vec = new Vector3();
 
-				vec.x = (float) -System.Convert.ToDouble( vec_split [ 0 ] );
-				vec.y = (float)  System.Convert.ToDouble( vec_split [ 1 ] );
-				vec.z = (float)  System.Convert.ToDouble( vec_split [ 2 ] );
+				vec.x = (float) -System.Convert.ToDouble( vec_split[ 0 ] );
+				vec.y = (float)  System.Convert.ToDouble( vec_split[ 1 ] );
+				vec.z = (float)  System.Convert.ToDouble( vec_split[ 2 ] );
 
 				prPoints.Add( vec );
 			}
@@ -323,10 +323,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			}
 
 			progressBar.prProgressBarMsg = "Loading and composing objects...";
-			
-			// Clean up.
-			destroyChildren( transform );
-			
+
 			// Create local object info caches (transforms need to be stored in a parallel array).
 			prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];
 			prObjectTransforms 	= new HAPI_Transform[ prObjectCount ];
@@ -459,17 +456,19 @@ public class HAPI_AssetCurve : HAPI_Asset
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		// Create main underling.
-		prMainChild = new GameObject( object_info.name );
-		
-		try
+		if ( prMainChild == null )
 		{
+			prMainChild = new GameObject( object_info.name + "_obj" );
 			prMainChild.transform.parent = transform;
-			
+
 			// Add required components.
 			prMainChild.AddComponent( "MeshFilter" );
 			prMainChild.AddComponent( "MeshRenderer" );
 			prMainChild.AddComponent( "HAPI_ChildSelectionControl" );
-			
+		}
+		
+		try
+		{
 			// Set Object Control on child selection control so it can read settings from here.
 			prMainChild.GetComponent< HAPI_ChildSelectionControl >().setAsset( this );
 			prMainChild.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;

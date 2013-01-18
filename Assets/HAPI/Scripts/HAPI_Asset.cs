@@ -99,6 +99,7 @@ public class HAPI_Asset : MonoBehaviour
 	public bool						prAutoSelectAssetNode { get; set; }
 	public bool						prEnableLogging { get; set; }
 	public bool						prSyncAssetTransform { get; set; }
+	public bool						prLiveTransformPropagation { get; set; }
 	
 	public int						prLastChangedParmId { get; set; }
 	
@@ -367,6 +368,7 @@ public class HAPI_Asset : MonoBehaviour
 		prAutoSelectAssetNode 		= true;
 		prEnableLogging				= false;
 		prSyncAssetTransform		= true;
+		prLiveTransformPropagation	= false;
 		
 		prLastChangedParmId 		= -1;
 		
@@ -424,6 +426,21 @@ public class HAPI_Asset : MonoBehaviour
 			HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
 				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+		}
+
+		// Process dependent assets.
+		// TODO: These steps here might be too slow for some assets and can grind Unity to
+		// a halt. But if we are to support all the different effects of transform changes
+		// then we do need to do a full build so I'm not sure how to do this more proper.
+		// Do note that the build function is fairly conditional and should only build
+		// the bare minimum.
+		if ( prLiveTransformPropagation )
+		{
+			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+				downstream_asset.build();
+			
+			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+				downstream_asset.build();
 		}
 	}
 

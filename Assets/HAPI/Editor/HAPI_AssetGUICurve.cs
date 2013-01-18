@@ -76,11 +76,25 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.build();
 			}
 
+			// Draw Auto Select Asset Node Toggle
+			{
+				bool value = myAsset.prAutoSelectAssetNode;
+				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
+				myAsset.prAutoSelectAssetNode = value;
+			}
+
 			// Sync Asset Transform Toggle
 			{
 				bool value = myAsset.prSyncAssetTransform;
 				HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
 				myAsset.prSyncAssetTransform = value;
+			}
+
+			// Live Transform Propagation Toggle
+			{
+				bool value = myAsset.prLiveTransformPropagation;
+				HAPI_GUI.toggle( "live_transform_propagation", "Life Transform Propagation", ref value );
+				myAsset.prLiveTransformPropagation = value;
 			}
 		} // if
 		

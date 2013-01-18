@@ -273,9 +273,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 				destroyChildren( transform );
 
 				// Create local object info caches (transforms need to be stored in a parallel array).
-				prObjects = new HAPI_ObjectInfo [ prObjectCount ];
-				prGameObjects = new GameObject [ prObjectCount ];
-				prObjectTransforms = new HAPI_Transform [ prObjectCount ];
+				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
+				prGameObjects = new GameObject[ prObjectCount ];
+				prObjectTransforms = new HAPI_Transform[ prObjectCount ];
 			}
 			else
 			{
@@ -400,7 +400,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		instancer.instanceObjects();
 	}
 
-	private void createPart( int object_id, int geo_id, int part_id, ref HAPI_GeoInfo geo_info, GameObject part_node)
+	private void createPart( int object_id, int geo_id, int part_id, ref HAPI_GeoInfo geo_info, GameObject part_node )
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		HAPI_PartInfo part_info = new HAPI_PartInfo();

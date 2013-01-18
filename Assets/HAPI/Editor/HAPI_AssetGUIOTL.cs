@@ -126,6 +126,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
 				myAsset.prSyncAssetTransform = value;
 			}
+
+			// Live Transform Propagation Toggle
+			{
+				bool value = myAsset.prLiveTransformPropagation;
+				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
+				myAsset.prLiveTransformPropagation = value;
+			}
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
