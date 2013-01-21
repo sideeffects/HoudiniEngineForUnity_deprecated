@@ -129,7 +129,7 @@ namespace HAPI
 		{
 			HAPI_Result status_code = (HAPI_Result) HAPI_GetAssetIdsFromLoadHIPFile( assetIds );
 			
-			processStatusCode( status_code );						
+			processStatusCode( status_code );
 			
 		}
 		
@@ -157,7 +157,7 @@ namespace HAPI
 			}
 			catch ( HAPI_Error error ) 
 			{
-				Debug.LogError( "Asset failed to unload: " + error.ToString() );
+				//Debug.LogError( "Asset failed to unload: " + error.ToString() );
 			}
 			
 			return true;	
@@ -168,10 +168,12 @@ namespace HAPI
 			string otls_path = Application.dataPath + "/OTLs/Scanned";
 
 			if ( myHoudiniSceneExists )
-				Debug.Log( "Loading OTL: Using Existing Scene" );
+			{
+				//Debug.Log( "Loading OTL: Using Existing Scene" );
+			}
 			else
 			{
-				Debug.Log( "Loading OTL: Creating New Scene" );
+				//Debug.Log( "Loading OTL: Creating New Scene" );
 
 				HAPI_Result status_code;
 				status_code = (HAPI_Result) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, otls_path,

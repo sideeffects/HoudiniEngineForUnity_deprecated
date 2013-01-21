@@ -43,9 +43,9 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public HAPI_AssetInfo 			prAssetInfo { get { return myAssetInfo; } set { myAssetInfo = value; } }
 	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
-	public int 						prAssetId { get; set; }	
-	public AssetType				prAssetType { get; set; }
-	public HAPI_AssetType			prHAPIAssetType { get; set; }
+	public int 						prAssetId { get { return myAssetId; } set { myAssetId = value; } }
+	public AssetType				prAssetType { get { return myAssetType; } set { myAssetType = value; } }
+	public HAPI_AssetType			prHAPIAssetType {get { return myHAPIAssetType; } set { myHAPIAssetType = value; } }
 	public int						prAssetSubType { get { return myAssetSubType; } set { myAssetSubType = value; } }
 	public bool						prFullBuild { get; set; }
 	public bool 					prUnloadAssetInFullBuild { get; set; }
@@ -282,7 +282,7 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public virtual void OnDestroy()
 	{
-		if ( prAssetId >= 0 )
+		if ( prAssetId >= 0 && !( EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode ) )
 		{
 			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
 				if ( upstream_asset != null )
@@ -301,6 +301,18 @@ public class HAPI_Asset : MonoBehaviour
 			
 			HAPI_Host.unloadOTL( prAssetId );
 			prAssetId = -1;
+		}
+	}
+
+	public virtual void OnEnable()
+	{
+		//Debug.Log( "OnEnable: prAssetId: " + prAssetId );
+		if ( prAssetId >= 0 )
+		{
+			prFullBuild = true;
+			//prUnloadAssetInFullBuild = false;
+			build();
+			//prUnloadAssetInFullBuild = true;
 		}
 	}
 	
@@ -394,53 +406,60 @@ public class HAPI_Asset : MonoBehaviour
 
 	public virtual void Update()
 	{
-		if ( !prSyncAssetTransform )
+		if ( !prSyncAssetTransform || prAssetId < 0 )
 			return;
 
-		Matrix4x4 local_to_world = transform.localToWorldMatrix;
-		HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
-		HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );
-
-		int parm = -1;
-		float [] parm_data = new float[ 3 ];
-
-		parm = findParm( "t" );
-		if ( parm > 0 )
+		try
 		{
-			HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
-			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
-		}
+			Matrix4x4 local_to_world = transform.localToWorldMatrix;
+			HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
+			HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );
 
-		parm = findParm( "r" );
-		if ( parm > 0 )
-		{
-			HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
-			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
-		}
+			int parm = -1;
+			float [] parm_data = new float[ 3 ];
 
-		parm = findParm( "s" );
-		if ( parm > 0 )
-		{
-			HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
-			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
-		}
+			parm = findParm( "t" );
+			if ( parm > 0 )
+			{
+				HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+				for ( int i = 0; i < 3; ++i )
+					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+			}
 
-		// Process dependent assets.
-		// TODO: These steps here might be too slow for some assets and can grind Unity to
-		// a halt. But if we are to support all the different effects of transform changes
-		// then we do need to do a full build so I'm not sure how to do this more proper.
-		// Do note that the build function is fairly conditional and should only build
-		// the bare minimum.
-		if ( prLiveTransformPropagation )
-		{
-			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-				downstream_asset.build();
+			parm = findParm( "r" );
+			if ( parm > 0 )
+			{
+				HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+				for ( int i = 0; i < 3; ++i )
+					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+			}
+
+			parm = findParm( "s" );
+			if ( parm > 0 )
+			{
+				HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+				for ( int i = 0; i < 3; ++i )
+					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+			}
+
+			// Process dependent assets.
+			// TODO: These steps here might be too slow for some assets and can grind Unity to
+			// a halt. But if we are to support all the different effects of transform changes
+			// then we do need to do a full build so I'm not sure how to do this more proper.
+			// Do note that the build function is fairly conditional and should only build
+			// the bare minimum.
+			if ( prLiveTransformPropagation )
+			{
+				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+					downstream_asset.build();
 			
-			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-				downstream_asset.build();
+				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+					downstream_asset.build();
+			}
+		}
+		catch ( HAPI_Error err )
+		{
+			Debug.LogError( err.ToString() );
 		}
 	}
 
@@ -513,8 +532,19 @@ public class HAPI_Asset : MonoBehaviour
 	
 	[SerializeField]
 	protected byte[] 			myPreset;
+
+	[SerializeField]
+	protected int				myAssetId;
+
+	[SerializeField]
+	protected AssetType			myAssetType;
+
+	[SerializeField]
+	protected HAPI_AssetType	myHAPIAssetType;
+
 	[SerializeField]
 	protected HAPI_AssetInfo	myAssetInfo;
+
 	[SerializeField]
 	protected int				myAssetSubType;
 }
