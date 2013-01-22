@@ -155,7 +155,7 @@ namespace HAPI
 			{
 				processStatusCode( (HAPI_Result) result );
 			}
-			catch ( HAPI_Error error ) 
+			catch ( HAPI_Error ) 
 			{
 				//Debug.LogError( "Asset failed to unload: " + error.ToString() );
 			}
