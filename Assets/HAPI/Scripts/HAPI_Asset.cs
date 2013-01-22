@@ -412,6 +412,10 @@ public class HAPI_Asset : MonoBehaviour
 		try
 		{
 			Matrix4x4 local_to_world = transform.localToWorldMatrix;
+			if ( local_to_world == myLastLocalToWorld )
+				return;
+			myLastLocalToWorld = local_to_world;
+
 			HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
 			HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );
 
@@ -547,4 +551,7 @@ public class HAPI_Asset : MonoBehaviour
 
 	[SerializeField]
 	protected int				myAssetSubType;
+
+	// Private Data
+	private Matrix4x4			myLastLocalToWorld;
 }

@@ -93,7 +93,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			// Live Transform Propagation Toggle
 			{
 				bool value = myAsset.prLiveTransformPropagation;
-				HAPI_GUI.toggle( "live_transform_propagation", "Life Transform Propagation", ref value );
+				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
 				myAsset.prLiveTransformPropagation = value;
 			}
 		} // if
