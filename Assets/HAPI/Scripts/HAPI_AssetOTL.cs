@@ -310,7 +310,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 				try
 				{
 					if ( !prObjects[ object_index ].isInstancer && 
-						 prObjects[ object_index ].isVisible &&
 						 ( prFullBuild || prObjects[ object_index ].hasTransformChanged
 									   || prObjects[ object_index ].haveGeosChanged ) )
 					{
@@ -420,8 +419,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 			part_node.AddComponent( "MeshFilter" );
 			part_node.AddComponent( "MeshRenderer" );
 			part_node.AddComponent( "HAPI_ChildSelectionControl" );
-
-			HAPI_ChildSelectionControl child_control = part_node.GetComponent< HAPI_ChildSelectionControl >();
+			MeshFilter mesh_filter							= part_node.GetComponent< MeshFilter >();
+			HAPI_ChildSelectionControl child_control		= part_node.GetComponent< HAPI_ChildSelectionControl >();
+			
 			// Set Object Control on child selection control so it can read settings from here.
 			child_control.setAsset( this );
 			child_control.prObjectId	= object_id;
@@ -430,12 +430,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 			child_control.prPartId		= part_id;
 		
 			// Get or create mesh.
-			MeshFilter part_mesh_filter 	= part_node.GetComponent< MeshFilter >();
-			Mesh part_mesh 					= part_mesh_filter.sharedMesh;
+			Mesh part_mesh 				= mesh_filter.sharedMesh;
 			if ( part_mesh == null ) 
 			{
-				part_mesh_filter.mesh 	= new Mesh();
-				part_mesh 				= part_mesh_filter.sharedMesh;
+				mesh_filter.mesh 		= new Mesh();
+				part_mesh 				= mesh_filter.sharedMesh;
 			}
 			part_mesh.Clear();
 		
@@ -457,10 +456,14 @@ public class HAPI_AssetOTL : HAPI_Asset
 			mesh_saver.prGameObject = part_node;
 			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + part_node.name;
 		}
+
+		// Set visibility.
+		MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
+		mesh_renderer.enabled = object_info.isVisible;
 		
 		// Set material.
-		if ( part_node.GetComponent< MeshRenderer >().sharedMaterial == null )
-			part_node.GetComponent< MeshRenderer >().sharedMaterial = new Material( Shader.Find( "Specular" ) );
+		if ( mesh_renderer.sharedMaterial == null )
+			mesh_renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
 		if ( part_info.materialId >= 0 && ( prFullBuild || geo_info.hasMaterialChanged ) )
 		{
 			HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
@@ -469,15 +472,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 			// Assign the transparency shader if this material is transparent or unassign it otherwise.
 			if ( material.isTransparent() && 
-				 part_node.GetComponent< MeshRenderer >().sharedMaterial.name == "Specular" )
-				part_node.GetComponent< MeshRenderer >().sharedMaterial = 
+				 mesh_renderer.sharedMaterial.name == "Specular" )
+				mesh_renderer.sharedMaterial = 
 					new Material( Shader.Find( "Transparent/Specular" ) );
 			else if ( !material.isTransparent() &&
-					  part_node.GetComponent< MeshRenderer >().sharedMaterial.name == "Transparent/Specular" )
-				part_node.GetComponent< MeshRenderer >().sharedMaterial =
+					  mesh_renderer.sharedMaterial.name == "Transparent/Specular" )
+				mesh_renderer.sharedMaterial =
 					new Material( Shader.Find( "Specular" ) );
 
-			Material mat = part_node.GetComponent< MeshRenderer >().sharedMaterial;
+			Material mat = mesh_renderer.sharedMaterial;
 			Utility.assignTexture( ref mat, material );
 		}
 	}

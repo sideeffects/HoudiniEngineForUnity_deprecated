@@ -143,10 +143,18 @@ public class HAPI_Instancer : MonoBehaviour {
 				if ( !prOverrideInstances )
 				{
 					obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
-					if( scale_attr_info.exists )
-						obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[0], 
-															instance_transforms[ ii ].scale[1], 
-															instance_transforms[ ii ].scale[2] );
+					if ( scale_attr_info.exists )
+						obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[ 0 ], 
+																instance_transforms[ ii ].scale[ 1 ], 
+																instance_transforms[ ii ].scale[ 2 ] );
+
+					// The original object is probably set to be invisible because it just contains
+					// the raw geometry with no transforms applied. We need to set the newly instanced
+					// object's childrens' mesh renderers to be enabled otherwise the instanced
+					// objects will also be invisible. :)
+					MeshRenderer[] mesh_renderers = obj.GetComponentsInChildren< MeshRenderer >();
+					foreach ( MeshRenderer mesh_renderer in mesh_renderers )
+						mesh_renderer.enabled = true;
 				}
 				else
 				{
@@ -155,8 +163,8 @@ public class HAPI_Instancer : MonoBehaviour {
 					obj.transform.localRotation = Quaternion.Euler( euler );
 					if( scale_attr_info.exists )
 						obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[ 0 ], 
-															instance_transforms[ ii ].scale[ 1 ], 
-															instance_transforms[ ii ].scale[ 2 ] );
+																instance_transforms[ ii ].scale[ 1 ], 
+																instance_transforms[ ii ].scale[ 2 ] );
 				}
 				
 				obj.transform.parent = transform;

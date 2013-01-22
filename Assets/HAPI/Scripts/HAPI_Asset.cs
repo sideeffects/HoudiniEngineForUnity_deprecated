@@ -369,7 +369,7 @@ public class HAPI_Asset : MonoBehaviour
 		
 		prObjects 					= new HAPI_ObjectInfo[ 0 ];
 		
-		prGameObjects 				= new GameObject[ 0 ];		
+		prGameObjects 				= new GameObject[ 0 ];
 		prObjectTransforms 			= new HAPI_Transform[ 0 ];
 		
 		// GUI ------------------------------------------------------------------------------------------------------
