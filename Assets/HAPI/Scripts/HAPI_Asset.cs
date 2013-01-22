@@ -377,7 +377,7 @@ public class HAPI_Asset : MonoBehaviour
 		prShowObjectControls 		= true;
 		prShowAssetControls 		= true;
 		prShowInputControls 		= true;
-		prAutoSelectAssetNode 		= true;
+		prAutoSelectAssetNode 		= false; // Should be turned back on for production build.
 		prEnableLogging				= false;
 		prSyncAssetTransform		= true;
 		prLiveTransformPropagation	= false;
