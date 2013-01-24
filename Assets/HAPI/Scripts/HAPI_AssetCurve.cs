@@ -48,15 +48,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 	~HAPI_AssetCurve()
 	{}
 	
-	public override void OnDestroy()
-	{
-		if ( prAssetId >= 0 )
-		{
-			HAPI_Host.unloadOTL( prAssetId );
-			prAssetId = -1;
-		}
-	}
-	
 	public void addPoint( Vector3 pos )
 	{
 		prPoints.Add( pos );

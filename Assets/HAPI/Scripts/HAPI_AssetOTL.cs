@@ -61,15 +61,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 	~HAPI_AssetOTL() 
 	{}
 	
-	public override void OnDestroy()
-	{
-		if ( prAssetId >= 0 )
-		{
-			HAPI_Host.unloadOTL( prAssetId );
-			prAssetId = -1;
-		}
-	}
-	
 	public override void reset()
 	{
 		base.reset();
@@ -91,24 +82,25 @@ public class HAPI_AssetOTL : HAPI_Asset
 		{
 			progressBar.prProgressBarStartTime = System.DateTime.Now;
 			
-			if ( prFullBuild ) 
+			if ( prFullBuild || prPartialBuild ) 
 			{
-				if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL )
+				if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
 					HAPI_Host.unloadOTL( prAssetId );
 				
 				try
 				{
 					int asset_id = 0;
-					if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL )
+					if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
 						asset_id = HAPI_Host.loadOTL( prAssetPath );
-					else if ( prAssetType == HAPI_Asset.AssetType.TYPE_HIP )
+					else
 						asset_id = prAssetId;
 
 					progressBar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
 
-					Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
+					if ( !prPartialBuild )
+						Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
 				}
 				catch ( HAPI_Error error )
 				{
@@ -205,76 +197,79 @@ public class HAPI_AssetOTL : HAPI_Asset
 				}
 				
 				// Add input fields.
-				if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+				if ( !prPartialBuild )
 				{
-					if ( prMaxInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
-						for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						{
-							prUpStreamTransformAssets.Add( null );
-							prUpStreamTransformObjects.Add( null );
-						}
-				}
-				
-				if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
-					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
+					if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					{
-						prFileInputs.Add( "" );
-						prUpStreamGeoAssets.Add( null );
-						prUpStreamGeoObjects.Add( null );
-						prUpStreamGeoAdded.Add( false );
+						if ( prMaxInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
+							for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+							{
+								prUpStreamTransformAssets.Add( null );
+								prUpStreamTransformObjects.Add( null );
+							}
 					}
 				
-				// Check for min input fields set.
-				if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-				{
-					int numValidTransformInputs = 0;
-					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						if ( prUpStreamTransformAssets[ ii ] )
-							numValidTransformInputs++;
+					if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
+						for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
+						{
+							prFileInputs.Add( "" );
+							prUpStreamGeoAssets.Add( null );
+							prUpStreamGeoObjects.Add( null );
+							prUpStreamGeoAdded.Add( false );
+						}
+				
+					// Check for min input fields set.
+					if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+					{
+						int numValidTransformInputs = 0;
+						for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+							if ( prUpStreamTransformAssets[ ii ] )
+								numValidTransformInputs++;
 					
-					if ( numValidTransformInputs < prMinInputCount )
-						Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
-										  "Please provide inputs in the Inputs section." );
-				}
+						if ( numValidTransformInputs < prMinInputCount )
+							Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
+											  "Please provide inputs in the Inputs section." );
+					}
 				
-				int numValidGeoInputs = 0;
-				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-					if ( prFileInputs[ ii ] != "" )
-						numValidGeoInputs++;
+					int numValidGeoInputs = 0;
+					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
+						if ( prFileInputs[ ii ] != "" )
+							numValidGeoInputs++;
 				
-				if ( numValidGeoInputs < prMinGeoInputCount )
-					Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
+					if ( numValidGeoInputs < prMinGeoInputCount )
+						Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
 				
-				if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-					for ( int ii = 0; ii < prMaxInputCount ; ++ii )
-						if ( prUpStreamTransformAssets[ ii ] )
-							HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
+					if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+						for ( int ii = 0; ii < prMaxInputCount ; ++ii )
+							if ( prUpStreamTransformAssets[ ii ] )
+								HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
 				
-				for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-				{
-					if ( prFileInputs[ ii ] != "" )
-						HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
+					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
+					{
+						if ( prFileInputs[ ii ] != "" )
+							HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
 					
-					//TODO: handle restoring geometry connections
-					//if ( prUpStreamGeoAssets[ ii ] != null )
-					//{
-					//	HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );
-					//}
-				}
+						//TODO: handle restoring geometry connections
+						//if ( prUpStreamGeoAssets[ ii ] != null )
+						//{
+						//	HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );
+						//}
+					}
 				
-				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-				{
-					int index = downstream_asset.getAssetTransformConnectionIndex( this );
-					if ( index >= 0 )
-						HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
-				}
+					foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+					{
+						int index = downstream_asset.getAssetTransformConnectionIndex( this );
+						if ( index >= 0 )
+							HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
+					}
 
-				// Clean up.
-				destroyChildren( transform );
+					// Clean up.
+					destroyChildren( transform );
+					prGameObjects = new GameObject[ prObjectCount ];
+				}
 
 				// Create local object info caches (transforms need to be stored in a parallel array).
 				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
-				prGameObjects = new GameObject[ prObjectCount ];
 				prObjectTransforms = new HAPI_Transform[ prObjectCount ];
 			}
 			else
@@ -346,13 +341,17 @@ public class HAPI_AssetOTL : HAPI_Asset
 			}
 			
 			// Process dependent assets.
-			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-				downstream_asset.build();
+			if ( !prPartialBuild )
+			{
+				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+					downstream_asset.build();
 			
-			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-				downstream_asset.build();
+				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+					downstream_asset.build();
+			}
 			
 			prFullBuild = false;
+			prPartialBuild = false;
 		}
 		catch ( HAPI_Error error )
 		{

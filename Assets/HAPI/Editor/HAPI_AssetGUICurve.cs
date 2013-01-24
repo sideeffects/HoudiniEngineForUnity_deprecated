@@ -31,8 +31,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	public override void OnEnable() 
 	{
 		base.OnEnable();
-		
-		myAssetCurve = target as HAPI_AssetCurve;
+		myAssetCurve = myAsset as HAPI_AssetCurve;
 		
 		myCurrentlyActivePoint = -1;
 
@@ -136,7 +135,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myAssetCurve.build();
 			myUnbuiltChanges = false;
 			
-			myAssetCurve.savePreset();
+			// To keep things consistent with Unity workflow, we should not save parameter changes
+			// while in Play mode.
+			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
+				myAssetCurve.savePreset();
 		}
 		else if ( myParmChanges )
 			myUnbuiltChanges = true;
@@ -590,13 +592,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		return changed;
 	}
 
-	[SerializeField]
 	private HAPI_AssetCurve	myAssetCurve;
 
-	private int 			myCurrentlyActivePoint;
-	private bool			myIsAddingPoints;
-	private string			myAddPointButtonLabel;
+	private int 				myCurrentlyActivePoint;
+	private bool				myIsAddingPoints;
+	private string				myAddPointButtonLabel;
 
-	[SerializeField]
-	private GameObject		myTarget;
+	[SerializeField] 
+	private GameObject			myTarget;
 }

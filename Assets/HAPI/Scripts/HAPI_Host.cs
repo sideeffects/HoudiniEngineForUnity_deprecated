@@ -23,8 +23,10 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
+int blah = 0;
 namespace HAPI 
 {	
+	
 	public class HAPI_Error : System.Exception 
 	{
 		public HAPI_Error() 
@@ -167,11 +169,7 @@ namespace HAPI
 		{
 			string otls_path = Application.dataPath + "/OTLs/Scanned";
 
-			if ( myHoudiniSceneExists )
-			{
-				Debug.Log( "Loading OTL: Using Existing Scene" );
-			}
-			else
+			if ( !myHoudiniSceneExists )
 			{
 				Debug.Log( "Loading OTL: Creating New Scene" );
 
@@ -186,6 +184,15 @@ namespace HAPI
 			}
 		}
 
+		// There is no way to save static variables by themselves between Unity modes
+		// (so serialization/deserialization steps). Therefore, we need to save "state"
+		// inside a component which will then restore the state after it was 
+		// deserialized. It doesn't matter which HAPI component does this.
+		public static void forceInitialize()
+		{
+			myHoudiniSceneExists = true;
+		}
+		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
 		

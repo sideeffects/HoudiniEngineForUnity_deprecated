@@ -41,79 +41,126 @@ public class HAPI_Asset : MonoBehaviour
 	
 	// Assets -------------------------------------------------------------------------------------------------------
 	
-	public HAPI_AssetInfo 			prAssetInfo { get { return myAssetInfo; } set { myAssetInfo = value; } }
-	public byte[]					prPreset { get { return myPreset; } set { myPreset = value; } }
-	public int 						prAssetId { get { return myAssetId; } set { myAssetId = value; } }
-	public AssetType				prAssetType { get { return myAssetType; } set { myAssetType = value; } }
-	public HAPI_AssetType			prHAPIAssetType {get { return myHAPIAssetType; } set { myHAPIAssetType = value; } }
-	public int						prAssetSubType { get { return myAssetSubType; } set { myAssetSubType = value; } }
-	public bool						prFullBuild { get; set; }
-	public bool 					prUnloadAssetInFullBuild { get; set; }
+	public HAPI_AssetInfo 			prAssetInfo {					get { return myAssetInfo; } 
+																	set { myAssetInfo = value; } }
+	public byte[]					prPreset {						get { return myPreset; } 
+																	set { myPreset = value; } }
+	public int 						prAssetId {						get { return myAssetId; } 
+																	set { myAssetId = value; } }
+	public AssetType				prAssetType {					get { return myAssetType; } 
+																	set { myAssetType = value; } }
+	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; } 
+																	set { myHAPIAssetType = value; } }
+	public int						prAssetSubType {				get { return myAssetSubType; } 
+																	set { myAssetSubType = value; } }
+	public bool						prFullBuild {					get { return myFullBuild; } 
+																	set { myFullBuild = value; } }
+	public bool						prPartialBuild {				get { return myPartialBuild; }
+																	set { myPartialBuild = value; } }
+	public bool 					prUnloadAssetInFullBuild {		get { return myUnloadAssetInFullBuild; } 
+																	set { myUnloadAssetInFullBuild = value; } }
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
-	public int 						prMinInputCount { get; set; }
-	public int 						prMaxInputCount { get; set; }
-	public int 						prMinGeoInputCount { get; set; }
-	public int						prMaxGeoInputCount { get; set; }
-	public List< string >			prFileInputs { get; set; }
+	public int 						prMinInputCount {				get { return myMinInputCount; } 
+																	set { myMinInputCount = value; } }
+	public int 						prMaxInputCount {				get { return myMaxInputCount; } 
+																	set { myMaxInputCount = value; } }
+	public int 						prMinGeoInputCount {			get { return myMinGeoInputCount; } 
+																	set { myMinGeoInputCount = value; } }
+	public int						prMaxGeoInputCount {			get { return myMaxGeoInputCount; } 
+																	set { myMaxGeoInputCount = value; } }
+	public List< string >			prFileInputs {					get { return myFileInputs; } 
+																	set { myFileInputs = value; } }
 	
-	public List< HAPI_Asset >		prDownStreamTransformAssets { get; set; }
-	public List< HAPI_Asset >		prUpStreamTransformAssets { get; set; }
-	public List< GameObject >		prUpStreamTransformObjects { get; set; }
+	public List< HAPI_Asset >		prDownStreamTransformAssets {	get { return myDownStreamTransformAssets; } 
+																	set { myDownStreamTransformAssets = value; } }
+	public List< HAPI_Asset >		prUpStreamTransformAssets {		get { return myUpStreamTransformAssets; } 
+																	set { myUpStreamTransformAssets = value; } }
+	public List< GameObject >		prUpStreamTransformObjects {	get { return myUpStreamTransformObjects; } 
+																	set { myUpStreamTransformObjects = value; } }
 	
-	public List< HAPI_Asset >		prDownStreamGeoAssets { get; set; }
-	public List< HAPI_Asset >		prUpStreamGeoAssets { get; set; }
-	public List< GameObject >		prUpStreamGeoObjects { get; set; }
-	public List< bool >				prUpStreamGeoAdded { get; set; }
+	public List< HAPI_Asset >		prDownStreamGeoAssets {			get { return myDownStreamGeoAssets; } 
+																	set { myDownStreamGeoAssets = value; } }
+	public List< HAPI_Asset >		prUpStreamGeoAssets {			get { return myUpStreamGeoAssets; } 
+																	set { myUpStreamGeoAssets = value; } }
+	public List< GameObject >		prUpStreamGeoObjects {			get { return myUpStreamGeoObjects; } 
+																	set { myUpStreamGeoObjects = value; } }
+	public List< bool >				prUpStreamGeoAdded {			get { return myUpStreamGeoAdded; } 
+																	set { myUpStreamGeoAdded = value; } }
 	
 	// Parameters ---------------------------------------------------------------------------------------------------
 	
-	public int 						prParmCount { get; set; }
-	public int						prParmIntValueCount { get; set; }
-	public int						prParmFloatValueCount { get; set; }
-	public int						prParmStringValueCount { get; set; }
-	public int						prParmChoiceCount { get; set; }
+	public int 						prParmCount {					get { return myParmCount; } 
+																	set { myParmCount = value; } }
+	public int						prParmIntValueCount {			get { return myParmIntValueCount; } 
+																	set { myParmIntValueCount = value; } }
+	public int						prParmFloatValueCount {			get { return myParmFloatValueCount; } 
+																	set { myParmFloatValueCount = value; } }
+	public int						prParmStringValueCount {		get { return myprParmStringValueCoun; } 
+																	set { myprParmStringValueCoun = value; } }
+	public int						prParmChoiceCount {				get { return myprParmChoiceCount; } 
+																	set { myprParmChoiceCount = value; } }
 	
-	public HAPI_ParmInfo[] 			prParms { get; set; }
-	public int[]					prParmIntValues { get; set; }
-	public float[]					prParmFloatValues { get; set; }
-	public int[]					prParmStringValues { get; set; } // string handles (SH)
-	public HAPI_ParmChoiceInfo[]	prParmChoiceLists { get; set; }
+	public HAPI_ParmInfo[] 			prParms {						get { return myParms; } 
+																	set { myParms = value; } }
+	public int[]					prParmIntValues {				get { return myParmIntValues; } 
+																	set { myParmIntValues = value; } }
+	public float[]					prParmFloatValues {				get { return myParmFloatValues; } 
+																	set { myParmFloatValues = value; } }
+	public int[]					prParmStringValues {			get { return myParmStringValues; }
+																	set { myParmStringValues = value; } } // SH
+	public HAPI_ParmChoiceInfo[]	prParmChoiceLists {				get { return myParmChoiceLists; } 
+																	set { myParmChoiceLists = value; } }
 	
 	// Objects ------------------------------------------------------------------------------------------------------
 	
-	public int 						prObjectCount { get; set; }
-	public int						prHandleCount { get; set; }
+	public int 						prObjectCount {					get { return myObjectCount; } 
+																	set { myObjectCount = value; } }
+	public int						prHandleCount {					get { return myHandleCount; } 
+																	set { myHandleCount = value; } }
 	
-	public HAPI_ObjectInfo[] 		prObjects { get; set; }
+	public HAPI_ObjectInfo[] 		prObjects {						get { return myObjects; } 
+																	set { myObjects = value; } }
 	
-	public GameObject[]				prGameObjects {	get; set; }
-	public HAPI_Transform[] 		prObjectTransforms { get; set; }
+	public GameObject[]				prGameObjects {					get { return myGameObjects; } 
+																	set { myGameObjects = value; } }
+	public HAPI_Transform[] 		prObjectTransforms {			get { return myObjectTransforms; } 
+																	set { myObjectTransforms = value; } }
 	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
-	public bool 					prShowObjectControls { get; set; }
-	public bool 					prShowAssetControls { get; set; }
-	public bool						prShowInputControls { get; set; }
-	public bool						prAutoSelectAssetNode { get; set; }
-	public bool						prEnableLogging { get; set; }
-	public bool						prSyncAssetTransform { get; set; }
-	public bool						prLiveTransformPropagation { get; set; }
+	public bool 					prShowObjectControls {			get { return myShowObjectControls; } 
+																	set { myShowObjectControls = value; } }
+	public bool 					prShowAssetControls {			get { return myShowAssetControls; } 
+																	set { myShowAssetControls = value; } }
+	public bool						prShowInputControls {			get { return myShowInputControls; } 
+																	set { myShowInputControls = value; } }
+	public bool						prAutoSelectAssetNode {			get { return myAutoSelectAssetNode; } 
+																	set { myAutoSelectAssetNode = value; } }
+	public bool						prEnableLogging {				get { return myEnableLogging; } 
+																	set { myEnableLogging = value; } }
+	public bool						prSyncAssetTransform {			get { return mySyncAssetTransform; } 
+																	set { mySyncAssetTransform = value; } }
+	public bool						prLiveTransformPropagation {	get { return myLiveTransformPropagation; } 
+																	set { myLiveTransformPropagation = value; } }
 	
-	public int						prLastChangedParmId { get; set; }
+	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
+																	set { myLastChangedParmId = value; } }
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
 	/// 	A 1:1 mapping with myFolderListSelectionIds.
 	/// </summary>
-	public List< int > 				prFolderListSelections { get; set; }
+	public List< int > 				prFolderListSelections {		get { return myFolderListSelections; } 
+																	set { myFolderListSelections = value; } }
 	
 	/// <summary>
 	/// 	Parameter ids of the currently selected folders in the Inspector. 
 	/// 	A 1:1 mapping with myFolderListSelections.
 	/// </summary>
-	public List< int > 				prFolderListSelectionIds { get; set; }
+	public List< int > 				prFolderListSelectionIds {		get { return myFolderListSelectionIds; } 
+																	set { myFolderListSelectionIds = value; } }
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -282,7 +329,12 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public virtual void OnDestroy()
 	{
-		if ( prAssetId >= 0 && !( EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode ) )
+		/*
+		bool is_playing = false;
+		is_playing |= EditorApplication.isPlaying;
+		is_playing |= EditorApplication.isPlayingOrWillChangePlaymode;
+
+		if ( prAssetId >= 0 && !is_playing )
 		{
 			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
 				if ( upstream_asset != null )
@@ -302,6 +354,7 @@ public class HAPI_Asset : MonoBehaviour
 			HAPI_Host.unloadOTL( prAssetId );
 			prAssetId = -1;
 		}
+		*/
 	}
 
 	public virtual void OnEnable()
@@ -309,10 +362,11 @@ public class HAPI_Asset : MonoBehaviour
 		//Debug.Log( "OnEnable: prAssetId: " + prAssetId );
 		if ( prAssetId >= 0 )
 		{
-			prFullBuild = true;
-			//prUnloadAssetInFullBuild = false;
+			if ( !HAPI_Host.hasScene() )
+				HAPI_Host.forceInitialize();
+
+			prPartialBuild = true;
 			build();
-			//prUnloadAssetInFullBuild = true;
 		}
 	}
 	
@@ -406,11 +460,14 @@ public class HAPI_Asset : MonoBehaviour
 
 	public virtual void Update()
 	{
-		if ( !prSyncAssetTransform || prAssetId < 0 )
+		if ( !prSyncAssetTransform || prAssetId < 0 || EditorApplication.isPlayingOrWillChangePlaymode )
 			return;
 
 		try
 		{
+			if ( !HAPI_Host.hasScene() )
+				HAPI_Host.forceInitialize();
+
 			Matrix4x4 local_to_world = transform.localToWorldMatrix;
 			if ( local_to_world == myLastLocalToWorld )
 				return;
@@ -514,6 +571,9 @@ public class HAPI_Asset : MonoBehaviour
 	
 	protected virtual int findParm( string name )
 	{
+		if ( prParms == null )
+			return -1;
+
 		for ( int i = 0; i < prParms.Length; ++i )
 		{
 			if ( prParms[ i ].name == name )
@@ -532,26 +592,85 @@ public class HAPI_Asset : MonoBehaviour
 	protected bool				myProgressBarJustUsed;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Serialized Data
+	// Serialized Private Data
 	
-	[SerializeField]
-	protected byte[] 			myPreset;
+	// Assets -------------------------------------------------------------------------------------------------------
+	
+	[SerializeField] private HAPI_AssetInfo			myAssetInfo;
+	[SerializeField] private byte[]					myPreset;
+	[SerializeField] private int					myAssetId;
+	[SerializeField] private AssetType				myAssetType;
+	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
+	[SerializeField] private int					myAssetSubType;
+	[SerializeField] private bool					myFullBuild;
+	[SerializeField] private bool					myPartialBuild;
+	[SerializeField] private bool 					myUnloadAssetInFullBuild;
+	
+	// Inputs -------------------------------------------------------------------------------------------------------
+	
+	[SerializeField] private int 					myMinInputCount;
+	[SerializeField] private int 					myMaxInputCount;
+	[SerializeField] private int 					myMinGeoInputCount;
+	[SerializeField] private int					myMaxGeoInputCount;
+	[SerializeField] private List< string >			myFileInputs;
+	
+	[SerializeField] private List< HAPI_Asset >		myDownStreamTransformAssets;
+	[SerializeField] private List< HAPI_Asset >		myUpStreamTransformAssets;
+	[SerializeField] private List< GameObject >		myUpStreamTransformObjects;
+	
+	[SerializeField] private List< HAPI_Asset >		myDownStreamGeoAssets;
+	[SerializeField] private List< HAPI_Asset >		myUpStreamGeoAssets;
+	[SerializeField] private List< GameObject >		myUpStreamGeoObjects;
+	[SerializeField] private List< bool >			myUpStreamGeoAdded;
+	
+	// Parameters ---------------------------------------------------------------------------------------------------
+	
+	[SerializeField] private int 					myParmCount;
+	[SerializeField] private int					myParmIntValueCount;
+	[SerializeField] private int					myParmFloatValueCount;
+	[SerializeField] private int					myprParmStringValueCoun;
+	[SerializeField] private int					myprParmChoiceCount;
+	
+	[SerializeField] private HAPI_ParmInfo[] 		myParms;
+	[SerializeField] private int[]					myParmIntValues;
+	[SerializeField] private float[]				myParmFloatValues;
+	[SerializeField] private int[]					myParmStringValues; // string handles (SH)
+	[SerializeField] private HAPI_ParmChoiceInfo[]	myParmChoiceLists;
+	
+	// Objects ------------------------------------------------------------------------------------------------------
+	
+	[SerializeField] private int 					myObjectCount;
+	[SerializeField] private int					myHandleCount;
+	
+	[SerializeField] private GameObject[]			myGameObjects;
 
-	[SerializeField]
-	protected int				myAssetId;
+					 private HAPI_ObjectInfo[] 		myObjects;
+					 private HAPI_Transform[] 		myObjectTransforms;
+	
+	// GUI ----------------------------------------------------------------------------------------------------------
+	
+	[SerializeField] private bool 					myShowObjectControls;
+	[SerializeField] private bool 					myShowAssetControls;
+	[SerializeField] private bool					myShowInputControls;
+	[SerializeField] private bool					myAutoSelectAssetNode;
+	[SerializeField] private bool					myEnableLogging;
+	[SerializeField] private bool					mySyncAssetTransform;
+	[SerializeField] private bool					myLiveTransformPropagation;
+	
+	[SerializeField] private int					myLastChangedParmId;
+	
+	/// <summary>
+	/// 	Indices of the currently selected folders in the Inspector.
+	/// 	A 1:1 mapping with myFolderListSelectionIds.
+	/// </summary>
+	[SerializeField] private List< int > 			myFolderListSelections;
+	
+	/// <summary>
+	/// 	Parameter ids of the currently selected folders in the Inspector. 
+	/// 	A 1:1 mapping with myFolderListSelections.
+	/// </summary>
+	[SerializeField] private List< int > 			myFolderListSelectionIds;
 
-	[SerializeField]
-	protected AssetType			myAssetType;
-
-	[SerializeField]
-	protected HAPI_AssetType	myHAPIAssetType;
-
-	[SerializeField]
-	protected HAPI_AssetInfo	myAssetInfo;
-
-	[SerializeField]
-	protected int				myAssetSubType;
-
-	// Private Data
-	private Matrix4x4			myLastLocalToWorld;
+	// Private Temporary Data
+	[SerializeField] private Matrix4x4				myLastLocalToWorld;
 }

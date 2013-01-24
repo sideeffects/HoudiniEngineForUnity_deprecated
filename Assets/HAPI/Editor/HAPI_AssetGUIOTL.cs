@@ -30,8 +30,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	public override void OnEnable() 
 	{
 		base.OnEnable();
-		
-		myAssetOTL = target as HAPI_AssetOTL;
+		myAssetOTL = myAsset as HAPI_AssetOTL;
 	}
 	
 	public override void OnInspectorGUI() 
@@ -151,7 +150,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			myUnbuiltChanges = false;
 			myParmChanges = false;
 
-			myAssetOTL.savePreset();
+			// To keep things consistent with Unity workflow, we should not save parameter changes
+			// while in Play mode.
+			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
+				myAssetOTL.savePreset();
 		}
 		else if ( myParmChanges )
 			myUnbuiltChanges = true;
@@ -479,5 +481,5 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		return changed;
 	}
 
-	private HAPI_AssetOTL	myAssetOTL;
+	private HAPI_AssetOTL myAssetOTL;
 }

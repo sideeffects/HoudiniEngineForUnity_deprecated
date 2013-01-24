@@ -56,7 +56,11 @@ public class HAPI_AssetGUI : Editor
 					if ( myAsset.prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 						for ( int ii = 0; ii < myAsset.prMaxInputCount; ++ii )
 							myParmChanges |= setTransformInput( ii );
-				
+					
+					if ( myAsset.prUpStreamGeoObjects == null || myAsset.prUpStreamGeoAssets == null ||
+						 myAsset.prUpStreamGeoObjects.Count <= 0 || myAsset.prUpStreamGeoAssets.Count <= 0 )
+						return;
+
 					for ( int ii = 0; ii < myAsset.prMaxGeoInputCount; ++ii )
 					{
 						HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + ii, "Geometry Input " + ii );
@@ -118,6 +122,9 @@ public class HAPI_AssetGUI : Editor
 	{
 		bool changed = false;
 		
+		if ( myAsset.prUpStreamTransformObjects == null || myAsset.prUpStreamTransformObjects.Count <= 0 )
+			return false;
+
 		HAPI_GUIParm trans_input = new HAPI_GUIParm( "trans_input_" + index, "Transform Input " + index );
 		Object obj = (Object) myAsset.prUpStreamTransformObjects[ index ];
 		changed |= HAPI_GUI.objectField( ref trans_input, ref obj, typeof( GameObject ) );
