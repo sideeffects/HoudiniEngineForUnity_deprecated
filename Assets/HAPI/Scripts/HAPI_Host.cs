@@ -66,14 +66,36 @@ namespace HAPI
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
 	/// 	Houdini runtime.
 	/// </summary>
+	[ InitializeOnLoad ]
 	public static partial class HAPI_Host
 	{
+		static HAPI_Host()
+		{
+			EditorApplication.update = update;
+			EditorApplication.playmodeStateChanged = playmodeStateChanged;
+
+			if ( !isRuntimeInitialized() )
+			{	
+				prHoudiniSceneExists = false;
+				prMidPlaymodeStateChange = false;
+
+				initialize();
+			}
+		}
+
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Public
-		
+
+		public static bool prHoudiniSceneExists {
+												get { return getBool( "HAPI_HoudiniSceneExists" ); } 
+												private set { setBool( "HAPI_HoudiniSceneExists", value ); } }
+		public static bool prMidPlaymodeStateChange {	
+												get { return getBool( "HAPI_MidPlaymodeStateChange" ); } 
+												private set { setBool( "HAPI_MidPlaymodeStateChange", value ); } }
+
 		public static bool hasScene() 
 		{
-			return myHoudiniSceneExists;
+			return prHoudiniSceneExists;
 		}
 		
 		public static void saveScene( string file_name )
@@ -84,7 +106,7 @@ namespace HAPI
 		public static int loadOTL( string path ) 
 		{
 			initialize();
-			
+
 			string textures_path = Application.dataPath + "/Textures";
 			
 			int asset_id = -1;
@@ -97,11 +119,10 @@ namespace HAPI
 			return asset_id;
 		}
 		
-		
 		public static void loadHip( string path ) 
 		{
 			initialize();
-			
+
 			string textures_path = Application.dataPath + "/Textures";
 																
 			HAPI_Result status_code = (HAPI_Result) HAPI_LoadHIPFile( path, textures_path, 
@@ -114,7 +135,6 @@ namespace HAPI
 		
 		public static int getAssetCountFromLoadHip() 
 		{
-			
 			int num_assets = 0;
 			
 			HAPI_Result status_code = (HAPI_Result) HAPI_GetAssetCountFromLoadHIPFile( ref num_assets );
@@ -136,7 +156,7 @@ namespace HAPI
 		public static int createCurve()
 		{
 			initialize();
-			
+
 			int asset_id = -1;
 			HAPI_Result status_code = (HAPI_Result) HAPI_CreateCurve( ref asset_id );
 			processStatusCode( status_code );
@@ -160,40 +180,62 @@ namespace HAPI
 				Debug.LogError( "Asset failed to unload: " + error.ToString() );
 			}
 			
-			return true;	
+			return true;
+		}
+
+		public static bool isRealDestroy()
+		{
+			return !EditorApplication.isPlayingOrWillChangePlaymode && !prMidPlaymodeStateChange;
 		}
 
 		public static void initialize()
 		{
 			string otls_path = Application.dataPath + "/OTLs/Scanned";
 
-			if ( !myHoudiniSceneExists )
+			if ( !prHoudiniSceneExists )
 			{
-				Debug.Log( "Loading OTL: Creating New Scene" );
-
 				HAPI_Result status_code;
-				status_code = (HAPI_Result) HAPI_Initialize( HAPI.HAPI_SetPath.prHoudiniPath, otls_path,
+				status_code = (HAPI_Result) HAPI_Initialize( HAPI_SetPath.prHoudiniPath, otls_path,
 															 true, -1 );
 
 				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
 
-				myHoudiniSceneExists = true;
+				prHoudiniSceneExists = true;
 			}
-		}
-
-		// There is no way to save static variables by themselves between Unity modes
-		// (so serialization/deserialization steps). Therefore, we need to save "state"
-		// inside a component which will then restore the state after it was 
-		// deserialized. It doesn't matter which HAPI component does this.
-		public static void forceInitialize()
-		{
-			myHoudiniSceneExists = true;
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
-		
+
+		private static void update()
+		{
+
+		}
+
+		private static void playmodeStateChanged()
+		{
+			prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
+		}
+
+		private static bool isRuntimeInitialized()
+		{
+			if ( !HAPI_SetPath.prIsPathSet )
+				return false;
+			else
+			{
+				try
+				{
+					getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
+			}
+		}
+
 		private static bool hasCallFailed( HAPI_Result code )
 		{
 			return ( (int) code > 0 );
@@ -210,8 +252,36 @@ namespace HAPI
 				throw new HAPI_Error( error_str.ToString() );
 			}
 		}
-		
-		private static bool myHoudiniSceneExists = false;
+
+		private static bool getBool( string name )
+		{
+			return EditorPrefs.GetInt( name ) == 0 ? false : true;
+		}
+
+		private static void setBool( string name, bool value )
+		{
+			setBool( name, value, false );
+		}
+		private static void setBool( string name, bool value, bool only_if_new )
+		{
+			if ( !only_if_new || EditorPrefs.HasKey( name ) )
+				EditorPrefs.SetInt( name, value ? 1 : 0 );
+		}
+
+		private static string getString( string name )
+		{
+			return EditorPrefs.GetString( name );
+		}
+
+		private static void setString( string name, string value )
+		{
+			setString( name, value, false );
+		}
+		private static void setString( string name, string value, bool only_if_new )
+		{
+			if ( !only_if_new || EditorPrefs.HasKey( name ) )
+				EditorPrefs.SetString( name, value );
+		}
 	}
 
 } // namespace HAPI

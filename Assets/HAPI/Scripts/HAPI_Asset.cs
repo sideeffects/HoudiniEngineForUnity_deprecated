@@ -265,7 +265,7 @@ public class HAPI_Asset : MonoBehaviour
 	{
 		prUpStreamGeoAssets[ index ] = asset;
 		
-		//TODO: It's hard coded to be the 0th group - fix this!
+		// TODO: It's hard coded to be the 0th group - fix this!
 		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, 0, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 		build();
@@ -329,12 +329,7 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public virtual void OnDestroy()
 	{
-		/*
-		bool is_playing = false;
-		is_playing |= EditorApplication.isPlaying;
-		is_playing |= EditorApplication.isPlayingOrWillChangePlaymode;
-
-		if ( prAssetId >= 0 && !is_playing )
+		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() )
 		{
 			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
 				if ( upstream_asset != null )
@@ -354,17 +349,12 @@ public class HAPI_Asset : MonoBehaviour
 			HAPI_Host.unloadOTL( prAssetId );
 			prAssetId = -1;
 		}
-		*/
 	}
 
 	public virtual void OnEnable()
 	{
-		//Debug.Log( "OnEnable: prAssetId: " + prAssetId );
 		if ( prAssetId >= 0 )
 		{
-			if ( !HAPI_Host.hasScene() )
-				HAPI_Host.forceInitialize();
-
 			prPartialBuild = true;
 			build();
 		}
@@ -465,9 +455,6 @@ public class HAPI_Asset : MonoBehaviour
 
 		try
 		{
-			if ( !HAPI_Host.hasScene() )
-				HAPI_Host.forceInitialize();
-
 			Matrix4x4 local_to_world = transform.localToWorldMatrix;
 			if ( local_to_world == myLastLocalToWorld )
 				return;
