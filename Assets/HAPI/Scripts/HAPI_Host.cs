@@ -23,10 +23,8 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
-int blah = 0;
 namespace HAPI 
-{	
-	
+{
 	public class HAPI_Error : System.Exception 
 	{
 		public HAPI_Error() 
