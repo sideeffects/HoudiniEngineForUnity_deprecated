@@ -71,8 +71,8 @@ namespace HAPI
 	{
 		static HAPI_Host()
 		{
-			EditorApplication.update = update;
-			EditorApplication.playmodeStateChanged = playmodeStateChanged;
+			EditorApplication.update += update;
+			EditorApplication.playmodeStateChanged += playmodeStateChanged;
 
 			if ( !isRuntimeInitialized() )
 			{	
@@ -81,6 +81,10 @@ namespace HAPI
 
 				initialize();
 			}
+
+			// Preferences
+			setBool( "HAPI_EnableDragAndDrop", true, true );
+			setBool( "HAPI_HideGeometryOnLinking", true, true );
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +96,13 @@ namespace HAPI
 		public static bool prMidPlaymodeStateChange {	
 												get { return getBool( "HAPI_MidPlaymodeStateChange" ); } 
 												private set { setBool( "HAPI_MidPlaymodeStateChange", value ); } }
+
+		public static bool prEnableDragAndDrop {
+												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
+												set { setBool( "HAPI_EnableDragAndDrop", value ); } }
+		public static bool prHideGeometryOnLinking {
+												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
+												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
 
 		public static bool hasScene() 
 		{
@@ -253,6 +264,21 @@ namespace HAPI
 			}
 		}
 
+		private static int getInt( string name )
+		{
+			return EditorPrefs.GetInt( name );
+		}
+
+		private static void setInt( string name, int value )
+		{
+			setInt( name, value, false );
+		}
+		private static void setInt( string name, int value, bool only_if_new )
+		{
+			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
+				EditorPrefs.SetInt( name, value );
+		}
+
 		private static bool getBool( string name )
 		{
 			return EditorPrefs.GetInt( name ) == 0 ? false : true;
@@ -264,7 +290,7 @@ namespace HAPI
 		}
 		private static void setBool( string name, bool value, bool only_if_new )
 		{
-			if ( !only_if_new || EditorPrefs.HasKey( name ) )
+			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
 				EditorPrefs.SetInt( name, value ? 1 : 0 );
 		}
 
@@ -279,7 +305,7 @@ namespace HAPI
 		}
 		private static void setString( string name, string value, bool only_if_new )
 		{
-			if ( !only_if_new || EditorPrefs.HasKey( name ) )
+			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
 				EditorPrefs.SetString( name, value );
 		}
 	}

@@ -120,6 +120,25 @@ public class HAPI_Window : EditorWindow
 					Debug.LogError( error.ToString() );
 				}
 			}
+
+			// Enable Drag-and-Drop
+			{
+				bool value = HAPI_Host.prEnableDragAndDrop;
+				bool changed = HAPI_GUI.toggle( "enable_drag_and_drop", "Enable Drag-and-Drop", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prEnableDragAndDrop = value;
+					HAPI_GUIUtility.setDragAndDrop( value );
+				}
+			}
+
+			// Hide Geometry On Linking
+			{
+				bool value = HAPI_Host.prHideGeometryOnLinking;
+				bool changed = HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
+				if ( changed )
+					HAPI_Host.prHideGeometryOnLinking = value;
+			}
 		}
 		
 		myShowFileList = EditorGUILayout.Foldout( myShowFileList, new GUIContent( "File List" ) );
