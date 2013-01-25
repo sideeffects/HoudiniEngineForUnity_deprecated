@@ -45,7 +45,7 @@ public class HAPI_AssetGUI : Editor
 		
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
-		
+
 			if ( myAsset.prMaxInputCount > 0 || myAsset.prMaxGeoInputCount > 0 )
 			{
 				myAsset.prShowInputControls = 

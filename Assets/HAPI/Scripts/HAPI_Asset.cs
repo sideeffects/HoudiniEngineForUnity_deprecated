@@ -147,6 +147,9 @@ public class HAPI_Asset : MonoBehaviour
 	
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
+
+	public bool						prIsGeoVisible {				get { return myIsGeoVisible; }
+																	set { myIsGeoVisible = value; } }
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
@@ -268,6 +271,19 @@ public class HAPI_Asset : MonoBehaviour
 		// TODO: It's hard coded to be the 0th group - fix this!
 		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, 0, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
+
+		if ( HAPI_Host.prHideGeometryOnLinking )
+		{
+			asset.prIsGeoVisible = false;
+			HAPI_ChildSelectionControl[] controls = asset.GetComponentsInChildren< HAPI_ChildSelectionControl >();
+			foreach ( HAPI_ChildSelectionControl control in controls )
+			{
+				if ( control.prGeoType != (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
+					 && control.gameObject.GetComponent< MeshRenderer >() != null )
+					control.gameObject.GetComponent< MeshRenderer >().enabled = false;
+			}
+		}
+
 		build();
 	}
 	
@@ -427,6 +443,8 @@ public class HAPI_Asset : MonoBehaviour
 		prLiveTransformPropagation	= false;
 		
 		prLastChangedParmId 		= -1;
+
+		myIsGeoVisible				= true;
 		
 		prFolderListSelections 		= new List< int >();
 		prFolderListSelectionIds 	= new List< int >();
@@ -645,6 +663,8 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private bool					myLiveTransformPropagation;
 	
 	[SerializeField] private int					myLastChangedParmId;
+
+	[SerializeField] private bool					myIsGeoVisible;
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.

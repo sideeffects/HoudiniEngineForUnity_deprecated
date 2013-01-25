@@ -458,7 +458,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 		// Set visibility.
 		MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
-		mesh_renderer.enabled = object_info.isVisible;
+		mesh_renderer.enabled = object_info.isVisible && 
+								( prIsGeoVisible || geo_info.type == (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT );
 		
 		// Set material.
 		if ( mesh_renderer.sharedMaterial == null )

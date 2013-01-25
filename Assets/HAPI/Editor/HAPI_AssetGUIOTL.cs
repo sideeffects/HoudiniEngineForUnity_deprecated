@@ -105,6 +105,24 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			
 			// These don't affect the asset directly so they don't trigger rebuilds.
 			
+			// Show Geometries
+			{
+				bool value = myAsset.prIsGeoVisible;
+				bool changed = HAPI_GUI.toggle( "show_geometries", "Show Geometries", ref value );
+				if ( changed )
+				{
+					myAsset.prIsGeoVisible = value;
+					HAPI_ChildSelectionControl[] controls = 
+						myAsset.GetComponentsInChildren< HAPI_ChildSelectionControl >();
+					foreach ( HAPI_ChildSelectionControl control in controls )
+					{
+						if ( control.prGeoType != (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
+								&& control.gameObject.GetComponent< MeshRenderer >() != null )
+							control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
+					}
+				}
+			}
+
 			// Draw Auto Select Asset Node Toggle
 			{
 				bool value = myAsset.prAutoSelectAssetNode;
