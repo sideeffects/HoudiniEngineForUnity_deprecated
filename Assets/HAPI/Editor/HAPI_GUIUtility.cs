@@ -155,7 +155,8 @@ public class HAPI_GUIUtility : Editor
 	}
 	
 	public const string myMenuName				= "HAPI";
-	public const string myLoadAssetLabel		= "Load Houdini Asset";
+	public const string mySaveHoudiniSceneLabel = "Save Current Houdini Scene...";
+	public const string myLoadAssetLabel		= "Load Houdini Asset...";
 	public const string myDefaultAssetLabel 	= "Houdini Asset";
 	public const string myDefaultPrefabLabel 	= "Houdini Asset";
 
