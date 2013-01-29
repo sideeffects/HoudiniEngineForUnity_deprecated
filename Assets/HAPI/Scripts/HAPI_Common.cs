@@ -475,6 +475,7 @@ namespace HAPI
 	{
 		public int		id;
 		public int		type;
+		private int		nameSH; // string handle (SH)
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool		hasGeoChanged;
@@ -483,6 +484,10 @@ namespace HAPI
 		public bool		hasMaterialChanged;
 
 		public int		partCount;
+
+		// Accessors
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -501,6 +506,7 @@ namespace HAPI
 		}
 
 		public int		id;
+		private int		nameSH; // string handle (SH)
 
 		public int 		materialId;
 		
@@ -511,6 +517,10 @@ namespace HAPI
 		public int		faceAttributeCount;
 		public int		vertexAttributeCount;
 		public int		detailAttributeCount;
+
+		// Accessors
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]

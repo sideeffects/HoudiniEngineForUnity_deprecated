@@ -408,7 +408,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			// Get Part info.
 			HAPI_Host.getPartInfo( prAssetId, object_id, geo_id, part_id, out part_info );
 			if ( prEnableLogging )
-			Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
+				Debug.Log( "Obj #" + object_id + " (" + object_info.name + "): "
 					   + "verts: " + part_info.vertexCount + " faces: " + part_info.faceCount );
 		}
 
@@ -418,8 +418,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 			part_node.AddComponent( "MeshFilter" );
 			part_node.AddComponent( "MeshRenderer" );
 			part_node.AddComponent( "HAPI_ChildSelectionControl" );
-			MeshFilter mesh_filter							= part_node.GetComponent< MeshFilter >();
-			HAPI_ChildSelectionControl child_control		= part_node.GetComponent< HAPI_ChildSelectionControl >();
+			MeshFilter mesh_filter						= part_node.GetComponent< MeshFilter >();
+			HAPI_ChildSelectionControl child_control	= part_node.GetComponent< HAPI_ChildSelectionControl >();
 			
 			// Set Object Control on child selection control so it can read settings from here.
 			child_control.setAsset( this );
@@ -502,7 +502,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 			destroyChildren( geo_node.transform );
 			for ( int ii = 0; ii < geo_info.partCount; ii++ )
 			{
-				GameObject part_node = new GameObject( "part" + ii );
+				HAPI_PartInfo part_info = new HAPI_PartInfo();
+				HAPI_Host.getPartInfo( prAssetId, object_id, geo_id, ii, out part_info );
+
+				GameObject part_node = new GameObject( part_info.name + "_part" + ii );
 				part_node.transform.parent = geo_node.transform;
 
 				// Need to reset position here because the assignment above will massage the child's
@@ -532,7 +535,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		// Create main underling.
 		if ( prGameObjects[ object_id ] == null )
 		{
-			prGameObjects[ object_id ] = new GameObject( object_info.name + "_obj" );
+			prGameObjects[ object_id ] = new GameObject( object_info.name + "_obj" + object_id );
 			prGameObjects[ object_id ].transform.parent = transform;
 		}
 		GameObject main_child = prGameObjects[ object_id ];
@@ -546,7 +549,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 					destroyChildren( main_child.transform );
 					for ( int ii = 0; ii < object_info.geoCount; ii++ )
 					{
-						GameObject geo_child = new GameObject( object_info.name + "_geo" + ii );
+						HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+						HAPI_Host.getGeoInfo( prAssetId, object_id, ii, out geo_info );
+
+						GameObject geo_child = new GameObject( geo_info.name + "_geo" + ii );
 						geo_child.transform.parent = main_child.transform;
 						
 						// Need to reset position here because the assignment above will massage the child's
