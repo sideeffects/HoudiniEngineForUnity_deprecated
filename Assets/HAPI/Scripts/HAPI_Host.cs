@@ -215,6 +215,15 @@ namespace HAPI
 				prHoudiniSceneExists = true;
 			}
 		}
+
+		public static void throwRuntimeError()
+		{
+			int buffer_size = 4000;
+			HAPI_GetStatusStringBufLength( (int) HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
+			StringBuilder error_str = new StringBuilder( buffer_size );
+			HAPI_GetStatusString( (int) HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
+			throw new HAPI_Error( error_str.ToString() );
+		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
@@ -255,13 +264,7 @@ namespace HAPI
 		private static void processStatusCode( HAPI_Result code )
 		{
 			if ( hasCallFailed( code ) )
-			{
-				int buffer_size = 4000;
-				HAPI_GetStatusStringBufLength( (int) HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
-				StringBuilder error_str = new StringBuilder( buffer_size );
-				HAPI_GetStatusString( (int) HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
-				throw new HAPI_Error( error_str.ToString() );
-			}
+				throwRuntimeError();
 		}
 
 		private static int getInt( string name )

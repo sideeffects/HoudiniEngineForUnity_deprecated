@@ -18,14 +18,14 @@ public class HAPI_ProgressBar  {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods			
 	
-	public HAPI_ProgressBar () 
+	public HAPI_ProgressBar() 
 	{
 		prProgressBarCurrent		= 0;
-		prProgressBarTotal			= 0;		
+		prProgressBarTotal			= 0;
 		prProgressBarMsg			= "";
 		prProgressBarStartTime		= System.DateTime.Now;
 						
-		myProgressBarTitle			= "Building Houdini Asset";		
+		myProgressBarTitle			= "Building Houdini Asset";
 		myProgressBarLastValue		= -1;
 		myProgressBarLastMsg		= "";
 		
@@ -39,7 +39,7 @@ public class HAPI_ProgressBar  {
 		HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 		prProgressBarCurrent = 0;
 		prProgressBarTotal = 100;
-		while ( state != HAPI_State.HAPI_STATE_READY )
+		while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 		{
 			state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
 
@@ -56,6 +56,12 @@ public class HAPI_ProgressBar  {
 
 			prProgressBarMsg = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
 			displayProgressBar();
+		}
+
+		if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
+		{
+			state = HAPI_State.HAPI_STATE_READY;
+			HAPI_Host.throwRuntimeError();
 		}
 	}
 	
