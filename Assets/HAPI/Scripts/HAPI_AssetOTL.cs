@@ -263,6 +263,14 @@ public class HAPI_AssetOTL : HAPI_Asset
 							HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
 					}
 
+					// Fill input names.
+					for ( int i = 0; i < prMaxGeoInputCount; ++i )
+					{
+						string geo_input_name = HAPI_Host.getInputName( prAssetId, i, 
+																		HAPI_InputType.HAPI_INPUT_GEOMETRY );
+						prGeoInputNames.Add( geo_input_name );
+					}
+
 					// Clean up.
 					destroyChildren( transform );
 					prGameObjects = new GameObject[ prObjectCount ];

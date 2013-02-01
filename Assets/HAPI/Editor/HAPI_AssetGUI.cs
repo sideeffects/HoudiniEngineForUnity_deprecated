@@ -63,7 +63,7 @@ public class HAPI_AssetGUI : Editor
 
 					for ( int ii = 0; ii < myAsset.prMaxGeoInputCount; ++ii )
 					{
-						HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + ii, "Geometry Input " + ii );
+						HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + ii, myAsset.prGeoInputNames[ ii ] );
 						Object obj = (Object) myAsset.prUpStreamGeoObjects[ ii ];
 						myParmChanges |= HAPI_GUI.objectField( ref geo_input, ref obj, typeof( GameObject ) );
 					

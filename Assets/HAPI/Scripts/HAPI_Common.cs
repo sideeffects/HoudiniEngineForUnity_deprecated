@@ -167,6 +167,14 @@ namespace HAPI
 		HAPI_GEOTYPE_MAX
 	};
 	
+	public enum HAPI_InputType
+	{
+		HAPI_INPUT_INVALID = -1,
+		HAPI_INPUT_TRANSFORM,
+		HAPI_INPUT_GEOMETRY,
+		HAPI_INPUT_MAX
+	};
+
 	public enum HAPI_RSTOrder
 	{
 		TRS = 0, 

@@ -301,6 +301,27 @@ namespace HAPI
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
+		/// <summary>
+		/// 	Get the name of an asset's input.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="input_idx">
+		/// 	Input index of the asset.
+		/// </param>
+		/// <param name="input_type">
+		/// 	Input type (<see cref="HAPI_InputType"/>).
+		/// </param>
+		public static string getInputName( int asset_id, int input_idx, HAPI_InputType input_type )
+		{
+			int name_sh = 0;
+			int status_code = HAPI_GetInputName( asset_id, input_idx, (int) input_type, ref name_sh );
+			processStatusCode( (HAPI_Result) status_code );
+			string name = getString( name_sh );
+			return name;
+		}
+
 		// HIP FILES ------------------------------------------------------------------------------------------------------
 
 		/// <summary>

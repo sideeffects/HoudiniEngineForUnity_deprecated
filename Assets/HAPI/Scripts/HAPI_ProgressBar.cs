@@ -9,18 +9,21 @@ public class HAPI_ProgressBar  {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
+
 	public System.DateTime	prProgressBarStartTime { get; set; }
+	public System.TimeSpan	prCurrentDuration { get; set; }
 	public int				prProgressBarCurrent { get; set; }
 	public int				prProgressBarTotal { get; set; } 
 	public string			prProgressBarMsg { get; set; }
 	
 		
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Public Methods			
+	// Public Methods
 	
 	public HAPI_ProgressBar() 
 	{
 		prProgressBarCurrent		= 0;
+		prCurrentDuration			= new System.TimeSpan( 0 );
 		prProgressBarTotal			= 0;
 		prProgressBarMsg			= "";
 		prProgressBarStartTime		= System.DateTime.Now;
@@ -28,11 +31,7 @@ public class HAPI_ProgressBar  {
 		myProgressBarTitle			= "Building Houdini Asset";
 		myProgressBarLastValue		= -1;
 		myProgressBarLastMsg		= "";
-		
 	}
-	
-	
-	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
 	public void statusCheckLoop()
 	{
@@ -80,21 +79,15 @@ public class HAPI_ProgressBar  {
 		prProgressBarCurrent += increment;
 		displayProgressBar( prProgressBarCurrent );
 	}
-		
-	
+
 	public void clearProgressBar()
 	{		
 		prProgressBarCurrent = 0;
 		EditorUtility.ClearProgressBar();
 	}
-		
 
 	protected void displayProgressBar( int value )
 	{
-		// If there are no changes to the progress bar value or message don't re-display it again.
-		if ( value == myProgressBarLastValue && prProgressBarMsg == myProgressBarLastMsg )
-			return;
-
 		System.DateTime current = System.DateTime.Now;
 		System.TimeSpan delta = current - prProgressBarStartTime;
 		
@@ -106,7 +99,11 @@ public class HAPI_ProgressBar  {
 			EditorUtility.ClearProgressBar();
 			return;
 		}
-				
+		
+		// If there are no changes to the progress bar value or message don't re-display it again.
+		if ( value == myProgressBarLastValue && prProgressBarMsg == myProgressBarLastMsg
+			 && delta == prCurrentDuration )
+			return;
 		
 		prProgressBarCurrent = value;
 		string message = "";
@@ -125,6 +122,7 @@ public class HAPI_ProgressBar  {
 		
 		if ( !result )
 		{
+			prCurrentDuration = new System.TimeSpan( 0 );
 			myProgressBarLastValue = -1;
 			myProgressBarLastMsg = "";
 			HAPI_Host.interrupt();
@@ -134,31 +132,14 @@ public class HAPI_ProgressBar  {
 		{
 			myProgressBarLastValue = value;
 			myProgressBarLastMsg = prProgressBarMsg;
+			prCurrentDuration = delta;
 		}
 	}
 	
-	
-		
-	
 	protected string			myProgressBarTitle;
-	
 	
 	// Used to reduce the update frequency of the progress bar so it doesn't flicker.
 	private int					myProgressBarLastValue;
 	private string				myProgressBarLastMsg;
-	
-	
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Overrides
-	
-	// Use this for initialization
-	
-	
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private Members
-	
-	
-	
+
 }
