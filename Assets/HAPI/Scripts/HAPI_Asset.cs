@@ -165,8 +165,12 @@ public class HAPI_Asset : MonoBehaviour
 	public List< int > 				prFolderListSelectionIds {		get { return myFolderListSelectionIds; } 
 																	set { myFolderListSelectionIds = value; } }
 
+	public List< string >			prTransInputNames {				get { return myTransInputNames; }
+																	set { myTransInputNames = value; } }
 	public List< string >			prGeoInputNames {				get { return myGeoInputNames; }
 																	set { myGeoInputNames = value; } }
+	public List< HAPI_GeoInputFormat >	prGeoInputFormats {			get { return myGeoInputFormats; }
+																	set { myGeoInputFormats = value; } }
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,7 +458,9 @@ public class HAPI_Asset : MonoBehaviour
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
 
+		prTransInputNames			= new List< string >();
 		prGeoInputNames				= new List< string >();
+		prGeoInputFormats			= new List< HAPI_GeoInputFormat >();
 		
 		myProgressBarJustUsed 		= false;
 				
@@ -683,7 +689,10 @@ public class HAPI_Asset : MonoBehaviour
 	/// </summary>
 	[SerializeField] private List< int > 			myFolderListSelectionIds;
 
+	[SerializeField] private List< string >			myTransInputNames;
 	[SerializeField] private List< string >			myGeoInputNames;
+	[SerializeField] 
+	private List< HAPI_GeoInputFormat >				myGeoInputFormats;
 
 	// Private Temporary Data
 	[SerializeField] private Matrix4x4				myLastLocalToWorld;

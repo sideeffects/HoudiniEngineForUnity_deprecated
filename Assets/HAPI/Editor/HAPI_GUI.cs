@@ -4,6 +4,10 @@ using System.Collections;
 
 public struct HAPI_GUIParm
 {
+	public HAPI_GUIParm( string name )
+		: this( name, "", 1 )
+	{}
+
 	public HAPI_GUIParm( string name, string label )
 		: this( name, label, 1 )
 	{}
@@ -12,9 +16,11 @@ public struct HAPI_GUIParm
 	{
 		this.size		= size;
 		choiceCount 	= 0;
+		width			= -1;
 		
 		this.name 		= name;
 		this.label 		= label;
+		labelExtraWidth	= 0;
 		
 		hasMin 			= false;
 		hasMax 			= false;
@@ -29,16 +35,18 @@ public struct HAPI_GUIParm
 		joinNext 		= false;
 		labelNone 		= false;
 		
-		valuesIndex = 0;
+		valuesIndex		= 0;
 	}
 	
 	public HAPI_GUIParm( HAPI.HAPI_ParmInfo info )
 	{
 		size 			= info.size;
 		choiceCount 	= info.choiceCount;
+		width			= -1;
 		
 		name 			= info.name;
 		label 			= info.label;
+		labelExtraWidth = 0;
 		
 		hasMin 			= info.hasMin;
 		hasMax 			= info.hasMax;
@@ -65,9 +73,11 @@ public struct HAPI_GUIParm
 	
 	public int size;
 	public int choiceCount;
+	public int width;
 	
 	public string name;
 	public string label;
+	public int labelExtraWidth;
 	
 	public bool hasMin;
 	public bool hasMax;
@@ -89,6 +99,37 @@ public class HAPI_GUI : Editor
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
+
+	public static void flexibleSpace( int width, bool join_next, bool join_last )
+	{
+		initializeConstants();
+
+		// Decide whether to join with the previous parameter on the same 
+		// line or not.
+		if ( !join_last )
+			EditorGUILayout.BeginHorizontal();
+
+		EditorGUILayout.SelectableLabel( "", myLabelStyle, GUILayout.Width( width ), myLineHeightGUI );
+
+		join_last = join_next;
+		if ( !join_next )
+			EditorGUILayout.EndHorizontal();
+	}
+
+	public static void label( string value, int width, bool join_next, ref bool join_last )
+	{
+		initializeConstants();
+
+		// Decide whether to join with the previous parameter on the same line or not.
+		if ( !join_last )
+			EditorGUILayout.BeginHorizontal();
+
+		EditorGUILayout.SelectableLabel( value, myLabelStyle, GUILayout.Width( width ), myLineHeightGUI );
+
+		join_last = join_next;
+		if ( !join_next )
+			EditorGUILayout.EndHorizontal();
+	}
 	
 	public static bool dropdown( ref HAPI_GUIParm parm,
 								 ref int[] values,
@@ -110,8 +151,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -121,7 +161,12 @@ public class HAPI_GUI : Editor
 		int old_value = values[ parm.valuesIndex ];
 		
 		// Draw popup.
-		int new_value = EditorGUILayout.IntPopup( old_value, dropdown_labels, dropdown_values );
+		int new_value = 0;
+		if ( parm.width >= 0 )
+			new_value = EditorGUILayout.IntPopup( old_value, dropdown_labels, dropdown_values,
+												  GUILayout.Width( parm.width ) );
+		else
+			new_value = EditorGUILayout.IntPopup( old_value, dropdown_labels, dropdown_values );
 		
 		// Determine if value changed and update parameter value.
 		if ( new_value != old_value )
@@ -156,8 +201,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -245,8 +289,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -324,8 +367,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -388,8 +430,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -437,8 +478,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -495,8 +535,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -552,8 +591,7 @@ public class HAPI_GUI : Editor
 		bool changed = false;
 		int parm_size = parm.size;
 		
-		// Decide whether to join with the previous parameter on the same 
-		// line or not.
+		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
 		
@@ -596,16 +634,16 @@ public class HAPI_GUI : Editor
 		return false;
 	}
 	
-	public const float	myMaxFieldCountPerLine		= 4;
+	public const float myMaxFieldCountPerLine		= 4;
 	
-	public const float 	myFileChooserButtonWidth 	= 30;
-	public const float 	myLineHeight 				= 16;
-	public const float 	myLabelWidth 				= 120;
-	public const float 	myToggleWidth 				= 12;
-	public const float	myDummyLabelMinWidth		= 20;
+	public const float myFileChooserButtonWidth 	= 30;
+	public const float myLineHeight 				= 16;
+	public const float myLabelWidth 				= 120;
+	public const float myToggleWidth 				= 12;
+	public const float myDummyLabelMinWidth			= 20;
 	
-	public const float 	myDefaultUIMin 				= 0.0f;
-	public const float 	myDefaultUIMax 				= 10.0f;
+	public const float myDefaultUIMin 				= 0.0f;
+	public const float myDefaultUIMax 				= 10.0f;
 	
 	public static GUILayoutOption 	myLineHeightGUI 			= GUILayout.Height( myLineHeight );
 	public static GUILayoutOption 	myLabelWidthGUI 			= GUILayout.Width( myLabelWidth );
@@ -637,7 +675,7 @@ public class HAPI_GUI : Editor
 		
 		// Draw second empty label field.
 		EditorGUILayout.LabelField( myNullContent, myDummyLabelMinWidthGUI );
-		float width2 = GUILayoutUtility.GetLastRect().width;
+		float width2	= GUILayoutUtility.GetLastRect().width;
 		
 		// Create the double rectangle from the two above.
 		Rect last_double_rect = new Rect( xMin, yMin, width + width2, height );
@@ -646,24 +684,27 @@ public class HAPI_GUI : Editor
 	}
 	
 	private static void label( ref HAPI_GUIParm parm,
-								  ref bool join_last, ref bool no_label_toggle_last )
+							   ref bool join_last, ref bool no_label_toggle_last )
 	{
 		if ( !parm.labelNone )
 		{
-			GUILayoutOption label_final_width = myLabelWidthGUI;
+			float label_final_width = myLabelWidth + (float) parm.labelExtraWidth;
 			if ( join_last && !no_label_toggle_last )
 			{
 				float min_width;
 				float max_width;
 				myLabelStyle.CalcMinMaxWidth( new GUIContent( parm.label ), out min_width, out max_width );
-				label_final_width = GUILayout.Width( min_width );
+				label_final_width += min_width;
 			}
 			else if ( !join_last )
 			{
 				// Add padding for the toggle column.
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
 			}
-			EditorGUILayout.SelectableLabel( parm.label, myLabelStyle, label_final_width, myLineHeightGUI );
+
+			GUILayoutOption label_final_width_gui = GUILayout.Width( label_final_width );
+
+			EditorGUILayout.SelectableLabel( parm.label, myLabelStyle, label_final_width_gui, myLineHeightGUI );
 			no_label_toggle_last = false;
 		}
 	}
@@ -672,8 +713,9 @@ public class HAPI_GUI : Editor
 	{
 		if ( myLabelStyle == null )
 		{
-			myLabelStyle = new GUIStyle( GUI.skin.label );
-			myLabelStyle.alignment = TextAnchor.MiddleRight;
+			myLabelStyle			= new GUIStyle( GUI.skin.label );
+			myLabelStyle.alignment	= TextAnchor.MiddleRight;
+			myLabelStyle.wordWrap	= false;
 		}
 		
 		if ( mySliderStyle == null )
