@@ -130,7 +130,8 @@ public class HAPI_AssetGUI : Editor
 						}
 						else
 						{
-							HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + ii, "File Input " + ii );
+							HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + ii,
+																		myAsset.prGeoInputNames[ ii ] );
 							string file_path = myAsset.prFileInputs[ ii ];
 							myParmChanges |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path,
 																 ref join_last, ref no_label_toggle_last );

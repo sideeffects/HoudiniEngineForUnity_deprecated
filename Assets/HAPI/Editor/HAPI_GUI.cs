@@ -489,7 +489,7 @@ public class HAPI_GUI : Editor
 		if ( new_path != old_path ) // Check if the field is being used instead of the slider.
 			delay_build = true;
 		
-		if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+		if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ), myLineHeightGUI ) ) 
 		{
 			string prompt_path = EditorUtility.OpenFilePanel( "Select File", old_path, "*" );;
 			if ( prompt_path.Length > 0 )
