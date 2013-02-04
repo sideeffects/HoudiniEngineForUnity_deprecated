@@ -307,12 +307,16 @@ public class HAPI_AssetCurve : HAPI_Asset
 					{
 						string trans_input_name = HAPI_Host.getInputName( prAssetId, i, 
 																		  HAPI_InputType.HAPI_INPUT_TRANSFORM );
+						if ( trans_input_name == "" )
+							trans_input_name = "Transform Input #" + ( i + 1 );
 						prTransInputNames.Add( trans_input_name );
 					}
 					for ( int i = 0; i < prMaxGeoInputCount; ++i )
 					{
 						string geo_input_name = HAPI_Host.getInputName( prAssetId, i, 
 																		HAPI_InputType.HAPI_INPUT_GEOMETRY );
+						if ( geo_input_name == "" )
+							geo_input_name = "Geometry Input #" + ( i + 1 );
 						prGeoInputNames.Add( geo_input_name );
 						prGeoInputFormats.Add( HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_DEFAULT );
 					}
