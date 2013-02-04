@@ -45,7 +45,8 @@ public class HAPI_AssetGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
 
-			if ( myAsset.prMaxInputCount > 0 || myAsset.prMaxGeoInputCount > 0 )
+			if ( ( myAsset.prMaxTransInputCount > 0 || myAsset.prMaxGeoInputCount > 0 ) &&
+				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
 			{
 				myAsset.prShowInputControls = 
 					EditorGUILayout.Foldout( myAsset.prShowInputControls, new GUIContent( "Inputs" ) );
@@ -53,7 +54,7 @@ public class HAPI_AssetGUI : Editor
 				if ( myAsset.prShowInputControls )
 				{
 					if ( myAsset.prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-						for ( int ii = 0; ii < myAsset.prMaxInputCount; ++ii )
+						for ( int ii = 0; ii < myAsset.prMaxTransInputCount; ++ii )
 							myParmChanges |= setTransformInput( ii );
 					
 					if ( myAsset.prUpStreamGeoObjects == null || myAsset.prUpStreamGeoAssets == null ||

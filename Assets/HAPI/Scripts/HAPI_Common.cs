@@ -302,8 +302,8 @@ namespace HAPI
 		public int handleCount;
 		public int materialCount;
 		
-		public int minInputCount;
-		public int maxInputCount;
+		public int minTransInputCount;
+		public int maxTransInputCount;
 		public int minGeoInputCount;
 		public int maxGeoInputCount;
 		

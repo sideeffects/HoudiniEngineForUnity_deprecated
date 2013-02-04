@@ -55,7 +55,7 @@ public class HAPI_Menu : MonoBehaviour
 		game_object.AddComponent( "HAPI_AssetCurve" );
 		HAPI_AssetCurve asset = game_object.GetComponent< HAPI_AssetCurve >();
 		
-		asset.prAssetSubType = (int) HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
+		asset.prAssetSubType = HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
 		
 		// Do first build.
 		bool build_result = asset.build();

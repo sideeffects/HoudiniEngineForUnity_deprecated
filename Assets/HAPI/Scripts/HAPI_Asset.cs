@@ -51,7 +51,7 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myAssetType = value; } }
 	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; } 
 																	set { myHAPIAssetType = value; } }
-	public int						prAssetSubType {				get { return myAssetSubType; } 
+	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; } 
 																	set { myAssetSubType = value; } }
 	public bool						prFullBuild {					get { return myFullBuild; } 
 																	set { myFullBuild = value; } }
@@ -62,10 +62,10 @@ public class HAPI_Asset : MonoBehaviour
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
-	public int 						prMinInputCount {				get { return myMinInputCount; } 
-																	set { myMinInputCount = value; } }
-	public int 						prMaxInputCount {				get { return myMaxInputCount; } 
-																	set { myMaxInputCount = value; } }
+	public int 						prMinTransInputCount {			get { return myMinTransInputCount; } 
+																	set { myMinTransInputCount = value; } }
+	public int 						prMaxTransInputCount {			get { return myMaxTransInputCount; } 
+																	set { myMaxTransInputCount = value; } }
 	public int 						prMinGeoInputCount {			get { return myMinGeoInputCount; } 
 																	set { myMinGeoInputCount = value; } }
 	public int						prMaxGeoInputCount {			get { return myMaxGeoInputCount; } 
@@ -400,8 +400,8 @@ public class HAPI_Asset : MonoBehaviour
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
-		prMinInputCount 			= 0;
-		prMaxInputCount 			= 0;
+		prMinTransInputCount 			= 0;
+		prMaxTransInputCount 			= 0;
 		prMinGeoInputCount 			= 0;
 		prMaxGeoInputCount 			= 0;
 		prFileInputs 				= new List< string >();
@@ -624,15 +624,15 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private int					myAssetId;
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
-	[SerializeField] private int					myAssetSubType;
+	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
 	[SerializeField] private bool					myFullBuild;
 	[SerializeField] private bool					myPartialBuild;
 	[SerializeField] private bool 					myUnloadAssetInFullBuild;
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
-	[SerializeField] private int 					myMinInputCount;
-	[SerializeField] private int 					myMaxInputCount;
+	[SerializeField] private int 					myMinTransInputCount;
+	[SerializeField] private int 					myMaxTransInputCount;
 	[SerializeField] private int 					myMinGeoInputCount;
 	[SerializeField] private int					myMaxGeoInputCount;
 	[SerializeField] private List< string >			myFileInputs;
