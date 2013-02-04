@@ -466,7 +466,11 @@ public class HAPI_Asset : MonoBehaviour
 				
 	}
 	
-	public virtual bool build() 
+	public virtual bool build()
+	{
+		return build( -1 );
+	}
+	public virtual bool build( int source ) 
 	{
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
 		{
@@ -474,6 +478,9 @@ public class HAPI_Asset : MonoBehaviour
 			return false;
 		}
 		
+		if ( source == prAssetId && !( prFullBuild || prPartialBuild ) )
+			return false;
+
 		return true;
 	}
 

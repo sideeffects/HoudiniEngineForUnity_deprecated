@@ -71,9 +71,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 		prHandleBindingInfos 		= null;
 	}
 	
-	public override bool build() 
+	public override bool build( int source ) 
 	{
-		bool base_built = base.build();
+		bool base_built = base.build( source );
 		if ( !base_built )
 			return false;
 		
@@ -358,11 +358,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 			// Process dependent assets.
 			if ( !prPartialBuild )
 			{
+				// If we're the source, set the source id to our asset id.
+				if ( source < 0 )
+					source = prAssetId;
+
 				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-					downstream_asset.build();
+					downstream_asset.build( source );
 			
 				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-					downstream_asset.build();
+					downstream_asset.build( source );
 			}
 			
 			prFullBuild = false;

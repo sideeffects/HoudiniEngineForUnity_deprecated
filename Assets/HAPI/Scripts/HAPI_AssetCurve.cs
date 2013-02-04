@@ -129,9 +129,9 @@ public class HAPI_AssetCurve : HAPI_Asset
 		prMainChild		= null;
 	}
 	
-	public override bool build() 
+	public override bool build( int source ) 
 	{
-		bool base_built = base.build();
+		bool base_built = base.build( source );
 		if ( !base_built )
 			return false;
 		
@@ -301,6 +301,21 @@ public class HAPI_AssetCurve : HAPI_Asset
 						if ( index >= 0 )
 							HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
 					}
+
+					// Fill input names.
+					for ( int i = 0; i < prMaxInputCount; ++i )
+					{
+						string trans_input_name = HAPI_Host.getInputName( prAssetId, i, 
+																		  HAPI_InputType.HAPI_INPUT_TRANSFORM );
+						prTransInputNames.Add( trans_input_name );
+					}
+					for ( int i = 0; i < prMaxGeoInputCount; ++i )
+					{
+						string geo_input_name = HAPI_Host.getInputName( prAssetId, i, 
+																		HAPI_InputType.HAPI_INPUT_GEOMETRY );
+						prGeoInputNames.Add( geo_input_name );
+						prGeoInputFormats.Add( HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_DEFAULT );
+					}
 				}
 			}
 			else
@@ -347,11 +362,15 @@ public class HAPI_AssetCurve : HAPI_Asset
 			// Process dependent assets.
 			if ( !prPartialBuild )
 			{
+				// If we're the source, set the source id to our asset id.
+				if ( source < 0 )
+					source = prAssetId;
+
 				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-					downstream_asset.build();
+					downstream_asset.build( source );
 			
 				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-					downstream_asset.build();
+					downstream_asset.build( source );
 			}
 			
 			prFullBuild = false;
