@@ -35,6 +35,11 @@ public class HAPI_AssetGUI : Editor
 		myUnbuiltChanges 	= false;
 	}
 
+	public virtual void OnDisable()
+	{
+
+	}
+
 	public override void OnInspectorGUI() 
 	{
 		try

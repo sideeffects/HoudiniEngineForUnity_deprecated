@@ -31,16 +31,21 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	public override void OnEnable() 
 	{
 		base.OnEnable();
-		myAssetCurve = myAsset as HAPI_AssetCurve;
+		myAssetCurve			= myAsset as HAPI_AssetCurve;
 		
-		myCurrentlyActivePoint = -1;
+		myCurrentlyActivePoint	= -1;
 
-		myIsAddingPoints = false;
-		myAddPointButtonLabel = "Add Points";
-		myTarget = null;
+		myForceInstectorRedraw	= false;
+		myAddPointButtonLabel	= "Add Points";
+		myTarget				= null;
 		
 		if ( GUI.changed )
 			myAssetCurve.build();
+	}
+
+	public override void OnDisable()
+	{
+		myAssetCurve.prIsAddingPoints = false;
 	}
 	
 	public override void OnInspectorGUI() 
@@ -52,10 +57,18 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		
 		base.OnInspectorGUI();
 		
-		Event curr_event = Event.current;
+		Event current_event = Event.current;
 		bool commitChanges = false;
-		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
+		if ( current_event.isKey && current_event.type == EventType.KeyUp && current_event.keyCode == KeyCode.Return )
 			commitChanges = true;
+
+		// Check if ENTER or ESC was pressed to we can exit curve mode.
+		if ( myAssetCurve.prIsAddingPoints && current_event.isKey && current_event.type == EventType.KeyUp )
+			if ( current_event.keyCode == KeyCode.Escape || current_event.keyCode == KeyCode.Return )
+			{
+				myAssetCurve.prIsAddingPoints	= false;
+				myForceInstectorRedraw			= true;
+			}
 		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
@@ -67,7 +80,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		{	
 			if ( GUILayout.Button( "Rebuild" ) ) 
 			{
-				myIsAddingPoints = false;
+				myAssetCurve.prIsAddingPoints = false;
 				myAssetCurve.prFullBuild = true;
 				myAssetCurve.build();
 
@@ -107,17 +120,18 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myDelayBuild = false;
 		if ( myAssetCurve.prShowAssetControls )
 		{
+			if ( myAssetCurve.prIsAddingPoints )
+				myAddPointButtonLabel = "Stop Adding Points";
+			else
+				myAddPointButtonLabel = "Add Points";
+
 			if ( GUILayout.Button( myAddPointButtonLabel ) )
 			{
-				//myAssetCurve.addPoint( Vector3.left ); // Don't set to zero as that's where the center asset gizmo is.
-				myIsAddingPoints = !myIsAddingPoints;
-				if ( myIsAddingPoints )
-					myAddPointButtonLabel = "Stop Adding Points";
-				else
-					myAddPointButtonLabel = "Add Points";
+				myAssetCurve.prIsAddingPoints = !myAssetCurve.prIsAddingPoints;
+				OnSceneGUI();
 			}
 
-			GUI.enabled = !myIsAddingPoints;
+			GUI.enabled = !myAssetCurve.prIsAddingPoints;
 
 			Object target = (Object) myTarget;
 			if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
@@ -148,6 +162,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	{
 		if ( myAssetCurve == null )
 			return;
+		
+		if ( !myTempCamera && Camera.current )
+			myTempCamera = Camera.current;
 
 		Event current_event 		= Event.current;
 		
@@ -160,48 +177,103 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		// Set appropriate handles matrix.
 		Handles.matrix = myAssetCurve.transform.localToWorldMatrix;
+		
+		// Check if ENTER or ESC was pressed to we can exit curve mode.
+		if ( myAssetCurve.prIsAddingPoints && current_event.isKey && current_event.type == EventType.KeyUp )
+			if ( current_event.keyCode == KeyCode.Escape || current_event.keyCode == KeyCode.Return )
+			{
+				myAssetCurve.prIsAddingPoints	= false;
+				myForceInstectorRedraw			= true;
+			}
 
 		// Add points.
-		if ( myIsAddingPoints && !current_event.alt )
+		if ( myAssetCurve.prIsAddingPoints )
 		{
-			Vector3 position	= Vector3.zero;
-			float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
-			bool button_press 	= Handles.Button( 	position, 
-													HAPI_AssetUtility.getQuaternion( Camera.current.transform.localToWorldMatrix ),
-													handle_size,
-													handle_size,
-													Handles.RectangleCap );
+			Handles.BeginGUI();
+			GUILayout.BeginArea( new Rect( 0, 0, Screen.width, Screen.height ) );
 
-			if ( button_press )
+			GUIStyle text_style		= new GUIStyle( GUI.skin.label );
+			text_style.alignment	= TextAnchor.UpperLeft;
+			text_style.fontStyle	= FontStyle.Bold;
+			Color original_color	= GUI.color;
+			GUI.color				= Color.yellow;
+			GUI.Box( new Rect( myActiveBorderWidth + 4, myActiveBorderWidth + 4, 220, 130 ), "" );
+			GUI.Label( new Rect( myActiveBorderWidth + 5, myActiveBorderWidth + 4, 200, 20 ), "Curve Editing Mode", text_style );
+			
+			text_style.fontStyle	= FontStyle.Normal;
+			text_style.wordWrap		= true;
+			GUI.Label( new Rect( myActiveBorderWidth + 5, myActiveBorderWidth + 21, 200, 80 ), "Click anywhere on the screen to add a new curve control point. You can also move existing points in this mode but you cannot select any other object. Press (ENTER) or (ESC) when done.", text_style );
+			
+			myAssetCurve.prIsAddingPoints = !GUI.Button( new Rect( myActiveBorderWidth + 100, myActiveBorderWidth + 108, 120, 20 ), "Exit Curve Mode" );
+			GUI.color				= original_color;
+
+			// Draw yellow mode lines around the Scene view.
+			Texture2D box_texture	= new Texture2D( 1, 1 );
+			box_texture.SetPixel( 0, 0, new Color( 1.0f, 1.0f, 0.0f, 0.6f ) );
+			box_texture.wrapMode	= TextureWrapMode.Repeat;
+			box_texture.Apply();
+			float width				= myTempCamera.pixelWidth;
+			float height			= myTempCamera.pixelHeight;
+			float border_width		= myActiveBorderWidth;
+			GUI.DrawTexture( new Rect( 0, 0, width, border_width ),								// Top
+							 box_texture, ScaleMode.StretchToFill );
+			GUI.DrawTexture( new Rect( 0, border_width, border_width, height - border_width ),	// Right
+							 box_texture, ScaleMode.StretchToFill );
+			GUI.DrawTexture( new Rect( border_width, height - border_width, width, height ),	// Bottom
+							 box_texture, ScaleMode.StretchToFill );
+			GUI.DrawTexture( new Rect( width - border_width, border_width,						// Left
+							 width, height - border_width - border_width ), 
+							 box_texture, ScaleMode.StretchToFill );
+
+			GUILayout.EndArea();
+			Handles.EndGUI();
+
+			if ( !current_event.alt )
 			{
-				Vector3 mouse_position = current_event.mousePosition;
-				
-				// Camera.current.pixelHeight != Screen.height for some reason.
-				mouse_position.y = Camera.current.pixelHeight - mouse_position.y;
-				
-				Ray ray = Camera.current.ScreenPointToRay( mouse_position );
-				ray.origin = Camera.current.transform.position;
 
-				Vector3 intersection = new Vector3();
+				Vector3 position	= Vector3.zero;
+				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
+				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+				bool button_press 	= Handles.Button( 	position, 
+														rotation,
+														handle_size,
+														handle_size,
+														Handles.RectangleCap );
 
-				if ( myTarget != null && myTarget.GetComponent< MeshCollider >() )
+				if ( button_press )
 				{
-					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
-					RaycastHit hit_info;
-					collider.Raycast( ray, out hit_info, 1000.0f );
-					intersection = hit_info.point;
-				}
-				else
-				{
-					Plane plane = new Plane();
-					plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
-					float enter = 0.0f;
-					plane.Raycast( ray, out enter );
- 					intersection = ray.origin + ray.direction * enter;
-				}
+					Vector3 mouse_position = current_event.mousePosition;
 				
-				myAssetCurve.addPoint( intersection );
+					// Camera.current.pixelHeight != Screen.height for some reason.
+					mouse_position.y		= myTempCamera.pixelHeight - mouse_position.y;
+					Ray ray					= myTempCamera.ScreenPointToRay( mouse_position );
+					ray.origin				= myTempCamera.transform.position;
+					Vector3 intersection	= new Vector3();
+
+					if ( myTarget != null && myTarget.GetComponent< MeshCollider >() )
+					{
+						MeshCollider collider = myTarget.GetComponent< MeshCollider >();
+						RaycastHit hit_info;
+						collider.Raycast( ray, out hit_info, 1000.0f );
+						intersection = hit_info.point;
+					}
+					else
+					{
+						Plane plane = new Plane();
+						plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
+						float enter = 0.0f;
+						plane.Raycast( ray, out enter );
+ 						intersection = ray.origin + ray.direction * enter;
+					}
+				
+					myAssetCurve.addPoint( intersection );
+				}
 			}
+		}
+		else if ( myForceInstectorRedraw )
+		{
+			Repaint();
+			myForceInstectorRedraw = false;
 		}
 
 		// Draw current curve.
@@ -226,8 +298,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			float handle_size 	= HandleUtility.GetHandleSize( position ) * 0.06f;
 			
 			Handles.color 		= Color.cyan;
+			Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 			bool buttonPress 	= Handles.Button( 	position, 
-													HAPI_AssetUtility.getQuaternion( Camera.current.transform.localToWorldMatrix ),
+													rotation,
 													handle_size,
 													handle_size,
 													Handles.RectangleCap );
@@ -259,13 +332,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			
 			if ( new_position != old_position )
 				myAssetCurve.updatePoint( myCurrentlyActivePoint, new_position );
-		}
-		
-		// Deactivate all control points.
-		if ( current_event.isKey && current_event.keyCode == KeyCode.Escape )
-		{
-			myCurrentlyActivePoint = -1;
-			myIsAddingPoints = false;
 		}
 	}
 	
@@ -592,11 +658,14 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		return changed;
 	}
 
-	private HAPI_AssetCurve	myAssetCurve;
+	private HAPI_AssetCurve		myAssetCurve;
 
 	private int 				myCurrentlyActivePoint;
-	private bool				myIsAddingPoints;
+	private bool				myForceInstectorRedraw;
 	private string				myAddPointButtonLabel;
+
+	private const float			myActiveBorderWidth = 5;
+	private Camera				myTempCamera;
 
 	[SerializeField] 
 	private GameObject			myTarget;

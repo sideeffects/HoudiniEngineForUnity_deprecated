@@ -33,6 +33,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 	public List< Vector3 > 	prPoints { get { return myPoints; } set { myPoints = value; } }
 	public Vector3[]		prVertices { get { return myVertices; } set { myVertices = value; } }
 	public GameObject		prMainChild { get { return myMainChild; } set { myMainChild = value; } }
+
+	public bool				prIsAddingPoints { get { return myIsAddingPoints; } set { myIsAddingPoints = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -124,9 +126,11 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
-		prPoints 		= new List< Vector3 >();
-		prVertices 		= new Vector3[ 0 ];
-		prMainChild		= null;
+		prPoints 			= new List< Vector3 >();
+		prVertices 			= new Vector3[ 0 ];
+		prMainChild			= null;
+
+		myIsAddingPoints	= true;
 	}
 	
 	public override bool build( int source ) 
@@ -177,8 +181,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 				// For convenience we copy some asset info properties locally (since they are constant anyway).
 				prAssetId 				= prAssetInfo.id;
 				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
-				prMinTransInputCount			= prAssetInfo.minTransInputCount;
-				prMaxTransInputCount			= prAssetInfo.maxTransInputCount;
+				prMinTransInputCount	= prAssetInfo.minTransInputCount;
+				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;
 				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
 				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
 				prParmCount 			= prAssetInfo.parmCount;
@@ -587,6 +591,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 	[SerializeField] private List< Vector3 >	myPoints;
 	[SerializeField] private Vector3[]			myVertices;
 	[SerializeField] private GameObject			myMainChild;
+
+	[SerializeField] private bool				myIsAddingPoints;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Data
