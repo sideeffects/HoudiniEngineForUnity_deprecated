@@ -144,9 +144,17 @@ public class HAPI_Instancer : MonoBehaviour {
 				{
 					obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
 					if ( scale_attr_info.exists )
+					{
+						if ( Mathf.Approximately( 0.0f, instance_transforms[ ii ].scale[ 0 ] ) ||
+							 Mathf.Approximately( 0.0f, instance_transforms[ ii ].scale[ 1 ] ) ||
+							 Mathf.Approximately( 0.0f, instance_transforms[ ii ].scale[ 2 ] ) )
+						{
+							Debug.LogWarning( "Instance " + ii + ": Scale has a zero component!" );
+						}
 						obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[ 0 ], 
 																instance_transforms[ ii ].scale[ 1 ], 
 																instance_transforms[ ii ].scale[ 2 ] );
+					}
 
 					// The original object is probably set to be invisible because it just contains
 					// the raw geometry with no transforms applied. We need to set the newly instanced

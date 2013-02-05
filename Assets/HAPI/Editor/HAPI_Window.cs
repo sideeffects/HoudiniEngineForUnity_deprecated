@@ -139,6 +139,14 @@ public class HAPI_Window : EditorWindow
 				if ( changed )
 					HAPI_Host.prHideGeometryOnLinking = value;
 			}
+
+			// Enable Support Warnings
+			{
+				bool value = HAPI_Host.prEnableSupportWarnings;
+				bool changed = HAPI_GUI.toggle( "enable_support_warnings", "Enable Support Warnings", ref value );
+				if ( changed )
+					HAPI_Host.prEnableSupportWarnings = value;
+			}
 		}
 		
 		myShowFileList = EditorGUILayout.Foldout( myShowFileList, new GUIContent( "File List" ) );

@@ -85,6 +85,7 @@ namespace HAPI
 			// Preferences
 			setBool( "HAPI_EnableDragAndDrop", true, true );
 			setBool( "HAPI_HideGeometryOnLinking", true, true );
+			setBool( "HAPI_EnableSupportWarnings", false, true );
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +104,9 @@ namespace HAPI
 		public static bool prHideGeometryOnLinking {
 												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
 												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
+		public static bool prEnableSupportWarnings {
+												get { return getBool( "HAPI_EnableSupportWarnings" ); } 
+												set { setBool( "HAPI_EnableSupportWarnings", value ); } }
 
 		public static bool hasScene() 
 		{

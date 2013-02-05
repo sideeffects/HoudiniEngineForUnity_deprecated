@@ -185,7 +185,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 					progressBar.incrementProgressBar();
 					HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
 					
-					if ( handle_info.typeName != "xform" )
+					if ( handle_info.typeName != "xform" && HAPI_Host.prEnableSupportWarnings )
 						Debug.LogWarning( "Handle " + handle_info.name + " of type " 
 								   		  + handle_info.typeName + " is unsupported at this time." );
 					
@@ -309,6 +309,13 @@ public class HAPI_AssetOTL : HAPI_Asset
 				HAPI_TransformEuler hapi_transform;
 				HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, 
 											 (int) HAPI_XYZOrder.ZXY, out hapi_transform );
+				if ( Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
+					 Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
+					 Mathf.Approximately( 0.0f, hapi_transform.scale[ 2 ] ) )
+				{
+					Debug.LogWarning( "Asset(id: " + prAssetId + ", name: " + prAssetInfo.name + "): Scale has a zero component!" );
+				}
+
 				Utility.applyTransform( hapi_transform, transform );
 			}
 			
