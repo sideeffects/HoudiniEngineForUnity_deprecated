@@ -58,6 +58,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				myAssetOTL.prFullBuild = true;
 				myAssetOTL.build();
 			}
+			if ( GUILayout.Button( "Recook" ) ) 
+			{
+				myAssetOTL.build();
+			}
 			
 			EditorGUILayout.BeginHorizontal(); 
 			{
@@ -149,6 +153,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				bool value = myAsset.prLiveTransformPropagation;
 				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
 				myAsset.prLiveTransformPropagation = value;
+			}
+
+			// Enable Cooking Toggle
+			{
+				bool value = myAsset.prEnableCooking;
+				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
+				myAsset.prEnableCooking = value;
 			}
 		} // if
 		

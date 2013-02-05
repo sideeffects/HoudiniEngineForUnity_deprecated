@@ -144,7 +144,9 @@ public class HAPI_Asset : MonoBehaviour
 																	set { mySyncAssetTransform = value; } }
 	public bool						prLiveTransformPropagation {	get { return myLiveTransformPropagation; } 
 																	set { myLiveTransformPropagation = value; } }
-	
+	public bool						prEnableCooking {				get { return myEnableCooking; }
+																	set { myEnableCooking = value; } }
+
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
 
@@ -448,6 +450,7 @@ public class HAPI_Asset : MonoBehaviour
 		prEnableLogging				= false;
 		prSyncAssetTransform		= true;
 		prLiveTransformPropagation	= false;
+		prEnableCooking				= true;
 		
 		prLastChangedParmId 		= -1;
 
@@ -477,6 +480,9 @@ public class HAPI_Asset : MonoBehaviour
 			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 			return false;
 		}
+
+		if ( !prEnableCooking )
+			return false;
 		
 		if ( source == prAssetId && !( prFullBuild || prPartialBuild ) )
 			return false;
@@ -679,6 +685,7 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private bool					myEnableLogging;
 	[SerializeField] private bool					mySyncAssetTransform;
 	[SerializeField] private bool					myLiveTransformPropagation;
+	[SerializeField] private bool					myEnableCooking;
 	
 	[SerializeField] private int					myLastChangedParmId;
 
