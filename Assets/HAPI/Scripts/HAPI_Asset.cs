@@ -60,6 +60,8 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myForceReconnectInFullBuild = value; } }
 	public bool 					prReloadAssetInFullBuild {		get { return myReloadAssetInFullBuild; } 
 																	set { myReloadAssetInFullBuild = value; } }
+	public bool 					prAssetBeingInstanced { 		get { return myAssetBeingInstanced; } 
+																	set { myAssetBeingInstanced = value; } }
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
@@ -380,7 +382,8 @@ public class HAPI_Asset : MonoBehaviour
 				prForceReconnectInFullBuild = true;
 				prAssetId = -1;
 			}
-			build();
+			if( !prAssetBeingInstanced )
+				build();
 		}
 	}
 	
@@ -399,6 +402,7 @@ public class HAPI_Asset : MonoBehaviour
 		prFullBuild					= true;
 		prForceReconnectInFullBuild	= false;
 		prReloadAssetInFullBuild	= true;
+		prAssetBeingInstanced 		= false;
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
@@ -717,6 +721,7 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private bool					myPartialBuild;
 	[SerializeField] private bool					myForceReconnectInFullBuild;
 	[SerializeField] private bool 					myReloadAssetInFullBuild;
+	[SerializeField] private bool 					myAssetBeingInstanced;
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
