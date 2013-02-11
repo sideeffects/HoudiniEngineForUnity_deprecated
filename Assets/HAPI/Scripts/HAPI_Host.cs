@@ -228,21 +228,8 @@ namespace HAPI
 			HAPI_GetStatusString( (int) HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
 			throw new HAPI_Error( error_str.ToString() );
 		}
-		
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Private
 
-		private static void update()
-		{
-
-		}
-
-		private static void playmodeStateChanged()
-		{
-			prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
-		}
-
-		private static bool isRuntimeInitialized()
+		public static bool isRuntimeInitialized()
 		{
 			if ( !HAPI_SetPath.prIsPathSet )
 				return false;
@@ -258,6 +245,19 @@ namespace HAPI
 					return false;
 				}
 			}
+		}
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Private
+
+		private static void update()
+		{
+
+		}
+
+		private static void playmodeStateChanged()
+		{
+			prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
 		}
 
 		private static bool hasCallFailed( HAPI_Result code )

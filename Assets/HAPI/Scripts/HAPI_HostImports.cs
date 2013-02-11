@@ -95,6 +95,9 @@ namespace HAPI
 		// ASSETS ---------------------------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_IsAssetValid( int asset_id, int asset_validation_id, out int answer );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_LoadOTLFile( string file_path,
 													string textures_path,
 													int min_vertices_per_primitive,
@@ -135,12 +138,10 @@ namespace HAPI
 													string textures_path,
 													int min_vertices_per_primitive,
 													int max_vertices_per_primitive );
-		
-		
+
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAssetCountFromLoadHIPFile( ref int asset_count );													
-		
-		
+		private static extern int HAPI_GetAssetCountFromLoadHIPFile( ref int asset_count );
+
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAssetIdsFromLoadHIPFile( [Out] int[] asset_ids );
 

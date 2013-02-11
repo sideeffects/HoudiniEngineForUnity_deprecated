@@ -228,6 +228,32 @@ namespace HAPI
 		// ASSETS ---------------------------------------------------------------------------------------------------------
 
 		/// <summary>
+		/// 	Determine if your instance of the asset actually still exists inside the Houdini scene. 
+		/// 	This is what can be used to determine when the Houdini scene needs to be re-populated 
+		/// 	using the host application's instances of the assets.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="asset_validation_id">
+		///		The asset validation id that's found in the <see cref="HAPI_AssetInfo"/> struct 
+		///		returned by <see cref="HAPI_GetAssetInfo"/>.
+		/// </param>
+		public static bool isAssetValid( int asset_id, int asset_validation_id )
+		{
+			int answer = 0;
+			
+			// No need to process return code because this function is guaranteed to 
+			// always return HAPI_STATUS_SUCCESS.
+			HAPI_IsAssetValid( asset_id, asset_validation_id, out answer );
+			
+			if ( answer > 0 )
+				return true;
+			else
+				return false;
+		}
+
+		/// <summary>
 		/// 	Get an asset_info struct.
 		/// </summary>
 		/// <param name="asset_id">

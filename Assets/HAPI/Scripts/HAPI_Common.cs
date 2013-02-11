@@ -285,6 +285,8 @@ namespace HAPI
 		public int id;
 		public int type;
 		public int subType;
+
+		public int validationId;
 		
 		private int nameSH;			// string handle (SH)
 		private int labelSH;		// string handle (SH)

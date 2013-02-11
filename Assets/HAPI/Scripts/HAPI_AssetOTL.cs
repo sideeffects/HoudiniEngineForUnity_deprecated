@@ -84,16 +84,18 @@ public class HAPI_AssetOTL : HAPI_Asset
 			
 			if ( prFullBuild || prPartialBuild ) 
 			{
-				if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
+				if ( prReloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
 					HAPI_Host.unloadOTL( prAssetId );
 				
 				try
 				{
 					int asset_id = 0;
-					if ( prUnloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
+					if ( prReloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
 						asset_id = HAPI_Host.loadOTL( prAssetPath );
 					else
 						asset_id = prAssetId;
+
+					prReloadAssetInFullBuild = true; // The default.
 
 					progressBar.statusCheckLoop();
 
@@ -197,7 +199,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				}
 				
 				// Add input fields.
-				if ( !prPartialBuild )
+				if ( !prPartialBuild && !prForceReconnectInFullBuild )
 				{
 					if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					{
@@ -367,19 +369,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 			}
 			
 			// Process dependent assets.
-			if ( !prPartialBuild )
-			{
-				// If we're the source, set the source id to our asset id.
-				if ( source < 0 )
-					source = prAssetId;
+			processDependents( source );
 
-				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-					downstream_asset.build( source );
-			
-				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-					downstream_asset.build( source );
-			}
-			
 			prFullBuild = false;
 			prPartialBuild = false;
 		}

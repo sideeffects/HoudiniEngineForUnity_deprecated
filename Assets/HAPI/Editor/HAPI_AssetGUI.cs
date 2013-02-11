@@ -132,6 +132,7 @@ public class HAPI_AssetGUI : Editor
 									else
 										myAsset.addGeoAsGeoInput( new_obj, ii );
 								}
+								myAsset.build();
 							}
 						}
 						else
@@ -183,6 +184,7 @@ public class HAPI_AssetGUI : Editor
 					myAsset.addAssetAsTransformInput( input_asset, index );
 				else
 					myAsset.removeTransformInput( index );
+				myAsset.build();
 			}
 		}
 		

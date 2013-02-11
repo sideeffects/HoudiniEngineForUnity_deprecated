@@ -24,8 +24,7 @@ using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
 public class HAPI_Asset : MonoBehaviour 
-{	
-	
+{
 	public enum AssetType
 	{
 		TYPE_OTL = 0,
@@ -57,8 +56,10 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myFullBuild = value; } }
 	public bool						prPartialBuild {				get { return myPartialBuild; }
 																	set { myPartialBuild = value; } }
-	public bool 					prUnloadAssetInFullBuild {		get { return myUnloadAssetInFullBuild; } 
-																	set { myUnloadAssetInFullBuild = value; } }
+	public bool						prForceReconnectInFullBuild {	get { return myForceReconnectInFullBuild; }
+																	set { myForceReconnectInFullBuild = value; } }
+	public bool 					prReloadAssetInFullBuild {		get { return myReloadAssetInFullBuild; } 
+																	set { myReloadAssetInFullBuild = value; } }
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
@@ -208,16 +209,13 @@ public class HAPI_Asset : MonoBehaviour
 	// Transform related connection methods -------------------------------------------------------
 	
 	public void addAssetAsTransformInput( HAPI_Asset asset, int index )
-	{		
-		
+	{
 		if ( prUpStreamTransformAssets[ index ] == asset )
 			return;
 		
 		prUpStreamTransformAssets[ index ] = asset;
 		HAPI_Host.connectAssetTransform( asset.prAssetId, prAssetId, index );
 		asset.addDownstreamTransformAsset( this );
-		build();
-		return;
 	}
 	
 	public void removeTransformInput( int index )
@@ -227,7 +225,6 @@ public class HAPI_Asset : MonoBehaviour
 			prUpStreamTransformAssets[ index ].removeDownstreamTransformAsset( this );
 			HAPI_Host.disconnectAssetTransform( prAssetId, index );
 			prUpStreamTransformAssets[ index ] = null;
-			build();
 		}
 		
 	}
@@ -242,8 +239,6 @@ public class HAPI_Asset : MonoBehaviour
 				HAPI_Host.disconnectAssetTransform( prAssetId, ii );
 				
 				asset.removeDownstreamTransformAsset( this );
-				build();
-				return;
 			}
 		}
 	}
@@ -292,8 +287,6 @@ public class HAPI_Asset : MonoBehaviour
 					control.gameObject.GetComponent< MeshRenderer >().enabled = false;
 			}
 		}
-
-		build();
 	}
 	
 	public void addGeoAsGeoInput( GameObject asset, int index )
@@ -310,7 +303,6 @@ public class HAPI_Asset : MonoBehaviour
 		HAPI_ChildSelectionControl child_control = asset.GetComponent< HAPI_ChildSelectionControl >();
 		
 		Utility.setMesh( prAssetId, object_id, geo_id, ref mesh, child_control );
-		build();
 	}
 	
 	public void removeGeoInput( int index )
@@ -322,14 +314,12 @@ public class HAPI_Asset : MonoBehaviour
 				prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
 				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
 				prUpStreamGeoAssets[ index ] = null;
-				build();
 			}
 			
 			if ( prUpStreamGeoAdded[ index ] )
 			{
 				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
 				prUpStreamGeoAdded[ index ] = false;
-				build();
 			}
 		}
 		catch ( HAPI_Error error )
@@ -380,7 +370,16 @@ public class HAPI_Asset : MonoBehaviour
 	{
 		if ( prAssetId >= 0 )
 		{
-			prPartialBuild = true;
+			if ( HAPI_Host.isAssetValid( prAssetId, prAssetInfo.validationId ) )
+				// Reloading asset after mode change or script-reload.
+				prPartialBuild = true;
+			else
+			{
+				// Loading Scene (no Houdini scene exists yet)
+				prFullBuild = true;
+				prForceReconnectInFullBuild = true;
+				prAssetId = -1;
+			}
 			build();
 		}
 	}
@@ -398,12 +397,13 @@ public class HAPI_Asset : MonoBehaviour
 		prHAPIAssetType 			= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 				= 0;
 		prFullBuild					= true;
-		prUnloadAssetInFullBuild	= true;
+		prForceReconnectInFullBuild	= false;
+		prReloadAssetInFullBuild	= true;
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
-		prMinTransInputCount 			= 0;
-		prMaxTransInputCount 			= 0;
+		prMinTransInputCount 		= 0;
+		prMaxTransInputCount 		= 0;
 		prMinGeoInputCount 			= 0;
 		prMaxGeoInputCount 			= 0;
 		prFileInputs 				= new List< string >();
@@ -557,7 +557,7 @@ public class HAPI_Asset : MonoBehaviour
 	{
 		try
 		{
-			if ( myPreset != null && myPreset.Length > 0 && prUnloadAssetInFullBuild )
+			if ( myPreset != null && myPreset.Length > 0 && prReloadAssetInFullBuild )
 				HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
 		}
 		catch ( HAPI_Error error )
@@ -583,10 +583,15 @@ public class HAPI_Asset : MonoBehaviour
 		}
 		catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
 	}
+
+	public bool isAssetValid()
+	{
+		return HAPI_Host.isAssetValid( prAssetId, prAssetInfo.validationId );
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected Methods
-	
+
 	protected virtual void destroyChildren( Transform trans ) 
 	{
 		List< GameObject > children = new List< GameObject >();
@@ -609,6 +614,83 @@ public class HAPI_Asset : MonoBehaviour
 				return i;
 		}
 		return -1;
+	}
+
+	protected virtual void processDependents( int source )
+	{
+		// If we're the source, set the source id to our asset id.
+		if ( source < 0 )
+			source = prAssetId;
+
+		if ( !prPartialBuild && !prForceReconnectInFullBuild )
+		{
+			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+			{
+				if ( !downstream_asset.isAssetValid() )
+					downstream_asset.OnEnable();
+				downstream_asset.build( source );
+			}
+			
+			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+			{
+				if ( !downstream_asset.isAssetValid() )
+					downstream_asset.OnEnable();
+				downstream_asset.build( source );
+			}
+		}
+		else if ( prForceReconnectInFullBuild )
+		{
+			for ( int i = 0; i < prUpStreamTransformObjects.Count; ++i )
+			{
+				if ( prUpStreamTransformObjects[ i ] != null )
+				{
+					GameObject game_obj = prUpStreamTransformObjects[ i ];
+
+					HAPI_Asset asset_component = game_obj.GetComponent< HAPI_Asset >();
+					if ( asset_component )
+					{
+						if ( !asset_component.isAssetValid() )
+							asset_component.OnEnable();
+						addAssetAsTransformInput( asset_component, i );
+					}
+				}
+			}
+			
+			for ( int i = 0; i < prUpStreamGeoObjects.Count; ++i )
+			{
+				if ( prUpStreamGeoObjects[ i ] != null )
+				{
+					GameObject new_obj = prUpStreamGeoObjects[ i ];
+
+					HAPI_Asset asset_component = null;
+					HAPI_ChildSelectionControl 
+						child_selection_control = new_obj.GetComponent< HAPI_ChildSelectionControl >();
+							
+					int object_index = 0;
+					if ( child_selection_control )
+					{
+						object_index = child_selection_control.prObjectId;
+						asset_component = child_selection_control.prAsset;
+					}
+					else
+						asset_component = new_obj.GetComponent< HAPI_Asset >();
+							
+					if ( asset_component )
+					{
+						if ( !asset_component.isAssetValid() )
+							asset_component.OnEnable();
+						addAssetAsGeoInput( asset_component, object_index, i );
+					}
+					else
+						addGeoAsGeoInput( new_obj, i );
+				}
+			}
+
+			prForceReconnectInFullBuild = false;
+			prFullBuild = false;
+			prPartialBuild = false;
+			build(); // Need to rebuild because now we're connected to other assets.
+		}
 	}
 	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
@@ -633,7 +715,8 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
 	[SerializeField] private bool					myFullBuild;
 	[SerializeField] private bool					myPartialBuild;
-	[SerializeField] private bool 					myUnloadAssetInFullBuild;
+	[SerializeField] private bool					myForceReconnectInFullBuild;
+	[SerializeField] private bool 					myReloadAssetInFullBuild;
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	

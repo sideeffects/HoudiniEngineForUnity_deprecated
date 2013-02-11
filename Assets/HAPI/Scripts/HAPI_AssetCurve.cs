@@ -147,16 +147,18 @@ public class HAPI_AssetCurve : HAPI_Asset
 			
 			if ( prFullBuild || prPartialBuild )
 			{
-				if ( prUnloadAssetInFullBuild && !prPartialBuild )
+				if ( prReloadAssetInFullBuild && !prPartialBuild )
 					HAPI_Host.unloadOTL( prAssetId );
 					
 				try
 				{
 					int asset_id = 0;
-					if ( prUnloadAssetInFullBuild && !prPartialBuild )
+					if ( prReloadAssetInFullBuild && !prPartialBuild )
 						asset_id = HAPI_Host.createCurve();
 					else
 						asset_id = prAssetId;
+
+					prReloadAssetInFullBuild = true; // The default.
 
 					progressBar.statusCheckLoop();
 
@@ -176,32 +178,32 @@ public class HAPI_AssetCurve : HAPI_Asset
 					return false; // false for failed :(
 				}
 				
-				prAssetType				= AssetType.TYPE_CURVE;
+				prAssetType							= AssetType.TYPE_CURVE;
 
 				// For convenience we copy some asset info properties locally (since they are constant anyway).
-				prAssetId 				= prAssetInfo.id;
-				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
-				prMinTransInputCount	= prAssetInfo.minTransInputCount;
-				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;
-				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
-				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
-				prParmCount 			= prAssetInfo.parmCount;
-				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
-				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
-				prParmStringValueCount	= prAssetInfo.parmStringValueCount;
-				prParmChoiceCount		= prAssetInfo.parmChoiceCount;
+				prAssetId 							= prAssetInfo.id;
+				prHAPIAssetType						= (HAPI_AssetType) prAssetInfo.type;
+				prMinTransInputCount				= prAssetInfo.minTransInputCount;
+				prMaxTransInputCount				= prAssetInfo.maxTransInputCount;
+				prMinGeoInputCount 					= prAssetInfo.minGeoInputCount;
+				prMaxGeoInputCount					= prAssetInfo.maxGeoInputCount;
+				prParmCount 						= prAssetInfo.parmCount;
+				prParmIntValueCount					= prAssetInfo.parmIntValueCount;
+				prParmFloatValueCount				= prAssetInfo.parmFloatValueCount;
+				prParmStringValueCount				= prAssetInfo.parmStringValueCount;
+				prParmChoiceCount					= prAssetInfo.parmChoiceCount;
 				
-				prObjectCount 			= prAssetInfo.objectCount;
-				prHandleCount 			= prAssetInfo.handleCount;
+				prObjectCount 						= prAssetInfo.objectCount;
+				prHandleCount 						= prAssetInfo.handleCount;
 				
 				progressBar.prProgressBarCurrent	= 0;
 				progressBar.prProgressBarTotal		= prParmCount
-										  + prParmIntValueCount
-										  + prParmFloatValueCount
-										  + prParmStringValueCount
-										  + prParmChoiceCount
-										  + prObjectCount
-										  + prHandleCount;
+													  + prParmIntValueCount
+													  + prParmFloatValueCount
+													  + prParmStringValueCount
+													  + prParmChoiceCount
+													  + prObjectCount
+													  + prHandleCount;
 				
 				// Try to load presets.
 				loadPreset();
@@ -240,7 +242,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 				progressBar.prProgressBarMsg = "Loading handles...";
 				
 				// Add input fields.
-				if ( !prPartialBuild )
+				if ( !prPartialBuild && !prForceReconnectInFullBuild )
 				{
 					if( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					{
@@ -368,18 +370,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			}
 			
 			// Process dependent assets.
-			if ( !prPartialBuild )
-			{
-				// If we're the source, set the source id to our asset id.
-				if ( source < 0 )
-					source = prAssetId;
-
-				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-					downstream_asset.build( source );
-			
-				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-					downstream_asset.build( source );
-			}
+			processDependents( source );
 			
 			prFullBuild = false;
 			prPartialBuild = false;

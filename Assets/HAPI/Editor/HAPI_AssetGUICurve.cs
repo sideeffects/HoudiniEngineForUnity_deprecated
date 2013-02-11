@@ -192,6 +192,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			Handles.BeginGUI();
 			GUILayout.BeginArea( new Rect( 0, 0, Screen.width, Screen.height ) );
 
+			// Draw description and exit button of curve editing mode.
 			GUIStyle text_style		= new GUIStyle( GUI.skin.label );
 			text_style.alignment	= TextAnchor.UpperLeft;
 			text_style.fontStyle	= FontStyle.Bold;
