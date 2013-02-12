@@ -94,11 +94,19 @@ public class HAPI_Instancer : MonoBehaviour {
 				throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
 									  + prAsset.prAssetId + "!" );
 			
+			
+			HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
+			progressBar.prProgressBarTotal = part_info.pointCount;
+			progressBar.prProgressBarMsg = "Instancing Objects...";			
+			
 			bool liveTransformPropagationSetting	= false;
 			bool syncAssetTransformSetting			= false;
 			bool enableCooking						= true;
 			for ( int ii = 0; ii < part_info.pointCount; ++ii )
 			{
+				progressBar.prProgressBarCurrent = ii;
+				progressBar.displayProgressBar();
+				
 				GameObject objToInstantiate = null;
 				
 				if ( object_info.objectToInstanceId >= 0 )
