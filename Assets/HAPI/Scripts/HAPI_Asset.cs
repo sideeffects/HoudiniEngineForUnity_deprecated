@@ -313,14 +313,14 @@ public class HAPI_Asset : MonoBehaviour
 	{
 		try
 		{
-			if ( prUpStreamGeoAssets[ index ] )
+			if ( prUpStreamGeoAssets[ index ] != null )
 			{
 				prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
 				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
 				prUpStreamGeoAssets[ index ] = null;
+				prUpStreamGeoAdded[ index ] = false;
 			}
-			
-			if ( prUpStreamGeoAdded[ index ] )
+			else if ( prUpStreamGeoAdded[ index ] )
 			{
 				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
 				prUpStreamGeoAdded[ index ] = false;

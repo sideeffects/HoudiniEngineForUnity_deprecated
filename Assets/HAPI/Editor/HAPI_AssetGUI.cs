@@ -101,9 +101,9 @@ public class HAPI_AssetGUI : Editor
 							{
 								if ( !obj )
 								{
+									myAsset.removeGeoInput( ii );
 									myAsset.prUpStreamGeoObjects[ ii ] = null;
 									myAsset.prUpStreamGeoAssets[ ii ] = null;
-									myAsset.removeGeoInput( ii );
 								}
 								else
 								{
