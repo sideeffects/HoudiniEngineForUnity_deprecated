@@ -46,6 +46,8 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myPreset = value; } }
 	public int 						prAssetId {						get { return myAssetId; } 
 																	set { myAssetId = value; } }
+	public int						prAssetValidationId {			get { return myAssetValidationId; }
+																	protected set { myAssetValidationId = value; } } 
 	public AssetType				prAssetType {					get { return myAssetType; } 
 																	set { myAssetType = value; } }
 	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; } 
@@ -60,8 +62,6 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myForceReconnectInFullBuild = value; } }
 	public bool 					prReloadAssetInFullBuild {		get { return myReloadAssetInFullBuild; } 
 																	set { myReloadAssetInFullBuild = value; } }
-	public bool 					prAssetBeingInstanced { 		get { return myAssetBeingInstanced; } 
-																	set { myAssetBeingInstanced = value; } }
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
@@ -372,9 +372,11 @@ public class HAPI_Asset : MonoBehaviour
 	{
 		if ( prAssetId >= 0 )
 		{
-			if ( HAPI_Host.isAssetValid( prAssetId, prAssetInfo.validationId ) )
+			if ( HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
+			{
 				// Reloading asset after mode change or script-reload.
 				prPartialBuild = true;
+			}
 			else
 			{
 				// Loading Scene (no Houdini scene exists yet)
@@ -382,8 +384,8 @@ public class HAPI_Asset : MonoBehaviour
 				prForceReconnectInFullBuild = true;
 				prAssetId = -1;
 			}
-			if( !prAssetBeingInstanced )
-				build();
+
+			build();
 		}
 	}
 	
@@ -396,13 +398,13 @@ public class HAPI_Asset : MonoBehaviour
 		prAssetInfo 				= new HAPI_AssetInfo();
 		prPreset 					= null;
 		prAssetId 					= -1;
+		prAssetValidationId			= -1;
 		prAssetType					= AssetType.TYPE_INVALID;
 		prHAPIAssetType 			= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 				= 0;
 		prFullBuild					= true;
 		prForceReconnectInFullBuild	= false;
 		prReloadAssetInFullBuild	= true;
-		prAssetBeingInstanced 		= false;
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
@@ -714,6 +716,7 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private HAPI_AssetInfo			myAssetInfo;
 	[SerializeField] private byte[]					myPreset;
 	[SerializeField] private int					myAssetId;
+	[SerializeField] private int					myAssetValidationId;
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
 	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
@@ -721,7 +724,6 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private bool					myPartialBuild;
 	[SerializeField] private bool					myForceReconnectInFullBuild;
 	[SerializeField] private bool 					myReloadAssetInFullBuild;
-	[SerializeField] private bool 					myAssetBeingInstanced;
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	

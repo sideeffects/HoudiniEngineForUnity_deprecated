@@ -116,7 +116,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 				}
 				
 				// For convenience we copy some asset info properties locally (since they are constant anyway).
+				// More imporantly, structs are not serialized and therefore putting them into their own
+				// variables is required in order to maintain state between serialization cycles.
 				prAssetId 				= prAssetInfo.id;
+				prAssetValidationId		= prAssetInfo.validationId;
 				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
 				prMinTransInputCount	= prAssetInfo.minTransInputCount;
 				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;

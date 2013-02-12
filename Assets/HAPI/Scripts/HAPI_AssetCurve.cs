@@ -126,6 +126,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 	{
 		base.reset();
 		
+		prAutoSelectAssetNode	= true;
+
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
 		prPoints 				= new List< Vector3 >();
@@ -184,7 +186,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 				prAssetType							= AssetType.TYPE_CURVE;
 
 				// For convenience we copy some asset info properties locally (since they are constant anyway).
+				// More imporantly, structs are not serialized and therefore putting them into their own
+				// variables is required in order to maintain state between serialization cycles.
 				prAssetId 							= prAssetInfo.id;
+				prAssetValidationId					= prAssetInfo.validationId;
 				prHAPIAssetType						= (HAPI_AssetType) prAssetInfo.type;
 				prMinTransInputCount				= prAssetInfo.minTransInputCount;
 				prMaxTransInputCount				= prAssetInfo.maxTransInputCount;

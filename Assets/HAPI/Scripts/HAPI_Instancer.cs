@@ -94,9 +94,10 @@ public class HAPI_Instancer : MonoBehaviour {
 				throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
 									  + prAsset.prAssetId + "!" );
 			
-			bool liveTransformPropagationSetting = false;
-			bool syncAssetTransformSetting = false;
-			for (int ii = 0; ii < part_info.pointCount; ++ii )
+			bool liveTransformPropagationSetting	= false;
+			bool syncAssetTransformSetting			= false;
+			bool enableCooking						= true;
+			for ( int ii = 0; ii < part_info.pointCount; ++ii )
 			{
 				GameObject objToInstantiate = null;
 				
@@ -121,13 +122,14 @@ public class HAPI_Instancer : MonoBehaviour {
 					}
 					
 					HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
-					if( hapi_asset != null )
+					if ( hapi_asset != null )
 					{
-						liveTransformPropagationSetting = hapi_asset.prLiveTransformPropagation;
-						syncAssetTransformSetting = hapi_asset.prSyncAssetTransform;						
-						hapi_asset.prLiveTransformPropagation = false;
-						hapi_asset.prSyncAssetTransform = false;	
-						hapi_asset.prAssetBeingInstanced = true;
+						liveTransformPropagationSetting			= hapi_asset.prLiveTransformPropagation;
+						syncAssetTransformSetting				= hapi_asset.prSyncAssetTransform;
+						enableCooking							= hapi_asset.prEnableCooking;
+						hapi_asset.prLiveTransformPropagation	= false;
+						hapi_asset.prSyncAssetTransform			= false;
+						hapi_asset.prEnableCooking				= false;
 					}
 					
 				}
@@ -147,11 +149,11 @@ public class HAPI_Instancer : MonoBehaviour {
 					// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
 					// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
 					// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
-					// causes a double negative - yeah, I know).												
+					// causes a double negative - yeah, I know).
 					
-					pos[0] = -instance_transforms[ ii ].position[0];
-					pos[1] = instance_transforms[ ii ].position[1];
-					pos[2] = instance_transforms[ ii ].position[2];
+					pos[ 0 ] = -instance_transforms[ ii ].position[ 0 ];
+					pos[ 1 ] =  instance_transforms[ ii ].position[ 1 ];
+					pos[ 2 ] =  instance_transforms[ ii ].position[ 2 ];
 					
 					Quaternion quat = new Quaternion( 	instance_transforms[ ii ].rotationQuaternion[ 0 ],
 														instance_transforms[ ii ].rotationQuaternion[ 1 ],
@@ -161,7 +163,7 @@ public class HAPI_Instancer : MonoBehaviour {
 					Vector3 euler = quat.eulerAngles;
 					euler.y = -euler.y;
 					euler.z = -euler.z;
-															
+
 					GameObject obj;
 					
 					if ( !prOverrideInstances )
@@ -181,11 +183,11 @@ public class HAPI_Instancer : MonoBehaviour {
 						}
 						
 						HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
-						if( hapi_asset != null )
+						if ( hapi_asset != null )
 						{
-							hapi_asset.prLiveTransformPropagation = liveTransformPropagationSetting;
-							hapi_asset.prSyncAssetTransform = syncAssetTransformSetting;
-							hapi_asset.prAssetBeingInstanced = false;							
+							hapi_asset.prLiveTransformPropagation	= liveTransformPropagationSetting;
+							hapi_asset.prSyncAssetTransform			= syncAssetTransformSetting;
+							hapi_asset.prEnableCooking				= enableCooking;
 						}
 						
 						// The original object is probably set to be invisible because it just contains
@@ -204,20 +206,21 @@ public class HAPI_Instancer : MonoBehaviour {
 							HAPI_Asset hapi_asset = prObjToInstantiate.GetComponent< HAPI_Asset >();
 							if( hapi_asset != null )
 							{
-								liveTransformPropagationSetting = hapi_asset.prLiveTransformPropagation;
-								syncAssetTransformSetting = hapi_asset.prSyncAssetTransform;
-								hapi_asset.prLiveTransformPropagation = false;
-								hapi_asset.prSyncAssetTransform = false;
-								hapi_asset.prAssetBeingInstanced = true;
+								liveTransformPropagationSetting			= hapi_asset.prLiveTransformPropagation;
+								syncAssetTransformSetting				= hapi_asset.prSyncAssetTransform;
+								enableCooking							= hapi_asset.prEnableCooking;
+								hapi_asset.prLiveTransformPropagation	= false;
+								hapi_asset.prSyncAssetTransform			= false;
+								hapi_asset.prEnableCooking				= false;
 							}
 							
 							obj = Instantiate( prObjToInstantiate, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
 							
 							if( hapi_asset != null )
 							{
-								hapi_asset.prLiveTransformPropagation = liveTransformPropagationSetting;
-								hapi_asset.prSyncAssetTransform = syncAssetTransformSetting;
-								hapi_asset.prAssetBeingInstanced = false;
+								hapi_asset.prLiveTransformPropagation	= liveTransformPropagationSetting;
+								hapi_asset.prSyncAssetTransform			= syncAssetTransformSetting;
+								hapi_asset.prEnableCooking				= enableCooking;
 							}
 												
 						}
