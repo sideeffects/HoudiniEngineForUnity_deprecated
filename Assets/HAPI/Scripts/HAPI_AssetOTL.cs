@@ -435,12 +435,17 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 		if ( prFullBuild || geo_info.hasGeoChanged )
 		{
+			// Overwrite name.
+			part_node.name = part_info.name;
+
 			// Add required components.
-			part_node.AddComponent( "MeshFilter" );
-			part_node.AddComponent( "MeshRenderer" );
-			part_node.AddComponent( "HAPI_ChildSelectionControl" );
-			MeshFilter mesh_filter						= part_node.GetComponent< MeshFilter >();
-			HAPI_ChildSelectionControl child_control	= part_node.GetComponent< HAPI_ChildSelectionControl >();
+			MeshFilter mesh_filter = part_node.AddComponent< MeshFilter >();
+			part_node.AddComponent< MeshRenderer >();
+			HAPI_ChildSelectionControl child_control = part_node.AddComponent< HAPI_ChildSelectionControl >();
+
+			// Add collider if group name matches.
+			if ( part_info.name == HAPI_Host.prCollisionGroupName )
+				part_node.AddComponent< MeshCollider >();
 			
 			// Set Object Control on child selection control so it can read settings from here.
 			child_control.setAsset( this );
@@ -485,7 +490,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		// Set material.
 		if ( mesh_renderer.sharedMaterial == null )
 			mesh_renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
-		if ( part_info.materialId >= 0 && ( prFullBuild || geo_info.hasMaterialChanged ) )
+		if ( ( prFullBuild || geo_info.hasMaterialChanged ) && part_info.materialId >= 0 )
 		{
 			HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
 			HAPI_Host.getMaterials( prAssetId, materials, part_info.materialId, 1 );
@@ -539,8 +544,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 		// I'm assuming here the object order is maintained and will match their ids.
 		int part_id = 0;
-		foreach ( Transform part_trans in geo_node.transform )
+		for ( int i = 0; i < geo_node.transform.childCount; ++i )
 		{
+			Transform part_trans = geo_node.transform.GetChild( i );
 			part_trans.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
 			createPart( object_id, geo_id, part_id, ref geo_info, part_trans.gameObject );
 			part_id++;

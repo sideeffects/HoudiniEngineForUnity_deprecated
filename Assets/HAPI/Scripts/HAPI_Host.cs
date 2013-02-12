@@ -83,6 +83,7 @@ namespace HAPI
 			}
 
 			// Preferences
+			setString( "HAPI_CollisionGroupName", "collision_geo", true );
 			setBool( "HAPI_EnableDragAndDrop", true, true );
 			setBool( "HAPI_HideGeometryOnLinking", true, true );
 			setBool( "HAPI_EnableSupportWarnings", false, true );
@@ -98,6 +99,9 @@ namespace HAPI
 												get { return getBool( "HAPI_MidPlaymodeStateChange" ); } 
 												private set { setBool( "HAPI_MidPlaymodeStateChange", value ); } }
 
+		public static string prCollisionGroupName {
+												get { return getString( "HAPI_CollisionGroupName" ); }
+												set { setString( "HAPI_CollisionGroupName", value ); } }
 		public static bool prEnableDragAndDrop {
 												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
 												set { setBool( "HAPI_EnableDragAndDrop", value ); } }

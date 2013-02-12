@@ -350,6 +350,16 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
+	public static bool stringField( string name, string label, ref string value )
+	{
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
+		string[] values = new string[ 1 ];
+		values[ 0 ] = value;
+		bool delay_build = false;
+		bool changed = stringField( ref gui_parm, ref delay_build, ref values );
+		value = values[ 0 ];
+		return changed;
+	}
 	public static bool stringField( ref HAPI_GUIParm parm,
 									ref bool delay_build,
 									ref string[] values )
