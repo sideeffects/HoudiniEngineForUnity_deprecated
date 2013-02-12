@@ -286,6 +286,13 @@ namespace HAPI
 		public int type;
 		public int subType;
 
+		// This id is primarily used to check whether the asset still exists
+		// within the Houdini scene running inside the runtime. The asset id
+		// alone is not enough as asset ids are re-used between sessions.
+		// We use this id to determine whether we need to re-instatiate an asset
+		// we have on the client side so that Houdini also knows about it -
+		// which is different from the case where a new asset is being loaded
+		// for the first time.
 		public int validationId;
 		
 		private int nameSH;			// string handle (SH)

@@ -369,7 +369,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			}
 			
 			// Process dependent assets.
-			processDependents( source );
+			processDependentAssets( source );
 
 			prFullBuild = false;
 			prPartialBuild = false;

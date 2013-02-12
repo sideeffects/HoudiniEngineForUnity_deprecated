@@ -62,6 +62,23 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( current_event.isKey && current_event.type == EventType.KeyUp && current_event.keyCode == KeyCode.Return )
 			commitChanges = true;
 
+		// Check if Shift is pressed so we can enable curve edit mode.
+		if ( !myAssetCurve.prIsAddingPoints && current_event.shift )
+		{
+			// Set curve edit mode to true but add the condition that it will stay
+			// true only if they continue to hold down Shift or they add at least
+			// one point.
+			myAssetCurve.prIsAddingPoints		= true;
+			myAssetCurve.prEditModeChangeWait	= true;
+		}
+		else if ( myAssetCurve.prEditModeChangeWait && !current_event.shift )
+		{
+			// If no points were added before Shift was let go then revert the curve edit mode
+			// change.
+			myAssetCurve.prIsAddingPoints		= false;
+			myAssetCurve.prEditModeChangeWait	= false;
+		}
+
 		// Check if ENTER or ESC was pressed to we can exit curve mode.
 		if ( myAssetCurve.prIsAddingPoints && current_event.isKey && current_event.type == EventType.KeyUp )
 			if ( current_event.keyCode == KeyCode.Escape || current_event.keyCode == KeyCode.Return )
@@ -177,7 +194,24 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		// Set appropriate handles matrix.
 		Handles.matrix = myAssetCurve.transform.localToWorldMatrix;
-		
+
+		// Check if Shift is pressed so we can enable curve edit mode.
+		if ( !myAssetCurve.prIsAddingPoints && current_event.shift )
+		{
+			// Set curve edit mode to true but add the condition that it will stay
+			// true only if they continue to hold down Shift or they add at least
+			// one point.
+			myAssetCurve.prIsAddingPoints		= true;
+			myAssetCurve.prEditModeChangeWait	= true;
+		}
+		else if ( myAssetCurve.prEditModeChangeWait && !current_event.shift )
+		{
+			// If no points were added before Shift was let go then revert the curve edit mode
+			// change.
+			myAssetCurve.prIsAddingPoints		= false;
+			myAssetCurve.prEditModeChangeWait	= false;
+		}
+
 		// Check if ENTER or ESC was pressed to we can exit curve mode.
 		if ( myAssetCurve.prIsAddingPoints && current_event.isKey && current_event.type == EventType.KeyUp )
 			if ( current_event.keyCode == KeyCode.Escape || current_event.keyCode == KeyCode.Return )
@@ -266,7 +300,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						plane.Raycast( ray, out enter );
  						intersection = ray.origin + ray.direction * enter;
 					}
-				
+
+					// Once we add a point we are no longer bound to the user holding down Shift.
+					// Curve edit mode is not full activated.
+					myAssetCurve.prEditModeChangeWait = false;
+
 					myAssetCurve.addPoint( intersection );
 				}
 			}

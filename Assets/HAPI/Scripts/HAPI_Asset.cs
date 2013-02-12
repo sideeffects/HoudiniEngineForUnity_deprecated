@@ -620,7 +620,7 @@ public class HAPI_Asset : MonoBehaviour
 		return -1;
 	}
 
-	protected virtual void processDependents( int source )
+	protected virtual void processDependentAssets( int source )
 	{
 		// If we're the source, set the source id to our asset id.
 		if ( source < 0 )

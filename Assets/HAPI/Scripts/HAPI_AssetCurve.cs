@@ -35,6 +35,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 	public GameObject		prMainChild { get { return myMainChild; } set { myMainChild = value; } }
 
 	public bool				prIsAddingPoints { get { return myIsAddingPoints; } set { myIsAddingPoints = value; } }
+	public bool				prEditModeChangeWait {	get { return myEditModeChangeWait; } 
+													set { myEditModeChangeWait = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -126,11 +128,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
-		prPoints 			= new List< Vector3 >();
-		prVertices 			= new Vector3[ 0 ];
-		prMainChild			= null;
+		prPoints 				= new List< Vector3 >();
+		prVertices 				= new Vector3[ 0 ];
+		prMainChild				= null;
 
-		myIsAddingPoints	= true;
+		myIsAddingPoints		= true;
+		myEditModeChangeWait	= false;
 	}
 	
 	public override bool build( int source ) 
@@ -370,7 +373,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			}
 			
 			// Process dependent assets.
-			processDependents( source );
+			processDependentAssets( source );
 			
 			prFullBuild = false;
 			prPartialBuild = false;
@@ -584,6 +587,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 	[SerializeField] private GameObject			myMainChild;
 
 	[SerializeField] private bool				myIsAddingPoints;
+	[SerializeField] private bool				myEditModeChangeWait;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Data
