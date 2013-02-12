@@ -126,16 +126,18 @@ public class HAPI_AssetCurve : HAPI_Asset
 	{
 		base.reset();
 		
-		prAutoSelectAssetNode	= true;
+		// Overwrite some settings that should be different by default for curves than other asset types.
+		prAutoSelectAssetNode		= true;
+		prHideWhenFedToOtherAsset	= false;
 
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
-		prPoints 				= new List< Vector3 >();
-		prVertices 				= new Vector3[ 0 ];
-		prMainChild				= null;
+		prPoints 					= new List< Vector3 >();
+		prVertices 					= new Vector3[ 0 ];
+		prMainChild					= null;
 
-		myIsAddingPoints		= true;
-		myEditModeChangeWait	= false;
+		myIsAddingPoints			= true;
+		myEditModeChangeWait		= false;
 	}
 	
 	public override bool build( int source ) 

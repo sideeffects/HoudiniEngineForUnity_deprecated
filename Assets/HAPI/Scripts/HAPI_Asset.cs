@@ -149,6 +149,8 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myLiveTransformPropagation = value; } }
 	public bool						prEnableCooking {				get { return myEnableCooking; }
 																	set { myEnableCooking = value; } }
+	public bool						prHideWhenFedToOtherAsset {		get { return myHideWhenFedToOtherAsset; }
+																	set { myHideWhenFedToOtherAsset = value; } }
 
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
@@ -278,7 +280,7 @@ public class HAPI_Asset : MonoBehaviour
 		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, 0, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 
-		if ( HAPI_Host.prHideGeometryOnLinking )
+		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideWhenFedToOtherAsset )
 		{
 			asset.prIsGeoVisible = false;
 			HAPI_ChildSelectionControl[] controls = asset.GetComponentsInChildren< HAPI_ChildSelectionControl >();
@@ -457,6 +459,7 @@ public class HAPI_Asset : MonoBehaviour
 		prSyncAssetTransform		= true;
 		prLiveTransformPropagation	= false;
 		prEnableCooking				= true;
+		myHideWhenFedToOtherAsset	= true;
 		
 		prLastChangedParmId 		= -1;
 
@@ -776,6 +779,7 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private bool					mySyncAssetTransform;
 	[SerializeField] private bool					myLiveTransformPropagation;
 	[SerializeField] private bool					myEnableCooking;
+	[SerializeField] private bool					myHideWhenFedToOtherAsset;
 	
 	[SerializeField] private int					myLastChangedParmId;
 

@@ -124,14 +124,21 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				}
 			}
 
-			// Draw Auto Select Asset Node Toggle
+			// Auto Select Asset Node Toggle
 			{
 				bool value = myAsset.prAutoSelectAssetNode;
 				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
 				myAsset.prAutoSelectAssetNode = value;
 			}
 			
-			// Draw Logging Toggle
+			// Hide When Fed to Other Asset
+			{
+				bool value = myAsset.prHideWhenFedToOtherAsset;
+				HAPI_GUI.toggle( "hide_when_fed_to_other_asset", "Hide When Fed to Other Asset", ref value );
+				myAsset.prHideWhenFedToOtherAsset = value;
+			}
+
+			// Logging Toggle
 			{
 				bool value = myAsset.prEnableLogging;
 				HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
