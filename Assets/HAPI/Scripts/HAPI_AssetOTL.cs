@@ -443,7 +443,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 			// Add required components.
 			MeshFilter mesh_filter = part_node.AddComponent< MeshFilter >();
-			part_node.AddComponent< MeshRenderer >();
 			HAPI_ChildSelectionControl child_control = part_node.AddComponent< HAPI_ChildSelectionControl >();
 			
 			// Set Object Control on child selection control so it can read settings from here.
@@ -478,6 +477,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 			// picks up the mesh automagically)
 			if ( part_info.name == HAPI_Host.prCollisionGroupName )
 				part_node.AddComponent< MeshCollider >();
+			else
+				part_node.AddComponent< MeshRenderer >();
 		
 			// Add Mesh-to-Prefab component.
 			part_node.AddComponent( "HAPI_MeshToPrefab" );
@@ -488,33 +489,37 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 
 		// Set visibility.
-		MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
-		mesh_renderer.enabled = object_info.isVisible && 
-								( prIsGeoVisible || geo_info.type == (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT );
-		
-		// Set material.
-		if ( mesh_renderer.sharedMaterial == null )
-			mesh_renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
-		if ( ( prFullBuild || geo_info.hasMaterialChanged ) && part_info.materialId >= 0 )
+		if ( part_info.name != HAPI_Host.prCollisionGroupName )
 		{
-			HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
-			HAPI_Host.getMaterials( prAssetId, materials, part_info.materialId, 1 );
-			HAPI_MaterialInfo material = materials[ 0 ];
-
-			// Assign vertex color shader if the flag says so.
-			if ( prShowVertexColours && mesh_renderer.sharedMaterial.name != "Particles/Additive" )
-				mesh_renderer.sharedMaterial = new Material( Shader.Find( "Particles/Additive" ) );
-			else
+			MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
+			mesh_renderer.enabled = 
+				object_info.isVisible && 
+					( prIsGeoVisible || geo_info.type == (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT );
+		
+			// Set material.
+			if ( mesh_renderer.sharedMaterial == null )
+				mesh_renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
+			if ( ( prFullBuild || geo_info.hasMaterialChanged ) && part_info.materialId >= 0 )
 			{
-				// Assign the transparency shader if this material is transparent or unassign it otherwise.
-				if ( material.isTransparent() && mesh_renderer.sharedMaterial.name != "Transparent/Specular" )
-					mesh_renderer.sharedMaterial = new Material( Shader.Find( "Transparent/Specular" ) );
-				else if ( !material.isTransparent() && mesh_renderer.sharedMaterial.name != "Specular" )
-					mesh_renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
-			}
+				HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
+				HAPI_Host.getMaterials( prAssetId, materials, part_info.materialId, 1 );
+				HAPI_MaterialInfo material = materials[ 0 ];
 
-			Material mat = mesh_renderer.sharedMaterial;
-			Utility.assignTexture( ref mat, material );
+				// Assign vertex color shader if the flag says so.
+				if ( prShowVertexColours && mesh_renderer.sharedMaterial.name != "Particles/Additive" )
+					mesh_renderer.sharedMaterial = new Material( Shader.Find( "Particles/Additive" ) );
+				else
+				{
+					// Assign the transparency shader if this material is transparent or unassign it otherwise.
+					if ( material.isTransparent() && mesh_renderer.sharedMaterial.name != "Transparent/Specular" )
+						mesh_renderer.sharedMaterial = new Material( Shader.Find( "Transparent/Specular" ) );
+					else if ( !material.isTransparent() && mesh_renderer.sharedMaterial.name != "Specular" )
+						mesh_renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
+				}
+
+				Material mat = mesh_renderer.sharedMaterial;
+				Utility.assignTexture( ref mat, material );
+			}
 		}
 	}
 	
