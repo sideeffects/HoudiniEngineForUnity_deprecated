@@ -26,15 +26,12 @@ using HAPI;
 /// </summary>
 public class HAPI_ChildSelectionControl : MonoBehaviour 
 {	
-	public int prObjectId { get; set; }
-	
-	public int prGeoId { get; set; }
-	
-	public int prGeoType { get; set; }
-	
-	public int prPartId { get; set; }
-	
-	public int[] prVertexList { get; set; }
+	public int prObjectId		{ get { return myObjectId; }	set { myObjectId = value; } }
+	public int prGeoId			{ get { return myGeoId; }		set { myGeoId = value; } }
+	public int prGeoType		{ get { return myGeoType; }		set { myGeoType = value; } }
+	public int prPartId			{ get { return myPartId; }		set { myPartId = value; } }
+	public int prMaterialId		{ get { return myMaterialId; }	set { myMaterialId = value; } }
+	public int[] prVertexList	{ get { return myVertexList; }	set { myVertexList = value; } }
 	
 	public HAPI_AttributeInfo prNormalAttrInfo { get; set; }
 	
@@ -72,5 +69,13 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 		}
 	}
 
-	private HAPI_Asset	myAsset;
+	// Private
+
+	[SerializeField] private HAPI_Asset		myAsset;
+	[SerializeField] private int			myObjectId;
+	[SerializeField] private int			myGeoId;
+	[SerializeField] private int			myGeoType;
+	[SerializeField] private int			myPartId;
+	[SerializeField] private int			myMaterialId;
+	[SerializeField] private int[]			myVertexList;
 }

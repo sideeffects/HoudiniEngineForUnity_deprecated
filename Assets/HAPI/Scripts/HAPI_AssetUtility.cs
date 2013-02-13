@@ -596,6 +596,12 @@ public class HAPI_AssetUtility
 		float[] normal_attr = new float[ 0 ];
 		getAttribute( asset_id, object_id, geo_id, part_id, "N", ref normal_attr_info, ref normal_attr, 
 					  HAPI_Host.getAttributeFloatData );
+
+		// Get colour attributes.
+		HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( "Cd" );
+		float[] colour_attr = new float[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, "Cd", ref colour_attr_info, ref colour_attr, 
+					  HAPI_Host.getAttributeFloatData );
 		
 		// Save properties.
 		child_control.prVertexList			= vertex_list;
@@ -607,6 +613,7 @@ public class HAPI_AssetUtility
 		int[] triangles 	= new int[ 		part_info.faceCount * 3 ];
 		Vector2[] uvs 		= new Vector2[ 	part_info.vertexCount ];
 		Vector3[] normals 	= new Vector3[ 	part_info.vertexCount ];
+		Color[] colours		= new Color[	part_info.vertexCount ];
 		
 		// Fill Unity-specific data objects with data from the runtime.
 		for ( int i = 0; i < part_info.vertexCount; ++i ) 
@@ -672,6 +679,33 @@ public class HAPI_AssetUtility
 							normals[ i ][ j ] *= -1;
 					}
 			}
+
+			// Fill colours.
+			if ( colour_attr_info.exists )
+			{
+				colours[ i ].r = 1.0f;
+				colours[ i ].g = 1.0f;
+				colours[ i ].b = 1.0f;
+				colours[ i ].a = 1.0f;
+
+				// If the colours are per vertex just query directly into the normals array we filled above.
+				if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+					for ( int j = 0; j < 3; ++j )
+						colours[ i ][ j ] = colour_attr[ i * 3 + j ];
+				
+				// If the colours are per point use the vertex list array point indicies to query into
+				// the normal array we filled above.
+				else if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					for ( int j = 0; j < 3; ++j )
+						colours[ i ][ j ] = colour_attr[ vertex_list[ i ] * 3 + j ];
+				
+				// If the colours are per face divide the vertex index by the number of vertices per face
+				// which should always be HAPI_MAX_VERTICES_PER_FACE.
+				else if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+					for ( int j = 0; j < 3; ++j )
+						colours[ i ][ j ] 
+							= colour_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
+			}
 		}
 		
 		for ( int i = 0; i < part_info.faceCount; ++i ) 
@@ -683,6 +717,7 @@ public class HAPI_AssetUtility
 		mesh.triangles 	= triangles;
 		mesh.uv 		= uvs;
 		mesh.normals 	= normals;
+		mesh.colors		= colours;
 		
 		mesh.RecalculateBounds();
 		

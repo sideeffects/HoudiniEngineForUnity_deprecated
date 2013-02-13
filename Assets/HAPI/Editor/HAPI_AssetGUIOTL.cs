@@ -124,6 +124,61 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				}
 			}
 
+			// Show Vertex Colours
+			{
+				bool value = myAsset.prShowVertexColours;
+				bool changed = HAPI_GUI.toggle( "show_vertex_colours", "Show Vertex Colors", ref value );
+				if ( changed )
+				{
+					myAsset.prShowVertexColours = value;
+					foreach ( MeshRenderer renderer in myAsset.GetComponentsInChildren< MeshRenderer >() )
+					{
+						if ( myAsset.prShowVertexColours )
+							renderer.sharedMaterial =  new Material( Shader.Find( "Particles/Additive" ) );
+						else
+						{
+							Transform parent = renderer.transform;
+							HAPI_ChildSelectionControl control = parent.GetComponent< HAPI_ChildSelectionControl >();
+							
+							if ( control.prMaterialId >= 0 )
+							{
+								try
+								{
+									HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
+									HAPI_Host.getMaterials( myAsset.prAssetId, materials, control.prMaterialId, 1 );
+									HAPI_MaterialInfo material = materials[ 0 ];
+
+									if ( material.isTransparent() )
+										renderer.sharedMaterial = new Material( Shader.Find( "Transparent/Specular" ) );
+									else if ( !material.isTransparent() )
+										renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
+
+									Material mat = renderer.sharedMaterial;
+									HAPI_AssetUtility.assignTexture( ref mat, material );
+								}
+								catch ( HAPI_Error error )
+								{
+									Debug.LogError( error.ToString() );
+								}
+							}
+							else
+							{
+								renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
+							}
+						}
+					}
+				}
+			}
+
+			HAPI_GUI.separator();
+
+			// Enable Cooking Toggle
+			{
+				bool value = myAsset.prEnableCooking;
+				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
+				myAsset.prEnableCooking = value;
+			}
+
 			// Auto Select Asset Node Toggle
 			{
 				bool value = myAsset.prAutoSelectAssetNode;
@@ -138,12 +193,16 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				myAsset.prHideWhenFedToOtherAsset = value;
 			}
 
+			HAPI_GUI.separator();
+			
+			/* Hide for now since it's not used a lot.
 			// Logging Toggle
 			{
 				bool value = myAsset.prEnableLogging;
 				HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
 				myAsset.prEnableLogging = value;
 			}
+			*/
 
 			// Sync Asset Transform Toggle
 			{
@@ -157,13 +216,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				bool value = myAsset.prLiveTransformPropagation;
 				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
 				myAsset.prLiveTransformPropagation = value;
-			}
-
-			// Enable Cooking Toggle
-			{
-				bool value = myAsset.prEnableCooking;
-				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
-				myAsset.prEnableCooking = value;
 			}
 		} // if
 		

@@ -445,10 +445,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 			MeshFilter mesh_filter = part_node.AddComponent< MeshFilter >();
 			part_node.AddComponent< MeshRenderer >();
 			HAPI_ChildSelectionControl child_control = part_node.AddComponent< HAPI_ChildSelectionControl >();
-
-			// Add collider if group name matches.
-			if ( part_info.name == HAPI_Host.prCollisionGroupName )
-				part_node.AddComponent< MeshCollider >();
 			
 			// Set Object Control on child selection control so it can read settings from here.
 			child_control.setAsset( this );
@@ -456,6 +452,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			child_control.prGeoId		= geo_id;
 			child_control.prGeoType		= geo_info.type;
 			child_control.prPartId		= part_id;
+			child_control.prMaterialId	= part_info.materialId;
 		
 			// Get or create mesh.
 			Mesh part_mesh 				= mesh_filter.sharedMesh;
@@ -476,6 +473,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 				Debug.LogWarning( error.ToString() );
 				return;
 			}
+
+			// Add collider if group name matches. (Should be added after the mesh is set so that it
+			// picks up the mesh automagically)
+			if ( part_info.name == HAPI_Host.prCollisionGroupName )
+				part_node.AddComponent< MeshCollider >();
 		
 			// Add Mesh-to-Prefab component.
 			part_node.AddComponent( "HAPI_MeshToPrefab" );
@@ -499,15 +501,17 @@ public class HAPI_AssetOTL : HAPI_Asset
 			HAPI_Host.getMaterials( prAssetId, materials, part_info.materialId, 1 );
 			HAPI_MaterialInfo material = materials[ 0 ];
 
-			// Assign the transparency shader if this material is transparent or unassign it otherwise.
-			if ( material.isTransparent() && 
-				 mesh_renderer.sharedMaterial.name == "Specular" )
-				mesh_renderer.sharedMaterial = 
-					new Material( Shader.Find( "Transparent/Specular" ) );
-			else if ( !material.isTransparent() &&
-					  mesh_renderer.sharedMaterial.name == "Transparent/Specular" )
-				mesh_renderer.sharedMaterial =
-					new Material( Shader.Find( "Specular" ) );
+			// Assign vertex color shader if the flag says so.
+			if ( prShowVertexColours && mesh_renderer.sharedMaterial.name != "Particles/Additive" )
+				mesh_renderer.sharedMaterial = new Material( Shader.Find( "Particles/Additive" ) );
+			else
+			{
+				// Assign the transparency shader if this material is transparent or unassign it otherwise.
+				if ( material.isTransparent() && mesh_renderer.sharedMaterial.name != "Transparent/Specular" )
+					mesh_renderer.sharedMaterial = new Material( Shader.Find( "Transparent/Specular" ) );
+				else if ( !material.isTransparent() && mesh_renderer.sharedMaterial.name != "Specular" )
+					mesh_renderer.sharedMaterial = new Material( Shader.Find( "Specular" ) );
+			}
 
 			Material mat = mesh_renderer.sharedMaterial;
 			Utility.assignTexture( ref mat, material );

@@ -151,6 +151,8 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myEnableCooking = value; } }
 	public bool						prHideWhenFedToOtherAsset {		get { return myHideWhenFedToOtherAsset; }
 																	set { myHideWhenFedToOtherAsset = value; } }
+	public bool						prShowVertexColours {			get { return myShowVertexColours; }
+																	set { myShowVertexColours = value; } }
 
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
@@ -460,6 +462,7 @@ public class HAPI_Asset : MonoBehaviour
 		prLiveTransformPropagation	= false;
 		prEnableCooking				= true;
 		myHideWhenFedToOtherAsset	= true;
+		prShowVertexColours			= false;
 		
 		prLastChangedParmId 		= -1;
 
@@ -780,6 +783,7 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private bool					myLiveTransformPropagation;
 	[SerializeField] private bool					myEnableCooking;
 	[SerializeField] private bool					myHideWhenFedToOtherAsset;
+	[SerializeField] private bool					myShowVertexColours;
 	
 	[SerializeField] private int					myLastChangedParmId;
 
