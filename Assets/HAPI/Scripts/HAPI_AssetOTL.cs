@@ -120,6 +120,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				// variables is required in order to maintain state between serialization cycles.
 				prAssetId 				= prAssetInfo.id;
 				prAssetValidationId		= prAssetInfo.validationId;
+				prAssetName				= prAssetInfo.name;
 				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
 				prMinTransInputCount	= prAssetInfo.minTransInputCount;
 				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;
@@ -204,7 +205,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				// Add input fields.
 				if ( !prPartialBuild && !prForceReconnectInFullBuild )
 				{
-					if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					{
 						if ( prMaxTransInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
 							for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
@@ -224,7 +225,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 						}
 				
 					// Check for min input fields set.
-					if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 					{
 						int numValidTransformInputs = 0;
 						for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
@@ -244,7 +245,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 					if ( numValidGeoInputs < prMinGeoInputCount )
 						Debug.LogWarning( "Insufficent Geo Inputs to Asset. Please provide inputs in the Inputs section." );
 				
-					if ( prAssetInfo.type == (int) HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 						for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
 							if ( prUpStreamTransformAssets[ ii ] )
 								HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
@@ -308,60 +309,41 @@ public class HAPI_AssetOTL : HAPI_Asset
 				progressBar.statusCheckLoop();
 			}
 
-			// Set asset's transform.
-			if ( prSyncAssetTransform )
+			if ( !prPartialBuild )
 			{
-				HAPI_TransformEuler hapi_transform;
-				HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, 
-											 (int) HAPI_XYZOrder.ZXY, out hapi_transform );
-				if ( Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
-					 Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
-					 Mathf.Approximately( 0.0f, hapi_transform.scale[ 2 ] ) )
+				// Set asset's transform.
+				if ( prSyncAssetTransform )
 				{
-					Debug.LogWarning( "Asset(id: " + prAssetId + ", name: " + prAssetInfo.name + "): Scale has a zero component!" );
-				}
-
-				Utility.applyTransform( hapi_transform, transform );
-			}
-			
-			progressBar.prProgressBarMsg = "Loading and composing objects...";
-			
-			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
-			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
-						 		 prObjectTransforms, prObjectCount );
-			
-			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-			{
-				progressBar.incrementProgressBar();
-				try
-				{
-					if ( !prObjects[ object_index ].isInstancer && 
-						 ( prFullBuild || prObjects[ object_index ].hasTransformChanged
-									   || prObjects[ object_index ].haveGeosChanged ) )
+					HAPI_TransformEuler hapi_transform;
+					HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, 
+												 (int) HAPI_XYZOrder.ZXY, out hapi_transform );
+					if ( Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
+						 Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
+						 Mathf.Approximately( 0.0f, hapi_transform.scale[ 2 ] ) )
 					{
-						createObject( object_index );
+						Debug.LogWarning( "Asset(id: " + prAssetId + ", name: " + prAssetName + "): Scale has a zero component!" );
 					}
+
+					Utility.applyTransform( hapi_transform, transform );
 				}
-				catch ( HAPI_Error error )
-				{
-					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-					Debug.LogWarning( error.ToString() );
-				}
-			}
 			
-			// Processing instancers.
-			for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-			{
-				HAPI_ObjectInfo object_info = prObjects[ object_index ];
-				if ( object_info.isInstancer )
+				progressBar.prProgressBarMsg = "Loading and composing objects...";
+			
+				Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
+				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+						 			 prObjectTransforms, prObjectCount );
+			
+				for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 				{
+					progressBar.incrementProgressBar();
 					try
 					{
-						if ( object_info.objectToInstanceId >= 0 && 
-							 prGameObjects[ object_info.objectToInstanceId ] == null )
-							createObject( object_info.objectToInstanceId );
-						
-						instanceObjects( object_index );
+						if ( !prObjects[ object_index ].isInstancer && 
+							 ( prFullBuild || prObjects[ object_index ].hasTransformChanged
+										   || prObjects[ object_index ].haveGeosChanged ) )
+						{
+							createObject( object_index );
+						}
 					}
 					catch ( HAPI_Error error )
 					{
@@ -369,10 +351,32 @@ public class HAPI_AssetOTL : HAPI_Asset
 						Debug.LogWarning( error.ToString() );
 					}
 				}
-			}
 			
-			// Process dependent assets.
-			processDependentAssets( source );
+				// Processing instancers.
+				for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+				{
+					HAPI_ObjectInfo object_info = prObjects[ object_index ];
+					if ( object_info.isInstancer )
+					{
+						try
+						{
+							if ( object_info.objectToInstanceId >= 0 && 
+								 prGameObjects[ object_info.objectToInstanceId ] == null )
+								createObject( object_info.objectToInstanceId );
+						
+							instanceObjects( object_index );
+						}
+						catch ( HAPI_Error error )
+						{
+							// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
+							Debug.LogWarning( error.ToString() );
+						}
+					}
+				}
+			
+				// Process dependent assets.
+				processDependentAssets( source );
+			}
 
 			prFullBuild = false;
 			prPartialBuild = false;
@@ -486,7 +490,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			HAPI_MeshToPrefab mesh_saver = part_node.GetComponent< HAPI_MeshToPrefab >();
 			mesh_saver.prObjectControl = this;
 			mesh_saver.prGameObject = part_node;
-			mesh_saver.prMeshName = this.prAssetInfo.name + "_" + part_node.name;
+			mesh_saver.prMeshName = prAssetName + "_" + part_node.name;
 		}
 
 		// Set visibility.
@@ -567,7 +571,12 @@ public class HAPI_AssetOTL : HAPI_Asset
 		{
 			Transform part_trans = geo_node.transform.GetChild( i );
 			part_trans.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
-			createPart( object_id, geo_id, part_id, ref geo_info, part_trans.gameObject );
+
+			HAPI_ChildSelectionControl control = part_trans.gameObject.GetComponent< HAPI_ChildSelectionControl >();
+			if ( control != null )
+				createPart( object_id, geo_id, control.prPartId, ref geo_info, part_trans.gameObject );
+			else
+				createPart( object_id, geo_id, part_id, ref geo_info, part_trans.gameObject );
 			part_id++;
 		}
 

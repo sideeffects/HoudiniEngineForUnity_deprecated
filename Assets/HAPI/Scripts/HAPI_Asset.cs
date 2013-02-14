@@ -47,7 +47,9 @@ public class HAPI_Asset : MonoBehaviour
 	public int 						prAssetId {						get { return myAssetId; } 
 																	set { myAssetId = value; } }
 	public int						prAssetValidationId {			get { return myAssetValidationId; }
-																	protected set { myAssetValidationId = value; } } 
+																	protected set { myAssetValidationId = value; } }
+ 	public string					prAssetName {					get { return myAssetName; }
+																	set { myAssetName = value; } }
 	public AssetType				prAssetType {					get { return myAssetType; } 
 																	set { myAssetType = value; } }
 	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; } 
@@ -403,6 +405,7 @@ public class HAPI_Asset : MonoBehaviour
 		prPreset 					= null;
 		prAssetId 					= -1;
 		prAssetValidationId			= -1;
+		prAssetName					= "ASSET_NAME";
 		prAssetType					= AssetType.TYPE_INVALID;
 		prHAPIAssetType 			= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 				= 0;
@@ -723,6 +726,7 @@ public class HAPI_Asset : MonoBehaviour
 	[SerializeField] private byte[]					myPreset;
 	[SerializeField] private int					myAssetId;
 	[SerializeField] private int					myAssetValidationId;
+	[SerializeField] private string					myAssetName;
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
 	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
