@@ -133,8 +133,15 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					myAsset.prShowVertexColours = value;
 					foreach ( MeshRenderer renderer in myAsset.GetComponentsInChildren< MeshRenderer >() )
 					{
+						// Set material.
+						if ( renderer.sharedMaterial == null )
+							renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+
 						if ( myAsset.prShowVertexColours )
-							renderer.sharedMaterial =  new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+						{
+							renderer.sharedMaterial.mainTexture = null;
+							renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+						}
 						else
 						{
 							Transform parent = renderer.transform;
@@ -149,9 +156,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 									HAPI_MaterialInfo material = materials[ 0 ];
 
 									if ( material.isTransparent() )
-										renderer.sharedMaterial = new Material( Shader.Find( "Transparent/Specular" ) );
+										renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
 									else if ( !material.isTransparent() )
-										renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+										renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
 
 									Material mat = renderer.sharedMaterial;
 									HAPI_AssetUtility.assignTexture( ref mat, material );
@@ -163,7 +170,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							}
 							else
 							{
-								renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+								renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
 							}
 						}
 					}

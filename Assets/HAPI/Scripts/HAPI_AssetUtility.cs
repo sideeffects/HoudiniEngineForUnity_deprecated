@@ -688,7 +688,6 @@ public class HAPI_AssetUtility
 			colours[ i ].a = 1.0f;
 			if ( colour_attr_info.exists )
 			{
-				int temp = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 				// If the colours are per vertex just query directly into the normals array we filled above.
 				if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 					for ( int j = 0; j < 3; ++j )
