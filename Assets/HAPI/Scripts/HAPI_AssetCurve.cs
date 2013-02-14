@@ -30,11 +30,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 	
-	public List< Vector3 > 	prPoints { get { return myPoints; } set { myPoints = value; } }
-	public Vector3[]		prVertices { get { return myVertices; } set { myVertices = value; } }
-	public GameObject		prMainChild { get { return myMainChild; } set { myMainChild = value; } }
+	public List< Vector3 > 	prPoints {				get { return myPoints; } set { myPoints = value; } }
+	public Vector3[]		prVertices {			get { return myVertices; } set { myVertices = value; } }
+	public GameObject		prMainChild {			get { return myMainChild; } set { myMainChild = value; } }
 
-	public bool				prIsAddingPoints { get { return myIsAddingPoints; } set { myIsAddingPoints = value; } }
+	public bool				prIsAddingPoints {		get { return myIsAddingPoints; } 
+													set { myIsAddingPoints = value; } }
 	public bool				prEditModeChangeWait {	get { return myEditModeChangeWait; } 
 													set { myEditModeChangeWait = value; } }
 	
@@ -46,11 +47,15 @@ public class HAPI_AssetCurve : HAPI_Asset
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset created!" );
 		
+		EditorApplication.playmodeStateChanged += playmodeStateChanged;
+
 		reset();
 	}
 	
 	~HAPI_AssetCurve()
-	{}
+	{
+		EditorApplication.playmodeStateChanged -= playmodeStateChanged;
+	}
 	
 	public void addPoint( Vector3 pos )
 	{
@@ -477,13 +482,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
 	
-	/// <summary>
-	/// 	Instantiate a game object corresponding to a Houdini object of this asset, get geometry information
-	/// 	on the object and re-create the geometry on the Unity side.
-	/// </summary>
-	/// <param name="object_id">
-	/// 	Object_id as returned by <see cref="GetObjects"/>.
-	/// </param>
 	private void createObject( int object_id )
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
@@ -582,6 +580,18 @@ public class HAPI_AssetCurve : HAPI_Asset
 			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;
+		}
+	}
+
+	private void playmodeStateChanged()
+	{
+		if ( prMainChild != null )
+		{
+			MeshRenderer renderer = prMainChild.GetComponent< MeshRenderer >();
+			if ( renderer != null )
+				renderer.enabled = !EditorApplication.isPlaying;
+			else
+				Debug.LogError( "Why does your curve not have a mesh renderer?" );
 		}
 	}
 	
