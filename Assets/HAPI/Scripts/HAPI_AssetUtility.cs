@@ -547,7 +547,7 @@ public class HAPI_AssetUtility
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 	
 	public static void getMesh( int asset_id, int object_id, int geo_id, int part_id, Mesh mesh, 
-								HAPI_ChildSelectionControl child_control )
+								HAPI_PartControl part_control )
 	{
 		// Get Detail info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
@@ -604,9 +604,7 @@ public class HAPI_AssetUtility
 					  HAPI_Host.getAttributeFloatData );
 		
 		// Save properties.
-		child_control.prVertexList			= vertex_list;
-		child_control.prUVAttrInfo			= uv_attr_info;
-		child_control.prNormalAttrInfo		= normal_attr_info;
+		part_control.prVertexList			= vertex_list;
 		
 		// Create Unity-specific data objects.
 		Vector3[] vertices 	= new Vector3[ 	part_info.vertexCount ];
@@ -729,14 +727,14 @@ public class HAPI_AssetUtility
 	}
 	
 	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh, 
-								HAPI_ChildSelectionControl child_control )
+								HAPI_PartControl part_control )
 	{
-		bool setting_raw_mesh = ( child_control == null );
+		bool setting_raw_mesh = ( part_control == null );
 
 		Vector3[] vertices 				= mesh.vertices;
 		int[] triangles 				= mesh.triangles;
-		//Vector2[] uvs 					= mesh.uv;
-		//Vector3[] normals 				= mesh.normals;
+		//Vector2[] uvs 				= mesh.uv;
+		//Vector3[] normals 			= mesh.normals;
 		
 		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
 		geo_info.id 					= geo_id;
@@ -752,14 +750,14 @@ public class HAPI_AssetUtility
 		}
 		else
 		{
-			part_info.faceCount = child_control.prVertexList.Length / 3;
-			part_info.vertexCount = child_control.prVertexList.Length;
+			part_info.faceCount = part_control.prVertexList.Length / 3;
+			part_info.vertexCount = part_control.prVertexList.Length;
 
 			int pointCount = 0;
-			for ( int ii = 0; ii < child_control.prVertexList.Length; ii++ )
+			for ( int ii = 0; ii < part_control.prVertexList.Length; ii++ )
 			{
-				if ( child_control.prVertexList[ ii ] > pointCount )
-					pointCount = child_control.prVertexList[ ii ];
+				if ( part_control.prVertexList[ ii ] > pointCount )
+					pointCount = part_control.prVertexList[ ii ];
 			}
 			//the values calculated from the loop are indices, so + 1 to get the count
 			part_info.pointCount = pointCount + 1;
@@ -793,7 +791,7 @@ public class HAPI_AssetUtility
 				for ( int j = 0; j < 3; ++j )
 					vertex_list[ i * 3 + j ] = triangles[ i * 3 + j ];
 		else
-			vertex_list = child_control.prVertexList;
+			vertex_list = part_control.prVertexList;
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
 		
 		// Set position attributes.
@@ -820,9 +818,9 @@ public class HAPI_AssetUtility
 		}
 		else
 		{
-			for ( int ii = 0; ii < child_control.prVertexList.Length; ii++ )
+			for ( int ii = 0; ii < part_control.prVertexList.Length; ii++ )
 			{
-				int point_index = child_control.prVertexList[ ii ] * 3;
+				int point_index = part_control.prVertexList[ ii ] * 3;
 
 				pos_attr[ point_index ] = -vertices[ ii ][ 0 ];
 				pos_attr[ point_index + 1 ] = vertices[ ii ][ 1 ];

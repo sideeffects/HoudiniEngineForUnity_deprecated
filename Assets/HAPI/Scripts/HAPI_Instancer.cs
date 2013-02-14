@@ -242,15 +242,15 @@ public class HAPI_Instancer : MonoBehaviour {
 					
 					obj.transform.parent = transform;
 					
-					HAPI_ChildSelectionControl selection_control = obj.GetComponent< HAPI_ChildSelectionControl >();
-					if ( selection_control == null )
+					HAPI_PartControl part_control = obj.GetComponent< HAPI_PartControl >();
+					if ( part_control == null )
 					{
-						obj.AddComponent( "HAPI_ChildSelectionControl" );
-						selection_control = obj.GetComponent< HAPI_ChildSelectionControl >();
+						obj.AddComponent< HAPI_PartControl >();
+						part_control = obj.GetComponent< HAPI_PartControl >();
 					}
 					
-					if ( selection_control )
-						selection_control.setAsset( prAsset );
+					if ( part_control )
+						part_control.prAsset = prAsset;
 				}
 			}
 		}

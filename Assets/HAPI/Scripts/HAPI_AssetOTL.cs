@@ -448,15 +448,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 			// Add required components.
 			MeshFilter mesh_filter = part_node.AddComponent< MeshFilter >();
-			HAPI_ChildSelectionControl child_control = part_node.AddComponent< HAPI_ChildSelectionControl >();
+			HAPI_PartControl part_control = part_node.AddComponent< HAPI_PartControl >();
 			
 			// Set Object Control on child selection control so it can read settings from here.
-			child_control.setAsset( this );
-			child_control.prObjectId	= object_id;
-			child_control.prGeoId		= geo_id;
-			child_control.prGeoType		= geo_info.type;
-			child_control.prPartId		= part_id;
-			child_control.prMaterialId	= part_info.materialId;
+			part_control.prAsset		= this;
+			part_control.prObjectId		= object_id;
+			part_control.prGeoId		= geo_id;
+			part_control.prGeoType		= geo_info.type;
+			part_control.prPartId		= part_id;
+			part_control.prMaterialId	= part_info.materialId;
 		
 			// Get or create mesh.
 			Mesh part_mesh 				= mesh_filter.sharedMesh;
@@ -470,7 +470,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			// Get mesh.
 			try
 			{
-				Utility.getMesh( prAssetId, object_id, geo_id, part_id, part_mesh, child_control );
+				Utility.getMesh( prAssetId, object_id, geo_id, part_id, part_mesh, part_control );
 			}
 			catch ( HAPI_Error error )
 			{
@@ -496,8 +496,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 		// Set visibility.
 		if ( part_info.name != HAPI_Host.prCollisionGroupName )
 		{
-			HAPI_ChildSelectionControl child_control = part_node.GetComponent< HAPI_ChildSelectionControl >();
-			child_control.prMaterialId = part_info.materialId;
+			HAPI_PartControl part_control = part_node.GetComponent< HAPI_PartControl >();
+			part_control.prMaterialId = part_info.materialId;
 			
 			MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
 			mesh_renderer.enabled = 
@@ -572,7 +572,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			Transform part_trans = geo_node.transform.GetChild( i );
 			part_trans.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
 
-			HAPI_ChildSelectionControl control = part_trans.gameObject.GetComponent< HAPI_ChildSelectionControl >();
+			HAPI_PartControl control = part_trans.gameObject.GetComponent< HAPI_PartControl >();
 			if ( control != null )
 				createPart( object_id, geo_id, control.prPartId, ref geo_info, part_trans.gameObject );
 			else

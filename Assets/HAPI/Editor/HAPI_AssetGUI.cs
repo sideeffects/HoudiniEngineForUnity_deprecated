@@ -112,14 +112,13 @@ public class HAPI_AssetGUI : Editor
 									myAsset.prUpStreamGeoObjects[ ii ] = new_obj;
 							
 									HAPI_Asset asset_component = null;
-									HAPI_ChildSelectionControl 
-										child_selection_control = new_obj.GetComponent< HAPI_ChildSelectionControl >();
+									HAPI_PartControl part_control = new_obj.GetComponent< HAPI_PartControl >();
 							
 									int object_index = 0;
-									if ( child_selection_control )
+									if ( part_control )
 									{
-										object_index = child_selection_control.prObjectId;
-										asset_component = child_selection_control.prAsset;
+										object_index = part_control.prObjectId;
+										asset_component = part_control.prAsset;
 									}
 									else
 										asset_component = new_obj.GetComponent< HAPI_Asset >();

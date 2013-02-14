@@ -11,7 +11,6 @@
  *		416-504-9876
  *
  * COMMENTS:
- * 		Contains HAPI_ChildSelectionControl which controls selection behaviour of asset game object children.
  * 
  */
 
@@ -21,11 +20,12 @@ using System.Collections;
 
 using HAPI;
 
-/// <summary>
-/// 	Controls selection behaviour of asset game object children.
-/// </summary>
-public class HAPI_ChildSelectionControl : MonoBehaviour 
+public class HAPI_PartControl : MonoBehaviour 
 {	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
+
+	public HAPI_Asset prAsset	{ get { return myAsset; }		set { myAsset = value; } }
 	public int prObjectId		{ get { return myObjectId; }	set { myObjectId = value; } }
 	public int prGeoId			{ get { return myGeoId; }		set { myGeoId = value; } }
 	public int prGeoType		{ get { return myGeoType; }		set { myGeoType = value; } }
@@ -33,34 +33,13 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 	public int prMaterialId		{ get { return myMaterialId; }	set { myMaterialId = value; } }
 	public int[] prVertexList	{ get { return myVertexList; }	set { myVertexList = value; } }
 	
-	public HAPI_AttributeInfo prNormalAttrInfo { get; set; }
-	
-	public HAPI_AttributeInfo prUVAttrInfo { get; set; }
-	
-	public HAPI_Asset prAsset 
-	{ 
-		get
-		{
-			return myAsset;
-		}
-	}
-	
-	public HAPI_ChildSelectionControl()
+	public HAPI_PartControl()
 	{
 		prVertexList = null;
 	}
 	
-	public void setAsset( MonoBehaviour asset )
-	{
-		myAsset = asset as HAPI_Asset;
-	}
-	
-	/// <summary>
-	/// 	Selects the parent of the current game object.
-	/// </summary>
 	public void selectParent()
 	{
-		
 		if ( myAsset != null && myAsset.prAutoSelectAssetNode )
 		{
 			GameObject[] selection 	= new GameObject[ 1 ];
@@ -69,6 +48,7 @@ public class HAPI_ChildSelectionControl : MonoBehaviour
 		}
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
 	[SerializeField] private HAPI_Asset		myAsset;

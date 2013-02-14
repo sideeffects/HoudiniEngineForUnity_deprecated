@@ -500,16 +500,16 @@ public class HAPI_AssetCurve : HAPI_Asset
 			prMainChild.transform.parent = transform;
 
 			// Add required components.
-			prMainChild.AddComponent( "MeshFilter" );
-			prMainChild.AddComponent( "MeshRenderer" );
-			prMainChild.AddComponent( "HAPI_ChildSelectionControl" );
+			prMainChild.AddComponent< MeshFilter >();
+			prMainChild.AddComponent< MeshRenderer >();
+			prMainChild.AddComponent< HAPI_PartControl >();
 		}
 		
 		try
 		{
 			// Set Object Control on child selection control so it can read settings from here.
-			prMainChild.GetComponent< HAPI_ChildSelectionControl >().setAsset( this );
-			prMainChild.GetComponent< HAPI_ChildSelectionControl >().prObjectId = object_id;
+			prMainChild.GetComponent< HAPI_PartControl >().prAsset		= this;
+			prMainChild.GetComponent< HAPI_PartControl >().prObjectId	= object_id;
 
 			// Set generic texture so it's not pink.
 			Material decal = new Material( Shader.Find( "Decal" ) );

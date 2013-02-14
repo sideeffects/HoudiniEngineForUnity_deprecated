@@ -113,9 +113,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				if ( changed )
 				{
 					myAsset.prIsGeoVisible = value;
-					HAPI_ChildSelectionControl[] controls = 
-						myAsset.GetComponentsInChildren< HAPI_ChildSelectionControl >();
-					foreach ( HAPI_ChildSelectionControl control in controls )
+					HAPI_PartControl[] controls = 
+						myAsset.GetComponentsInChildren< HAPI_PartControl >();
+					foreach ( HAPI_PartControl control in controls )
 					{
 						if ( control.prGeoType != (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
 								&& control.gameObject.GetComponent< MeshRenderer >() != null )
@@ -145,7 +145,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						else
 						{
 							Transform parent = renderer.transform;
-							HAPI_ChildSelectionControl control = parent.GetComponent< HAPI_ChildSelectionControl >();
+							HAPI_PartControl control = parent.GetComponent< HAPI_PartControl >();
 							
 							if ( control.prMaterialId >= 0 )
 							{

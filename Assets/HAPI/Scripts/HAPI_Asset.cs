@@ -287,8 +287,8 @@ public class HAPI_Asset : MonoBehaviour
 		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideWhenFedToOtherAsset )
 		{
 			asset.prIsGeoVisible = false;
-			HAPI_ChildSelectionControl[] controls = asset.GetComponentsInChildren< HAPI_ChildSelectionControl >();
-			foreach ( HAPI_ChildSelectionControl control in controls )
+			HAPI_PartControl[] controls = asset.GetComponentsInChildren< HAPI_PartControl >();
+			foreach ( HAPI_PartControl control in controls )
 			{
 				if ( control.prGeoType != (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
 					 && control.gameObject.GetComponent< MeshRenderer >() != null )
@@ -308,7 +308,7 @@ public class HAPI_Asset : MonoBehaviour
 		
 		MeshFilter asset_mesh_filter 	= asset.GetComponent< MeshFilter >();
 		Mesh mesh 						= asset_mesh_filter.sharedMesh;
-		HAPI_ChildSelectionControl child_control = asset.GetComponent< HAPI_ChildSelectionControl >();
+		HAPI_PartControl child_control = asset.GetComponent< HAPI_PartControl >();
 		
 		Utility.setMesh( prAssetId, object_id, geo_id, ref mesh, child_control );
 	}
@@ -678,14 +678,13 @@ public class HAPI_Asset : MonoBehaviour
 					GameObject new_obj = prUpStreamGeoObjects[ i ];
 
 					HAPI_Asset asset_component = null;
-					HAPI_ChildSelectionControl 
-						child_selection_control = new_obj.GetComponent< HAPI_ChildSelectionControl >();
+					HAPI_PartControl part_control = new_obj.GetComponent< HAPI_PartControl >();
 							
 					int object_index = 0;
-					if ( child_selection_control )
+					if ( part_control )
 					{
-						object_index = child_selection_control.prObjectId;
-						asset_component = child_selection_control.prAsset;
+						object_index = part_control.prObjectId;
+						asset_component = part_control.prAsset;
 					}
 					else
 						asset_component = new_obj.GetComponent< HAPI_Asset >();
