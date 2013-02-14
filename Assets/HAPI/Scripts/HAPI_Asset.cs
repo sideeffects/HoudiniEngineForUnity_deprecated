@@ -495,7 +495,7 @@ public class HAPI_Asset : HAPI_Control
 			return false;
 		}
 
-		if ( !prEnableCooking )
+		if ( !prEnableCooking || !HAPI_Host.prEnableGlobalCooking )
 			return false;
 		
 		if ( source == prAssetId && !( prFullBuild || prPartialBuild ) )

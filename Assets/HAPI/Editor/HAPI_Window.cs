@@ -148,6 +148,14 @@ public class HAPI_Window : EditorWindow
 					HAPI_Host.prHideGeometryOnLinking = value;
 			}
 
+			// Hide Geometry On Linking
+			{
+				bool value = HAPI_Host.prEnableGlobalCooking;
+				bool changed = HAPI_GUI.toggle( "enable_global_cooking", "Enable Global Cooking", ref value );
+				if ( changed )
+					HAPI_Host.prEnableGlobalCooking = value;
+			}
+
 			// Enable Support Warnings
 			{
 				bool value = HAPI_Host.prEnableSupportWarnings;

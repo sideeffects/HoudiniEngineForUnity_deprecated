@@ -83,13 +83,13 @@ namespace HAPI
 	{
 		static HAPI_Host()
 		{
-			EditorApplication.update += update;
-			EditorApplication.playmodeStateChanged += playmodeStateChanged;
+			EditorApplication.update				+= update;
+			EditorApplication.playmodeStateChanged	+= playmodeStateChanged;
 
 			if ( !isRuntimeInitialized() )
 			{	
-				prHoudiniSceneExists = false;
-				prMidPlaymodeStateChange = false;
+				prHoudiniSceneExists		= false;
+				prMidPlaymodeStateChange	= false;
 
 				initialize();
 			}
@@ -98,6 +98,7 @@ namespace HAPI
 			setString( "HAPI_CollisionGroupName", "collision_geo", true );
 			setBool( "HAPI_EnableDragAndDrop", true, true );
 			setBool( "HAPI_HideGeometryOnLinking", true, true );
+			setBool( "HAPI_EnableGlobalCooking", true, true );
 			setBool( "HAPI_EnableSupportWarnings", false, true );
 		}
 
@@ -120,6 +121,9 @@ namespace HAPI
 		public static bool prHideGeometryOnLinking {
 												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
 												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
+		public static bool prEnableGlobalCooking {
+												get { return getBool( "HAPI_EnableGlobalCooking" ); }
+												set { setBool( "HAPI_EnableGlobalCooking", value ); } }
 		public static bool prEnableSupportWarnings {
 												get { return getBool( "HAPI_EnableSupportWarnings" ); } 
 												set { setBool( "HAPI_EnableSupportWarnings", value ); } }
