@@ -672,8 +672,9 @@ public class HAPI_AssetUtility
 				else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
 					for ( int j = 0; j < 3; ++j )
 					{
+						int face_index = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 						normals[ i ][ j ] 
-							= normal_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
+							= normal_attr[ face_index * HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE + j ];
 						// Flip the x coordinate.
 						if ( j == 0 )
 							normals[ i ][ j ] *= -1;
@@ -681,13 +682,13 @@ public class HAPI_AssetUtility
 			}
 
 			// Fill colours.
+			colours[ i ].r = 1.0f;
+			colours[ i ].g = 1.0f;
+			colours[ i ].b = 1.0f;
+			colours[ i ].a = 1.0f;
 			if ( colour_attr_info.exists )
 			{
-				colours[ i ].r = 1.0f;
-				colours[ i ].g = 1.0f;
-				colours[ i ].b = 1.0f;
-				colours[ i ].a = 1.0f;
-
+				int temp = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 				// If the colours are per vertex just query directly into the normals array we filled above.
 				if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 					for ( int j = 0; j < 3; ++j )
@@ -702,9 +703,12 @@ public class HAPI_AssetUtility
 				// If the colours are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
 				else if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				{
+					int face_index = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 					for ( int j = 0; j < 3; ++j )
 						colours[ i ][ j ] 
-							= colour_attr[ (int) Mathf.Floor( i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE ) ];
+							= colour_attr[ face_index * HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE + j ];
+				}
 			}
 		}
 		
