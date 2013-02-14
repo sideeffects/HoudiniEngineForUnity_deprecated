@@ -66,11 +66,11 @@ public class HAPI_AssetGUI : Editor
 						 myAsset.prUpStreamGeoObjects.Count <= 0 || myAsset.prUpStreamGeoAssets.Count <= 0 )
 						return;
 
-					for ( int ii = 0; ii < myAsset.prMaxGeoInputCount; ++ii )
+					for ( int input_index = 0; input_index < myAsset.prMaxGeoInputCount; ++input_index )
 					{
 						bool join_last							= false;
 						bool no_label_toggle_last				= true;
-						HAPI_GUIParm input_format_dropdown		= new HAPI_GUIParm( "input_format_dropdown_" + ii );
+						HAPI_GUIParm input_format_dropdown		= new HAPI_GUIParm( "input_format_dropdown_" + input_index );
 						input_format_dropdown.width				= myInputFormatDropdownWidth;
 						input_format_dropdown.size				= 1;
 						input_format_dropdown.choiceCount		= 2;
@@ -79,20 +79,20 @@ public class HAPI_AssetGUI : Editor
 						int[] input_format_value				= new int[ 1 ] { 0 };
 						int[] input_format_dropdown_values		= new int[ 2 ] { 0, 1 };
 						string[] input_format_dropdown_labels	= new string[ 2 ] { "Object", "File" };
-						input_format_value[ 0 ]					= (int) myAsset.prGeoInputFormats[ ii ];
+						input_format_value[ 0 ]					= (int) myAsset.prGeoInputFormats[ input_index ];
 
 						HAPI_GUI.dropdown( ref input_format_dropdown, ref input_format_value, 
 										   input_format_dropdown_labels, input_format_dropdown_values, 
 										   ref join_last, ref no_label_toggle_last );
 
 						HAPI_GeoInputFormat value				= (HAPI_GeoInputFormat) input_format_value[ 0 ];
-						myAsset.prGeoInputFormats[ ii ]			= value;
+						myAsset.prGeoInputFormats[ input_index ]			= value;
 
 						if ( value == HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_OBJECT )
 						{
-							HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + ii, 
-																	   myAsset.prGeoInputNames[ ii ] );
-							Object obj = (Object) myAsset.prUpStreamGeoObjects[ ii ];
+							HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + input_index, 
+																	   myAsset.prGeoInputNames[ input_index ] );
+							Object obj = (Object) myAsset.prUpStreamGeoObjects[ input_index ];
 							myParmChanges |= HAPI_GUI.objectField( ref geo_input, ref obj, 
 																   typeof( GameObject ), ref join_last,
 																   ref no_label_toggle_last );
@@ -101,44 +101,54 @@ public class HAPI_AssetGUI : Editor
 							{
 								if ( !obj )
 								{
-									myAsset.removeGeoInput( ii );
-									myAsset.prUpStreamGeoObjects[ ii ] = null;
-									myAsset.prUpStreamGeoAssets[ ii ] = null;
+									myAsset.removeGeoInput( input_index );
+									myAsset.prUpStreamGeoObjects[ input_index ] = null;
+									myAsset.prUpStreamGeoAssets[ input_index ] = null;
 								}
 								else
 								{
 									GameObject new_obj = (GameObject) obj;
 							
-									myAsset.prUpStreamGeoObjects[ ii ] = new_obj;
+									myAsset.prUpStreamGeoObjects[ input_index ] = new_obj;
 							
-									HAPI_Asset asset_component = null;
+									HAPI_Asset asset = null;
 									HAPI_PartControl part_control = new_obj.GetComponent< HAPI_PartControl >();
 							
 									int object_index = 0;
 									if ( part_control )
 									{
 										object_index = part_control.prObjectId;
-										asset_component = part_control.prAsset;
+										asset = part_control.prAsset;
 									}
 									else
-										asset_component = new_obj.GetComponent< HAPI_Asset >();
-							
-									if ( asset_component )
-										if ( myAsset == asset_component )
-											Debug.LogError( "Can't connect an asset to itself!" );
+										asset = new_obj.GetComponent< HAPI_Asset >();
+									
+									if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
+									{
+										if ( asset )
+										{
+											if ( myAsset == asset )
+												Debug.LogError( "Can't connect an asset to itself!" );
+											else
+											{
+												myAsset.addAssetAsGeoInput( asset, object_index, input_index );
+												myAsset.build();
+											}
+										}
 										else
-											myAsset.addAssetAsGeoInput( asset_component, object_index, ii );
-									else
-										myAsset.addGeoAsGeoInput( new_obj, ii );
+										{
+											myAsset.addGeoAsGeoInput( new_obj, input_index );
+											myAsset.build();
+										}
+									}
 								}
-								myAsset.build();
 							}
 						}
 						else
 						{
-							HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + ii,
-																		myAsset.prGeoInputNames[ ii ] );
-							string file_path = myAsset.prFileInputs[ ii ];
+							HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + input_index,
+																		myAsset.prGeoInputNames[ input_index ] );
+							string file_path = myAsset.prFileInputs[ input_index ];
 							myParmChanges |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path,
 																 ref join_last, ref no_label_toggle_last );
 						} // if

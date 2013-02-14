@@ -20,24 +20,39 @@ using System.Collections;
 
 using HAPI;
 
-public class HAPI_PartControl : MonoBehaviour 
+public class HAPI_PartControl : HAPI_GeoControl 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 
-	public HAPI_Asset prAsset	{ get { return myAsset; }		set { myAsset = value; } }
-	public int prObjectId		{ get { return myObjectId; }	set { myObjectId = value; } }
-	public int prGeoId			{ get { return myGeoId; }		set { myGeoId = value; } }
-	public int prGeoType		{ get { return myGeoType; }		set { myGeoType = value; } }
-	public int prPartId			{ get { return myPartId; }		set { myPartId = value; } }
-	public int prMaterialId		{ get { return myMaterialId; }	set { myMaterialId = value; } }
-	public int[] prVertexList	{ get { return myVertexList; }	set { myVertexList = value; } }
+	public HAPI_Asset	prAsset {		get { return myAsset; }			set { myAsset = value; } }
+	public int			prPartId {		get { return myPartId; }		set { myPartId = value; } }
+	public string		prPartName {	get { return myPartName; }		set { myPartName = value; } }
+	public int			prMaterialId {	get { return myMaterialId; }	set { myMaterialId = value; } }
+	public int[]		prVertexList {	get { return myVertexList; }	set { myVertexList = value; } }
 	
 	public HAPI_PartControl()
 	{
-		prVertexList = null;
+		reset();
+	}
+
+	~HAPI_PartControl()
+	{
+
 	}
 	
+	public override void reset()
+	{
+		base.reset();
+
+		// Please keep these in the same order and grouping as their declarations at the top.
+		
+		prPartId 		= -1;
+		prPartName		= "part_name";
+		prMaterialId 	= -1;
+		prVertexList 	= new int[ 1 ];
+	}
+
 	public void selectParent()
 	{
 		if ( myAsset != null && myAsset.prAutoSelectAssetNode )
@@ -48,14 +63,29 @@ public class HAPI_PartControl : MonoBehaviour
 		}
 	}
 
+	public void init( HAPI_PartControl part_control )
+	{
+		init( (HAPI_GeoControl) part_control );
+
+		prAsset			= part_control.prAsset;
+		prPartId		= part_control.prPartId;
+		prPartName		= part_control.prPartName;
+		prMaterialId	= part_control.prMaterialId;
+	}
+	public void init( HAPI_Asset asset, int part_id, string part_name, int material_id )
+	{
+		prAsset			= asset;
+		prPartId		= part_id;
+		prPartName		= part_name;
+		prMaterialId	= material_id;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
 	[SerializeField] private HAPI_Asset		myAsset;
-	[SerializeField] private int			myObjectId;
-	[SerializeField] private int			myGeoId;
-	[SerializeField] private int			myGeoType;
 	[SerializeField] private int			myPartId;
+	[SerializeField] private string			myPartName;
 	[SerializeField] private int			myMaterialId;
 	[SerializeField] private int[]			myVertexList;
 }

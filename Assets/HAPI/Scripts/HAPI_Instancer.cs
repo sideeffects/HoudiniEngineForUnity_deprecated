@@ -61,26 +61,10 @@ public class HAPI_Instancer : MonoBehaviour {
 								  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
 			
 			if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-				throw new HAPI_Error( "I only understand scale as point attributes!" );
+				throw new HAPI_ErrorIgnorable( "I only understand scale as point attributes!" );
 			
 			if ( scale_attr_info.exists && scale_attr.Length != part_info.pointCount * 3 )
 				throw new HAPI_Error( "Unexpected scale array length found for asset: " + prAsset.prAssetId + "!" );
-					
-			// Get string point attributes.
-			/*HAPI_AttributeInfo instancehint_attr_info = new HAPI_AttributeInfo( "instance_hint" );
-			int[] instancehint_attr = new int[ 0 ];
-			prObjectControl.getAttribute( prObjectControl.prAssetId, prObjectId, "instance_hint", 
-						ref instancehint_attr_info, ref instancehint_attr, HAPI_Host.getAttributeStrData );
-			if ( !instancehint_attr_info.exists )
-				throw new HAPI_Error( "No instance_hint attribute found." );
-			else if ( instancehint_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-				throw new HAPI_Error( "I only understand instance_hint as point attributes!" );
-			
-			if( instancehint_attr.Length != geo_info.pointCount )
-			{
-				throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
-									+ prObjectControl.prAssetId + "!" );
-			}*/	
 			
 			HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
 			int[] instance_attr = new int[ 0 ];
@@ -88,7 +72,7 @@ public class HAPI_Instancer : MonoBehaviour {
 								  ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
 			
 			if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-				throw new HAPI_Error( "I only understand instance as point attributes!" );
+				throw new HAPI_ErrorIgnorable( "I only understand instance as point attributes!" );
 			
 			if ( instance_attr_info.exists && instance_attr.Length != part_info.pointCount )
 				throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 

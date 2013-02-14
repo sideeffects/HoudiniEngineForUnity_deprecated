@@ -23,7 +23,7 @@ using HAPI;
 using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
-public class HAPI_Asset : MonoBehaviour 
+public class HAPI_Asset : HAPI_Control
 {
 	public enum AssetType
 	{
@@ -44,8 +44,6 @@ public class HAPI_Asset : MonoBehaviour
 																	set { myAssetInfo = value; } }
 	public byte[]					prPreset {						get { return myPreset; } 
 																	set { myPreset = value; } }
-	public int 						prAssetId {						get { return myAssetId; } 
-																	set { myAssetId = value; } }
 	public int						prAssetValidationId {			get { return myAssetValidationId; }
 																	protected set { myAssetValidationId = value; } }
  	public string					prAssetName {					get { return myAssetName; }
@@ -290,7 +288,7 @@ public class HAPI_Asset : MonoBehaviour
 			HAPI_PartControl[] controls = asset.GetComponentsInChildren< HAPI_PartControl >();
 			foreach ( HAPI_PartControl control in controls )
 			{
-				if ( control.prGeoType != (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
+				if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
 					 && control.gameObject.GetComponent< MeshRenderer >() != null )
 					control.gameObject.GetComponent< MeshRenderer >().enabled = false;
 			}
@@ -308,7 +306,7 @@ public class HAPI_Asset : MonoBehaviour
 		
 		MeshFilter asset_mesh_filter 	= asset.GetComponent< MeshFilter >();
 		Mesh mesh 						= asset_mesh_filter.sharedMesh;
-		HAPI_PartControl child_control = asset.GetComponent< HAPI_PartControl >();
+		HAPI_PartControl child_control  = asset.GetComponent< HAPI_PartControl >();
 		
 		Utility.setMesh( prAssetId, object_id, geo_id, ref mesh, child_control );
 	}
@@ -395,15 +393,16 @@ public class HAPI_Asset : MonoBehaviour
 		}
 	}
 	
-	public virtual void reset()
+	public override void reset()
 	{
+		base.reset();
+
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
 		// Assets ---------------------------------------------------------------------------------------------------
 		
 		prAssetInfo 				= new HAPI_AssetInfo();
 		prPreset 					= null;
-		prAssetId 					= -1;
 		prAssetValidationId			= -1;
 		prAssetName					= "ASSET_NAME";
 		prAssetType					= AssetType.TYPE_INVALID;
@@ -723,7 +722,6 @@ public class HAPI_Asset : MonoBehaviour
 	
 	[SerializeField] private HAPI_AssetInfo			myAssetInfo;
 	[SerializeField] private byte[]					myPreset;
-	[SerializeField] private int					myAssetId;
 	[SerializeField] private int					myAssetValidationId;
 	[SerializeField] private string					myAssetName;
 	[SerializeField] private AssetType				myAssetType;

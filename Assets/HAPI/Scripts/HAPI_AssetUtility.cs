@@ -546,9 +546,13 @@ public class HAPI_AssetUtility
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 	
-	public static void getMesh( int asset_id, int object_id, int geo_id, int part_id, Mesh mesh, 
-								HAPI_PartControl part_control )
+	public static void getMesh( HAPI_PartControl part_control, Mesh mesh )
 	{
+		int asset_id	= part_control.prAssetId;
+		int object_id	= part_control.prObjectId;
+		int geo_id		= part_control.prGeoId;
+		int part_id		= part_control.prPartId;
+
 		// Get Detail info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HAPI_Host.getPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
@@ -582,7 +586,7 @@ public class HAPI_AssetUtility
 		if ( !pos_attr_info.exists )
 			throw new HAPI_Error( "No position attribute found." );
 		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_Error( "I only understand position as point attributes!" );
+			throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
 				
 		// Get uv attributes.
 		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );

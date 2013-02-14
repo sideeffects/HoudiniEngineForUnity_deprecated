@@ -304,12 +304,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 					{
 						if ( prFileInputs[ ii ] != "" )
 							HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
-					
-						//TODO: handle restoring geometry connections
-						//if ( prUpStreamGeoAssets[ ii ] != null )
-						//{
-						//	HAPI_Host.connectAsset( prUpStreamAssets[ ii ].prAssetId, prAssetId, ii );
-						//}
 					}
 				
 					foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
@@ -389,6 +383,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			prFullBuild = false;
 			prPartialBuild = false;
 		}
+		catch ( HAPI_ErrorIgnorable ) {}
 		catch ( HAPI_Error error )
 		{
 			Debug.LogError( error.ToString() );

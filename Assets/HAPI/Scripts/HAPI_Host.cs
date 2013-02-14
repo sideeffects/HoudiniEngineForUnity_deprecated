@@ -51,7 +51,7 @@ namespace HAPI
 			return myErrorMessage;
 		}
 		
-		private string myErrorMessage;
+		protected string myErrorMessage;
 	}
 	
 	public class HAPI_ErrorProgressCancelled : HAPI_Error 
@@ -59,6 +59,18 @@ namespace HAPI
 		public override string ToString()
 		{
 			return "Load Cancelled by User";
+		}
+	}
+
+	public class HAPI_ErrorIgnorable : HAPI_Error
+	{
+		public HAPI_ErrorIgnorable() 
+		{
+			myErrorMessage = "Ignorable Error";
+		}
+		public HAPI_ErrorIgnorable( string msg ) 
+		{
+			myErrorMessage = msg;
 		}
 	}
 	

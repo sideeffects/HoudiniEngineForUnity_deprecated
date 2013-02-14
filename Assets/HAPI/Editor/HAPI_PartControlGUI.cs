@@ -39,18 +39,18 @@ public class HAPI_PartControlGUI : Editor
 	
 	public override void OnInspectorGUI() 
 	{
-		if ( myPartControl.prGeoType == (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT )
+		if ( myPartControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT )
 		{
 			if ( GUILayout.Button( "Update Intermediate Result" ) ) 
 			{
-				MeshFilter mesh_filter 	= myPartControl.gameObject.GetComponent< MeshFilter >();
-				Mesh shared_mesh = mesh_filter.sharedMesh;
-				HAPI_PartControl part_control = myPartControl.gameObject.GetComponent< HAPI_PartControl >();
-				HAPI_AssetUtility.setMesh( myPartControl.prAsset.prAssetId, 
-										   myPartControl.prObjectId,
-										   myPartControl.prGeoId,
-										   ref shared_mesh,
-										   part_control );
+				MeshFilter mesh_filter			= myPartControl.gameObject.GetComponent< MeshFilter >();
+				Mesh shared_mesh				= mesh_filter.sharedMesh;
+				HAPI_PartControl part_control	= myPartControl.gameObject.GetComponent< HAPI_PartControl >();
+				HAPI_AssetUtility.setMesh(		myPartControl.prAsset.prAssetId, 
+												myPartControl.prObjectId,
+												myPartControl.prGeoId,
+												ref shared_mesh,
+												part_control );
 				
 				myPartControl.prAsset.prFullBuild = false;
 				myPartControl.prAsset.build();

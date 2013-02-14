@@ -117,7 +117,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						myAsset.GetComponentsInChildren< HAPI_PartControl >();
 					foreach ( HAPI_PartControl control in controls )
 					{
-						if ( control.prGeoType != (int) HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
+						if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
 								&& control.gameObject.GetComponent< MeshRenderer >() != null )
 							control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
 					}
