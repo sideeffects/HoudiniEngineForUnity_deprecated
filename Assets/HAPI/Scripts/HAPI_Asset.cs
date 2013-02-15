@@ -381,7 +381,6 @@ public class HAPI_Asset : HAPI_Control
 			if ( HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
-				prUseDelayForProgressBar		= false;
 				prPartialBuild					= true;
 			}
 			else
@@ -488,11 +487,7 @@ public class HAPI_Asset : HAPI_Control
 				
 	}
 	
-	public virtual bool build()
-	{
-		return build( -1 );
-	}
-	public virtual bool build( int source ) 
+	public virtual bool build() 
 	{
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
 		{
@@ -501,9 +496,6 @@ public class HAPI_Asset : HAPI_Control
 		}
 
 		if ( !prEnableCooking || !HAPI_Host.prEnableGlobalCooking )
-			return false;
-		
-		if ( source == prAssetId && !( prFullBuild || prPartialBuild ) )
 			return false;
 
 		return true;
@@ -635,28 +627,28 @@ public class HAPI_Asset : HAPI_Control
 		return -1;
 	}
 
-	protected virtual void processDependentAssets( int source )
+	protected virtual void processDependentAssets()
 	{
-		// If we're the source, set the source id to our asset id.
-		if ( source < 0 )
-			source = prAssetId;
-
 		if ( !prPartialBuild && !prForceReconnectInFullBuild )
 		{
 			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 			{
+				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
 					downstream_asset.OnEnable();
 				downstream_asset.prUseDelayForProgressBar = prUseDelayForProgressBar;
-				downstream_asset.build( source );
+				downstream_asset.build();
+				prEnableCooking = true;
 			}
 			
 			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
 			{
+				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
 					downstream_asset.OnEnable();
 				downstream_asset.prUseDelayForProgressBar = prUseDelayForProgressBar;
-				downstream_asset.build( source );
+				downstream_asset.build();
+				prEnableCooking = true;
 			}
 		}
 		else if ( prForceReconnectInFullBuild )
@@ -667,12 +659,17 @@ public class HAPI_Asset : HAPI_Control
 				{
 					GameObject game_obj = prUpStreamTransformObjects[ i ];
 
-					HAPI_Asset asset_component = game_obj.GetComponent< HAPI_Asset >();
-					if ( asset_component )
+					HAPI_Asset asset = game_obj.GetComponent< HAPI_Asset >();
+					if ( asset )
 					{
-						if ( !asset_component.isAssetValid() )
-							asset_component.OnEnable();
-						addAssetAsTransformInput( asset_component, i );
+						if ( !asset.isAssetValid() )
+						{
+							// No need to cache because since we're in here it means prEnableCooking == true.
+							prEnableCooking = false;
+							asset.OnEnable();
+							prEnableCooking = true;
+						}
+						addAssetAsTransformInput( asset, i );
 					}
 				}
 			}
@@ -683,23 +680,28 @@ public class HAPI_Asset : HAPI_Control
 				{
 					GameObject new_obj = prUpStreamGeoObjects[ i ];
 
-					HAPI_Asset asset_component = null;
+					HAPI_Asset asset = null;
 					HAPI_PartControl part_control = new_obj.GetComponent< HAPI_PartControl >();
 							
 					int object_index = 0;
 					if ( part_control )
 					{
 						object_index = part_control.prObjectId;
-						asset_component = part_control.prAsset;
+						asset = part_control.prAsset;
 					}
 					else
-						asset_component = new_obj.GetComponent< HAPI_Asset >();
+						asset = new_obj.GetComponent< HAPI_Asset >();
 							
-					if ( asset_component )
+					if ( asset )
 					{
-						if ( !asset_component.isAssetValid() )
-							asset_component.OnEnable();
-						addAssetAsGeoInput( asset_component, object_index, i );
+						if ( !asset.isAssetValid() )
+						{
+							// No need to cache because since we're in here it means prEnableCooking == true.
+							prEnableCooking = false;
+							asset.OnEnable();
+							prEnableCooking = true;
+						}
+						addAssetAsGeoInput( asset, object_index, i );
 					}
 					else
 						addGeoAsGeoInput( new_obj, i );

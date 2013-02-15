@@ -145,9 +145,9 @@ public class HAPI_AssetCurve : HAPI_Asset
 		myEditModeChangeWait		= false;
 	}
 	
-	public override bool build( int source ) 
+	public override bool build() 
 	{
-		bool base_built = base.build( source );
+		bool base_built = base.build();
 		if ( !base_built )
 			return false;
 		
@@ -384,7 +384,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 				}
 			
 				// Process dependent assets.
-				processDependentAssets( source );
+				processDependentAssets();
 			}
 		}
 		catch ( HAPI_ErrorIgnorable ) {}

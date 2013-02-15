@@ -71,9 +71,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 		prHandleBindingInfos 		= null;
 	}
 	
-	public override bool build( int source ) 
+	public override bool build() 
 	{
-		bool base_built = base.build( source );
+		bool base_built = base.build();
 		if ( !base_built )
 			return false;
 		
@@ -376,7 +376,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				}
 			
 				// Process dependent assets.
-				processDependentAssets( source );
+				processDependentAssets();
 			}
 		}
 		catch ( HAPI_ErrorIgnorable ) {}
@@ -511,7 +511,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 			if ( mesh_renderer.sharedMaterial == null )
 				mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
 
-			if ( ( prFullBuild || has_material_changed ) && part_info.materialId >= 0 )
+			if ( ( prFullBuild || has_material_changed || mesh_renderer.sharedMaterial.mainTexture == null ) 
+				 && part_info.materialId >= 0 )
 			{
 				HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
 				HAPI_Host.getMaterials( prAssetId, materials, part_info.materialId, 1 );
