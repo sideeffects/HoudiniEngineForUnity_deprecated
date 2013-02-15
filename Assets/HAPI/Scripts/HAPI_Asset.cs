@@ -151,7 +151,7 @@ public class HAPI_Asset : HAPI_Control
 																	set { myLiveTransformPropagation = value; } }
 	public bool						prEnableCooking {				get { return myEnableCooking; }
 																	set { myEnableCooking = value; } }
-	public bool						prHideWhenFedToOtherAsset {		get { return myHideWhenFedToOtherAsset; }
+	public bool						prHideGeometryOnLinking {		get { return myHideWhenFedToOtherAsset; }
 																	set { myHideWhenFedToOtherAsset = value; } }
 	public bool						prShowVertexColours {			get { return myShowVertexColours; }
 																	set { myShowVertexColours = value; } }
@@ -284,7 +284,7 @@ public class HAPI_Asset : HAPI_Control
 		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, 0, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 
-		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideWhenFedToOtherAsset )
+		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideGeometryOnLinking )
 		{
 			asset.prIsGeoVisible = false;
 			HAPI_PartControl[] controls = asset.GetComponentsInChildren< HAPI_PartControl >();
@@ -462,7 +462,7 @@ public class HAPI_Asset : HAPI_Control
 		prShowObjectControls 		= true;
 		prShowAssetControls 		= true;
 		prShowInputControls 		= true;
-		prAutoSelectAssetNode 		= false; // Should be turned back on for production build.
+		prAutoSelectAssetNode 		= true;
 		prEnableLogging				= false;
 		prSyncAssetTransform		= true;
 		prLiveTransformPropagation	= false;
@@ -495,7 +495,7 @@ public class HAPI_Asset : HAPI_Control
 			return false;
 		}
 
-		if ( !prEnableCooking || !HAPI_Host.prEnableGlobalCooking )
+		if ( !prEnableCooking || !HAPI_Host.prEnableCooking )
 			return false;
 
 		return true;

@@ -35,7 +35,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		
 		myCurrentlyActivePoint	= -1;
 
-		myForceInstectorRedraw	= false;
+		myForceInspectorRedraw	= false;
 		myAddPointButtonLabel	= "Add Points";
 		myTarget				= null;
 		
@@ -84,7 +84,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			if ( current_event.keyCode == KeyCode.Escape || current_event.keyCode == KeyCode.Return )
 			{
 				myAssetCurve.prIsAddingPoints	= false;
-				myForceInstectorRedraw			= true;
+				myForceInspectorRedraw			= true;
 			}
 		
 		///////////////////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			if ( current_event.keyCode == KeyCode.Escape || current_event.keyCode == KeyCode.Return )
 			{
 				myAssetCurve.prIsAddingPoints	= false;
-				myForceInstectorRedraw			= true;
+				myForceInspectorRedraw			= true;
 			}
 
 		// Add points.
@@ -309,10 +309,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				}
 			}
 		}
-		else if ( myForceInstectorRedraw )
+		else if ( myForceInspectorRedraw )
 		{
 			Repaint();
-			myForceInstectorRedraw = false;
+			myForceInspectorRedraw = false;
 		}
 
 		// Draw current curve.
@@ -700,7 +700,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	private HAPI_AssetCurve		myAssetCurve;
 
 	private int 				myCurrentlyActivePoint;
-	private bool				myForceInstectorRedraw;
+	private bool				myForceInspectorRedraw;
 	private string				myAddPointButtonLabel;
 
 	private const float			myActiveBorderWidth = 5;

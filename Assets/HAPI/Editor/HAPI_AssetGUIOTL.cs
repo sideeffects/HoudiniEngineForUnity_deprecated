@@ -182,22 +182,43 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			// Enable Cooking Toggle
 			{
 				bool value = myAsset.prEnableCooking;
-				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
+				if ( HAPI_Host.prEnableCooking == false )
+				{
+					GUI.enabled = false;
+					HAPI_GUI.toggle( "enable_cooking", "Enable Cooking (overwritted by global setting)", ref value );
+					GUI.enabled = true;
+				}
+				else
+					HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
 				myAsset.prEnableCooking = value;
 			}
 
 			// Auto Select Asset Node Toggle
 			{
 				bool value = myAsset.prAutoSelectAssetNode;
-				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
+				if ( HAPI_Host.prAutoSelectParent == false )
+				{
+					GUI.enabled = false;
+					HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent (overwritted by global setting)", ref value );
+					GUI.enabled = true;
+				}
+				else
+					HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
 				myAsset.prAutoSelectAssetNode = value;
 			}
 			
 			// Hide When Fed to Other Asset
 			{
-				bool value = myAsset.prHideWhenFedToOtherAsset;
-				HAPI_GUI.toggle( "hide_when_fed_to_other_asset", "Hide When Fed to Other Asset", ref value );
-				myAsset.prHideWhenFedToOtherAsset = value;
+				bool value = myAsset.prHideGeometryOnLinking;
+				if ( HAPI_Host.prHideGeometryOnLinking == false )
+				{
+					GUI.enabled = false;
+					HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking (overwritted by global setting)", ref value );
+					GUI.enabled = true;
+				}
+				else
+					HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
+				myAsset.prHideGeometryOnLinking = value;
 			}
 
 			HAPI_GUI.separator();

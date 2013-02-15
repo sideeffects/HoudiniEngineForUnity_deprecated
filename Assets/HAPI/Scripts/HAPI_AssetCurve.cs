@@ -133,7 +133,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		// Overwrite some settings that should be different by default for curves than other asset types.
 		prAutoSelectAssetNode		= true;
-		prHideWhenFedToOtherAsset	= false;
+		prHideGeometryOnLinking	= false;
 
 		// Please keep these in the same order and grouping as their declarations at the top.
 		

@@ -140,28 +140,50 @@ public class HAPI_Window : EditorWindow
 				}
 			}
 
-			// Hide Geometry On Linking
-			{
-				bool value = HAPI_Host.prHideGeometryOnLinking;
-				bool changed = HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
-				if ( changed )
-					HAPI_Host.prHideGeometryOnLinking = value;
-			}
-
-			// Hide Geometry On Linking
-			{
-				bool value = HAPI_Host.prEnableGlobalCooking;
-				bool changed = HAPI_GUI.toggle( "enable_global_cooking", "Enable Global Cooking", ref value );
-				if ( changed )
-					HAPI_Host.prEnableGlobalCooking = value;
-			}
-
 			// Enable Support Warnings
 			{
 				bool value = HAPI_Host.prEnableSupportWarnings;
 				bool changed = HAPI_GUI.toggle( "enable_support_warnings", "Enable Support Warnings", ref value );
 				if ( changed )
 					HAPI_Host.prEnableSupportWarnings = value;
+			}
+
+			HAPI_GUI.separator();
+
+			// Enable Cooking
+			{
+				bool value = HAPI_Host.prEnableCooking;
+				bool changed = HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prEnableCooking = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Auto Select Parent
+			{
+				bool value = HAPI_Host.prAutoSelectParent;
+				bool changed = HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prAutoSelectParent = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Hide Geometry On Linking
+			{
+				bool value = HAPI_Host.prHideGeometryOnLinking;
+				bool changed = HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prHideGeometryOnLinking = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
 			}
 		}
 		

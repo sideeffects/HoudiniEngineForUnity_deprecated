@@ -44,6 +44,8 @@ public class HAPI_AssetGUI : Editor
 	{
 		try
 		{
+			HAPI_Host.myRepaintDelegate = this.Repaint;
+
 			myDelayBuild	= false;
 			myParmChanges	= false;
 		

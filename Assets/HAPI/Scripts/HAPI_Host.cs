@@ -25,6 +25,8 @@ using System.Text;
 
 namespace HAPI 
 {
+	public delegate void RepaintDelegate();
+
 	public class HAPI_Error : System.Exception 
 	{
 		public HAPI_Error() 
@@ -97,9 +99,12 @@ namespace HAPI
 			// Preferences
 			setString( "HAPI_CollisionGroupName", "collision_geo", true );
 			setBool( "HAPI_EnableDragAndDrop", true, true );
-			setBool( "HAPI_HideGeometryOnLinking", true, true );
-			setBool( "HAPI_EnableGlobalCooking", true, true );
 			setBool( "HAPI_EnableSupportWarnings", false, true );
+			setBool( "HAPI_EnableCooking", true, true );
+			setBool( "HAPI_AutoSelectParent", true, true );
+			setBool( "HAPI_HideGeometryOnLinking", true, true );
+
+			myRepaintDelegate = null;
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,15 +123,21 @@ namespace HAPI
 		public static bool prEnableDragAndDrop {
 												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
 												set { setBool( "HAPI_EnableDragAndDrop", value ); } }
-		public static bool prHideGeometryOnLinking {
-												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
-												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
-		public static bool prEnableGlobalCooking {
-												get { return getBool( "HAPI_EnableGlobalCooking" ); }
-												set { setBool( "HAPI_EnableGlobalCooking", value ); } }
 		public static bool prEnableSupportWarnings {
 												get { return getBool( "HAPI_EnableSupportWarnings" ); } 
 												set { setBool( "HAPI_EnableSupportWarnings", value ); } }
+
+		public static bool prEnableCooking {
+												get { return getBool( "HAPI_EnableCooking" ); }
+												set { setBool( "HAPI_EnableCooking", value ); } }
+		public static bool prAutoSelectParent {
+												get { return getBool( "HAPI_AutoSelectParent" ); } 
+												set { setBool( "HAPI_AutoSelectParent", value ); } }
+		public static bool prHideGeometryOnLinking {
+												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
+												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
+
+		public static RepaintDelegate			myRepaintDelegate;
 
 		public static bool hasScene() 
 		{
