@@ -10,50 +10,56 @@ public class HAPI_ProgressBar  {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
-	public System.DateTime	prProgressBarStartTime { get; set; }
+	public System.DateTime	prStartTime { get; set; }
 	public System.TimeSpan	prCurrentDuration { get; set; }
-	public int				prProgressBarCurrent { get; set; }
-	public int				prProgressBarTotal { get; set; } 
-	public string			prProgressBarMsg { get; set; }
-	
-		
+	public int				prCurrentValue { get; set; }
+	public int				prTotal { get; set; }
+	public string			prTitle { get; set; }
+	public string			prMessage { get; set; }
+	public bool				prUseDelay { get; set; }
+	public HAPI_Asset		prAsset { get; set; }
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
 	public HAPI_ProgressBar() 
 	{
-		prProgressBarCurrent		= 0;
-		prCurrentDuration			= new System.TimeSpan( 0 );
-		prProgressBarTotal			= 0;
-		prProgressBarMsg			= "";
-		prProgressBarStartTime		= System.DateTime.Now;
-						
-		myProgressBarTitle			= "Building Houdini Asset";
-		myProgressBarLastValue		= -1;
-		myProgressBarLastMsg		= "";
+		prCurrentValue		= 0;
+		prCurrentDuration	= new System.TimeSpan( 0 );
+		prTotal				= 0;
+		prTitle				= "Building Houdini Asset";
+		prMessage			= "Doing stuff.";
+		prStartTime			= System.DateTime.Now;
+
+		myLastValue			= -1;
+		myLastMsg			= "";
+
+		prUseDelay			= true;
+
+		prAsset				= null;
 	}
 	
 	public void statusCheckLoop()
 	{
 		HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
-		prProgressBarCurrent = 0;
-		prProgressBarTotal = 100;
+		prCurrentValue = 0;
+		prTotal = 100;
 		while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 		{
 			state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
 
 			if ( state == HAPI_State.HAPI_STATE_COOKING )
 			{
-				prProgressBarCurrent = HAPI_Host.getCookingCurrentCount();
-				prProgressBarTotal = HAPI_Host.getCookingTotalCount();
+				prCurrentValue = HAPI_Host.getCookingCurrentCount();
+				prTotal = HAPI_Host.getCookingTotalCount();
 			}
 			else
 			{
-				prProgressBarCurrent = ( System.DateTime.Now - prProgressBarStartTime ).Seconds;
-				prProgressBarTotal = 100;
+				prCurrentValue = ( System.DateTime.Now - prStartTime ).Seconds;
+				prTotal = 100;
 			}
 
-			prProgressBarMsg = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
+			prMessage = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
 			displayProgressBar();
 		}
 
@@ -66,7 +72,7 @@ public class HAPI_ProgressBar  {
 	
 	public void displayProgressBar()
 	{
-		displayProgressBar( prProgressBarCurrent );
+		displayProgressBar( prCurrentValue );
 	}
 
 	public void incrementProgressBar()
@@ -76,70 +82,71 @@ public class HAPI_ProgressBar  {
 
 	public void incrementProgressBar( int increment )
 	{
-		prProgressBarCurrent += increment;
-		displayProgressBar( prProgressBarCurrent );
+		prCurrentValue += increment;
+		displayProgressBar( prCurrentValue );
 	}
 
 	public void clearProgressBar()
 	{		
-		prProgressBarCurrent = 0;
+		prCurrentValue = 0;
 		EditorUtility.ClearProgressBar();
 	}
 
 	protected void displayProgressBar( int value )
 	{
 		System.DateTime current = System.DateTime.Now;
-		System.TimeSpan delta = current - prProgressBarStartTime;
+		System.TimeSpan delta = current - prStartTime;
 		
 		// This delay for displaying the progress bar is so the bar won't flicker for really quick updates
 		// (less than a few seconds). Also, when we do show the progress bar the focus of the current 
 		// inspector control is lost.
-		if ( delta.TotalSeconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
+		if ( prUseDelay && delta.TotalSeconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
 		{
 			EditorUtility.ClearProgressBar();
 			return;
 		}
 		
 		// If there are no changes to the progress bar value or message don't re-display it again.
-		if ( value == myProgressBarLastValue && prProgressBarMsg == myProgressBarLastMsg
+		if ( value == myLastValue && prMessage == myLastMsg
 			 && delta == prCurrentDuration )
 			return;
 		
-		prProgressBarCurrent = value;
+		prCurrentValue = value;
 		string message = "";
 		if ( delta.Hours > 0 )
-			message = delta.Hours + "h " + delta.Minutes + "m " + delta.Seconds + "s - " + prProgressBarMsg;
+			message = delta.Hours + "h " + delta.Minutes + "m " + delta.Seconds + "s - " + prMessage;
 		else if ( delta.Minutes > 0 )
-			message = delta.Minutes + "m " + delta.Seconds + "s - " + prProgressBarMsg;
+			message = delta.Minutes + "m " + delta.Seconds + "s - " + prMessage;
 		else if ( delta.Seconds > 0 )
-			message = delta.Seconds + "s - " + prProgressBarMsg;
+			message = delta.Seconds + "s - " + prMessage;
 		else
-			message = prProgressBarMsg;
+			message = prMessage;
 
-		bool result = 
-			!EditorUtility.DisplayCancelableProgressBar( 
-				myProgressBarTitle, message, Mathf.InverseLerp( 0, prProgressBarTotal, prProgressBarCurrent ) );
+		string title = prTitle;
+		if ( prAsset != null && prAsset.prAssetName != "ASSET_NAME" )
+			title = "Building Houdini Asset: " + prAsset.prAssetName;
+
+		bool result = !EditorUtility.DisplayCancelableProgressBar( 
+								title, message, Mathf.InverseLerp( 0, prTotal, prCurrentValue ) );
 		
 		if ( !result )
 		{
 			prCurrentDuration = new System.TimeSpan( 0 );
-			myProgressBarLastValue = -1;
-			myProgressBarLastMsg = "";
+			myLastValue = -1;
+			myLastMsg = "";
 			HAPI_Host.interrupt();
 			throw new HAPI_ErrorProgressCancelled();
 		}
 		else
 		{
-			myProgressBarLastValue = value;
-			myProgressBarLastMsg = prProgressBarMsg;
+			myLastValue = value;
+			myLastMsg = prMessage;
 			prCurrentDuration = delta;
 		}
 	}
 	
-	protected string			myProgressBarTitle;
-	
 	// Used to reduce the update frequency of the progress bar so it doesn't flicker.
-	private int					myProgressBarLastValue;
-	private string				myProgressBarLastMsg;
+	private int					myLastValue;
+	private string				myLastMsg;
 
 }

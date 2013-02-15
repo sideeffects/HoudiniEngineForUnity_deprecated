@@ -80,15 +80,15 @@ public class HAPI_Instancer : MonoBehaviour {
 			
 			
 			HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
-			progressBar.prProgressBarTotal = part_info.pointCount;
-			progressBar.prProgressBarMsg = "Instancing Objects...";			
+			progressBar.prTotal = part_info.pointCount;
+			progressBar.prMessage = "Instancing Objects...";			
 			
 			bool liveTransformPropagationSetting	= false;
 			bool syncAssetTransformSetting			= false;
 			bool enableCooking						= true;
 			for ( int ii = 0; ii < part_info.pointCount; ++ii )
 			{
-				progressBar.prProgressBarCurrent = ii;
+				progressBar.prCurrentValue = ii;
 				progressBar.displayProgressBar();
 				
 				GameObject objToInstantiate = null;

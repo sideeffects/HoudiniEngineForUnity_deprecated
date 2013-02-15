@@ -62,6 +62,8 @@ public class HAPI_Asset : HAPI_Control
 																	set { myForceReconnectInFullBuild = value; } }
 	public bool 					prReloadAssetInFullBuild {		get { return myReloadAssetInFullBuild; } 
 																	set { myReloadAssetInFullBuild = value; } }
+	public bool						prUseDelayForProgressBar {		get { return myUseDelayForProgressBar; }
+																	set { myUseDelayForProgressBar = value; } }
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
@@ -379,14 +381,16 @@ public class HAPI_Asset : HAPI_Control
 			if ( HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
-				prPartialBuild = true;
+				prUseDelayForProgressBar		= false;
+				prPartialBuild					= true;
 			}
 			else
 			{
 				// Loading Scene (no Houdini scene exists yet)
-				prFullBuild = true;
-				prForceReconnectInFullBuild = true;
-				prAssetId = -1;
+				prUseDelayForProgressBar		= false;
+				prFullBuild						= true;
+				prForceReconnectInFullBuild		= true;
+				prAssetId						= -1;
 			}
 
 			build();
@@ -411,6 +415,7 @@ public class HAPI_Asset : HAPI_Control
 		prFullBuild					= true;
 		prForceReconnectInFullBuild	= false;
 		prReloadAssetInFullBuild	= true;
+		prUseDelayForProgressBar	= true;
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
@@ -642,6 +647,7 @@ public class HAPI_Asset : HAPI_Control
 			{
 				if ( !downstream_asset.isAssetValid() )
 					downstream_asset.OnEnable();
+				downstream_asset.prUseDelayForProgressBar = prUseDelayForProgressBar;
 				downstream_asset.build( source );
 			}
 			
@@ -649,6 +655,7 @@ public class HAPI_Asset : HAPI_Control
 			{
 				if ( !downstream_asset.isAssetValid() )
 					downstream_asset.OnEnable();
+				downstream_asset.prUseDelayForProgressBar = prUseDelayForProgressBar;
 				downstream_asset.build( source );
 			}
 		}
@@ -731,6 +738,7 @@ public class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myPartialBuild;
 	[SerializeField] private bool					myForceReconnectInFullBuild;
 	[SerializeField] private bool 					myReloadAssetInFullBuild;
+	[SerializeField] private bool					myUseDelayForProgressBar;
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	

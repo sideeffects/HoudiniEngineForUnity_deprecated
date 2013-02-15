@@ -151,11 +151,13 @@ public class HAPI_AssetCurve : HAPI_Asset
 		if ( !base_built )
 			return false;
 		
-		HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
+		HAPI_ProgressBar progressBar	= new HAPI_ProgressBar();
+		progressBar.prUseDelay			= prUseDelayForProgressBar;
+		progressBar.prAsset				= this;
 
 		try
 		{
-			progressBar.prProgressBarStartTime = System.DateTime.Now;
+			progressBar.prStartTime = System.DateTime.Now;
 			
 			if ( prFullBuild || prPartialBuild )
 			{
@@ -212,8 +214,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 				prObjectCount 						= prAssetInfo.objectCount;
 				prHandleCount 						= prAssetInfo.handleCount;
 				
-				progressBar.prProgressBarCurrent	= 0;
-				progressBar.prProgressBarTotal		= prParmCount
+				progressBar.prCurrentValue	= 0;
+				progressBar.prTotal		= prParmCount
 													  + prParmIntValueCount
 													  + prParmFloatValueCount
 													  + prParmStringValueCount
@@ -227,7 +229,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 				progressBar.displayProgressBar();
 				myProgressBarJustUsed = true;
 				
-				progressBar.prProgressBarMsg = "Loading parameter information...";
+				progressBar.prMessage = "Loading parameter information...";
 				
 				// Get all parameters.
 				prParms = new HAPI_ParmInfo[ prParmCount ];
@@ -255,7 +257,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
 				progressBar.incrementProgressBar( prParmChoiceCount );
 				
-				progressBar.prProgressBarMsg = "Loading handles...";
+				progressBar.prMessage = "Loading handles...";
 				
 				// Add input fields.
 				if ( !prPartialBuild && !prForceReconnectInFullBuild )
@@ -343,7 +345,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 				progressBar.displayProgressBar();
 				myProgressBarJustUsed = true;
 				
-				progressBar.prProgressBarTotal = prObjectCount;
+				progressBar.prTotal = prObjectCount;
 
 				HAPI_Host.cookAsset( prAssetId );
 
@@ -361,7 +363,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 					Utility.applyTransform( hapi_transform, transform );
 				}
 
-				progressBar.prProgressBarMsg = "Loading and composing objects...";
+				progressBar.prMessage = "Loading and composing objects...";
 
 				// Create local object info caches (transforms need to be stored in a parallel array).
 				prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];
@@ -384,9 +386,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 				// Process dependent assets.
 				processDependentAssets( source );
 			}
-			
-			prFullBuild = false;
-			prPartialBuild = false;
 		}
 		catch ( HAPI_ErrorIgnorable ) {}
 		catch ( HAPI_Error error )
@@ -401,6 +400,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 		{
 			progressBar.clearProgressBar();
 			myProgressBarJustUsed = false;
+
+			prFullBuild = false;
+			prPartialBuild = false;
+			prForceReconnectInFullBuild = false;
+
+			prUseDelayForProgressBar = true;
 		}
 		
 		return true;
