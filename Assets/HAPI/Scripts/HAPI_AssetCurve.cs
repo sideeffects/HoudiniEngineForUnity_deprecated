@@ -256,6 +256,21 @@ public class HAPI_AssetCurve : HAPI_Asset
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
 				progressBar.incrementProgressBar( prParmChoiceCount );
+
+				// Set curve defaults.
+				// TODO: Make the defaults editable.
+				// TODO: Make generic update parm value functions.
+				int primitive_type_parm = findParm( "type" );
+				int method_parm = findParm( "method" );
+				prParmIntValues[ prParms[ primitive_type_parm ].intValuesIndex ] = 1;
+				prParmIntValues[ prParms[ method_parm ].intValuesIndex ] = 1;
+				{
+					int[] temp_int_values = new int[ 1 ];
+					temp_int_values[ 0 ] = 1;
+					HAPI_Host.setParmIntValues( prAssetId, temp_int_values, prParms[ primitive_type_parm ].intValuesIndex, 1 );
+					HAPI_Host.setParmIntValues( prAssetId, temp_int_values, prParms[ method_parm ].intValuesIndex, 1 );
+				}
+				HAPI_Host.cookAsset( prAssetId );
 				
 				progressBar.prMessage = "Loading handles...";
 				
