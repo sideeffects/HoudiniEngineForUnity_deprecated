@@ -140,6 +140,30 @@ public class HAPI_Window : EditorWindow
 			}
 
 			HAPI_GUI.separator();
+			
+			// Curve Primitive Type Default
+			{
+				int value = HAPI_Host.prCurvePrimitiveTypeDefault;
+				string[] labels = { "Polygon", "NURBS", "Bezier" };
+				int[] values = { 0, 1, 2 };
+				bool changed = HAPI_GUI.dropdown( "curve_primitive_type_default", "Default Curve Type", 
+												  ref value, labels, values );
+				if ( changed )
+					HAPI_Host.prCurvePrimitiveTypeDefault = value;
+			}
+
+			// Curve Method Default
+			{
+				int value = HAPI_Host.prCurveMethodDefault;
+				string[] labels = { "CVs", "Breakpoints", "Freehand" };
+				int[] values = { 0, 1, 2 };
+				bool changed = HAPI_GUI.dropdown( "curve_method_default", "Default Curve Method", 
+												  ref value, labels, values );
+				if ( changed )
+					HAPI_Host.prCurveMethodDefault = value;
+			}
+
+			HAPI_GUI.separator();
 
 			// Enable Drag-and-Drop
 			{

@@ -131,6 +131,18 @@ public class HAPI_GUI : Editor
 			EditorGUILayout.EndHorizontal();
 	}
 	
+	public static bool dropdown( string name, string label, 
+								 ref int value,
+								 string[] dropdown_labels,
+								 int[] dropdown_values )
+	{
+		HAPI_GUIParm parm = new HAPI_GUIParm( name, label, 1 );
+		int[] values = new int[ 1 ];
+		values[ 0 ] = value;
+		bool changed = dropdown( ref parm, ref values, dropdown_labels, dropdown_values );
+		value = values[ 0 ];
+		return changed;
+	}
 	public static bool dropdown( ref HAPI_GUIParm parm,
 								 ref int[] values,
 								 string[] dropdown_labels,

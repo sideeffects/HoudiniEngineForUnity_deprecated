@@ -260,17 +260,25 @@ public class HAPI_AssetCurve : HAPI_Asset
 				// Set curve defaults.
 				// TODO: Make the defaults editable.
 				// TODO: Make generic update parm value functions.
-				int primitive_type_parm = findParm( "type" );
-				int method_parm = findParm( "method" );
-				prParmIntValues[ prParms[ primitive_type_parm ].intValuesIndex ] = 1;
-				prParmIntValues[ prParms[ method_parm ].intValuesIndex ] = 1;
 				{
+					int primitive_type_parm = findParm( "type" );
+					int method_parm = findParm( "method" );
+					int primitive_type_parm_default = HAPI_Host.prCurvePrimitiveTypeDefault;
+					int method_parm_default = HAPI_Host.prCurveMethodDefault;
+
+					prParmIntValues[ prParms[ primitive_type_parm ].intValuesIndex ] = primitive_type_parm_default;
+					prParmIntValues[ prParms[ method_parm ].intValuesIndex ] = method_parm_default;
+
 					int[] temp_int_values = new int[ 1 ];
-					temp_int_values[ 0 ] = 1;
+
+					temp_int_values[ 0 ] = primitive_type_parm_default;
 					HAPI_Host.setParmIntValues( prAssetId, temp_int_values, prParms[ primitive_type_parm ].intValuesIndex, 1 );
+					
+					temp_int_values[ 0 ] = method_parm_default;
 					HAPI_Host.setParmIntValues( prAssetId, temp_int_values, prParms[ method_parm ].intValuesIndex, 1 );
+					
+					HAPI_Host.cookAsset( prAssetId );
 				}
-				HAPI_Host.cookAsset( prAssetId );
 				
 				progressBar.prMessage = "Loading handles...";
 				

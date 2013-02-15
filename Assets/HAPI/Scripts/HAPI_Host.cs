@@ -97,13 +97,19 @@ namespace HAPI
 			}
 
 			// Preferences
-			setString( "HAPI_CollisionGroupName", "collision_geo", true );
-			setString( "HAPI_RenderedCollisionGroupName", "rendered_collision_geo", true );
-			setBool( "HAPI_EnableDragAndDrop", true, true );
-			setBool( "HAPI_EnableSupportWarnings", false, true );
-			setBool( "HAPI_EnableCooking", true, true );
-			setBool( "HAPI_AutoSelectParent", true, true );
-			setBool( "HAPI_HideGeometryOnLinking", true, true );
+			
+			setString(	"HAPI_CollisionGroupName", "collision_geo", true );
+			setString(	"HAPI_RenderedCollisionGroupName", "rendered_collision_geo", true );
+
+			setInt(		"HAPI_CurvePrimitiveTypeDefault", 1, true );
+			setInt(		"HAPI_CurveMethodDefault", 1, true );
+
+			setBool(	"HAPI_EnableDragAndDrop", true, true );
+			setBool(	"HAPI_EnableSupportWarnings", false, true );
+			
+			setBool(	"HAPI_EnableCooking", true, true );
+			setBool(	"HAPI_AutoSelectParent", true, true );
+			setBool(	"HAPI_HideGeometryOnLinking", true, true );
 
 			myRepaintDelegate = null;
 		}
@@ -124,6 +130,14 @@ namespace HAPI
 		public static string prRenderedCollisionGroupName {
 												get { return getString( "HAPI_RenderedCollisionGroupName" ); }
 												set { setString( "HAPI_RenderedCollisionGroupName", value ); } }
+
+		public static int prCurvePrimitiveTypeDefault {
+												get { return getInt( "HAPI_CurvePrimitiveTypeDefault" ); }
+												set { setInt( "HAPI_CurvePrimitiveTypeDefault", value ); } }
+		public static int prCurveMethodDefault {
+												get { return getInt( "HAPI_CurveMethodDefault" ); }
+												set { setInt( "HAPI_CurveMethodDefault", value ); } }
+
 		public static bool prEnableDragAndDrop {
 												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
 												set { setBool( "HAPI_EnableDragAndDrop", value ); } }
