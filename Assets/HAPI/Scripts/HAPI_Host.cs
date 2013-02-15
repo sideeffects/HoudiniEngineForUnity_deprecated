@@ -98,6 +98,7 @@ namespace HAPI
 
 			// Preferences
 			setString( "HAPI_CollisionGroupName", "collision_geo", true );
+			setString( "HAPI_RenderedCollisionGroupName", "rendered_collision_geo", true );
 			setBool( "HAPI_EnableDragAndDrop", true, true );
 			setBool( "HAPI_EnableSupportWarnings", false, true );
 			setBool( "HAPI_EnableCooking", true, true );
@@ -120,6 +121,9 @@ namespace HAPI
 		public static string prCollisionGroupName {
 												get { return getString( "HAPI_CollisionGroupName" ); }
 												set { setString( "HAPI_CollisionGroupName", value ); } }
+		public static string prRenderedCollisionGroupName {
+												get { return getString( "HAPI_RenderedCollisionGroupName" ); }
+												set { setString( "HAPI_RenderedCollisionGroupName", value ); } }
 		public static bool prEnableDragAndDrop {
 												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
 												set { setBool( "HAPI_EnableDragAndDrop", value ); } }

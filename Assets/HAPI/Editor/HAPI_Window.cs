@@ -124,10 +124,20 @@ public class HAPI_Window : EditorWindow
 			// Collision Group Name
 			{
 				string value = HAPI_Host.prCollisionGroupName;
-				bool changed = HAPI_GUI.stringField( "collision_group_name", "Collision Grp. Name", ref value );
+				bool changed = HAPI_GUI.stringField( "collision_group_name", "Colli. Grp.", ref value );
 				if ( changed )
 					HAPI_Host.prCollisionGroupName = value;
 			}
+
+			// Rendered Collision Group Name
+			{
+				string value = HAPI_Host.prRenderedCollisionGroupName;
+				bool changed = HAPI_GUI.stringField( "rendered_collision_group_name", "Rendered Colli. Grp.", ref value );
+				if ( changed )
+					HAPI_Host.prRenderedCollisionGroupName = value;
+			}
+
+			HAPI_GUI.separator();
 
 			// Enable Drag-and-Drop
 			{

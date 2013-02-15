@@ -481,7 +481,12 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 			// Add collider if group name matches. (Should be added after the mesh is set so that it
 			// picks up the mesh automagically)
-			if ( part_info.name == HAPI_Host.prCollisionGroupName )
+			if ( part_info.name == HAPI_Host.prRenderedCollisionGroupName )
+			{
+				part_node.AddComponent< MeshCollider >();
+				part_node.AddComponent< MeshRenderer >();
+			}
+			else if ( part_info.name == HAPI_Host.prCollisionGroupName )
 				part_node.AddComponent< MeshCollider >();
 			else
 				part_node.AddComponent< MeshRenderer >();
