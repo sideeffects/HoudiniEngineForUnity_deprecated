@@ -52,8 +52,11 @@ public class HAPI_InstancerGUI : Editor
 		}
 		
 		if ( changed )
-			myInstancer.instanceObjects();
-		
+		{
+			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+			myInstancer.instanceObjects( progress_bar );
+			progress_bar.clearProgressBar();
+		}
 	}
 	
 	private HAPI_Instancer	 	myInstancer;

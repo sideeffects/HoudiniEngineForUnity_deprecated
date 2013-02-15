@@ -121,6 +121,8 @@ public class HAPI_Window : EditorWindow
 				}
 			}
 
+			HAPI_GUI.separator();
+
 			// Collision Group Name
 			{
 				string value = HAPI_Host.prCollisionGroupName;

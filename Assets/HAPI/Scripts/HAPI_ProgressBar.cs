@@ -38,6 +38,14 @@ public class HAPI_ProgressBar  {
 
 		prAsset				= null;
 	}
+
+	~HAPI_ProgressBar()
+	{
+		// Cannot clear progress bar here because clearProgressBar can only be called
+		// from the main thread while destructors are usually called by another thread
+		// (the garbage collector).
+		// clearProgressBar();
+	}
 	
 	public void statusCheckLoop()
 	{

@@ -26,11 +26,10 @@ public class HAPI_Instancer : MonoBehaviour {
 		prObjectId = -1;
 	}
 	
-	public void instanceObjects( )
+	public void instanceObjects( HAPI_ProgressBar progress_bar )
 	{
 		try
 		{
-			
 			destroyChildren();
 			
 			HAPI_ObjectInfo object_info = prAsset.prObjects[ prObjectId ];
@@ -78,19 +77,13 @@ public class HAPI_Instancer : MonoBehaviour {
 				throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
 									  + prAsset.prAssetId + "!" );
 			
-			
-			HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
-			progressBar.prTotal = part_info.pointCount;
-			progressBar.prMessage = "Instancing Objects...";			
+			progress_bar.prTotal = part_info.pointCount;
 			
 			bool liveTransformPropagationSetting	= false;
 			bool syncAssetTransformSetting			= false;
 			bool enableCooking						= true;
 			for ( int ii = 0; ii < part_info.pointCount; ++ii )
 			{
-				progressBar.prCurrentValue = ii;
-				progressBar.displayProgressBar();
-				
 				GameObject objToInstantiate = null;
 				
 				if ( object_info.objectToInstanceId >= 0 )
@@ -104,14 +97,9 @@ public class HAPI_Instancer : MonoBehaviour {
 													
 					int objectIndex = prAsset.findObjectByName( instanceObjectName );
 					if ( objectIndex >= 0 )
-					{
 						objToInstantiate = prAsset.prGameObjects[ objectIndex ];
-					}
 					else
-					{					
-						
 						objToInstantiate = GameObject.Find( instanceObjectName );
-					}
 					
 					HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
 					if ( hapi_asset != null )
@@ -123,13 +111,13 @@ public class HAPI_Instancer : MonoBehaviour {
 						hapi_asset.prSyncAssetTransform			= false;
 						hapi_asset.prEnableCooking				= false;
 					}
-					
 				}
+
+				// Set progress bar information.
+				progress_bar.prCurrentValue = ii;
+				progress_bar.prMessage = "Instancing: " + objToInstantiate.name + " (" + ii + " of " + part_info.pointCount + ")";
+				progress_bar.displayProgressBar();
 				
-				//string instance_hint = HAPI_Host.getString( instancehint_attr[ ii ] );
-				//Debug.Log( "instance hint: " + instance_hint );
-				
-				//GameObject obj = PrefabUtility.InstantiatePrefab( prGameObjects[prObjectId] ) as GameObject;	
 				if ( objToInstantiate != null )
 				{
 					Vector3 pos = new Vector3();
