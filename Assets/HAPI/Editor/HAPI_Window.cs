@@ -58,6 +58,9 @@ public class HAPI_Window : EditorWindow
 	
 	public void OnGUI() 
 	{
+		if ( !myEnableDraw )
+			return;
+
 		string path = Application.dataPath;
 		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 		
@@ -111,7 +114,7 @@ public class HAPI_Window : EditorWindow
 							Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 							return;
 						}
-						HAPI_Host.initialize();
+						myEnableDraw = HAPI_Host.initialize();
 					}
 					HAPI_Host.setTime( myTime );
 				}
@@ -302,6 +305,8 @@ public class HAPI_Window : EditorWindow
 		HAPI_GUIUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
 	}
 	
+	private static bool				myEnableDraw			= true;
+
 	private static bool				myShowUtility			= true;
 	private static bool				myShowFileList			= true;
 	

@@ -169,7 +169,8 @@ namespace HAPI
 		
 		public static int loadOTL( string path ) 
 		{
-			initialize();
+			if ( !initialize() )
+				throw new HAPI_Error( "DLL Not Found." );
 
 			string textures_path = Application.dataPath + "/Textures";
 			
@@ -185,7 +186,8 @@ namespace HAPI
 		
 		public static void loadHip( string path ) 
 		{
-			initialize();
+			if ( !initialize() )
+				throw new HAPI_Error( "DLL Not Found." );
 
 			string textures_path = Application.dataPath + "/Textures";
 																
@@ -219,7 +221,8 @@ namespace HAPI
 		
 		public static int createCurve()
 		{
-			initialize();
+			if ( !initialize() )
+				throw new HAPI_Error( "DLL Not Found." );
 
 			int asset_id = -1;
 			HAPI_Result status_code = (HAPI_Result) HAPI_CreateCurve( ref asset_id );
@@ -252,21 +255,31 @@ namespace HAPI
 			return !EditorApplication.isPlayingOrWillChangePlaymode && !prMidPlaymodeStateChange;
 		}
 
-		public static void initialize()
+		public static bool initialize()
 		{
 			string otls_path = Application.dataPath + "/OTLs/Scanned";
 
 			if ( !prHoudiniSceneExists )
 			{
 				HAPI_Result status_code;
-				status_code = (HAPI_Result) HAPI_Initialize( HAPI_SetPath.prHoudiniPath, otls_path,
-															 true, -1 );
+				try
+				{
+					status_code = (HAPI_Result) HAPI_Initialize( HAPI_SetPath.prHoudiniPath, otls_path,
+																 true, -1 );
+				}
+				catch ( System.Exception error )
+				{
+					Debug.LogError( error.ToString() );
+					return false;
+				}
 
 				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
 
 				prHoudiniSceneExists = true;
 			}
+
+			return true;
 		}
 
 		public static void throwRuntimeError()
