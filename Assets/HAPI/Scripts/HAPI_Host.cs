@@ -89,7 +89,7 @@ namespace HAPI
 			EditorApplication.playmodeStateChanged	+= playmodeStateChanged;
 
 			if ( !isRuntimeInitialized() )
-			{	
+			{
 				prHoudiniSceneExists		= false;
 				prMidPlaymodeStateChange	= false;
 
@@ -266,15 +266,19 @@ namespace HAPI
 				{
 					status_code = (HAPI_Result) HAPI_Initialize( HAPI_SetPath.prHoudiniPath, otls_path,
 																 true, -1 );
+					if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
+						processStatusCode( status_code );
+				}
+				catch ( HAPI_Error error )
+				{
+					Debug.LogError( error.ToString() );
+					return false;
 				}
 				catch ( System.Exception error )
 				{
 					Debug.LogError( error.ToString() );
 					return false;
 				}
-
-				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
-					processStatusCode( status_code );
 
 				prHoudiniSceneExists = true;
 			}

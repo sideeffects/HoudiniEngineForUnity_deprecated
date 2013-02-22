@@ -125,7 +125,7 @@ public class HAPI_AssetGUI : Editor
 									else
 										asset = new_obj.GetComponent< HAPI_Asset >();
 									
-									if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
+									if ( asset == null || myAsset.prUpStreamGeoAssets[ input_index ] != asset )
 									{
 										if ( asset )
 										{
