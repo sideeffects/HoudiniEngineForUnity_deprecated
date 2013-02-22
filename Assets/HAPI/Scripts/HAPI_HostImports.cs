@@ -33,6 +33,9 @@ namespace HAPI
 		// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_IsInitialized();
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Initialize( string houdini_install_path,
 													string otl_search_path,
 													[MarshalAs( UnmanagedType.U1 )] bool use_cooking_thread,

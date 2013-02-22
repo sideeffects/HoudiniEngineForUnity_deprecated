@@ -303,7 +303,7 @@ namespace HAPI
 			{
 				try
 				{
-					getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+					processStatusCode( (HAPI_Result) HAPI_IsInitialized() );
 					return true;
 				}
 				catch
