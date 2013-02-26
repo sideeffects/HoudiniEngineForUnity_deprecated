@@ -1475,26 +1475,21 @@ namespace HAPI
 		// MATERIALS ------------------------------------------------------------------------------------------------
 
 		/// <summary>
-		/// 	Fill an array of <see cref="HAPI_MaterialInfo"> structs with information about the materials
+		/// 	Fill a <see cref="HAPI_MaterialInfo"> struct with information about the material
 		/// 	used and stored in an asset.
 		/// </summary>
 	    /// <param name="asset_id">
 	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
-	    /// <param name ="material_infos">
-	    ///		Array of <see cref="HAPI_MaterialInfo"/> exactly the size of <paramref name="length"/>.
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
 		/// </param>
-		/// <param name="start">
-		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.materialCount"/> - 1.
-		/// </param>
-		/// <param name="length">
-		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.materialCount"/> - <paramref name="start"/>.
-		/// </param>
-		public static void getMaterials( int asset_id, [Out] HAPI_MaterialInfo[] material_infos,
-										 int start, int length )
+		public static HAPI_MaterialInfo getMaterial( int asset_id, int material_id )
 		{
-			int status_code = HAPI_GetMaterials( asset_id, material_infos, start, length );
+			HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+			int status_code = HAPI_GetMaterial( asset_id, material_id, out material_info );
 			processStatusCode( (HAPI_Result) status_code );
+			return material_info;
 		}
 	}
 

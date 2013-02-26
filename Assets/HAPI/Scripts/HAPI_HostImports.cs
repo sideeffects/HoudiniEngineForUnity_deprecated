@@ -371,9 +371,8 @@ namespace HAPI
 		// MATERIALS ------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetMaterials(	int asset_id, 
-														[Out] HAPI_MaterialInfo[] material_infos,
-														int start, int length );
+		private static extern int HAPI_GetMaterial(		int asset_id, int material_id,
+														out HAPI_MaterialInfo material_info );
 		
 	}
 

@@ -151,9 +151,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							{
 								try
 								{
-									HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
-									HAPI_Host.getMaterials( myAsset.prAssetId, materials, control.prMaterialId, 1 );
-									HAPI_MaterialInfo material = materials[ 0 ];
+									HAPI_MaterialInfo material = HAPI_Host.getMaterial( myAsset.prAssetId, 
+																						control.prMaterialId );
 
 									if ( material.isTransparent() )
 										renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );

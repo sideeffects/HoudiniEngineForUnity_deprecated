@@ -519,9 +519,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			if ( ( prFullBuild || has_material_changed || mesh_renderer.sharedMaterial.mainTexture == null ) 
 				 && part_info.materialId >= 0 )
 			{
-				HAPI_MaterialInfo[] materials = new HAPI_MaterialInfo[ 1 ];
-				HAPI_Host.getMaterials( prAssetId, materials, part_info.materialId, 1 );
-				HAPI_MaterialInfo material = materials[ 0 ];
+				HAPI_MaterialInfo material = HAPI_Host.getMaterial( prAssetId, part_info.materialId );
 
 				// Assign vertex color shader if the flag says so.
 				if ( prShowVertexColours )
