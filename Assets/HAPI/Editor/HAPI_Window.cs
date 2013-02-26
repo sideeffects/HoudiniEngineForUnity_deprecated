@@ -64,6 +64,8 @@ public class HAPI_Window : EditorWindow
 		string path = Application.dataPath;
 		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 		
+		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
+
 		myShowUtility = EditorGUILayout.Foldout( myShowUtility, new GUIContent( "Utility" ) );
 		
 		if ( myShowUtility )
@@ -235,8 +237,6 @@ public class HAPI_Window : EditorWindow
 				if ( !di.Exists )
 					throw new HAPI_Error( "Project/Assets/OTLs directory does not exist!" );
 				
-				myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
-				
 				foreach ( DirectoryInfo child_directory in di.GetDirectories() )
 				{
 					OTLDirectory otlDir = null;
@@ -274,14 +274,14 @@ public class HAPI_Window : EditorWindow
 							genOTLEntry( fi );
 					}
 				}
-				
-				GUILayout.EndScrollView();
 			}
 			catch ( System.Exception e )
 			{
-				Debug.LogError( "Directory navigation failed: " + e.ToString() );	
+				Debug.LogError( "Directory navigation failed: " + e.ToString() );
 			}
 		}
+
+		GUILayout.EndScrollView();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
