@@ -26,12 +26,20 @@ namespace HAPI
 	
 	public struct HAPI_Constants
 	{
-		// Unity-only constants.
+		// Unity-Only Constants ---------------------------------------------
+
+		public const string HAPI_PRODUCT_NAME				= "Houdini Engine";
+		
+		// Used for things like window titles that have limited space.
+		public const string HAPI_PRODUCT_SHORT_NAME			= "Houdini";
+
 		public const int HAPI_MAX_PAGE_SIZE					= 32768;
 		public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 3;
 		public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 		public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
 		
+		// Shared Constants -------------------------------------------------
+
 		public const int HAPI_POSITION_VECTOR_SIZE			= 3;
 		public const int HAPI_SCALE_VECTOR_SIZE				= 3;
 		public const int HAPI_NORMAL_VECTOR_SIZE			= 3;

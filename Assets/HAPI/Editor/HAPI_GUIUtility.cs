@@ -154,9 +154,10 @@ public class HAPI_GUIUtility : Editor
 		Selection.objects 		= selection;
 	}
 	
-	public const string myMenuName				= "HAPI";
 	public const string mySaveHoudiniSceneLabel = "Save Current Houdini Scene...";
 	public const string myLoadAssetLabel		= "Load Houdini Asset...";
+	public const string myLoadHipLabel			= "Load .hip File...";
+	public const string myCreateCurveLabel		= "Create Curve";
 	public const string myDefaultAssetLabel 	= "Houdini Asset";
 	public const string myDefaultPrefabLabel 	= "Houdini Asset";
 

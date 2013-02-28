@@ -31,21 +31,21 @@ public class HAPI_Menu : MonoBehaviour
 	/// <summary>
 	/// 	Prompts the user for a path to a .otl file and creates a HAPI game object from it.
 	/// </summary>
-	[ MenuItem( "HAPI/" + HAPI_GUIUtility.myLoadAssetLabel ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadAssetLabel ) ]
 	static private void createHAPIObject() 
 	{
 		string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
 		HAPI_GUIUtility.instantiateAsset( asset_file_path );
 	}
 	
-	[ MenuItem( "HAPI/Load Hip File..." ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel ) ]
 	static private void loadHipFile() 
 	{
 		string hip_file_path = HAPI_GUIUtility.promptForHIPPath();
 		HAPI_GUIUtility.loadHipFile( hip_file_path );
 	}
 	
-	[ MenuItem( "HAPI/Create Curve" ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myCreateCurveLabel ) ]
 	static private void createCurve()
 	{
 		// Create game object.

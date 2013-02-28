@@ -34,11 +34,11 @@ public class HAPI_Window : EditorWindow
 		public string myDirectoryPath;
 	}
 
-	[ MenuItem( "Window/HAPI" ) ]
+	[ MenuItem( "Window/" + HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Utilities" ) ]
 	public static void ShowWindow() 
 	{
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow< HAPI_Window >( false, "HAPI Debug" );
+		EditorWindow.GetWindow< HAPI_Window >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Utilities" );
 		float time = 0.0f;
 
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
@@ -67,7 +67,7 @@ public class HAPI_Window : EditorWindow
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
 
 		myShowUtility = EditorGUILayout.Foldout( myShowUtility, new GUIContent( "Utility" ) );
-		
+
 		if ( myShowUtility )
 		{
 			if ( GUILayout.Button( HAPI_GUIUtility.mySaveHoudiniSceneLabel ) )
@@ -125,9 +125,12 @@ public class HAPI_Window : EditorWindow
 					Debug.LogError( error.ToString() );
 				}
 			}
+		}
 
-			HAPI_GUI.separator();
+		myShowSettings = EditorGUILayout.Foldout( myShowSettings, new GUIContent( "Settings" ) );
 
+		if ( myShowSettings )
+		{
 			// Collision Group Name
 			{
 				string value = HAPI_Host.prCollisionGroupName;
@@ -308,6 +311,7 @@ public class HAPI_Window : EditorWindow
 	private static bool				myEnableDraw			= true;
 
 	private static bool				myShowUtility			= true;
+	private static bool				myShowSettings			= true;
 	private static bool				myShowFileList			= true;
 	
 	private static List< OTLDirectory >	myOTLDirectories  	= new List< OTLDirectory >();	
