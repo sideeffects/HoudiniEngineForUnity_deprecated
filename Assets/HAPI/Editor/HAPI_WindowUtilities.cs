@@ -22,23 +22,16 @@ using System.Collections.Generic;
 using System.IO;
 using HAPI;
 
-public class HAPI_Window : EditorWindow 
+public class HAPI_WindowUtilities : EditorWindow 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
-
-	class OTLDirectory
-	{
-		public bool myExpanded;
-		public string myDirectoryName;
-		public string myDirectoryPath;
-	}
 
 	[ MenuItem( "Window/" + HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Utilities" ) ]
 	public static void ShowWindow() 
 	{
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow< HAPI_Window >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Utilities" );
+		EditorWindow.GetWindow< HAPI_WindowUtilities >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Utilities" );
 		float time = 0.0f;
 
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
@@ -53,16 +46,13 @@ public class HAPI_Window : EditorWindow
 		}
 
 		HAPI_Host.getTime( out time );
-		HAPI_Window.myTime = time;
+		HAPI_WindowUtilities.myTime = time;
 	}
 	
 	public void OnGUI() 
 	{
 		if ( !myEnableDraw )
 			return;
-
-		string path = Application.dataPath;
-		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 		
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
 
@@ -83,25 +73,6 @@ public class HAPI_Window : EditorWindow
 			{
 				string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
 				HAPI_GUIUtility.instantiateAsset( asset_file_path );
-			}
-			
-			if ( GUILayout.Button( "Instantiate Core Assets" ) )
-			{
-				try
-				{
-					DirectoryInfo core = new DirectoryInfo( path + "//OTLs/Core" );
-					
-					if ( !core.Exists )
-						throw new HAPI_Error( "Project/Assets/OTLs/Core directory does not exist!" );
-					
-					foreach ( FileInfo fi in core.GetFiles() )
-						if ( fi.Extension == ".otl" )
-							loadOTL( fi );
-				}
-				catch ( System.Exception e )
-				{
-					Debug.LogError( "Directory navigation failed: " + e.ToString() );
-				}
 			}
 
 			if ( HAPI_GUI.floatField( "global_time", "Global Time", ref myTime ) )
@@ -231,93 +202,17 @@ public class HAPI_Window : EditorWindow
 			}
 		}
 		
-		myShowFileList = EditorGUILayout.Foldout( myShowFileList, new GUIContent( "File List" ) );
-		
-		if ( myShowFileList )
-		{
-			try
-			{
-				if ( !di.Exists )
-					throw new HAPI_Error( "Project/Assets/OTLs directory does not exist!" );
-				
-				foreach ( DirectoryInfo child_directory in di.GetDirectories() )
-				{
-					OTLDirectory otlDir = null;
-					
-					foreach ( OTLDirectory existingOTLDir in myOTLDirectories )
-					{
-						if ( existingOTLDir.myDirectoryName == child_directory.Name )
-						{
-							otlDir = existingOTLDir;
-							break;
-						}
-					}
-					
-					if ( otlDir == null )
-					{
-						otlDir = new OTLDirectory();
-						otlDir.myDirectoryName = child_directory.Name;
-						otlDir.myDirectoryPath = child_directory.FullName;
-						otlDir.myExpanded = false;
-						myOTLDirectories.Add( otlDir );
-					}
-					
-					otlDir.myExpanded = 
-								EditorGUILayout.Foldout( otlDir.myExpanded, new GUIContent( otlDir.myDirectoryName ) );
-					
-					if ( otlDir.myDirectoryName == "Core" )
-						otlDir.myExpanded = true;
-					
-					if ( otlDir.myExpanded )
-					{
-						DirectoryInfo dirContents = new DirectoryInfo( otlDir.myDirectoryPath );
-						
-						foreach ( FileInfo fi in dirContents.GetFiles() )
-						if ( fi.Extension == ".otl" )
-							genOTLEntry( fi );
-					}
-				}
-			}
-			catch ( System.Exception e )
-			{
-				Debug.LogError( "Directory navigation failed: " + e.ToString() );
-			}
-		}
-
 		GUILayout.EndScrollView();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Public
-	private void genOTLEntry( FileInfo fi )
-	{
-		bool load_file = false;
-		EditorGUILayout.BeginHorizontal(); 
-		{
-			load_file = GUILayout.Button( "Instantiate", GUILayout.Width( 100 ) );
-			EditorGUILayout.SelectableLabel( fi.Name, myLineHeightGUI );
-		}
-		EditorGUILayout.EndHorizontal();
-		
-		if ( load_file )
-			loadOTL( fi );
-	}
-	
-	private void loadOTL( FileInfo fi )
-	{
-		HAPI_GUIUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
-	}
+	// Private
 	
 	private static bool				myEnableDraw			= true;
 
 	private static bool				myShowUtility			= true;
 	private static bool				myShowSettings			= true;
-	private static bool				myShowFileList			= true;
 	
-	private static List< OTLDirectory >	myOTLDirectories  	= new List< OTLDirectory >();	
-	
-	private static float 			myLineHeight 			= 16;
-	private static GUILayoutOption 	myLineHeightGUI 		= GUILayout.Height( myLineHeight );
 	private static Vector2 			myScrollPosition;
 
 	private static float			myTime;
