@@ -71,10 +71,20 @@ namespace HAPI
 														 	int rst_order, int rot_order );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_ConvertMatrix(	float[] mat,
-														int rst_order, int rot_order,
-														ref HAPI_TransformEuler transform_out );
+		private static extern int HAPI_ConvertMatrixToQuat(		float[] mat, int rst_order,
+																ref HAPI_Transform transform_out );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConvertMatrixToEuler(	float[] mat, int rst_order, int rot_order,
+																ref HAPI_TransformEuler transform_out );
 		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConvertTransformQuatToMatrix( HAPI_Transform transform, 
+																	 [Out] float[] matrix );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ConvertTransformEulerToMatrix( HAPI_TransformEuler transform, 
+																	  [Out] float[] matrix );
 		
 		// STRINGS --------------------------------------------------------------------------------------------------
 		

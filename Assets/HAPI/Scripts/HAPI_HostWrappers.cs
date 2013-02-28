@@ -134,7 +134,34 @@ namespace HAPI
 		}
 
 		/// <summary>
-		/// 	Converts a 4x4 matrix into its TRS form.
+		/// 	Converts a 4x4 matrix into its quaternion TRS form.
+		/// </summary>
+		/// <param name="mat">
+		/// 	A 4x4 matrix expressed in a 16 element float array.
+		/// </param>
+		/// <param name="rst_order">
+		/// 	The desired transform order of the output.
+		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
+		/// </param>
+		/// <return>
+		///		The converted <see cref="HAPI_Transform"/>.
+		/// </return>
+		public static HAPI_Transform convertMatrixToQuat( Matrix4x4 matrix, int rst_order )
+		{
+			HAPI_Transform transform = new HAPI_Transform();
+			float[] raw_matrix = new float[ 16 ];
+
+			for ( int i = 0; i < 16; ++i )
+				raw_matrix[ i ] = matrix[ i ];
+
+			int status_code = HAPI_ConvertMatrixToQuat( raw_matrix, rst_order, ref transform );
+			processStatusCode( (HAPI_Result) status_code );
+
+			return transform;
+		}
+
+		/// <summary>
+		/// 	Converts a 4x4 matrix into its euler TRS form.
 		/// </summary>
 		/// <param name="mat">
 		/// 	A 4x4 matrix expressed in a 16 element float array.
@@ -147,15 +174,67 @@ namespace HAPI
 		/// 	The desired rotation order of the output.
 		/// 	XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
 		/// </param>
-		/// <param name="transform_out">
-		/// 	Used for the output.
-		/// </param>
-		public static void convertMatrix(	float[] mat,
-											int rst_order, int rot_order,
-											ref HAPI_TransformEuler transform_out )
+		/// <return>
+		///		The converted <see cref="HAPI_TransformEuler"/>.
+		/// </return>
+		public static HAPI_TransformEuler convertMatrixToEuler( Matrix4x4 matrix, int rst_order, int rot_order )
 		{
-			int status_code = HAPI_ConvertMatrix( mat, rst_order, rot_order, ref transform_out );
+			HAPI_TransformEuler transform = new HAPI_TransformEuler();
+			float[] raw_matrix = new float[ 16 ];
+
+			for ( int i = 0; i < 16; ++i )
+				raw_matrix[ i ] = matrix[ i ];
+
+			int status_code = HAPI_ConvertMatrixToEuler( raw_matrix, rst_order, rot_order, ref transform );
 			processStatusCode( (HAPI_Result) status_code );
+
+			return transform;
+		}
+
+		/// <summary>
+		///		Converts a <see cref="HAPI_Transform"/> into a 4x4 matrix.
+		/// </summary>
+		/// <param name="transform">
+		///		The <see cref="HAPI_Transform"/> that you wish to convert.
+		/// </param>
+		/// <returns>
+		///		The converted 4x4 matrix.
+		/// </returns>
+		public static Matrix4x4 convertTransformQuatToMatrix( HAPI_Transform transform )
+		{
+			float[] raw_matrix = new float[ 16 ];
+			int status_code = HAPI_ConvertTransformQuatToMatrix( transform, raw_matrix );
+			processStatusCode( (HAPI_Result) status_code );
+
+			Matrix4x4 output = new Matrix4x4();
+			
+			for ( int i = 0; i < 16; ++i )
+				output[ i ] = raw_matrix[ i ];
+
+			return output;
+		}
+
+		/// <summary>
+		///		Converts a <see cref="HAPI_TransformEuler"/> into a 4x4 matrix.
+		/// </summary>
+		/// <param name="transform">
+		///		The <see cref="HAPI_TransformEuler"/> that you wish to convert.
+		/// </param>
+		/// <returns>
+		///		The converted 4x4 matrix.
+		/// </returns>
+		public static Matrix4x4 convertTransformEulerToMatrix( HAPI_TransformEuler transform )
+		{
+			float[] raw_matrix = new float[ 16 ];
+			int status_code = HAPI_ConvertTransformEulerToMatrix( transform, raw_matrix );
+			processStatusCode( (HAPI_Result) status_code );
+
+			Matrix4x4 output = new Matrix4x4();
+			
+			for ( int i = 0; i < 16; ++i )
+				output[ i ] = raw_matrix[ i ];
+
+			return output;
 		}
 
 		// STRINGS --------------------------------------------------------------------------------------------------

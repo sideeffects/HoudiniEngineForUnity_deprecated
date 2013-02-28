@@ -217,10 +217,11 @@ namespace HAPI
 	{
 		public HAPI_Transform( int id_in )
 		{
-			id = id_in;
-			position = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
-			rotationQuaternion = new float[ HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE ];
-			scale = new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
+			id					= id_in;
+			position			= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			rotationQuaternion	= new float[ HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE ];
+			scale				= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
+			rstOrder			= (int) HAPI_RSTOrder.SRT;
 		}
 
 		public int id;
@@ -239,6 +240,8 @@ namespace HAPI
 					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
 					 ArraySubType = UnmanagedType.R4 ) ]
 		public float[] scale;
+
+		public int rstOrder;
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -272,8 +275,8 @@ namespace HAPI
 					 ArraySubType = UnmanagedType.R4 ) ]
 		public float[] scale;
 	
-	    public int     rotationOrder;
-	    public int     rstOrder;
+	    public int rotationOrder;
+	    public int rstOrder;
 	}
 	
 	
