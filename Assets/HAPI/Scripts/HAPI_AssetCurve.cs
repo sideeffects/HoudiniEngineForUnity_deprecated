@@ -151,13 +151,13 @@ public class HAPI_AssetCurve : HAPI_Asset
 		if ( !base_built )
 			return false;
 		
-		HAPI_ProgressBar progressBar	= new HAPI_ProgressBar();
-		progressBar.prUseDelay			= prUseDelayForProgressBar;
-		progressBar.prAsset				= this;
+		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
+		progress_bar.prUseDelay			= prUseDelayForProgressBar;
+		progress_bar.prAsset			= this;
 
 		try
 		{
-			progressBar.prStartTime = System.DateTime.Now;
+			progress_bar.prStartTime = System.DateTime.Now;
 			
 			if ( prFullBuild || prPartialBuild )
 			{
@@ -174,7 +174,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 					prReloadAssetInFullBuild = true; // The default.
 
-					progressBar.statusCheckLoop();
+					progress_bar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
 
@@ -214,8 +214,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 				prObjectCount 						= prAssetInfo.objectCount;
 				prHandleCount 						= prAssetInfo.handleCount;
 				
-				progressBar.prCurrentValue	= 0;
-				progressBar.prTotal		= prParmCount
+				progress_bar.prCurrentValue			= 0;
+				progress_bar.prTotal				= prParmCount
 													  + prParmIntValueCount
 													  + prParmFloatValueCount
 													  + prParmStringValueCount
@@ -226,36 +226,36 @@ public class HAPI_AssetCurve : HAPI_Asset
 				// Try to load presets.
 				loadPreset();
 				
-				progressBar.displayProgressBar();
+				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
 				
-				progressBar.prMessage = "Loading parameter information...";
+				progress_bar.prMessage = "Loading parameter information...";
 				
 				// Get all parameters.
 				prParms = new HAPI_ParmInfo[ prParmCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
-				progressBar.incrementProgressBar( prParmCount );
+				progress_bar.incrementProgressBar( prParmCount );
 				
 				// Get parameter int values.
 				prParmIntValues = new int[ prParmIntValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
-				progressBar.incrementProgressBar( prParmIntValueCount );
+				progress_bar.incrementProgressBar( prParmIntValueCount );
 				
 				// Get parameter float values.
 				prParmFloatValues = new float[ prParmFloatValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
-				progressBar.incrementProgressBar( prParmFloatValueCount );
+				progress_bar.incrementProgressBar( prParmFloatValueCount );
 				
 				// Get parameter string (handle) values.
 				prParmStringValues = new int[ prParmStringValueCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
 									 prParmStringValueCount );
-				progressBar.incrementProgressBar( prParmStringValueCount );
+				progress_bar.incrementProgressBar( prParmStringValueCount );
 				
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-				progressBar.incrementProgressBar( prParmChoiceCount );
+				progress_bar.incrementProgressBar( prParmChoiceCount );
 
 				// Set curve defaults.
 				// TODO: Make the defaults editable.
@@ -280,7 +280,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 					HAPI_Host.cookAsset( prAssetId );
 				}
 				
-				progressBar.prMessage = "Loading handles...";
+				progress_bar.prMessage = "Loading handles...";
 				
 				// Add input fields.
 				if ( !prPartialBuild && !prForceReconnectInFullBuild )
@@ -359,14 +359,31 @@ public class HAPI_AssetCurve : HAPI_Asset
 			}
 			else
 			{
-				progressBar.displayProgressBar();
+				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
 				
-				progressBar.prTotal = prObjectCount;
+				progress_bar.prTotal = prObjectCount + prParmIntValueCount 
+									   + prParmFloatValueCount + prParmStringValueCount;
 
 				HAPI_Host.cookAsset( prAssetId );
 
-				progressBar.statusCheckLoop();
+				// We need to get the parameter values again because they could have been
+				// changed by a script.
+
+				// Get parameter int values.
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+				progress_bar.incrementProgressBar( prParmIntValueCount );
+				
+				// Get parameter float values.
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+				progress_bar.incrementProgressBar( prParmFloatValueCount );
+				
+				// Get parameter string (handle) values.
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
+									 prParmStringValueCount );
+				progress_bar.incrementProgressBar( prParmStringValueCount );
+
+				progress_bar.statusCheckLoop();
 			}
 			
 			if ( !prPartialBuild )
@@ -380,7 +397,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 					Utility.applyTransform( hapi_transform, transform );
 				}
 
-				progressBar.prMessage = "Loading and composing objects...";
+				progress_bar.prMessage = "Loading and composing objects...";
 
 				// Create local object info caches (transforms need to be stored in a parallel array).
 				prObjects 			= new HAPI_ObjectInfo[ prObjectCount ];
@@ -415,7 +432,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		}
 		finally
 		{
-			progressBar.clearProgressBar();
+			progress_bar.clearProgressBar();
 			myProgressBarJustUsed = false;
 
 			prFullBuild = false;

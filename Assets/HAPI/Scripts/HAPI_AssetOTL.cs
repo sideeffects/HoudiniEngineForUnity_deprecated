@@ -297,9 +297,26 @@ public class HAPI_AssetOTL : HAPI_Asset
 				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
 				
-				progress_bar.prTotal = prObjectCount;
+				progress_bar.prTotal = prObjectCount + prParmIntValueCount 
+									   + prParmFloatValueCount + prParmStringValueCount;
 
 				HAPI_Host.cookAsset( prAssetId );
+
+				// We need to get the parameter values again because they could have been
+				// changed by a script.
+
+				// Get parameter int values.
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+				progress_bar.incrementProgressBar( prParmIntValueCount );
+				
+				// Get parameter float values.
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+				progress_bar.incrementProgressBar( prParmFloatValueCount );
+				
+				// Get parameter string (handle) values.
+				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
+									 prParmStringValueCount );
+				progress_bar.incrementProgressBar( prParmStringValueCount );
 
 				progress_bar.statusCheckLoop();
 			}
