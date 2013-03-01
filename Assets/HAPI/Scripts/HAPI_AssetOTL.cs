@@ -253,13 +253,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 						for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
 							if ( prUpStreamTransformAssets[ ii ] )
 								HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
-				
-					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-					{
-						if ( prFileInputs[ ii ] != "" )
-							HAPI_Host.setFileInput( prAssetId, ii, prFileInputs[ ii ] );
-					}
-				
+
 					foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 					{
 						int index = downstream_asset.getAssetTransformConnectionIndex( this );

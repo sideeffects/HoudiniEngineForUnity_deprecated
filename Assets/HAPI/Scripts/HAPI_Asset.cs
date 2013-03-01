@@ -297,6 +297,14 @@ public class HAPI_Asset : HAPI_Control
 		}
 	}
 	
+	public void addFileAsGeoInput( string path, int index )
+	{
+		prUpStreamGeoAssets[ index ] = null;
+		prUpStreamGeoAdded[ index ] = true;
+
+		HAPI_Host.setFileInput( prAssetId, index, path );
+	}
+
 	public void addGeoAsGeoInput( GameObject asset, int index )
 	{
 		prUpStreamGeoAssets[ index ] = null;

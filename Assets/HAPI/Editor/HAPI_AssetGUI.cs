@@ -153,6 +153,11 @@ public class HAPI_AssetGUI : Editor
 							string file_path = myAsset.prFileInputs[ input_index ];
 							myParmChanges |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path,
 																 ref join_last, ref no_label_toggle_last );
+							if ( myParmChanges )
+							{
+								myAsset.prFileInputs[ input_index ] = file_path;
+								myAsset.addFileAsGeoInput( file_path, input_index );
+							}
 						} // if
 					} // for
 				} // if
