@@ -650,6 +650,57 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
+	public static bool button( string name, string label )
+	{
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
+		bool result = button( ref gui_parm );
+		return result;
+	}
+	public static bool button( ref HAPI_GUIParm parm )
+	{
+		bool join_last = false; bool no_label_toggle_last = false;
+		return button( ref parm, ref join_last, ref no_label_toggle_last );
+	}
+	public static bool button( ref HAPI_GUIParm parm,
+							   ref bool join_last, ref bool no_label_toggle_last )
+	{
+		initializeConstants();
+		
+		bool changed = false;
+		int parm_size = parm.size;
+		
+		// Decide whether to join with the previous parameter on the same line or not.
+		if ( !join_last || parm_size > 1 )
+			EditorGUILayout.BeginHorizontal();
+		
+		if ( !parm.joinNext )
+		{
+			// Add padding for the toggle column.
+			EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
+			// Add empty space to align with fields.
+			EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
+		}
+
+		// Buttons should be only as wide as the text in them.
+		float min_width, max_width;
+		myLabelStyle.CalcMinMaxWidth( new GUIContent( parm.label ), out min_width, out max_width );
+		min_width += 20; // Since the min width dosn't take into account button decoration.
+		
+		// Draw button.
+		if ( GUILayout.Button( parm.label, GUILayout.Width( min_width ), myLineHeightGUI ) ) 
+		{
+			changed = true;
+		}
+		
+		// Decide whether to join with the next parameter on the same line or not
+		// but also save our status for the next parameter.
+		join_last = ( parm.joinNext && parm_size <= 1 );
+		if ( !parm.joinNext || parm_size > 1 )
+			EditorGUILayout.EndHorizontal();
+		
+		return changed;
+	}
+
 	public static bool separator()
 	{
 		EditorGUILayout.Separator();
