@@ -716,7 +716,7 @@ public class HAPI_GUI : Editor
 				float min_width;
 				float max_width;
 				myLabelStyle.CalcMinMaxWidth( new GUIContent( parm.label ), out min_width, out max_width );
-				label_final_width += min_width;
+				label_final_width = min_width + (float) parm.labelExtraWidth;
 			}
 			else if ( !join_last )
 			{
