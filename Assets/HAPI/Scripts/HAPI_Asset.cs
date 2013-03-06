@@ -593,12 +593,7 @@ public class HAPI_Asset : HAPI_Control
 	{
 		try
 		{
-			int buf_length = 0;
-			HAPI_Host.getPreset( prAssetId, myPreset, ref buf_length );
-				
-			myPreset = new byte[ buf_length ];
-				
-			HAPI_Host.getPreset( prAssetId, myPreset, ref buf_length );
+			myPreset = HAPI_Host.getPreset( prAssetId );
 		}
 		catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
 	}

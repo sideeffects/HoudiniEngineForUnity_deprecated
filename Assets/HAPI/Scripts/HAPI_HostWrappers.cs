@@ -724,16 +724,20 @@ namespace HAPI
 		/// <param name="asset_id">
 		/// 	The asset id returned by HAPI_LoadOTLFile().
 		/// </param>
-		/// <param name="buf">
-		/// 	Buffer to hold the preset data.
-		/// </param>
-		/// <param name="length">
-		/// 	Size of the buffer.  If this value is 0, the required length of the buffer will be returned.
-		/// </param>
-		public static void getPreset( int asset_id, byte[] preset, ref int length )
+		/// <returns>
+		///		The preset byte string.
+		/// </returns>
+		public static byte[] getPreset( int asset_id )
 		{
-			int status_code = HAPI_GetPreset( asset_id, preset, ref length );
+			int buffer_length = 0;
+			int status_code = HAPI_GetPresetBufLength( asset_id, ref buffer_length );
 			processStatusCode( (HAPI_Result) status_code );
+
+			byte[] preset = new byte[ buffer_length ];
+			status_code = HAPI_GetPreset( asset_id, preset, buffer_length );
+			processStatusCode( (HAPI_Result) status_code );
+
+			return preset;
 		}
 
 		/// <summary>
@@ -742,15 +746,15 @@ namespace HAPI
 		/// <param name="asset_id">
 		/// 	The asset id returned by HAPI_LoadOTLFile().
 		/// </param>
-		/// <param name="buf">
+		/// <param name="preset">
 		/// 	Buffer to hold the preset data.
 		/// </param>
-		/// <param ="length">
+		/// <param name="buffer_length">
 		/// 	Size of the buffer.
 		/// </param>
-		public static void setPreset( int asset_id, byte[] preset, int length )
+		public static void setPreset( int asset_id, byte[] preset, int buffer_length )
 		{
-			int status_code = HAPI_SetPreset( asset_id, preset, length );
+			int status_code = HAPI_SetPreset( asset_id, preset, buffer_length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 

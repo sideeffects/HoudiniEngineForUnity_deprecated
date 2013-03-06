@@ -225,16 +225,13 @@ namespace HAPI
 		// PRESETS --------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetPreset( int asset_id, 
-												  byte[] preset,
-												  ref int length );
-
+		private static extern int HAPI_GetPresetBufLength( int asset_id, ref int buffer_length );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetPreset(	int asset_id, 
-				 									byte[] preset,
-													int length );
-		
+		private static extern int HAPI_GetPreset( int asset_id, [Out] byte[] preset, int buffer_length );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetPreset( int asset_id, byte[] preset, int buffer_length );
 		
 		// OBJECTS --------------------------------------------------------------------------------------------------
 		

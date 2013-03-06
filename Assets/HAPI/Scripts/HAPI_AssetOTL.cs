@@ -79,7 +79,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		
 		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
 		progress_bar.prUseDelay			= prUseDelayForProgressBar;
-		progress_bar.prAsset				= this;
+		progress_bar.prAsset			= this;
 
 		try
 		{
@@ -301,6 +301,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 									   + prParmFloatValueCount + prParmStringValueCount;
 
 				HAPI_Host.cookAsset( prAssetId );
+				progress_bar.statusCheckLoop();
 
 				// We need to get the parameter values again because they could have been
 				// changed by a script.
@@ -317,8 +318,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
 									 prParmStringValueCount );
 				progress_bar.incrementProgressBar( prParmStringValueCount );
-
-				progress_bar.statusCheckLoop();
 			}
 
 			if ( !prPartialBuild )
