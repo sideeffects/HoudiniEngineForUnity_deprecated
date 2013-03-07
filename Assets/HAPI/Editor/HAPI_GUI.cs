@@ -131,32 +131,32 @@ public class HAPI_GUI : Editor
 			EditorGUILayout.EndHorizontal();
 	}
 	
-	public static bool dropdown( string name, string label, 
-								 ref int value,
-								 string[] dropdown_labels,
-								 int[] dropdown_values )
+	public static bool dropdown< T >( string name, string label, 
+									  ref T value,
+									  string[] dropdown_labels,
+									  T[] dropdown_values )
 	{
 		HAPI_GUIParm parm = new HAPI_GUIParm( name, label, 1 );
-		int[] values = new int[ 1 ];
+		T[] values = new T[ 1 ];
 		values[ 0 ] = value;
 		bool changed = dropdown( ref parm, ref values, dropdown_labels, dropdown_values );
 		value = values[ 0 ];
 		return changed;
 	}
-	public static bool dropdown( ref HAPI_GUIParm parm,
-								 ref int[] values,
-								 string[] dropdown_labels,
-								 int[] dropdown_values )
+	public static bool dropdown< T >( ref HAPI_GUIParm parm,
+									  ref T[] values,
+									  string[] dropdown_labels,
+									  T[] dropdown_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
 		return dropdown( ref parm, ref values, dropdown_labels, dropdown_values, 
 						 ref join_last, ref no_label_toggle_last );
 	}
-	public static bool dropdown( ref HAPI_GUIParm parm,
-								 ref int[] values,
-								 string[] dropdown_labels,
-								 int[] dropdown_values,
-								 ref bool join_last, ref bool no_label_toggle_last )
+	public static bool dropdown< T >( ref HAPI_GUIParm parm,
+									  ref T[] values,
+									  string[] dropdown_labels,
+									  T[] dropdown_values,
+									  ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
 		
@@ -168,20 +168,41 @@ public class HAPI_GUI : Editor
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
-		
+
 		// Get old value.
-		int old_value = values[ parm.valuesIndex ];
+		T old_value = values[ parm.valuesIndex ];
+
+		// Create map integer array.
+		int[] mapped_values = new int[ dropdown_values.Length ];
+		for ( int i = 0; i < dropdown_values.Length; ++i )
+			mapped_values[ i ] = i;
+
+		int old_mapped_value = -1;
+		for ( int i = 0; i < dropdown_values.Length; ++i )
+			if ( old_value.Equals( dropdown_values[ i ] ) )
+			{
+				old_mapped_value = i;
+				break;
+			}
+		if ( old_mapped_value < 0 )
+		{
+			// Current value not possible!
+			EditorGUILayout.TextField( "Dropdown value outside range of possible values!" );
+			return false;
+		}
 		
 		// Draw popup.
-		int new_value = 0;
+		int new_mapped_value = 0;
 		if ( parm.width >= 0 )
-			new_value = EditorGUILayout.IntPopup( old_value, dropdown_labels, dropdown_values,
-												  GUILayout.Width( parm.width ) );
+			new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values,
+														 GUILayout.Width( parm.width ) );
 		else
-			new_value = EditorGUILayout.IntPopup( old_value, dropdown_labels, dropdown_values );
+			new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values );
 		
+		T new_value = dropdown_values[ new_mapped_value ];
+
 		// Determine if value changed and update parameter value.
-		if ( new_value != old_value )
+		if ( !new_value.Equals( old_value ) )
 		{
 			values[ parm.valuesIndex ] = new_value;
 			changed |= true;

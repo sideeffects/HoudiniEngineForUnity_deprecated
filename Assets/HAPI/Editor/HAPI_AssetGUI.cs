@@ -296,19 +296,53 @@ public class HAPI_AssetGUI : Editor
 		// String Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_STRING )
 		{
-			string[] values = new string[ parm_size ];
-			for ( int p = 0; p < parm_size; ++p )
-				values[ p ] = HAPI_Host.getString( parm_string_values[ values_index + p ] );
-			
-			// The given string array is only for this parm so we need to set the values index to 0.
-			gui_parm.valuesIndex = 0;
-			
-			changed = HAPI_GUI.stringField( ref gui_parm, ref myDelayBuild, ref values,
-											ref join_last, ref no_label_toggle_last );
-			
-			if ( changed )
+			if ( parm.choiceCount > 0 && parm.choiceIndex >= 0 )
+			{
+				// Draw popup (menu) field.
+				List< string > labels = new List< string >();
+				List< string > values = new List< string >();
+				
+				// Go through our choices.
+				for ( int i = 0; i < parm.choiceCount; ++i )
+				{
+					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != id )
+						Debug.LogError( "Parm choice parent parm id (" 
+										+ myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
+										+ ") not matching current parm id (" + id + ")!\n"
+										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
+										+ "Choice count: " + parm.choiceCount );
+					
+					labels.Add( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].label );
+					values.Add( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].value );
+				}
+				
+				string[] values_temp = new string[ 1 ];
+				values_temp[ 0 ] = HAPI_Host.getString( parm_string_values[ values_index ] );
+				gui_parm.valuesIndex = 0; // Since we're piping a de-handled temp array.
+
+				changed = HAPI_GUI.dropdown( ref gui_parm, ref values_temp,
+											 labels.ToArray(), values.ToArray(),
+											 ref join_last, ref no_label_toggle_last );
+
+				if ( changed )
+					HAPI_Host.setParmStringValue( asset_id, values_temp[ 0 ], id, 0 );
+			}
+			else
+			{
+				string[] values = new string[ parm_size ];
 				for ( int p = 0; p < parm_size; ++p )
-					HAPI_Host.setParmStringValue( asset_id, values[ p ], id, p );
+					values[ p ] = HAPI_Host.getString( parm_string_values[ values_index + p ] );
+			
+				// The given string array is only for this parm so we need to set the values index to 0.
+				gui_parm.valuesIndex = 0;
+			
+				changed = HAPI_GUI.stringField( ref gui_parm, ref myDelayBuild, ref values,
+												ref join_last, ref no_label_toggle_last );
+			
+				if ( changed )
+					for ( int p = 0; p < parm_size; ++p )
+						HAPI_Host.setParmStringValue( asset_id, values[ p ], id, p );
+			}
 		}
 		///////////////////////////////////////////////////////////////////////
 		// File Field
