@@ -583,7 +583,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 				// Need to reset position here because the assignment above will massage the child's
 				// position in order to be in the same place it was in the global namespace.
-				part_node.transform.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
+				part_node.transform.localPosition	= new Vector3();
+				part_node.transform.localRotation	= new Quaternion();
+				part_node.transform.localScale		= new Vector3( 1.0f, 1.0f, 1.0f );
 
 				HAPI_PartControl part_control = part_node.AddComponent< HAPI_PartControl >();
 				part_control.init( geo_control );
@@ -631,7 +633,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 						
 						// Need to reset position here because the assignment above will massage the child's
 						// position in order to be in the same place it was in the global namespace.
-						geo_child.transform.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
+						geo_child.transform.localPosition	= new Vector3();
+						geo_child.transform.localRotation	= new Quaternion();
+						geo_child.transform.localScale		= new Vector3( 1.0f, 1.0f, 1.0f );
 
 						HAPI_GeoControl geo_control = geo_child.AddComponent< HAPI_GeoControl >();
 						geo_control.init( main_child.GetComponent< HAPI_ObjectControl >() );
