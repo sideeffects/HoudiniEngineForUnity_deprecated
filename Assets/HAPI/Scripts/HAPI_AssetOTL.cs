@@ -71,6 +71,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 		prHandleBindingInfos 		= null;
 	}
 	
+	public override void Update()
+	{
+		if ( EditorApplication.isPlaying && prLiveInGameCooking )
+		{
+			HAPI_Host.setTime( Time.time );
+			build();
+		}
+	}
+
 	public override bool build() 
 	{
 		bool base_built = base.build();

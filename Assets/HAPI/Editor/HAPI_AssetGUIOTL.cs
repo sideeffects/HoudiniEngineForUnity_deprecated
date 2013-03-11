@@ -244,6 +244,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
 				myAsset.prLiveTransformPropagation = value;
 			}
+
+			// Live In-Game Cooking
+			{
+				bool value = myAsset.prLiveInGameCooking;
+				HAPI_GUI.toggle( "live_ingame_cooking", "Live In-Game Cooking", ref value );
+				myAsset.prLiveInGameCooking = value;
+			}
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////

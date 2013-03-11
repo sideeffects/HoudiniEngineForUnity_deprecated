@@ -155,6 +155,8 @@ public class HAPI_Asset : HAPI_Control
 																	set { myHideWhenFedToOtherAsset = value; } }
 	public bool						prShowVertexColours {			get { return myShowVertexColours; }
 																	set { myShowVertexColours = value; } }
+	public bool						prLiveInGameCooking {			get { return myLiveInGameCooking; }
+																	set { myLiveInGameCooking = value; } }
 
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
@@ -477,6 +479,7 @@ public class HAPI_Asset : HAPI_Control
 		prEnableCooking				= true;
 		myHideWhenFedToOtherAsset	= true;
 		prShowVertexColours			= false;
+		prLiveInGameCooking			= false;
 		
 		prLastChangedParmId 		= -1;
 
@@ -798,6 +801,7 @@ public class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myEnableCooking;
 	[SerializeField] private bool					myHideWhenFedToOtherAsset;
 	[SerializeField] private bool					myShowVertexColours;
+	[SerializeField] private bool					myLiveInGameCooking;
 	
 	[SerializeField] private int					myLastChangedParmId;
 
