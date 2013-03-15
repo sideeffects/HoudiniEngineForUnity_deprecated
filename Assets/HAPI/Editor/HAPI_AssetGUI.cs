@@ -106,9 +106,14 @@ public class HAPI_AssetGUI : Editor
 									myAsset.removeGeoInput( input_index );
 									myAsset.prUpStreamGeoObjects[ input_index ] = null;
 									myAsset.prUpStreamGeoAssets[ input_index ] = null;
+									
+									myAsset.prFileInputs[ input_index ] = "";
+									myAsset.build();
 								}
 								else
 								{
+									myAsset.prFileInputs[ input_index ] = "";
+									
 									GameObject new_obj = (GameObject) obj;
 							
 									myAsset.prUpStreamGeoObjects[ input_index ] = new_obj;
@@ -155,8 +160,24 @@ public class HAPI_AssetGUI : Editor
 																 ref join_last, ref no_label_toggle_last );
 							if ( myParmChanges )
 							{
-								myAsset.prFileInputs[ input_index ] = file_path;
-								myAsset.addFileAsGeoInput( file_path, input_index );
+								if ( file_path.Equals("") )
+								{
+									myAsset.removeGeoInput( input_index );
+									myAsset.prFileInputs[ input_index ] = "";
+									
+									myAsset.prUpStreamGeoObjects[ input_index ] = null;
+									myAsset.prUpStreamGeoAssets[ input_index ] = null;
+									myAsset.build();
+								}
+								else
+								{
+									myAsset.prFileInputs[ input_index ] = file_path;
+									myAsset.addFileAsGeoInput( file_path, input_index );
+									
+									myAsset.prUpStreamGeoObjects[ input_index ] = null;
+									myAsset.prUpStreamGeoAssets[ input_index ] = null;
+									myAsset.build();
+								}
 							}
 						} // if
 					} // for

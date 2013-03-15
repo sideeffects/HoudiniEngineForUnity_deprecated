@@ -320,7 +320,8 @@ public class HAPI_Asset : HAPI_Control
 		Mesh mesh 						= asset_mesh_filter.sharedMesh;
 		HAPI_PartControl child_control  = asset.GetComponent< HAPI_PartControl >();
 		
-		Utility.setMesh( prAssetId, object_id, geo_id, ref mesh, child_control );
+		// Write marshlled geo to External Input Asset ( having assetId '0' )
+		Utility.setMesh( 0, object_id, geo_id, ref mesh, child_control );
 	}
 	
 	public void removeGeoInput( int index )
