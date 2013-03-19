@@ -75,44 +75,51 @@ public class HAPI_GUIUtility : Editor
 	
 	public static void loadHipFile( string file_path )
 	{
-		if ( file_path.Length <= 0 )
-			return;			
-		
-		HAPI_Host.loadHip( file_path );
-		
-		HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
-		progressBar.statusCheckLoop();
-		
-		int num_assets = HAPI_Host.getAssetCountFromLoadHip();
-		
-		int [] asset_ids = new int[ num_assets ];
-		HAPI_Host.getAssetIdsFromLoadHIPFile( asset_ids );
-		
-		foreach ( int asset_id in asset_ids )
+		try
 		{
-			// Create game object.
-			GameObject game_object = new GameObject( myDefaultAssetLabel );
-			
-			// Add HAPI Object Control script component.
-			game_object.AddComponent( "HAPI_AssetOTL" );		
-			HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
-			
-			asset.prAssetType = HAPI_Asset.AssetType.TYPE_HIP;
-			// Set that asset path.
-			asset.prAssetPath = file_path;
-			
-			asset.prAssetId = asset_id;
-			
-			bool build_result = asset.build();
-			if ( build_result == false ) // Something is not right. Clean up.
-			{
-				DestroyImmediate( game_object );
+			if ( file_path.Length <= 0 )
 				return;
-			}
 			
-			// Set new object name from asset name.
-			string asset_name		= asset.prAssetInfo.name;
-			game_object.name 		= asset_name;
+			HAPI_Host.loadHip( file_path );
+			
+			HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
+			progressBar.statusCheckLoop();
+			
+			int num_assets = HAPI_Host.getAssetCountFromLoadHip();
+			
+			int [] asset_ids = new int[ num_assets ];
+			HAPI_Host.getAssetIdsFromLoadHIPFile( asset_ids );
+			
+			foreach ( int asset_id in asset_ids )
+			{
+				// Create game object.
+				GameObject game_object = new GameObject( myDefaultAssetLabel );
+				
+				// Add HAPI Object Control script component.
+				game_object.AddComponent( "HAPI_AssetOTL" );
+				HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
+				
+				asset.prAssetType = HAPI_Asset.AssetType.TYPE_HIP;
+				// Set that asset path.
+				asset.prAssetPath = file_path;
+				
+				asset.prAssetId = asset_id;
+				
+				bool build_result = asset.build();
+				if ( build_result == false ) // Something is not right. Clean up.
+				{
+					DestroyImmediate( game_object );
+					return;
+				}
+				
+				// Set new object name from asset name.
+				string asset_name		= asset.prAssetInfo.name;
+				game_object.name 		= asset_name;
+			}
+		}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogError( error.ToString() );
 		}
 	}
 	
