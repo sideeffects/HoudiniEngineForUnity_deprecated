@@ -37,8 +37,9 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Initialize( string houdini_install_path,
-													string otl_search_path,
-													[MarshalAs( UnmanagedType.U1 )] bool use_cooking_thread,
+												   string otl_search_path,
+												   string dso_search_path,
+												   [MarshalAs( UnmanagedType.U1 )] bool use_cooking_thread,
 												   int cooking_thread_stack_size );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

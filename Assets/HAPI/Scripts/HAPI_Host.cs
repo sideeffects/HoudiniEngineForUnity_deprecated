@@ -258,6 +258,7 @@ namespace HAPI
 		public static bool initialize()
 		{
 			string otls_path = Application.dataPath + "/OTLs/Scanned";
+			string dsos_path = Application.dataPath + "/DSOs";
 
 			if ( !prHoudiniSceneExists )
 			{
@@ -265,7 +266,7 @@ namespace HAPI
 				try
 				{
 					status_code = (HAPI_Result) HAPI_Initialize( HAPI_SetPath.prHoudiniPath, otls_path,
-																 true, -1 );
+																 dsos_path, true, -1 );
 					if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 						processStatusCode( status_code );
 				}
