@@ -352,7 +352,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
 				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
 						 			 prObjectTransforms, prObjectCount );
-			
+				
 				for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 				{
 					progress_bar.incrementProgressBar();
@@ -461,6 +461,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 		// Get Part info.
 		HAPI_Host.getPartInfo( prAssetId, part_control.prObjectId, part_control.prGeoId, 
 							   part_control.prPartId, out part_info );
+
+		bool is_mesh = ( part_info.vertexCount > 0 );
 		
 		if ( prEnableLogging && ( prFullBuild || has_geo_changed || has_material_changed ) )
 			Debug.Log( "Obj #" + part_control.prObjectId + " (" + part_control.prObjectName + "): "
@@ -474,52 +476,124 @@ public class HAPI_AssetOTL : HAPI_Asset
 			// Overwrite name.
 			part_node.name = part_info.name + "_part" + part_control.prPartId;
 
-			// Add required components.
-			MeshFilter mesh_filter = part_node.AddComponent< MeshFilter >();
+			if ( is_mesh ) // Valid mesh.
+			{
+				// Add required components.
+				MeshFilter mesh_filter = part_node.AddComponent< MeshFilter >();
 
-			// Get or create mesh.
-			Mesh part_mesh 				= mesh_filter.sharedMesh;
-			if ( part_mesh == null ) 
-			{
-				mesh_filter.mesh 		= new Mesh();
-				part_mesh 				= mesh_filter.sharedMesh;
-			}
-			part_mesh.Clear();
+				// Get or create mesh.
+				Mesh part_mesh 				= mesh_filter.sharedMesh;
+				if ( part_mesh == null ) 
+				{
+					mesh_filter.mesh 		= new Mesh();
+					part_mesh 				= mesh_filter.sharedMesh;
+				}
+				part_mesh.Clear();
 		
-			// Get mesh.
-			try
-			{
-				Utility.getMesh( part_control, part_mesh );
-			}
-			catch ( HAPI_ErrorIgnorable ) {}
-			catch ( HAPI_Error error )
-			{
-				Debug.LogWarning( error.ToString() );
-				return;
-			}
+				// Get mesh.
+				try
+				{
+					Utility.getMesh( part_control, part_mesh );
+				}
+				catch ( HAPI_ErrorIgnorable ) {}
+				catch ( HAPI_Error error )
+				{
+					Debug.LogWarning( error.ToString() );
+					return;
+				}
 
-			// Add collider if group name matches. (Should be added after the mesh is set so that it
-			// picks up the mesh automagically)
-			if ( part_info.name.EndsWith( HAPI_Host.prRenderedCollisionGroupName ) )
-			{
-				part_node.AddComponent< MeshCollider >();
-				part_node.AddComponent< MeshRenderer >();
-			}
-			else if ( part_info.name == HAPI_Host.prCollisionGroupName )
-				part_node.AddComponent< MeshCollider >();
-			else
-				part_node.AddComponent< MeshRenderer >();
+				// Add collider if group name matches. (Should be added after the mesh is set so that it
+				// picks up the mesh automagically)
+				if ( part_info.name.EndsWith( HAPI_Host.prRenderedCollisionGroupName ) )
+				{
+					part_node.AddComponent< MeshCollider >();
+					part_node.AddComponent< MeshRenderer >();
+				}
+				else if ( part_info.name == HAPI_Host.prCollisionGroupName )
+					part_node.AddComponent< MeshCollider >();
+				else
+					part_node.AddComponent< MeshRenderer >();
 		
-			// Add Mesh-to-Prefab component.
-			part_node.AddComponent( "HAPI_MeshToPrefab" );
-			HAPI_MeshToPrefab mesh_saver = part_node.GetComponent< HAPI_MeshToPrefab >();
-			mesh_saver.prObjectControl = this;
-			mesh_saver.prGameObject = part_node;
-			mesh_saver.prMeshName = prAssetName + "_" + part_node.name;
+				// Add Mesh-to-Prefab component.
+				part_node.AddComponent( "HAPI_MeshToPrefab" );
+				HAPI_MeshToPrefab mesh_saver = part_node.GetComponent< HAPI_MeshToPrefab >();
+				mesh_saver.prObjectControl = this;
+				mesh_saver.prGameObject = part_node;
+				mesh_saver.prMeshName = prAssetName + "_" + part_node.name;
+			}
+			else if ( part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
+			{
+				// Get position attributes.
+				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+				float[] pos_attr = new float[ 0 ];
+				Utility.getAttribute( prAssetId, part_control.prObjectId, part_control.prGeoId, 
+									  part_control.prPartId, "P", ref pos_attr_info, ref pos_attr, 
+									  HAPI_Host.getAttributeFloatData );
+				if ( !pos_attr_info.exists )
+					throw new HAPI_Error( "No position attribute found." );
+				else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
+
+				// Get colour attributes.
+				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( "Cd" );
+				float[] colour_attr = new float[ 0 ];
+				Utility.getAttribute( prAssetId, part_control.prObjectId, part_control.prGeoId, 
+									  part_control.prPartId, "Cd", ref colour_attr_info, ref colour_attr, 
+									  HAPI_Host.getAttributeFloatData );
+
+				ParticleEmitter particle_emitter = part_node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
+				particle_emitter.emit = false;
+				particle_emitter.useWorldSpace = true;
+
+				particle_emitter.maxSize = 0.6f;
+				particle_emitter.minSize = 0.2f;
+				//particle_emitter.maxSize = 0.06f;
+				//particle_emitter.minSize = 0.02f;
+
+				ParticleRenderer renderer = part_node.AddComponent< ParticleRenderer >();
+				Material mat = new Material( Shader.Find( "Particles/Additive (Soft)" ) );
+				int width = 20;
+				int length = 20;
+				Texture2D tex = new Texture2D( width, length, TextureFormat.RGBA32, false );
+				for ( int x = 0; x < width; ++x ) 
+				{
+					for ( int y = 0; y < length; ++y ) 
+					{
+						float dist = (x - 10) * (x-10) + (y-10) * (y-10);
+						dist = Mathf.Sqrt( dist );
+						float alpha_f = 1.0f - dist / 10.0f;
+						//Color col = new Color( 0.1f, 0.08f, 0.03f, alpha_f );
+						Color col = new Color( 0.8f, 0.8f, 0.8f, alpha_f );
+						tex.SetPixel( x, y, col );
+					}
+				}
+				tex.Apply();
+				mat.mainTexture = tex;
+				mat.color = new Color( 1.0f, 1.0f, 0.5f );
+				renderer.material = mat;
+
+				particle_emitter.Emit( part_info.pointCount );
+
+				Particle[] particles = particle_emitter.particles;
+
+				for ( int i = 0; i < part_info.pointCount; ++i )
+				{
+					particles[ i ].position = new Vector3( pos_attr[ i * 3 + 0 ], 
+														   pos_attr[ i * 3 + 1 ], 
+														   pos_attr[ i * 3 + 2 ] );
+					if ( colour_attr_info.exists )
+						particles[ i ].color = new Color( colour_attr[ i * 4 + 0 ], 
+														  colour_attr[ i * 4 + 1 ], 
+														  colour_attr[ i * 4 + 2 ], 
+														  colour_attr[ i * 4 + 3 ] );
+				}
+
+				particle_emitter.particles = particles;
+			}
 		}
 
 		// Set visibility.
-		if ( part_control.prPartName != HAPI_Host.prCollisionGroupName )
+		if ( part_control.prPartName != HAPI_Host.prCollisionGroupName && is_mesh )
 		{
 			part_control.prMaterialId = part_info.materialId;
 			
