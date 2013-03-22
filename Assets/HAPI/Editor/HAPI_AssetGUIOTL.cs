@@ -81,7 +81,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					{
 						try
 						{
-							HAPI_Host.replaceAssetFromHIPFile ( myAssetOTL.prAssetId, hip_file_path );
+							HAPI_Host.replaceAssetFromHIPFile( myAssetOTL.prAssetId, hip_file_path );
 						}
 						catch ( HAPI_Error error )
 						{

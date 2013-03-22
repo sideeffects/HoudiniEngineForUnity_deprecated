@@ -395,7 +395,34 @@ public class HAPI_AssetGUI : Editor
 		// Button Parameter
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_BUTTON )
 		{
-			changed = HAPI_GUI.button( ref gui_parm, ref join_last, ref no_label_toggle_last );
+			if ( parm.choiceCount > 0 && parm.choiceIndex >= 0 )
+			{
+				// Draw popup (menu) field.
+				List< string > 	labels = new List< string >();
+				List< int>		values = new List< int >();
+				
+				// Go through our choices.
+				for ( int i = 0; i < parm.choiceCount; ++i )
+				{
+					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != id )
+						Debug.LogError( "Parm choice parent parm id (" 
+										+ myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
+										+ ") not matching current parm id (" + id + ")!\n"
+										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
+										+ "Choice count: " + parm.choiceCount );
+					
+					labels.Add( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].label );
+					values.Add( i );
+				}
+				
+				changed = HAPI_GUI.dropdown( ref gui_parm, ref parm_int_values,
+											 labels.ToArray(), values.ToArray(),
+											 ref join_last, ref no_label_toggle_last );
+			}
+			else
+			{
+				changed = HAPI_GUI.button( ref gui_parm, ref join_last, ref no_label_toggle_last );
+			}
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Separator
