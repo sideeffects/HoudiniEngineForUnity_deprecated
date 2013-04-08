@@ -859,7 +859,9 @@ namespace HAPI
 
 		/// <summary>
 		/// 	Set the transform of an individual object. This is mostly used with marshaled 
-		/// 	geometry objects.
+		/// 	geometry objects. Trying to modify the transform of an object belonging to an 
+		/// 	asset other than the special External Input Asset with object id 0 will most
+		/// 	likely fail, unless the transforms are exposed as editable via exposed parameters.
 		/// </summary>
 		/// <param name="asset_id">
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
