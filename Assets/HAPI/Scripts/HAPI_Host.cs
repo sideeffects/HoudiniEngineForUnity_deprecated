@@ -325,6 +325,7 @@ namespace HAPI
 		private static void playmodeStateChanged()
 		{
 			prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
+			setTime( 0.0f );
 		}
 
 		private static bool hasCallFailed( HAPI_Result code )

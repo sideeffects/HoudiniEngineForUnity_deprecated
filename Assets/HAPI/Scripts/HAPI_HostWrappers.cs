@@ -856,6 +856,26 @@ namespace HAPI
 														  start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
+
+		/// <summary>
+		/// 	Set the transform of an individual object. This is mostly used with marshaled 
+		/// 	geometry objects.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.HAPI_GetObjects"/>.
+		/// </param>
+		/// <param name="transform">
+		/// 	A <see cref="HAPI_TransformEuler"/> that stores the transform.
+		/// </param>
+		public static void setObjectTransform(	int asset_id, int object_id,
+												HAPI_TransformEuler transform )
+		{
+			int status_code = HAPI_SetObjectTransform( asset_id, object_id, transform );
+			processStatusCode( (HAPI_Result) status_code );
+		}
 		
 		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 

@@ -322,6 +322,10 @@ public class HAPI_Asset : HAPI_Control
 		
 		// Write marshlled geo to External Input Asset ( having assetId '0' )
 		Utility.setMesh( 0, object_id, geo_id, ref mesh, child_control );
+
+		// Apply the input asset transform to the marshaled object in the Houdini scene.
+		HAPI_TransformEuler trans = Utility.getHapiTransform( asset.transform.localToWorldMatrix );
+		HAPI_Host.setObjectTransform( 0, object_id, trans );
 	}
 	
 	public void removeGeoInput( int index )
