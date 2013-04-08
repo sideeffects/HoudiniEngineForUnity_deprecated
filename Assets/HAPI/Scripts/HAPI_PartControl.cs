@@ -31,6 +31,9 @@ public class HAPI_PartControl : HAPI_GeoControl
 	public int			prMaterialId {	get { return myMaterialId; }	set { myMaterialId = value; } }
 	public int[]		prVertexList {	get { return myVertexList; }	set { myVertexList = value; } }
 	
+	public int 			prInstancePointNumber { get { return myInstancePointNumber; } set { myInstancePointNumber = value; } }
+	public GameObject 	prObjectToInstantiate { get; set; }
+	
 	public HAPI_PartControl()
 	{
 		reset();
@@ -51,6 +54,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 		prPartName		= "part_name";
 		prMaterialId 	= -1;
 		prVertexList 	= new int[ 1 ];
+		myInstancePointNumber = -1;
 	}
 
 	public void selectParent()
@@ -88,4 +92,5 @@ public class HAPI_PartControl : HAPI_GeoControl
 	[SerializeField] private string			myPartName;
 	[SerializeField] private int			myMaterialId;
 	[SerializeField] private int[]			myVertexList;
+	[SerializeField] private int			myInstancePointNumber;
 }

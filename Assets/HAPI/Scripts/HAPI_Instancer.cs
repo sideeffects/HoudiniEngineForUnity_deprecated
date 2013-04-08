@@ -6,6 +6,13 @@ using Utility = HAPI_AssetUtility;
 
 using HAPI;
 
+public class HAPI_InstancerOverrideInfo
+{
+	public HAPI_TransformEuler xform = new HAPI_TransformEuler( true );
+	public GameObject objectToInstantiate = null;
+	public int instancePointNumber = -1;
+}
+
 public class HAPI_Instancer : MonoBehaviour {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,6 +23,8 @@ public class HAPI_Instancer : MonoBehaviour {
 	public HAPI_Asset 	prAsset { get; set; }
 	public int 			prObjectId { get; set; }
 	
+	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances { get; set; }
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
@@ -24,6 +33,166 @@ public class HAPI_Instancer : MonoBehaviour {
 		prAsset = null;
 		prOverrideInstances = false;
 		prObjectId = -1;
+		prOverriddenInstances = new List< HAPI_InstancerOverrideInfo >();
+	}
+	
+	
+	private void instanceOverriddenObjects( int total_points, List< int > exclusion_list )
+	{
+		int current_max_point_index = total_points - 1;
+		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		{
+			
+			Vector3 pos = new Vector3( override_info.xform.position[ 0 ],
+									   override_info.xform.position[ 1 ],
+									   override_info.xform.position[ 2 ] );
+			
+			Vector3 euler = new Vector3 ( override_info.xform.rotationEuler[ 0 ],
+										  override_info.xform.rotationEuler[ 1 ],
+										  override_info.xform.rotationEuler[ 2 ] );
+			
+			Vector3 scale = new Vector3 ( override_info.xform.scale[ 0 ],
+										  override_info.xform.scale[ 1 ],
+										  override_info.xform.scale[ 2 ] );
+			
+			instanceObject( override_info.objectToInstantiate, 
+							pos, euler, override_info.instancePointNumber, true, scale );
+			
+			if ( override_info.instancePointNumber < total_points )
+				exclusion_list.Add( override_info.instancePointNumber );
+			else
+			{
+				if ( current_max_point_index >= 0 )
+				{
+					exclusion_list.Add( current_max_point_index );
+					current_max_point_index--;
+				}
+			}
+				
+		}
+	}
+	
+	
+	private void instanceObject( GameObject objToInstantiate, 
+								 Vector3 pos,
+								 Vector3 euler,
+								 int point_index,
+								 bool scale_exists,
+								 Vector3 scale )
+	{
+		
+		GameObject obj;
+		
+		if ( !prOverrideInstances )
+		{
+			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
+			
+			HAPI_PartControl child_part_control = obj.GetComponentInChildren<HAPI_PartControl>();
+			child_part_control.prInstancePointNumber = point_index;
+			child_part_control.prObjectToInstantiate = objToInstantiate;
+			
+			
+			if ( scale_exists )
+			{
+				if ( Mathf.Approximately( 0.0f, scale.x ) ||
+					 Mathf.Approximately( 0.0f, scale.y ) ||
+					 Mathf.Approximately( 0.0f, scale.z ) )
+				{
+					Debug.LogWarning( "Instance " + point_index + ": Scale has a zero component!" );
+				}
+				obj.transform.localScale = scale;
+			}
+						
+			
+			// The original object is probably set to be invisible because it just contains
+			// the raw geometry with no transforms applied. We need to set the newly instanced
+			// object's childrens' mesh renderers to be enabled otherwise the instanced
+			// objects will also be invisible. :)
+			MeshRenderer[] mesh_renderers = obj.GetComponentsInChildren< MeshRenderer >();
+			foreach ( MeshRenderer mesh_renderer in mesh_renderers )
+				mesh_renderer.enabled = true;
+		}
+		else
+		{
+			obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
+			if( obj == null )
+			{
+				bool liveTransformPropagationSetting	= false;
+				bool syncAssetTransformSetting			= false;
+				bool enableCooking						= true;
+				
+				HAPI_Asset hapi_asset = prObjToInstantiate.GetComponent< HAPI_Asset >();
+				if( hapi_asset != null )
+				{
+					liveTransformPropagationSetting			= hapi_asset.prLiveTransformPropagation;
+					syncAssetTransformSetting				= hapi_asset.prSyncAssetTransform;
+					enableCooking							= hapi_asset.prEnableCooking;
+					hapi_asset.prLiveTransformPropagation	= false;
+					hapi_asset.prSyncAssetTransform			= false;
+					hapi_asset.prEnableCooking				= false;
+				}
+				
+				obj = Instantiate( prObjToInstantiate, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
+				
+				if( hapi_asset != null )
+				{
+					hapi_asset.prLiveTransformPropagation	= liveTransformPropagationSetting;
+					hapi_asset.prSyncAssetTransform			= syncAssetTransformSetting;
+					hapi_asset.prEnableCooking				= enableCooking;
+				}									
+			}
+			
+			obj.transform.localPosition = pos;
+			obj.transform.localRotation = Quaternion.Euler( euler );
+			if( scale_exists )
+				obj.transform.localScale = scale;
+		}
+		
+		obj.transform.parent = transform;
+		
+	}
+	
+	public bool isPointOverridden( int point_index )
+	{
+		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		{
+			if( override_info.instancePointNumber == point_index )
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public bool pinInstance( HAPI_InstancerOverrideInfo info )
+	{
+		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		{
+			if( override_info.instancePointNumber == info.instancePointNumber )
+				return false;
+		}
+		
+		prOverriddenInstances.Add( info );
+		return true;
+		
+	}
+	
+	public void unPinInstance( int point_index )
+	{
+		int index_to_remove = -1;
+		for( int ii = 0 ; ii < prOverriddenInstances.Count ; ii++ )
+		{
+			HAPI_InstancerOverrideInfo override_info = prOverriddenInstances[ ii ];
+			if( override_info.instancePointNumber == point_index )
+			{
+				index_to_remove = ii;
+				break;
+			}			
+		}
+		
+		if( index_to_remove >= 0 )
+		{
+			prOverriddenInstances.RemoveAt( index_to_remove );
+		}
 	}
 	
 	public void instanceObjects( HAPI_ProgressBar progress_bar )
@@ -79,11 +248,17 @@ public class HAPI_Instancer : MonoBehaviour {
 			
 			progress_bar.prTotal = part_info.pointCount;
 			
+			List <int> exclusion_list = new List<int>();
+			instanceOverriddenObjects( part_info.pointCount, exclusion_list );
+			
 			bool liveTransformPropagationSetting	= false;
 			bool syncAssetTransformSetting			= false;
 			bool enableCooking						= true;
 			for ( int ii = 0; ii < part_info.pointCount; ++ii )
 			{
+				if ( exclusion_list.Contains( ii ) )
+					continue;
+				
 				GameObject objToInstantiate = null;
 				
 				if ( object_info.objectToInstanceId >= 0 )
@@ -120,6 +295,7 @@ public class HAPI_Instancer : MonoBehaviour {
 				
 				if ( objToInstantiate != null )
 				{
+					
 					Vector3 pos = new Vector3();
 					
 					// Apply object transforms.
@@ -143,25 +319,20 @@ public class HAPI_Instancer : MonoBehaviour {
 					Vector3 euler = quat.eulerAngles;
 					euler.y = -euler.y;
 					euler.z = -euler.z;
-
-					GameObject obj;
 					
+					Vector3 scale = new Vector3 ( instance_transforms[ ii ].scale[ 0 ],
+												  instance_transforms[ ii ].scale[ 1 ],
+												  instance_transforms[ ii ].scale[ 2 ] );
+							
+					instanceObject( objToInstantiate, 
+								 	pos,
+									euler,									
+								 	ii,
+									scale_attr_info.exists,
+									scale );
+						
 					if ( !prOverrideInstances )
 					{
-						obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
-						if ( scale_attr_info.exists )
-						{
-							if ( Mathf.Approximately( 0.0f, instance_transforms[ ii ].scale[ 0 ] ) ||
-								 Mathf.Approximately( 0.0f, instance_transforms[ ii ].scale[ 1 ] ) ||
-								 Mathf.Approximately( 0.0f, instance_transforms[ ii ].scale[ 2 ] ) )
-							{
-								Debug.LogWarning( "Instance " + ii + ": Scale has a zero component!" );
-							}
-							obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[ 0 ], 
-																	instance_transforms[ ii ].scale[ 1 ], 
-																	instance_transforms[ ii ].scale[ 2 ] );
-						}
-						
 						HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
 						if ( hapi_asset != null )
 						{
@@ -169,60 +340,7 @@ public class HAPI_Instancer : MonoBehaviour {
 							hapi_asset.prSyncAssetTransform			= syncAssetTransformSetting;
 							hapi_asset.prEnableCooking				= enableCooking;
 						}
-						
-						// The original object is probably set to be invisible because it just contains
-						// the raw geometry with no transforms applied. We need to set the newly instanced
-						// object's childrens' mesh renderers to be enabled otherwise the instanced
-						// objects will also be invisible. :)
-						MeshRenderer[] mesh_renderers = obj.GetComponentsInChildren< MeshRenderer >();
-						foreach ( MeshRenderer mesh_renderer in mesh_renderers )
-							mesh_renderer.enabled = true;
 					}
-					else
-					{
-						obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
-						if( obj == null )
-						{
-							HAPI_Asset hapi_asset = prObjToInstantiate.GetComponent< HAPI_Asset >();
-							if( hapi_asset != null )
-							{
-								liveTransformPropagationSetting			= hapi_asset.prLiveTransformPropagation;
-								syncAssetTransformSetting				= hapi_asset.prSyncAssetTransform;
-								enableCooking							= hapi_asset.prEnableCooking;
-								hapi_asset.prLiveTransformPropagation	= false;
-								hapi_asset.prSyncAssetTransform			= false;
-								hapi_asset.prEnableCooking				= false;
-							}
-							
-							obj = Instantiate( prObjToInstantiate, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
-							
-							if( hapi_asset != null )
-							{
-								hapi_asset.prLiveTransformPropagation	= liveTransformPropagationSetting;
-								hapi_asset.prSyncAssetTransform			= syncAssetTransformSetting;
-								hapi_asset.prEnableCooking				= enableCooking;
-							}
-												
-						}
-						obj.transform.localPosition = pos;
-						obj.transform.localRotation = Quaternion.Euler( euler );
-						if( scale_attr_info.exists )
-							obj.transform.localScale = new Vector3( instance_transforms[ ii ].scale[ 0 ], 
-																	instance_transforms[ ii ].scale[ 1 ], 
-																	instance_transforms[ ii ].scale[ 2 ] );
-					}
-					
-					obj.transform.parent = transform;
-					
-					HAPI_PartControl part_control = obj.GetComponent< HAPI_PartControl >();
-					if ( part_control == null )
-					{
-						obj.AddComponent< HAPI_PartControl >();
-						part_control = obj.GetComponent< HAPI_PartControl >();
-					}
-					
-					if ( part_control )
-						part_control.prAsset = prAsset;
 				}
 			}
 		}
