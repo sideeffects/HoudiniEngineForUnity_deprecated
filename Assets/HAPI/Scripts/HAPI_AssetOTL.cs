@@ -63,12 +63,18 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	public override void reset()
 	{
+		// Save the asset type so we can restore it after the reset.
+		HAPI_Asset.AssetType asset_type = prAssetType;
+
 		base.reset();
 		
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
 		prHandleInfos 				= new HAPI_HandleInfo[ 0 ];
 		prHandleBindingInfos 		= null;
+
+		// Need to restore the asset type here.
+		prAssetType = asset_type;
 	}
 	
 	public override void Update()
@@ -97,7 +103,16 @@ public class HAPI_AssetOTL : HAPI_Asset
 			if ( prFullBuild || prPartialBuild ) 
 			{
 				if ( prReloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
-					HAPI_Host.unloadOTL( prAssetId );
+				{
+					// There's no reason to abort the whole rebuild process because we can't unload
+					// the asset first as that would leave the user with no options other than
+					// to delete this HAPI asset and create a new one for this OTL.
+					try
+					{
+						HAPI_Host.unloadOTL( prAssetId );
+					}
+					catch ( HAPI_Error ) {}
+				}
 				
 				bool is_first_time_build = false;
 

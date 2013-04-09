@@ -129,11 +129,17 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 	public override void reset()
 	{
+		// Save the asset type so we can restore it after the reset.
+		HAPI_Asset.AssetType asset_type = prAssetType;
+
 		base.reset();
 		
 		// Overwrite some settings that should be different by default for curves than other asset types.
 		prAutoSelectAssetNode		= true;
-		prHideGeometryOnLinking	= false;
+		prHideGeometryOnLinking		= false;
+
+		// Need to restore the asset type here.
+		prAssetType					= asset_type;
 
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
@@ -162,7 +168,16 @@ public class HAPI_AssetCurve : HAPI_Asset
 			if ( prFullBuild || prPartialBuild )
 			{
 				if ( prReloadAssetInFullBuild && !prPartialBuild )
-					HAPI_Host.unloadOTL( prAssetId );
+				{
+					// There's no reason to abort the whole rebuild process because we can't unload
+					// the asset first as that would leave the user with no options other than
+					// to delete this HAPI asset and create a new one for this OTL.
+					try
+					{
+						HAPI_Host.unloadOTL( prAssetId );
+					}
+					catch ( HAPI_Error ) {}
+				}
 				
 				bool is_first_time_build = false;
 
