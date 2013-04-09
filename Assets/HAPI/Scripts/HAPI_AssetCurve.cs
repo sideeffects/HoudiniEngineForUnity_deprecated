@@ -163,14 +163,24 @@ public class HAPI_AssetCurve : HAPI_Asset
 			{
 				if ( prReloadAssetInFullBuild && !prPartialBuild )
 					HAPI_Host.unloadOTL( prAssetId );
-					
+				
+				bool is_first_time_build = false;
+
 				try
 				{
 					int asset_id = 0;
+
+					if ( prAssetId < 0 )
+						is_first_time_build = true;
+
 					if ( prReloadAssetInFullBuild && !prPartialBuild )
 						asset_id = HAPI_Host.createCurve();
 					else
 						asset_id = prAssetId;
+
+					// We need to update the prAssetId in case the cook is aborted/fails 
+					// and we need to clean up (unload the asset) in the catch.
+					prAssetId = asset_id;
 
 					prReloadAssetInFullBuild = true; // The default.
 
@@ -186,8 +196,22 @@ public class HAPI_AssetCurve : HAPI_Asset
 					Debug.LogError( "Asset not loaded: " + error.ToString() );
 					// Nothing to build since the load failed.
 					
+					// Try to unload the asset so it doesn't dangle.
+					if ( is_first_time_build )
+					{
+						try
+						{
+							HAPI_Host.unloadOTL( prAssetId );
+						}
+						catch ( HAPI_Error ) {}
+					}
+
 					// Clean up.
 					reset();
+
+					// If in play mode, disable live cooks.
+					if ( EditorApplication.isPlaying )
+						prLiveInGameCooking = false;
 					
 					return false; // false for failed :(
 				}
@@ -422,6 +446,14 @@ public class HAPI_AssetCurve : HAPI_Asset
 			}
 		}
 		catch ( HAPI_ErrorIgnorable ) {}
+		catch ( HAPI_ErrorProgressCancelled error )
+		{
+			// If in play mode, disable live cooks.
+			if ( EditorApplication.isPlaying )
+				prLiveInGameCooking = false;
+
+			Debug.LogError( error.ToString() );
+		}
 		catch ( HAPI_Error error )
 		{
 			Debug.LogError( error.ToString() );

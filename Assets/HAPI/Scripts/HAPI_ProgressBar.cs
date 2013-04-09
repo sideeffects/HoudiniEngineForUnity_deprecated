@@ -52,6 +52,9 @@ public class HAPI_ProgressBar  {
 		HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 		prCurrentValue = 0;
 		prTotal = 100;
+
+		bool progress_cancelled = false;
+
 		while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 		{
 			state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
@@ -68,8 +71,26 @@ public class HAPI_ProgressBar  {
 			}
 
 			prMessage = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
-			displayProgressBar();
+
+			if ( progress_cancelled )
+				EditorUtility.DisplayProgressBar( prTitle, "Aborting...", 0 );
+			else
+			{
+				try
+				{
+					displayProgressBar();
+				}
+				catch ( HAPI_ErrorProgressCancelled )
+				{
+					progress_cancelled = true;
+					EditorUtility.DisplayProgressBar( prTitle, "Aborting...", 0 );
+				}
+			}
 		}
+
+		// We want to propage the cancellation of the progress still, even if it is after a delay.
+		if ( progress_cancelled )
+			throw new HAPI_ErrorProgressCancelled();
 
 		if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 		{
