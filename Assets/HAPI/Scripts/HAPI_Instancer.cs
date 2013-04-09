@@ -176,6 +176,11 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 	}
 	
+	public void unPinAllInstances()
+	{
+		prOverriddenInstances.Clear();		
+	}
+	
 	public void unPinInstance( int point_index )
 	{
 		int index_to_remove = -1;

@@ -60,12 +60,24 @@ public class HAPI_InstancerGUI : Editor
 			myInstancer.prOverrideInstances = value;
 		}
 		
+		
+		if ( myInstancer.prOverriddenInstances.Count > 0 )
+		{
+			if ( GUILayout.Button( "UnPin All Instances" ) ) 
+			{
+				myInstancer.unPinAllInstances();
+				changed = true;
+			}
+		}
+		
 		if ( changed )
 		{
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			myInstancer.instanceObjects( progress_bar );
 			progress_bar.clearProgressBar();
 		}
+		
+		
 	}
 	
 	private HAPI_Instancer	 	myInstancer;
