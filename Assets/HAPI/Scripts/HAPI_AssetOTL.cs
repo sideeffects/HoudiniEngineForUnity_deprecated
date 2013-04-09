@@ -102,7 +102,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 			
 			if ( prFullBuild || prPartialBuild ) 
 			{
-				if ( prReloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
+				bool unload_asset = prReloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild;
+				if ( unload_asset )
 				{
 					// There's no reason to abort the whole rebuild process because we can't unload
 					// the asset first as that would leave the user with no options other than
@@ -112,6 +113,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 						HAPI_Host.unloadOTL( prAssetId );
 					}
 					catch ( HAPI_Error ) {}
+
+					// Once an asset is unloaded its id will is obviously no longer valid, so reset it here.
+					prAssetId = -1;
 				}
 				
 				bool is_first_time_build = false;
@@ -123,7 +127,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 					if ( prAssetId < 0 )
 						is_first_time_build = true;
 
-					if ( prReloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild )
+					if ( unload_asset )
 						asset_id = HAPI_Host.loadOTL( prAssetPath );
 					else
 						asset_id = prAssetId;
