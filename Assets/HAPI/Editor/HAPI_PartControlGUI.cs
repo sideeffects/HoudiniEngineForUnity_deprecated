@@ -31,7 +31,18 @@ public class HAPI_PartControlGUI : Editor
 	{
 		HAPI_PartControl control = target as HAPI_PartControl;
 		control.selectParent();
-
+		
+		HAPI_Instancer instancer = instancerFromPartObject( control.gameObject );
+		if( instancer == null )
+			return;
+		
+		bool is_overridden = instancer.isPointOverridden( control.prInstancePointNumber );
+		
+		if ( is_overridden )
+		{
+			instancer.drawPin( control.prInstancePointNumber );
+		}
+		
 		/*
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
@@ -164,7 +175,7 @@ public class HAPI_PartControlGUI : Editor
 		Object[] selection = Selection.objects;
 		if( selection.Length > 1 )
 		{
-			if ( GUILayout.Button( "Pin Instances" ) ) 
+			if ( GUILayout.Button( "Pin Selection" ) ) 
 			{
 				foreach( Object obj in selection )
 				{
@@ -173,7 +184,7 @@ public class HAPI_PartControlGUI : Editor
 				}
 			}
 			
-			if ( GUILayout.Button( "UnPin Instances" ) ) 
+			if ( GUILayout.Button( "UnPin Selection" ) ) 
 			{
 				foreach( Object obj in selection )
 				{

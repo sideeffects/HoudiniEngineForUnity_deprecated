@@ -195,6 +195,64 @@ public class HAPI_Instancer : MonoBehaviour {
 		}
 	}
 	
+	public void drawAllPins()
+	{
+		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		{
+			drawPin( override_info );
+						
+		}
+	}
+	
+	public void drawPin( int point_index )
+	{
+		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		{
+			if( override_info.instancePointNumber == point_index )
+				drawPin( override_info );
+		}				
+	}
+	
+	public void drawPin( HAPI_InstancerOverrideInfo override_info )
+	{
+		MeshFilter mesh_filter = override_info.objectToInstantiate.GetComponentInChildren< MeshFilter >();
+		Bounds bounds = mesh_filter.sharedMesh.bounds;
+		float max_extent = Mathf.Max( bounds.extents.x, Mathf.Max( bounds.extents.y, bounds.extents.z ) );
+					
+		
+		Vector3 position = new Vector3 ( override_info.xform.position[0], 
+										 override_info.xform.position[1],
+										 override_info.xform.position[2] );
+		
+		float handle_size 	= HandleUtility.GetHandleSize( position );
+		if( handle_size < 1 )
+			handle_size = 1;
+		
+		float min_offset = 1.2f;
+		float offset = min_offset*(handle_size);
+		if( offset < min_offset )
+			offset = min_offset; 
+		position.y += offset;
+		
+		Handles.color = new Color( 1.0f, 0, 0, 1.0f );					
+		
+		
+		float scale_factor = handle_size;
+		if(scale_factor < 1 )
+			scale_factor = 1;
+		
+		Handles.ArrowCap( override_info.instancePointNumber,
+						 position, 
+						 Quaternion.Euler( new Vector3( 90, 0, 0) ),
+						 scale_factor );
+		
+		
+		Handles.color = new Color( 0.8f, 0, 0, 0.5f );
+		
+		position.y = override_info.xform.position[1];
+		Handles.DrawSolidDisc(position , new Vector3( 0, 1, 0) , max_extent*override_info.xform.scale[ 0 ] );
+	}
+	
 	public void instanceObjects( HAPI_ProgressBar progress_bar )
 	{
 		try

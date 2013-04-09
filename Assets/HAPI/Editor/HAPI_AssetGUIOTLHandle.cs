@@ -27,6 +27,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	// Public
 	public void OnSceneGUI()
 	{
+		
+		drawPinnedInstances();
+		
 		string currentGlobalManipTool = Tools.current.ToString();
 
 		if ( currentGlobalManipTool == "Rotate" )
@@ -307,6 +310,15 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
+	
+	private void drawPinnedInstances()
+	{
+		HAPI_Instancer instancer = myAsset.gameObject.GetComponentInChildren< HAPI_Instancer >();
+		if( instancer == null )
+			return;
+		
+		instancer.drawAllPins();
+	}
 	
 	private enum XformManipMode 
 	{

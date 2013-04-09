@@ -34,6 +34,15 @@ public class HAPI_InstancerGUI : Editor
 		myInstancer = target as HAPI_Instancer;
 	}
 	
+	public void OnSceneGUI()
+	{
+		myInstancer = target as HAPI_Instancer;
+		
+		if ( myInstancer != null )
+			myInstancer.drawAllPins();
+		
+	}
+	
 	public override void OnInspectorGUI() 
 	{
 		bool changed = false;
