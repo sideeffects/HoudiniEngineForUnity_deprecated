@@ -139,6 +139,8 @@ public class HAPI_Asset : HAPI_Control
 																	set { myShowObjectControls = value; } }
 	public bool 					prShowAssetControls {			get { return myShowAssetControls; } 
 																	set { myShowAssetControls = value; } }
+	public bool 					prShowAssetOptions {			get { return myShowAssetOptions; } 
+																	set { myShowAssetOptions = value; } }
 	public bool						prShowInputControls {			get { return myShowInputControls; } 
 																	set { myShowInputControls = value; } }
 	public bool						prAutoSelectAssetNode {			get { return myAutoSelectAssetNode; } 
@@ -155,6 +157,8 @@ public class HAPI_Asset : HAPI_Control
 																	set { myHideWhenFedToOtherAsset = value; } }
 	public bool						prShowVertexColours {			get { return myShowVertexColours; }
 																	set { myShowVertexColours = value; } }
+	public bool						prShowPinnedInstances {			get { return myShowPinnedInstances; }
+																	set { myShowPinnedInstances = value; } }
 	public bool						prLiveInGameCooking {			get { return myLiveInGameCooking; }
 																	set { myLiveInGameCooking = value; } }
 
@@ -476,6 +480,7 @@ public class HAPI_Asset : HAPI_Control
 		
 		prShowObjectControls 		= true;
 		prShowAssetControls 		= true;
+		prShowAssetOptions			= true;
 		prShowInputControls 		= true;
 		prAutoSelectAssetNode 		= true;
 		prEnableLogging				= false;
@@ -484,6 +489,7 @@ public class HAPI_Asset : HAPI_Control
 		prEnableCooking				= true;
 		myHideWhenFedToOtherAsset	= true;
 		prShowVertexColours			= false;
+		prShowPinnedInstances		= true;
 		prLiveInGameCooking			= false;
 		
 		prLastChangedParmId 		= -1;
@@ -798,6 +804,7 @@ public class HAPI_Asset : HAPI_Control
 	
 	[SerializeField] private bool 					myShowObjectControls;
 	[SerializeField] private bool 					myShowAssetControls;
+	[SerializeField] private bool 					myShowAssetOptions;	
 	[SerializeField] private bool					myShowInputControls;
 	[SerializeField] private bool					myAutoSelectAssetNode;
 	[SerializeField] private bool					myEnableLogging;
@@ -806,6 +813,7 @@ public class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myEnableCooking;
 	[SerializeField] private bool					myHideWhenFedToOtherAsset;
 	[SerializeField] private bool					myShowVertexColours;
+	[SerializeField] private bool					myShowPinnedInstances;	
 	[SerializeField] private bool					myLiveInGameCooking;
 	
 	[SerializeField] private int					myLastChangedParmId;

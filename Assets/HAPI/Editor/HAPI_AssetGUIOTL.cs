@@ -103,154 +103,17 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			myParmChanges |= HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
 			if ( myParmChanges )
 				myAssetOTL.prAssetPath = path;
-			
+						
+			EditorGUILayout.Separator();
+			myAssetOTL.prShowAssetOptions = 
+				EditorGUILayout.Foldout( myAssetOTL.prShowAssetOptions, new GUIContent( "Asset Options" ) );
 			// These don't affect the asset directly so they don't trigger rebuilds.
 			
-			// Show Geometries
+			if( myAssetOTL.prShowAssetOptions )
 			{
-				bool value = myAsset.prIsGeoVisible;
-				bool changed = HAPI_GUI.toggle( "show_geometries", "Show Geometries", ref value );
-				if ( changed )
-				{
-					myAsset.prIsGeoVisible = value;
-					HAPI_PartControl[] controls = 
-						myAsset.GetComponentsInChildren< HAPI_PartControl >();
-					foreach ( HAPI_PartControl control in controls )
-					{
-						if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
-								&& control.gameObject.GetComponent< MeshRenderer >() != null )
-							control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
-					}
-				}
-			}
-
-			// Show Vertex Colours
-			{
-				bool value = myAsset.prShowVertexColours;
-				bool changed = HAPI_GUI.toggle( "show_vertex_colours", "Show Vertex Colors", ref value );
-				if ( changed )
-				{
-					myAsset.prShowVertexColours = value;
-					foreach ( MeshRenderer renderer in myAsset.GetComponentsInChildren< MeshRenderer >() )
-					{
-						// Set material.
-						if ( renderer.sharedMaterial == null )
-							renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
-
-						if ( myAsset.prShowVertexColours )
-						{
-							renderer.sharedMaterial.mainTexture = null;
-							renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-						}
-						else
-						{
-							Transform parent = renderer.transform;
-							HAPI_PartControl control = parent.GetComponent< HAPI_PartControl >();
-							
-							if ( control.prMaterialId >= 0 )
-							{
-								try
-								{
-									HAPI_MaterialInfo material = HAPI_Host.getMaterial( myAsset.prAssetId, 
-																						control.prMaterialId );
-
-									if ( material.isTransparent() )
-										renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
-									else if ( !material.isTransparent() )
-										renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-
-									Material mat = renderer.sharedMaterial;
-									HAPI_AssetUtility.assignTexture( ref mat, material );
-								}
-								catch ( HAPI_Error error )
-								{
-									Debug.LogError( error.ToString() );
-								}
-							}
-							else
-							{
-								renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-							}
-						}
-					}
-				}
-			}
-
-			HAPI_GUI.separator();
-
-			// Enable Cooking Toggle
-			{
-				bool value = myAsset.prEnableCooking;
-				if ( HAPI_Host.prEnableCooking == false )
-				{
-					GUI.enabled = false;
-					HAPI_GUI.toggle( "enable_cooking", "Enable Cooking (overwritted by global setting)", ref value );
-					GUI.enabled = true;
-				}
-				else
-					HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
-				myAsset.prEnableCooking = value;
-			}
-
-			// Auto Select Asset Node Toggle
-			{
-				bool value = myAsset.prAutoSelectAssetNode;
-				if ( HAPI_Host.prAutoSelectParent == false )
-				{
-					GUI.enabled = false;
-					HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent (overwritted by global setting)", ref value );
-					GUI.enabled = true;
-				}
-				else
-					HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
-				myAsset.prAutoSelectAssetNode = value;
+				generateAssetOptionControls();
 			}
 			
-			// Hide When Fed to Other Asset
-			{
-				bool value = myAsset.prHideGeometryOnLinking;
-				if ( HAPI_Host.prHideGeometryOnLinking == false )
-				{
-					GUI.enabled = false;
-					HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking (overwritted by global setting)", ref value );
-					GUI.enabled = true;
-				}
-				else
-					HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
-				myAsset.prHideGeometryOnLinking = value;
-			}
-
-			HAPI_GUI.separator();
-			
-			/* Hide for now since it's not used a lot.
-			// Logging Toggle
-			{
-				bool value = myAsset.prEnableLogging;
-				HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
-				myAsset.prEnableLogging = value;
-			}
-			*/
-
-			// Sync Asset Transform Toggle
-			{
-				bool value = myAsset.prSyncAssetTransform;
-				HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
-				myAsset.prSyncAssetTransform = value;
-			}
-
-			// Live Transform Propagation Toggle
-			{
-				bool value = myAsset.prLiveTransformPropagation;
-				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
-				myAsset.prLiveTransformPropagation = value;
-			}
-
-			// Live In-Game Cooking
-			{
-				bool value = myAsset.prLiveInGameCooking;
-				HAPI_GUI.toggle( "live_ingame_cooking", "Live In-Game Cooking", ref value );
-				myAsset.prLiveInGameCooking = value;
-			}
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
@@ -280,6 +143,164 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
+	private void generateAssetOptionControls()
+	{
+		// Show Geometries
+		{
+			bool value = myAsset.prIsGeoVisible;
+			bool changed = HAPI_GUI.toggle( "show_geometries", "Show Geometries", ref value );
+			if ( changed )
+			{
+				myAsset.prIsGeoVisible = value;
+				HAPI_PartControl[] controls = 
+					myAsset.GetComponentsInChildren< HAPI_PartControl >();
+				foreach ( HAPI_PartControl control in controls )
+				{
+					if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
+							&& control.gameObject.GetComponent< MeshRenderer >() != null )
+						control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
+				}
+			}
+		}
+
+		// Show Vertex Colours
+		{
+			bool value = myAsset.prShowVertexColours;
+			bool changed = HAPI_GUI.toggle( "show_vertex_colours", "Show Vertex Colors", ref value );
+			if ( changed )
+			{
+				myAsset.prShowVertexColours = value;
+				foreach ( MeshRenderer renderer in myAsset.GetComponentsInChildren< MeshRenderer >() )
+				{
+					// Set material.
+					if ( renderer.sharedMaterial == null )
+						renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+
+					if ( myAsset.prShowVertexColours )
+					{
+						renderer.sharedMaterial.mainTexture = null;
+						renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+					}
+					else
+					{
+						Transform parent = renderer.transform;
+						HAPI_PartControl control = parent.GetComponent< HAPI_PartControl >();
+						
+						if ( control.prMaterialId >= 0 )
+						{
+							try
+							{
+								HAPI_MaterialInfo material = HAPI_Host.getMaterial( myAsset.prAssetId, 
+																					control.prMaterialId );
+
+								if ( material.isTransparent() )
+									renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
+								else if ( !material.isTransparent() )
+									renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+
+								Material mat = renderer.sharedMaterial;
+								HAPI_AssetUtility.assignTexture( ref mat, material );
+							}
+							catch ( HAPI_Error error )
+							{
+								Debug.LogError( error.ToString() );
+							}
+						}
+						else
+						{
+							renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+						}
+					}
+				}
+			}
+		}
+		
+		// Show Pinned Instances
+		{
+			bool value = myAsset.prShowPinnedInstances;
+			bool changed = HAPI_GUI.toggle( "show_pinned_instances", "Show Pinned Instances", ref value );
+			if ( changed )
+			{
+				myAsset.prShowPinnedInstances = value;				
+			}
+		}
+
+		HAPI_GUI.separator();
+
+		// Enable Cooking Toggle
+		{
+			bool value = myAsset.prEnableCooking;
+			if ( HAPI_Host.prEnableCooking == false )
+			{
+				GUI.enabled = false;
+				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking (overwritted by global setting)", ref value );
+				GUI.enabled = true;
+			}
+			else
+				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
+			myAsset.prEnableCooking = value;
+		}
+
+		// Auto Select Asset Node Toggle
+		{
+			bool value = myAsset.prAutoSelectAssetNode;
+			if ( HAPI_Host.prAutoSelectParent == false )
+			{
+				GUI.enabled = false;
+				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent (overwritted by global setting)", ref value );
+				GUI.enabled = true;
+			}
+			else
+				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
+			myAsset.prAutoSelectAssetNode = value;
+		}
+		
+		// Hide When Fed to Other Asset
+		{
+			bool value = myAsset.prHideGeometryOnLinking;
+			if ( HAPI_Host.prHideGeometryOnLinking == false )
+			{
+				GUI.enabled = false;
+				HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking (overwritted by global setting)", ref value );
+				GUI.enabled = true;
+			}
+			else
+				HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
+			myAsset.prHideGeometryOnLinking = value;
+		}
+
+		HAPI_GUI.separator();
+		
+		/* Hide for now since it's not used a lot.
+		// Logging Toggle
+		{
+			bool value = myAsset.prEnableLogging;
+			HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
+			myAsset.prEnableLogging = value;
+		}
+		*/
+
+		// Sync Asset Transform Toggle
+		{
+			bool value = myAsset.prSyncAssetTransform;
+			HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
+			myAsset.prSyncAssetTransform = value;
+		}
+
+		// Live Transform Propagation Toggle
+		{
+			bool value = myAsset.prLiveTransformPropagation;
+			HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
+			myAsset.prLiveTransformPropagation = value;
+		}
+
+		// Live In-Game Cooking
+		{
+			bool value = myAsset.prLiveInGameCooking;
+			HAPI_GUI.toggle( "live_ingame_cooking", "Live In-Game Cooking", ref value );
+			myAsset.prLiveInGameCooking = value;
+		}
+	}
 	
 	private HAPI_AssetOTL myAssetOTL;
 }

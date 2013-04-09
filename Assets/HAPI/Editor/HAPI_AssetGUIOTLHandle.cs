@@ -27,8 +27,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	// Public
 	public void OnSceneGUI()
 	{
-		
-		drawPinnedInstances();
+		if ( myAssetOTL.prShowPinnedInstances )
+			drawPinnedInstances();
 		
 		string currentGlobalManipTool = Tools.current.ToString();
 
