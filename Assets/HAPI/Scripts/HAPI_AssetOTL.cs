@@ -88,391 +88,96 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 	public override bool build() 
 	{
-		bool base_built = base.build();
+		bool unload_asset_first = prReloadAssetInFullBuild 
+								  && prAssetType == HAPI_Asset.AssetType.TYPE_OTL 
+								  && !prPartialBuild;
+
+		bool base_built = base.build( unload_asset_first );
 		if ( !base_built )
 			return false;
-		
-		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
-		progress_bar.prUseDelay			= prUseDelayForProgressBar;
-		progress_bar.prAsset			= this;
 
-		try
-		{
-			progress_bar.prStartTime = System.DateTime.Now;
-			
-			if ( prFullBuild || prPartialBuild ) 
-			{
-				bool unload_asset = prReloadAssetInFullBuild && prAssetType == HAPI_Asset.AssetType.TYPE_OTL && !prPartialBuild;
-				if ( unload_asset )
-				{
-					// There's no reason to abort the whole rebuild process because we can't unload
-					// the asset first as that would leave the user with no options other than
-					// to delete this HAPI asset and create a new one for this OTL.
-					try
-					{
-						HAPI_Host.unloadOTL( prAssetId );
-					}
-					catch ( HAPI_Error ) {}
-
-					// Once an asset is unloaded its id will is obviously no longer valid, so reset it here.
-					prAssetId = -1;
-				}
-				
-				bool is_first_time_build = false;
-
-				try
-				{
-					int asset_id = 0;
-
-					if ( prAssetId < 0 )
-						is_first_time_build = true;
-
-					if ( unload_asset )
-						asset_id = HAPI_Host.loadOTL( prAssetPath );
-					else
-						asset_id = prAssetId;
-
-					// We need to update the prAssetId in case the cook is aborted/fails 
-					// and we need to clean up (unload the asset) in the catch.
-					prAssetId = asset_id;
-
-					prReloadAssetInFullBuild = true; // The default.
-
-					progress_bar.statusCheckLoop();
-
-					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
-
-					if ( !prPartialBuild )
-						Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
-				}
-				catch ( HAPI_Error error )
-				{
-					Debug.LogError( "Asset not loaded: " + error.ToString() );
-					// Nothing to build since the load failed.
-
-					// Try to unload the asset so it doesn't dangle.
-					if ( is_first_time_build )
-					{
-						try
-						{
-							HAPI_Host.unloadOTL( prAssetId );
-						}
-						catch ( HAPI_Error ) {}
-					}
-					
-					// Clean up.
-					reset();
-
-					// If in play mode, disable live cooks.
-					if ( EditorApplication.isPlaying )
-						prLiveInGameCooking = false;
-					
-					return false; // false for failed :(
-				}
-				
-				// For convenience we copy some asset info properties locally (since they are constant anyway).
-				// More imporantly, structs are not serialized and therefore putting them into their own
-				// variables is required in order to maintain state between serialization cycles.
-				prAssetId 				= prAssetInfo.id;
-				prAssetValidationId		= prAssetInfo.validationId;
-				prAssetName				= prAssetInfo.name;
-				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
-				prMinTransInputCount	= prAssetInfo.minTransInputCount;
-				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;
-				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
-				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
-				prParmCount 			= prAssetInfo.parmCount;
-				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
-				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
-				prParmStringValueCount	= prAssetInfo.parmStringValueCount;
-				prParmChoiceCount		= prAssetInfo.parmChoiceCount;
-				
-				prObjectCount 			= prAssetInfo.objectCount;
-				prHandleCount 			= prAssetInfo.handleCount;
-				
-				progress_bar.prCurrentValue			= 0;
-				progress_bar.prTotal				= prParmCount
-													  + prParmIntValueCount
-													  + prParmFloatValueCount
-													  + prParmStringValueCount
-													  + prParmChoiceCount
-													  + prObjectCount
-													  + prHandleCount;
-				
-				// Try to load presets.
-				loadPreset();
-				
-				progress_bar.displayProgressBar();
-				myProgressBarJustUsed = true;
-				
-				progress_bar.prMessage = "Loading parameter information...";
-				
-				// Get all parameters.
-				prParms = new HAPI_ParmInfo[ prParmCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
-				progress_bar.incrementProgressBar( prParmCount );
-				
-				// Get parameter int values.
-				prParmIntValues = new int[ prParmIntValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
-				progress_bar.incrementProgressBar( prParmIntValueCount );
-				
-				// Get parameter float values.
-				prParmFloatValues = new float[ prParmFloatValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
-				progress_bar.incrementProgressBar( prParmFloatValueCount );
-				
-				// Get parameter string (handle) values.
-				prParmStringValues = new int[ prParmStringValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
-									 prParmStringValueCount );
-				progress_bar.incrementProgressBar( prParmStringValueCount );
-				
-				// Get parameter choice lists.
-				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-				progress_bar.incrementProgressBar( prParmChoiceCount );
-				
-				progress_bar.prMessage = "Loading handles...";
-				
-				// Get exposed handle information.
-				prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
-				
-				// Get handles.
-				prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
-				for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
-				{
-					progress_bar.incrementProgressBar();
-					HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
-					
-					if ( handle_info.typeName != "xform" && HAPI_Host.prEnableSupportWarnings )
-						Debug.LogWarning( "Handle " + handle_info.name + " of type " 
-								   		  + handle_info.typeName + " is unsupported at this time." );
-					
-					HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
-					Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
-								 		 binding_infos, handle_info.bindingsCount );
-					
-					prHandleBindingInfos.Add( binding_infos );
-				}
-				
-				// Add input fields.
-				if ( !prPartialBuild && !prForceReconnectInFullBuild )
-				{
-					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-					{
-						if ( prMaxTransInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
-							for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
-							{
-								prUpStreamTransformAssets.Add( null );
-								prUpStreamTransformObjects.Add( null );
-							}
-					}
-				
-					if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
-						for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-						{
-							prFileInputs.Add( "" );
-							prUpStreamGeoAssets.Add( null );
-							prUpStreamGeoObjects.Add( null );
-							prUpStreamGeoAdded.Add( false );
-						}
-				
-					// Check for min input fields set.
-					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-					{
-						int numValidTransformInputs = 0;
-						for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
-							if ( prUpStreamTransformAssets[ ii ] )
-								numValidTransformInputs++;
-					
-						if ( numValidTransformInputs < prMinTransInputCount )
-							Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
-											  "Please provide inputs in the Inputs section." );
-					}
-				
-					int numValidGeoInputs = 0;
-					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-						if ( prFileInputs[ ii ] != "" )
-							numValidGeoInputs++;
-				
-					if ( numValidGeoInputs < prMinGeoInputCount )
-						Debug.LogWarning( "Insufficent Geo Inputs to Asset. " +
-										  "Please provide inputs in the Inputs section." );
-				
-					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-						for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
-							if ( prUpStreamTransformAssets[ ii ] )
-								HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
-
-					foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-					{
-						int index = downstream_asset.getAssetTransformConnectionIndex( this );
-						if ( index >= 0 )
-							HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
-					}
-					
-					// Fill input names.
-					for ( int i = 0; i < prMaxTransInputCount; ++i )
-					{
-						string trans_input_name = HAPI_Host.getInputName( prAssetId, i, 
-																		  HAPI_InputType.HAPI_INPUT_TRANSFORM );
-						if ( trans_input_name == "" )
-							trans_input_name = "Transform Input #" + ( i + 1 );
-						prTransInputNames.Add( trans_input_name );
-					}
-					for ( int i = 0; i < prMaxGeoInputCount; ++i )
-					{
-						string geo_input_name = HAPI_Host.getInputName( prAssetId, i, 
-																		HAPI_InputType.HAPI_INPUT_GEOMETRY );
-						if ( geo_input_name == "" )
-							geo_input_name = "Geometry Input #" + ( i + 1 );
-						prGeoInputNames.Add( geo_input_name );
-						prGeoInputFormats.Add( HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_DEFAULT );
-					}
-				}
-
-				if ( !prPartialBuild )
-				{
-					// Clean up.
-					destroyChildren( transform );
-					prGameObjects = new GameObject[ prObjectCount ];
-				}
-
-				// Create local object info caches (transforms need to be stored in a parallel array).
-				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
-				prObjectTransforms = new HAPI_Transform[ prObjectCount ];
-			}
-			else
-			{
-				progress_bar.displayProgressBar();
-				myProgressBarJustUsed = true;
-				
-				progress_bar.prTotal = prObjectCount + prParmIntValueCount 
-									   + prParmFloatValueCount + prParmStringValueCount;
-
-				HAPI_Host.cookAsset( prAssetId );
-				progress_bar.statusCheckLoop();
-
-				// We need to get the parameter values again because they could have been
-				// changed by a script.
-
-				// Get parameter int values.
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
-				progress_bar.incrementProgressBar( prParmIntValueCount );
-				
-				// Get parameter float values.
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
-				progress_bar.incrementProgressBar( prParmFloatValueCount );
-				
-				// Get parameter string (handle) values.
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
-									 prParmStringValueCount );
-				progress_bar.incrementProgressBar( prParmStringValueCount );
-			}
-
-			if ( !prPartialBuild )
-			{
-				// Set asset's transform.
-				if ( prSyncAssetTransform )
-				{
-					HAPI_TransformEuler hapi_transform;
-					HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, 
-												 (int) HAPI_XYZOrder.ZXY, out hapi_transform );
-					if ( Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
-						 Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
-						 Mathf.Approximately( 0.0f, hapi_transform.scale[ 2 ] ) )
-					{
-						Debug.LogWarning( "Asset(id: " + prAssetId + ", name: " + prAssetName + "): Scale has a zero component!" );
-					}
-
-					Utility.applyTransform( hapi_transform, transform );
-				}
-			
-				progress_bar.prMessage = "Loading and composing objects...";
-			
-				Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
-				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
-						 			 prObjectTransforms, prObjectCount );
-				
-				for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-				{
-					progress_bar.incrementProgressBar();
-					try
-					{
-						if ( !prObjects[ object_index ].isInstancer && 
-							 ( prFullBuild || prObjects[ object_index ].hasTransformChanged
-										   || prObjects[ object_index ].haveGeosChanged ) )
-						{
-							createObject( object_index );
-						}
-					}
-					catch ( HAPI_Error error )
-					{
-						// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-						Debug.LogWarning( error.ToString() );
-					}
-				}
-			
-				// Processing instancers.
-				for ( int object_index = 0; object_index < prObjectCount; ++object_index )
-				{
-					HAPI_ObjectInfo object_info = prObjects[ object_index ];
-					if ( object_info.isInstancer )
-					{
-						try
-						{
-							if ( object_info.objectToInstanceId >= 0 && 
-								 prGameObjects[ object_info.objectToInstanceId ] == null )
-								createObject( object_info.objectToInstanceId );
-						
-							instanceObjects( object_index, progress_bar );
-						}
-						catch ( HAPI_Error error )
-						{
-							// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-							Debug.LogWarning( error.ToString() );
-						}
-					}
-				}
-			
-				// Process dependent assets.
-				processDependentAssets();
-			}
-		}
-		catch ( HAPI_ErrorIgnorable ) {}
-		catch ( HAPI_ErrorProgressCancelled error )
-		{
-			// If in play mode, disable live cooks.
-			if ( EditorApplication.isPlaying )
-				prLiveInGameCooking = false;
-
-			Debug.LogError( error.ToString() );
-		}
-		catch ( HAPI_Error error )
-		{
-			Debug.LogError( error.ToString() );
-		}
-		catch ( System.Exception error )
-		{
-			Debug.LogError( error.ToString() );
-		}
-		finally
-		{
-			progress_bar.clearProgressBar();
-
-			prFullBuild = false;
-			prPartialBuild = false;
-			prForceReconnectInFullBuild = false;
-
-			myProgressBarJustUsed = false;
-			prUseDelayForProgressBar = true;
-		}
-		
 		return true;
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Protected Methods
+
+	protected override int buildCreateAsset()
+	{
+		return HAPI_Host.loadOTL( prAssetPath );
+	}
+
+	protected override void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar )
+	{
+		progress_bar.prMessage = "Loading handles...";
+				
+		// Get exposed handle information.
+		prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
+		Utility.getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
+				
+		// Get handles.
+		prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
+		for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
+		{
+			progress_bar.incrementProgressBar();
+			HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
+					
+			if ( handle_info.typeName != "xform" && HAPI_Host.prEnableSupportWarnings )
+				Debug.LogWarning( "Handle " + handle_info.name + " of type " 
+								   	+ handle_info.typeName + " is unsupported at this time." );
+					
+			HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
+			Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
+								 	binding_infos, handle_info.bindingsCount );
+					
+			prHandleBindingInfos.Add( binding_infos );
+		}
+	}
+
+	protected override void buildCreateObjects( ref HAPI_ProgressBar progress_bar )
+	{
+		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+		{
+			progress_bar.incrementProgressBar();
+			try
+			{
+				if ( !prObjects[ object_index ].isInstancer && 
+						( prFullBuild || prObjects[ object_index ].hasTransformChanged
+									|| prObjects[ object_index ].haveGeosChanged ) )
+				{
+					createObject( object_index );
+				}
+			}
+			catch ( HAPI_Error error )
+			{
+				// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
+				Debug.LogWarning( error.ToString() );
+			}
+		}
+			
+		// Processing instancers.
+		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+		{
+			HAPI_ObjectInfo object_info = prObjects[ object_index ];
+			if ( object_info.isInstancer )
+			{
+				try
+				{
+					if ( object_info.objectToInstanceId >= 0 && 
+							prGameObjects[ object_info.objectToInstanceId ] == null )
+						createObject( object_info.objectToInstanceId );
+						
+					instanceObjects( object_index, progress_bar );
+				}
+				catch ( HAPI_Error error )
+				{
+					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
+					Debug.LogWarning( error.ToString() );
+				}
+			}
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
 	
