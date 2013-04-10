@@ -79,6 +79,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	public override void Update()
 	{
+		base.Update();
+
 		if ( EditorApplication.isPlaying && prLiveInGameCooking )
 		{
 			HAPI_Host.setTime( Time.time );
