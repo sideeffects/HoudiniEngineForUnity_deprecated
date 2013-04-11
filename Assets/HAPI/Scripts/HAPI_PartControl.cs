@@ -32,7 +32,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 	public int[]		prVertexList {	get { return myVertexList; }	set { myVertexList = value; } }
 	
 	public int 			prInstancePointNumber { get { return myInstancePointNumber; } set { myInstancePointNumber = value; } }
-	public GameObject 	prObjectToInstantiate { get; set; }
+	public GameObject 	prObjectToInstantiate { get { return myObjectToInstantiate; } set { myObjectToInstantiate = value; } }
 	
 	public HAPI_PartControl()
 	{
@@ -93,4 +93,5 @@ public class HAPI_PartControl : HAPI_GeoControl
 	[SerializeField] private int			myMaterialId;
 	[SerializeField] private int[]			myVertexList;
 	[SerializeField] private int			myInstancePointNumber;
+	[SerializeField] private GameObject		myObjectToInstantiate;
 }

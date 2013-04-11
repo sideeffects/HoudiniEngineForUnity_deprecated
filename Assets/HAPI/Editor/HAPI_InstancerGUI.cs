@@ -61,7 +61,7 @@ public class HAPI_InstancerGUI : Editor
 		}
 		
 		
-		if ( myInstancer.prOverriddenInstances.Count > 0 )
+		if ( myInstancer.hasOverriddenInstances() )
 		{
 			if ( GUILayout.Button( "UnPin All Instances" ) ) 
 			{

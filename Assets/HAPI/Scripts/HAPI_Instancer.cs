@@ -6,24 +6,18 @@ using Utility = HAPI_AssetUtility;
 
 using HAPI;
 
-public class HAPI_InstancerOverrideInfo
-{
-	public HAPI_TransformEuler xform = new HAPI_TransformEuler( true );
-	public GameObject objectToInstantiate = null;
-	public int instancePointNumber = -1;
-}
+
 
 public class HAPI_Instancer : MonoBehaviour {
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public GameObject 	prObjToInstantiate { get; set; }
+	public GameObject 	prObjToInstantiate { get { return myObjToInstantiate; }  set { myObjToInstantiate = value; } }
 	public bool 		prOverrideInstances { get; set; }
-	public HAPI_Asset 	prAsset { get; set; }
+	public HAPI_Asset 	prAsset { get { return myAsset; } set { myAsset = value; } }
 	public int 			prObjectId { get; set; }
-	
-	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances { get; set; }
+		
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -32,30 +26,24 @@ public class HAPI_Instancer : MonoBehaviour {
 	{
 		prAsset = null;
 		prOverrideInstances = false;
-		prObjectId = -1;
-		prOverriddenInstances = new List< HAPI_InstancerOverrideInfo >();
+		prObjectId = -1;		
 	}
 	
 	
 	private void instanceOverriddenObjects( int total_points, List< int > exclusion_list )
-	{
+	{		
 		int current_max_point_index = total_points - 1;
-		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
 		{
 			
-			Vector3 pos = new Vector3( override_info.xform.position[ 0 ],
-									   override_info.xform.position[ 1 ],
-									   override_info.xform.position[ 2 ] );
+			Vector3 pos = override_info.translate;
 			
-			Vector3 euler = new Vector3 ( override_info.xform.rotationEuler[ 0 ],
-										  override_info.xform.rotationEuler[ 1 ],
-										  override_info.xform.rotationEuler[ 2 ] );
+			Vector3 euler = override_info.rotate;
 			
-			Vector3 scale = new Vector3 ( override_info.xform.scale[ 0 ],
-										  override_info.xform.scale[ 1 ],
-										  override_info.xform.scale[ 2 ] );
+			Vector3 scale = override_info.scale;
 			
-			instanceObject( override_info.objectToInstantiate, 
+			GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiateName );
+			instanceObject( object_to_instantiate, 
 							pos, euler, override_info.instancePointNumber, true, scale );
 			
 			if ( override_info.instancePointNumber < total_points )
@@ -152,9 +140,14 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 	}
 	
+	public bool hasOverriddenInstances()
+	{
+		return prAsset.prOverriddenInstances.Count > 0;
+	}
+	
 	public bool isPointOverridden( int point_index )
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
 		{
 			if( override_info.instancePointNumber == point_index )
 				return true;
@@ -165,28 +158,28 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public bool pinInstance( HAPI_InstancerOverrideInfo info )
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
 		{
 			if( override_info.instancePointNumber == info.instancePointNumber )
 				return false;
 		}
 		
-		prOverriddenInstances.Add( info );
+		prAsset.prOverriddenInstances.Add( info );
 		return true;
 		
 	}
 	
 	public void unPinAllInstances()
 	{
-		prOverriddenInstances.Clear();		
+		prAsset.prOverriddenInstances.Clear();		
 	}
 	
 	public void unPinInstance( int point_index )
 	{
 		int index_to_remove = -1;
-		for( int ii = 0 ; ii < prOverriddenInstances.Count ; ii++ )
+		for( int ii = 0 ; ii < prAsset.prOverriddenInstances.Count ; ii++ )
 		{
-			HAPI_InstancerOverrideInfo override_info = prOverriddenInstances[ ii ];
+			HAPI_InstancerOverrideInfo override_info = prAsset.prOverriddenInstances[ ii ];
 			if( override_info.instancePointNumber == point_index )
 			{
 				index_to_remove = ii;
@@ -196,13 +189,13 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 		if( index_to_remove >= 0 )
 		{
-			prOverriddenInstances.RemoveAt( index_to_remove );
+			prAsset.prOverriddenInstances.RemoveAt( index_to_remove );
 		}
 	}
 	
 	public void drawAllPins()
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
 		{
 			drawPin( override_info );
 						
@@ -211,7 +204,7 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public void drawPin( int point_index )
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prOverriddenInstances )
+		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
 		{
 			if( override_info.instancePointNumber == point_index )
 				drawPin( override_info );
@@ -220,14 +213,14 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public void drawPin( HAPI_InstancerOverrideInfo override_info )
 	{
-		MeshFilter mesh_filter = override_info.objectToInstantiate.GetComponentInChildren< MeshFilter >();
+		GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiateName );
+		
+		MeshFilter mesh_filter = object_to_instantiate.GetComponentInChildren< MeshFilter >();
 		Bounds bounds = mesh_filter.sharedMesh.bounds;
 		float max_extent = Mathf.Max( bounds.extents.x, Mathf.Max( bounds.extents.y, bounds.extents.z ) );
 					
 		
-		Vector3 position = new Vector3 ( override_info.xform.position[0], 
-										 override_info.xform.position[1],
-										 override_info.xform.position[2] );
+		Vector3 position = override_info.translate;
 		
 		float handle_size 	= HandleUtility.GetHandleSize( position );
 		if( handle_size < 1 )
@@ -254,8 +247,8 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 		Handles.color = new Color( 0.8f, 0, 0, 0.5f );
 		
-		position.y = override_info.xform.position[1];
-		Handles.DrawSolidDisc(position , new Vector3( 0, 1, 0) , max_extent*override_info.xform.scale[ 0 ] );
+		position.y = override_info.translate.y;
+		Handles.DrawSolidDisc(position , new Vector3( 0, 1, 0) , max_extent*override_info.scale.x );
 	}
 	
 	public void instanceObjects( HAPI_ProgressBar progress_bar )
@@ -427,5 +420,9 @@ public class HAPI_Instancer : MonoBehaviour {
 		foreach ( GameObject child in children )
 			DestroyImmediate( child );
 	}
+	
+	
+	[SerializeField] private HAPI_Asset myAsset;
+	[SerializeField] private GameObject myObjToInstantiate;
 	
 }

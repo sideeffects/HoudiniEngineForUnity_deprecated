@@ -87,6 +87,19 @@ public class HAPI_PartControlGUI : Editor
 		return instancer;
 	}
 	
+	private string findFullPath( GameObject game_obj )
+	{
+		GameObject obj = game_obj;
+		string path = "/" + obj.name;
+		while ( obj.transform.parent != null )
+		{
+			obj = obj.transform.parent.gameObject;
+			path = "/" + obj.name + path;
+		}
+		return path;
+	}
+	
+	
 	private void pinPartObject( GameObject part_object, bool pin )
 	{
 		
@@ -106,15 +119,10 @@ public class HAPI_PartControlGUI : Editor
 		{			
 			Transform game_object_xform = part_control.gameObject.transform;
 			
-			HAPI_TransformEuler xform = new HAPI_TransformEuler( true );
-			xform.position[ 0 ] = game_object_xform.position.x;
-			xform.position[ 1 ] = game_object_xform.position.y;
-			xform.position[ 2 ] = game_object_xform.position.z;
+			HAPI_InstancerOverrideInfo override_info = ScriptableObject.CreateInstance<HAPI_InstancerOverrideInfo>(); //new HAPI_InstancerOverrideInfo();
 			
-			Vector3 euler_rotation = game_object_xform.rotation.eulerAngles;
-			xform.rotationEuler[ 0 ] = euler_rotation.x;
-			xform.rotationEuler[ 1 ] = euler_rotation.y;
-			xform.rotationEuler[ 2 ] = euler_rotation.z;
+			override_info.translate = game_object_xform.position;
+			override_info.rotate = game_object_xform.rotation.eulerAngles;
 			
 			Vector3 scale = game_object_xform.localScale;
 			
@@ -127,14 +135,8 @@ public class HAPI_PartControlGUI : Editor
 				parent = parent.parent;						
 			}
 			
-			xform.scale[ 0 ] = scale.x;
-			xform.scale[ 1 ] = scale.y;
-			xform.scale[ 2 ] = scale.z;
-								
-			
-			HAPI_InstancerOverrideInfo override_info = new HAPI_InstancerOverrideInfo();
-			override_info.objectToInstantiate = part_control.prObjectToInstantiate;
-			override_info.xform = xform;
+			override_info.scale = scale;			
+			override_info.objectToInstantiateName = findFullPath( part_control.prObjectToInstantiate );			
 			override_info.instancePointNumber = part_control.prInstancePointNumber;
 			
 			instancer.pinInstance( override_info );
