@@ -14,9 +14,9 @@ public class HAPI_Instancer : MonoBehaviour {
 	// Public Properties
 	
 	public GameObject 	prObjToInstantiate { get { return myObjToInstantiate; }  set { myObjToInstantiate = value; } }
-	public bool 		prOverrideInstances { get; set; }
+	public bool 		prOverrideInstances { get { return myOverrideInstances; } set { myOverrideInstances = value; } }
 	public HAPI_Asset 	prAsset { get { return myAsset; } set { myAsset = value; } }
-	public int 			prObjectId { get; set; }
+	public int 			prObjectId { get { return myObjectId; } set { myObjectId = value; } }
 		
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ public class HAPI_Instancer : MonoBehaviour {
 			
 			Vector3 scale = override_info.scale;
 			
-			GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiateName );
+			GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiatePath );
 			instanceObject( object_to_instantiate, 
 							pos, euler, override_info.instancePointNumber, true, scale );
 			
@@ -213,7 +213,7 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public void drawPin( HAPI_InstancerOverrideInfo override_info )
 	{
-		GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiateName );
+		GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiatePath );
 		
 		MeshFilter mesh_filter = object_to_instantiate.GetComponentInChildren< MeshFilter >();
 		Bounds bounds = mesh_filter.sharedMesh.bounds;
@@ -424,5 +424,7 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	[SerializeField] private HAPI_Asset myAsset;
 	[SerializeField] private GameObject myObjToInstantiate;
+	[SerializeField] private bool myOverrideInstances;
+	[SerializeField] private int myObjectId;
 	
 }

@@ -136,7 +136,7 @@ public class HAPI_PartControlGUI : Editor
 			}
 			
 			override_info.scale = scale;			
-			override_info.objectToInstantiateName = findFullPath( part_control.prObjectToInstantiate );			
+			override_info.objectToInstantiatePath = findFullPath( part_control.prObjectToInstantiate );			
 			override_info.instancePointNumber = part_control.prInstancePointNumber;
 			
 			instancer.pinInstance( override_info );

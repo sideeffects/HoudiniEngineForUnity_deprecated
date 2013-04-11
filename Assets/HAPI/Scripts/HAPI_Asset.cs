@@ -189,17 +189,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	public List< HAPI_GeoInputFormat >	prGeoInputFormats {			get { return myGeoInputFormats; }
 																	set { myGeoInputFormats = value; } }
 	
-	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances 
-	{ 
-		get
-		{
-			return myOverriddenInstances;
-		}
-		set
-		{
-			myOverriddenInstances = value;
-		}		
-	}
+	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances { get { return myOverriddenInstances; }		
+																	  set {	myOverriddenInstances = value; } }
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
