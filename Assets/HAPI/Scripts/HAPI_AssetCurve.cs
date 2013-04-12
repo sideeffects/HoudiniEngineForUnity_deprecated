@@ -30,14 +30,17 @@ public class HAPI_AssetCurve : HAPI_Asset
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 	
-	public List< Vector3 > 	prPoints {				get { return myPoints; } set { myPoints = value; } }
-	public Vector3[]		prVertices {			get { return myVertices; } set { myVertices = value; } }
-	public GameObject		prMainChild {			get { return myMainChild; } set { myMainChild = value; } }
-
-	public bool				prIsAddingPoints {		get { return myIsAddingPoints; } 
-													set { myIsAddingPoints = value; } }
-	public bool				prEditModeChangeWait {	get { return myEditModeChangeWait; } 
-													set { myEditModeChangeWait = value; } }
+	public List< Vector3 > 	prPoints {					get { return myPoints; } 
+														set { myPoints = value; } }
+	public Vector3[]		prVertices {				get { return myVertices; } 
+														set { myVertices = value; } }
+	
+	public bool				prIsAddingPoints {			get { return myIsAddingPoints; } 
+														set { myIsAddingPoints = value; } }
+	public bool				prModeChangeWait {			get { return myModeChangeWait; } 
+														set { myModeChangeWait = value; } }
+	public bool				prIsEditingPoints {			get { return myIsEditingPoints; } 
+														set { myIsEditingPoints = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -140,10 +143,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		prPoints 					= new List< Vector3 >();
 		prVertices 					= new Vector3[ 0 ];
-		prMainChild					= null;
 
 		myIsAddingPoints			= true;
-		myEditModeChangeWait		= false;
+		myModeChangeWait		= false;
+		myIsEditingPoints			= false;
 	}
 	
 	public override bool build() 
@@ -159,75 +162,27 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 	public void buildDummyMesh()
 	{
-		if ( prMainChild == null )
-			return;
+		//////////////////////////////////
+		// Line Mesh
 
-		int vertex_count = prVertices.Length;
+		if ( gameObject.GetComponent< MeshFilter >() == null )
+			return; //throw new MissingComponentException( "Missing MeshFilter." );
+		if ( gameObject.GetComponent< MeshFilter >().sharedMesh == null )
+			return; //throw new HAPI_Error( "Missing sharedMesh on curve object." );
+		if ( gameObject.GetComponent< MeshRenderer >() == null )
+			return; //throw new MissingComponentException( "Missing MeshRenderer." );
 
-		// Set mesh counts.
-		int mesh_vertex_count	= vertex_count * 2;
-		int mesh_uv_count		= mesh_vertex_count;
-		int mesh_triangle_count = ( vertex_count - 1 ) * 4; // Two triangles per side (double-sided).
+		Mesh mesh = gameObject.GetComponent< MeshFilter >().sharedMesh;
 
-		// Create mesh arrays.
-		Vector3[] vertices 	= new Vector3[ 	mesh_vertex_count ];
-		Vector2[] uvs		= new Vector2[  mesh_uv_count ];
-		int[] triangles 	= new int[ 		mesh_triangle_count * 3 ];
+		int[] line_indices = new int[ prVertices.Length ];
+		for ( int i = 0; i < prVertices.Length; ++i )
+			line_indices[ i ] = i;
 
-		for ( int i = 0; i < vertex_count; ++i )
-		{
-			vertices[ i * 2 ] = prVertices[ i ];
-			vertices[ i * 2 + 1 ] = prVertices[ i ];
-			vertices[ i * 2 + 1 ].y += HandleUtility.GetHandleSize( prVertices[ i ] ) * myDummyLineWidthMod;
-
-			uvs[ i * 2 + 0 ][ 0 ] = 0.0f;
-			uvs[ i * 2 + 1 ][ 1 ] = 0.0f;
-
-			if ( i < vertex_count - 1 )
-			{
-				// Side one.
-					
-				// Triangle 1.
-				triangles[ i * 12 + 0  ] = i * 2 + 0;
-				triangles[ i * 12 + 1  ] = i * 2 + 1;
-				triangles[ i * 12 + 2  ] = i * 2 + 2;
-
-				// Triangle 2.
-				triangles[ i * 12 + 3  ] = i * 2 + 1;
-				triangles[ i * 12 + 4  ] = i * 2 + 3;
-				triangles[ i * 12 + 5  ] = i * 2 + 2;
-
-				// Side two.
-
-				// Triangle 3.
-				triangles[ i * 12 + 6  ] = i * 2 + 2;
-				triangles[ i * 12 + 7  ] = i * 2 + 1;
-				triangles[ i * 12 + 8  ] = i * 2 + 0;
-
-				// Triangle 4.
-				triangles[ i * 12 + 9  ] = i * 2 + 2;
-				triangles[ i * 12 + 10 ] = i * 2 + 3;
-				triangles[ i * 12 + 11 ] = i * 2 + 1;
-			}
-		}
-
-		// Load into vertices and face into mesh.
-		// Get or create mesh.
-		MeshFilter main_child_mesh_filter 	= prMainChild.GetComponent< MeshFilter >();
-		Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-		if ( main_child_mesh == null ) 
-		{
-			main_child_mesh_filter.mesh 	= new Mesh();
-			main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-		}
-		main_child_mesh.Clear();
+		mesh.Clear();
 		
-		main_child_mesh.vertices	= vertices;
-		main_child_mesh.uv			= uvs;
-		main_child_mesh.triangles	= triangles;
-
-		main_child_mesh.RecalculateBounds();
-		main_child_mesh.RecalculateNormals();
+		mesh.vertices = prVertices;
+		mesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
+		mesh.RecalculateBounds();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,42 +241,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
-		// Create main underling.
-		if ( prMainChild == null )
-		{
-			prMainChild = new GameObject( object_info.name + "_obj" );
-			prMainChild.transform.parent = transform;
-
-			// Add required components.
-			prMainChild.AddComponent< MeshFilter >();
-			prMainChild.AddComponent< MeshRenderer >();
-			prMainChild.AddComponent< HAPI_PartControl >();
-		}
-		
 		try
 		{
-			// Set Object Control on child selection control so it can read settings from here.
-			prMainChild.GetComponent< HAPI_PartControl >().prAsset		= this;
-			prMainChild.GetComponent< HAPI_PartControl >().prObjectId	= object_id;
-
-			// Set generic texture so it's not pink.
-			Material decal = new Material( Shader.Find( "Decal" ) );
-			prMainChild.GetComponent< MeshRenderer >().material = decal;
-			decal.SetColor( "_Color", new Color( 0.0f, 0.0f, 0.0f ) );
-
-			// Get or create mesh.
-			MeshFilter main_child_mesh_filter 	= prMainChild.GetComponent< MeshFilter >();
-			Mesh main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			if ( main_child_mesh == null ) 
-			{
-				main_child_mesh_filter.mesh 	= new Mesh();
-				main_child_mesh 				= main_child_mesh_filter.sharedMesh;
-			}
-			main_child_mesh.Clear();
-			
-			// Print attribute names.
-			//printAllAttributeNames( asset_id, object_id, geo_id, geo_info );
-			
 			// Get position attributes (this is all we get for the curve's geometry).
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
 			float[] pos_attr = new float[ 0 ];
@@ -340,43 +261,32 @@ public class HAPI_AssetCurve : HAPI_Asset
 					prVertices[ i ][ j ] = pos_attr[ i * 3 + j ];
 				prVertices[ i ].x = -prVertices[ i ].x;
 			}
-			
-			// Get transforms.
-			HAPI_Transform trans = prObjectTransforms[ object_id ];
-			
-			// Apply object transforms.		
-			//
-			// Axis and Rotation conversions:
-			// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
-			// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
-			// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
-			// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
-			// causes a double negative - yeah, I know).
-			
-			prMainChild.transform.localPosition = new Vector3( -trans.position[ 0 ], 
-																trans.position[ 1 ],
-																trans.position[ 2 ] );
-			
-			Quaternion quat = new Quaternion(	trans.rotationQuaternion[ 0 ],
-												trans.rotationQuaternion[ 1 ],
-												trans.rotationQuaternion[ 2 ],
-												trans.rotationQuaternion[ 3 ] );
-			
-			Vector3 euler = quat.eulerAngles;
-			euler.y = -euler.y;
-			euler.z = -euler.z;
-			
-			prMainChild.transform.localRotation = Quaternion.Euler( euler );
-			prMainChild.transform.localScale = new Vector3( trans.scale[ 0 ], trans.scale[ 1 ], trans.scale[ 2 ] );
 
-			// Create guide mesh (for when the asset is not selected).
+			// Set the Mesh Filter.
+			if ( gameObject.GetComponent< MeshFilter >() == null )
+			{
+				MeshFilter mesh_filter = gameObject.AddComponent< MeshFilter >();
+				mesh_filter.sharedMesh = new Mesh();
+			}
+
+			// Set the Mesh Renderer.
+			if ( gameObject.GetComponent< MeshRenderer >() == null )
+			{
+				MeshRenderer mesh_renderer = gameObject.AddComponent< MeshRenderer >();
+		
+				// Set generic texture so it's not pink.
+				Material line_material = new Material( Shader.Find( "HAPI/Line" ) );
+				mesh_renderer.material = line_material;
+				//line_material.SetColor( "_Color", new Color( 0.0f, 0.0f, 0.0f ) );
+			}
+
+			// Create guide and selection meshes.
 			buildDummyMesh();
 
 			AssetDatabase.Refresh();
 		}
 		catch ( HAPI_Error error )
 		{
-			DestroyImmediate( prMainChild );
 			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;
@@ -385,28 +295,21 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 	private void playmodeStateChanged()
 	{
-		if ( prMainChild != null )
-		{
-			MeshRenderer renderer = prMainChild.GetComponent< MeshRenderer >();
-			if ( renderer != null )
-				renderer.enabled = !EditorApplication.isPlaying;
-			else
-				Debug.LogError( "Why does your curve not have a mesh renderer?" );
-		}
+		MeshRenderer renderer = gameObject.GetComponent< MeshRenderer >();
+		if ( renderer != null )
+			renderer.enabled = !EditorApplication.isPlaying;
+		else
+			Debug.LogError( "Why does your curve not have a mesh renderer?" );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Serialized Data
+	// Serialized Private Data
 	
 	[SerializeField] private List< Vector3 >	myPoints;
 	[SerializeField] private Vector3[]			myVertices;
-	[SerializeField] private GameObject			myMainChild;
 
 	[SerializeField] private bool				myIsAddingPoints;
-	[SerializeField] private bool				myEditModeChangeWait;
+	[SerializeField] private bool				myModeChangeWait;
+	[SerializeField] private bool				myIsEditingPoints;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private Data
-
-	private static float myDummyLineWidthMod = 0.05f;
 }
