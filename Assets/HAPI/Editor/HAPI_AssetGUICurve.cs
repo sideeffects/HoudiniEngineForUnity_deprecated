@@ -17,6 +17,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using HAPI;
@@ -39,8 +40,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	{
 		base.OnEnable();
 		myAssetCurve			= myAsset as HAPI_AssetCurve;
-		
-		myCurrentlyActivePoint	= -1;
 
 		myForceInspectorRedraw	= false;
 		myAddPointButtonLabel	= "Add Points";
@@ -49,6 +48,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		mySelectionMeshColours	= null;
 		mySelectionMesh			= null;
 		mySelectionMaterial		= null;
+		mySelectedPoints		= new List< int >();
+		mySelectedPointsMask	= new List< bool >();
 
 		myConnectionMesh		= null;
 		myConnectionMaterial	= null;
@@ -178,8 +179,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myTempCamera = Camera.current;
 
 		Event current_event 		= Event.current;
-		
-		int pressed_point_index 	= -1;
 
 		// TESTING
 		//if ( current_event.type == EventType.MouseDown && current_event.button == 0 )
@@ -265,7 +264,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				if ( button_press )
 				{
 					// Deselect all.
-					myCurrentlyActivePoint = -1;
+					if ( !current_event.control )
+						clearSelection();
 
 					Vector3 mouse_position = current_event.mousePosition;
 				
@@ -283,19 +283,15 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						proj_pos.z = 0.0f;
 						
 						float distance = Vector3.Distance( mouse_position, proj_pos );
-						if ( distance < 8.0f )
+						if ( distance < myMinDistanceForPointSelection )
 						{
 							// Once we modify a point we are no longer bound to the user holding down 
 							// the point edit key. Edit point mode is now fully activated.
 							myAssetCurve.prModeChangeWait = false;
-							pressed_point_index = i;
-							if ( mySelectionMesh != null && mySelectionMeshColours != null )
-								mySelectionMeshColours[ i ] = Color.yellow;
-						}
-						else if ( mySelectionMesh != null && mySelectionMeshColours != null )
-							mySelectionMeshColours[ i ] = Color.white;
-					}
-				}
+							togglePointSelection( i );
+						} // if point hit
+					} // for all points
+				} // if clicked on the screen
 			}
 		}
 		else if ( myForceInspectorRedraw )
@@ -304,19 +300,41 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myForceInspectorRedraw = false;
 		}
 
-		// Set active control point.
-		if ( pressed_point_index >= 0 )
-			myCurrentlyActivePoint = pressed_point_index;
+		// Hide default transform handles.
+		myIsTransformHandleHidden = myAssetCurve.prIsEditingPoints;
 
 		// Update active control point.
-		if ( myCurrentlyActivePoint >= 0 ) 
+		if ( mySelectedPoints.Count > 0 ) 
 		{
-			Vector3 old_position = myAssetCurve.prPoints[ myCurrentlyActivePoint ];
-			Vector3 new_position = Handles.PositionHandle( old_position, 
-														   Quaternion.identity );
+			// Create midpoint for the handle.
+			Vector3 max_bounds = myAssetCurve.prPoints[ mySelectedPoints[ 0 ] ];
+			Vector3 min_bounds = myAssetCurve.prPoints[ mySelectedPoints[ 0 ] ];
+			for ( int i = 1; i < mySelectedPoints.Count; ++i )
+			{
+				Vector3 current_pos = myAssetCurve.prPoints[ mySelectedPoints[ i ] ];
+				max_bounds.x = Mathf.Max( max_bounds.x, current_pos.x );
+				max_bounds.y = Mathf.Max( max_bounds.y, current_pos.y );
+				max_bounds.z = Mathf.Max( max_bounds.z, current_pos.z );
+				min_bounds.x = Mathf.Min( min_bounds.x, current_pos.x );
+				min_bounds.y = Mathf.Min( min_bounds.y, current_pos.y );
+				min_bounds.z = Mathf.Min( min_bounds.z, current_pos.z );
+			}
+			Vector3 mid_pos = ( max_bounds + min_bounds ) / 2.0f;
+
+			Vector3 new_mid_pos = Handles.PositionHandle( mid_pos, 
+														  Quaternion.identity );
 			
-			if ( new_position != old_position )
-				myAssetCurve.updatePoint( myCurrentlyActivePoint, new_position );
+			if ( new_mid_pos != mid_pos )
+			{
+				Vector3 delta = new_mid_pos - mid_pos;
+				for ( int i = 0; i < mySelectedPoints.Count; ++i )
+				{
+					int point_index = mySelectedPoints[ i ];
+					Vector3 old_pos = myAssetCurve.prPoints[ point_index ];
+					Vector3 new_pos = old_pos + delta;
+					myAssetCurve.updatePoint( point_index, new_pos );
+				}
+			}
 		}
 
 		// Remake and Draw Guide Geometry
@@ -342,6 +360,41 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
+	private void clearSelection()
+	{
+		mySelectedPoints.Clear();
+		for ( int i = 0; i < mySelectedPointsMask.Count; ++i )
+			mySelectedPointsMask[ i ] = false;
+
+		if ( mySelectionMeshColours != null )
+			for ( int i = 0; i < mySelectionMeshColours.Length; ++i )
+				mySelectionMeshColours[ i ] = myUnselectedColour;
+	}
+
+	private void togglePointSelection( int point_index )
+	{
+		if ( mySelectedPointsMask == null ||
+			 mySelectedPoints == null ||
+			 mySelectionMeshColours == null )
+			return;
+
+		if ( point_index < mySelectedPointsMask.Count )
+		{
+			if ( mySelectedPointsMask[ point_index ] )
+			{
+				mySelectedPointsMask[ point_index ] = false;
+				mySelectedPoints.Remove( point_index );
+				mySelectionMeshColours[ point_index ] = myUnselectedColour;
+			}
+			else
+			{
+				mySelectedPointsMask[ point_index ] = true;
+				mySelectedPoints.Add( point_index );
+				mySelectionMeshColours[ point_index ] = mySelectedColour;
+			}
+		}
+	}
+
 	private void buildGuideGeometry()
 	{
 		// Build Selection Mesh -------------------------------------------------------------------------------------
@@ -358,6 +411,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			mySelectionMesh							= new Mesh();
 			mySelectionMesh.hideFlags				= HideFlags.HideAndDontSave;
 		}
+
+		// Check if we need to resize the selection mask.
+		while ( mySelectedPointsMask.Count < myAssetCurve.prPoints.Count )
+			mySelectedPointsMask.Add( false );
 
 		// Pretend we have two points if only one actually exists. Since DrawMesh won't draw
 		// anything unless it has at least a line we need a dummy line to exist.
@@ -384,9 +441,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			for ( int i = 0; i < selection_vertices.Length; ++i )
 			{
 				if ( !myAssetCurve.prIsEditingPoints )
-					mySelectionMeshColours[ i ] = new Color( 0.0f, 0.2f, 0.2f );
+					mySelectionMeshColours[ i ] = myUnselectableColour;
 				else
-					mySelectionMeshColours[ i ] = Color.white;
+					mySelectionMeshColours[ i ] = myUnselectedColour;
 			}
 		}
 
@@ -515,8 +572,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// Change the colours of the points if the edit points mode has changed.
 		if ( edit_points_mode != myAssetCurve.prIsEditingPoints )
 		{
-			mySelectionMeshColours = null;
-			myCurrentlyActivePoint = -1;
+			clearSelection();
 		}
 
 		myAssetCurve.prIsAddingPoints	= add_points_mode;
@@ -568,10 +624,22 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		return cancel_mode;
 	}
+
+	public static bool myIsTransformHandleHidden {
+		get {
+			System.Type type = typeof (Tools);
+			FieldInfo field = type.GetField ("s_Hidden", BindingFlags.NonPublic | BindingFlags.Static);
+			return ((bool) field.GetValue (null));
+		}
+		set {
+			System.Type type = typeof (Tools);
+			FieldInfo field = type.GetField ("s_Hidden", BindingFlags.NonPublic | BindingFlags.Static);
+			field.SetValue (null, value);
+		}
+	}
 	
 	private HAPI_AssetCurve		myAssetCurve;
 
-	private int 				myCurrentlyActivePoint;
 	private bool				myForceInspectorRedraw;
 	private string				myAddPointButtonLabel;
 
@@ -581,9 +649,17 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	[SerializeField] 
 	private GameObject			myTarget;
 
+	private static float		myMinDistanceForPointSelection = 8.0f;
+	private static Color		myUnselectableColour = new Color( 0.0f, 0.2f, 0.2f );
+	private static Color		myUnselectedColour = Color.white;
+	private static Color		mySelectedColour = Color.yellow;
 	private Color[]				mySelectionMeshColours;
 	private Mesh				mySelectionMesh;
 	private Material			mySelectionMaterial;
+	[SerializeField] 
+	private List< int >			mySelectedPoints;
+	[SerializeField] 
+	private List< bool >		mySelectedPointsMask;
 
 	private Mesh				myConnectionMesh;
 	private Material			myConnectionMaterial;
