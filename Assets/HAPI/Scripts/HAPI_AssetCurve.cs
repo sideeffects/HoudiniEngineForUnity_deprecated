@@ -66,6 +66,29 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		updatePoints();
 	}
+
+	public void deletePoint( int index )
+	{
+		prPoints.RemoveAt( index );
+		updatePoints();
+	}
+
+	public void deletePoints( int[] indicies )
+	{
+		List< Vector3 > new_points = new List< Vector3 >( prPoints.Count - indicies.Length );
+		List< bool > point_status = new List< bool >( prPoints.Count );
+		for ( int i = 0; i < prPoints.Count; ++i )
+			point_status.Add( true );
+		for ( int i = 0; i < indicies.Length; ++i )
+			point_status[ indicies[ i ] ] = false;
+		for ( int i = 0; i < point_status.Count; ++i )
+			if ( point_status[ i ] )
+				new_points.Add( prPoints[ i ] );
+
+		prPoints = new_points;
+
+		updatePoints();
+	}
 	
 	public void updatePoint( int index, Vector3 pos )
 	{
@@ -174,15 +197,20 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 		Mesh mesh = gameObject.GetComponent< MeshFilter >().sharedMesh;
 
-		int[] line_indices = new int[ prVertices.Length ];
-		for ( int i = 0; i < prVertices.Length; ++i )
-			line_indices[ i ] = i;
+		if ( prPoints.Count <= 1 )
+			gameObject.GetComponent< MeshFilter >().sharedMesh = null;
+		else
+		{
+			int[] line_indices = new int[ prVertices.Length ];
+			for ( int i = 0; i < prVertices.Length; ++i )
+				line_indices[ i ] = i;
 
-		mesh.Clear();
+			mesh.Clear();
 		
-		mesh.vertices = prVertices;
-		mesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
-		mesh.RecalculateBounds();
+			mesh.vertices = prVertices;
+			mesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
+			mesh.RecalculateBounds();
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

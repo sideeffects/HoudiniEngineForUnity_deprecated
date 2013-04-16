@@ -244,6 +244,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		else if ( myAssetCurve.prIsEditingPoints )
 		{
 			myAssetCurve.prIsEditingPoints = drawModeBorders( new Color( 0.7f, 0.7f, 0.9f ), mouse_position );
+			if ( !myAssetCurve.prIsEditingPoints )
+				clearSelection();
 
 			if ( !current_event.alt )
 			{
@@ -307,7 +309,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 							} // if point hit
 						} // single click
 					} // for all points
-				
 				} // mouse up
 				
 				// Prevent click from being passed lower (this is so stupid!).
@@ -315,6 +316,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
+
+				// Prevent the delete key from deleting the curve in this mode.
+				if ( current_event.isKey && current_event.keyCode == KeyCode.Delete && mySelectedPoints.Count == 0 )
+					Event.current.Use();
 			}
 		}
 		else if ( myForceInspectorRedraw )
@@ -344,36 +349,44 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// Update active control point.
 		if ( mySelectedPoints.Count > 0 ) 
 		{
-			// Create midpoint for the handle.
-			Vector3 max_bounds = myAssetCurve.prPoints[ mySelectedPoints[ 0 ] ];
-			Vector3 min_bounds = myAssetCurve.prPoints[ mySelectedPoints[ 0 ] ];
-			for ( int i = 1; i < mySelectedPoints.Count; ++i )
-			{
-				Vector3 current_pos = myAssetCurve.prPoints[ mySelectedPoints[ i ] ];
-				max_bounds.x = Mathf.Max( max_bounds.x, current_pos.x );
-				max_bounds.y = Mathf.Max( max_bounds.y, current_pos.y );
-				max_bounds.z = Mathf.Max( max_bounds.z, current_pos.z );
-				min_bounds.x = Mathf.Min( min_bounds.x, current_pos.x );
-				min_bounds.y = Mathf.Min( min_bounds.y, current_pos.y );
-				min_bounds.z = Mathf.Min( min_bounds.z, current_pos.z );
+			if ( current_event.isKey && current_event.keyCode == KeyCode.Delete )
+			{ // Handle deletions.
+				myAssetCurve.deletePoints( mySelectedPoints.ToArray() );
+				clearSelection();
+				Event.current.Use();
 			}
-			Vector3 mid_pos = ( max_bounds + min_bounds ) / 2.0f;
-
-			Vector3 new_mid_pos = Handles.PositionHandle( mid_pos, 
-														  Quaternion.identity );
-			
-			if ( new_mid_pos != mid_pos )
-			{
-				myIsMouseDown = false;
-				Vector3 delta = new_mid_pos - mid_pos;
-				for ( int i = 0; i < mySelectedPoints.Count; ++i )
+			else
+			{ // Create midpoint for the handle.
+				Vector3 max_bounds = myAssetCurve.prPoints[ mySelectedPoints[ 0 ] ];
+				Vector3 min_bounds = myAssetCurve.prPoints[ mySelectedPoints[ 0 ] ];
+				for ( int i = 1; i < mySelectedPoints.Count; ++i )
 				{
-					int point_index = mySelectedPoints[ i ];
-					Vector3 old_pos = myAssetCurve.prPoints[ point_index ];
-					Vector3 new_pos = old_pos + delta;
-					myAssetCurve.updatePoint( point_index, new_pos );
+					Vector3 current_pos = myAssetCurve.prPoints[ mySelectedPoints[ i ] ];
+					max_bounds.x = Mathf.Max( max_bounds.x, current_pos.x );
+					max_bounds.y = Mathf.Max( max_bounds.y, current_pos.y );
+					max_bounds.z = Mathf.Max( max_bounds.z, current_pos.z );
+					min_bounds.x = Mathf.Min( min_bounds.x, current_pos.x );
+					min_bounds.y = Mathf.Min( min_bounds.y, current_pos.y );
+					min_bounds.z = Mathf.Min( min_bounds.z, current_pos.z );
 				}
-			}
+				Vector3 mid_pos = ( max_bounds + min_bounds ) / 2.0f;
+
+				Vector3 new_mid_pos = Handles.PositionHandle( mid_pos, 
+															  Quaternion.identity );
+			
+				if ( new_mid_pos != mid_pos )
+				{
+					myIsMouseDown = false;
+					Vector3 delta = new_mid_pos - mid_pos;
+					for ( int i = 0; i < mySelectedPoints.Count; ++i )
+					{
+						int point_index = mySelectedPoints[ i ];
+						Vector3 old_pos = myAssetCurve.prPoints[ point_index ];
+						Vector3 new_pos = old_pos + delta;
+						myAssetCurve.updatePoint( point_index, new_pos );
+					}
+				}
+			} // Delete?
 		}
 
 		// Connection Mesh Draws
@@ -414,7 +427,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		if ( mySelectionMeshColours != null )
 			for ( int i = 0; i < mySelectionMeshColours.Length; ++i )
-				mySelectionMeshColours[ i ] = myUnselectedColour;
+				if ( myAssetCurve.prIsEditingPoints )
+					mySelectionMeshColours[ i ] = myUnselectedColour;
+				else
+					mySelectionMeshColours[ i ] = myUnselectableColour;
 	}
 
 	private void togglePointSelection( int point_index )
@@ -452,11 +468,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			mySelectionMaterial.shader.hideFlags	= HideFlags.HideAndDontSave;
 		}
 
-		if ( mySelectionMesh == null )
-		{
-			mySelectionMesh							= new Mesh();
-			mySelectionMesh.hideFlags				= HideFlags.HideAndDontSave;
-		}
+		mySelectionMesh								= new Mesh();
+		mySelectionMesh.hideFlags					= HideFlags.HideAndDontSave;
 
 		// Check if we need to resize the selection mask.
 		while ( mySelectedPointsMask.Count < myAssetCurve.prPoints.Count )
@@ -507,11 +520,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myConnectionMaterial.shader.hideFlags	= HideFlags.HideAndDontSave;
 		}
 
-		if ( myConnectionMesh == null )
-		{
-			myConnectionMesh						= new Mesh();
-			myConnectionMesh.hideFlags				= HideFlags.HideAndDontSave;
-		}
+		myConnectionMesh							= new Mesh();
+		myConnectionMesh.hideFlags					= HideFlags.HideAndDontSave;
 
 		Vector3[] connection_vertices = myAssetCurve.prPoints.ToArray();
 		int[] connection_indices = new int[ connection_vertices.Length ];
@@ -618,6 +628,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// Change the colours of the points if the edit points mode has changed.
 		if ( edit_points_mode != myAssetCurve.prIsEditingPoints )
 		{
+			// Must assign this earlier than normal because clearSelection() will
+			// use the value to determine the colour of the control points.
+			// (between unselected and unselectable)
+			myAssetCurve.prIsEditingPoints	= edit_points_mode;
 			clearSelection();
 		}
 
