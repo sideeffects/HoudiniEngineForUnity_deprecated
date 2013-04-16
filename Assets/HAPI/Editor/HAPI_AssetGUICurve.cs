@@ -45,6 +45,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myAddPointButtonLabel	= "Add Points";
 		myTarget				= null;
 
+		myIsMouseDown			= false;
+		myFirstMousePosition	= new Vector3();
+
+		mySelectionArea			= new Rect();
 		mySelectionMeshColours	= null;
 		mySelectionMesh			= null;
 		mySelectionMaterial		= null;
@@ -179,12 +183,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myTempCamera = Camera.current;
 
 		Event current_event 		= Event.current;
-
-		// TESTING
-		//if ( current_event.type == EventType.MouseDown && current_event.button == 0 )
-			//Debug.Log("Left-Mouse Down");
-		//if ( current_event.type == EventType.MouseUp && current_event.button == 0 )
-			//Debug.Log("Left-Mouse Up");
+		Vector3 mouse_position		= getMousePosition( ref current_event ); 
 
 		// Rebuilding geometry here to make sure the dummy line geometry is visible at any zoom level.
 		myAssetCurve.buildDummyMesh();
@@ -198,7 +197,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// Add points.
 		if ( myAssetCurve.prIsAddingPoints )
 		{
-			myAssetCurve.prIsAddingPoints = drawModeBorders( Color.yellow );
+			myAssetCurve.prIsAddingPoints = drawModeBorders( Color.yellow, mouse_position );
 
 			if ( !current_event.alt )
 			{
@@ -214,10 +213,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 				if ( button_press )
 				{
-					Vector3 mouse_position = current_event.mousePosition;
-				
-					// Camera.current.pixelHeight != Screen.height for some reason.
-					mouse_position.y		= myTempCamera.pixelHeight - mouse_position.y;
 					Ray ray					= myTempCamera.ScreenPointToRay( mouse_position );
 					ray.origin				= myTempCamera.transform.position;
 					Vector3 intersection	= new Vector3();
@@ -248,31 +243,38 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		}
 		else if ( myAssetCurve.prIsEditingPoints )
 		{
-			myAssetCurve.prIsEditingPoints = drawModeBorders( new Color( 0.7f, 0.7f, 0.9f ) );
+			myAssetCurve.prIsEditingPoints = drawModeBorders( new Color( 0.7f, 0.7f, 0.9f ), mouse_position );
 
 			if ( !current_event.alt )
 			{
-				Vector3 position	= Vector3.zero;
-				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
-				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
-				bool button_press 	= Handles.Button( 	position, 
-														rotation,
-														handle_size,
-														handle_size,
-														Handles.RectangleCap );
-
-				if ( button_press )
+				// Track mouse dragging.
+				if ( current_event.type == EventType.MouseDown && current_event.button == 0 && !myIsMouseDown )
 				{
+					myIsMouseDown = true;
+					myFirstMousePosition = mouse_position;
+				} 
+				// I have to also interpret the Ignore event as the mouse up event because that's all I
+				// get if the use lets go of the mouse button while over a different Unity window...
+				else if ( ( ( current_event.type == EventType.MouseUp && current_event.button == 0 ) ||
+							( current_event.type == EventType.Ignore ) ) 
+						  && myIsMouseDown )
+				{
+					myIsMouseDown = false;
+					
 					// Deselect all.
 					if ( !current_event.control )
 						clearSelection();
 
-					Vector3 mouse_position = current_event.mousePosition;
-				
-					// Camera.current.pixelHeight != Screen.height for some reason.
-					mouse_position.y		= myTempCamera.pixelHeight - mouse_position.y;
 					Ray ray					= myTempCamera.ScreenPointToRay( mouse_position );
 					ray.origin				= myTempCamera.transform.position;
+
+					Vector3 mouse_delta		= myFirstMousePosition - mouse_position;
+					Vector3 max_bounds		= mouse_position;
+					Vector3 min_bounds		= mouse_position;
+					max_bounds.x			= Mathf.Max( max_bounds.x, myFirstMousePosition.x );
+					max_bounds.y			= Mathf.Max( max_bounds.y, myFirstMousePosition.y );
+					min_bounds.x			= Mathf.Min( min_bounds.x, myFirstMousePosition.x );
+					min_bounds.y			= Mathf.Min( min_bounds.y, myFirstMousePosition.y );
 
 					// Get Picking Information
 					Vector3[] points = myAssetCurve.prPoints.ToArray();
@@ -281,17 +283,38 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						Vector3 transformed_point = myAssetCurve.transform.TransformPoint( points[ i ] );
 						Vector3 proj_pos = myTempCamera.WorldToScreenPoint( transformed_point );
 						proj_pos.z = 0.0f;
-						
-						float distance = Vector3.Distance( mouse_position, proj_pos );
-						if ( distance < myMinDistanceForPointSelection )
+
+						if ( Mathf.Abs( mouse_delta.x ) > 1.5f || Mathf.Abs( mouse_delta.y ) > 1.5f )
 						{
-							// Once we modify a point we are no longer bound to the user holding down 
-							// the point edit key. Edit point mode is now fully activated.
-							myAssetCurve.prModeChangeWait = false;
-							togglePointSelection( i );
-						} // if point hit
+							if ( proj_pos.x >= min_bounds.x && proj_pos.x <= max_bounds.x &&
+								 proj_pos.y >= min_bounds.y && proj_pos.y <= max_bounds.y )
+							{
+								// Once we modify a point we are no longer bound to the user holding down 
+								// the point edit key. Edit point mode is now fully activated.
+								myAssetCurve.prModeChangeWait = false;
+								togglePointSelection( i );
+							}
+						} // drag
+						else
+						{
+							float distance = Vector3.Distance( mouse_position, proj_pos );
+							if ( distance < myMinDistanceForPointSelection )
+							{
+								// Once we modify a point we are no longer bound to the user holding down 
+								// the point edit key. Edit point mode is now fully activated.
+								myAssetCurve.prModeChangeWait = false;
+								togglePointSelection( i );
+							} // if point hit
+						} // single click
 					} // for all points
-				} // if clicked on the screen
+				
+				} // mouse up
+				
+				// Prevent click from being passed lower (this is so stupid!).
+				Vector3 position	= Vector3.zero;
+				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
+				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
 			}
 		}
 		else if ( myForceInspectorRedraw )
@@ -299,6 +322,21 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			Repaint();
 			myForceInspectorRedraw = false;
 		}
+
+		// Create selection area.
+		if ( myAssetCurve.prIsEditingPoints && myIsMouseDown )
+		{
+			float sel_left			= Mathf.Min( myFirstMousePosition.x, mouse_position.x );
+			float sel_top			= myTempCamera.pixelHeight - Mathf.Max( myFirstMousePosition.y, mouse_position.y );
+			float sel_width			= Mathf.Abs( myFirstMousePosition.x - mouse_position.x );
+			float sel_height		= Mathf.Abs( myFirstMousePosition.y - mouse_position.y );
+			mySelectionArea			= new Rect( sel_left, sel_top, sel_width, sel_height );
+		}
+		else
+			mySelectionArea			= new Rect();
+
+		// Remake and Draw Guide Geometry
+		buildGuideGeometry();
 
 		// Hide default transform handles.
 		myIsTransformHandleHidden = myAssetCurve.prIsEditingPoints;
@@ -326,6 +364,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			
 			if ( new_mid_pos != mid_pos )
 			{
+				myIsMouseDown = false;
 				Vector3 delta = new_mid_pos - mid_pos;
 				for ( int i = 0; i < mySelectedPoints.Count; ++i )
 				{
@@ -336,9 +375,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				}
 			}
 		}
-
-		// Remake and Draw Guide Geometry
-		buildGuideGeometry();
 
 		// Connection Mesh Draws
 		if ( myConnectionMaterial != null && myConnectionMesh != null )
@@ -359,6 +395,16 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private Vector3 getMousePosition( ref Event current_event )
+	{
+		Vector3 mouse_position = current_event.mousePosition;
+		
+		// Camera.current.pixelHeight != Screen.height for some reason.
+		mouse_position.y = myTempCamera.pixelHeight - mouse_position.y;
+
+		return mouse_position;
+	}
 
 	private void clearSelection()
 	{
@@ -580,7 +626,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myAssetCurve.prModeChangeWait	= mode_change_wait;
 	}
 
-	private bool drawModeBorders( Color color )
+	private bool drawModeBorders( Color color, Vector3 mouse_position )
 	{
 		Handles.BeginGUI();
 		GUILayout.BeginArea( new Rect( 0, 0, Screen.width, Screen.height ) );
@@ -599,7 +645,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		GUI.Label( new Rect( myActiveBorderWidth + 5, myActiveBorderWidth + 21, 200, 80 ), "Click anywhere on the screen to add a new curve control point. You can also move existing points in this mode but you cannot select any other object. Press (ENTER) or (ESC) when done.", text_style );
 			
 		bool cancel_mode		= !GUI.Button( new Rect( myActiveBorderWidth + 100, myActiveBorderWidth + 108, 120, 20 ), "Exit Curve Mode" );
-		GUI.color				= original_color;
 
 		// Draw yellow mode lines around the Scene view.
 		Texture2D box_texture	= new Texture2D( 1, 1 );
@@ -618,6 +663,14 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		GUI.DrawTexture( new Rect( width - border_width, border_width,						// Left
 								   width, height - border_width - border_width ), 
 						 box_texture, ScaleMode.StretchToFill );
+
+		// Draw selection rectangle.
+		// NOTE: If we must ALWAYS draw this rectangle, even if no selection is being made.
+		// If we add a decision statement here it will affect the drawing order and render
+		// the full-screen button used for preventing deselection of the curve useless.
+		GUI.color				= Color.white;
+		GUI.Box( mySelectionArea, "" );
+		GUI.color				= original_color;
 
 		GUILayout.EndArea();
 		Handles.EndGUI();
@@ -649,10 +702,14 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	[SerializeField] 
 	private GameObject			myTarget;
 
+	private bool				myIsMouseDown;
+	private Vector3				myFirstMousePosition;
+
 	private static float		myMinDistanceForPointSelection = 8.0f;
 	private static Color		myUnselectableColour = new Color( 0.0f, 0.2f, 0.2f );
 	private static Color		myUnselectedColour = Color.white;
 	private static Color		mySelectedColour = Color.yellow;
+	private Rect				mySelectionArea;
 	private Color[]				mySelectionMeshColours;
 	private Mesh				mySelectionMesh;
 	private Material			mySelectionMaterial;
