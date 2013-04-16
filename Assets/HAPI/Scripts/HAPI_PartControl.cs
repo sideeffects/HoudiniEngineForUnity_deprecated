@@ -20,6 +20,7 @@ using System.Collections;
 
 using HAPI;
 
+[ ExecuteInEditMode ]
 public class HAPI_PartControl : HAPI_GeoControl 
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +34,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 	
 	public int 			prInstancePointNumber { get { return myInstancePointNumber; } set { myInstancePointNumber = value; } }
 	public GameObject 	prObjectToInstantiate { get { return myObjectToInstantiate; } set { myObjectToInstantiate = value; } }
+	public bool 		prTransformChanged { get { return myTransformChanged; } set { myTransformChanged = value; } }
 	
 	public HAPI_PartControl()
 	{
@@ -55,6 +57,12 @@ public class HAPI_PartControl : HAPI_GeoControl
 		prMaterialId 	= -1;
 		prVertexList 	= new int[ 1 ];
 		myInstancePointNumber = -1;
+		myTransformChanged = false;		
+	}
+	
+	public void Awake()
+	{
+		myLastLocalToWorld = transform.localToWorldMatrix;
 	}
 
 	public void selectParent()
@@ -83,6 +91,20 @@ public class HAPI_PartControl : HAPI_GeoControl
 		prPartName		= part_name;
 		prMaterialId	= material_id;
 	}
+	
+	
+	public virtual void Update()
+	{
+		
+		Matrix4x4 local_to_world = transform.localToWorldMatrix;
+		
+		if ( local_to_world == myLastLocalToWorld )
+			return;
+						
+		myLastLocalToWorld = local_to_world;
+		myTransformChanged = true;
+		
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
@@ -94,4 +116,6 @@ public class HAPI_PartControl : HAPI_GeoControl
 	[SerializeField] private int[]			myVertexList;
 	[SerializeField] private int			myInstancePointNumber;
 	[SerializeField] private GameObject		myObjectToInstantiate;
+	[SerializeField] private Matrix4x4		myLastLocalToWorld;
+	[SerializeField] private bool			myTransformChanged;
 }

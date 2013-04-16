@@ -110,6 +110,7 @@ namespace HAPI
 			setBool(	"HAPI_EnableCooking", true, true );
 			setBool(	"HAPI_AutoSelectParent", true, true );
 			setBool(	"HAPI_HideGeometryOnLinking", true, true );
+			setBool(	"HAPI_AutoPinInstances", true, true );
 
 			myRepaintDelegate = null;
 		}
@@ -154,6 +155,10 @@ namespace HAPI
 		public static bool prHideGeometryOnLinking {
 												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
 												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
+		
+		public static bool prAutoPinInstances {
+												get { return getBool( "HAPI_AutopinInstances" ); } 
+												set { setBool( "HAPI_AutopinInstances", value ); } }
 
 		public static RepaintDelegate			myRepaintDelegate;
 

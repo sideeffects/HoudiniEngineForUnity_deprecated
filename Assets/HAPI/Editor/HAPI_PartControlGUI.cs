@@ -43,6 +43,26 @@ public class HAPI_PartControlGUI : Editor
 			instancer.drawPin( control.prInstancePointNumber );
 		}
 		
+		Event curr_event = Event.current;
+		
+		if ( curr_event.isMouse && curr_event.type == EventType.MouseDown )
+		{
+			if ( HAPI_Host.prAutoPinInstances )
+			{
+				control.prTransformChanged = false;
+			}
+		}		
+		else if ( curr_event.isMouse && curr_event.type == EventType.MouseUp )
+		{
+			if ( HAPI_Host.prAutoPinInstances && control.prTransformChanged )
+			{
+				pinPartObject( control.gameObject, true );
+				control.prTransformChanged = false;
+				Repaint();
+			}			
+		}
+			
+		
 		/*
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
@@ -142,7 +162,7 @@ public class HAPI_PartControlGUI : Editor
 			instancer.pinInstance( override_info );
 		}
 		
-		
+
 	}
 	
 	public override void OnInspectorGUI() 
@@ -174,15 +194,19 @@ public class HAPI_PartControlGUI : Editor
 				myPartControl.prAsset.build();
 			}
 		}
+		
 		Object[] selection = Selection.objects;
 		if( selection.Length > 1 )
 		{
-			if ( GUILayout.Button( "Pin Selection" ) ) 
-			{
-				foreach( Object obj in selection )
+			if ( !HAPI_Host.prAutoPinInstances )
+			{				
+				if ( GUILayout.Button( "Pin Selection" ) ) 
 				{
-					if( obj.GetType() == typeof(GameObject) )
-						pinPartObject( (GameObject) obj, true );
+					foreach( Object obj in selection )
+					{
+						if( obj.GetType() == typeof(GameObject) )
+							pinPartObject( (GameObject) obj, true );
+					}
 				}
 			}
 			
@@ -212,9 +236,12 @@ public class HAPI_PartControlGUI : Editor
 			}
 			else
 			{
-				if ( GUILayout.Button( "Pin Instance" ) ) 
+				if( !HAPI_Host.prAutoPinInstances )
 				{
-					pinPartObject( myPartControl.gameObject, true );
+					if ( GUILayout.Button( "Pin Instance" ) ) 
+					{
+						pinPartObject( myPartControl.gameObject, true );
+					}
 				}
 			}			
 			

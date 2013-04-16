@@ -200,6 +200,19 @@ public class HAPI_WindowUtilities : EditorWindow
 						HAPI_Host.myRepaintDelegate();
 				}
 			}
+			
+			// Auto pin
+			{
+				bool value = HAPI_Host.prAutoPinInstances;
+				bool changed = HAPI_GUI.toggle( "auto_pin_instances", "Auto Pin Instances", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prAutoPinInstances = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+			
 		}
 		
 		GUILayout.EndScrollView();

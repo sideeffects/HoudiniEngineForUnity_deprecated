@@ -483,7 +483,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		prShowObjectControls 		= true;
 		prShowAssetControls 		= true;
-		prShowAssetOptions			= true;
+		prShowAssetOptions			= false;
 		prShowInputControls 		= true;
 		prAutoSelectAssetNode 		= true;
 		prEnableLogging				= false;

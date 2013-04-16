@@ -90,7 +90,7 @@ public class HAPI_Instancer : MonoBehaviour {
 				}
 				obj.transform.localScale = scale;
 			}
-						
+									
 			
 			// The original object is probably set to be invisible because it just contains
 			// the raw geometry with no transforms applied. We need to set the newly instanced
@@ -158,10 +158,15 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public bool pinInstance( HAPI_InstancerOverrideInfo info )
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
+		int ii = 0;
+		for( ii = 0; ii < prAsset.prOverriddenInstances.Count; ii++ )
 		{
+			HAPI_InstancerOverrideInfo override_info = prAsset.prOverriddenInstances[ ii ];
 			if( override_info.instancePointNumber == info.instancePointNumber )
-				return false;
+			{
+				prAsset.prOverriddenInstances.RemoveAt( ii );
+				break;
+			}
 		}
 		
 		prAsset.prOverriddenInstances.Add( info );
