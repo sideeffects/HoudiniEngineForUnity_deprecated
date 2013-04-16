@@ -207,7 +207,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			if ( !current_event.alt )
 			{
 				Vector3 position	= Vector3.zero;
-				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
+				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f; // TODO: Constant?
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				bool button_press 	= Handles.Button( 	position, 
 														rotation,
@@ -238,17 +238,53 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				// Draw guide line.
 				if ( myAssetCurve.prPoints.Count > 0 )
 				{
-					Vector3 start = myAssetCurve.prPoints[ myAssetCurve.prPoints.Count - 1 ];
-					Vector3 end = intersection;
-					float length = Vector3.Distance( start, end ) * 2.0f;
+					Vector3 anchor1 = myAssetCurve.prPoints[ myAssetCurve.prPoints.Count - 1 ];
+					Vector3 anchor2 = Vector3.zero;
+					Vector3 new_point_location = intersection;
+					bool is_mid_point = false;
 
-					Vector3[] line_vertices = new Vector3[ 2 ];
-					line_vertices[ 0 ] = start;
-					line_vertices[ 1 ] = end;
-					int[] line_indices = new int[ 2 ];
-					line_indices[ 0 ] = 0; line_indices[ 1 ] = 1;
-					Vector2[] uvs = new Vector2[ 2 ];
-					uvs[ 0 ] = new Vector2(); uvs[ 1 ] = new Vector2( 1.0f, 1.0f );
+					// See if we're close to another segment.
+					for ( int i = 1; i < myAssetCurve.prPoints.Count; ++i )
+					{
+						Vector3 p0 = myAssetCurve.prPoints[ i - 1 ];
+						Vector3 p1 = myAssetCurve.prPoints[ i ];
+						
+						Vector3 closest_point = new Vector3();
+						float distance = HAPI_GUIUtility.closestDistanceBetweenLineAndLineSegment(
+												p0, p1, ray, out closest_point );
+						
+						if ( distance < HandleUtility.GetHandleSize( closest_point ) / 5.0f ) // TODO: Constant?
+						{
+							anchor1 = p0;
+							anchor2 = p1;
+							new_point_location = closest_point;
+							is_mid_point = true;
+						}
+					}
+
+					float length = Vector3.Distance( anchor1, new_point_location ) * 2.0f;
+
+					int point_count = ( is_mid_point ? 3 : 2 );
+
+					Vector3[] line_vertices = new Vector3[ point_count ];
+					int[] line_indices = new int[ point_count ];
+					Vector2[] uvs = new Vector2[ point_count ];
+
+					line_vertices[ 0 ] = anchor1;
+					line_vertices[ 1 ] = new_point_location;
+					line_indices[ 0 ] = 0; 
+					line_indices[ 1 ] = 1;
+					uvs[ 0 ] = new Vector2(); 
+					uvs[ 1 ] = new Vector2( 1.0f, 1.0f );
+
+					if ( is_mid_point )
+					{
+						line_vertices[ 2 ] = anchor2;
+						line_indices[ 2 ] = 2;
+						uvs[ 2 ] = new Vector2( 0.0f, 0.0f );
+					}
+
+					myGuideLinesMesh.Clear();
 					myGuideLinesMesh.vertices = line_vertices;
 					myGuideLinesMesh.uv = uvs;
 					myGuideLinesMesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
@@ -704,7 +740,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		GUI.color				= color;
 		GUI.Box( new Rect( myActiveBorderWidth + 4, myActiveBorderWidth + 4, 220, 130 ), "" );
 		GUI.Label( new Rect( myActiveBorderWidth + 5, myActiveBorderWidth + 4, 200, 20 ), "Curve Editing Mode", text_style );
-			
+		
 		text_style.fontStyle	= FontStyle.Normal;
 		text_style.wordWrap		= true;
 		GUI.Label( new Rect( myActiveBorderWidth + 5, myActiveBorderWidth + 21, 200, 80 ), "Click anywhere on the screen to add a new curve control point. You can also move existing points in this mode but you cannot select any other object. Press (ENTER) or (ESC) when done.", text_style );
@@ -712,7 +748,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		bool cancel_mode		= !GUI.Button( new Rect( myActiveBorderWidth + 100, myActiveBorderWidth + 108, 120, 20 ), "Exit Curve Mode" );
 
 		// Draw yellow mode lines around the Scene view.
-		//* TEMORARLY HIDDEN AS IT'S SLOWING DOWN THE WHOLE DRAW
 		Texture2D box_texture	= new Texture2D( 1, 1 );
 		box_texture.SetPixel( 0, 0, new Color( color.r, color.g, color.b, 0.6f ) );
 		box_texture.wrapMode	= TextureWrapMode.Repeat;
@@ -729,12 +764,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		GUI.DrawTexture( new Rect( width - border_width, border_width,						// Left
 								   width, height - border_width - border_width ), 
 						 box_texture, ScaleMode.StretchToFill );
-		
 
 		// Draw selection rectangle.
 		// NOTE: If we must ALWAYS draw this rectangle, even if no selection is being made.
 		// If we add a decision statement here it will affect the drawing order and render
-		// the full-screen button used for preventing deselection of the curve useless.
+		// the full-screen button, used for preventing deselection of the curve, useless.
 		GUI.color				= Color.white;
 		GUI.Box( mySelectionArea, "" );
 		GUI.color				= original_color;

@@ -160,6 +160,48 @@ public class HAPI_GUIUtility : Editor
 		selection[ 0 ] 			= game_object;
 		Selection.objects 		= selection;
 	}
+
+	public static float closestDistanceBetweenLineAndLineSegment( Vector3 line_p0, Vector3 line_p1, Ray ray, out Vector3 out_point )
+	{
+		float SMALL_NUM = 0.0000001f;
+
+		// Line 1 = line_p0, line_p1
+		// Line 2 = ray
+
+		Vector3 p1 = line_p0;
+		Vector3 v1 = line_p1 - line_p0;
+		Vector3 p2 = ray.origin;
+		Vector3 v2 = ray.direction;
+
+		float t1, t2;
+
+		// We use double precision here,
+		// because denom can be quite small.
+		Vector3 vc = p2 - p1;
+		float v1v1   = Vector3.Dot(v1, v1);
+		float v1v2   = Vector3.Dot(v1, v2);
+		float v2v2   = Vector3.Dot(v2, v2);
+		float v1vc   = Vector3.Dot(v1, vc);
+		float v2vc   = Vector3.Dot(v2, vc);
+		float denom  = (v2v2 * v1v1) - (v1v2 * v1v2);
+
+		t1 = ( v2v2*v1vc - v1v2*v2vc ) / denom;
+		t2 = ( v1v2*v1vc - v1v1*v2vc ) / denom;
+
+		if ( denom < SMALL_NUM )
+		{
+			out_point = new Vector3();
+			return 100000000f; // TODO: Be less random.
+		}
+
+		t1 = Mathf.Clamp( t1, 0.0f, 1.0f );
+
+		out_point = p2 + ( v2 * t2 );
+
+		Vector3 other_point = p1 + ( v1 * t1 );
+
+		return ( out_point - other_point ).magnitude;
+	}
 	
 	public const string mySaveHoudiniSceneLabel = "Save Current Houdini Scene...";
 	public const string myLoadAssetLabel		= "Load Houdini Asset...";
@@ -190,7 +232,7 @@ public class HAPI_GUIUtility : Editor
 				hierarchy_count++;
 		}
 		
-		// We need to create SOMETHING so that the hierarchy is not completely empty. It it does
+		// We need to create SOMETHING so that the hierarchy is not completely empty. If it does
 		// become empty then the callbacks to hierarchyWindowItemOnGUI stop coming at all so it
 		// becomes impossible to tell if something is being dragged. If we have to create something
 		// we might as well create the Main Camera since you need this object in your game ANYWAY.
