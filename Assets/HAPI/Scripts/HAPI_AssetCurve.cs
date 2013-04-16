@@ -88,6 +88,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		prPoints = new_points;
 
 		updatePoints();
+		buildDummyMesh();
 	}
 	
 	public void updatePoint( int index, Vector3 pos )
@@ -168,7 +169,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		prVertices 					= new Vector3[ 0 ];
 
 		myIsAddingPoints			= true;
-		myModeChangeWait		= false;
+		myModeChangeWait			= false;
 		myIsEditingPoints			= false;
 	}
 	

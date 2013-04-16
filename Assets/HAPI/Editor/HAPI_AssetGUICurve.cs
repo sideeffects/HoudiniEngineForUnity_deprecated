@@ -48,6 +48,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myIsMouseDown			= false;
 		myFirstMousePosition	= new Vector3();
 
+		myGuideLinesMaterial	= null;
+		myGuideLinesTexture		= null;
+		myGuideLinesMesh		= null;
+
 		mySelectionArea			= new Rect();
 		mySelectionMeshColours	= null;
 		mySelectionMesh			= null;
@@ -178,15 +182,16 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	{
 		if ( myAssetCurve == null )
 			return;
+
+		// First Remake and Draw Guide Geometry if necessary.
+		if ( mySelectionMesh == null )
+			buildGuideGeometry();
 		
 		if ( !myTempCamera && Camera.current )
 			myTempCamera = Camera.current;
 
 		Event current_event 		= Event.current;
 		Vector3 mouse_position		= getMousePosition( ref current_event ); 
-
-		// Rebuilding geometry here to make sure the dummy line geometry is visible at any zoom level.
-		myAssetCurve.buildDummyMesh();
 
 		// Set appropriate handles matrix.
 		Handles.matrix = myAssetCurve.transform.localToWorldMatrix;
@@ -198,10 +203,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( myAssetCurve.prIsAddingPoints )
 		{
 			myAssetCurve.prIsAddingPoints = drawModeBorders( Color.yellow, mouse_position );
-
+			
 			if ( !current_event.alt )
 			{
-
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
@@ -211,33 +215,59 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 														handle_size,
 														Handles.RectangleCap );
 
+				Ray ray					= myTempCamera.ScreenPointToRay( mouse_position );
+				ray.origin				= myTempCamera.transform.position;
+				Vector3 intersection	= new Vector3();
+				
+				if ( myTarget != null && myTarget.GetComponent< MeshCollider >() )
+				{
+					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
+					RaycastHit hit_info;
+					collider.Raycast( ray, out hit_info, 1000.0f );
+					intersection = hit_info.point;
+				}
+				else
+				{
+					Plane plane = new Plane();
+					plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
+					float enter = 0.0f;
+					plane.Raycast( ray, out enter );
+ 					intersection = ray.origin + ray.direction * enter;
+				}
+				
+				// Draw guide line.
+				if ( myAssetCurve.prPoints.Count > 0 )
+				{
+					Vector3 start = myAssetCurve.prPoints[ myAssetCurve.prPoints.Count - 1 ];
+					Vector3 end = intersection;
+					float length = Vector3.Distance( start, end ) * 2.0f;
+
+					Vector3[] line_vertices = new Vector3[ 2 ];
+					line_vertices[ 0 ] = start;
+					line_vertices[ 1 ] = end;
+					int[] line_indices = new int[ 2 ];
+					line_indices[ 0 ] = 0; line_indices[ 1 ] = 1;
+					Vector2[] uvs = new Vector2[ 2 ];
+					uvs[ 0 ] = new Vector2(); uvs[ 1 ] = new Vector2( 1.0f, 1.0f );
+					myGuideLinesMesh.vertices = line_vertices;
+					myGuideLinesMesh.uv = uvs;
+					myGuideLinesMesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
+
+					myGuideLinesMaterial.SetPass( 0 );
+					myGuideLinesMaterial.SetTextureScale( "_MainTex", new Vector2( length, length ) );
+					Graphics.DrawMeshNow( myGuideLinesMesh, myAssetCurve.transform.localToWorldMatrix );
+				}
+
 				if ( button_press )
 				{
-					Ray ray					= myTempCamera.ScreenPointToRay( mouse_position );
-					ray.origin				= myTempCamera.transform.position;
-					Vector3 intersection	= new Vector3();
-
-					if ( myTarget != null && myTarget.GetComponent< MeshCollider >() )
-					{
-						MeshCollider collider = myTarget.GetComponent< MeshCollider >();
-						RaycastHit hit_info;
-						collider.Raycast( ray, out hit_info, 1000.0f );
-						intersection = hit_info.point;
-					}
-					else
-					{
-						Plane plane = new Plane();
-						plane.SetNormalAndPosition( Vector3.up, myAssetCurve.transform.position );
-						float enter = 0.0f;
-						plane.Raycast( ray, out enter );
- 						intersection = ray.origin + ray.direction * enter;
-					}
-
 					// Once we add a point we are no longer bound to the user holding down the add points key.
 					// Add points mode is now fully activated.
 					myAssetCurve.prModeChangeWait = false;
 
 					myAssetCurve.addPoint( intersection );
+
+					// Remake and Draw Guide Geometry
+					buildGuideGeometry();
 				}
 			}
 		}
@@ -340,9 +370,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		else
 			mySelectionArea			= new Rect();
 
-		// Remake and Draw Guide Geometry
-		buildGuideGeometry();
-
 		// Hide default transform handles.
 		myIsTransformHandleHidden = myAssetCurve.prIsEditingPoints;
 
@@ -385,6 +412,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						Vector3 new_pos = old_pos + delta;
 						myAssetCurve.updatePoint( point_index, new_pos );
 					}
+
+					// Remake and Draw Guide Geometry
+					buildGuideGeometry();
 				}
 			} // Delete?
 		}
@@ -431,6 +461,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					mySelectionMeshColours[ i ] = myUnselectedColour;
 				else
 					mySelectionMeshColours[ i ] = myUnselectableColour;
+
+		buildGuideGeometry();
 	}
 
 	private void togglePointSelection( int point_index )
@@ -455,10 +487,30 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				mySelectionMeshColours[ point_index ] = mySelectedColour;
 			}
 		}
+
+		buildGuideGeometry();
 	}
 
 	private void buildGuideGeometry()
 	{
+		// Build Guide Lines Mesh -----------------------------------------------------------------------------------
+
+		if ( myGuideLinesMaterial == null || myGuideLinesTexture == null || myGuideLinesMaterial == null )
+		{
+			myGuideLinesMaterial	= new Material( Shader.Find( "HAPI/DottedLine" ) );
+			myGuideLinesTexture		= new Texture2D( 4, 1, TextureFormat.RGBA32, false );
+			myGuideLinesTexture.hideFlags = HideFlags.HideAndDontSave;
+			myGuideLinesTexture.wrapMode = TextureWrapMode.Repeat;
+			myGuideLinesTexture.SetPixel( 0, 0, new Color( 0.0f, 0.0f, 0.0f, 0.0f ) );
+			myGuideLinesTexture.SetPixel( 1, 0, new Color( 0.0f, 0.0f, 0.0f, 0.0f ) );
+			myGuideLinesTexture.SetPixel( 2, 0, new Color( 0.0f, 0.2f, 0.2f, 1.0f ) );
+			myGuideLinesTexture.SetPixel( 3, 0, new Color( 0.0f, 0.2f, 0.2f, 1.0f ) );
+			myGuideLinesTexture.Apply();
+			myGuideLinesMaterial.mainTexture = myGuideLinesTexture;
+			myGuideLinesMaterial.SetTexture( "_MainTex", myGuideLinesTexture );
+			myGuideLinesMesh		= new Mesh();
+		}
+
 		// Build Selection Mesh -------------------------------------------------------------------------------------
 
 		if ( mySelectionMaterial == null )
@@ -510,8 +562,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		mySelectionMesh.colors		= mySelectionMeshColours;
 		mySelectionMesh.SetIndices( selection_indices, MeshTopology.Points, 0 );
 
-		//////////////////////////////////
-		// Build Connection Mesh
+		// Build Connection Mesh ------------------------------------------------------------------------------------
 
 		if ( myConnectionMaterial == null )
 		{
@@ -661,6 +712,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		bool cancel_mode		= !GUI.Button( new Rect( myActiveBorderWidth + 100, myActiveBorderWidth + 108, 120, 20 ), "Exit Curve Mode" );
 
 		// Draw yellow mode lines around the Scene view.
+		//* TEMORARLY HIDDEN AS IT'S SLOWING DOWN THE WHOLE DRAW
 		Texture2D box_texture	= new Texture2D( 1, 1 );
 		box_texture.SetPixel( 0, 0, new Color( color.r, color.g, color.b, 0.6f ) );
 		box_texture.wrapMode	= TextureWrapMode.Repeat;
@@ -677,6 +729,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		GUI.DrawTexture( new Rect( width - border_width, border_width,						// Left
 								   width, height - border_width - border_width ), 
 						 box_texture, ScaleMode.StretchToFill );
+		
 
 		// Draw selection rectangle.
 		// NOTE: If we must ALWAYS draw this rectangle, even if no selection is being made.
@@ -718,6 +771,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 	private bool				myIsMouseDown;
 	private Vector3				myFirstMousePosition;
+
+	private Material			myGuideLinesMaterial;
+	private Texture2D			myGuideLinesTexture;
+	private Mesh				myGuideLinesMesh;
 
 	private static float		myMinDistanceForPointSelection = 8.0f;
 	private static Color		myUnselectableColour = new Color( 0.0f, 0.2f, 0.2f );
