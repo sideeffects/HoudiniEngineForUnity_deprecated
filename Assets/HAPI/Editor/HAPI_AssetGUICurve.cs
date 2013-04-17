@@ -266,26 +266,26 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						}
 					}
 
-					float length = Vector3.Distance( anchor1, new_point_location ) * 2.0f;
-
 					int point_count = ( is_mid_point ? 3 : 2 );
 
 					Vector3[] line_vertices = new Vector3[ point_count ];
 					int[] line_indices = new int[ point_count ];
 					Vector2[] uvs = new Vector2[ point_count ];
 
-					line_vertices[ 0 ] = anchor1;
-					line_vertices[ 1 ] = new_point_location;
-					line_indices[ 0 ] = 0; 
-					line_indices[ 1 ] = 1;
-					uvs[ 0 ] = new Vector2(); 
-					uvs[ 1 ] = new Vector2( 1.0f, 1.0f );
+					line_vertices[ 0 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( anchor1, myTempCamera );
+					line_vertices[ 1 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( new_point_location, myTempCamera );
+					float length		= Vector3.Distance( line_vertices[ 0 ], line_vertices[ 1 ] ) * 4.0f;
+					line_indices[ 0 ]	= 0; 
+					line_indices[ 1 ]	= 1;
+					uvs[ 0 ]			= new Vector2(); 
+					uvs[ 1 ]			= new Vector2( length, length );
 
 					if ( is_mid_point )
 					{
-						line_vertices[ 2 ] = anchor2;
+						line_vertices[ 2 ] = HAPI_GUIUtility.getCameraNearPlanePoint( anchor2, myTempCamera );
 						line_indices[ 2 ] = 2;
-						uvs[ 2 ] = new Vector2( 0.0f, 0.0f );
+						length += Vector3.Distance( line_vertices[ 1 ], line_vertices[ 2 ] ) * 4.0f;
+						uvs[ 2 ] = new Vector2( length, length );
 					}
 
 					myGuideLinesMesh.Clear();
@@ -294,7 +294,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					myGuideLinesMesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
 
 					myGuideLinesMaterial.SetPass( 0 );
-					myGuideLinesMaterial.SetTextureScale( "_MainTex", new Vector2( length, length ) );
+					myGuideLinesMaterial.SetTextureScale( "_MainTex", new Vector2( 1.0f, 1.0f ) );
 					Graphics.DrawMeshNow( myGuideLinesMesh, myAssetCurve.transform.localToWorldMatrix );
 				}
 

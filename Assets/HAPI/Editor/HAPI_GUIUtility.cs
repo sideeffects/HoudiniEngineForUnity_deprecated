@@ -202,6 +202,19 @@ public class HAPI_GUIUtility : Editor
 
 		return ( out_point - other_point ).magnitude;
 	}
+
+	public static Vector3 getCameraNearPlanePoint( Vector3 original_point, Camera camera )
+	{
+		float near_plane_distance	= camera.nearClipPlane;
+		Vector3 screen_space_point	= camera.WorldToScreenPoint( original_point );
+
+		// Just slightly beyond the near plane.
+		screen_space_point.z		= near_plane_distance + myScreenSpaceNearPlanePadding;
+
+		Vector3 near_plane_point	= camera.ScreenToWorldPoint( screen_space_point );
+
+		return near_plane_point;
+	}
 	
 	public const string mySaveHoudiniSceneLabel = "Save Current Houdini Scene...";
 	public const string myLoadAssetLabel		= "Load Houdini Asset...";
@@ -280,4 +293,5 @@ public class HAPI_GUIUtility : Editor
 	}
 
 	private static bool myDragFlag = false;
+	private const float myScreenSpaceNearPlanePadding = 10.0f;
 }
