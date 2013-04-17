@@ -63,7 +63,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 	public void addPoint( Vector3 pos )
 	{
 		prPoints.Add( pos );
-		
+		updatePoints();
+	}
+
+	public void insertPoint( int index, Vector3 pos )
+	{
+		prPoints.Insert( index, pos );
 		updatePoints();
 	}
 

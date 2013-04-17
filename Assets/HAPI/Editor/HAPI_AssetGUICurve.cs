@@ -215,10 +215,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 														handle_size,
 														Handles.RectangleCap );
 
-				Ray ray					= myTempCamera.ScreenPointToRay( mouse_position );
-				ray.origin				= myTempCamera.transform.position;
-				Vector3 intersection	= new Vector3();
-				
+				Ray ray						= myTempCamera.ScreenPointToRay( mouse_position );
+				ray.origin					= myTempCamera.transform.position;
+				Vector3 intersection		= new Vector3();
+
 				if ( myTarget != null && myTarget.GetComponent< MeshCollider >() )
 				{
 					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
@@ -234,14 +234,17 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					plane.Raycast( ray, out enter );
  					intersection = ray.origin + ray.direction * enter;
 				}
+
+				bool is_mid_point			= false;
+				int insert_index			= -1;
+				Vector3 new_point_location	= intersection;
 				
 				// Draw guide line.
 				if ( myAssetCurve.prPoints.Count > 0 )
 				{
-					Vector3 anchor1 = myAssetCurve.prPoints[ myAssetCurve.prPoints.Count - 1 ];
-					Vector3 anchor2 = Vector3.zero;
-					Vector3 new_point_location = intersection;
-					bool is_mid_point = false;
+					Vector3 anchor1				= myAssetCurve.prPoints[ myAssetCurve.prPoints.Count - 1 ];
+					Vector3 anchor2				= Vector3.zero;
+					insert_index				= myAssetCurve.prPoints.Count;
 
 					// See if we're close to another segment.
 					for ( int i = 1; i < myAssetCurve.prPoints.Count; ++i )
@@ -258,6 +261,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 							anchor1 = p0;
 							anchor2 = p1;
 							new_point_location = closest_point;
+							insert_index = i;
 							is_mid_point = true;
 						}
 					}
@@ -300,7 +304,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					// Add points mode is now fully activated.
 					myAssetCurve.prModeChangeWait = false;
 
-					myAssetCurve.addPoint( intersection );
+					if ( is_mid_point )
+						myAssetCurve.insertPoint( insert_index, new_point_location );
+					else
+						myAssetCurve.addPoint( new_point_location );
 
 					// Remake and Draw Guide Geometry
 					buildGuideGeometry();
