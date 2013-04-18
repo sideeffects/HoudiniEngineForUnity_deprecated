@@ -23,18 +23,20 @@ Shader "HAPI/Point" {
 
 				struct v2f {
 					float4 pos : SV_POSITION;
+					float4 colour : COLOR;
 					float size : PSIZE;
 				};
 
 				v2f vert( appdata v ) {
 					v2f o;
 					o.pos = mul( UNITY_MATRIX_MVP, v.pos );
+					o.colour = v.colour;
 					o.size = 10.0;
 					return o;
 				}
 
 				half4 frag( v2f i ) : COLOR {
-					return half4( 0.0, 0.2, 0.2, 1 );
+					return half4( 0.0, 0.0, 0.0, 1 );
 				}
 
 			ENDCG

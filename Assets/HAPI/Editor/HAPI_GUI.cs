@@ -617,6 +617,23 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
+	public static bool colourField( string name, string label, ref Color value )
+	{
+		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
+		gui_parm.size = 4;
+		bool delay_build = false;
+		float[] values = new float[ 4 ];
+		values[ 0 ] = value.r;
+		values[ 1 ] = value.g;
+		values[ 2 ] = value.b;
+		values[ 3 ] = value.a;
+		bool result = colourField( ref gui_parm, ref delay_build, ref values );
+		value.r = values[ 0 ];
+		value.g = values[ 1 ];
+		value.b = values[ 2 ];
+		value.a = values[ 3 ];
+		return result;
+	}
 	public static bool colourField( ref HAPI_GUIParm parm,
 									ref bool delay_build,
 									ref float[] values )

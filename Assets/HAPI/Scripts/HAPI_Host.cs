@@ -83,6 +83,32 @@ namespace HAPI
 	[ InitializeOnLoad ]
 	public static partial class HAPI_Host
 	{
+		private const string myDefaultCollisionGroupName					= "collision_geo";
+		private const string myDefaultRenderedCollisionGroupName			= "rendered_collision_geo";
+
+		private const bool myDefaultEnableDragAndDrop						= true;
+		private const bool myDefaultEnableSupportWarnings					= true;
+
+		private const bool myDefaultEnableCooking							= true;
+		private const bool myDefaultAutoSelectParent						= true;
+		private const bool myDefaultHideGeometryOnLinking					= true;
+		private const bool myDefaultAutoPinInstances						= true;
+
+		private static KeyCode myDefaultAddingPointsHotKey					= KeyCode.LeftShift;
+		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
+		private static KeyCode myDefaultEditingPointsHotKey					= KeyCode.LeftControl;
+		private static Color myDefaultEditingPointsModeColour				= new Color( 0.7f, 0.7f, 0.9f, 1.0f );
+
+		private static Color myDefaultGuideWireframeColour					= new Color( 0.1f, 0.1f, 0.1f, 1.0f );
+		private static Color myDefaultUnselectableGuideWireframeColour		= new Color( 0.1f, 0.1f, 0.1f, 1.0f );
+		private static Color myDefaultUnselectedGuideWireframeColour		= Color.white;
+		private static Color myDefaultSelectedGuideWireframeColour			= Color.yellow;
+		private const float myDefaultMinDistanceForPointSelection			= 8.0f;
+		private const float myDefaultGuideMinDistanceForMidPointInsertion	= 5.0f;
+
+		private const int myDefaultCurvePrimitiveTypeDefault				= 1;
+		private const int myDefaultCurveMethodDefault						= 1;
+
 		static HAPI_Host()
 		{
 			EditorApplication.update				+= update;
@@ -98,19 +124,31 @@ namespace HAPI
 
 			// Preferences
 			
-			setString(	"HAPI_CollisionGroupName", "collision_geo", true );
-			setString(	"HAPI_RenderedCollisionGroupName", "rendered_collision_geo", true );
+			setString(	"HAPI_CollisionGroupName", myDefaultCollisionGroupName, true );
+			setString(	"HAPI_RenderedCollisionGroupName", myDefaultRenderedCollisionGroupName, true );
 
-			setInt(		"HAPI_CurvePrimitiveTypeDefault", 1, true );
-			setInt(		"HAPI_CurveMethodDefault", 1, true );
-
-			setBool(	"HAPI_EnableDragAndDrop", true, true );
-			setBool(	"HAPI_EnableSupportWarnings", false, true );
+			setBool(	"HAPI_EnableDragAndDrop", myDefaultEnableDragAndDrop, true );
+			setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
 			
-			setBool(	"HAPI_EnableCooking", true, true );
-			setBool(	"HAPI_AutoSelectParent", true, true );
-			setBool(	"HAPI_HideGeometryOnLinking", true, true );
-			setBool(	"HAPI_AutoPinInstances", true, true );
+			setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
+			setBool(	"HAPI_AutoSelectParent", myDefaultAutoSelectParent, true );
+			setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
+			setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
+
+			setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsHotKey, true );
+			setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
+			setKeyCode( "HAPI_EditingPointsHotKey", myDefaultEditingPointsHotKey, true );
+			setColour(	"HAPI_EditingPointsModeColour", myDefaultEditingPointsModeColour, true );
+
+			setColour(	"HAPI_GuideWireframeColour", myDefaultGuideWireframeColour, true );
+			setColour(	"HAPI_UnselectableGuideWireframeColour", myDefaultUnselectableGuideWireframeColour, true );
+			setColour(	"HAPI_UnselectedGuideWireframeColour", myDefaultUnselectedGuideWireframeColour, true );
+			setColour(	"HAPI_SelectedGuideWireframeColour", myDefaultSelectedGuideWireframeColour, true );
+			setFloat(	"HAPI_MinDistanceForPointSelection", myDefaultMinDistanceForPointSelection, true );
+			setFloat(	"HAPI_GuideMinDistanceForMidPointInsertion", myDefaultGuideMinDistanceForMidPointInsertion, true );
+
+			setInt(		"HAPI_CurvePrimitiveTypeDefault", myDefaultCurvePrimitiveTypeDefault, true );
+			setInt(		"HAPI_CurveMethodDefault", myDefaultCurveMethodDefault, true );
 
 			myRepaintDelegate = null;
 		}
@@ -132,13 +170,6 @@ namespace HAPI
 												get { return getString( "HAPI_RenderedCollisionGroupName" ); }
 												set { setString( "HAPI_RenderedCollisionGroupName", value ); } }
 
-		public static int prCurvePrimitiveTypeDefault {
-												get { return getInt( "HAPI_CurvePrimitiveTypeDefault" ); }
-												set { setInt( "HAPI_CurvePrimitiveTypeDefault", value ); } }
-		public static int prCurveMethodDefault {
-												get { return getInt( "HAPI_CurveMethodDefault" ); }
-												set { setInt( "HAPI_CurveMethodDefault", value ); } }
-
 		public static bool prEnableDragAndDrop {
 												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
 												set { setBool( "HAPI_EnableDragAndDrop", value ); } }
@@ -155,12 +186,76 @@ namespace HAPI
 		public static bool prHideGeometryOnLinking {
 												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
 												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
-		
 		public static bool prAutoPinInstances {
 												get { return getBool( "HAPI_AutopinInstances" ); } 
 												set { setBool( "HAPI_AutopinInstances", value ); } }
 
+		public static KeyCode prAddingPointsModeHotKey {
+												get { return getKeyCode( "HAPI_AddingPointsModeHotKey" ); }
+												set { setKeyCode( "HAPI_AddingPointsModeHotKey", value ); } }
+		public static Color prAddingPointsModeColour {
+												get { return getColour( "HAPI_AddingPointsModeColour" ); }
+												set { setColour( "HAPI_AddingPointsModeColour", value ); } }
+		public static KeyCode prEditingPointsModeHotKey {
+												get { return getKeyCode( "HAPI_EditingPointsModeHotKey" ); }
+												set { setKeyCode( "HAPI_EditingPointsModeHotKey", value ); } }
+		public static Color prEditingPointsModeColour {
+												get { return getColour( "HAPI_EditingPointsModeColour" ); }
+												set { setColour( "HAPI_EditingPointsModeColour", value ); } }
+
+		public static Color prGuideWireframeColour {
+												get { return getColour( "HAPI_GuideWireframeColour" ); }
+												set { setColour( "HAPI_GuideWireframeColour", value ); } }
+		public static Color prUnselectableGuideWireframeColour {
+												get { return getColour( "HAPI_UnselectableGuideWireframeColour" ); }
+												set { setColour( "HAPI_UnselectableGuideWireframeColour", value ); } }
+		public static Color prUnselectedGuideWireframeColour {
+												get { return getColour( "HAPI_UnselectedGuideWireframeColour" ); }
+												set { setColour( "HAPI_UnselectedGuideWireframeColour", value ); } }
+		public static Color prSelectedGuideWireframeColour {
+												get { return getColour( "HAPI_SelectedGuideWireframeColour" ); }
+												set { setColour( "HAPI_SelectedGuideWireframeColour", value ); } }
+		public static float prMinDistanceForPointSelection {
+												get { return getFloat( "HAPI_MinDistanceForPointSelection" ); }
+												set { setFloat( "HAPI_MinDistanceForPointSelection", value ); } }
+		public static float prGuideMinDistanceForMidPointInsertion {
+												get { return getFloat( "HAPI_GuideMinDistanceForMidPointInsertion" ); }
+												set { setFloat( "HAPI_GuideMinDistanceForMidPointInsertion", value ); } }
+
+		public static int prCurvePrimitiveTypeDefault {
+												get { return getInt( "HAPI_CurvePrimitiveTypeDefault" ); }
+												set { setInt( "HAPI_CurvePrimitiveTypeDefault", value ); } }
+		public static int prCurveMethodDefault {
+												get { return getInt( "HAPI_CurveMethodDefault" ); }
+												set { setInt( "HAPI_CurveMethodDefault", value ); } }
+
 		public static RepaintDelegate			myRepaintDelegate;
+
+		public static void revertAllSettingsToDefaults()
+		{
+			prCollisionGroupName					= myDefaultCollisionGroupName;
+			prRenderedCollisionGroupName			= myDefaultRenderedCollisionGroupName;
+			
+			prEnableDragAndDrop						= myDefaultEnableDragAndDrop;
+			prEnableSupportWarnings					= myDefaultEnableSupportWarnings;
+
+			prEnableCooking							= myDefaultEnableCooking;
+			prAutoSelectParent						= myDefaultAutoSelectParent;
+			prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
+			prAutoPinInstances						= myDefaultAutoPinInstances;
+
+			prAddingPointsModeHotKey				= myDefaultAddingPointsHotKey;
+			prAddingPointsModeColour				= myDefaultAddingPointsModeColour;
+			prEditingPointsModeHotKey				= myDefaultEditingPointsHotKey;
+			prEditingPointsModeColour				= myDefaultEditingPointsModeColour;
+
+			prGuideWireframeColour					= myDefaultGuideWireframeColour;
+			prUnselectableGuideWireframeColour		= myDefaultUnselectableGuideWireframeColour;
+			prUnselectedGuideWireframeColour		= myDefaultUnselectedGuideWireframeColour;
+			prSelectedGuideWireframeColour			= myDefaultSelectedGuideWireframeColour;
+			prMinDistanceForPointSelection			= myDefaultMinDistanceForPointSelection;
+			prGuideMinDistanceForMidPointInsertion	= myDefaultGuideMinDistanceForMidPointInsertion;
+		}
 
 		public static bool hasScene() 
 		{
@@ -348,7 +443,6 @@ namespace HAPI
 		{
 			return EditorPrefs.GetInt( name );
 		}
-
 		private static void setInt( string name, int value )
 		{
 			setInt( name, value, false );
@@ -363,7 +457,6 @@ namespace HAPI
 		{
 			return EditorPrefs.GetInt( name ) == 0 ? false : true;
 		}
-
 		private static void setBool( string name, bool value )
 		{
 			setBool( name, value, false );
@@ -374,11 +467,24 @@ namespace HAPI
 				EditorPrefs.SetInt( name, value ? 1 : 0 );
 		}
 
+		private static float getFloat( string name )
+		{
+			return EditorPrefs.GetFloat( name );
+		}
+		private static void setFloat( string name, float value )
+		{
+			setFloat( name, value, false );
+		}
+		private static void setFloat( string name, float value, bool only_if_new )
+		{
+			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
+				EditorPrefs.SetFloat( name, value );
+		}
+
 		private static string getString( string name )
 		{
 			return EditorPrefs.GetString( name );
 		}
-
 		private static void setString( string name, string value )
 		{
 			setString( name, value, false );
@@ -387,6 +493,42 @@ namespace HAPI
 		{
 			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
 				EditorPrefs.SetString( name, value );
+		}
+
+		private static KeyCode getKeyCode( string name )
+		{
+			return (KeyCode) EditorPrefs.GetInt( name );
+		}
+		private static void setKeyCode( string name, KeyCode value )
+		{
+			setKeyCode( name, value, false );
+		}
+		private static void setKeyCode( string name, KeyCode value, bool only_if_new )
+		{
+			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
+				EditorPrefs.SetInt( name, (int) value );
+		}
+
+		private static Color getColour( string name )
+		{
+			return new Color( getFloat( name + "_r" ), getFloat( name + "_g" ), 
+							  getFloat( name + "_b" ), getFloat( name + "_a" ) );
+		}
+		private static void setColour( string name, Color value )
+		{
+			setColour( name, value, false );
+		}
+		private static void setColour( string name, Color value, bool only_if_new )
+		{
+			if ( !only_if_new || 
+					!( EditorPrefs.HasKey( name + "_r" ) || EditorPrefs.HasKey( name + "_g" ) ||
+					   EditorPrefs.HasKey( name + "_b" ) || EditorPrefs.HasKey( name + "_a" ) ) )
+			{
+				setFloat( name + "_r", value.r );
+				setFloat( name + "_g", value.g );
+				setFloat( name + "_b", value.b );
+				setFloat( name + "_a", value.a );
+			}
 		}
 	}
 

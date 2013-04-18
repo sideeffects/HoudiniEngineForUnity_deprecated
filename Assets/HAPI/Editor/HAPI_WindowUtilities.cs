@@ -20,6 +20,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using HAPI;
 
 public class HAPI_WindowUtilities : EditorWindow 
@@ -96,11 +97,17 @@ public class HAPI_WindowUtilities : EditorWindow
 					Debug.LogError( error.ToString() );
 				}
 			}
+
+			HAPI_GUI.separator();
+
+			if ( GUILayout.Button( HAPI_GUIUtility.myRevertAllSettingsLabel ) )
+			{
+				HAPI_Host.revertAllSettingsToDefaults();
+			}
 		}
 
-		myShowSettings = EditorGUILayout.Foldout( myShowSettings, new GUIContent( "Settings" ) );
-
-		if ( myShowSettings )
+		myShowGeneralSettings = EditorGUILayout.Foldout( myShowGeneralSettings, new GUIContent( "General Settings" ) );
+		if ( myShowGeneralSettings )
 		{
 			// Collision Group Name
 			{
@@ -113,33 +120,10 @@ public class HAPI_WindowUtilities : EditorWindow
 			// Rendered Collision Group Name
 			{
 				string value = HAPI_Host.prRenderedCollisionGroupName;
-				bool changed = HAPI_GUI.stringField( "rendered_collision_group_name", "Rendered Colli. Grp.", ref value );
+				bool changed = HAPI_GUI.stringField( "rendered_collision_group_name", 
+													 "Rendered Colli. Grp.", ref value );
 				if ( changed )
 					HAPI_Host.prRenderedCollisionGroupName = value;
-			}
-
-			HAPI_GUI.separator();
-			
-			// Curve Primitive Type Default
-			{
-				int value = HAPI_Host.prCurvePrimitiveTypeDefault;
-				string[] labels = { "Polygon", "NURBS", "Bezier" };
-				int[] values = { 0, 1, 2 };
-				bool changed = HAPI_GUI.dropdown( "curve_primitive_type_default", "Default Curve Type", 
-												  ref value, labels, values );
-				if ( changed )
-					HAPI_Host.prCurvePrimitiveTypeDefault = value;
-			}
-
-			// Curve Method Default
-			{
-				int value = HAPI_Host.prCurveMethodDefault;
-				string[] labels = { "CVs", "Breakpoints", "Freehand" };
-				int[] values = { 0, 1, 2 };
-				bool changed = HAPI_GUI.dropdown( "curve_method_default", "Default Curve Method", 
-												  ref value, labels, values );
-				if ( changed )
-					HAPI_Host.prCurveMethodDefault = value;
 			}
 
 			HAPI_GUI.separator();
@@ -212,7 +196,169 @@ public class HAPI_WindowUtilities : EditorWindow
 						HAPI_Host.myRepaintDelegate();
 				}
 			}
-			
+		}
+
+		myShowGeometryToolsSettings = EditorGUILayout.Foldout( myShowGeometryToolsSettings, 
+															   new GUIContent( "Geometry Tools Settings" ) );
+		if ( myShowGeometryToolsSettings )
+		{
+			// Adding Points Mode Hot Key
+			{
+				int value = (int) HAPI_Host.prAddingPointsModeHotKey;
+				string[] labels = System.Enum.GetValues(typeof(KeyCode))
+									.Cast< KeyCode >()
+									.Select(v => v.ToString())
+									.ToArray();
+				int[] values = System.Enum.GetValues(typeof(KeyCode))
+									.Cast< KeyCode >()
+									.Select(v => (int) v)
+									.ToArray();
+				bool changed = HAPI_GUI.dropdown( "adding_points_mode_hot_key", "Adding Points Key", 
+												  ref value, labels, values );
+				if ( changed )
+					HAPI_Host.prAddingPointsModeHotKey = (KeyCode) value;
+			}
+
+			// Adding Points Mode Colour
+			{
+				Color value = HAPI_Host.prAddingPointsModeColour;
+				bool changed = HAPI_GUI.colourField( "adding_ponits_mode_colour", "Adding Points Mode", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prAddingPointsModeColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Editing Points Mode Hot Key
+			{
+				int value = (int) HAPI_Host.prEditingPointsModeHotKey;
+				string[] labels = System.Enum.GetValues(typeof(KeyCode))
+									.Cast< KeyCode >()
+									.Select(v => v.ToString())
+									.ToArray();
+				int[] values = System.Enum.GetValues(typeof(KeyCode))
+									.Cast< KeyCode >()
+									.Select(v => (int) v)
+									.ToArray();
+				bool changed = HAPI_GUI.dropdown( "editing_points_mode_hot_key", "Editing Points Key", 
+												  ref value, labels, values );
+				if ( changed )
+					HAPI_Host.prEditingPointsModeHotKey = (KeyCode) value;
+			}
+
+			// Editing Points Mode Colour
+			{
+				Color value = HAPI_Host.prEditingPointsModeColour;
+				bool changed = HAPI_GUI.colourField( "editing_ponits_mode_colour", "Editing Points Mode", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prEditingPointsModeColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			HAPI_GUI.separator();
+
+			// Guide Wireframe Colour
+			{
+				Color value = HAPI_Host.prGuideWireframeColour;
+				bool changed = HAPI_GUI.colourField( "guide_wireframe_colour", "Guide Wireframe", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prGuideWireframeColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Unselectable Guide Wireframe Colour
+			{
+				Color value = HAPI_Host.prUnselectableGuideWireframeColour;
+				bool changed = HAPI_GUI.colourField( "unselectable_guide_wireframe_colour", "Unselectable Guide", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prUnselectableGuideWireframeColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Unselected Guide Wireframe Colour
+			{
+				Color value = HAPI_Host.prUnselectedGuideWireframeColour;
+				bool changed = HAPI_GUI.colourField( "unselected_guide_wireframe_colour", "Unselected Guide", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prUnselectedGuideWireframeColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Selected Guide Wireframe Colour
+			{
+				Color value = HAPI_Host.prSelectedGuideWireframeColour;
+				bool changed = HAPI_GUI.colourField( "selected_guide_wireframe_colour", "Selected Guide", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prSelectedGuideWireframeColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Min. Distance For Point Selection
+			{
+				float value = HAPI_Host.prMinDistanceForPointSelection;
+				bool changed = HAPI_GUI.floatField( "min_distance_for_point_selection", "Min. Distance For Point Selection", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prMinDistanceForPointSelection = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
+			// Guide Min. Distance For Mid Point Insertion
+			{
+				float value = HAPI_Host.prGuideMinDistanceForMidPointInsertion;
+				bool changed = HAPI_GUI.floatField( "guide_min_distance_for_mid_point_insertion", "Guide Min. Distance For Mid Point Insertion", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prGuideMinDistanceForMidPointInsertion = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+		}
+
+		myShowCurveSettings = EditorGUILayout.Foldout( myShowCurveSettings, new GUIContent( "Curve Settings" ) );
+		if ( myShowCurveSettings )
+		{
+			// Curve Primitive Type Default
+			{
+				int value = HAPI_Host.prCurvePrimitiveTypeDefault;
+				string[] labels = { "Polygon", "NURBS", "Bezier" };
+				int[] values = { 0, 1, 2 };
+				bool changed = HAPI_GUI.dropdown( "curve_primitive_type_default", "Default Curve Type", 
+												  ref value, labels, values );
+				if ( changed )
+					HAPI_Host.prCurvePrimitiveTypeDefault = value;
+			}
+
+			// Curve Method Default
+			{
+				int value = HAPI_Host.prCurveMethodDefault;
+				string[] labels = { "CVs", "Breakpoints", "Freehand" };
+				int[] values = { 0, 1, 2 };
+				bool changed = HAPI_GUI.dropdown( "curve_method_default", "Default Curve Method", 
+												  ref value, labels, values );
+				if ( changed )
+					HAPI_Host.prCurveMethodDefault = value;
+			}
 		}
 		
 		GUILayout.EndScrollView();
@@ -221,10 +367,12 @@ public class HAPI_WindowUtilities : EditorWindow
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 	
-	private static bool				myEnableDraw			= true;
+	private static bool				myEnableDraw					= true;
 
-	private static bool				myShowUtility			= true;
-	private static bool				myShowSettings			= true;
+	private static bool				myShowUtility					= true;
+	private static bool				myShowGeneralSettings			= false;
+	private static bool				myShowGeometryToolsSettings		= false;
+	private static bool				myShowCurveSettings				= false;
 	
 	private static Vector2 			myScrollPosition;
 

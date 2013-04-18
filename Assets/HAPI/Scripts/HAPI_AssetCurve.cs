@@ -211,9 +211,14 @@ public class HAPI_AssetCurve : HAPI_Asset
 			for ( int i = 0; i < prVertices.Length; ++i )
 				line_indices[ i ] = i;
 
+			Color[] line_colours = new Color[ prVertices.Length ];
+			for ( int i = 0; i < prVertices.Length; ++i )
+				line_colours[ i ] = HAPI_Host.prGuideWireframeColour;
+
 			mesh.Clear();
 		
 			mesh.vertices = prVertices;
+			mesh.colors = line_colours;
 			mesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
 			mesh.RecalculateBounds();
 		}

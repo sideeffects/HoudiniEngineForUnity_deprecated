@@ -46,6 +46,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myTarget				= null;
 
 		myIsMouseDown			= false;
+		myCurrentlyPressedKey	= KeyCode.None;
 		myFirstMousePosition	= new Vector3();
 
 		myGuideLinesMaterial	= null;
@@ -196,18 +197,22 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// Set appropriate handles matrix.
 		Handles.matrix = myAssetCurve.transform.localToWorldMatrix;
 
+		// Determine key state.
+		getKeyState( current_event );
+
 		// Decide modes.
-		decideModes( ref current_event );
+		if ( current_event.type == EventType.Layout )
+			decideModes( ref current_event );
 
 		// Add points.
 		if ( myAssetCurve.prIsAddingPoints )
 		{
-			myAssetCurve.prIsAddingPoints = drawModeBorders( Color.yellow, mouse_position );
+			myAssetCurve.prIsAddingPoints = drawModeBorders( HAPI_Host.prAddingPointsModeColour, mouse_position );
 			
 			if ( !current_event.alt )
 			{
 				Vector3 position	= Vector3.zero;
-				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f; // TODO: Constant?
+				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				bool button_press 	= Handles.Button( 	position, 
 														rotation,
@@ -223,7 +228,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				{
 					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
 					RaycastHit hit_info;
-					collider.Raycast( ray, out hit_info, 1000.0f );
+					collider.Raycast( ray, out hit_info, myIntersectionRayLength );
 					intersection = hit_info.point;
 				}
 				else
@@ -254,9 +259,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						
 						Vector3 closest_point = new Vector3();
 						float distance = HAPI_GUIUtility.closestDistanceBetweenLineAndLineSegment(
-												p0, p1, ray, out closest_point );
+											p0, p1, ray, out closest_point );
 						
-						if ( distance < HandleUtility.GetHandleSize( closest_point ) / 5.0f ) // TODO: Constant?
+						if ( distance < 
+								HandleUtility.GetHandleSize( closest_point ) / 
+								HAPI_Host.prGuideMinDistanceForMidPointInsertion )
 						{
 							anchor1 = p0;
 							anchor2 = p1;
@@ -274,7 +281,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 					line_vertices[ 0 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( anchor1, myTempCamera );
 					line_vertices[ 1 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( new_point_location, myTempCamera );
-					float length		= Vector3.Distance( line_vertices[ 0 ], line_vertices[ 1 ] ) * 4.0f;
+					float length		= Vector3.Distance( line_vertices[ 0 ], line_vertices[ 1 ] ) * 
+										  myGuideLinesDashTilingMultiplier;
 					line_indices[ 0 ]	= 0; 
 					line_indices[ 1 ]	= 1;
 					uvs[ 0 ]			= new Vector2(); 
@@ -282,10 +290,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 					if ( is_mid_point )
 					{
-						line_vertices[ 2 ] = HAPI_GUIUtility.getCameraNearPlanePoint( anchor2, myTempCamera );
-						line_indices[ 2 ] = 2;
-						length += Vector3.Distance( line_vertices[ 1 ], line_vertices[ 2 ] ) * 4.0f;
-						uvs[ 2 ] = new Vector2( length, length );
+						line_vertices[ 2 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( anchor2, myTempCamera );
+						line_indices[ 2 ]	= 2;
+						length				+= Vector3.Distance( line_vertices[ 1 ], line_vertices[ 2 ] ) * 
+											   myGuideLinesDashTilingMultiplier;
+						uvs[ 2 ]			= new Vector2( length, length );
 					}
 
 					myGuideLinesMesh.Clear();
@@ -316,7 +325,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		}
 		else if ( myAssetCurve.prIsEditingPoints )
 		{
-			myAssetCurve.prIsEditingPoints = drawModeBorders( new Color( 0.7f, 0.7f, 0.9f ), mouse_position );
+			myAssetCurve.prIsEditingPoints = drawModeBorders( HAPI_Host.prEditingPointsModeColour, mouse_position );
 			if ( !myAssetCurve.prIsEditingPoints )
 				clearSelection();
 
@@ -373,7 +382,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						else
 						{
 							float distance = Vector3.Distance( mouse_position, proj_pos );
-							if ( distance < myMinDistanceForPointSelection )
+							if ( distance < HAPI_Host.prMinDistanceForPointSelection )
 							{
 								// Once we modify a point we are no longer bound to the user holding down 
 								// the point edit key. Edit point mode is now fully activated.
@@ -386,7 +395,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				
 				// Prevent click from being passed lower (this is so stupid!).
 				Vector3 position	= Vector3.zero;
-				float handle_size 	= HandleUtility.GetHandleSize( position ) * 1000000.0f;
+				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
@@ -492,6 +501,20 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		return mouse_position;
 	}
 
+	private void getKeyState( Event current_event )
+	{
+		if ( current_event.type == EventType.KeyDown )
+		{
+			myCurrentlyPressedKey = current_event.keyCode;
+		} 
+		// I have to also interpret the Ignore event as the mouse up event because that's all I
+		// get if the use lets go of the mouse button while over a different Unity window...
+		else if ( current_event.type == EventType.KeyUp || current_event.type == EventType.Ignore )
+		{
+			myCurrentlyPressedKey = KeyCode.None;
+		}
+	}
+
 	private void clearSelection()
 	{
 		mySelectedPoints.Clear();
@@ -501,9 +524,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( mySelectionMeshColours != null )
 			for ( int i = 0; i < mySelectionMeshColours.Length; ++i )
 				if ( myAssetCurve.prIsEditingPoints )
-					mySelectionMeshColours[ i ] = myUnselectedColour;
+					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
 				else
-					mySelectionMeshColours[ i ] = myUnselectableColour;
+					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
 
 		buildGuideGeometry();
 	}
@@ -521,13 +544,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			{
 				mySelectedPointsMask[ point_index ] = false;
 				mySelectedPoints.Remove( point_index );
-				mySelectionMeshColours[ point_index ] = myUnselectedColour;
+				mySelectionMeshColours[ point_index ] = HAPI_Host.prUnselectedGuideWireframeColour;
 			}
 			else
 			{
 				mySelectedPointsMask[ point_index ] = true;
 				mySelectedPoints.Add( point_index );
-				mySelectionMeshColours[ point_index ] = mySelectedColour;
+				mySelectionMeshColours[ point_index ] = HAPI_Host.prSelectedGuideWireframeColour;
 			}
 		}
 
@@ -544,10 +567,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myGuideLinesTexture		= new Texture2D( 4, 1, TextureFormat.RGBA32, false );
 			myGuideLinesTexture.hideFlags = HideFlags.HideAndDontSave;
 			myGuideLinesTexture.wrapMode = TextureWrapMode.Repeat;
-			myGuideLinesTexture.SetPixel( 0, 0, new Color( 0.0f, 0.0f, 0.0f, 0.0f ) );
-			myGuideLinesTexture.SetPixel( 1, 0, new Color( 0.0f, 0.0f, 0.0f, 0.0f ) );
-			myGuideLinesTexture.SetPixel( 2, 0, new Color( 0.0f, 0.2f, 0.2f, 1.0f ) );
-			myGuideLinesTexture.SetPixel( 3, 0, new Color( 0.0f, 0.2f, 0.2f, 1.0f ) );
+			Color transparent_version = HAPI_Host.prGuideWireframeColour;
+			transparent_version.a = 0.0f;
+			myGuideLinesTexture.SetPixel( 0, 0, transparent_version );
+			myGuideLinesTexture.SetPixel( 1, 0, transparent_version );
+			myGuideLinesTexture.SetPixel( 2, 0, HAPI_Host.prGuideWireframeColour );
+			myGuideLinesTexture.SetPixel( 3, 0, HAPI_Host.prGuideWireframeColour );
 			myGuideLinesTexture.Apply();
 			myGuideLinesMaterial.mainTexture = myGuideLinesTexture;
 			myGuideLinesMaterial.SetTexture( "_MainTex", myGuideLinesTexture );
@@ -595,9 +620,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			for ( int i = 0; i < selection_vertices.Length; ++i )
 			{
 				if ( !myAssetCurve.prIsEditingPoints )
-					mySelectionMeshColours[ i ] = myUnselectableColour;
+					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
 				else
-					mySelectionMeshColours[ i ] = myUnselectedColour;
+					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
 			}
 		}
 
@@ -622,7 +647,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		for ( int i = 0; i < connection_vertices.Length; ++i )
 			connection_indices[ i ] = i;
 
+		Color[] connection_colours = new Color[ connection_vertices.Length ];
+		for ( int i = 0; i < connection_vertices.Length; ++i )
+			connection_colours[ i ] = HAPI_Host.prGuideWireframeColour;
+
 		myConnectionMesh.vertices = connection_vertices;
+		myConnectionMesh.colors = connection_colours;
 		myConnectionMesh.SetIndices( connection_indices, MeshTopology.LineStrip, 0 );
 	}
 
@@ -655,8 +685,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 	private void decideModes( ref Event current_event )
 	{
-		bool add_points_mode_key	= current_event.shift;
-		bool edit_points_mode_key	= current_event.control;
+		bool add_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prAddingPointsModeHotKey;
+		bool edit_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prEditingPointsModeHotKey;
+		//bool add_points_mode_key	= current_event.shift;
+		//bool edit_points_mode_key	= current_event.control;
 
 		bool add_points_mode		= myAssetCurve.prIsAddingPoints;
 		bool edit_points_mode		= myAssetCurve.prIsEditingPoints;
@@ -811,20 +843,21 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	private GameObject			myTarget;
 
 	private bool				myIsMouseDown;
+	private KeyCode				myCurrentlyPressedKey;
 	private Vector3				myFirstMousePosition;
+	private const float			myBigButtonHandleSizeMultiplier = 1000000.0f;
+	private const float			myIntersectionRayLength = 5000.0f;
 
+	private const float			myGuideLinesDashTilingMultiplier = 4.0f;
 	private Material			myGuideLinesMaterial;
 	private Texture2D			myGuideLinesTexture;
 	private Mesh				myGuideLinesMesh;
 
-	private static float		myMinDistanceForPointSelection = 8.0f;
-	private static Color		myUnselectableColour = new Color( 0.0f, 0.2f, 0.2f );
-	private static Color		myUnselectedColour = Color.white;
-	private static Color		mySelectedColour = Color.yellow;
 	private Rect				mySelectionArea;
 	private Color[]				mySelectionMeshColours;
 	private Mesh				mySelectionMesh;
 	private Material			mySelectionMaterial;
+
 	[SerializeField] 
 	private List< int >			mySelectedPoints;
 	[SerializeField] 
