@@ -503,13 +503,23 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 	private void getKeyState( Event current_event )
 	{
-		if ( current_event.type == EventType.KeyDown )
+		// So, for some odd reason, it is possible (and highly likely) to get a the
+		// EventType.KeyDown event triggerd but with a keyCode of KeyCode.None. Lovely.
+		if ( current_event.type == EventType.KeyDown && current_event.keyCode != KeyCode.None )
 		{
 			myCurrentlyPressedKey = current_event.keyCode;
-		} 
+		}
+		else if ( current_event.shift )
+		{
+			myCurrentlyPressedKey = KeyCode.LeftShift;
+		}
 		// I have to also interpret the Ignore event as the mouse up event because that's all I
 		// get if the use lets go of the mouse button while over a different Unity window...
 		else if ( current_event.type == EventType.KeyUp || current_event.type == EventType.Ignore )
+		{
+			myCurrentlyPressedKey = KeyCode.None;
+		}
+		else if ( myCurrentlyPressedKey == KeyCode.LeftShift && !current_event.shift )
 		{
 			myCurrentlyPressedKey = KeyCode.None;
 		}
@@ -687,8 +697,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	{
 		bool add_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prAddingPointsModeHotKey;
 		bool edit_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prEditingPointsModeHotKey;
-		//bool add_points_mode_key	= current_event.shift;
-		//bool edit_points_mode_key	= current_event.control;
 
 		bool add_points_mode		= myAssetCurve.prIsAddingPoints;
 		bool edit_points_mode		= myAssetCurve.prIsEditingPoints;
@@ -743,8 +751,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		}
 
 		// Check if ENTER or ESC was pressed so we can exit the mode.
-		if ( current_event.isKey && current_event.type == EventType.KeyUp
-			 && ( current_event.keyCode == KeyCode.Escape || current_event.keyCode == KeyCode.Return ) )
+		if ( myCurrentlyPressedKey == KeyCode.Escape || myCurrentlyPressedKey == KeyCode.Return )
 		{
 			add_points_mode				= false;
 			edit_points_mode			= false;
