@@ -220,40 +220,46 @@ public class HAPI_Instancer : MonoBehaviour {
 	{
 		GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiatePath );
 		
-		MeshFilter mesh_filter = object_to_instantiate.GetComponentInChildren< MeshFilter >();
-		Bounds bounds = mesh_filter.sharedMesh.bounds;
-		float max_extent = Mathf.Max( bounds.extents.x, Mathf.Max( bounds.extents.y, bounds.extents.z ) );
-					
-		
 		Vector3 position = override_info.translate;
 		
 		float handle_size 	= HandleUtility.GetHandleSize( position );
 		if( handle_size < 1 )
 			handle_size = 1;
 		
-		float min_offset = 1.2f;
-		float offset = min_offset*(handle_size);
-		if( offset < min_offset )
-			offset = min_offset; 
-		position.y += offset;
-		
+						
 		Handles.color = new Color( 1.0f, 0, 0, 1.0f );					
 		
+		const float scale_factor_tweak1 = 0.17f;
+		const float scale_factor_tweak2 = 0.2f;
 		
-		float scale_factor = handle_size;
-		if(scale_factor < 1 )
-			scale_factor = 1;
+		float scale_factor = scale_factor_tweak1*handle_size;
+		if(scale_factor < scale_factor_tweak1 )
+			scale_factor = scale_factor_tweak1;
 		
-		Handles.ArrowCap( override_info.instancePointNumber,
-						 position, 
-						 Quaternion.Euler( new Vector3( 90, 0, 0) ),
-						 scale_factor );
+		scale_factor *= HAPI_Host.prPinSize;
+			
+		Handles.color = new Color( 1.0f, 1.0f, 1.0f, 1.0f );		
+		
+		for( int ii = 0; ii < 14; ii++ )
+		{
+			
+			Handles.CylinderCap( override_info.instancePointNumber,
+								 position,
+								 Quaternion.Euler( new Vector3( 90, 0, 0)),
+								 scale_factor*scale_factor_tweak2 );
+			
+			position.y += scale_factor*scale_factor_tweak2;
+		}
 		
 		
-		Handles.color = new Color( 0.8f, 0, 0, 0.5f );
+		Handles.color = new Color( 0.7f, 0.0f, 0.0f, 1.0f );		
+		position.y += scale_factor*scale_factor_tweak2;
+		Handles.SphereCap  ( override_info.instancePointNumber,
+							 position,
+							 Quaternion.Euler( new Vector3( 90, 0, 0)),
+							 scale_factor*1.3f );
 		
-		position.y = override_info.translate.y;
-		Handles.DrawSolidDisc(position , new Vector3( 0, 1, 0) , max_extent*override_info.scale.x );
+		
 	}
 	
 	public void instanceObjects( HAPI_ProgressBar progress_bar )

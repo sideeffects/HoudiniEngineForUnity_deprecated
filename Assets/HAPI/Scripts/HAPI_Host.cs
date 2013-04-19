@@ -93,6 +93,7 @@ namespace HAPI
 		private const bool myDefaultAutoSelectParent						= true;
 		private const bool myDefaultHideGeometryOnLinking					= true;
 		private const bool myDefaultAutoPinInstances						= true;
+		private const float myDefaultPinSize								= 1.0f;
 
 		private static KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
@@ -134,6 +135,7 @@ namespace HAPI
 			setBool(	"HAPI_AutoSelectParent", myDefaultAutoSelectParent, true );
 			setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
 			setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
+			setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 
 			setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 			setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
@@ -189,6 +191,10 @@ namespace HAPI
 		public static bool prAutoPinInstances {
 												get { return getBool( "HAPI_AutopinInstances" ); } 
 												set { setBool( "HAPI_AutopinInstances", value ); } }
+		
+		public static float prPinSize {
+												get { return getFloat( "HAPI_PinSize" ); }
+												set { setFloat( "HAPI_PinSize", value ); } }
 
 		public static KeyCode prAddingPointsModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_AddingPointsModeHotKey" );
@@ -251,6 +257,7 @@ namespace HAPI
 			prAutoSelectParent						= myDefaultAutoSelectParent;
 			prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
 			prAutoPinInstances						= myDefaultAutoPinInstances;
+			prPinSize 								= myDefaultPinSize;
 
 			prAddingPointsModeHotKey				= myDefaultAddingPointsModeHotKey;
 			prAddingPointsModeColour				= myDefaultAddingPointsModeColour;

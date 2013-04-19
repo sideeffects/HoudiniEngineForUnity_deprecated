@@ -196,6 +196,19 @@ public class HAPI_WindowUtilities : EditorWindow
 						HAPI_Host.myRepaintDelegate();
 				}
 			}
+			
+			// Pin Size
+			{
+				float value = HAPI_Host.prPinSize;
+				bool changed = HAPI_GUI.floatField( "pin_size", "Pin Size", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prPinSize = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+			
 		}
 
 		myShowGeometryToolsSettings = EditorGUILayout.Foldout( myShowGeometryToolsSettings, 
