@@ -9,7 +9,7 @@ Shader "HAPI/DottedLine"
 	SubShader 
 	{
 
-		ZTest Less
+		ZTest Always
 		Blend SrcAlpha OneMinusSrcAlpha 
 
 		Pass 

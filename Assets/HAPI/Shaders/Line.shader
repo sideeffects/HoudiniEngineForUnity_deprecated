@@ -7,7 +7,7 @@ Shader "HAPI/Line" {
 
 	SubShader {
 
-		ZTest Less
+		ZTest Always
 
 		Pass {
 			CGPROGRAM
