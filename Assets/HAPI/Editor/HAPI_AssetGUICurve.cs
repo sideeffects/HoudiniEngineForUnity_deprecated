@@ -311,6 +311,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					myGuideLinesMesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
 
 					myGuideLinesMaterial.SetPass( 0 );
+					myGuideLinesMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
 					myGuideLinesMaterial.SetTextureScale( "_MainTex", new Vector2( 1.0f, 1.0f ) );
 					Graphics.DrawMeshNow( myGuideLinesMesh, myAssetCurve.transform.localToWorldMatrix );
 				}
@@ -489,10 +490,19 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// Selection Mesh Draws
 		if ( mySelectionMaterial != null && mySelectionMesh != null )
 		{
-			mySelectionMaterial.SetPass( 0 );
-			Graphics.DrawMeshNow( mySelectionMesh, myAssetCurve.transform.localToWorldMatrix );
-			mySelectionMaterial.SetPass( 1 );
-			Graphics.DrawMeshNow( mySelectionMesh, myAssetCurve.transform.localToWorldMatrix );
+			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize );
+			mySelectionMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
+			if ( mySelectionMaterial.SetPass( 0 ) )
+			{
+				Graphics.DrawMeshNow( mySelectionMesh, myAssetCurve.transform.localToWorldMatrix );
+			}
+
+			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize - myGuideBorderSize );
+			mySelectionMaterial.SetColor( "_Color", Color.white );
+			if ( mySelectionMaterial.SetPass( 1 ) )
+			{
+				Graphics.DrawMeshNow( mySelectionMesh, myAssetCurve.transform.localToWorldMatrix );
+			}
 		}
 	}
 	
@@ -581,20 +591,25 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		if ( myGuideLinesMaterial == null || myGuideLinesTexture == null || myGuideLinesMaterial == null )
 		{
-			myGuideLinesMaterial	= new Material( Shader.Find( "HAPI/DottedLine" ) );
-			myGuideLinesTexture		= new Texture2D( 4, 1, TextureFormat.RGBA32, false );
-			myGuideLinesTexture.hideFlags = HideFlags.HideAndDontSave;
-			myGuideLinesTexture.wrapMode = TextureWrapMode.Repeat;
-			Color transparent_version = HAPI_Host.prGuideWireframeColour;
-			transparent_version.a = 0.0f;
-			myGuideLinesTexture.SetPixel( 0, 0, transparent_version );
-			myGuideLinesTexture.SetPixel( 1, 0, transparent_version );
-			myGuideLinesTexture.SetPixel( 2, 0, HAPI_Host.prGuideWireframeColour );
-			myGuideLinesTexture.SetPixel( 3, 0, HAPI_Host.prGuideWireframeColour );
+			myGuideLinesMaterial					= new Material( Shader.Find( "HAPI/DottedLine" ) );
+			myGuideLinesMaterial.hideFlags			= HideFlags.HideAndDontSave;
+
+			myGuideLinesTexture						= new Texture2D( 4, 1, TextureFormat.RGBA32, false );
+			myGuideLinesTexture.hideFlags			= HideFlags.HideAndDontSave;
+			myGuideLinesTexture.wrapMode			= TextureWrapMode.Repeat;
+
+			// We only set 2 pixels to pure black and 2 to pure white. This way, we can change the
+			// dashed line colour via a global colour shader property which is multiplied by
+			// this texture.
+			myGuideLinesTexture.SetPixel( 0, 0, new Color( 0.0f, 0.0f, 0.0f, 0.0f ) );
+			myGuideLinesTexture.SetPixel( 1, 0, new Color( 0.0f, 0.0f, 0.0f, 0.0f ) );
+			myGuideLinesTexture.SetPixel( 2, 0, new Color( 1.0f, 1.0f, 1.0f, 1.0f ) );
+			myGuideLinesTexture.SetPixel( 3, 0, new Color( 1.0f, 1.0f, 1.0f, 1.0f ) );
 			myGuideLinesTexture.Apply();
+			
 			myGuideLinesMaterial.mainTexture = myGuideLinesTexture;
 			myGuideLinesMaterial.SetTexture( "_MainTex", myGuideLinesTexture );
-			myGuideLinesMesh		= new Mesh();
+			myGuideLinesMesh = new Mesh();
 		}
 
 		// Build Selection Mesh -------------------------------------------------------------------------------------
@@ -863,6 +878,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	private const float			myBigButtonHandleSizeMultiplier = 1000000.0f;
 	private const float			myIntersectionRayLength = 5000.0f;
 
+	private const float			myGuideBorderSize = 4.0f;
 	private const float			myGuideLinesDashTilingMultiplier = 4.0f;
 	private Material			myGuideLinesMaterial;
 	private Texture2D			myGuideLinesTexture;

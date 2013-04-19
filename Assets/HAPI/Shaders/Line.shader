@@ -1,4 +1,10 @@
 Shader "HAPI/Line" {
+
+	Properties
+	{
+		_Color ("Color", Color) = (1,1,1)
+	}
+
 	SubShader {
 
 		ZTest Less
@@ -9,6 +15,8 @@ Shader "HAPI/Line" {
 				#pragma exclude_renderers flash
 				#pragma vertex vert
 				#pragma fragment frag
+
+				float4 _Color;
 
 				struct appdata {
 					float4 pos : POSITION;
@@ -28,7 +36,7 @@ Shader "HAPI/Line" {
 				}
 
 				half4 frag( v2f i ) : COLOR {
-					return half4( i.colour );
+					return i.colour * _Color;
 				}
 
 			ENDCG

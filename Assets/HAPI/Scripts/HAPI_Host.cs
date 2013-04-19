@@ -92,12 +92,14 @@ namespace HAPI
 		private const bool myDefaultEnableCooking							= true;
 		private const bool myDefaultAutoSelectParent						= true;
 		private const bool myDefaultHideGeometryOnLinking					= true;
-		private const bool myDefaultAutoPinInstances						= true;
+
 		private const float myDefaultPinSize								= 1.0f;
 		private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
+		private const bool myDefaultAutoPinInstances						= true;
 
 		private static KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
+
 		private static KeyCode myDefaultEditingPointsModeHotKey				= KeyCode.LeftControl;
 		private static Color myDefaultEditingPointsModeColour				= new Color( 0.7f, 0.7f, 0.9f, 1.0f );
 
@@ -105,6 +107,8 @@ namespace HAPI
 		private static Color myDefaultUnselectableGuideWireframeColour		= new Color( 0.1f, 0.1f, 0.1f, 1.0f );
 		private static Color myDefaultUnselectedGuideWireframeColour		= Color.white;
 		private static Color myDefaultSelectedGuideWireframeColour			= Color.yellow;
+
+		private const float myDefaultGuidePointSize							= 10.0f;
 		private const float myDefaultMinDistanceForPointSelection			= 8.0f;
 		private const float myDefaultGuideMinDistanceForMidPointInsertion	= 5.0f;
 
@@ -135,12 +139,14 @@ namespace HAPI
 			setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
 			setBool(	"HAPI_AutoSelectParent", myDefaultAutoSelectParent, true );
 			setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
-			setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
+			
 			setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 			setColour(	"HAPI_PinColour", myDefaultPinColour, true );
+			setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
 
 			setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 			setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
+
 			setKeyCode( "HAPI_EditingPointsHotKey", myDefaultEditingPointsModeHotKey, true );
 			setColour(	"HAPI_EditingPointsModeColour", myDefaultEditingPointsModeColour, true );
 
@@ -148,6 +154,8 @@ namespace HAPI
 			setColour(	"HAPI_UnselectableGuideWireframeColour", myDefaultUnselectableGuideWireframeColour, true );
 			setColour(	"HAPI_UnselectedGuideWireframeColour", myDefaultUnselectedGuideWireframeColour, true );
 			setColour(	"HAPI_SelectedGuideWireframeColour", myDefaultSelectedGuideWireframeColour, true );
+
+			setFloat(	"HAPI_GuidePointSize", myDefaultGuidePointSize, true );
 			setFloat(	"HAPI_MinDistanceForPointSelection", myDefaultMinDistanceForPointSelection, true );
 			setFloat(	"HAPI_GuideMinDistanceForMidPointInsertion", myDefaultGuideMinDistanceForMidPointInsertion, true );
 
@@ -190,18 +198,16 @@ namespace HAPI
 		public static bool prHideGeometryOnLinking {
 												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
 												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
-		public static bool prAutoPinInstances {
-												get { return getBool( "HAPI_AutopinInstances" ); } 
-												set { setBool( "HAPI_AutopinInstances", value ); } }
-		
+
 		public static float prPinSize {
 												get { return getFloat( "HAPI_PinSize" ); }
 												set { setFloat( "HAPI_PinSize", value ); } }
-		
-		
 		public static Color prPinColour {
 												get { return getColour( "HAPI_PinColour" ); }
 												set { setColour( "HAPI_PinColour", value ); } }
+		public static bool prAutoPinInstances {
+												get { return getBool( "HAPI_AutopinInstances" ); } 
+												set { setBool( "HAPI_AutopinInstances", value ); } }
 
 		public static KeyCode prAddingPointsModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_AddingPointsModeHotKey" );
@@ -213,6 +219,7 @@ namespace HAPI
 		public static Color prAddingPointsModeColour {
 												get { return getColour( "HAPI_AddingPointsModeColour" ); }
 												set { setColour( "HAPI_AddingPointsModeColour", value ); } }
+
 		public static KeyCode prEditingPointsModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_EditingPointsModeHotKey" );
 													  if ( key == KeyCode.None ) {
@@ -236,6 +243,10 @@ namespace HAPI
 		public static Color prSelectedGuideWireframeColour {
 												get { return getColour( "HAPI_SelectedGuideWireframeColour" ); }
 												set { setColour( "HAPI_SelectedGuideWireframeColour", value ); } }
+
+		public static float prGuidePointSize {
+												get { return getFloat( "HAPI_GuidePointSize" ); }
+												set { setFloat( "HAPI_GuidePointSize", value ); } }
 		public static float prMinDistanceForPointSelection {
 												get { return getFloat( "HAPI_MinDistanceForPointSelection" ); }
 												set { setFloat( "HAPI_MinDistanceForPointSelection", value ); } }
@@ -263,12 +274,14 @@ namespace HAPI
 			prEnableCooking							= myDefaultEnableCooking;
 			prAutoSelectParent						= myDefaultAutoSelectParent;
 			prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
-			prAutoPinInstances						= myDefaultAutoPinInstances;
+
 			prPinSize 								= myDefaultPinSize;
 			prPinColour								= myDefaultPinColour;
+			prAutoPinInstances						= myDefaultAutoPinInstances;
 
 			prAddingPointsModeHotKey				= myDefaultAddingPointsModeHotKey;
 			prAddingPointsModeColour				= myDefaultAddingPointsModeColour;
+
 			prEditingPointsModeHotKey				= myDefaultEditingPointsModeHotKey;
 			prEditingPointsModeColour				= myDefaultEditingPointsModeColour;
 
@@ -276,6 +289,8 @@ namespace HAPI
 			prUnselectableGuideWireframeColour		= myDefaultUnselectableGuideWireframeColour;
 			prUnselectedGuideWireframeColour		= myDefaultUnselectedGuideWireframeColour;
 			prSelectedGuideWireframeColour			= myDefaultSelectedGuideWireframeColour;
+
+			prGuidePointSize						= myDefaultGuidePointSize;
 			prMinDistanceForPointSelection			= myDefaultMinDistanceForPointSelection;
 			prGuideMinDistanceForMidPointInsertion	= myDefaultGuideMinDistanceForMidPointInsertion;
 		}

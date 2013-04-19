@@ -2,7 +2,8 @@ Shader "HAPI/Point" {
 	
 	Properties
 	{
-		_Color ("Color", Color) = (1,1,1)
+		_PointSize ("PointSize", Float) = 10.0
+		_Color ("Color", Color) = (1,1,1,1)
 	}
 
 	SubShader {
@@ -16,27 +17,27 @@ Shader "HAPI/Point" {
 				#pragma vertex vert
 				#pragma fragment frag
 
+				float _PointSize;
+				float4 _Color;
+
 				struct appdata {
 					float4 pos : POSITION;
-					float4 colour : COLOR;
 				};
 
 				struct v2f {
 					float4 pos : SV_POSITION;
-					float4 colour : COLOR;
 					float size : PSIZE;
 				};
 
 				v2f vert( appdata v ) {
 					v2f o;
 					o.pos = mul( UNITY_MATRIX_MVP, v.pos );
-					o.colour = v.colour;
-					o.size = 10.0;
+					o.size = _PointSize;
 					return o;
 				}
 
 				half4 frag( v2f i ) : COLOR {
-					return half4( 0.0, 0.0, 0.0, 1 );
+					return _Color;
 				}
 
 			ENDCG
@@ -49,6 +50,9 @@ Shader "HAPI/Point" {
 				#pragma vertex vert
 				#pragma fragment frag
 
+				float _PointSize;
+				float4 _Color;
+
 				struct appdata {
 					float4 pos : POSITION;
 					float4 colour : COLOR;
@@ -64,12 +68,12 @@ Shader "HAPI/Point" {
 					v2f o;
 					o.pos = mul( UNITY_MATRIX_MVP, v.pos );
 					o.colour = v.colour;
-					o.size = 6.0;
+					o.size = _PointSize;
 					return o;
 				}
 
 				half4 frag( v2f i ) : COLOR {
-					return i.colour;
+					return i.colour * _Color;
 				}
 
 			ENDCG

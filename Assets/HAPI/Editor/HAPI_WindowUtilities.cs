@@ -107,6 +107,7 @@ public class HAPI_WindowUtilities : EditorWindow
 												  "Yes", "No" ) )
 				{
 					HAPI_Host.revertAllSettingsToDefaults();
+					HAPI_Host.myRepaintDelegate();
 				}
 			}
 		}
@@ -189,18 +190,8 @@ public class HAPI_WindowUtilities : EditorWindow
 						HAPI_Host.myRepaintDelegate();
 				}
 			}
-			
-			// Auto pin
-			{
-				bool value = HAPI_Host.prAutoPinInstances;
-				bool changed = HAPI_GUI.toggle( "auto_pin_instances", "Auto Pin Instances", ref value );
-				if ( changed )
-				{
-					HAPI_Host.prAutoPinInstances = value;
-					if ( HAPI_Host.myRepaintDelegate != null )
-						HAPI_Host.myRepaintDelegate();
-				}
-			}
+
+			HAPI_GUI.separator();
 			
 			// Pin Size
 			{
@@ -213,7 +204,7 @@ public class HAPI_WindowUtilities : EditorWindow
 						HAPI_Host.myRepaintDelegate();
 				}
 			}
-			
+
 			// Pin Colour
 			{
 				Color value = HAPI_Host.prPinColour;
@@ -225,7 +216,18 @@ public class HAPI_WindowUtilities : EditorWindow
 						HAPI_Host.myRepaintDelegate();
 				}
 			}
-			
+
+			// Auto pin
+			{
+				bool value = HAPI_Host.prAutoPinInstances;
+				bool changed = HAPI_GUI.toggle( "auto_pin_instances", "Auto Pin Instances", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prAutoPinInstances = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
 		}
 
 		myShowGeometryToolsSettings = EditorGUILayout.Foldout( myShowGeometryToolsSettings, 
@@ -260,6 +262,8 @@ public class HAPI_WindowUtilities : EditorWindow
 						HAPI_Host.myRepaintDelegate();
 				}
 			}
+
+			HAPI_GUI.separator();
 
 			// Editing Points Mode Hot Key
 			{
@@ -340,10 +344,27 @@ public class HAPI_WindowUtilities : EditorWindow
 				}
 			}
 
+			HAPI_GUI.separator();
+
+			// Guide Point Size
+			{
+				float value = HAPI_Host.prGuidePointSize;
+				bool changed = HAPI_GUI.floatField( "guide_point_size", "Guide Point Size", 
+													ref value, 4.0f, 40.0f );
+				if ( changed )
+				{
+					HAPI_Host.prGuidePointSize = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
 			// Min. Distance For Point Selection
 			{
 				float value = HAPI_Host.prMinDistanceForPointSelection;
-				bool changed = HAPI_GUI.floatField( "min_distance_for_point_selection", "Min. Distance For Point Selection", ref value );
+				bool changed = HAPI_GUI.floatField( "min_distance_for_point_selection", 
+													"Min. Distance For Point Selection", 
+													ref value, 1.0f, 20.0f );
 				if ( changed )
 				{
 					HAPI_Host.prMinDistanceForPointSelection = value;
@@ -355,7 +376,9 @@ public class HAPI_WindowUtilities : EditorWindow
 			// Guide Min. Distance For Mid Point Insertion
 			{
 				float value = HAPI_Host.prGuideMinDistanceForMidPointInsertion;
-				bool changed = HAPI_GUI.floatField( "guide_min_distance_for_mid_point_insertion", "Guide Min. Distance For Mid Point Insertion", ref value );
+				bool changed = HAPI_GUI.floatField( "guide_min_distance_for_mid_point_insertion", 
+													"Guide Min. Distance For Mid Point Insertion", 
+													ref value, 1.0f, 20.0f );
 				if ( changed )
 				{
 					HAPI_Host.prGuideMinDistanceForMidPointInsertion = value;
