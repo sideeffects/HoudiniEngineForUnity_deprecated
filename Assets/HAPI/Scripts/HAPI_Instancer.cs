@@ -218,16 +218,17 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 	public void drawPin( HAPI_InstancerOverrideInfo override_info )
 	{
-		GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiatePath );
 		
-		Vector3 position = override_info.translate;
+		float handle_size 	= HandleUtility.GetHandleSize( override_info.translate );		
 		
-		float handle_size 	= HandleUtility.GetHandleSize( position );
-		if( handle_size < 1 )
-			handle_size = 1;
+		Matrix4x4 old_handles_mat = Handles.matrix;
+		Matrix4x4 mat = new Matrix4x4();	
+		mat.m00 = 1; mat.m11 = 1; mat.m22 = 1; mat.m33 = 1;
 		
-						
-		Handles.color = new Color( 1.0f, 0, 0, 1.0f );					
+		mat.SetColumn( 3, new Vector4( 	override_info.translate.x, 
+										override_info.translate.y, 
+										override_info.translate.z, 1) );
+		Handles.matrix = mat;
 		
 		const float scale_factor_tweak1 = 0.17f;
 		const float scale_factor_tweak2 = 0.2f;
@@ -240,25 +241,34 @@ public class HAPI_Instancer : MonoBehaviour {
 			
 		Handles.color = new Color( 1.0f, 1.0f, 1.0f, 1.0f );		
 		
-		for( int ii = 0; ii < 14; ii++ )
-		{
-			
-			Handles.CylinderCap( override_info.instancePointNumber,
-								 position,
-								 Quaternion.Euler( new Vector3( 90, 0, 0)),
-								 scale_factor*scale_factor_tweak2 );
-			
-			position.y += scale_factor*scale_factor_tweak2;
-		}
 		
+		const float vertical_scale = 14.0f;
+		float pin_sphere_displacement = 14.0f*scale_factor*scale_factor_tweak2;
+		
+		mat = Handles.matrix;
+		mat.m11 = vertical_scale;
+		Handles.matrix = mat;
+		
+		Vector3 position = new Vector3( 0, 0, 0 );
+		position.y = 0.5f*pin_sphere_displacement/vertical_scale;
+		
+		Handles.CylinderCap( override_info.instancePointNumber,
+							 position,
+							 Quaternion.Euler( new Vector3( 90, 0, 0)),
+							 scale_factor*scale_factor_tweak2 );
+		
+		
+		mat.m11 = 1.0f;
+		Handles.matrix = mat;
 		
 		Handles.color = new Color( 0.7f, 0.0f, 0.0f, 1.0f );		
-		position.y += scale_factor*scale_factor_tweak2;
+		position.y = pin_sphere_displacement;
 		Handles.SphereCap  ( override_info.instancePointNumber,
 							 position,
 							 Quaternion.Euler( new Vector3( 90, 0, 0)),
 							 scale_factor*1.3f );
 		
+		Handles.matrix = old_handles_mat;
 		
 	}
 	
