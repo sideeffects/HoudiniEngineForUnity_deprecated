@@ -261,7 +261,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		mat.m11 = 1.0f;
 		Handles.matrix = mat;
 		
-		Handles.color = new Color( 0.7f, 0.0f, 0.0f, 1.0f );		
+		Handles.color = HAPI_Host.prPinColour;	
 		position.y = pin_sphere_displacement;
 		Handles.SphereCap  ( override_info.instancePointNumber,
 							 position,

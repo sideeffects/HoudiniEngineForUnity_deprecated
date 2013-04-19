@@ -214,6 +214,18 @@ public class HAPI_WindowUtilities : EditorWindow
 				}
 			}
 			
+			// Pin Colour
+			{
+				Color value = HAPI_Host.prPinColour;
+				bool changed = HAPI_GUI.colourField( "pin_colour", "Pin Color", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prPinColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+			
 		}
 
 		myShowGeometryToolsSettings = EditorGUILayout.Foldout( myShowGeometryToolsSettings, 
