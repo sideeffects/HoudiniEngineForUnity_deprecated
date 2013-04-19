@@ -25,8 +25,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
-	public void OnSceneGUI()
+	public override void OnSceneGUI()
 	{
+		base.OnSceneGUI();
+
 		if ( myAssetOTL.prShowPinnedInstances )
 			drawPinnedInstances();
 		

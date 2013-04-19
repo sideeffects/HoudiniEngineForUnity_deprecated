@@ -102,7 +102,12 @@ public class HAPI_WindowUtilities : EditorWindow
 
 			if ( GUILayout.Button( HAPI_GUIUtility.myRevertAllSettingsLabel ) )
 			{
-				HAPI_Host.revertAllSettingsToDefaults();
+				if ( EditorUtility.DisplayDialog( "Revert all settings?",
+												  "Are you sure you want to revert ALL Houdini plugin settings?", 
+												  "Yes", "No" ) )
+				{
+					HAPI_Host.revertAllSettingsToDefaults();
+				}
 			}
 		}
 

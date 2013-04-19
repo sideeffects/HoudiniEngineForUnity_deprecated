@@ -74,7 +74,15 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// This is called after OnSceneGUI sometimes for some reason.
 	}
 
-	public override void OnInspectorGUI() 
+	public override void refresh()
+	{
+		buildGuideGeometry();
+		//OnSceneGUI();
+
+		base.refresh();
+	}
+
+	public override void OnInspectorGUI()
 	{
 		if ( myAssetCurve == null )
 			return;
@@ -149,10 +157,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			if ( GUILayout.Button( myAddPointButtonLabel ) )
 			{
 				myAssetCurve.prIsAddingPoints = !myAssetCurve.prIsAddingPoints;
-				OnSceneGUI();
+				refresh();
 			}
-
-			GUI.enabled = !myAssetCurve.prIsAddingPoints;
 
 			Object target = (Object) myTarget;
 			if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
@@ -179,10 +185,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myUnbuiltChanges = true;
 	}
 	
-	public void OnSceneGUI() 
+	public override void OnSceneGUI() 
 	{
 		if ( myAssetCurve == null )
 			return;
+
+		base.OnSceneGUI();
 
 		// First Remake and Draw Guide Geometry if necessary.
 		if ( mySelectionMesh == null )

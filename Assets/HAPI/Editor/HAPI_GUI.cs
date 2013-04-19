@@ -665,7 +665,7 @@ public class HAPI_GUI : Editor
 		
 		// Draw control.
 		Color new_color = EditorGUILayout.ColorField( old_color );
-		
+
 		// Determine if value changed and update parameter value.
 		if ( new_color != old_color )
 		{

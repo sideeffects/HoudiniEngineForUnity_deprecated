@@ -45,7 +45,7 @@ namespace HAPI
 		
 		public void addMessageDetail( string detail )
 		{
-			myErrorMessage = myErrorMessage + "\n" + detail;	
+			myErrorMessage = myErrorMessage + "\n" + detail;
 		}
 		
 		public override string ToString()

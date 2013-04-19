@@ -40,11 +40,17 @@ public class HAPI_AssetGUI : Editor
 
 	}
 
+	public virtual void refresh()
+	{
+		Repaint();
+		SceneView.lastActiveSceneView.Repaint();
+	}
+
 	public override void OnInspectorGUI() 
 	{
 		try
 		{
-			HAPI_Host.myRepaintDelegate = this.Repaint;
+			HAPI_Host.myRepaintDelegate = this.refresh;
 
 			myDelayBuild	= false;
 			myParmChanges	= false;
@@ -188,6 +194,11 @@ public class HAPI_AssetGUI : Editor
 		{
 			Debug.LogError( e.ToString() );
 		}
+	}
+
+	public virtual void OnSceneGUI()
+	{
+		HAPI_Host.myRepaintDelegate = this.refresh;
 	}
 	
 	protected bool setTransformInput( int index )
