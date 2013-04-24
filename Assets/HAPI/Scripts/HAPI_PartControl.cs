@@ -31,6 +31,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 	public string		prPartName {	get { return myPartName; }		set { myPartName = value; } }
 	public int			prMaterialId {	get { return myMaterialId; }	set { myMaterialId = value; } }
 	public int[]		prVertexList {	get { return myVertexList; }	set { myVertexList = value; } }
+	public bool			prShowPointNumbers { get { return myShowPointNumbers; }	set { myShowPointNumbers = value; } }
 	
 	public int 			prInstancePointNumber { get { return myInstancePointNumber; } set { myInstancePointNumber = value; } }
 	public GameObject 	prObjectToInstantiate { get { return myObjectToInstantiate; } set { myObjectToInstantiate = value; } }
@@ -57,7 +58,8 @@ public class HAPI_PartControl : HAPI_GeoControl
 		prMaterialId 	= -1;
 		prVertexList 	= new int[ 1 ];
 		myInstancePointNumber = -1;
-		myTransformChanged = false;		
+		myTransformChanged = false;
+		myShowPointNumbers = false;
 	}
 	
 	public void Awake()
@@ -118,4 +120,5 @@ public class HAPI_PartControl : HAPI_GeoControl
 	[SerializeField] private GameObject		myObjectToInstantiate;
 	[SerializeField] private Matrix4x4		myLastLocalToWorld;
 	[SerializeField] private bool			myTransformChanged;
+	[SerializeField] private bool			myShowPointNumbers;
 }

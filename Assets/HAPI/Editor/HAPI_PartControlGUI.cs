@@ -32,6 +32,29 @@ public class HAPI_PartControlGUI : Editor
 		HAPI_PartControl control = target as HAPI_PartControl;
 		control.selectParent();
 		
+		
+		if ( control.prShowPointNumbers )
+		{
+			// Get position attributes.
+			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+			float[] pos_attr = new float[ 0 ];
+			HAPI_AssetUtility.getAttribute( myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId, 
+						  myPartControl.prPartId, "P", ref pos_attr_info, ref pos_attr, 
+						  HAPI_Host.getAttributeFloatData );
+			if ( !pos_attr_info.exists )
+				throw new HAPI_Error( "No position attribute found." );
+			
+			int point_count = pos_attr.Length / 3;
+			// Determine which control point was pressed for modification.
+			for ( int i = 0; i < point_count; ++i ) 
+			{
+				Vector3 position 	= new Vector3( -pos_attr[ i * 3 + 0 ], pos_attr[ i * 3 + 1 ], pos_attr[ i * 3 + 2 ] );
+				//float handle_size 	= HandleUtility.GetHandleSize( position ) * 0.06f;
+				
+				Handles.Label( position, new GUIContent("" + i ) );
+			}
+		}
+		
 		HAPI_Instancer instancer = instancerFromPartObject( control.gameObject );
 		if( instancer == null )
 			return;
@@ -63,26 +86,7 @@ public class HAPI_PartControlGUI : Editor
 		}
 			
 		
-		/*
-		// Get position attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
-		float[] pos_attr = new float[ 0 ];
-		HAPI_AssetUtility.getAttribute( myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId, 
-					  myPartControl.prPartId, "P", ref pos_attr_info, ref pos_attr, 
-					  HAPI_Host.getAttributeFloatData );
-		if ( !pos_attr_info.exists )
-			throw new HAPI_Error( "No position attribute found." );
 		
-		int point_count = pos_attr.Length / 3;
-		// Determine which control point was pressed for modification.
-		for ( int i = 0; i < point_count; ++i ) 
-		{
-			Vector3 position 	= new Vector3( -pos_attr[ i * 3 + 0 ], pos_attr[ i * 3 + 1 ], pos_attr[ i * 3 + 2 ] );
-			//float handle_size 	= HandleUtility.GetHandleSize( position ) * 0.06f;
-			
-			Handles.Label( position, new GUIContent( i + ": " + position.x + " " + position.y + " " + position.z ) );
-		}
-		*/
 	}
 	
 	public virtual void OnEnable() 
@@ -167,6 +171,17 @@ public class HAPI_PartControlGUI : Editor
 	
 	public override void OnInspectorGUI() 
 	{
+		
+		{
+			bool value = myPartControl.prShowPointNumbers;
+			bool changed = HAPI_GUI.toggle( "show_point_numbers", "Show Point Numbers", ref value );
+			myPartControl.prShowPointNumbers = value;
+			if (changed )
+			{
+				EditorUtility.SetDirty( myPartControl );
+			}
+		}
+		
 		if ( myPartControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT )
 		{
 			if ( GUILayout.Button( "Update Intermediate Result" ) ) 
@@ -246,6 +261,8 @@ public class HAPI_PartControlGUI : Editor
 			}			
 			
 		}
+		
+		
 		
 	}
 	
