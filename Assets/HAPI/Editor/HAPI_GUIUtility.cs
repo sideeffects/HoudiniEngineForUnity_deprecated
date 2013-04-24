@@ -223,6 +223,7 @@ public class HAPI_GUIUtility : Editor
 	public const string myCreateCurveLabel			= "Create Curve";
 	public const string myDefaultAssetLabel 		= "Houdini Asset";
 	public const string myDefaultPrefabLabel 		= "Houdini Asset";
+	public const string myPreferencesLabel 			= "Preferences...";
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private

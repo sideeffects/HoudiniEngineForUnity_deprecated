@@ -34,15 +34,60 @@ public class HAPI_WindowDebug : EditorWindow
 		public string myDirectoryPath;
 	}
 
-	[ MenuItem( "Window/" + HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Debug" ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + "Debug Window..." ) ]
 	public static void ShowWindow() 
 	{
+		float time = 0.0f;
 		// Show existing window instance. If one doesn't exist, make one.
 		EditorWindow.GetWindow< HAPI_WindowDebug >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Debug" );
+		
+		HAPI_Host.getTime( out time );
+		HAPI_WindowDebug.myTime = time;
 	}
 	
 	public void OnGUI() 
 	{
+		
+		if ( GUILayout.Button( HAPI_GUIUtility.mySaveHoudiniSceneLabel ) )
+		{
+			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
+			if ( hip_file_path != "" && HAPI_Host.hasScene() )
+				HAPI_Host.saveScene( hip_file_path );
+			else
+				Debug.LogError( "Nothing to save." );
+		}
+		
+		if ( GUILayout.Button( HAPI_GUIUtility.myLoadAssetLabel ) )
+		{
+			string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
+			HAPI_GUIUtility.instantiateAsset( asset_file_path );
+		}
+
+		if ( HAPI_GUI.floatField( "global_time", "Global Time", ref myTime ) )
+		{
+			try
+			{
+				if ( !HAPI.HAPI_SetPath.prIsPathSet )
+				{
+					HAPI.HAPI_SetPath.setPath();
+					if ( !HAPI.HAPI_SetPath.prIsPathSet )
+					{
+						Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
+						return;
+					}
+					HAPI_Host.initialize();
+				}
+				HAPI_Host.setTime( myTime );
+			}
+			catch ( HAPI_Error error )
+			{
+				Debug.LogError( error.ToString() );
+			}
+		}
+
+		HAPI_GUI.separator();
+		
+		
 		string path = Application.dataPath;
 		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 		
@@ -145,4 +190,5 @@ public class HAPI_WindowDebug : EditorWindow
 	private static float 			myLineHeight 			= 16;
 	private static GUILayoutOption 	myLineHeightGUI 		= GUILayout.Height( myLineHeight );
 	private static Vector2 			myScrollPosition;
+	private static float			myTime;
 }

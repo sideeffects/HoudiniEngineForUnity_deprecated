@@ -75,4 +75,10 @@ public class HAPI_Menu : MonoBehaviour
 		Selection.objects 		= selection;
 	}
 	
+	
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myPreferencesLabel ) ]
+	static private void preferences()
+	{
+		HAPI_PreferencesWindow.ShowWindow();
+	}
 }
