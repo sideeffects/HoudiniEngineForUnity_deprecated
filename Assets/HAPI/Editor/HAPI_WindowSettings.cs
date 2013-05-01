@@ -21,7 +21,7 @@ using System.IO;
 using System.Linq;
 using HAPI;
 
-public class HAPI_PreferencesWindow : EditorWindow 
+public class HAPI_WindowSettings : EditorWindow 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -29,7 +29,8 @@ public class HAPI_PreferencesWindow : EditorWindow
 	public static void ShowWindow() 
 	{
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow< HAPI_PreferencesWindow >( false, " Preferences" );		
+		EditorWindow.GetWindow< HAPI_WindowSettings >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + 
+													   " " + HAPI_GUIUtility.mySettingsLabel );
 
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
 		{
@@ -69,24 +70,18 @@ public class HAPI_PreferencesWindow : EditorWindow
 		
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
 
-		myShowUtility = EditorGUILayout.Foldout( myShowUtility, new GUIContent( "Utility" ) );
-
-		if ( myShowUtility )
-		{			
-
-			if ( GUILayout.Button( HAPI_GUIUtility.myRevertAllSettingsLabel ) )
+		if ( GUILayout.Button( HAPI_GUIUtility.myRevertAllSettingsLabel ) )
+		{
+			if ( EditorUtility.DisplayDialog( "Revert all settings?",
+												"Are you sure you want to revert ALL Houdini plugin settings?", 
+												"Yes", "No" ) )
 			{
-				if ( EditorUtility.DisplayDialog( "Revert all settings?",
-												  "Are you sure you want to revert ALL Houdini plugin settings?", 
-												  "Yes", "No" ) )
-				{
-					HAPI_Host.revertAllSettingsToDefaults();
-					HAPI_Host.myRepaintDelegate();
-				}
+				HAPI_Host.revertAllSettingsToDefaults();
+				HAPI_Host.myRepaintDelegate();
 			}
 		}
 
-		myShowGeneralSettings = EditorGUILayout.Foldout( myShowGeneralSettings, new GUIContent( "General Settings" ) );
+		myShowGeneralSettings = EditorGUILayout.Foldout( myShowGeneralSettings, new GUIContent( "General" ) );
 		if ( myShowGeneralSettings )
 		{
 			// Collision Group Name
@@ -205,7 +200,7 @@ public class HAPI_PreferencesWindow : EditorWindow
 		}
 
 		myShowGeometryToolsSettings = EditorGUILayout.Foldout( myShowGeometryToolsSettings, 
-															   new GUIContent( "Geometry Tools Settings" ) );
+															   new GUIContent( "Geometry Tools" ) );
 		if ( myShowGeometryToolsSettings )
 		{
 			// Adding Points Mode Hot Key
@@ -362,7 +357,7 @@ public class HAPI_PreferencesWindow : EditorWindow
 			}
 		}
 
-		myShowCurveSettings = EditorGUILayout.Foldout( myShowCurveSettings, new GUIContent( "Curve Settings" ) );
+		myShowCurveSettings = EditorGUILayout.Foldout( myShowCurveSettings, new GUIContent( "Curves" ) );
 		if ( myShowCurveSettings )
 		{
 			// Curve Primitive Type Default
@@ -396,7 +391,6 @@ public class HAPI_PreferencesWindow : EditorWindow
 	
 	private static bool				myEnableDraw					= true;
 
-	private static bool				myShowUtility					= true;
 	private static bool				myShowGeneralSettings			= false;
 	private static bool				myShowGeometryToolsSettings		= false;
 	private static bool				myShowCurveSettings				= false;

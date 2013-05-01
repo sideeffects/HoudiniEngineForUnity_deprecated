@@ -34,12 +34,12 @@ public class HAPI_WindowDebug : EditorWindow
 		public string myDirectoryPath;
 	}
 
-	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + "Debug Window..." ) ]
 	public static void ShowWindow() 
 	{
 		float time = 0.0f;
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow< HAPI_WindowDebug >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Debug" );
+		EditorWindow.GetWindow< HAPI_WindowDebug >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME +
+													" " + HAPI_GUIUtility.myDebugLabel );
 		
 		HAPI_Host.getTime( out time );
 		HAPI_WindowDebug.myTime = time;

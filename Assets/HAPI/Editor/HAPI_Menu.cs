@@ -28,24 +28,37 @@ public class HAPI_Menu : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 	
-	/// <summary>
-	/// 	Prompts the user for a path to a .otl file and creates a HAPI game object from it.
-	/// </summary>
-	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadAssetLabel ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadAssetLabel, false, 0 ) ]
 	static private void createHAPIObject() 
 	{
 		string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
 		HAPI_GUIUtility.instantiateAsset( asset_file_path );
 	}
 	
-	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel, false, 1 ) ]
 	static private void loadHipFile() 
 	{
 		string hip_file_path = HAPI_GUIUtility.promptForHIPPath();
 		HAPI_GUIUtility.loadHipFile( hip_file_path );
 	}
+
+	// -----------------------------------------------------------------------
 	
-	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myCreateCurveLabel ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myDebugLabel + " Window", false, 50 ) ]
+	static private void debugWindow()
+	{
+		HAPI_WindowDebug.ShowWindow();
+	}
+
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.mySettingsLabel + " Window", false, 51 ) ]
+	static private void settingsWindow()
+	{
+		HAPI_WindowSettings.ShowWindow();
+	}
+
+	// -----------------------------------------------------------------------
+
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myCreateCurveLabel, false, 100 ) ]
 	static private void createCurve()
 	{
 		// Create game object.
@@ -73,12 +86,5 @@ public class HAPI_Menu : MonoBehaviour
 		GameObject[] selection 	= new GameObject[ 1 ];
 		selection[ 0 ] 			= game_object;
 		Selection.objects 		= selection;
-	}
-	
-	
-	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myPreferencesLabel ) ]
-	static private void preferences()
-	{
-		HAPI_PreferencesWindow.ShowWindow();
 	}
 }
