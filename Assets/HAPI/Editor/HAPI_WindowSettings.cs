@@ -217,7 +217,11 @@ public class HAPI_WindowSettings : EditorWindow
 				bool changed = HAPI_GUI.dropdown( "adding_points_mode_hot_key", "Adding Points Key", 
 												  ref value, labels, values );
 				if ( changed )
+				{
 					HAPI_Host.prAddingPointsModeHotKey = (KeyCode) value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
 			}
 
 			// Adding Points Mode Colour
@@ -248,7 +252,11 @@ public class HAPI_WindowSettings : EditorWindow
 				bool changed = HAPI_GUI.dropdown( "editing_points_mode_hot_key", "Editing Points Key", 
 												  ref value, labels, values );
 				if ( changed )
+				{
 					HAPI_Host.prEditingPointsModeHotKey = (KeyCode) value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
 			}
 
 			// Editing Points Mode Colour

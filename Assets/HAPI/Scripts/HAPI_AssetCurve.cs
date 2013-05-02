@@ -24,7 +24,17 @@ using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
 public class HAPI_AssetCurve : HAPI_Asset
-{	
+{
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public Enums
+	
+	public enum Mode
+	{
+		NONE,
+		ADD,
+		EDIT
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -35,12 +45,22 @@ public class HAPI_AssetCurve : HAPI_Asset
 	public Vector3[]		prVertices {				get { return myVertices; } 
 														set { myVertices = value; } }
 	
-	public bool				prIsAddingPoints {			get { return myIsAddingPoints; } 
-														set { myIsAddingPoints = value; } }
+	public Mode				prCurrentMode {				get { return myCurrentMode; }
+														set { myCurrentMode = value; } }
+	public bool				prIsAddingPoints {			get { return ( myCurrentMode == Mode.ADD ); } 
+														set { myCurrentMode = 
+																( value ? Mode.ADD 
+																		: ( myCurrentMode == Mode.ADD 
+																			? Mode.NONE 
+																			: myCurrentMode ) ); } }
+	public bool				prIsEditingPoints {			get { return ( myCurrentMode == Mode.EDIT ); } 
+														set { myCurrentMode = 
+																( value ? Mode.EDIT 
+																		: ( myCurrentMode == Mode.EDIT 
+																			? Mode.NONE 
+																			: myCurrentMode ) ); } }
 	public bool				prModeChangeWait {			get { return myModeChangeWait; } 
 														set { myModeChangeWait = value; } }
-	public bool				prIsEditingPoints {			get { return myIsEditingPoints; } 
-														set { myIsEditingPoints = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -173,9 +193,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 		prPoints 					= new List< Vector3 >();
 		prVertices 					= new Vector3[ 0 ];
 
-		myIsAddingPoints			= true;
+		prCurrentMode				= Mode.ADD;
 		myModeChangeWait			= false;
-		myIsEditingPoints			= false;
 	}
 	
 	public override bool build() 
@@ -347,8 +366,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 	[SerializeField] private List< Vector3 >	myPoints;
 	[SerializeField] private Vector3[]			myVertices;
 
-	[SerializeField] private bool				myIsAddingPoints;
+	[SerializeField] private Mode				myCurrentMode;
 	[SerializeField] private bool				myModeChangeWait;
-	[SerializeField] private bool				myIsEditingPoints;
 
 }

@@ -26,13 +26,6 @@ using HAPI;
 [ CustomEditor( typeof( HAPI_AssetCurve ) ) ]
 public class HAPI_AssetGUICurve : HAPI_AssetGUI 
 {
-	public enum Mode
-	{
-		NONE,
-		ADD,
-		EDIT
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
@@ -42,7 +35,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myAssetCurve			= myAsset as HAPI_AssetCurve;
 
 		myForceInspectorRedraw	= false;
-		myAddPointButtonLabel	= "Add Points";
 		myTarget				= null;
 
 		myIsMouseDown			= false;
@@ -63,7 +55,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myConnectionMesh		= null;
 		myConnectionMaterial	= null;
 
-		myLastMode				= Mode.NONE;
+		myLastMode				= HAPI_AssetCurve.Mode.NONE;
 		
 		if ( GUI.changed )
 			myAssetCurve.build();
@@ -77,8 +69,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	public override void refresh()
 	{
 		buildGuideGeometry();
-		//OnSceneGUI();
-
 		base.refresh();
 	}
 
@@ -149,16 +139,18 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myDelayBuild = false;
 		if ( myAssetCurve.prShowAssetControls )
 		{
-			if ( myAssetCurve.prIsAddingPoints )
-				myAddPointButtonLabel = "Stop Adding Points";
-			else
-				myAddPointButtonLabel = "Add Points";
+			GUIContent[] modes = new GUIContent[ 3 ];
+			modes[ 0 ] = new GUIContent( "View" );
+			modes[ 1 ] = new GUIContent( "Add Points" );
+			modes[ 2 ] = new GUIContent( "Edit Points" );
+			HAPI_AssetCurve.Mode last_mode = myAssetCurve.prCurrentMode;
+			myAssetCurve.prCurrentMode = 
+				(HAPI_AssetCurve.Mode) GUILayout.Toolbar( (int) last_mode, modes );
 
-			if ( GUILayout.Button( myAddPointButtonLabel ) )
-			{
-				myAssetCurve.prIsAddingPoints = !myAssetCurve.prIsAddingPoints;
+			if ( myAssetCurve.prCurrentMode != last_mode )
 				refresh();
-			}
+
+			HAPI_GUI.separator();
 
 			Object target = (Object) myTarget;
 			if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
@@ -212,11 +204,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( current_event.type == EventType.Layout )
 			decideModes( ref current_event );
 
+		// Draw scene UI.
+		drawSceneUI();
+
 		// Add points.
 		if ( myAssetCurve.prIsAddingPoints )
 		{
-			myAssetCurve.prIsAddingPoints = drawModeBorders( HAPI_Host.prAddingPointsModeColour, mouse_position );
-			
 			if ( !current_event.alt )
 			{
 				Vector3 position	= Vector3.zero;
@@ -334,10 +327,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		}
 		else if ( myAssetCurve.prIsEditingPoints )
 		{
-			myAssetCurve.prIsEditingPoints = drawModeBorders( HAPI_Host.prEditingPointsModeColour, mouse_position );
-			if ( !myAssetCurve.prIsEditingPoints )
-				clearSelection();
-
 			if ( !current_event.alt )
 			{
 				// Track mouse dragging.
@@ -413,7 +402,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					Event.current.Use();
 			}
 		}
-		else if ( myForceInspectorRedraw )
+		
+		if ( myForceInspectorRedraw )
 		{
 			Repaint();
 			myForceInspectorRedraw = false;
@@ -689,23 +679,23 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myConnectionMesh.SetIndices( connection_indices, MeshTopology.LineStrip, 0 );
 	}
 
-	private void changeModes( ref bool add_points_mode, ref bool edit_points_mode, Mode mode )
+	private void changeModes( ref bool add_points_mode, ref bool edit_points_mode, HAPI_AssetCurve.Mode mode )
 	{
 		switch ( mode )
 		{
-			case Mode.NONE: 
+			case HAPI_AssetCurve.Mode.NONE: 
 				{
 					add_points_mode = false;
 					edit_points_mode = false;
 					break;
 				}
-			case Mode.ADD:
+			case HAPI_AssetCurve.Mode.ADD:
 				{
 					add_points_mode = true;
 					edit_points_mode = false;
 					break;
 				}
-			case Mode.EDIT:
+			case HAPI_AssetCurve.Mode.EDIT:
 				{
 					add_points_mode = false;
 					edit_points_mode = true;
@@ -729,7 +719,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		{
 			if ( !mode_change_wait && edit_points_mode_key )
 			{
-				myLastMode			= Mode.ADD;
+				myLastMode			= HAPI_AssetCurve.Mode.ADD;
 
 				add_points_mode		= false;
 				edit_points_mode	= true;
@@ -745,7 +735,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		{
 			if ( !mode_change_wait && add_points_mode_key )
 			{
-				myLastMode			= Mode.EDIT;
+				myLastMode			= HAPI_AssetCurve.Mode.EDIT;
 
 				add_points_mode		= true;
 				edit_points_mode	= false;
@@ -763,13 +753,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			{
 				add_points_mode		= true;
 				mode_change_wait	= true;
-				myLastMode			= Mode.NONE;
+				myLastMode			= HAPI_AssetCurve.Mode.NONE;
 			}
 			else if ( edit_points_mode_key )
 			{
 				edit_points_mode	= true;
 				mode_change_wait	= true;
-				myLastMode			= Mode.NONE;
+				myLastMode			= HAPI_AssetCurve.Mode.NONE;
 			}
 		}
 
@@ -796,56 +786,161 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myAssetCurve.prModeChangeWait	= mode_change_wait;
 	}
 
-	private bool drawModeBorders( Color color, Vector3 mouse_position )
+	private void drawSceneUI()
 	{
+		string title_text = HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Curve";
+		string add_hotkey_string = HAPI_Host.prAddingPointsModeHotKey.ToString();
+		string edit_hotkey_string = HAPI_Host.prEditingPointsModeHotKey.ToString();
+		string help_text = "Hold <b>" + add_hotkey_string + "</b> to add points or <b>" + 
+						   edit_hotkey_string + "</b> to edit points.";
+
+		int skin = EditorPrefs.GetInt( "UserSkin" );
+		Color box_color = ( skin == 0 ? new Color( 0.9f, 0.9f, 0.9f, 1.0f )
+									  : new Color( 0.5f, 0.5f, 0.5f, 1.0f ) );
+		Color text_color = Color.white;
+
+		if ( myAssetCurve.prIsAddingPoints )
+		{
+			help_text = "Click in space to add the next point or on a line segment to add a midpoint.";
+			box_color = HAPI_Host.prAddingPointsModeColour;
+		}
+		else if ( myAssetCurve.prIsEditingPoints )
+		{
+			help_text = "Click or drag to select points. Press <b>Delete</b> to delete selected points.";
+			box_color = HAPI_Host.prEditingPointsModeColour;
+		}
+
+		Color original_color		= GUI.color;
+		
+		float scene_width			= myTempCamera.pixelWidth;
+		float scene_height			= myTempCamera.pixelHeight;
+		float border_width			= myActiveBorderWidth;
+		float border_padding		= mySceneUIBorderPadding;
+		float border_total			= border_width + border_padding;
+		float line_height			= mySceneUILineHeight;
+		float line_padding			= mySceneUILinePadding;
+		float double_line_padding	= 2.0f * line_padding;
+
+		GUIStyle normal_text_style	= new GUIStyle( GUI.skin.label );
+		normal_text_style.alignment	= TextAnchor.MiddleLeft;
+		normal_text_style.fontStyle	= FontStyle.Normal;
+		normal_text_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
+
+		GUIStyle bold_text_style	= new GUIStyle( GUI.skin.label );
+		bold_text_style.alignment	= TextAnchor.MiddleLeft;
+		bold_text_style.fontStyle	= FontStyle.Bold;
+		bold_text_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
+		
+		float box_height			= line_height;
+		float box_top				= scene_height - border_total - box_height;
+
+		float title_box_width		= bold_text_style.CalcSize( new GUIContent( title_text ) ).x;
+		title_box_width				+= double_line_padding;
+
+		float mode_box_width		= mySceneUIModeIndicatorWidth;
+		float help_box_width		= scene_width - title_box_width - mode_box_width - 
+									  ( 2.0f * border_total ) - ( 2.0f * border_padding );
+		
+		float title_box_right		= border_total;
+		float mode_box_right		= border_total + title_box_width + border_padding;
+		float help_box_right		= mode_box_right + mode_box_width + border_padding;
+
+		// Create background boxes texture.
+		Texture2D box_texture		= new Texture2D( 1, 1 );
+		box_texture.wrapMode		= TextureWrapMode.Repeat;
+		box_texture.SetPixel( 0, 0, new Color( box_color.r - mySceneUIDarkeningFactor, 
+											   box_color.g - mySceneUIDarkeningFactor, 
+											   box_color.b - mySceneUIDarkeningFactor, 0.5f ) );
+		box_texture.Apply();
+
+		// Set up rectangles for the boxes and the labels.
+		Rect title_box_rect  = new Rect( title_box_right, box_top, title_box_width, box_height );
+		Rect mode_box_rect	 = new Rect( mode_box_right, box_top, mode_box_width, box_height );
+		Rect help_box_rect	 = new Rect( help_box_right, box_top, help_box_width, box_height );
+		Rect title_text_rect = new Rect( title_box_right + line_padding, box_top, 
+										 title_box_width - double_line_padding, box_height - double_line_padding );
+		Rect mode_text_rect  = new Rect( mode_box_right + line_padding, box_top, 
+										 mode_box_width - double_line_padding, box_height - double_line_padding );
+		Rect help_text_rect  = new Rect( help_box_right + line_padding, box_top, 
+										 help_box_width - double_line_padding, box_height - double_line_padding );
+
+		// Start Drawing --------------------------------------------------------------------------------------------
 		Handles.BeginGUI();
 		GUILayout.BeginArea( new Rect( 0, 0, Screen.width, Screen.height ) );
 
-		// Draw description and exit button of curve editing mode.
-		GUIStyle text_style		= new GUIStyle( GUI.skin.label );
-		text_style.alignment	= TextAnchor.UpperLeft;
-		text_style.fontStyle	= FontStyle.Bold;
-		Color original_color	= GUI.color;
-		GUI.color				= color;
-		GUI.Box( new Rect( myActiveBorderWidth + 4, myActiveBorderWidth + 4, 220, 130 ), "" );
-		GUI.Label( new Rect( myActiveBorderWidth + 5, myActiveBorderWidth + 4, 200, 20 ), "Curve Editing Mode", text_style );
-		
-		text_style.fontStyle	= FontStyle.Normal;
-		text_style.wordWrap		= true;
-		GUI.Label( new Rect( myActiveBorderWidth + 5, myActiveBorderWidth + 21, 200, 80 ), "Click anywhere on the screen to add a new curve control point. You can also move existing points in this mode but you cannot select any other object. Press (ENTER) or (ESC) when done.", text_style );
-			
-		bool cancel_mode		= !GUI.Button( new Rect( myActiveBorderWidth + 100, myActiveBorderWidth + 108, 120, 20 ), "Exit Curve Mode" );
+		// Draw the background boxes for the Scene UI.
+		GUI.color = box_color;
+		GUI.DrawTexture( title_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( help_box_rect, box_texture, ScaleMode.StretchToFill );
 
-		// Draw yellow mode lines around the Scene view.
-		Texture2D box_texture	= new Texture2D( 1, 1 );
-		box_texture.SetPixel( 0, 0, new Color( color.r, color.g, color.b, 0.6f ) );
-		box_texture.wrapMode	= TextureWrapMode.Repeat;
-		box_texture.Apply();
-		float width				= myTempCamera.pixelWidth;
-		float height			= myTempCamera.pixelHeight;
-		float border_width		= myActiveBorderWidth;
-		GUI.DrawTexture( new Rect( 0, 0, width, border_width ),								// Top
-						 box_texture, ScaleMode.StretchToFill );
-		GUI.DrawTexture( new Rect( 0, border_width, border_width, height - border_width ),	// Right
-						 box_texture, ScaleMode.StretchToFill );
-		GUI.DrawTexture( new Rect( border_width, height - border_width, width, height ),	// Bottom
-						 box_texture, ScaleMode.StretchToFill );
-		GUI.DrawTexture( new Rect( width - border_width, border_width,						// Left
-								   width, height - border_width - border_width ), 
-						 box_texture, ScaleMode.StretchToFill );
+		// Draw the labels for the curve and the help.
+		GUI.color = text_color;
+		GUI.Label( title_text_rect, title_text, bold_text_style );
+ 		GUI.Label( help_text_rect, help_text, normal_text_style );
+
+		// Set up mode selection toolbar.
+		GUIStyle button_style	= new GUIStyle( GUI.skin.button );
+		button_style.alignment	= TextAnchor.MiddleCenter;
+		button_style.fontStyle	= FontStyle.Normal;
+		button_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
+		Color toolbar_color		= box_color;
+		toolbar_color.r			+= mySceneUIBrightningFactor;
+		toolbar_color.g			+= mySceneUIBrightningFactor;
+		toolbar_color.b			+= mySceneUIBrightningFactor;
+		GUI.color				= toolbar_color;
+		GUIContent[] modes		= new GUIContent[ 3 ];
+		modes[ 0 ]				= new GUIContent( "View" );
+		modes[ 1 ]				= new GUIContent( "Add" );
+		modes[ 2 ]				= new GUIContent( "Edit" );
+
+		// Draw the mode selection toolbar.
+		// Note: We want to disable the toolbar if a mode key is being held down because
+		// if a button is pressed the current mode will imidiatly switch back to the mode
+		// whos key is being held down...
+		GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
+								  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
+		myAssetCurve.prCurrentMode = (HAPI_AssetCurve.Mode) GUI.Toolbar( mode_text_rect, 
+																		 (int) myAssetCurve.prCurrentMode, 
+																		 modes );
+		GUI.enabled = true;
 
 		// Draw selection rectangle.
-		// NOTE: If we must ALWAYS draw this rectangle, even if no selection is being made.
-		// If we add a decision statement here it will affect the drawing order and render
-		// the full-screen button, used for preventing deselection of the curve, useless.
-		GUI.color				= Color.white;
-		GUI.Box( mySelectionArea, "" );
-		GUI.color				= original_color;
+		if ( myAssetCurve.prIsEditingPoints )
+		{
+			GUI.color = Color.white;
+			GUI.Box( mySelectionArea, "" );
+		}
+
+		// Draw yellow mode lines around the Scene view.
+		if ( myAssetCurve.prCurrentMode != HAPI_AssetCurve.Mode.NONE )
+		{
+			// Create texture.
+			Texture2D border_texture	= new Texture2D( 1, 1 );
+			border_texture.wrapMode		= TextureWrapMode.Repeat;
+			border_texture.SetPixel( 0, 0, new Color( box_color.r, box_color.g, box_color.b, 0.6f ) );
+			border_texture.Apply();
+
+			float width					= myTempCamera.pixelWidth;
+			float height				= myTempCamera.pixelHeight;
+
+			GUI.DrawTexture( new Rect( 0, 0, width, border_width ),								// Top
+							 border_texture, ScaleMode.StretchToFill );
+			GUI.DrawTexture( new Rect( 0, border_width, border_width, height - border_width ),	// Right
+							 border_texture, ScaleMode.StretchToFill );
+			GUI.DrawTexture( new Rect( border_width, height - border_width, width, height ),	// Bottom
+							 border_texture, ScaleMode.StretchToFill );
+			GUI.DrawTexture( new Rect( width - border_width, border_width,						// Left
+									   width, height - border_width - border_width ), 
+							 border_texture, ScaleMode.StretchToFill );
+		}
 
 		GUILayout.EndArea();
 		Handles.EndGUI();
-
-		return cancel_mode;
+		// Stop Drawing ---------------------------------------------------------------------------------------------
+	
+		// Restore GUI colour.
+		GUI.color = original_color;
 	}
 
 	public static bool myIsTransformHandleHidden {
@@ -864,7 +959,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	private HAPI_AssetCurve		myAssetCurve;
 
 	private bool				myForceInspectorRedraw;
-	private string				myAddPointButtonLabel;
 
 	private const float			myActiveBorderWidth = 5;
 	private Camera				myTempCamera;
@@ -874,6 +968,15 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 	private bool				myIsMouseDown;
 	private KeyCode				myCurrentlyPressedKey;
+
+	private const float			mySceneUIBorderPadding = 2.0f;
+	private const float			mySceneUILineHeight = 18.0f;
+	private const float			mySceneUILinePadding = 1.0f;
+	private const int			mySceneUIFontSizeFromLineHeightMod = 8;
+	private const float			mySceneUIModeIndicatorWidth = 160.0f;
+	private const float			mySceneUIDarkeningFactor = 0.5f;
+	private const float			mySceneUIBrightningFactor = 0.2f;
+
 	private Vector3				myFirstMousePosition;
 	private const float			myBigButtonHandleSizeMultiplier = 1000000.0f;
 	private const float			myIntersectionRayLength = 5000.0f;
@@ -897,5 +1000,5 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	private Mesh				myConnectionMesh;
 	private Material			myConnectionMaterial;
 
-	private Mode				myLastMode;
+	private HAPI_AssetCurve.Mode myLastMode;
 }
