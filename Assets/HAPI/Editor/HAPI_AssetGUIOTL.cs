@@ -114,6 +114,14 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				generateAssetOptionControls();
 			}
 			
+			myAssetOTL.prShowBakeOptions = 
+				EditorGUILayout.Foldout( myAssetOTL.prShowBakeOptions, new GUIContent( "Bake Animations" ) );
+			
+			if( myAssetOTL.prShowBakeOptions )
+			{
+				generateAssetBakeControls();
+			}
+			
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
@@ -143,6 +151,63 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
+	
+	private void generateAssetBakeControls()
+	{
+		//Start Time
+		{
+			float value = myAsset.prBakeStartTime;
+			bool changed = HAPI_GUI.floatField( "bake_start_time", "Start Time", ref value );
+			if( changed )
+			{
+				myAsset.prBakeStartTime = value;
+			}
+		}
+		
+		//End Time
+		{
+			float value = myAsset.prBakeEndTime;
+			bool changed = HAPI_GUI.floatField( "bake_end_time", "End Time", ref value );
+			if( changed )
+			{
+				myAsset.prBakeEndTime = value;
+			}
+		}
+		
+		//Samples per second
+		{
+			
+			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "bake_samples_per_second", "Samples Per Second" );
+			gui_parm.hasMin = true;
+			gui_parm.hasMax = true;
+			gui_parm.hasUIMin = true;
+			gui_parm.hasUIMax = true;
+			gui_parm.min = 1;
+			gui_parm.max = 120;
+			gui_parm.UIMin = 1;
+			gui_parm.UIMax = 120;
+			
+			bool delay_build = false;
+			int[] values = new int[1];
+			values[0] = myAsset.prBakeSamplesPerSecond;
+			bool changed = HAPI_GUI.intField( ref gui_parm,	ref delay_build,
+								 ref values );
+				
+			if( changed )
+			{
+				myAsset.prBakeSamplesPerSecond = values[0];
+								
+			}
+		}
+		
+		if ( GUILayout.Button( "Bake" ) ) 
+		{
+			Debug.Log("Baking anim start = " + myAsset.prBakeStartTime + " end=" + myAsset.prBakeEndTime + " samplesPerSec=" + myAsset.prBakeSamplesPerSecond);
+			Debug.LogError("Baking Animation feature not yet complete.");
+		}
+		
+	}
+	
 	private void generateAssetOptionControls()
 	{
 		// Show Geometries

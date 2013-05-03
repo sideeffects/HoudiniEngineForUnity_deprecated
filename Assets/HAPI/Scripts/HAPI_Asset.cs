@@ -133,6 +133,17 @@ public abstract class HAPI_Asset : HAPI_Control
 	public HAPI_Transform[] 		prObjectTransforms {			get { return myObjectTransforms; } 
 																	set { myObjectTransforms = value; } }
 	
+	
+	// Baking ------------------------------------------------------------------------------------------------------
+	public float					prBakeStartTime {				get { return myBakeStartTime; }
+																	set { myBakeStartTime = value; } }
+	
+	public float					prBakeEndTime {					get { return myBakeEndTime; }
+																	set { myBakeEndTime = value; } }
+	
+	public int						prBakeSamplesPerSecond {				get { return myBakeSamplesPerSecond; }
+																	set { myBakeSamplesPerSecond = value; } }
+	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	public bool 					prShowObjectControls {			get { return myShowObjectControls; } 
@@ -141,6 +152,8 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myShowAssetControls = value; } }
 	public bool 					prShowAssetOptions {			get { return myShowAssetOptions; } 
 																	set { myShowAssetOptions = value; } }
+	public bool 					prShowBakeOptions {				get { return myShowBakeOptions; } 
+																	set { myShowBakeOptions = value; } }
 	public bool						prShowInputControls {			get { return myShowInputControls; } 
 																	set { myShowInputControls = value; } }
 	public bool						prAutoSelectAssetNode {			get { return myAutoSelectAssetNode; } 
@@ -479,11 +492,17 @@ public abstract class HAPI_Asset : HAPI_Control
 		prGameObjects 				= new GameObject[ 0 ];
 		prObjectTransforms 			= new HAPI_Transform[ 0 ];
 		
+		// Baking ---------------------------------------------------------------------------------------------------
+		prBakeStartTime				= 0.0f;
+		prBakeEndTime				= 1.0f;
+		prBakeSamplesPerSecond		= 30;
+		
 		// GUI ------------------------------------------------------------------------------------------------------
 		
 		prShowObjectControls 		= true;
 		prShowAssetControls 		= true;
 		prShowAssetOptions			= false;
+		prShowBakeOptions			= false;
 		prShowInputControls 		= true;
 		prAutoSelectAssetNode 		= true;
 		prEnableLogging				= false;
@@ -1142,11 +1161,19 @@ public abstract class HAPI_Asset : HAPI_Control
 					 private HAPI_ObjectInfo[] 		myObjects;
 					 private HAPI_Transform[] 		myObjectTransforms;
 	
+	
+	// Baking -------------------------------------------------------------------------------------------------------
+	[SerializeField] private float 					myBakeStartTime;																		
+	[SerializeField] private float					myBakeEndTime;																		
+	[SerializeField] private int 					myBakeSamplesPerSecond;
+
+	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private bool 					myShowObjectControls;
 	[SerializeField] private bool 					myShowAssetControls;
-	[SerializeField] private bool 					myShowAssetOptions;	
+	[SerializeField] private bool 					myShowAssetOptions;
+	[SerializeField] private bool 					myShowBakeOptions;
 	[SerializeField] private bool					myShowInputControls;
 	[SerializeField] private bool					myAutoSelectAssetNode;
 	[SerializeField] private bool					myEnableLogging;
