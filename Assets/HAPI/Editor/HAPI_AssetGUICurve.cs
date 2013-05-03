@@ -72,6 +72,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		base.refresh();
 	}
 
+	public override void deselect()
+	{
+		base.deselect();
+	
+		myIsTransformHandleHidden = false;
+	}
+
 	public override void OnInspectorGUI()
 	{
 		if ( myAssetCurve == null )
@@ -192,7 +199,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myTempCamera = Camera.current;
 
 		Event current_event 		= Event.current;
-		Vector3 mouse_position		= getMousePosition( ref current_event ); 
+		Vector3 mouse_position		= getMousePosition( ref current_event );
 
 		// Set appropriate handles matrix.
 		Handles.matrix = myAssetCurve.transform.localToWorldMatrix;
@@ -795,8 +802,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 						   edit_hotkey_string + "</b> to edit points.";
 
 		int skin = EditorPrefs.GetInt( "UserSkin" );
-		Color box_color = ( skin == 0 ? new Color( 0.9f, 0.9f, 0.9f, 1.0f )
-									  : new Color( 0.5f, 0.5f, 0.5f, 1.0f ) );
+		Color box_color = ( skin == 0 ? mySceneUILightColour : mySceneUIDarkColour );
 		Color text_color = Color.white;
 
 		if ( myAssetCurve.prIsAddingPoints )
@@ -969,20 +975,22 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	private bool				myIsMouseDown;
 	private KeyCode				myCurrentlyPressedKey;
 
-	private const float			mySceneUIBorderPadding = 2.0f;
-	private const float			mySceneUILineHeight = 18.0f;
-	private const float			mySceneUILinePadding = 1.0f;
-	private const int			mySceneUIFontSizeFromLineHeightMod = 8;
-	private const float			mySceneUIModeIndicatorWidth = 160.0f;
-	private const float			mySceneUIDarkeningFactor = 0.5f;
-	private const float			mySceneUIBrightningFactor = 0.2f;
+	private static Color		mySceneUIDarkColour					= new Color( 0.5f, 0.5f, 0.5f, 1.0f );
+	private static Color		mySceneUILightColour				= new Color( 0.9f, 0.9f, 0.9f, 1.0f );
+	private const float			mySceneUIBorderPadding				= 2.0f;
+	private const float			mySceneUILineHeight					= 18.0f;
+	private const float			mySceneUILinePadding				= 1.0f;
+	private const int			mySceneUIFontSizeFromLineHeightMod	= 8;
+	private const float			mySceneUIModeIndicatorWidth			= 160.0f;
+	private const float			mySceneUIDarkeningFactor			= 0.5f;
+	private const float			mySceneUIBrightningFactor			= 0.2f;
 
 	private Vector3				myFirstMousePosition;
-	private const float			myBigButtonHandleSizeMultiplier = 1000000.0f;
-	private const float			myIntersectionRayLength = 5000.0f;
+	private const float			myBigButtonHandleSizeMultiplier		= 1000000.0f;
+	private const float			myIntersectionRayLength				= 5000.0f;
 
-	private const float			myGuideBorderSize = 4.0f;
-	private const float			myGuideLinesDashTilingMultiplier = 4.0f;
+	private const float			myGuideBorderSize					= 4.0f;
+	private const float			myGuideLinesDashTilingMultiplier	= 4.0f;
 	private Material			myGuideLinesMaterial;
 	private Texture2D			myGuideLinesTexture;
 	private Mesh				myGuideLinesMesh;

@@ -46,11 +46,18 @@ public class HAPI_AssetGUI : Editor
 		SceneView.lastActiveSceneView.Repaint();
 	}
 
+	public virtual void deselect()
+	{
+		// Nothing for now.
+	}
+
 	public override void OnInspectorGUI() 
 	{
 		try
 		{
 			HAPI_Host.myRepaintDelegate = this.refresh;
+			HAPI_Host.myDeselectionDelegate = this.deselect;
+			HAPI_Host.mySelectionTarget = myAsset;
 
 			myDelayBuild	= false;
 			myParmChanges	= false;
@@ -199,6 +206,8 @@ public class HAPI_AssetGUI : Editor
 	public virtual void OnSceneGUI()
 	{
 		HAPI_Host.myRepaintDelegate = this.refresh;
+		HAPI_Host.myDeselectionDelegate = this.deselect;
+		HAPI_Host.mySelectionTarget = myAsset;
 	}
 	
 	protected bool setTransformInput( int index )

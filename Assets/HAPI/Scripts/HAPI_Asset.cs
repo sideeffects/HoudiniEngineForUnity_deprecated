@@ -529,7 +529,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		prOverriddenInstances 		= new List< HAPI_InstancerOverrideInfo >();
 		
 		myProgressBarJustUsed 		= false;
-				
 	}
 	
 	public virtual bool build() 

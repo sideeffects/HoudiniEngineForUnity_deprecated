@@ -26,6 +26,7 @@ using System.Text;
 namespace HAPI 
 {
 	public delegate void RepaintDelegate();
+	public delegate void DeselectionDelegate();
 
 	public class HAPI_Error : System.Exception 
 	{
@@ -162,7 +163,9 @@ namespace HAPI
 			setInt(		"HAPI_CurvePrimitiveTypeDefault", myDefaultCurvePrimitiveTypeDefault, true );
 			setInt(		"HAPI_CurveMethodDefault", myDefaultCurveMethodDefault, true );
 
-			myRepaintDelegate = null;
+			myRepaintDelegate		= null;
+			myDeselectionDelegate	= null;
+			mySelectionTarget		= null;
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,6 +265,9 @@ namespace HAPI
 												set { setInt( "HAPI_CurveMethodDefault", value ); } }
 
 		public static RepaintDelegate			myRepaintDelegate;
+		public static DeselectionDelegate		myDeselectionDelegate;
+
+		public static HAPI_Asset				mySelectionTarget;
 
 		public static void revertAllSettingsToDefaults()
 		{
@@ -457,7 +463,16 @@ namespace HAPI
 
 		private static void update()
 		{
-
+			if ( HAPI_Host.mySelectionTarget != null && myDeselectionDelegate != null )
+			{
+				GameObject selected = Selection.activeGameObject;
+				if ( selected != null )
+				{
+					HAPI_Asset selected_asset = selected.GetComponent< HAPI_Asset >();
+					if ( selected_asset != mySelectionTarget )
+						myDeselectionDelegate();
+				}
+			}
 		}
 
 		private static void playmodeStateChanged()
