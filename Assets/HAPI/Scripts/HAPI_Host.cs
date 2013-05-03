@@ -339,8 +339,7 @@ namespace HAPI
 																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
 																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE );
 			
-			processStatusCode( status_code );						
-						
+			processStatusCode( status_code );
 		}
 		
 		public static int getAssetCountFromLoadHip() 
@@ -352,7 +351,6 @@ namespace HAPI
 			processStatusCode( status_code );
 			
 			return num_assets;
-						
 		}
 		
 		public static void getAssetIdsFromLoadHIPFile( int [] assetIds )

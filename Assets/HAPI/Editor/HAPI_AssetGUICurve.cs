@@ -816,6 +816,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			box_color = HAPI_Host.prEditingPointsModeColour;
 		}
 
+		if ( !mySceneWindowHasFocus )
+			help_text = "Scene window does not have focus. Hotkeys may not work. Right click anywhere in the scene to focus.";
+
 		Color original_color		= GUI.color;
 		
 		float scene_width			= myTempCamera.pixelWidth;
@@ -919,7 +922,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		}
 
 		// Draw yellow mode lines around the Scene view.
-		if ( myAssetCurve.prCurrentMode != HAPI_AssetCurve.Mode.NONE )
+		if ( myAssetCurve.prCurrentMode != HAPI_AssetCurve.Mode.NONE && mySceneWindowHasFocus )
 		{
 			// Create texture.
 			Texture2D border_texture	= new Texture2D( 1, 1 );
@@ -947,6 +950,12 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	
 		// Restore GUI colour.
 		GUI.color = original_color;
+	}
+
+	public static bool mySceneWindowHasFocus {
+		get {
+			return EditorWindow.focusedWindow == SceneView.lastActiveSceneView;
+		}
 	}
 
 	public static bool myIsTransformHandleHidden {
