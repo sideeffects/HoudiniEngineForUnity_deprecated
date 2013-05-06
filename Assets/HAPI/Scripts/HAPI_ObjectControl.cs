@@ -67,6 +67,19 @@ public class HAPI_ObjectControl : HAPI_Control
 		prObjectName	= object_name;
 		prObjectVisible = object_visible;
 	}
+	
+	public void beginBakeAnimation()
+	{
+	}
+	
+		
+	public void bakeAnimation(  float current_time )
+	{
+	}
+	
+	public void endBakeAnimation()
+	{
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data

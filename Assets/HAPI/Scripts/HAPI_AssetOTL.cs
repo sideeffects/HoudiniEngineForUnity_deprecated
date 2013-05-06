@@ -199,6 +199,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			main_object.transform.parent = transform;
 
 			main_object.AddComponent( "HAPI_Instancer" );
+			prGameObjects[ object_id ] = main_object;
 			instancer = main_object.GetComponent< HAPI_Instancer >();
 		}
 		

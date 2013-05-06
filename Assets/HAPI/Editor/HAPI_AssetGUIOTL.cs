@@ -202,8 +202,12 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		if ( GUILayout.Button( "Bake" ) ) 
 		{
-			Debug.Log("Baking anim start = " + myAsset.prBakeStartTime + " end=" + myAsset.prBakeEndTime + " samplesPerSec=" + myAsset.prBakeSamplesPerSecond);
-			Debug.LogError("Baking Animation feature not yet complete.");
+			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+			myAsset.bakeAnimations( myAsset.prBakeStartTime, 
+									myAsset.prBakeEndTime, 
+									myAsset.prBakeSamplesPerSecond, 
+									progress_bar );
+			progress_bar.clearProgressBar();				
 		}
 		
 	}

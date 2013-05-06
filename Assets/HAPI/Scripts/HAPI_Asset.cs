@@ -931,6 +931,116 @@ public abstract class HAPI_Asset : HAPI_Control
 			Debug.LogError( err.ToString() );
 		}
 	}
+	
+	public void bakeAnimations( float start_time, 
+								float end_time, 
+								int samples_per_second, 
+								HAPI_ProgressBar progress_bar )
+	{
+		try
+		{
+			int num_objects = prObjects.Length;
+			for( int ii = 0; ii < num_objects; ii++ )
+			{
+				GameObject game_object = prGameObjects[ ii ];
+				HAPI_ObjectInfo obj_info = prObjects[ ii ];
+				
+				if( game_object != null )
+				{
+					if( !obj_info.isInstancer )					
+					{
+						HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
+						obj_control.beginBakeAnimation();
+					}
+					else
+					{
+						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
+						instancer.beginBakeAnimation();
+					}
+				}
+			}
+			
+			int num_samples = Mathf.CeilToInt(samples_per_second*( end_time - start_time ));
+				
+			float total_sim_time = ( end_time - start_time );
+			float delta_time = total_sim_time / (float) num_samples;
+			
+			progress_bar.prTotal = num_samples;
+			progress_bar.prCurrentValue = 0;
+			for ( float curr_time = start_time; curr_time <= end_time; curr_time += delta_time )
+			{
+				HAPI_Host.setTime( curr_time );
+				
+				HAPI_Host.cookAsset( prAssetId );
+				
+				HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
+					
+				while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
+				{
+					state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );	
+					
+				}
+						
+				if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
+				{
+					state = HAPI_State.HAPI_STATE_READY;
+					HAPI_Host.throwRuntimeError();
+				}
+				
+				
+				for( int ii = 0; ii < num_objects; ii++ )
+				{
+					GameObject game_object = prGameObjects[ ii ];
+					HAPI_ObjectInfo obj_info = prObjects[ ii ];
+					
+					if( game_object != null )
+					{
+						if( !obj_info.isInstancer )					
+						{
+							HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
+							obj_control.bakeAnimation( curr_time );
+						}
+						else
+						{
+							HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
+							instancer.bakeAnimation( curr_time );
+						}
+					}
+				}			
+				
+				// Set progress bar information.
+				progress_bar.prCurrentValue++;
+				progress_bar.prMessage = "Baking: " + progress_bar.prCurrentValue + " of " + num_samples;
+				progress_bar.displayProgressBar();
+			}
+			
+			
+			for( int ii = 0; ii < num_objects; ii++ )
+			{
+				GameObject game_object = prGameObjects[ ii ];
+				HAPI_ObjectInfo obj_info = prObjects[ ii ];
+				
+				if( game_object != null )
+				{
+					if( !obj_info.isInstancer )					
+					{
+						HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
+						obj_control.endBakeAnimation();
+					}
+					else
+					{
+						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
+						instancer.endBakeAnimation();
+					}
+				}
+			}
+		}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogWarning( error.ToString() );
+		}
+		
+	}
 
 	public void loadPreset()
 	{

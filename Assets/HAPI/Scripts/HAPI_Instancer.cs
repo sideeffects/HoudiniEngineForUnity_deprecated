@@ -7,6 +7,19 @@ using Utility = HAPI_AssetUtility;
 using HAPI;
 
 
+public class HAPI_CurvesCollection
+{
+	public AnimationCurve tx = new AnimationCurve();
+	public AnimationCurve ty = new AnimationCurve();
+	public AnimationCurve tz = new AnimationCurve();
+	public AnimationCurve qx = new AnimationCurve();
+	public AnimationCurve qy = new AnimationCurve();
+	public AnimationCurve qz = new AnimationCurve();
+	public AnimationCurve qw = new AnimationCurve();
+	public AnimationCurve sx = new AnimationCurve();
+	public AnimationCurve sy = new AnimationCurve();
+	public AnimationCurve sz = new AnimationCurve();
+}
 
 public class HAPI_Instancer : MonoBehaviour {
 	
@@ -26,7 +39,10 @@ public class HAPI_Instancer : MonoBehaviour {
 	{
 		prAsset = null;
 		prOverrideInstances = false;
-		prObjectId = -1;		
+		prObjectId = -1;
+		prObjToInstantiate = null;
+		myNumInstances = 0;
+		myCurvesCollection = null;
 	}
 	
 	
@@ -272,6 +288,213 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 	}
 	
+	
+	private void addKeyToCurve( float time, float val, AnimationCurve curve )
+	{
+		Keyframe curr_key = new Keyframe( time, val, 0, 0 );
+		
+		if( curve.length > 0 )
+		{
+			Keyframe prev_key = curve.keys[ curve.length - 1 ];
+			float tangent = (val - prev_key.value) / (time - prev_key.time );
+			prev_key.outTangent = tangent;
+			curr_key.inTangent = tangent;
+			
+			curve.RemoveKey( curve.length - 1 );
+			curve.AddKey( prev_key );			
+		}
+		
+		curve.AddKey( curr_key );
+		
+	}
+	
+	private void cacheNumInstances()
+	{
+		HAPI_ObjectInfo object_info = prAsset.prObjects[ prObjectId ];
+			
+		// Get Detail info.
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HAPI_Host.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
+		if ( geo_info.partCount == 0 )
+			return;
+		
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Host.getPartInfo( prAsset.prAssetId, prObjectId, 0, 0, out part_info );
+		if ( prAsset.prEnableLogging )
+			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
+					   + "points: " + part_info.pointCount );
+				
+		if ( part_info.pointCount > 65000 )
+			throw new HAPI_Error( "Point count (" + part_info.pointCount + ") above limit (" + 65000 + ")!" );
+		
+		myNumInstances = part_info.pointCount;
+	}
+	
+	public void beginBakeAnimation()
+	{
+		try
+		{
+			cacheNumInstances();
+			
+			myCurvesCollection = new HAPI_CurvesCollection[ myNumInstances ];
+			for ( int ii = 0; ii < myNumInstances; ++ii )
+			{
+				myCurvesCollection[ ii ] = new HAPI_CurvesCollection();
+				
+			}
+		}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogWarning( error.ToString() );
+			return;
+		}
+		
+	}	
+	
+	public void bakeAnimation( float curr_time )
+	{
+		
+		try
+		{
+																			
+			HAPI_Transform[] instance_transforms = new HAPI_Transform[ myNumInstances ];
+			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.SRT, 
+								 HAPI_Host.getInstanceTransforms, instance_transforms, myNumInstances );
+											
+							
+			for ( int ii = 0; ii < myNumInstances; ++ii )
+			{										
+										
+				Vector3 pos = new Vector3();
+				
+				// Apply object transforms.
+				//
+				// Axis and Rotation conversions:
+				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
+				// rotation is right handed, whereas Unity is left handed.  To account for this, we need to invert
+				// the x coordinate of the translation, and do the same for the rotations (except for the x rotation,
+				// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
+				// causes a double negative - yeah, I know).
+				
+				pos[ 0 ] = -instance_transforms[ ii ].position[ 0 ];
+				pos[ 1 ] =  instance_transforms[ ii ].position[ 1 ];
+				pos[ 2 ] =  instance_transforms[ ii ].position[ 2 ];
+				
+				Quaternion quat = new Quaternion( 	instance_transforms[ ii ].rotationQuaternion[ 0 ],
+													instance_transforms[ ii ].rotationQuaternion[ 1 ],
+													instance_transforms[ ii ].rotationQuaternion[ 2 ],
+													instance_transforms[ ii ].rotationQuaternion[ 3 ] );
+				
+				Vector3 euler = quat.eulerAngles;
+				euler.y = -euler.y;
+				euler.z = -euler.z;
+									
+				quat = Quaternion.Euler( euler );
+				
+				Vector3 scale = new Vector3 ( instance_transforms[ ii ].scale[ 0 ],
+											  instance_transforms[ ii ].scale[ 1 ],
+											  instance_transforms[ ii ].scale[ 2 ] );
+				
+				
+				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];						
+				
+				addKeyToCurve( curr_time, pos[0], curves.tx );
+				addKeyToCurve( curr_time, pos[1], curves.ty );
+				addKeyToCurve( curr_time, pos[2], curves.tz );
+				addKeyToCurve( curr_time, quat.x, curves.qx );
+				addKeyToCurve( curr_time, quat.y, curves.qy );
+				addKeyToCurve( curr_time, quat.z, curves.qz );
+				addKeyToCurve( curr_time, quat.w, curves.qw );
+				addKeyToCurve( curr_time, scale.x, curves.sx );
+				addKeyToCurve( curr_time, scale.y, curves.sy );
+				addKeyToCurve( curr_time, scale.z, curves.sz );
+				
+				
+				
+			}
+			
+		}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogWarning( error.ToString() );
+			return;
+		}
+	}
+	
+	public void endBakeAnimation()
+	{
+		try
+		{
+			HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
+			int[] instance_attr = new int[ 0 ];
+			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "instance", 
+								  ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
+			
+			if ( !instance_attr_info.exists )
+				return;
+			
+			if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				throw new HAPI_ErrorIgnorable( "I only understand instance as point attributes!" );
+			
+			if ( instance_attr_info.exists && instance_attr.Length != myNumInstances )
+				throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
+									  + prAsset.prAssetId + "!" );
+			
+			
+			for ( int ii = 0; ii < myNumInstances; ++ii )
+			{												
+				GameObject objToInstantiate = null;
+				
+				if ( instance_attr_info.exists )
+				{
+	
+					string instanceObjectPath	= HAPI_Host.getString( instance_attr[ ii ] );
+					string[] pathItems			= instanceObjectPath.Split('/');
+					string instanceObjectName	= pathItems[ pathItems.Length - 1 ];
+																							
+					int objectIndex = prAsset.findObjectByName( instanceObjectName );
+					if ( objectIndex >= 0 )
+						objToInstantiate = prAsset.prGameObjects[ objectIndex ];
+					else
+						objToInstantiate = GameObject.Find( instanceObjectName );
+																								
+				}
+				
+				if( objToInstantiate == null )
+					continue;
+												
+				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];
+				
+				objToInstantiate.AddComponent< Animation >();
+				Animation anim_component = objToInstantiate.GetComponent< Animation >();
+				AnimationClip clip = new AnimationClip();
+				anim_component.clip = clip;
+				//anim_component.AddClip( clip, "hengine_baked_simulation" + ii );
+														
+				
+				clip.SetCurve( "", typeof(Transform), "localPosition.x", curves.tx );				
+				clip.SetCurve( "", typeof(Transform), "localPosition.y", curves.ty );				
+				clip.SetCurve( "", typeof(Transform), "localPosition.z", curves.tz );							
+				clip.SetCurve( "", typeof(Transform), "localRotation.x", curves.qx );				
+				clip.SetCurve( "", typeof(Transform), "localRotation.y", curves.qy );				
+				clip.SetCurve( "", typeof(Transform), "localRotation.z", curves.qz );
+				clip.SetCurve( "", typeof(Transform), "localRotation.w", curves.qw );								
+				clip.SetCurve( "", typeof(Transform), "localScale.x", curves.sx );				
+				clip.SetCurve( "", typeof(Transform), "localScale.y", curves.sy );				
+				clip.SetCurve( "", typeof(Transform), "localScale.z", curves.sz );
+	
+				clip.EnsureQuaternionContinuity();												
+				
+			}
+						
+		}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogWarning( error.ToString() );
+			return;
+		}
+	}
+	
 	public void instanceObjects( HAPI_ProgressBar progress_bar )
 	{
 		try
@@ -346,6 +569,7 @@ public class HAPI_Instancer : MonoBehaviour {
 					string instanceObjectPath	= HAPI_Host.getString( instance_attr[ ii ] );
 					string[] pathItems			= instanceObjectPath.Split('/');
 					string instanceObjectName	= pathItems[ pathItems.Length - 1 ];
+															
 													
 					int objectIndex = prAsset.findObjectByName( instanceObjectName );
 					if ( objectIndex >= 0 )
@@ -447,5 +671,8 @@ public class HAPI_Instancer : MonoBehaviour {
 	[SerializeField] private GameObject myObjToInstantiate;
 	[SerializeField] private bool myOverrideInstances;
 	[SerializeField] private int myObjectId;
+	[SerializeField] private int myNumInstances;
+	
+	private HAPI_CurvesCollection[] myCurvesCollection;
 	
 }
