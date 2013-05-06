@@ -174,6 +174,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			myAssetCurve.syncPointsWithParm();
 			myAssetCurve.build();
 			myUnbuiltChanges = false;
+			refresh();
 			
 			// To keep things consistent with Unity workflow, we should not save parameter changes
 			// while in Play mode.
@@ -922,7 +923,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		}
 
 		// Draw yellow mode lines around the Scene view.
-		if ( myAssetCurve.prCurrentMode != HAPI_AssetCurve.Mode.NONE && mySceneWindowHasFocus )
+		if ( mySceneWindowHasFocus )
 		{
 			// Create texture.
 			Texture2D border_texture	= new Texture2D( 1, 1 );
@@ -932,6 +933,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 			float width					= myTempCamera.pixelWidth;
 			float height				= myTempCamera.pixelHeight;
+
+			if ( myAssetCurve.prCurrentMode == HAPI_AssetCurve.Mode.NONE )
+			{
+				border_texture.SetPixel( 0, 0, new Color( text_color.r, text_color.g, text_color.b, 0.6f ) );
+				border_texture.Apply();
+				border_width = myInactiveBorderWidth;
+			}
 
 			GUI.DrawTexture( new Rect( 0, 0, width, border_width ),								// Top
 							 border_texture, ScaleMode.StretchToFill );
@@ -975,7 +983,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 	private bool				myForceInspectorRedraw;
 
-	private const float			myActiveBorderWidth = 5;
+	private const float			myActiveBorderWidth = 5.0f;
+	private const float			myInactiveBorderWidth = 2.0f;
 	private Camera				myTempCamera;
 
 	[SerializeField] 
