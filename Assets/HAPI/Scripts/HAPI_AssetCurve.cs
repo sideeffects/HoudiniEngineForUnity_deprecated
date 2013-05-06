@@ -98,6 +98,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 		updatePoints();
 	}
 
+	public void deleteLastPoint()
+	{
+		prPoints.RemoveAt( prPoints.Count - 1 );
+		updatePoints();
+	}
+
 	public void deletePoints( int[] indicies )
 	{
 		List< Vector3 > new_points = new List< Vector3 >( prPoints.Count - indicies.Length );

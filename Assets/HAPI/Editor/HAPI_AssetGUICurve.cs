@@ -217,9 +217,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		drawSceneUI();
 
 		// Add points.
-		if ( myAssetCurve.prIsAddingPoints )
+		if ( !current_event.alt )
 		{
-			if ( !current_event.alt )
+			if ( myAssetCurve.prIsAddingPoints )
 			{
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
@@ -318,6 +318,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					Graphics.DrawMeshNow( myGuideLinesMesh, myAssetCurve.transform.localToWorldMatrix );
 				}
 
+				// Add points on click.
 				if ( button_press )
 				{
 					// Once we add a point we are no longer bound to the user holding down the add points key.
@@ -332,11 +333,24 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 					// Remake and Draw Guide Geometry
 					buildGuideGeometry();
 				}
-			}
-		}
-		else if ( myAssetCurve.prIsEditingPoints )
-		{
-			if ( !current_event.alt )
+
+				// Delete last point on backspace.
+				if ( current_event.isKey && current_event.type == EventType.KeyUp &&
+					 ( current_event.keyCode == KeyCode.Delete || current_event.keyCode == KeyCode.Backspace ) )
+				{
+					myAssetCurve.deleteLastPoint();
+
+					// Remake and Draw Guide Geometry
+					buildGuideGeometry();
+				}
+				if ( current_event.isKey && current_event.keyCode == KeyCode.Delete 
+					 || current_event.keyCode == KeyCode.Backspace )
+				{
+					Event.current.Use();
+				}
+
+			} // Add mode.
+			else if ( myAssetCurve.prIsEditingPoints )
 			{
 				// Track mouse dragging.
 				if ( current_event.type == EventType.MouseDown && current_event.button == 0 && !myIsMouseDown )
@@ -407,10 +421,13 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
 				// Prevent the delete key from deleting the curve in this mode.
-				if ( current_event.isKey && current_event.keyCode == KeyCode.Delete && mySelectedPoints.Count == 0 )
+				if ( current_event.isKey && current_event.keyCode == KeyCode.Delete )
+				{
 					Event.current.Use();
-			}
-		}
+				}
+
+			} // Edit mode.
+		} // Not currently pressing alt.
 		
 		if ( myForceInspectorRedraw )
 		{
@@ -436,7 +453,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// Update active control point.
 		if ( mySelectedPoints.Count > 0 ) 
 		{
-			if ( current_event.isKey && current_event.keyCode == KeyCode.Delete )
+			if ( myCurrentlyPressedKey == KeyCode.Delete )
 			{ // Handle deletions.
 				myAssetCurve.deletePoints( mySelectedPoints.ToArray() );
 				clearSelection();
@@ -809,7 +826,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		if ( myAssetCurve.prIsAddingPoints )
 		{
-			help_text = "<b>Click</b> in space: add next point | <b>Click</b> a line segment: add midpoint | <b>ESC</b> or <b>Enter</b>: exit mode";
+			help_text = "<b>Click</b> in space: add next point | <b>Click</b> a line segment: add midpoint | <b>Backspace</b>: delete last point | <b>ESC</b> or <b>Enter</b>: exit mode";
 			box_color = HAPI_Host.prAddingPointsModeColour;
 		}
 		else if ( myAssetCurve.prIsEditingPoints )
