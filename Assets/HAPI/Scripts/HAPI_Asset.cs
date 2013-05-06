@@ -143,6 +143,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public int						prBakeSamplesPerSecond {				get { return myBakeSamplesPerSecond; }
 																	set { myBakeSamplesPerSecond = value; } }
+	public GameObject				prBakeParentObject {			get { return myBakeParentObject; }
+																	set { myBakeParentObject = value; } }
 	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
@@ -496,6 +498,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prBakeStartTime				= 0.0f;
 		prBakeEndTime				= 1.0f;
 		prBakeSamplesPerSecond		= 30;
+		prBakeParentObject			= null;
 		
 		// GUI ------------------------------------------------------------------------------------------------------
 		
@@ -934,7 +937,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public void bakeAnimations( float start_time, 
 								float end_time, 
-								int samples_per_second, 
+								int samples_per_second,
+								GameObject parent_object,
 								HAPI_ProgressBar progress_bar )
 	{
 		try
@@ -998,12 +1002,12 @@ public abstract class HAPI_Asset : HAPI_Control
 						if( !obj_info.isInstancer )					
 						{
 							HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
-							obj_control.bakeAnimation( curr_time );
+							obj_control.bakeAnimation( curr_time, parent_object );
 						}
 						else
 						{
 							HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
-							instancer.bakeAnimation( curr_time );
+							instancer.bakeAnimation( curr_time, parent_object );
 						}
 					}
 				}			
@@ -1275,6 +1279,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private float 					myBakeStartTime;																		
 	[SerializeField] private float					myBakeEndTime;																		
 	[SerializeField] private int 					myBakeSamplesPerSecond;
+	[SerializeField] private GameObject				myBakeParentObject;
 
 	
 	// GUI ----------------------------------------------------------------------------------------------------------

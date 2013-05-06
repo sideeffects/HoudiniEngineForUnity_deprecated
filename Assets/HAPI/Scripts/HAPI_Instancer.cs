@@ -351,7 +351,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 	}	
 	
-	public void bakeAnimation( float curr_time )
+	public void bakeAnimation( float curr_time, GameObject parent_object )
 	{
 		
 		try
@@ -361,7 +361,12 @@ public class HAPI_Instancer : MonoBehaviour {
 			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.SRT, 
 								 HAPI_Host.getInstanceTransforms, instance_transforms, myNumInstances );
 											
-							
+						
+			Matrix4x4 parent_xform_inverse = Matrix4x4.identity;
+				
+			if( parent_object != null )
+				parent_xform_inverse = parent_object.transform.localToWorldMatrix.inverse;
+			
 			for ( int ii = 0; ii < myNumInstances; ++ii )
 			{										
 										
@@ -395,6 +400,17 @@ public class HAPI_Instancer : MonoBehaviour {
 											  instance_transforms[ ii ].scale[ 1 ],
 											  instance_transforms[ ii ].scale[ 2 ] );
 				
+				if( parent_object != null )
+				{
+					
+					Matrix4x4 world_mat = Matrix4x4.identity;
+					world_mat.SetTRS( pos, quat, scale );					
+					Matrix4x4 local_mat = parent_xform_inverse  * world_mat;					
+					
+					quat = HAPI_AssetUtility.getQuaternion( local_mat );
+					scale = HAPI_AssetUtility.getScale( local_mat );
+					pos = HAPI_AssetUtility.getPosition( local_mat );
+				}
 				
 				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];						
 				
@@ -451,6 +467,8 @@ public class HAPI_Instancer : MonoBehaviour {
 					string instanceObjectPath	= HAPI_Host.getString( instance_attr[ ii ] );
 					string[] pathItems			= instanceObjectPath.Split('/');
 					string instanceObjectName	= pathItems[ pathItems.Length - 1 ];
+					
+					
 																							
 					int objectIndex = prAsset.findObjectByName( instanceObjectName );
 					if ( objectIndex >= 0 )
@@ -468,8 +486,7 @@ public class HAPI_Instancer : MonoBehaviour {
 				objToInstantiate.AddComponent< Animation >();
 				Animation anim_component = objToInstantiate.GetComponent< Animation >();
 				AnimationClip clip = new AnimationClip();
-				anim_component.clip = clip;
-				//anim_component.AddClip( clip, "hengine_baked_simulation" + ii );
+				anim_component.clip = clip;				
 														
 				
 				clip.SetCurve( "", typeof(Transform), "localPosition.x", curves.tx );				
@@ -569,7 +586,7 @@ public class HAPI_Instancer : MonoBehaviour {
 					string instanceObjectPath	= HAPI_Host.getString( instance_attr[ ii ] );
 					string[] pathItems			= instanceObjectPath.Split('/');
 					string instanceObjectName	= pathItems[ pathItems.Length - 1 ];
-															
+																				
 													
 					int objectIndex = prAsset.findObjectByName( instanceObjectName );
 					if ( objectIndex >= 0 )

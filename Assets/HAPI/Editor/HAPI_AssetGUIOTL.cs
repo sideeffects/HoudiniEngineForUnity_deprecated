@@ -200,12 +200,28 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			}
 		}
 		
+		
+		//Bake relative to object
+		{			
+			Object parent_object = myAsset.prBakeParentObject;
+			
+			bool changed = HAPI_GUI.objectField( "bake_parent_object", 
+												 "Parent Object", 
+												 ref parent_object, 
+												 typeof(GameObject) );
+			if( changed )
+			{
+				myAsset.prBakeParentObject = parent_object as GameObject;
+			}
+		}
+		
 		if ( GUILayout.Button( "Bake" ) ) 
 		{
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			myAsset.bakeAnimations( myAsset.prBakeStartTime, 
 									myAsset.prBakeEndTime, 
 									myAsset.prBakeSamplesPerSecond, 
+									myAsset.prBakeParentObject,
 									progress_bar );
 			progress_bar.clearProgressBar();				
 		}

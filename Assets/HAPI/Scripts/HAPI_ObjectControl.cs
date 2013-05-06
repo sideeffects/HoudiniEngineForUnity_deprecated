@@ -73,7 +73,7 @@ public class HAPI_ObjectControl : HAPI_Control
 	}
 	
 		
-	public void bakeAnimation(  float current_time )
+	public void bakeAnimation(  float current_time, GameObject parent_object )
 	{
 	}
 	
