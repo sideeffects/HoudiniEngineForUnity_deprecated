@@ -68,6 +68,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 	public override void refresh()
 	{
+		myAssetCurve.buildDummyMesh();
 		buildGuideGeometry();
 		base.refresh();
 	}
@@ -799,8 +800,8 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		string title_text = HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Curve";
 		string add_hotkey_string = HAPI_Host.prAddingPointsModeHotKey.ToString();
 		string edit_hotkey_string = HAPI_Host.prEditingPointsModeHotKey.ToString();
-		string help_text = "Hold <b>" + add_hotkey_string + "</b> to add points or <b>" + 
-						   edit_hotkey_string + "</b> to edit points.";
+		string help_text = "<b>" + add_hotkey_string + "</b>: add points | <b>" + 
+						   edit_hotkey_string + "</b>: edit points";
 
 		int skin = EditorPrefs.GetInt( "UserSkin" );
 		Color box_color = ( skin == 0 ? mySceneUILightColour : mySceneUIDarkColour );
@@ -808,17 +809,17 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 		if ( myAssetCurve.prIsAddingPoints )
 		{
-			help_text = "Click in space to add the next point or on a line segment to add a midpoint.";
+			help_text = "<b>Click</b> in space: add next point | <b>Click</b> a line segment: add midpoint | <b>ESC</b> or <b>Enter</b>: exit mode";
 			box_color = HAPI_Host.prAddingPointsModeColour;
 		}
 		else if ( myAssetCurve.prIsEditingPoints )
 		{
-			help_text = "Click or drag to select points. Press <b>Delete</b> to delete selected points.";
+			help_text = "<b>Click</b> or <b>drag</b>: select points | <b>Delete</b>: delete selected | Hold <b>Control</b>: toggle-based selection | <b>ESC</b> or <b>Enter</b>: exit mode";
 			box_color = HAPI_Host.prEditingPointsModeColour;
 		}
 
 		if ( !mySceneWindowHasFocus )
-			help_text = "Scene window does not have focus. Hotkeys may not work. Right click anywhere in the scene to focus.";
+			help_text = "Scene window doesn't have focus. <b>Hotkeys may not work</b>. Right click anywhere in the scene to focus.";
 
 		Color original_color		= GUI.color;
 		
@@ -910,9 +911,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// whos key is being held down...
 		GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
 								  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
-		myAssetCurve.prCurrentMode = (HAPI_AssetCurve.Mode) GUI.Toolbar( mode_text_rect, 
-																		 (int) myAssetCurve.prCurrentMode, 
-																		 modes );
+		myLastMode				= myAssetCurve.prCurrentMode;
+		myAssetCurve.prCurrentMode = (HAPI_AssetCurve.Mode) GUI.Toolbar( mode_text_rect, (int) myLastMode, modes );
+		if ( myLastMode != myAssetCurve.prCurrentMode )
+			clearSelection();
 		GUI.enabled = true;
 
 		// Draw selection rectangle.

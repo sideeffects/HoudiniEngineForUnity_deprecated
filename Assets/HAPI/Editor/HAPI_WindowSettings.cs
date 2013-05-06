@@ -273,6 +273,18 @@ public class HAPI_WindowSettings : EditorWindow
 
 			HAPI_GUI.separator();
 
+			// Wireframe Colour
+			{
+				Color value = HAPI_Host.prWireframeColour;
+				bool changed = HAPI_GUI.colourField( "wireframe_colour", "Wireframe", ref value );
+				if ( changed )
+				{
+					HAPI_Host.prWireframeColour = value;
+					if ( HAPI_Host.myRepaintDelegate != null )
+						HAPI_Host.myRepaintDelegate();
+				}
+			}
+
 			// Guide Wireframe Colour
 			{
 				Color value = HAPI_Host.prGuideWireframeColour;

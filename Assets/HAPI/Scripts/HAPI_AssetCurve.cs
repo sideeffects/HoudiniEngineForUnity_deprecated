@@ -232,7 +232,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 			Color[] line_colours = new Color[ prVertices.Length ];
 			for ( int i = 0; i < prVertices.Length; ++i )
-				line_colours[ i ] = Color.white; //HAPI_Host.prGuideWireframeColour;
+				line_colours[ i ] = HAPI_Host.prWireframeColour;
 
 			mesh.Clear();
 		
@@ -335,7 +335,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 				// Set generic texture so it's not pink.
 				Material line_material = new Material( Shader.Find( "HAPI/Line" ) );
 				mesh_renderer.material = line_material;
-				line_material.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
 			}
 
 			// Create guide and selection meshes.

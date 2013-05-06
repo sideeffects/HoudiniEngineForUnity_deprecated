@@ -104,6 +104,7 @@ namespace HAPI
 		private static KeyCode myDefaultEditingPointsModeHotKey				= KeyCode.LeftControl;
 		private static Color myDefaultEditingPointsModeColour				= new Color( 0.7f, 0.7f, 0.9f, 1.0f );
 
+		private static Color myDefaultWireframeColour						= new Color( 0.0f, 1.0f, 0.0f, 1.0f );
 		private static Color myDefaultGuideWireframeColour					= new Color( 0.1f, 0.1f, 0.1f, 1.0f );
 		private static Color myDefaultUnselectableGuideWireframeColour		= new Color( 0.1f, 0.1f, 0.1f, 1.0f );
 		private static Color myDefaultUnselectedGuideWireframeColour		= Color.white;
@@ -150,7 +151,8 @@ namespace HAPI
 
 			setKeyCode( "HAPI_EditingPointsHotKey", myDefaultEditingPointsModeHotKey, true );
 			setColour(	"HAPI_EditingPointsModeColour", myDefaultEditingPointsModeColour, true );
-
+			
+			setColour(	"HAPI_WireframeColour", myDefaultWireframeColour, true );
 			setColour(	"HAPI_GuideWireframeColour", myDefaultGuideWireframeColour, true );
 			setColour(	"HAPI_UnselectableGuideWireframeColour", myDefaultUnselectableGuideWireframeColour, true );
 			setColour(	"HAPI_UnselectedGuideWireframeColour", myDefaultUnselectedGuideWireframeColour, true );
@@ -234,6 +236,9 @@ namespace HAPI
 												get { return getColour( "HAPI_EditingPointsModeColour" ); }
 												set { setColour( "HAPI_EditingPointsModeColour", value ); } }
 
+		public static Color prWireframeColour {
+												get { return getColour( "HAPI_WireframeColour" ); }
+												set { setColour( "HAPI_WireframeColour", value ); } }
 		public static Color prGuideWireframeColour {
 												get { return getColour( "HAPI_GuideWireframeColour" ); }
 												set { setColour( "HAPI_GuideWireframeColour", value ); } }
@@ -291,6 +296,7 @@ namespace HAPI
 			prEditingPointsModeHotKey				= myDefaultEditingPointsModeHotKey;
 			prEditingPointsModeColour				= myDefaultEditingPointsModeColour;
 
+			prWireframeColour						= myDefaultWireframeColour;
 			prGuideWireframeColour					= myDefaultGuideWireframeColour;
 			prUnselectableGuideWireframeColour		= myDefaultUnselectableGuideWireframeColour;
 			prUnselectedGuideWireframeColour		= myDefaultUnselectedGuideWireframeColour;
