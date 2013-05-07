@@ -1063,7 +1063,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					else
 					{
 						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
-						instancer.endBakeAnimation();
+						instancer.endBakeAnimation( parent_object );
 					}
 				}
 			}

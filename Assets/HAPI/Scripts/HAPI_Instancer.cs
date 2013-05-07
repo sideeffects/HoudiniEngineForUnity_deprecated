@@ -473,7 +473,7 @@ public class HAPI_Instancer : MonoBehaviour {
 								  + prAsset.prAssetId + "!" );
 	}
 	
-	public void endBakeAnimation()
+	public void endBakeAnimation( GameObject parent_object )
 	{
 		try
 		{						
@@ -500,8 +500,19 @@ public class HAPI_Instancer : MonoBehaviour {
 				clip.SetCurve( "", typeof(Transform), "localScale.y", curves.sy );				
 				clip.SetCurve( "", typeof(Transform), "localScale.z", curves.sz );
 	
-				clip.EnsureQuaternionContinuity();												
+				clip.EnsureQuaternionContinuity();
 				
+				
+				
+			}
+			
+			if( parent_object != null )
+			{
+				while( transform.childCount > 0 )
+				{
+					GameObject child = transform.GetChild( 0 ).gameObject;
+					child.transform.parent = parent_object.transform;	
+				}				
 			}
 						
 		}
