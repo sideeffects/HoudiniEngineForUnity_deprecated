@@ -238,6 +238,35 @@ public abstract class HAPI_Asset : HAPI_Control
 		return -1;
 	}
 	
+	
+	public GameObject findPartByName( string part_name, bool allow_partial_match )
+	{
+		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+		{
+			GameObject top_level_obj = prGameObjects[ object_index ];
+			for( int geo_index = 0; geo_index < top_level_obj.transform.childCount; geo_index++ )
+			{
+				GameObject geo = top_level_obj.transform.GetChild( geo_index ).gameObject;
+				for( int part_index = 0; part_index < geo.transform.childCount; part_index++ )
+				{
+					GameObject part = geo.transform.GetChild( part_index ).gameObject;
+					if( allow_partial_match )
+					{
+						if( part.name.StartsWith( part_name ) )
+							return part;
+					}
+					else
+					{
+						if( part.name == part_name )
+							return part;
+					}
+				}
+			}
+			
+		}
+		return null;
+	}
+	
 	// Transform related connection methods -------------------------------------------------------
 	
 	public void addAssetAsTransformInput( HAPI_Asset asset, int index )
