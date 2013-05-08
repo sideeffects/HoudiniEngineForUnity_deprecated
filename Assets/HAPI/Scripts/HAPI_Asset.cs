@@ -142,9 +142,7 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myBakeEndTime = value; } }
 	
 	public int						prBakeSamplesPerSecond {				get { return myBakeSamplesPerSecond; }
-																	set { myBakeSamplesPerSecond = value; } }
-	public GameObject				prBakeParentObject {			get { return myBakeParentObject; }
-																	set { myBakeParentObject = value; } }
+																	set { myBakeSamplesPerSecond = value; } }	
 	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
@@ -526,8 +524,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		// Baking ---------------------------------------------------------------------------------------------------
 		prBakeStartTime				= 0.0f;
 		prBakeEndTime				= 1.0f;
-		prBakeSamplesPerSecond		= 30;
-		prBakeParentObject			= null;
+		prBakeSamplesPerSecond		= 30;		
 		
 		// GUI ------------------------------------------------------------------------------------------------------
 		
@@ -962,7 +959,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			Debug.LogError( err.ToString() );
 		}
-	}
+	}		
 	
 	public void bakeAnimations( float start_time, 
 								float end_time, 
@@ -1020,6 +1017,9 @@ public abstract class HAPI_Asset : HAPI_Control
 					HAPI_Host.throwRuntimeError();
 				}
 				
+				HAPI_Transform[] object_transforms = new HAPI_Transform[ prObjectCount ];
+				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+						 			 object_transforms, prObjectCount );
 				
 				for( int ii = 0; ii < num_objects; ii++ )
 				{
@@ -1031,7 +1031,7 @@ public abstract class HAPI_Asset : HAPI_Control
 						if( !obj_info.isInstancer )					
 						{
 							HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
-							obj_control.bakeAnimation( curr_time, parent_object );
+							obj_control.bakeAnimation( curr_time, parent_object, object_transforms[ ii ] );
 						}
 						else
 						{
@@ -1047,6 +1047,10 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.displayProgressBar();
 			}
 			
+			GameObject baked_game_obj = new GameObject( gameObject.name + "_baked" );
+			baked_game_obj.transform.position = transform.position;
+			baked_game_obj.transform.rotation = transform.rotation;
+			baked_game_obj.transform.localScale = transform.localScale;
 			
 			for( int ii = 0; ii < num_objects; ii++ )
 			{
@@ -1065,6 +1069,9 @@ public abstract class HAPI_Asset : HAPI_Control
 						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
 						instancer.endBakeAnimation( parent_object );
 					}
+					
+					GameObject duplicate = GameObject.Instantiate( game_object ) as GameObject;
+					duplicate.transform.parent = baked_game_obj.transform;
 				}
 			}
 		}
@@ -1307,8 +1314,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	// Baking -------------------------------------------------------------------------------------------------------
 	[SerializeField] private float 					myBakeStartTime;																		
 	[SerializeField] private float					myBakeEndTime;																		
-	[SerializeField] private int 					myBakeSamplesPerSecond;
-	[SerializeField] private GameObject				myBakeParentObject;
+	[SerializeField] private int 					myBakeSamplesPerSecond;	
 
 	
 	// GUI ----------------------------------------------------------------------------------------------------------

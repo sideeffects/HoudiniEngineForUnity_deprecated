@@ -484,8 +484,12 @@ public class HAPI_Instancer : MonoBehaviour {
 																				
 				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];
 				
-				child.AddComponent< Animation >();
 				Animation anim_component = child.GetComponent< Animation >();
+				if( anim_component == null )
+				{
+					child.AddComponent< Animation >();
+					anim_component = child.GetComponent< Animation >();
+				}
 				AnimationClip clip = new AnimationClip();
 				anim_component.clip = clip;																		
 				
@@ -502,17 +506,6 @@ public class HAPI_Instancer : MonoBehaviour {
 	
 				clip.EnsureQuaternionContinuity();
 				
-				
-				
-			}
-			
-			if( parent_object != null )
-			{
-				while( transform.childCount > 0 )
-				{
-					GameObject child = transform.GetChild( 0 ).gameObject;
-					child.transform.parent = parent_object.transform;	
-				}				
 			}
 						
 		}
