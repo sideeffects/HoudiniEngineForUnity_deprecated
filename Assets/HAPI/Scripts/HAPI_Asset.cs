@@ -976,11 +976,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.prMessage = "Baking: " + progress_bar.prCurrentValue + " of " + num_samples;
 				progress_bar.displayProgressBar();
 			}
-			
-			GameObject baked_game_obj = new GameObject( gameObject.name + "_baked" );
-			baked_game_obj.transform.position = transform.position;
-			baked_game_obj.transform.rotation = transform.rotation;
-			baked_game_obj.transform.localScale = transform.localScale;
+						
 			
 			for( int ii = 0; ii < num_objects; ii++ )
 			{
@@ -999,9 +995,7 @@ public abstract class HAPI_Asset : HAPI_Control
 						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
 						instancer.endBakeAnimation( parent_object );
 					}
-					
-					GameObject duplicate = GameObject.Instantiate( game_object ) as GameObject;
-					duplicate.transform.parent = baked_game_obj.transform;
+										
 				}
 			}
 		}
