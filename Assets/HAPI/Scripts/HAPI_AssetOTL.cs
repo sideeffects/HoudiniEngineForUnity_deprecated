@@ -92,7 +92,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 	{
 		bool unload_asset_first = prReloadAssetInFullBuild 
 								  && prAssetType == HAPI_Asset.AssetType.TYPE_OTL 
-								  && !prPartialBuild;
+								  && !prSerializationRecoveryOnly;
 
 		bool base_built = base.build( unload_asset_first );
 		if ( !base_built )

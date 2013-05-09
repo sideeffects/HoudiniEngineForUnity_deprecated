@@ -56,8 +56,8 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myAssetSubType = value; } }
 	public bool						prFullBuild {					get { return myFullBuild; } 
 																	set { myFullBuild = value; } }
-	public bool						prPartialBuild {				get { return myPartialBuild; }
-																	set { myPartialBuild = value; } }
+	public bool						prSerializationRecoveryOnly {	get { return mySerializationRecoveryOnly; }
+																	set { mySerializationRecoveryOnly = value; } }
 	public bool						prForceReconnectInFullBuild {	get { return myForceReconnectInFullBuild; }
 																	set { myForceReconnectInFullBuild = value; } }
 	public bool 					prReloadAssetInFullBuild {		get { return myReloadAssetInFullBuild; } 
@@ -445,7 +445,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
-				prPartialBuild					= true;
+				prSerializationRecoveryOnly		= true;
 			}
 			else
 			{
@@ -585,7 +585,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			progress_bar.prStartTime = System.DateTime.Now;
 			
-			if ( prFullBuild || prPartialBuild ) 
+			if ( prFullBuild || prSerializationRecoveryOnly ) 
 			{
 				if ( unload_asset_first )
 				{
@@ -626,7 +626,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
 
-					if ( !prPartialBuild )
+					if ( !prSerializationRecoveryOnly )
 						Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
 				}
 				catch ( HAPI_Error error )
@@ -718,82 +718,12 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.incrementProgressBar( prParmChoiceCount );
 				
 				// Add input fields.
-				if ( !prPartialBuild && !prForceReconnectInFullBuild )
+				if ( !prSerializationRecoveryOnly && !prForceReconnectInFullBuild )
 				{
-					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-					{
-						if ( prMaxTransInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
-							for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
-							{
-								prUpStreamTransformAssets.Add( null );
-								prUpStreamTransformObjects.Add( null );
-							}
-					}
-				
-					if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
-						for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-						{
-							prFileInputs.Add( "" );
-							prUpStreamGeoAssets.Add( null );
-							prUpStreamGeoObjects.Add( null );
-							prUpStreamGeoAdded.Add( false );
-						}
-				
-					// Check for min input fields set.
-					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-					{
-						int numValidTransformInputs = 0;
-						for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
-							if ( prUpStreamTransformAssets[ ii ] )
-								numValidTransformInputs++;
-					
-						if ( numValidTransformInputs < prMinTransInputCount )
-							Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
-											  "Please provide inputs in the Inputs section." );
-					}
-				
-					int numValidGeoInputs = 0;
-					for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-						if ( prFileInputs[ ii ] != "" )
-							numValidGeoInputs++;
-				
-					if ( numValidGeoInputs < prMinGeoInputCount )
-						Debug.LogWarning( "Insufficent Geo Inputs to Asset. " +
-										  "Please provide inputs in the Inputs section." );
-				
-					if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-						for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
-							if ( prUpStreamTransformAssets[ ii ] )
-								HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
-
-					foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-					{
-						int index = downstream_asset.getAssetTransformConnectionIndex( this );
-						if ( index >= 0 )
-							HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
-					}
-					
-					// Fill input names.
-					for ( int i = 0; i < prMaxTransInputCount; ++i )
-					{
-						string trans_input_name = HAPI_Host.getInputName( prAssetId, i, 
-																		  HAPI_InputType.HAPI_INPUT_TRANSFORM );
-						if ( trans_input_name == "" )
-							trans_input_name = "Transform Input #" + ( i + 1 );
-						prTransInputNames.Add( trans_input_name );
-					}
-					for ( int i = 0; i < prMaxGeoInputCount; ++i )
-					{
-						string geo_input_name = HAPI_Host.getInputName( prAssetId, i, 
-																		HAPI_InputType.HAPI_INPUT_GEOMETRY );
-						if ( geo_input_name == "" )
-							geo_input_name = "Geometry Input #" + ( i + 1 );
-						prGeoInputNames.Add( geo_input_name );
-						prGeoInputFormats.Add( HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_DEFAULT );
-					}
+					initAssetConnections();
 				}
 
-				if ( !prPartialBuild )
+				if ( !prSerializationRecoveryOnly )
 				{
 					// Clean up.
 					destroyChildren( transform );
@@ -807,8 +737,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				// Custom work during a full build (custom to each subclass).
 				buildFullBuildCustomWork( ref progress_bar );
 			}
-			else
-			{
+			else //if ( prFullBuild || prSerializationRecoveryOnly ) 
+			{				
 				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
 				
@@ -834,8 +764,12 @@ public abstract class HAPI_Asset : HAPI_Control
 									 prParmStringValueCount );
 				progress_bar.incrementProgressBar( prParmStringValueCount );
 			}
-
-			if ( !prPartialBuild )
+			
+			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
+			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+					 			 prObjectTransforms, prObjectCount );
+			
+			if ( !prSerializationRecoveryOnly )
 			{
 				// Set asset's transform.
 				if ( prSyncAssetTransform )
@@ -855,10 +789,6 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 				progress_bar.prMessage = "Loading and composing objects...";
 			
-				Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
-				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
-						 			 prObjectTransforms, prObjectCount );
-
 				// Custom way to load objects (custom to each subclass).
 				buildCreateObjects( ref progress_bar );
 			
@@ -888,7 +818,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			progress_bar.clearProgressBar();
 
 			prFullBuild = false;
-			prPartialBuild = false;
+			prSerializationRecoveryOnly = false;
 			prForceReconnectInFullBuild = false;
 
 			myProgressBarJustUsed = false;
@@ -1153,10 +1083,86 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		return -1;
 	}
+	
+	
+	protected void initAssetConnections()
+	{
+		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+		{
+			if ( prMaxTransInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
+				for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
+				{
+					prUpStreamTransformAssets.Add( null );
+					prUpStreamTransformObjects.Add( null );
+				}
+		}
+	
+		if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
+			for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
+			{
+				prFileInputs.Add( "" );
+				prUpStreamGeoAssets.Add( null );
+				prUpStreamGeoObjects.Add( null );
+				prUpStreamGeoAdded.Add( false );
+			}
+	
+		// Check for min input fields set.
+		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+		{
+			int numValidTransformInputs = 0;
+			for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
+				if ( prUpStreamTransformAssets[ ii ] )
+					numValidTransformInputs++;
+		
+			if ( numValidTransformInputs < prMinTransInputCount )
+				Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
+								  "Please provide inputs in the Inputs section." );
+		}
+	
+		int numValidGeoInputs = 0;
+		for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
+			if ( prFileInputs[ ii ] != "" )
+				numValidGeoInputs++;
+	
+		if ( numValidGeoInputs < prMinGeoInputCount )
+			Debug.LogWarning( "Insufficent Geo Inputs to Asset. " +
+							  "Please provide inputs in the Inputs section." );
+	
+		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+			for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
+				if ( prUpStreamTransformAssets[ ii ] )
+					HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
+
+		foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+		{
+			int index = downstream_asset.getAssetTransformConnectionIndex( this );
+			if ( index >= 0 )
+				HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
+		}
+		
+		// Fill input names.
+		for ( int i = 0; i < prMaxTransInputCount; ++i )
+		{
+			string trans_input_name = HAPI_Host.getInputName( prAssetId, i, 
+															  HAPI_InputType.HAPI_INPUT_TRANSFORM );
+			if ( trans_input_name == "" )
+				trans_input_name = "Transform Input #" + ( i + 1 );
+			prTransInputNames.Add( trans_input_name );
+		}
+		for ( int i = 0; i < prMaxGeoInputCount; ++i )
+		{
+			string geo_input_name = HAPI_Host.getInputName( prAssetId, i, 
+															HAPI_InputType.HAPI_INPUT_GEOMETRY );
+			if ( geo_input_name == "" )
+				geo_input_name = "Geometry Input #" + ( i + 1 );
+			prGeoInputNames.Add( geo_input_name );
+			prGeoInputFormats.Add( HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_DEFAULT );
+		}
+	}
 
 	protected virtual void processDependentAssets()
 	{
-		if ( !prPartialBuild && !prForceReconnectInFullBuild )
+		if ( !prSerializationRecoveryOnly && !prForceReconnectInFullBuild )
 		{
 			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 			{
@@ -1237,7 +1243,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 			prForceReconnectInFullBuild = false;
 			prFullBuild = false;
-			prPartialBuild = false;
+			prSerializationRecoveryOnly = false;
 			build(); // Need to rebuild because now we're connected to other assets.
 		}
 	}
@@ -1264,7 +1270,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
 	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
 	[SerializeField] private bool					myFullBuild;
-	[SerializeField] private bool					myPartialBuild;
+	[SerializeField] private bool					mySerializationRecoveryOnly;
 	[SerializeField] private bool					myForceReconnectInFullBuild;
 	[SerializeField] private bool 					myReloadAssetInFullBuild;
 	[SerializeField] private bool					myUseDelayForProgressBar;

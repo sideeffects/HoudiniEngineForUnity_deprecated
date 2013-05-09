@@ -205,7 +205,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 	
 	public override bool build() 
 	{
-		bool unload_asset_first = prReloadAssetInFullBuild && !prPartialBuild;
+		bool unload_asset_first = prReloadAssetInFullBuild && !prSerializationRecoveryOnly;
 
 		bool base_built = base.build( unload_asset_first );
 		if ( !base_built )
