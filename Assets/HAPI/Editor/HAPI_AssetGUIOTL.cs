@@ -254,22 +254,25 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					else
 					{
 						Transform parent = renderer.transform;
-						HAPI_PartControl control = parent.GetComponent< HAPI_PartControl >();
+						HAPI_PartControl part_control = parent.GetComponent< HAPI_PartControl >();
 						
-						if ( control.prMaterialId >= 0 )
+						if ( part_control.prMaterialId >= 0 )
 						{
 							try
 							{
-								HAPI_MaterialInfo material = HAPI_Host.getMaterial( myAsset.prAssetId, 
-																					control.prMaterialId );
-
-								if ( material.isTransparent() )
+								HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( myAsset.prAssetId, 
+																						 part_control.prMaterialId );
+								
+								bool is_transparent = HAPI_AssetUtility.isMaterialTransparent( material_info );
+								if ( is_transparent )
 									renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
-								else if ( !material.isTransparent() )
+								else
 									renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-
-								Material mat = renderer.sharedMaterial;
-								HAPI_AssetUtility.assignTexture( ref mat, material );
+								
+								Material material  = renderer.sharedMaterial;
+								string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
+													 part_control.prAsset.prAssetName;
+								HAPI_AssetUtility.assignMaterial( ref material, material_info, folder_path );
 							}
 							catch ( HAPI_Error error )
 							{
@@ -291,7 +294,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			bool changed = HAPI_GUI.toggle( "show_pinned_instances", "Show Pinned Instances", ref value );
 			if ( changed )
 			{
-				myAsset.prShowPinnedInstances = value;				
+				myAsset.prShowPinnedInstances = value;
 			}
 		}
 

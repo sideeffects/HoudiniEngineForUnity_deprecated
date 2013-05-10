@@ -205,9 +205,9 @@ public class HAPI_AssetGUI : Editor
 
 	public virtual void OnSceneGUI()
 	{
-		HAPI_Host.myRepaintDelegate = this.refresh;
-		HAPI_Host.myDeselectionDelegate = this.deselect;
-		HAPI_Host.mySelectionTarget = myAsset;
+		HAPI_Host.myRepaintDelegate			= this.refresh;
+		HAPI_Host.myDeselectionDelegate		= this.deselect;
+		HAPI_Host.mySelectionTarget			= myAsset;
 	}
 	
 	protected bool setTransformInput( int index )
@@ -258,7 +258,7 @@ public class HAPI_AssetGUI : Editor
 		
 		bool changed 				= false;
 		
-		int asset_id				= myAsset.prAssetId;
+		int node_id					= myAsset.prAssetNodeId;
 		
 		HAPI_ParmInfo[] parms 		= myAsset.prParms;
 		HAPI_ParmInfo parm			= parms[ id ];
@@ -366,7 +366,7 @@ public class HAPI_AssetGUI : Editor
 											 ref join_last, ref no_label_toggle_last );
 
 				if ( changed )
-					HAPI_Host.setParmStringValue( asset_id, values_temp[ 0 ], id, 0 );
+					HAPI_Host.setParmStringValue( node_id, values_temp[ 0 ], id, 0 );
 			}
 			else
 			{
@@ -382,7 +382,7 @@ public class HAPI_AssetGUI : Editor
 			
 				if ( changed )
 					for ( int p = 0; p < parm_size; ++p )
-						HAPI_Host.setParmStringValue( asset_id, values[ p ], id, p );
+						HAPI_Host.setParmStringValue( node_id, values[ p ], id, p );
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
@@ -395,7 +395,7 @@ public class HAPI_AssetGUI : Editor
 										  ref join_last, ref no_label_toggle_last );
 			
 			if ( changed )
-				HAPI_Host.setParmStringValue( asset_id, path, id, 0 );
+				HAPI_Host.setParmStringValue( node_id, path, id, 0 );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
@@ -465,14 +465,14 @@ public class HAPI_AssetGUI : Editor
 				int[] temp_int_values = new int[ parm_size ];
 				for ( int p = 0; p < parm_size; ++p )
 					temp_int_values[ p ] = parm_int_values[ values_index + p ];
-				HAPI_Host.setParmIntValues( asset_id, temp_int_values, values_index, parm_size );
+				HAPI_Host.setParmIntValues( node_id, temp_int_values, values_index, parm_size );
 			}
 			else if ( parm.isFloat() )
 			{
 				float[] temp_float_values = new float[ parm_size ];
 				for ( int p = 0; p < parm_size; ++p )
 					temp_float_values[ p ] = parm_float_values[ values_index + p ];
-				HAPI_Host.setParmFloatValues( asset_id, temp_float_values, values_index, parm_size );
+				HAPI_Host.setParmFloatValues( node_id, temp_float_values, values_index, parm_size );
 			}
 			
 			// Note: String parameters update their values themselves so no need to do anything here.

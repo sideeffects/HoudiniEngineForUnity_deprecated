@@ -5,6 +5,10 @@ Shader "HAPI/SpecularVertexColor" {
 		_Emission ("Emmisive Color", Color) = (0,0,0,0)
 		_Shininess ("Shininess", Range (0.01, 1)) = 0.7
 		_MainTex ("Base (RGB)", 2D) = "white" {}
+		_SpecularMap("Specular Map", 2D) = "black" {}
+		_NormalMap ("Normal Map", 2D) = "bump" {}
+		_BumpMap ("Bump Map", 2D) = "bump" {}
+		_DisplacementMap ("Displacement Map", 2D) = "black" {}
 	}
 
 	SubShader {

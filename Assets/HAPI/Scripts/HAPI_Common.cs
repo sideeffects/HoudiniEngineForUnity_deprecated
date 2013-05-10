@@ -33,6 +33,8 @@ namespace HAPI
 		// Used for things like window titles that have limited space.
 		public const string HAPI_PRODUCT_SHORT_NAME			= "Houdini";
 
+		public static string HAPI_TEXTURES_PATH				= Application.dataPath + "/Textures";
+
 		public const int HAPI_MAX_PAGE_SIZE					= 32768;
 		public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 3;
 		public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
@@ -288,7 +290,6 @@ namespace HAPI
 	    public int rstOrder;
 	}
 	
-	
 	// ASSETS -------------------------------------------------------------------------------------------------------
 		
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -306,18 +307,14 @@ namespace HAPI
 		// which is different from the case where a new asset is being loaded
 		// for the first time.
 		public int validationId;
+
+		// Use the node id to get the asset's parameters.
+		public int nodeId;
 		
 		private int nameSH;			// string handle (SH)
 		private int labelSH;		// string handle (SH)
 		private int instancePathSH;	// string handle (SH)
 		private int filePathSH;		// string handle (SH)
-		private int texturesPathSH;	// string handle (SH)
-		
-		public int parmCount;
-		public int parmIntValueCount;
-		public int parmFloatValueCount;
-		public int parmStringValueCount;
-		public int parmChoiceCount;
 		
 		public int objectCount;
 		public int handleCount;
@@ -340,10 +337,22 @@ namespace HAPI
 		{ get { return HAPI_Host.getString( instancePathSH ); } private set {} }
 		public string filePath
 		{ get { return HAPI_Host.getString( filePathSH ); } private set {} }
-		public string texturesPath
-		{ get { return HAPI_Host.getString( texturesPathSH ); } private set {} }
 	}
 	
+	// NODES --------------------------------------------------------------------------------------------------------
+
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_NodeInfo 
+	{
+		public int id;
+		
+		public int parmCount;
+		public int parmIntValueCount;
+		public int parmFloatValueCount;
+		public int parmStringValueCount;
+		public int parmChoiceCount;
+	}
+
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -591,35 +600,8 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_MaterialInfo
 	{
-		public bool isTransparent()
-		{
-			return ( diffuse[ 3 ] < 0.95f ); // True if alpha of the diffuse is less than 1.0
-		}
-
 		public int id;
-		
-		private int textureFilePathSH;	// string handle (SH)
-		
-		public float roughness; // inverse of shininess
-		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_COLOR_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-	    public float[] ambient;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_COLOR_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-	    public float[] diffuse;
-		
-		[ MarshalAs( UnmanagedType.ByValArray, 
-					 SizeConst = HAPI_Constants.HAPI_COLOR_VECTOR_SIZE, 
-					 ArraySubType = UnmanagedType.R4 ) ]
-	    public float[] specular;
-		
-		// Accessors
-		public string textureFilePath
-		{ get { return HAPI_Host.getString( textureFilePathSH ); } private set {} }
+		public int materialNodeId;
 	}
 	
 }

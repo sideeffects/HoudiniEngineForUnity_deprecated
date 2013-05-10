@@ -113,7 +113,6 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_LoadOTLFile( string file_path,
-													string textures_path,
 													int min_vertices_per_primitive,
 													int max_vertices_per_primitive,
 													ref int asset_id );
@@ -149,7 +148,6 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_LoadHIPFile( string file_name,
-													string textures_path,
 													int min_vertices_per_primitive,
 													int max_vertices_per_primitive );
 
@@ -168,46 +166,43 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ReplaceAssetFromHIPFile( int asset_id, string file_name );
 
+		// NODES ----------------------------------------------------------------------------------------------------
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetNodeInfo( int node_id, ref HAPI_NodeInfo node_info );
+
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetParameters( 		int asset_id, 
-															[Out] HAPI_ParmInfo[] parm_infos, 
+		private static extern int HAPI_GetParameters( 		int node_id, [Out] HAPI_ParmInfo[] parm_infos, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetParmIntValues( 	int asset_id, 
-															[Out] int[] values, 
+		private static extern int HAPI_GetParmIntValues( 	int node_id, [Out] int[] values, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetParmFloatValues( 	int asset_id, 
-															[Out] float[] values, 
+		private static extern int HAPI_GetParmFloatValues( 	int node_id, [Out] float[] values, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetParmStringValues( int asset_id, 
-															[Out] int[] values, 
+		private static extern int HAPI_GetParmStringValues( int node_id, [Out] int[] values, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetParmChoiceLists(	int asset_id, 
-															[Out] HAPI_ParmChoiceInfo[] parm_choices, 
+		private static extern int HAPI_GetParmChoiceLists(	int node_id, [Out] HAPI_ParmChoiceInfo[] parm_choices, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetParmIntValues( 	int asset_id, 
-															int[] values, 
+		private static extern int HAPI_SetParmIntValues( 	int node_id, int[] values, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetParmFloatValues( 	int asset_id, 
-															float[] values, 
+		private static extern int HAPI_SetParmFloatValues( 	int node_id, float[] values, 
 															int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetParmStringValue( 	int asset_id, 
-															string value, 
+		private static extern int HAPI_SetParmStringValue( 	int node_id, string value, 
 															int parm_id, int index );
 		
 		// HANDLES --------------------------------------------------------------------------------------------------
@@ -385,7 +380,19 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetMaterial(		int asset_id, int material_id,
 														out HAPI_MaterialInfo material_info );
-		
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_ExtractTextureToFile(	int node_id, int parm_id,
+																string destination_folder_path,
+																ref int destination_file_path );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetTextureSize(	int node_id, int parm_id,
+														ref int texture_size );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetTexture(		int node_id, int parm_id,
+														[Out] byte[] buffer );
 	}
 
 }

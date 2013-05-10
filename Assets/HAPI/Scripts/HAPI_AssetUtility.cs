@@ -500,45 +500,148 @@ public class HAPI_AssetUtility
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
 			printAttributeNames( asset_id, object_id, geo_id, part_id, part_info, (HAPI_AttributeOwner) owner );
 	}
+
+	// PARAMETERS ---------------------------------------------------------------------------------------------------
 	
+	public static int findParm( ref HAPI_ParmInfo[] parms, string name )
+	{
+		if ( parms == null )
+			return -1;
+
+		for ( int i = 0; i < parms.Length; ++i )
+		{
+			if ( parms[ i ].name == name )
+				return i;
+		}
+		return -1;
+	}
+
+	public static float getParmFloatValue( int node_id, string parm_name, float default_value )
+	{
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( node_id );
+
+		// Get all parameters.
+		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
+		getArray1Id( node_id, HAPI_Host.getParameters, parms, node_info.parmCount );
+
+		int parm_id = findParm( ref parms, parm_name );
+		if ( parm_id < 0 )
+			return default_value;
+
+		int values_index = parms[ parm_id ].floatValuesIndex;
+		float[] value = new float[ 1 ];
+
+		HAPI_Host.getParmFloatValues( node_id, value, values_index, 1 );
+
+		return value[ 0 ];
+	}
+
+	public static Color getParmColour3Value( int node_id, string parm_name, Color default_value )
+	{
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( node_id );
+
+		// Get all parameters.
+		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
+		getArray1Id( node_id, HAPI_Host.getParameters, parms, node_info.parmCount );
+
+		int parm_id = findParm( ref parms, parm_name );
+		if ( parm_id < 0 )
+			return default_value;
+
+		if ( parms[ parm_id ].size < 3 )
+			Debug.LogError( "Parm size not large enough to be a color3." );
+
+		int values_index = parms[ parm_id ].floatValuesIndex;
+		float[] values = new float[ 3 ];
+
+		HAPI_Host.getParmFloatValues( node_id, values, values_index, 3 );
+
+		return new Color( values[ 0 ], values[ 1 ], values[ 2 ], 1.0f );
+	}
+
+	public static Color getParmColour4Value( int node_id, string parm_name, Color default_value )
+	{
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( node_id );
+
+		// Get all parameters.
+		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
+		getArray1Id( node_id, HAPI_Host.getParameters, parms, node_info.parmCount );
+
+		int parm_id = findParm( ref parms, parm_name );
+		if ( parm_id < 0 )
+			return default_value;
+
+		if ( parms[ parm_id ].size < 4 )
+			Debug.LogError( "Parm size not large enough to be a color4." );
+
+		int values_index = parms[ parm_id ].floatValuesIndex;
+		float[] values = new float[ 4 ];
+
+		HAPI_Host.getParmFloatValues( node_id, values, values_index, 4 );
+
+		return new Color( values[ 0 ], values[ 1 ], values[ 2 ], values[ 3 ] );
+	}
+
 	// TEXTURES -----------------------------------------------------------------------------------------------------
 	
-	public static void assignTexture( ref Material material, HAPI_MaterialInfo material_info )
+	public static bool isMaterialTransparent( HAPI_MaterialInfo material_info )
+	{
+		float alpha = getParmFloatValue( material_info.materialNodeId, "ogl_alpha", 1.0f );
+
+		return ( alpha < 0.95f );
+	}
+
+	public static void assignMaterial( ref Material material, HAPI_MaterialInfo material_info,
+									   string folder_path )
 	{
 		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
-		string assets_root_path 		= Application.dataPath;
-		string textures_root_path 		= assets_root_path + "/Textures";
-		DirectoryInfo textures_dir 		= new DirectoryInfo( textures_root_path );
+		DirectoryInfo textures_dir 		= new DirectoryInfo( folder_path );
 		if ( !textures_dir.Exists )
 			textures_dir.Create();
-		
-		// Figure out the source file path and name.
-		string tex_file_path 		= material_info.textureFilePath.Replace( "\\", "/" );
-		string relative_file_path 	= tex_file_path.Replace( assets_root_path, "Assets" );
-		
-		// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths
-		// relative to the project folder.
-		Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-		if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+
+		// Get all parameters.
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( material_info.materialNodeId );
+		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
+		getArray1Id( material_info.materialNodeId, HAPI_Host.getParameters, parms, node_info.parmCount );
+
+		// Extract diffuse map file from material.
+		int diffuse_map_parm_id = findParm( ref parms, "baseColorMap" );
+		if ( diffuse_map_parm_id < 0 )
+			diffuse_map_parm_id = findParm( ref parms, "map" );
+		if ( diffuse_map_parm_id >= 0 )
 		{
-			// Asset has not been imported yet so import and try again.
-			AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
-			tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+			// Figure out the source file path and name.
+			string texture_file_path	= HAPI_Host.extractTextureToFile( material_info.materialNodeId, 
+																		  diffuse_map_parm_id, 
+																		  folder_path );
+			string relative_file_path 	= texture_file_path.Replace(	  Application.dataPath, 
+																		  "Assets" );
+		
+			// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths
+			// relative to the project folder.
+			Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+			if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+			{
+				// Asset has not been imported yet so import and try again.
+				AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+				tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+			}
+		
+			// Assign main texture.
+			material.mainTexture = (Texture2D) tex_obj;
 		}
 		
-		// Assign main texture.
-		material.mainTexture = (Texture2D) tex_obj;
-		
 		// Assign shader properties.
-		material.SetFloat( "_Shininess", 1.0f - material_info.roughness );
-		material.SetColor( "_Color", new Color( material_info.diffuse[ 0 ], 
-												material_info.diffuse[ 1 ],
-												material_info.diffuse[ 2 ],
-												material_info.diffuse[ 3 ] ) );
-		material.SetColor( "_SpecColor", new Color( material_info.specular[ 0 ], 
-													material_info.specular[ 1 ],
-													material_info.specular[ 2 ],
-													material_info.specular[ 3 ] ) );
+
+		material.SetFloat( "_Shininess", 
+						   1.0f - getParmFloatValue( material_info.materialNodeId, "ogl_rough", 0.0f ) );
+
+		Color diffuse_colour	= getParmColour3Value( material_info.materialNodeId, "ogl_diff", Color.white );
+		diffuse_colour.a		= getParmFloatValue( material_info.materialNodeId, "ogl_alpha", 1.0f );
+		material.SetColor( "_Color", diffuse_colour );
+
+		material.SetColor( "_SpecColor", 
+						   getParmColour3Value( material_info.materialNodeId, "ogl_spec", Color.black ) );
 		
 		// Refresh all assets just in case.
 		AssetDatabase.Refresh();

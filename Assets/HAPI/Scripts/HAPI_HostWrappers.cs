@@ -462,13 +462,31 @@ namespace HAPI
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
-		// PARAMETERS -----------------------------------------------------------------------------------------------------
+		// NODES ----------------------------------------------------------------------------------------------------
+
+		/// <summary>
+		/// 	Get an node info struct.
+		/// </summary>
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
+		/// </param>
+		public static HAPI_NodeInfo getNodeInfo( int node_id )
+		{
+			HAPI_NodeInfo node_info = new HAPI_NodeInfo();
+			int status_code = HAPI_GetNodeInfo( node_id, ref node_info );
+			processStatusCode( (HAPI_Result) status_code );
+			return node_info;
+		}
+
+		// PARAMETERS -----------------------------------------------------------------------------------------------
 
 		/// <summary>
 		/// 	Fill an array of HAPI_ParmInfo structs with parameter information from the asset instance node.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="parm_infos">
 		/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of
@@ -480,19 +498,19 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getParameters( 	int asset_id,
-											[Out] HAPI_ParmInfo[] parm_infos,
+		public static void getParameters( 	int node_id, [Out] HAPI_ParmInfo[] parm_infos,
 											int start, int length )
 		{
-			int status_code = HAPI_GetParameters( asset_id, parm_infos, start, length );
+			int status_code = HAPI_GetParameters( node_id, parm_infos, start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
 		/// 	Fill an array of parameter int values.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="values">
 		/// 	Array of ints at least the size of <paramref name="length"/>.
@@ -505,19 +523,19 @@ namespace HAPI
 		/// 	Must be at least 0 and at most
 		/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getParmIntValues(	int asset_id,
-												[Out] int[] values,
+		public static void getParmIntValues(	int node_id, [Out] int[] values,
 												int start, int length )
 		{
-			int status_code = HAPI_GetParmIntValues( asset_id, values, start, length );
+			int status_code = HAPI_GetParmIntValues( node_id, values, start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
 		/// 	Fill an array of parameter float values.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="values">
 		/// 	Array of floats at least the size of <paramref name="length"/>.
@@ -530,11 +548,10 @@ namespace HAPI
 		/// 	Must be at least 0 and at most
 		/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getParmFloatValues(	int asset_id,
-												[Out] float[] values,
+		public static void getParmFloatValues(	int node_id, [Out] float[] values,
 												int start, int length )
 		{
-			int status_code = HAPI_GetParmFloatValues( asset_id, values, start, length );
+			int status_code = HAPI_GetParmFloatValues( node_id, values, start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
@@ -542,8 +559,9 @@ namespace HAPI
 		/// 	Fill an array of parameter string handles. These handles must be used in conjunction with
 		/// 	<see cref="HAPI_GetString"> to get the actual string values.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="values">
 		/// 	Array of ints at least the size of <paramref name="length"/>.
@@ -556,11 +574,10 @@ namespace HAPI
 		/// 	Must be at least 0 and at most
 		/// 	<see cref="HAPI_AssetInfo.parmStringValueCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getParmStringValues(	int asset_id,
-												[Out] int[] values,
+		public static void getParmStringValues(	int node_id, [Out] int[] values,
 												int start, int length )
 		{
-			int status_code = HAPI_GetParmStringValues( asset_id, values, start, length );
+			int status_code = HAPI_GetParmStringValues( node_id, values, start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
@@ -568,8 +585,9 @@ namespace HAPI
 		/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information
 		/// 	from the asset instance node.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="parm_choices">
 		/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of <paramref name="length"/>.
@@ -580,19 +598,19 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmChoiceCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getParmChoiceLists( 	int asset_id,
-												[Out] HAPI_ParmChoiceInfo[] parm_choices,
+		public static void getParmChoiceLists( 	int node_id, [Out] HAPI_ParmChoiceInfo[] parm_choices,
 												int start, int length )
 		{
-			int status_code = HAPI_GetParmChoiceLists( asset_id, parm_choices, start, length );
+			int status_code = HAPI_GetParmChoiceLists( node_id, parm_choices, start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
 		/// 	Set (push) an array of parameter int values.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="values">
 		/// 	Array of ints at least the size of <paramref name="length"/>.
@@ -605,19 +623,19 @@ namespace HAPI
 		/// 	Must be at least 0 and at most
 		/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void setParmIntValues(	int asset_id,
-												int[] values,
+		public static void setParmIntValues(	int node_id, int[] values,
 												int start, int length )
 		{
-			int status_code = HAPI_SetParmIntValues( asset_id, values, start, length );
+			int status_code = HAPI_SetParmIntValues( node_id, values, start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
 		/// <summary>
 		/// 	Set (push) an array of parameter float values.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="values">
 		/// 	Array of floats at least the size of <paramref name="length"/>.
@@ -630,11 +648,10 @@ namespace HAPI
 		/// 	Must be at least 0 and at most
 		/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - <paramref name="start"/>.
 		/// </param>
-		public static void setParmFloatValues(	int asset_id,
-												float[] values,
+		public static void setParmFloatValues(	int node_id, float[] values,
 												int start, int length )
 		{
-			int status_code = HAPI_SetParmFloatValues( asset_id, values, start, length );
+			int status_code = HAPI_SetParmFloatValues( node_id, values, start, length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 
@@ -642,8 +659,9 @@ namespace HAPI
 		/// 	Set (push) a string value. We can only set a single value at a time because we want to avoid
 		/// 	fixed size string buffers.
 		/// </summary>
-		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// <param name="node_id">
+		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
+		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
 		/// </param>
 		/// <param name="value">
 		/// 	The string value.
@@ -654,11 +672,10 @@ namespace HAPI
 		/// <param name="index">
 		/// 	Index within the parameter's values tuple.
 		/// </param>
-		public static void setParmStringValue(	int asset_id,
-												string value,
+		public static void setParmStringValue(	int node_id, string value,
 												int parm_id, int index )
 		{
-			int status_code = HAPI_SetParmStringValue( asset_id, value, parm_id, index );
+			int status_code = HAPI_SetParmStringValue( node_id, value, parm_id, index );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 		
@@ -1595,6 +1612,33 @@ namespace HAPI
 			int status_code = HAPI_GetMaterial( asset_id, material_id, out material_info );
 			processStatusCode( (HAPI_Result) status_code );
 			return material_info;
+		}
+
+		/// <summary>
+		/// 	Extract a texture map to a file.
+		/// </summary>
+	    /// <param name="node_id">
+	    ///		The node id given by the <see cref="HAPI_MaterialInfo"/> struct from 
+		///		<see cref="HAPI_Host.getMaterial"/>.
+		/// </param>
+		/// <param name="parm_id">
+		///		This is the index in the parameter list of the material node with the above node_id.
+		/// </param>
+		/// <param name="destination_folder_path">
+		///		The folder path of where you wish the texture file to be extracted.
+		/// </param>
+		/// <return>
+		///		The full path, including the destination_folder_path and the texture file name, 
+		///		to the extracted file.
+		/// </return>
+		public static string extractTextureToFile( int node_id, int parm_id, string destination_folder_path )
+		{
+			int destination_file_path_sh = 0;
+			int status_code = HAPI_ExtractTextureToFile( node_id, parm_id, destination_folder_path,
+														 ref destination_file_path_sh );
+			processStatusCode( (HAPI_Result) status_code );
+
+			return getString( destination_file_path_sh ).Replace( "\\", "/" );
 		}
 	}
 

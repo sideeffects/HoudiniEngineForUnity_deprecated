@@ -168,7 +168,7 @@ public class HAPI_GUI : Editor
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
-
+		
 		// Get old value.
 		T old_value = values[ parm.valuesIndex ];
 

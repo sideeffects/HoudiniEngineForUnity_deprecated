@@ -46,6 +46,8 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myPreset = value; } }
 	public int						prAssetValidationId {			get { return myAssetValidationId; }
 																	protected set { myAssetValidationId = value; } }
+	public int						prAssetNodeId {					get { return myAssetNodeId; }
+																	set { myAssetNodeId = value; } }
  	public string					prAssetName {					get { return myAssetName; }
 																	set { myAssetName = value; } }
 	public AssetType				prAssetType {					get { return myAssetType; } 
@@ -471,6 +473,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prAssetInfo 				= new HAPI_AssetInfo();
 		prPreset 					= null;
 		prAssetValidationId			= -1;
+		prAssetNodeId				= -1;
 		prAssetName					= "ASSET_NAME";
 		prAssetType					= AssetType.TYPE_INVALID;
 		prHAPIAssetType 			= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
@@ -659,17 +662,22 @@ public abstract class HAPI_Asset : HAPI_Control
 				// variables is required in order to maintain state between serialization cycles.
 				prAssetId 				= prAssetInfo.id;
 				prAssetValidationId		= prAssetInfo.validationId;
+				prAssetNodeId			= prAssetInfo.nodeId;
+
 				prAssetName				= prAssetInfo.name;
 				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
 				prMinTransInputCount	= prAssetInfo.minTransInputCount;
 				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;
 				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
 				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
-				prParmCount 			= prAssetInfo.parmCount;
-				prParmIntValueCount		= prAssetInfo.parmIntValueCount;
-				prParmFloatValueCount	= prAssetInfo.parmFloatValueCount;
-				prParmStringValueCount	= prAssetInfo.parmStringValueCount;
-				prParmChoiceCount		= prAssetInfo.parmChoiceCount;
+
+				HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prAssetNodeId );
+
+				prParmCount 			= node_info.parmCount;
+				prParmIntValueCount		= node_info.parmIntValueCount;
+				prParmFloatValueCount	= node_info.parmFloatValueCount;
+				prParmStringValueCount	= node_info.parmStringValueCount;
+				prParmChoiceCount		= node_info.parmChoiceCount;
 				
 				prObjectCount 			= prAssetInfo.objectCount;
 				prHandleCount 			= prAssetInfo.handleCount;
@@ -693,28 +701,31 @@ public abstract class HAPI_Asset : HAPI_Control
 				
 				// Get all parameters.
 				prParms = new HAPI_ParmInfo[ prParmCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParameters, prParms, prParmCount );
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParameters, prParms, prParmCount );
 				progress_bar.incrementProgressBar( prParmCount );
 				
 				// Get parameter int values.
 				prParmIntValues = new int[ prParmIntValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmIntValues, 
+									 prParmIntValues, prParmIntValueCount );
 				progress_bar.incrementProgressBar( prParmIntValueCount );
 				
 				// Get parameter float values.
 				prParmFloatValues = new float[ prParmFloatValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmFloatValues, 
+									 prParmFloatValues, prParmFloatValueCount );
 				progress_bar.incrementProgressBar( prParmFloatValueCount );
 				
 				// Get parameter string (handle) values.
 				prParmStringValues = new int[ prParmStringValueCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
 									 prParmStringValueCount );
 				progress_bar.incrementProgressBar( prParmStringValueCount );
 				
 				// Get parameter choice lists.
 				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmChoiceLists, 
+									 prParmChoiceLists, prParmChoiceCount );
 				progress_bar.incrementProgressBar( prParmChoiceCount );
 				
 				// Add input fields.
@@ -752,15 +763,17 @@ public abstract class HAPI_Asset : HAPI_Control
 				// changed by a script.
 
 				// Get parameter int values.
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmIntValues, 
+									 prParmIntValues, prParmIntValueCount );
 				progress_bar.incrementProgressBar( prParmIntValueCount );
 				
 				// Get parameter float values.
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmFloatValues, 
+									 prParmFloatValues, prParmFloatValueCount );
 				progress_bar.incrementProgressBar( prParmFloatValueCount );
 				
 				// Get parameter string (handle) values.
-				Utility.getArray1Id( prAssetId, HAPI_Host.getParmStringValues, prParmStringValues, 
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
 									 prParmStringValueCount );
 				progress_bar.incrementProgressBar( prParmStringValueCount );
 			}
@@ -849,7 +862,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			parm = findParm( "t" );
 			if ( parm > 0 )
 			{
-				HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+				HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
 				for ( int i = 0; i < 3; ++i )
 					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
 			}
@@ -857,7 +870,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			parm = findParm( "r" );
 			if ( parm > 0 )
 			{
-				HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+				HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
 				for ( int i = 0; i < 3; ++i )
 					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
 			}
@@ -865,7 +878,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			parm = findParm( "s" );
 			if ( parm > 0 )
 			{
-				HAPI_Host.getParmFloatValues( prAssetId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+				HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
 				for ( int i = 0; i < 3; ++i )
 					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
 			}
@@ -1259,6 +1272,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private HAPI_AssetInfo			myAssetInfo;
 	[SerializeField] private byte[]					myPreset;
 	[SerializeField] private int					myAssetValidationId;
+	[SerializeField] private int					myAssetNodeId;
 	[SerializeField] private string					myAssetName;
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;

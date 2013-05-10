@@ -338,6 +338,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				if ( current_event.isKey && current_event.type == EventType.KeyUp &&
 					 ( current_event.keyCode == KeyCode.Delete || current_event.keyCode == KeyCode.Backspace ) )
 				{
+					// Once we add a point we are no longer bound to the user holding down the add points key.
+					// Add points mode is now fully activated.
+					myAssetCurve.prModeChangeWait = false;
+
 					myAssetCurve.deleteLastPoint();
 
 					// Remake and Draw Guide Geometry
@@ -928,9 +932,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		// whos key is being held down...
 		GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
 								  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
-		myLastMode				= myAssetCurve.prCurrentMode;
-		myAssetCurve.prCurrentMode = (HAPI_AssetCurve.Mode) GUI.Toolbar( mode_text_rect, (int) myLastMode, modes );
-		if ( myLastMode != myAssetCurve.prCurrentMode )
+		HAPI_AssetCurve.Mode last_mode = myAssetCurve.prCurrentMode;
+		myAssetCurve.prCurrentMode = (HAPI_AssetCurve.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
+		if ( last_mode != myAssetCurve.prCurrentMode )
 			clearSelection();
 		GUI.enabled = true;
 

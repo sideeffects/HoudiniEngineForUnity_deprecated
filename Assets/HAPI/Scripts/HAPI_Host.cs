@@ -321,11 +321,9 @@ namespace HAPI
 		{
 			if ( !initialize() )
 				throw new HAPI_Error( "DLL Not Found." );
-
-			string textures_path = Application.dataPath + "/Textures";
 			
 			int asset_id = -1;
-			HAPI_Result status_code = (HAPI_Result) HAPI_LoadOTLFile( path, textures_path,
+			HAPI_Result status_code = (HAPI_Result) HAPI_LoadOTLFile( path,
 																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
 																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
 																	  ref asset_id );
@@ -338,10 +336,8 @@ namespace HAPI
 		{
 			if ( !initialize() )
 				throw new HAPI_Error( "DLL Not Found." );
-
-			string textures_path = Application.dataPath + "/Textures";
 																
-			HAPI_Result status_code = (HAPI_Result) HAPI_LoadHIPFile( path, textures_path, 
+			HAPI_Result status_code = (HAPI_Result) HAPI_LoadHIPFile( path,
 																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
 																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE );
 			
