@@ -19,6 +19,102 @@ public class HAPI_CurvesCollection
 	public AnimationCurve sx = new AnimationCurve();
 	public AnimationCurve sy = new AnimationCurve();
 	public AnimationCurve sz = new AnimationCurve();
+	
+	
+	private bool isConstantAnimCurve( AnimationCurve curve )
+	{
+		if( curve.length < 1 )
+			return true;
+		
+		Keyframe key = curve.keys[ 0 ];
+		for ( int ii=1; ii < curve.keys.Length; ii++ )
+		{
+			Keyframe curr_key = curve.keys[ ii ];
+			if( Mathf.Abs( curr_key.value - key.value ) > 0.0001f )
+			{
+				return false;
+			}			
+		}
+		
+		return true;
+	}
+	
+	public AnimationClip assignCurvesToClip()
+	{
+		HAPI_CurvesCollection curves = this;
+						
+		AnimationClip clip = new AnimationClip();			
+		
+		bool found_nonconst_curve = false;
+		
+		if( !curves.isConstantAnimCurve( curves.tx ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localPosition.x", curves.tx );				
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.ty ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localPosition.y", curves.ty );				
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.tz ) )
+		{				
+			clip.SetCurve( "", typeof(Transform), "localPosition.z", curves.tz );							
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.qx ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localRotation.x", curves.qx );				
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.qy ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localRotation.y", curves.qy );				
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.qz ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localRotation.z", curves.qz );
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.qw ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localRotation.w", curves.qw );								
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.sx ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localScale.x", curves.sx );				
+			found_nonconst_curve = true;
+		}	
+		
+		if( !curves.isConstantAnimCurve( curves.sy ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localScale.y", curves.sy );				
+			found_nonconst_curve = true;
+		}
+		
+		if( !curves.isConstantAnimCurve( curves.sz ) )
+		{
+			clip.SetCurve( "", typeof(Transform), "localScale.z", curves.sz );
+			found_nonconst_curve = true;
+		}	
+		
+		if( found_nonconst_curve )
+		{
+			clip.EnsureQuaternionContinuity();
+			return clip;
+		}
+		return null;
+	}
+	
 }
 
 public class HAPI_Instancer : MonoBehaviour {
@@ -473,46 +569,40 @@ public class HAPI_Instancer : MonoBehaviour {
 								  + prAsset.prAssetId + "!" );
 	}
 	
-	public void endBakeAnimation( GameObject parent_object )
+	public bool endBakeAnimation( GameObject parent_object )
 	{
 		try
 		{						
-			
+			bool found_non_const_curve = false;
 			for ( int ii = 0; ii < myNumInstances; ++ii )
 			{												
 				GameObject child = transform.GetChild( ii ).gameObject;
 																				
 				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];
 				
-				Animation anim_component = child.GetComponent< Animation >();
-				if( anim_component == null )
+				AnimationClip clip = curves.assignCurvesToClip();
+				
+				if( clip != null )
 				{
-					child.AddComponent< Animation >();
-					anim_component = child.GetComponent< Animation >();
-				}
-				AnimationClip clip = new AnimationClip();
-				anim_component.clip = clip;																		
+					Animation anim_component = child.GetComponent< Animation >();
+					if( anim_component == null )
+					{
+						child.AddComponent< Animation >();
+						anim_component = child.GetComponent< Animation >();
+					}
 				
-				clip.SetCurve( "", typeof(Transform), "localPosition.x", curves.tx );				
-				clip.SetCurve( "", typeof(Transform), "localPosition.y", curves.ty );				
-				clip.SetCurve( "", typeof(Transform), "localPosition.z", curves.tz );							
-				clip.SetCurve( "", typeof(Transform), "localRotation.x", curves.qx );				
-				clip.SetCurve( "", typeof(Transform), "localRotation.y", curves.qy );				
-				clip.SetCurve( "", typeof(Transform), "localRotation.z", curves.qz );
-				clip.SetCurve( "", typeof(Transform), "localRotation.w", curves.qw );								
-				clip.SetCurve( "", typeof(Transform), "localScale.x", curves.sx );				
-				clip.SetCurve( "", typeof(Transform), "localScale.y", curves.sy );				
-				clip.SetCurve( "", typeof(Transform), "localScale.z", curves.sz );
-	
-				clip.EnsureQuaternionContinuity();
-				
+					anim_component.clip = clip;					
+					found_non_const_curve = true;
+				}								
 			}
+			
+			return found_non_const_curve;
 						
 		}
 		catch ( HAPI_Error error )
 		{
 			Debug.LogWarning( error.ToString() );
-			return;
+			return false;
 		}
 	}
 	

@@ -156,46 +156,38 @@ public class HAPI_ObjectControl : HAPI_Control
 			return;
 		}
 	}
+		
 	
-	public void endBakeAnimation()
+	public bool endBakeAnimation()
 	{
 		try
 		{						
 						
 			HAPI_CurvesCollection curves = myCurveCollection;
+						
+			AnimationClip clip = curves.assignCurvesToClip();
 			
-			Animation anim_component = gameObject.GetComponent< Animation >();
-			if( anim_component == null )
-			{
-				gameObject.AddComponent< Animation >();
-				anim_component = gameObject.GetComponent< Animation >();
+			if( clip != null )
+			{				
+				
+				Animation anim_component = gameObject.GetComponent< Animation >();
+				if( anim_component == null )
+				{
+					gameObject.AddComponent< Animation >();
+					anim_component = gameObject.GetComponent< Animation >();
+				}
+				
+				anim_component.clip = clip;																						
+				return true;
 			}
-			AnimationClip clip = new AnimationClip();
-			anim_component.clip = clip;																		
 			
-			clip.SetCurve( "", typeof(Transform), "localPosition.x", curves.tx );				
-			clip.SetCurve( "", typeof(Transform), "localPosition.y", curves.ty );				
-			clip.SetCurve( "", typeof(Transform), "localPosition.z", curves.tz );							
-			clip.SetCurve( "", typeof(Transform), "localRotation.x", curves.qx );				
-			clip.SetCurve( "", typeof(Transform), "localRotation.y", curves.qy );				
-			clip.SetCurve( "", typeof(Transform), "localRotation.z", curves.qz );
-			clip.SetCurve( "", typeof(Transform), "localRotation.w", curves.qw );								
-			clip.SetCurve( "", typeof(Transform), "localScale.x", curves.sx );				
-			clip.SetCurve( "", typeof(Transform), "localScale.y", curves.sy );				
-			clip.SetCurve( "", typeof(Transform), "localScale.z", curves.sz );
-
-			clip.EnsureQuaternionContinuity();
-			
-			/*if( parent_object != null )
-			{
-				transform.parent = parent_object.transform;									
-			}*/
+			return false;
 						
 		}
 		catch ( HAPI_Error error )
 		{
 			Debug.LogWarning( error.ToString() );
-			return;
+			return false;
 		}
 	}
 

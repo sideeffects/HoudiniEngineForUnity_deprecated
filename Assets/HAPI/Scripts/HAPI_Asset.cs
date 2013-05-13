@@ -990,7 +990,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.displayProgressBar();
 			}
 						
-			
+			bool found_anim = false;
 			for( int ii = 0; ii < num_objects; ii++ )
 			{
 				GameObject game_object = prGameObjects[ ii ];
@@ -1001,15 +1001,22 @@ public abstract class HAPI_Asset : HAPI_Control
 					if( !obj_info.isInstancer )					
 					{
 						HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
-						obj_control.endBakeAnimation();
+						if( obj_control.endBakeAnimation() )
+							found_anim = true;
 					}
 					else
 					{
 						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
-						instancer.endBakeAnimation( parent_object );
+						if( instancer.endBakeAnimation( parent_object ) )
+							found_anim = true;
 					}
 										
 				}
+			}
+			
+			if( !found_anim )
+			{
+				EditorUtility.DisplayDialog( "Bake Error", "No animation was found to bake", "OK" );
 			}
 		}
 		catch ( HAPI_Error error )
