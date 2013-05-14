@@ -33,6 +33,7 @@ public class HAPI_AssetGUI : Editor
 		
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
+		myReloadAsset		= false;
 	}
 
 	public virtual void OnDisable()
@@ -121,7 +122,7 @@ public class HAPI_AssetGUI : Editor
 									myAsset.prUpStreamGeoAssets[ input_index ] = null;
 									
 									myAsset.prFileInputs[ input_index ] = "";
-									myAsset.build();
+									myAsset.buildClientSide();
 								}
 								else
 								{
@@ -152,13 +153,13 @@ public class HAPI_AssetGUI : Editor
 											else
 											{
 												myAsset.addAssetAsGeoInput( asset, object_index, input_index );
-												myAsset.build();
+												myAsset.buildClientSide();
 											}
 										}
 										else
 										{
 											myAsset.addGeoAsGeoInput( new_obj, input_index );
-											myAsset.build();
+											myAsset.buildClientSide();
 										}
 									}
 								}
@@ -180,7 +181,7 @@ public class HAPI_AssetGUI : Editor
 									
 									myAsset.prUpStreamGeoObjects[ input_index ] = null;
 									myAsset.prUpStreamGeoAssets[ input_index ] = null;
-									myAsset.build();
+									myAsset.buildClientSide();
 								}
 								else
 								{
@@ -189,7 +190,7 @@ public class HAPI_AssetGUI : Editor
 									
 									myAsset.prUpStreamGeoObjects[ input_index ] = null;
 									myAsset.prUpStreamGeoAssets[ input_index ] = null;
-									myAsset.build();
+									myAsset.buildClientSide();
 								}
 							}
 						} // if
@@ -241,7 +242,7 @@ public class HAPI_AssetGUI : Editor
 					myAsset.addAssetAsTransformInput( input_asset, index );
 				else
 					myAsset.removeTransformInput( index );
-				myAsset.build();
+				myAsset.buildClientSide();
 			}
 		}
 		
@@ -631,6 +632,7 @@ public class HAPI_AssetGUI : Editor
 	protected bool			myDelayBuild;
 	protected bool			myParmChanges;
 	protected bool			myUnbuiltChanges;
+	protected bool			myReloadAsset;
 
 	private const int		myInputFormatDropdownWidth = 62;
 }

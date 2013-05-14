@@ -54,14 +54,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		if ( myAssetOTL.prShowObjectControls ) 
 		{
 			if ( GUILayout.Button( "Rebuild" ) ) 
-			{
-				myAssetOTL.prFullBuild = true;
-				myAssetOTL.build();
-			}
-			if ( GUILayout.Button( "Recook" ) ) 
-			{
-				myAssetOTL.build();
-			}
+				myAssetOTL.buildAll();
+
+			if ( GUILayout.Button( "Recook" ) )
+				myAssetOTL.buildClientSide();
 			
 			EditorGUILayout.BeginHorizontal(); 
 			{
@@ -88,9 +84,12 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							Debug.LogError( error.ToString() );
 						}
 						
-						myAssetOTL.prFullBuild = true;
-						myAssetOTL.prReloadAssetInFullBuild = false;
-						myAssetOTL.build();
+						myAssetOTL.build(	true,	// reload_asset
+											false,	// unload_asset_first
+											false,	// serialization_recovery_only
+											false,	// force_reconnect
+											true	// use_progress_bar_delay
+										);
 					}
 					else
 						Debug.LogError( "Nothing to save." );
@@ -100,27 +99,27 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			EditorGUILayout.EndHorizontal();
 			
 			string path = myAssetOTL.prAssetPath;
-			myParmChanges |= HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
-			if ( myParmChanges )
-				myAssetOTL.prAssetPath = path;
+			bool file_path_changed = HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
+			if ( file_path_changed )
+			{
+				myParmChanges			|= file_path_changed;
+				myAssetOTL.prAssetPath	 = path;
+				myReloadAsset			 = true;
+			}
 						
 			EditorGUILayout.Separator();
 			myAssetOTL.prShowAssetOptions = 
 				EditorGUILayout.Foldout( myAssetOTL.prShowAssetOptions, new GUIContent( "Asset Options" ) );
 			// These don't affect the asset directly so they don't trigger rebuilds.
 			
-			if( myAssetOTL.prShowAssetOptions )
-			{
+			if ( myAssetOTL.prShowAssetOptions )
 				generateAssetOptionControls();
-			}
 			
 			myAssetOTL.prShowBakeOptions = 
 				EditorGUILayout.Foldout( myAssetOTL.prShowBakeOptions, new GUIContent( "Bake Animations" ) );
 			
-			if( myAssetOTL.prShowBakeOptions )
-			{
+			if ( myAssetOTL.prShowBakeOptions )
 				generateAssetBakeControls();
-			}
 			
 		} // if
 		
@@ -136,9 +135,16 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
 		{
-			myAssetOTL.build();
-			myUnbuiltChanges = false;
-			myParmChanges = false;
+			myAssetOTL.build(	myReloadAsset,	// reload_asset
+								true,			// unload_asset_first
+								false,			// serializatin_recovery_only
+								false,			// force_reconnect
+								true			// use_delay_for_progress_bar
+							);
+
+			myUnbuiltChanges	= false;
+			myParmChanges		= false;
+			myReloadAsset		= false;
 
 			// To keep things consistent with Unity workflow, we should not save parameter changes
 			// while in Play mode.

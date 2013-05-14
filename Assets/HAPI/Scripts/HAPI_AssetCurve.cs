@@ -144,7 +144,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		
 		HAPI_Host.setParmStringValue( prAssetId, parm, 2, 0 );
 		
-		build();
+		buildClientSide();
 
 		savePreset();
 	}
@@ -203,11 +203,15 @@ public class HAPI_AssetCurve : HAPI_Asset
 		myModeChangeWait			= false;
 	}
 	
-	public override bool build() 
+	public override bool build( bool reload_asset, bool unload_asset_first,
+								bool serialization_recovery_only,
+								bool force_reconnect,
+								bool use_delay_for_progress_bar ) 
 	{
-		bool unload_asset_first = prReloadAssetInFullBuild && !prSerializationRecoveryOnly;
+		unload_asset_first = unload_asset_first && !serialization_recovery_only;
 
-		bool base_built = base.build( unload_asset_first );
+		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
+									  force_reconnect, use_delay_for_progress_bar );
 		if ( !base_built )
 			return false;
 		
@@ -285,7 +289,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		HAPI_Host.cookAsset( prAssetId );
 	}
 
-	protected override void buildCreateObjects( ref HAPI_ProgressBar progress_bar )
+	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
 	{
 		try
 		{

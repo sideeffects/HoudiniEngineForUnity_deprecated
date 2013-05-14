@@ -56,16 +56,6 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myHAPIAssetType = value; } }
 	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; } 
 																	set { myAssetSubType = value; } }
-	public bool						prFullBuild {					get { return myFullBuild; } 
-																	set { myFullBuild = value; } }
-	public bool						prSerializationRecoveryOnly {	get { return mySerializationRecoveryOnly; }
-																	set { mySerializationRecoveryOnly = value; } }
-	public bool						prForceReconnectInFullBuild {	get { return myForceReconnectInFullBuild; }
-																	set { myForceReconnectInFullBuild = value; } }
-	public bool 					prReloadAssetInFullBuild {		get { return myReloadAssetInFullBuild; } 
-																	set { myReloadAssetInFullBuild = value; } }
-	public bool						prUseDelayForProgressBar {		get { return myUseDelayForProgressBar; }
-																	set { myUseDelayForProgressBar = value; } }
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
@@ -447,18 +437,24 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
-				prSerializationRecoveryOnly		= true;
+				build(	false,	// reload_asset
+						false,	// unload_asset_first
+						true,	// serializatin_recovery_only
+						false,	// force_reconnect
+						true	// use_delay_for_progress_bar
+					);
 			}
 			else
 			{
 				// Loading Scene (no Houdini scene exists yet)
-				prUseDelayForProgressBar		= false;
-				prFullBuild						= true;
-				prForceReconnectInFullBuild		= true;
-				prAssetId						= -1;
+				prAssetId = -1;
+				build(	true,	// reload_asset
+						true,	// unload_asset_first
+						false,	// serializatin_recovery_only
+						true,	// force_reconnect
+						false	// use_delay_for_progress_bar
+					);
 			}
-
-			build();
 		}
 	}
 	
@@ -478,10 +474,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		prAssetType					= AssetType.TYPE_INVALID;
 		prHAPIAssetType 			= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 				= 0;
-		prFullBuild					= true;
-		prForceReconnectInFullBuild	= false;
-		prReloadAssetInFullBuild	= true;
-		prUseDelayForProgressBar	= true;
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
@@ -562,14 +554,31 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		myProgressBarJustUsed 		= false;
 	}
-	
-	public virtual bool build() 
+
+	public virtual bool buildAll()
 	{
-		Debug.LogError( "Should not be calling this directly!" );
-		return false;
+		return build(	true,	// reload_asset
+						true,	// unload_asset_first
+						false,	// serializatin_recovery_only
+						false,	// force_reconnect
+						false	// use_delay_for_progress_bar
+					);
 	}
 
-	public virtual bool build( bool unload_asset_first )
+	public virtual bool buildClientSide()
+	{
+		return build(	false,	// reload_asset
+						false,	// unload_asset_first
+						false,	// serializatin_recovery_only
+						false,	// force_reconnect
+						true	// use_delay_for_progress_bar
+					);
+	}
+
+	public virtual bool build( bool reload_asset, bool unload_asset_first,
+							   bool serialization_recovery_only,
+							   bool force_reconnect,
+							   bool use_delay_for_progress_bar )
 	{
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
 		{
@@ -581,14 +590,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			return false;
 
 		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
-		progress_bar.prUseDelay			= prUseDelayForProgressBar;
+		progress_bar.prUseDelay			= use_delay_for_progress_bar;
 		progress_bar.prAsset			= this;
 
 		try
 		{
 			progress_bar.prStartTime = System.DateTime.Now;
 			
-			if ( prFullBuild || prSerializationRecoveryOnly ) 
+			if ( reload_asset || serialization_recovery_only ) 
 			{
 				if ( unload_asset_first )
 				{
@@ -623,13 +632,11 @@ public abstract class HAPI_Asset : HAPI_Control
 					// and we need to clean up (unload the asset) in the catch.
 					prAssetId = asset_id;
 
-					prReloadAssetInFullBuild = true; // The default.
-
 					progress_bar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
 
-					if ( !prSerializationRecoveryOnly )
+					if ( !serialization_recovery_only )
 						Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
 				}
 				catch ( HAPI_Error error )
@@ -692,7 +699,8 @@ public abstract class HAPI_Asset : HAPI_Control
 													  + prHandleCount;
 				
 				// Try to load presets.
-				loadPreset();
+				if ( unload_asset_first )
+					loadPreset();
 				
 				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
@@ -729,12 +737,10 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.incrementProgressBar( prParmChoiceCount );
 				
 				// Add input fields.
-				if ( !prSerializationRecoveryOnly && !prForceReconnectInFullBuild )
-				{
+				if ( !serialization_recovery_only && !force_reconnect )
 					initAssetConnections();
-				}
 
-				if ( !prSerializationRecoveryOnly )
+				if ( !serialization_recovery_only )
 				{
 					// Clean up.
 					destroyChildren( transform );
@@ -748,7 +754,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				// Custom work during a full build (custom to each subclass).
 				buildFullBuildCustomWork( ref progress_bar );
 			}
-			else //if ( prFullBuild || prSerializationRecoveryOnly ) 
+			else
 			{				
 				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
@@ -778,11 +784,12 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.incrementProgressBar( prParmStringValueCount );
 			}
 			
+			// Refresh object info arrays as they are lost after serialization.
 			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
 			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
 					 			 prObjectTransforms, prObjectCount );
 			
-			if ( !prSerializationRecoveryOnly )
+			if ( !serialization_recovery_only )
 			{
 				// Set asset's transform.
 				if ( prSyncAssetTransform )
@@ -803,10 +810,11 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.prMessage = "Loading and composing objects...";
 			
 				// Custom way to load objects (custom to each subclass).
-				buildCreateObjects( ref progress_bar );
+				buildCreateObjects( reload_asset, ref progress_bar );
 			
 				// Process dependent assets.
-				processDependentAssets();
+				processDependentAssets( serialization_recovery_only, force_reconnect, 
+										use_delay_for_progress_bar );
 			}
 		}
 		catch ( HAPI_ErrorIgnorable ) {}
@@ -830,12 +838,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			progress_bar.clearProgressBar();
 
-			prFullBuild = false;
-			prSerializationRecoveryOnly = false;
-			prForceReconnectInFullBuild = false;
-
 			myProgressBarJustUsed = false;
-			prUseDelayForProgressBar = true;
 		}
 		
 		return true;
@@ -892,10 +895,10 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( prLiveTransformPropagation )
 			{
 				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
-					downstream_asset.build();
+					downstream_asset.buildClientSide();
 			
 				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
-					downstream_asset.build();
+					downstream_asset.buildClientSide();
 			}
 		}
 		catch ( HAPI_Error err )
@@ -1030,7 +1033,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		try
 		{
-			if ( myPreset != null && myPreset.Length > 0 && prReloadAssetInFullBuild )
+			if ( myPreset != null && myPreset.Length > 0 )
 				HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
 		}
 		catch ( HAPI_Error error )
@@ -1070,7 +1073,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	protected virtual void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar ) {}
 
 	// Inherited classes should override this with however they wish to load objects in the prObjects array.
-	protected abstract void buildCreateObjects( ref HAPI_ProgressBar progress_bar );
+	protected abstract void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar );
 
 	// -------------------------------------------------------------------------------------------------------------
 
@@ -1174,17 +1177,21 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 	}
 
-	protected virtual void processDependentAssets()
+	protected virtual void processDependentAssets( bool serialization_recovery_only, bool force_reconnect, 
+												   bool use_delay_for_progress_bar )
 	{
-		if ( !prSerializationRecoveryOnly && !prForceReconnectInFullBuild )
+		if ( !serialization_recovery_only && !force_reconnect )
 		{
 			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 			{
 				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
 					downstream_asset.OnEnable();
-				downstream_asset.prUseDelayForProgressBar = prUseDelayForProgressBar;
-				downstream_asset.build();
+				downstream_asset.build( false, // reload_asset
+										false, // unload_asset_first
+										false, // serialization_recovery_only
+										false, // force_reconnect
+										use_delay_for_progress_bar );
 				prEnableCooking = true;
 			}
 			
@@ -1193,12 +1200,15 @@ public abstract class HAPI_Asset : HAPI_Control
 				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
 					downstream_asset.OnEnable();
-				downstream_asset.prUseDelayForProgressBar = prUseDelayForProgressBar;
-				downstream_asset.build();
+				downstream_asset.build( false, // reload_asset
+										false, // unload_asset_first
+										false, // serialization_recovery_only
+										false, // force_reconnect
+										use_delay_for_progress_bar );
 				prEnableCooking = true;
 			}
 		}
-		else if ( prForceReconnectInFullBuild )
+		else if ( force_reconnect )
 		{
 			for ( int i = 0; i < prUpStreamTransformObjects.Count; ++i )
 			{
@@ -1255,10 +1265,12 @@ public abstract class HAPI_Asset : HAPI_Control
 				}
 			}
 
-			prForceReconnectInFullBuild = false;
-			prFullBuild = false;
-			prSerializationRecoveryOnly = false;
-			build(); // Need to rebuild because now we're connected to other assets.
+			// Need to rebuild because now we're connected to other assets.
+			build(	false, // reload_asset
+					false, // unload_asset_first
+					false, // serialization_recovery_only
+					false, // force_reconnect
+					use_delay_for_progress_bar );
 		}
 	}
 	
@@ -1284,11 +1296,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
 	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
-	[SerializeField] private bool					myFullBuild;
-	[SerializeField] private bool					mySerializationRecoveryOnly;
-	[SerializeField] private bool					myForceReconnectInFullBuild;
-	[SerializeField] private bool 					myReloadAssetInFullBuild;
-	[SerializeField] private bool					myUseDelayForProgressBar;
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
@@ -1333,11 +1340,11 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	
 	// Baking -------------------------------------------------------------------------------------------------------
-	[SerializeField] private float 					myBakeStartTime;																		
-	[SerializeField] private float					myBakeEndTime;																		
-	[SerializeField] private int 					myBakeSamplesPerSecond;	
-
 	
+	[SerializeField] private float 					myBakeStartTime;
+	[SerializeField] private float					myBakeEndTime;
+	[SerializeField] private int 					myBakeSamplesPerSecond;
+
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private bool 					myShowObjectControls;

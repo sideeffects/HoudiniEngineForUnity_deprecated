@@ -58,7 +58,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		myLastMode				= HAPI_AssetCurve.Mode.NONE;
 		
 		if ( GUI.changed )
-			myAssetCurve.build();
+			myAssetCurve.buildClientSide();
 	}
 
 	public override void OnDisable()
@@ -108,11 +108,11 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 			if ( GUILayout.Button( "Rebuild" ) ) 
 			{
 				myAssetCurve.prIsAddingPoints = false;
-				myAssetCurve.prFullBuild = true;
-				myAssetCurve.build();
+
+				myAssetCurve.buildAll();
 
 				myAssetCurve.syncPointsWithParm();
-				myAssetCurve.build();
+				myAssetCurve.buildClientSide();
 			}
 
 			// Draw Auto Select Asset Node Toggle
@@ -173,7 +173,7 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
 		{
 			myAssetCurve.syncPointsWithParm();
-			myAssetCurve.build();
+			myAssetCurve.buildClientSide();
 			myUnbuiltChanges = false;
 			refresh();
 			

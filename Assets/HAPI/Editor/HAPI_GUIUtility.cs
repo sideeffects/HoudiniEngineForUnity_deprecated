@@ -105,7 +105,7 @@ public class HAPI_GUIUtility : Editor
 				
 				asset.prAssetId = asset_id;
 				
-				bool build_result = asset.build();
+				bool build_result = asset.buildAll();
 				if ( build_result == false ) // Something is not right. Clean up.
 				{
 					DestroyImmediate( game_object );
@@ -144,7 +144,7 @@ public class HAPI_GUIUtility : Editor
 		//PrefabUtility.ReplacePrefab( game_object, prefab, ReplacePrefabOptions.ConnectToPrefab );
 		
 		// Do first build.
-		bool build_result = asset.build();
+		bool build_result = asset.buildAll();
 		if ( build_result == false ) // Something is not right. Clean up.
 		{
 			DestroyImmediate( game_object );

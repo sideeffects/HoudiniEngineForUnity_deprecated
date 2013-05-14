@@ -195,8 +195,7 @@ public class HAPI_PartControlGUI : Editor
 												ref shared_mesh,
 												part_control );
 				
-				myPartControl.prAsset.prFullBuild = false;
-				myPartControl.prAsset.build();
+				myPartControl.prAsset.buildClientSide();
 			}
 			
 			if ( GUILayout.Button( "Clear Edits" ) ) 
@@ -205,8 +204,7 @@ public class HAPI_PartControlGUI : Editor
 									 myPartControl.prObjectId,
 									 myPartControl.prGeoId );
 				
-				myPartControl.prAsset.prFullBuild = false;
-				myPartControl.prAsset.build();
+				myPartControl.prAsset.buildClientSide();
 			}
 		}
 		

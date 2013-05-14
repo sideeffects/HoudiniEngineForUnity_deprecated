@@ -307,7 +307,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		} // for each handle
 		
 		if ( GUI.changed )
-			myAssetOTL.build();
+			myAssetOTL.buildClientSide();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

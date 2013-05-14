@@ -71,7 +71,7 @@ public class HAPI_Menu : MonoBehaviour
 		asset.prAssetSubType = HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
 		
 		// Do first build.
-		bool build_result = asset.build();
+		bool build_result = asset.buildAll();
 		if ( !build_result ) // Something is not right. Clean up.
 		{
 			DestroyImmediate( game_object );

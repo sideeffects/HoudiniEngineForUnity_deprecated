@@ -30,17 +30,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 	
-	public string 					prAssetPath { 
-										get { return myAssetPath; } 
-										set 
-										{
-											if ( value != prAssetPath ) 
-											{
-												myAssetPath = value;
-												prFullBuild = true;
-											}
-										}
-									}
+	public string 					prAssetPath {	get { return myAssetPath; } 
+													set { myAssetPath = value; } }
 	public HAPI_HandleInfo[]		prHandleInfos { get; set; }
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
 	
@@ -84,17 +75,33 @@ public class HAPI_AssetOTL : HAPI_Asset
 		if ( EditorApplication.isPlaying && prLiveInGameCooking )
 		{
 			HAPI_Host.setTime( Time.time );
-			build();
+			buildClientSide();
 		}
 	}
 
-	public override bool build() 
+	public override bool buildAll()
 	{
-		bool unload_asset_first = prReloadAssetInFullBuild 
-								  && prAssetType == HAPI_Asset.AssetType.TYPE_OTL 
-								  && !prSerializationRecoveryOnly;
+		bool unload_asset_first = ( prAssetType == HAPI_Asset.AssetType.TYPE_OTL );
 
-		bool base_built = base.build( unload_asset_first );
+		return base.build(	true,	// reload_asset
+							unload_asset_first,
+							false,	// serializatin_recovery_only
+							false,	// force_reconnect
+							false	// use_delay_for_progress_bar
+						);
+	}
+
+	public override bool build( bool reload_asset, bool unload_asset_first,
+								bool serialization_recovery_only,
+								bool force_reconnect,
+								bool use_delay_for_progress_bar ) 
+	{
+		unload_asset_first = unload_asset_first 
+							 && prAssetType == HAPI_Asset.AssetType.TYPE_OTL 
+							 && !serialization_recovery_only;
+
+		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
+									  force_reconnect, use_delay_for_progress_bar );
 		if ( !base_built )
 			return false;
 
@@ -136,7 +143,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 	}
 
-	protected override void buildCreateObjects( ref HAPI_ProgressBar progress_bar )
+	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
 	{
 		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 		{
@@ -144,10 +151,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 			try
 			{
 				if ( !prObjects[ object_index ].isInstancer && 
-						( prFullBuild || prObjects[ object_index ].hasTransformChanged
-									|| prObjects[ object_index ].haveGeosChanged ) )
+						( reload_asset	|| prObjects[ object_index ].hasTransformChanged
+										|| prObjects[ object_index ].haveGeosChanged ) )
 				{
-					createObject( object_index );
+					createObject( object_index, reload_asset );
 				}
 			}
 			catch ( HAPI_Error error )
@@ -167,7 +174,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				{
 					if ( object_info.objectToInstanceId >= 0 && 
 							prGameObjects[ object_info.objectToInstanceId ] == null )
-						createObject( object_info.objectToInstanceId );
+						createObject( object_info.objectToInstanceId, reload_asset );
 						
 					instanceObjects( object_index, progress_bar );
 				}
@@ -185,8 +192,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	private void instanceObjects( int object_id, HAPI_ProgressBar progress_bar )
 	{
-		HAPI_ObjectInfo object_info = prObjects[ object_id ];
-		HAPI_Instancer instancer = null;
+		HAPI_ObjectInfo object_info		= prObjects[ object_id ];
+		HAPI_Instancer instancer		= null;
 		
 		Transform old_instancer_transform = transform.Find( object_info.name );
 		if ( old_instancer_transform && old_instancer_transform.gameObject.GetComponent< HAPI_Instancer >() )
@@ -203,13 +210,14 @@ public class HAPI_AssetOTL : HAPI_Asset
 			instancer = main_object.GetComponent< HAPI_Instancer >();
 		}
 		
-		instancer.prAsset = this;
-		instancer.prObjectId = object_id;
+		instancer.prAsset		= this;
+		instancer.prObjectId	= object_id;
 		
 		instancer.instanceObjects( progress_bar );
 	}
 
-	private void createPart( GameObject part_node, bool has_geo_changed, bool has_material_changed )
+	private void createPart( GameObject part_node, bool reload_asset, bool has_geo_changed, 
+							 bool has_material_changed )
 	{
 		HAPI_PartControl part_control = part_node.GetComponent< HAPI_PartControl >();
 		if ( part_control == null )
@@ -223,11 +231,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 		bool is_mesh = ( part_info.vertexCount > 0 );
 		
-		if ( prEnableLogging && ( prFullBuild || has_geo_changed || has_material_changed ) )
+		if ( prEnableLogging && ( reload_asset || has_geo_changed || has_material_changed ) )
 			Debug.Log( "Obj #" + part_control.prObjectId + " (" + part_control.prObjectName + "): "
 					   + "verts: " + part_info.vertexCount + " faces: " + part_info.faceCount );
 
-		if ( prFullBuild || has_geo_changed )
+		if ( reload_asset || has_geo_changed )
 		{
 			// Initialize our part control.
 			part_control.init( this, part_info.id, part_info.name, part_info.materialId );
@@ -368,7 +376,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			if ( mesh_renderer.sharedMaterial == null )
 				mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
 
-			if ( ( prFullBuild || has_material_changed || mesh_renderer.sharedMaterial.mainTexture == null ) 
+			if ( ( reload_asset || has_material_changed || mesh_renderer.sharedMaterial.mainTexture == null ) 
 				 && part_info.materialId >= 0 )
 			{
 				HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( prAssetId, part_info.materialId );
@@ -395,7 +403,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 	}
 	
-	private void createGeo( GameObject geo_node, bool first_time )
+	private void createGeo( GameObject geo_node, bool reload_asset, bool first_time )
 	{
 		HAPI_GeoControl geo_control = geo_node.GetComponent< HAPI_GeoControl >();
 		if ( geo_control == null )
@@ -408,10 +416,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 		if ( geo_info.type == (int) HAPI.HAPI_GeoType.HAPI_GEOTYPE_INPUT )
 			return;
 
-		if ( !first_time && !prFullBuild && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
+		if ( !first_time && !reload_asset && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
 			return;
 
-		if ( first_time || prFullBuild || geo_node.transform.childCount == 0 || geo_info.hasGeoChanged )
+		if ( first_time || reload_asset || geo_node.transform.childCount == 0 || geo_info.hasGeoChanged )
 		{
 			// Initialize our geo control.
 			geo_control.init( geo_control.prGeoId, geo_info.name, (HAPI_GeoType) geo_info.type );
@@ -436,19 +444,20 @@ public class HAPI_AssetOTL : HAPI_Asset
 				part_control.prPartId = ii;
 
 				// Force geo re-build so for "has_geo_changed" to true.
-				createPart( part_node, true, geo_info.hasMaterialChanged );
+				createPart( part_node, reload_asset, true, geo_info.hasMaterialChanged );
 			}
 			
 			geo_info.hasGeoChanged = true;
 		}
 		else
 			foreach ( Transform part_trans in geo_node.transform )
-				createPart( part_trans.gameObject, geo_info.hasGeoChanged, geo_info.hasMaterialChanged );
+				createPart( part_trans.gameObject, reload_asset, geo_info.hasGeoChanged, 
+							geo_info.hasMaterialChanged );
 
 		geo_info.hasMaterialChanged = false;
 	}
 	
-	private void createObject( int object_id )
+	private void createObject( int object_id, bool reload_asset )
 	{
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
@@ -465,9 +474,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 		
 		try
 		{
-			if ( prFullBuild || object_info.haveGeosChanged )
+			if ( reload_asset || object_info.haveGeosChanged )
 			{
-				if ( prFullBuild || object_info.geoCount != main_child.transform.childCount )
+				if ( reload_asset || object_info.geoCount != main_child.transform.childCount )
 				{
 					destroyChildren( main_child.transform );
 					for ( int ii = 0; ii < object_info.geoCount; ii++ )
@@ -485,15 +494,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 						geo_control.init( main_child.GetComponent< HAPI_ObjectControl >() );
 						geo_control.prGeoId = ii;
 
-						createGeo( geo_child, true );
+						createGeo( geo_child, reload_asset, true );
 					}
 				}
 				else
 					foreach ( Transform geo_trans in main_child.transform )
-						createGeo( geo_trans.gameObject, false );
+						createGeo( geo_trans.gameObject, reload_asset, false );
 			}
 			
-			if ( prFullBuild || object_info.hasTransformChanged )
+			if ( reload_asset || object_info.hasTransformChanged )
 			{
 				// Get transforms.
 				HAPI_Transform trans = prObjectTransforms[ object_id ];
