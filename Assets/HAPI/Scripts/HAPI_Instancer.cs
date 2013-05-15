@@ -65,29 +65,17 @@ public class HAPI_CurvesCollection
 			found_nonconst_curve = true;
 		}
 		
-		if( !curves.isConstantAnimCurve( curves.qx ) )
+		if( !curves.isConstantAnimCurve( curves.qx ) || 
+			!curves.isConstantAnimCurve( curves.qy ) ||
+			!curves.isConstantAnimCurve( curves.qz ) ||
+			!curves.isConstantAnimCurve( curves.qw ) )
 		{
 			clip.SetCurve( "", typeof(Transform), "localRotation.x", curves.qx );				
-			found_nonconst_curve = true;
-		}
-		
-		if( !curves.isConstantAnimCurve( curves.qy ) )
-		{
 			clip.SetCurve( "", typeof(Transform), "localRotation.y", curves.qy );				
-			found_nonconst_curve = true;
-		}
-		
-		if( !curves.isConstantAnimCurve( curves.qz ) )
-		{
 			clip.SetCurve( "", typeof(Transform), "localRotation.z", curves.qz );
+			clip.SetCurve( "", typeof(Transform), "localRotation.w", curves.qw );
 			found_nonconst_curve = true;
-		}
-		
-		if( !curves.isConstantAnimCurve( curves.qw ) )
-		{
-			clip.SetCurve( "", typeof(Transform), "localRotation.w", curves.qw );								
-			found_nonconst_curve = true;
-		}
+		}		
 		
 		if( !curves.isConstantAnimCurve( curves.sx ) )
 		{
