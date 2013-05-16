@@ -357,6 +357,9 @@ public abstract class HAPI_Asset : HAPI_Control
 		int geo_id;
 		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id );
 		
+		HAPI_GeoInputControl input_control = asset.GetComponent< HAPI_GeoInputControl >();
+		input_control.prInputObjectId = object_id;
+		
 		MeshFilter asset_mesh_filter 	= asset.GetComponent< MeshFilter >();
 		Mesh mesh 						= asset_mesh_filter.sharedMesh;
 		HAPI_PartControl child_control  = asset.GetComponent< HAPI_PartControl >();
@@ -915,6 +918,10 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		try
 		{
+			//This build is needed in case the user changed a geometry input to the asset.  
+			//The geometry to be instanced needs to be re-brought in.
+			buildClientSide();
+			
 			int num_objects = prObjects.Length;
 			for( int ii = 0; ii < num_objects; ii++ )
 			{
