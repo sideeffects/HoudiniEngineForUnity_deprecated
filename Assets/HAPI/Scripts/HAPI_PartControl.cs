@@ -25,8 +25,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 {	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
-
-	public HAPI_Asset	prAsset {		get { return myAsset; }			set { myAsset = value; } }
+	
 	public int			prPartId {		get { return myPartId; }		set { myPartId = value; } }
 	public string		prPartName {	get { return myPartName; }		set { myPartName = value; } }
 	public int			prMaterialId {	get { return myMaterialId; }	set { myMaterialId = value; } }
@@ -69,10 +68,10 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 	public void selectParent()
 	{
-		if ( myAsset != null && myAsset.prAutoSelectAssetNode && HAPI_Host.prAutoSelectParent )
+		if ( prAsset != null && prAsset.prAutoSelectAssetNode && HAPI_Host.prAutoSelectParent )
 		{
 			GameObject[] selection 	= new GameObject[ 1 ];
-			selection[ 0 ] 			= myAsset.gameObject;
+			selection[ 0 ] 			= prAsset.gameObject;
 			Selection.objects 		= selection;
 		}
 	}
@@ -110,8 +109,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
-
-	[SerializeField] private HAPI_Asset		myAsset;
+	
 	[SerializeField] private int			myPartId;
 	[SerializeField] private string			myPartName;
 	[SerializeField] private int			myMaterialId;

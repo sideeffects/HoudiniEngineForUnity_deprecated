@@ -115,8 +115,17 @@ public class HAPI_AssetGUI : Editor
 					
 							if ( myParmChanges )
 							{
-								if ( !obj )
+								if ( myAsset.prUpStreamGeoObjects[ input_index ] != null )
 								{
+									HAPI_GeoInputControl control = 
+										myAsset.prUpStreamGeoObjects[ input_index ].GetComponent< HAPI_GeoInputControl>();
+									
+									if( control != null )
+										DestroyImmediate( control );
+								}
+								
+								if ( !obj )
+								{																		
 									myAsset.removeGeoInput( input_index );
 									myAsset.prUpStreamGeoObjects[ input_index ] = null;
 									myAsset.prUpStreamGeoAssets[ input_index ] = null;
@@ -143,6 +152,14 @@ public class HAPI_AssetGUI : Editor
 									}
 									else
 										asset = new_obj.GetComponent< HAPI_Asset >();
+									
+									if( asset == null )
+									{
+										new_obj.AddComponent< HAPI_GeoInputControl >();
+										HAPI_GeoInputControl control = new_obj.GetComponent< HAPI_GeoInputControl >();
+										control.prAsset = myAsset;
+										control.prAssetId = myAsset.prAssetId;
+									}
 									
 									if ( asset == null || myAsset.prUpStreamGeoAssets[ input_index ] != asset )
 									{
