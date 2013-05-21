@@ -185,6 +185,23 @@ namespace HAPI
 		HAPI_INPUT_GEOMETRY,
 		HAPI_INPUT_MAX
 	};
+	
+	public enum HAPI_TransformComponentType
+	{
+		HAPI_TRANSFORM_TX,
+		HAPI_TRANSFORM_TY,
+		HAPI_TRANSFORM_TZ,
+		HAPI_TRANSFORM_RX,
+		HAPI_TRANSFORM_RY,
+		HAPI_TRANSFORM_RZ,
+		HAPI_TRANSFORM_QX,
+		HAPI_TRANSFORM_QY,
+		HAPI_TRANSFORM_QZ,
+		HAPI_TRANSFORM_QW,
+		HAPI_TRANSFORM_SX,
+		HAPI_TRANSFORM_SY,
+		HAPI_TRANSFORM_SZ
+	};
 
 	// Unity-Only:
 
@@ -540,6 +557,14 @@ namespace HAPI
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 	}
+	
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_GeoInputInfo
+	{				
+		public int		objectId;
+		public int		geoId;
+		public int		objectNodeId;
+	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_PartInfo
@@ -604,4 +629,31 @@ namespace HAPI
 		public int materialNodeId;
 	}
 	
+	
+	// ANIMATION ----------------------------------------------------------------------------------------------------
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_Keyframe
+	{
+	
+		HAPI_Keyframe( float t, float v, float in_tangent, float out_tangent )
+		{
+			time = t;
+			value = v;
+			inTangent = in_tangent;
+			outTangent = out_tangent;
+		}
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float   time;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float   value;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float   inTangent;
+		
+		[ MarshalAs( UnmanagedType.R4) ]
+		public float   outTangent;
+	
+	}
 }

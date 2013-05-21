@@ -1490,9 +1490,18 @@ namespace HAPI
 		/// <param name="geo_id">
 		///		Geometry id corresponding to created input node. Use this id to push geometry to this input.
 		/// </param>
-		public static void createGeoInput( int asset_id, int input_idx, out int object_id, out int geo_id )
+		/// <param name="node_id">
+		///		The node id of the exposed object node so that parameters such as transform information, may
+		///		be set on the exposed node.
+		/// </param>
+		public static void createGeoInput( int asset_id, int input_idx, 
+										   out int object_id, out int geo_id, out int node_id )
 		{
-			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out object_id, out geo_id );
+			HAPI_GeoInputInfo geo_input_info = new HAPI_GeoInputInfo();
+			int status_code = HAPI_CreateGeoInput( asset_id, input_idx, out geo_input_info );
+			object_id = geo_input_info.objectId;
+			geo_id = geo_input_info.geoId;
+			node_id = geo_input_info.objectNodeId;
 			processStatusCode( (HAPI_Result) status_code );
 		}
 		

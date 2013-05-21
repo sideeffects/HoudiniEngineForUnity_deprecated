@@ -355,7 +355,8 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		int object_id;
 		int geo_id;
-		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id );
+		int node_id;		
+		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id, out node_id );		
 		
 		HAPI_GeoInputControl input_control = asset.GetComponent< HAPI_GeoInputControl >();
 		input_control.prInputObjectId = object_id;
