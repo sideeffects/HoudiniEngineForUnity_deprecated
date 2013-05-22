@@ -142,7 +142,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			parm += " ";
 		}
 		
-		HAPI_Host.setParmStringValue( prAssetId, parm, 2, 0 );
+		HAPI_Host.setParmStringValue( prAssetNodeId, parm, 2, 0 );
 		
 		buildClientSide();
 
@@ -281,10 +281,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 		int[] temp_int_values = new int[ 1 ];
 
 		temp_int_values[ 0 ] = primitive_type_parm_default;
-		HAPI_Host.setParmIntValues( prAssetId, temp_int_values, prParms[ primitive_type_parm ].intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, prParms[ primitive_type_parm ].intValuesIndex, 1 );
 		
 		temp_int_values[ 0 ] = method_parm_default;
-		HAPI_Host.setParmIntValues( prAssetId, temp_int_values, prParms[ method_parm ].intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, prParms[ method_parm ].intValuesIndex, 1 );
 		
 		HAPI_Host.cookAsset( prAssetId );
 	}
