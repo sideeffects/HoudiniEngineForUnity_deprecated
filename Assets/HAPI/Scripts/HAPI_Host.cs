@@ -401,7 +401,7 @@ namespace HAPI
 
 		public static bool initialize()
 		{
-			string otls_path = Application.dataPath + "/OTLs/Scanned";
+			string otls_path = "@/otls_^;@/otls;" + Application.dataPath + "/OTLs/Scanned";
 			string dsos_path = "@/dso_^;@/dso;" + Application.dataPath + "/DSOs";
 
 			if ( !prHoudiniSceneExists )
