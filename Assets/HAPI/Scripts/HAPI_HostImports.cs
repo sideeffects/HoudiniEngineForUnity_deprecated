@@ -382,6 +382,12 @@ namespace HAPI
 														out HAPI_MaterialInfo material_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_RenderMaterialToFile(	int asset_id, int material_id,
+																int shader_type,
+																string destination_folder_path,
+																ref int destination_file_path );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ExtractTextureToFile(	int node_id, int parm_id,
 																string destination_folder_path,
 																ref int destination_file_path );

@@ -397,7 +397,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 					Material material = mesh_renderer.sharedMaterial;
 					string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
 										 part_control.prAsset.prAssetName;
-					Utility.assignMaterial( ref material, material_info, folder_path );
+					Utility.assignMaterial( ref material, material_info, folder_path, 
+											prMaterialShaderType );
 				}
 			}
 		}

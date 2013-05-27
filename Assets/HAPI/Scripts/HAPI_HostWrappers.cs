@@ -1624,6 +1624,38 @@ namespace HAPI
 		}
 
 		/// <summary>
+		/// 	Use the specified shader to render the material onto a texture.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="shader_type">
+		///		The HAPI_ShaderType to use to render the material.
+		/// </param>
+		/// <param name="destination_folder_path">
+		///		The folder path of where you wish the texture file to be extracted.
+		/// </param>
+		/// <return>
+		///		The full path, including the destination_folder_path and the texture file name, 
+		///		to the extracted file.
+		/// </return>
+		public static string renderMaterialToFile( int asset_id, int material_id, HAPI_ShaderType shader_type, 
+												   string destination_folder_path )
+		{
+			int destination_file_path_sh = 0;
+			int shader_type_int = (int) shader_type;
+			int status_code = HAPI_RenderMaterialToFile( asset_id, material_id, shader_type_int,
+														 destination_folder_path,
+														 ref destination_file_path_sh );
+			processStatusCode( (HAPI_Result) status_code );
+
+			return getString( destination_file_path_sh ).Replace( "\\", "/" );
+		}
+
+		/// <summary>
 		/// 	Extract a texture map to a file.
 		/// </summary>
 	    /// <param name="node_id">

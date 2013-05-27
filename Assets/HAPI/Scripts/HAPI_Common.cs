@@ -203,6 +203,14 @@ namespace HAPI
 		HAPI_TRANSFORM_SZ
 	};
 
+	public enum HAPI_ShaderType
+	{
+		HAPI_SHADER_INVALID = -1,
+		HAPI_SHADER_OPENGL,
+		HAPI_SHADER_MANTRA,
+		HAPI_SHADER_MAX
+	};
+
 	// Unity-Only:
 
 	public enum HAPI_GeoInputFormat
@@ -626,7 +634,8 @@ namespace HAPI
 	public struct HAPI_MaterialInfo
 	{
 		public int id;
-		public int materialNodeId;
+		public int assetId;
+		public int nodeId;
 	}
 	
 	

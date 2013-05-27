@@ -138,6 +138,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
+	public HAPI_ShaderType			prMaterialShaderType {			get { return myMaterialShaderType; }
+																	set { myMaterialShaderType = value; } }
 	public bool 					prShowObjectControls {			get { return myShowObjectControls; } 
 																	set { myShowObjectControls = value; } }
 	public bool 					prShowAssetControls {			get { return myShowAssetControls; } 
@@ -521,12 +523,14 @@ public abstract class HAPI_Asset : HAPI_Control
 		prObjectTransforms 			= new HAPI_Transform[ 0 ];
 		
 		// Baking ---------------------------------------------------------------------------------------------------
+		
 		prBakeStartTime				= 0.0f;
 		prBakeEndTime				= 1.0f;
-		prBakeSamplesPerSecond		= 30;		
+		prBakeSamplesPerSecond		= 30;
 		
 		// GUI ------------------------------------------------------------------------------------------------------
 		
+		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
 		prShowObjectControls 		= true;
 		prShowAssetControls 		= true;
 		prShowAssetOptions			= false;
@@ -1355,6 +1359,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
+	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
 	[SerializeField] private bool 					myShowObjectControls;
 	[SerializeField] private bool 					myShowAssetControls;
 	[SerializeField] private bool 					myShowAssetOptions;

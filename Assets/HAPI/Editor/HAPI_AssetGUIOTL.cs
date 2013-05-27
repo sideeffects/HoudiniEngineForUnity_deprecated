@@ -214,13 +214,27 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 									myAsset.prBakeSamplesPerSecond, 
 									myAsset.gameObject,
 									progress_bar );
-			progress_bar.clearProgressBar();				
+			progress_bar.clearProgressBar();
 		}
 		
 	}
 	
 	private void generateAssetOptionControls()
 	{
+		// Material Shader Type
+		{
+			int value = (int) myAsset.prMaterialShaderType;
+			string[] labels = { "OpenGL", "Mantra" };
+			int[] values = { 0, 1 };
+			bool changed = HAPI_GUI.dropdown( "material_shader_type", "Shader Type", 
+											  ref value, labels, values );
+			if ( changed )
+			{
+				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
+				HAPI_AssetUtility.reApplyMaterials( myAsset );
+			}
+		}
+
 		// Show Geometries
 		{
 			bool value = myAsset.prIsGeoVisible;
@@ -246,51 +260,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			if ( changed )
 			{
 				myAsset.prShowVertexColours = value;
-				foreach ( MeshRenderer renderer in myAsset.GetComponentsInChildren< MeshRenderer >() )
-				{
-					// Set material.
-					if ( renderer.sharedMaterial == null )
-						renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
-
-					if ( myAsset.prShowVertexColours )
-					{
-						renderer.sharedMaterial.mainTexture = null;
-						renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-					}
-					else
-					{
-						Transform parent = renderer.transform;
-						HAPI_PartControl part_control = parent.GetComponent< HAPI_PartControl >();
-						
-						if ( part_control.prMaterialId >= 0 )
-						{
-							try
-							{
-								HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( myAsset.prAssetId, 
-																						 part_control.prMaterialId );
-								
-								bool is_transparent = HAPI_AssetUtility.isMaterialTransparent( material_info );
-								if ( is_transparent )
-									renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
-								else
-									renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-								
-								Material material  = renderer.sharedMaterial;
-								string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
-													 part_control.prAsset.prAssetName;
-								HAPI_AssetUtility.assignMaterial( ref material, material_info, folder_path );
-							}
-							catch ( HAPI_Error error )
-							{
-								Debug.LogError( error.ToString() );
-							}
-						}
-						else
-						{
-							renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-						}
-					}
-				}
+				HAPI_AssetUtility.reApplyMaterials( myAsset );
 			}
 		}
 		
