@@ -157,10 +157,10 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myAutoSelectAssetNode = value; } }
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
 																	set { myEnableLogging = value; } }
-	public bool						prSyncAssetTransform {			get { return mySyncAssetTransform; } 
-																	set { mySyncAssetTransform = value; } }
-	public bool						prLiveTransformPropagation {	get { return myLiveTransformPropagation; } 
-																	set { myLiveTransformPropagation = value; } }
+	public bool						prPushUnityTransformToHoudini {	get { return myPushUnityTransformToHoudini; } 
+																	set { myPushUnityTransformToHoudini = value; } }
+	public bool						prTransformChangeTriggersCooks{ get { return myTransformChangeTriggersCooks; } 
+																	set { myTransformChangeTriggersCooks = value; } }
 	public bool						prEnableCooking {				get { return myEnableCooking; }
 																	set { myEnableCooking = value; } }
 	public bool						prHideGeometryOnLinking {		get { return myHideWhenFedToOtherAsset; }
@@ -169,8 +169,8 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myShowVertexColours = value; } }
 	public bool						prShowPinnedInstances {			get { return myShowPinnedInstances; }
 																	set { myShowPinnedInstances = value; } }
-	public bool						prLiveInGameCooking {			get { return myLiveInGameCooking; }
-																	set { myLiveInGameCooking = value; } }
+	public bool						prPlaymodePerFrameCooking {		get { return myPlaymodePerFrameCooking; }
+																	set { myPlaymodePerFrameCooking = value; } }
 
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
@@ -199,7 +199,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	public List< HAPI_GeoInputFormat >	prGeoInputFormats {			get { return myGeoInputFormats; }
 																	set { myGeoInputFormats = value; } }
 	
-	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances { get { return myOverriddenInstances; }		
+	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances { get { return myOverriddenInstances; }
 																	  set {	myOverriddenInstances = value; } }
 	
 	
@@ -475,96 +475,97 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		// Assets ---------------------------------------------------------------------------------------------------
 		
-		prAssetInfo 				= new HAPI_AssetInfo();
-		prPreset 					= null;
-		prAssetValidationId			= -1;
-		prAssetNodeId				= -1;
-		prAssetName					= "ASSET_NAME";
-		prAssetType					= AssetType.TYPE_INVALID;
-		prHAPIAssetType 			= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
-		prAssetSubType 				= 0;
+		prAssetInfo 					= new HAPI_AssetInfo();
+		prPreset 						= null;
+		prAssetValidationId				= -1;
+		prAssetNodeId					= -1;
+		prAssetName						= "ASSET_NAME";
+		prAssetType						= AssetType.TYPE_INVALID;
+		prHAPIAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
+		prAssetSubType 					= 0;
 		
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
-		prMinTransInputCount 		= 0;
-		prMaxTransInputCount 		= 0;
-		prMinGeoInputCount 			= 0;
-		prMaxGeoInputCount 			= 0;
-		prFileInputs 				= new List< string >();
+		prMinTransInputCount 			= 0;
+		prMaxTransInputCount 			= 0;
+		prMinGeoInputCount 				= 0;
+		prMaxGeoInputCount 				= 0;
+		prFileInputs 					= new List< string >();
 		
-		prDownStreamTransformAssets = new List< HAPI_Asset >();
-		prUpStreamTransformAssets 	= new List< HAPI_Asset >();
-		prUpStreamTransformObjects 	= new List< GameObject >();
+		prDownStreamTransformAssets		= new List< HAPI_Asset >();
+		prUpStreamTransformAssets 		= new List< HAPI_Asset >();
+		prUpStreamTransformObjects 		= new List< GameObject >();
 		
-		prDownStreamGeoAssets 		= new List< HAPI_Asset >();
-		prUpStreamGeoAssets 		= new List< HAPI_Asset >();
-		prUpStreamGeoObjects 		= new List< GameObject >();
-		prUpStreamGeoAdded 			= new List< bool >();
+		prDownStreamGeoAssets 			= new List< HAPI_Asset >();
+		prUpStreamGeoAssets 			= new List< HAPI_Asset >();
+		prUpStreamGeoObjects 			= new List< GameObject >();
+		prUpStreamGeoAdded 				= new List< bool >();
 		
 		// Parameters -----------------------------------------------------------------------------------------------
 		
-		prParmCount 				= 0;
-		prParmIntValueCount 		= 0;
-		prParmFloatValueCount 		= 0;
-		prParmStringValueCount 		= 0;
-		prParmChoiceCount 			= 0;
+		prParmCount 					= 0;
+		prParmIntValueCount 			= 0;
+		prParmFloatValueCount 			= 0;
+		prParmStringValueCount 			= 0;
+		prParmChoiceCount 				= 0;
 		
-		prParms 					= null;
-		prParmIntValues 			= new int[ 0 ];
-		prParmFloatValues 			= new float[ 0 ];
-		prParmStringValues 			= new int[ 0 ]; // string handles (SH)
-		prParmChoiceLists 			= new HAPI_ParmChoiceInfo[ 0 ];
+		prParms 						= null;
+		prParmIntValues 				= new int[ 0 ];
+		prParmFloatValues 				= new float[ 0 ];
+		prParmStringValues 				= new int[ 0 ]; // string handles (SH)
+		prParmChoiceLists 				= new HAPI_ParmChoiceInfo[ 0 ];
 		
 		// Objects --------------------------------------------------------------------------------------------------
 		
-		prObjectCount 				= 0;
-		prHandleCount 				= 0;
+		prObjectCount 					= 0;
+		prHandleCount 					= 0;
 		
-		prObjects 					= new HAPI_ObjectInfo[ 0 ];
+		prObjects 						= new HAPI_ObjectInfo[ 0 ];
 		
-		prGameObjects 				= new GameObject[ 0 ];
-		prObjectTransforms 			= new HAPI_Transform[ 0 ];
+		prGameObjects 					= new GameObject[ 0 ];
+		prObjectTransforms 				= new HAPI_Transform[ 0 ];
 		
 		// Baking ---------------------------------------------------------------------------------------------------
 		
-		prBakeStartTime				= 0.0f;
-		prBakeEndTime				= 1.0f;
-		prBakeSamplesPerSecond		= 30;
+		prBakeStartTime					= 0.0f;
+		prBakeEndTime					= 1.0f;
+		prBakeSamplesPerSecond			= 30;
 		
 		// GUI ------------------------------------------------------------------------------------------------------
 		
-		prMaterialShaderType		= HAPI_ShaderType.HAPI_SHADER_OPENGL;
-		prShowHoudiniControls 		= true;
-		prShowAssetControls 		= true;
-		prShowAssetOptions			= true;
-		prShowBakeOptions			= false;
-		prShowInputControls 		= true;
-		prAssetOptionsCategory		= 0;
-		prAutoSelectAssetNode 		= true;
-		prEnableLogging				= false;
-		prSyncAssetTransform		= true;
-		prLiveTransformPropagation	= false;
-		prEnableCooking				= true;
-		myHideWhenFedToOtherAsset	= true;
-		prShowVertexColours			= false;
-		prShowPinnedInstances		= true;
-		prLiveInGameCooking			= false;
-		
-		prLastChangedParmId 		= -1;
+		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
+		prShowHoudiniControls 			= true;
+		prShowAssetControls 			= true;
+		prShowAssetOptions				= true;
+		prShowBakeOptions				= false;
+		prShowInputControls 			= true;
+		prAssetOptionsCategory			= 0;
 
-		myIsGeoVisible				= true;
+		prAutoSelectAssetNode 			= true;
+		prEnableLogging					= false;
+		prPushUnityTransformToHoudini	= true;
+		prTransformChangeTriggersCooks	= false;
+		prEnableCooking					= true;
+		myHideWhenFedToOtherAsset		= true;
+		prShowVertexColours				= false;
+		prShowPinnedInstances			= true;
+		prPlaymodePerFrameCooking		= false;
+
+		prLastChangedParmId 			= -1;
+
+		myIsGeoVisible					= true;
 		
-		prFolderListSelections 		= new List< int >();
-		prFolderListSelectionIds 	= new List< int >();
+		prFolderListSelections 			= new List< int >();
+		prFolderListSelectionIds 		= new List< int >();
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
 
-		prTransInputNames			= new List< string >();
-		prGeoInputNames				= new List< string >();
-		prGeoInputFormats			= new List< HAPI_GeoInputFormat >();
-		prOverriddenInstances 		= new List< HAPI_InstancerOverrideInfo >();
+		prTransInputNames				= new List< string >();
+		prGeoInputNames					= new List< string >();
+		prGeoInputFormats				= new List< HAPI_GeoInputFormat >();
+		prOverriddenInstances 			= new List< HAPI_InstancerOverrideInfo >();
 		
-		myProgressBarJustUsed 		= false;
+		myProgressBarJustUsed 			= false;
 	}
 
 	public virtual bool buildAll()
@@ -671,7 +672,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 					// If in play mode, disable live cooks.
 					if ( EditorApplication.isPlaying )
-						prLiveInGameCooking = false;
+						prPlaymodePerFrameCooking = false;
 					
 					return false; // false for failed :(
 				}
@@ -804,7 +805,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( !serialization_recovery_only )
 			{
 				// Set asset's transform.
-				if ( prSyncAssetTransform )
+				if ( prPushUnityTransformToHoudini )
 				{
 					HAPI_TransformEuler hapi_transform;
 					HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, 
@@ -834,7 +835,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			// If in play mode, disable live cooks.
 			if ( EditorApplication.isPlaying )
-				prLiveInGameCooking = false;
+				prPlaymodePerFrameCooking = false;
 
 			Debug.LogError( error.ToString() );
 		}
@@ -858,7 +859,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void Update()
 	{
-		if ( !prSyncAssetTransform || prAssetId < 0 || EditorApplication.isPlayingOrWillChangePlaymode )
+		if ( !prPushUnityTransformToHoudini || prAssetId < 0 || EditorApplication.isPlayingOrWillChangePlaymode )
 			return;
 
 		try
@@ -904,7 +905,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			// then we do need to do a full build so I'm not sure how to do this more proper.
 			// Do note that the build function is fairly conditional and should only build
 			// the bare minimum.
-			if ( prLiveTransformPropagation )
+			if ( prTransformChangeTriggersCooks )
 			{
 				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 					downstream_asset.buildClientSide();
@@ -1373,13 +1374,13 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	[SerializeField] private bool					myAutoSelectAssetNode;
 	[SerializeField] private bool					myEnableLogging;
-	[SerializeField] private bool					mySyncAssetTransform;
-	[SerializeField] private bool					myLiveTransformPropagation;
+	[SerializeField] private bool					myPushUnityTransformToHoudini;
+	[SerializeField] private bool					myTransformChangeTriggersCooks;
 	[SerializeField] private bool					myEnableCooking;
 	[SerializeField] private bool					myHideWhenFedToOtherAsset;
 	[SerializeField] private bool					myShowVertexColours;
-	[SerializeField] private bool					myShowPinnedInstances;	
-	[SerializeField] private bool					myLiveInGameCooking;
+	[SerializeField] private bool					myShowPinnedInstances;
+	[SerializeField] private bool					myPlaymodePerFrameCooking;
 	
 	[SerializeField] private int					myLastChangedParmId;
 
@@ -1392,7 +1393,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private List< int > 			myFolderListSelections;
 	
 	/// <summary>
-	/// 	Parameter ids of the currently selected folders in the Inspector. 
+	/// 	Parameter ids of the currently selected folders in the Inspector.
 	/// 	A 1:1 mapping with myFolderListSelections.
 	/// </summary>
 	[SerializeField] private List< int > 			myFolderListSelectionIds;
@@ -1403,7 +1404,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	private List< HAPI_GeoInputFormat >				myGeoInputFormats;
 	
 	
-	[SerializeField] private List< HAPI_InstancerOverrideInfo >		myOverriddenInstances;
+	[SerializeField] private List< HAPI_InstancerOverrideInfo >	myOverriddenInstances;
 	
 	// Private Temporary Data
 	[SerializeField] private Matrix4x4				myLastLocalToWorld;

@@ -124,16 +124,16 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 			// Sync Asset Transform Toggle
 			{
-				bool value = myAsset.prSyncAssetTransform;
+				bool value = myAsset.prPushUnityTransformToHoudini;
 				HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
-				myAsset.prSyncAssetTransform = value;
+				myAsset.prPushUnityTransformToHoudini = value;
 			}
 
 			// Live Transform Propagation Toggle
 			{
-				bool value = myAsset.prLiveTransformPropagation;
+				bool value = myAsset.prTransformChangeTriggersCooks;
 				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
-				myAsset.prLiveTransformPropagation = value;
+				myAsset.prTransformChangeTriggersCooks = value;
 			}
 		} // if
 		

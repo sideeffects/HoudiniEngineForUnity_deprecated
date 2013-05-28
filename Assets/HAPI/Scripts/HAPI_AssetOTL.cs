@@ -72,7 +72,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 	{
 		base.Update();
 
-		if ( EditorApplication.isPlaying && prLiveInGameCooking )
+		if ( EditorApplication.isPlaying && prPlaymodePerFrameCooking )
 		{
 			HAPI_Host.setTime( Time.time );
 			buildClientSide();

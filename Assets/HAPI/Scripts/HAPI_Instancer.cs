@@ -212,11 +212,11 @@ public class HAPI_Instancer : MonoBehaviour {
 				HAPI_Asset hapi_asset = prObjToInstantiate.GetComponent< HAPI_Asset >();
 				if( hapi_asset != null )
 				{
-					liveTransformPropagationSetting			= hapi_asset.prLiveTransformPropagation;
-					syncAssetTransformSetting				= hapi_asset.prSyncAssetTransform;
+					liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
+					syncAssetTransformSetting				= hapi_asset.prPushUnityTransformToHoudini;
 					enableCooking							= hapi_asset.prEnableCooking;
-					hapi_asset.prLiveTransformPropagation	= false;
-					hapi_asset.prSyncAssetTransform			= false;
+					hapi_asset.prTransformChangeTriggersCooks	= false;
+					hapi_asset.prPushUnityTransformToHoudini			= false;
 					hapi_asset.prEnableCooking				= false;
 				}
 				
@@ -224,8 +224,8 @@ public class HAPI_Instancer : MonoBehaviour {
 				
 				if( hapi_asset != null )
 				{
-					hapi_asset.prLiveTransformPropagation	= liveTransformPropagationSetting;
-					hapi_asset.prSyncAssetTransform			= syncAssetTransformSetting;
+					hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
+					hapi_asset.prPushUnityTransformToHoudini			= syncAssetTransformSetting;
 					hapi_asset.prEnableCooking				= enableCooking;
 				}									
 			}
@@ -679,11 +679,11 @@ public class HAPI_Instancer : MonoBehaviour {
 					HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
 					if ( hapi_asset != null )
 					{
-						liveTransformPropagationSetting			= hapi_asset.prLiveTransformPropagation;
-						syncAssetTransformSetting				= hapi_asset.prSyncAssetTransform;
+						liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
+						syncAssetTransformSetting				= hapi_asset.prPushUnityTransformToHoudini;
 						enableCooking							= hapi_asset.prEnableCooking;
-						hapi_asset.prLiveTransformPropagation	= false;
-						hapi_asset.prSyncAssetTransform			= false;
+						hapi_asset.prTransformChangeTriggersCooks	= false;
+						hapi_asset.prPushUnityTransformToHoudini			= false;
 						hapi_asset.prEnableCooking				= false;
 					}
 				}
@@ -736,8 +736,8 @@ public class HAPI_Instancer : MonoBehaviour {
 						HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
 						if ( hapi_asset != null )
 						{
-							hapi_asset.prLiveTransformPropagation	= liveTransformPropagationSetting;
-							hapi_asset.prSyncAssetTransform			= syncAssetTransformSetting;
+							hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
+							hapi_asset.prPushUnityTransformToHoudini			= syncAssetTransformSetting;
 							hapi_asset.prEnableCooking				= enableCooking;
 						}
 					}

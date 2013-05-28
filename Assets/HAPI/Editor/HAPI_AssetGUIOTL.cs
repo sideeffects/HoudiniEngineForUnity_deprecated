@@ -318,25 +318,26 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			myAsset.prEnableCooking = value;
 		}
 
-		// Sync Asset Transform Toggle
+		// Playmode Per-Frame Cooking Toggle
 		{
-			bool value = myAsset.prSyncAssetTransform;
-			HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
-			myAsset.prSyncAssetTransform = value;
+			bool value = myAsset.prPlaymodePerFrameCooking;
+			HAPI_GUI.toggle( "playmode_per_frame_cooking", "Playmode Per-Frame Cooking", ref value );
+			myAsset.prPlaymodePerFrameCooking = value;
 		}
 
-		// Live Transform Propagation Toggle
+		// Push Unity Transform To Houdini Engine Toggle
 		{
-			bool value = myAsset.prLiveTransformPropagation;
-			HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
-			myAsset.prLiveTransformPropagation = value;
+			bool value = myAsset.prPushUnityTransformToHoudini;
+			HAPI_GUI.toggle( "push_unity_transform_to_houdini_engine", 
+							 "Push Unity Transform To Houdini Engine", ref value );
+			myAsset.prPushUnityTransformToHoudini = value;
 		}
 
-		// Live In-Game Cooking
+		// Transform Change Triggers Cooks Toggle
 		{
-			bool value = myAsset.prLiveInGameCooking;
-			HAPI_GUI.toggle( "live_ingame_cooking", "Live In-Game Cooking", ref value );
-			myAsset.prLiveInGameCooking = value;
+			bool value = myAsset.prTransformChangeTriggersCooks;
+			HAPI_GUI.toggle( "transform_change_triggers_cooks", "Transform Change Triggers Cooks", ref value );
+			myAsset.prTransformChangeTriggersCooks = value;
 		}
 	}
 
