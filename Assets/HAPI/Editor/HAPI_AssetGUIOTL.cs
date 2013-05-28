@@ -48,10 +48,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
-		myAssetOTL.prShowObjectControls = 
-			EditorGUILayout.Foldout( myAssetOTL.prShowObjectControls, new GUIContent( "Object Controls" ) );
-		
-		if ( myAssetOTL.prShowObjectControls ) 
+		myAssetOTL.prShowHoudiniControls = HAPI_GUI.foldout( "Houdini Controls", 
+															 myAssetOTL.prShowHoudiniControls, true );
+		if ( myAssetOTL.prShowHoudiniControls ) 
 		{
 			if ( GUILayout.Button( "Rebuild" ) ) 
 				myAssetOTL.buildAll();
@@ -106,29 +105,31 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				myAssetOTL.prAssetPath	 = path;
 				myReloadAsset			 = true;
 			}
-						
-			EditorGUILayout.Separator();
-			myAssetOTL.prShowAssetOptions = 
-				EditorGUILayout.Foldout( myAssetOTL.prShowAssetOptions, new GUIContent( "Asset Options" ) );
-			// These don't affect the asset directly so they don't trigger rebuilds.
-			
-			if ( myAssetOTL.prShowAssetOptions )
-				generateAssetOptionControls();
-			
-			myAssetOTL.prShowBakeOptions = 
-				EditorGUILayout.Foldout( myAssetOTL.prShowBakeOptions, new GUIContent( "Bake Animations" ) );
-			
-			if ( myAssetOTL.prShowBakeOptions )
-				generateAssetBakeControls();
-			
 		} // if
 		
+		///////////////////////////////////////////////////////////////////////
+		// Draw Asset Options
+		//	These don't affect the asset directly so they don't 
+		//	trigger rebuilds.
+		//
+
+		myAssetOTL.prShowAssetOptions = HAPI_GUI.foldout( "Asset Options", myAssetOTL.prShowAssetOptions, true );
+		if ( myAssetOTL.prShowAssetOptions )
+			generateAssetOptions();
+
+		///////////////////////////////////////////////////////////////////////
+		// Draw Baking Controls
+
+		myAssetOTL.prShowBakeOptions = HAPI_GUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
+		if ( myAssetOTL.prShowBakeOptions )
+			generateAssetBakeControls();
+
 		///////////////////////////////////////////////////////////////////////
 		// Draw Asset Controls
 		
 		EditorGUILayout.Separator();
-		myAssetOTL.prShowAssetControls = 
-			EditorGUILayout.Foldout( myAssetOTL.prShowAssetControls, new GUIContent( "Asset Controls" ) );
+		myAssetOTL.prShowAssetControls = HAPI_GUI.foldout( "Asset Controls", 
+														   myAssetOTL.prShowAssetControls, true );
 		
 		if ( myAssetOTL.prShowAssetControls )
 			myParmChanges |= generateAssetControls();
@@ -160,7 +161,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	private void generateAssetBakeControls()
 	{
-		//Start Time
+		// Start Time
 		{
 			float value = myAsset.prBakeStartTime;
 			bool changed = HAPI_GUI.floatField( "bake_start_time", "Start Time", ref value );
@@ -170,7 +171,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			}
 		}
 		
-		//End Time
+		// End Time
 		{
 			float value = myAsset.prBakeEndTime;
 			bool changed = HAPI_GUI.floatField( "bake_end_time", "End Time", ref value );
@@ -180,31 +181,27 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			}
 		}
 		
-		//Samples per second
+		// Samples per second
 		{
+			HAPI_GUIParm gui_parm	= new HAPI_GUIParm( "bake_samples_per_second", "Samples Per Second" );
+			gui_parm.hasMin			= true;
+			gui_parm.hasMax			= true;
+			gui_parm.hasUIMin		= true;
+			gui_parm.hasUIMax		= true;
+			gui_parm.min			= 1;
+			gui_parm.max			= 120;
+			gui_parm.UIMin			= 1;
+			gui_parm.UIMax			= 120;
 			
-			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "bake_samples_per_second", "Samples Per Second" );
-			gui_parm.hasMin = true;
-			gui_parm.hasMax = true;
-			gui_parm.hasUIMin = true;
-			gui_parm.hasUIMax = true;
-			gui_parm.min = 1;
-			gui_parm.max = 120;
-			gui_parm.UIMin = 1;
-			gui_parm.UIMax = 120;
-			
-			bool delay_build = false;
-			int[] values = new int[1];
-			values[0] = myAsset.prBakeSamplesPerSecond;
-			bool changed = HAPI_GUI.intField( ref gui_parm,	ref delay_build,
-								 ref values );
-				
-			if( changed )
-			{
-				myAsset.prBakeSamplesPerSecond = values[0];
-								
-			}
-		}		
+			bool delay_build		= false;
+			int[] values			= new int[1];
+			values[0]				= myAsset.prBakeSamplesPerSecond;
+			bool changed			= HAPI_GUI.intField( ref gui_parm, ref delay_build,
+														 ref values );
+
+			if ( changed )
+				myAsset.prBakeSamplesPerSecond = values[ 0 ];
+		}
 		
 		if ( GUILayout.Button( "Bake" ) ) 
 		{
@@ -216,25 +213,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 									progress_bar );
 			progress_bar.clearProgressBar();
 		}
-		
 	}
-	
-	private void generateAssetOptionControls()
-	{
-		// Material Shader Type
-		{
-			int value = (int) myAsset.prMaterialShaderType;
-			string[] labels = { "OpenGL", "Mantra" };
-			int[] values = { 0, 1 };
-			bool changed = HAPI_GUI.dropdown( "material_shader_type", "Shader Type", 
-											  ref value, labels, values );
-			if ( changed )
-			{
-				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
-				HAPI_AssetUtility.reApplyMaterials( myAsset );
-			}
-		}
 
+	private void generateViewOptions()
+	{
 		// Show Geometries
 		{
 			bool value = myAsset.prIsGeoVisible;
@@ -252,17 +234,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				}
 			}
 		}
-
-		// Show Vertex Colours
-		{
-			bool value = myAsset.prShowVertexColours;
-			bool changed = HAPI_GUI.toggle( "show_vertex_colours", "Show Vertex Colors", ref value );
-			if ( changed )
-			{
-				myAsset.prShowVertexColours = value;
-				HAPI_AssetUtility.reApplyMaterials( myAsset );
-			}
-		}
 		
 		// Show Pinned Instances
 		{
@@ -272,22 +243,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			{
 				myAsset.prShowPinnedInstances = value;
 			}
-		}
-
-		HAPI_GUI.separator();
-
-		// Enable Cooking Toggle
-		{
-			bool value = myAsset.prEnableCooking;
-			if ( HAPI_Host.prEnableCooking == false )
-			{
-				GUI.enabled = false;
-				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking (overwritted by global setting)", ref value );
-				GUI.enabled = true;
-			}
-			else
-				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
-			myAsset.prEnableCooking = value;
 		}
 
 		// Auto Select Asset Node Toggle
@@ -317,17 +272,51 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
 			myAsset.prHideGeometryOnLinking = value;
 		}
-
-		HAPI_GUI.separator();
-		
-		/* Hide for now since it's not used a lot.
-		// Logging Toggle
+	}
+	
+	private void generateMaterialOptions()
+	{
+		// Material Shader Type
 		{
-			bool value = myAsset.prEnableLogging;
-			HAPI_GUI.toggle( "enable_logging", "Enable Logging", ref value );
-			myAsset.prEnableLogging = value;
+			int value = (int) myAsset.prMaterialShaderType;
+			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
+			int[] values = { 0, 1 };
+			bool changed = HAPI_GUI.dropdown( "material_renderer", "Material Renderer", 
+											  ref value, labels, values );
+			if ( changed )
+			{
+				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
+				HAPI_AssetUtility.reApplyMaterials( myAsset );
+			}
 		}
-		*/
+
+		// Show Vertex Colours
+		{
+			bool value = myAsset.prShowVertexColours;
+			bool changed = HAPI_GUI.toggle( "show_vertex_colours", "Show Vertex Colors", ref value );
+			if ( changed )
+			{
+				myAsset.prShowVertexColours = value;
+				HAPI_AssetUtility.reApplyMaterials( myAsset );
+			}
+		}
+	}
+
+	private void generateCookingOptions()
+	{
+		// Enable Cooking Toggle
+		{
+			bool value = myAsset.prEnableCooking;
+			if ( HAPI_Host.prEnableCooking == false )
+			{
+				GUI.enabled = false;
+				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking (overwritted by global setting)", ref value );
+				GUI.enabled = true;
+			}
+			else
+				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
+			myAsset.prEnableCooking = value;
+		}
 
 		// Sync Asset Transform Toggle
 		{
@@ -348,6 +337,23 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			bool value = myAsset.prLiveInGameCooking;
 			HAPI_GUI.toggle( "live_ingame_cooking", "Live In-Game Cooking", ref value );
 			myAsset.prLiveInGameCooking = value;
+		}
+	}
+
+	private void generateAssetOptions()
+	{
+		GUIContent[] modes = new GUIContent[ 3 ];
+		modes[ 0 ] = new GUIContent( "View" );
+		modes[ 1 ] = new GUIContent( "Materials" );
+		modes[ 2 ] = new GUIContent( "Cooking" );
+		myAsset.prAssetOptionsCategory = GUILayout.Toolbar( myAsset.prAssetOptionsCategory, modes );
+
+		switch ( myAsset.prAssetOptionsCategory )
+		{
+			case 0: generateViewOptions(); break;
+			case 1: generateMaterialOptions(); break;
+			case 2: generateCookingOptions(); break;
+			default: Debug.LogError( "Invalid Asset Options Category." ); break;
 		}
 	}
 	

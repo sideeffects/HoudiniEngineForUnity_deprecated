@@ -133,15 +133,15 @@ public abstract class HAPI_Asset : HAPI_Control
 	public float					prBakeEndTime {					get { return myBakeEndTime; }
 																	set { myBakeEndTime = value; } }
 	
-	public int						prBakeSamplesPerSecond {				get { return myBakeSamplesPerSecond; }
-																	set { myBakeSamplesPerSecond = value; } }	
+	public int						prBakeSamplesPerSecond {		get { return myBakeSamplesPerSecond; }
+																	set { myBakeSamplesPerSecond = value; } }
 	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	public HAPI_ShaderType			prMaterialShaderType {			get { return myMaterialShaderType; }
 																	set { myMaterialShaderType = value; } }
-	public bool 					prShowObjectControls {			get { return myShowObjectControls; } 
-																	set { myShowObjectControls = value; } }
+	public bool 					prShowHoudiniControls {			get { return myShowHoudiniControls; } 
+																	set { myShowHoudiniControls = value; } }
 	public bool 					prShowAssetControls {			get { return myShowAssetControls; } 
 																	set { myShowAssetControls = value; } }
 	public bool 					prShowAssetOptions {			get { return myShowAssetOptions; } 
@@ -150,6 +150,9 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myShowBakeOptions = value; } }
 	public bool						prShowInputControls {			get { return myShowInputControls; } 
 																	set { myShowInputControls = value; } }
+	public int						prAssetOptionsCategory {		get { return myAssetOptionsCategory; }
+																	set { myAssetOptionsCategory = value; } }
+
 	public bool						prAutoSelectAssetNode {			get { return myAutoSelectAssetNode; } 
 																	set { myAutoSelectAssetNode = value; } }
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
@@ -530,12 +533,13 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		// GUI ------------------------------------------------------------------------------------------------------
 		
-		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
-		prShowObjectControls 		= true;
+		prMaterialShaderType		= HAPI_ShaderType.HAPI_SHADER_OPENGL;
+		prShowHoudiniControls 		= true;
 		prShowAssetControls 		= true;
-		prShowAssetOptions			= false;
+		prShowAssetOptions			= true;
 		prShowBakeOptions			= false;
 		prShowInputControls 		= true;
+		prAssetOptionsCategory		= 0;
 		prAutoSelectAssetNode 		= true;
 		prEnableLogging				= false;
 		prSyncAssetTransform		= true;
@@ -1360,11 +1364,13 @@ public abstract class HAPI_Asset : HAPI_Control
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
-	[SerializeField] private bool 					myShowObjectControls;
+	[SerializeField] private bool 					myShowHoudiniControls;
 	[SerializeField] private bool 					myShowAssetControls;
 	[SerializeField] private bool 					myShowAssetOptions;
 	[SerializeField] private bool 					myShowBakeOptions;
 	[SerializeField] private bool					myShowInputControls;
+	[SerializeField] private int					myAssetOptionsCategory;
+
 	[SerializeField] private bool					myAutoSelectAssetNode;
 	[SerializeField] private bool					myEnableLogging;
 	[SerializeField] private bool					mySyncAssetTransform;

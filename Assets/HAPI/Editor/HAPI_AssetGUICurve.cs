@@ -100,10 +100,10 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
-		myAssetCurve.prShowObjectControls = 
-			EditorGUILayout.Foldout( myAssetCurve.prShowObjectControls, new GUIContent( "Object Controls" ) );
+		myAssetCurve.prShowHoudiniControls = 
+			EditorGUILayout.Foldout( myAssetCurve.prShowHoudiniControls, new GUIContent( "Object Controls" ) );
 		
-		if ( myAssetCurve.prShowObjectControls ) 
+		if ( myAssetCurve.prShowHoudiniControls ) 
 		{	
 			if ( GUILayout.Button( "Rebuild" ) ) 
 			{

@@ -130,6 +130,31 @@ public class HAPI_GUI : Editor
 		if ( !join_next )
 			EditorGUILayout.EndHorizontal();
 	}
+
+	public static bool foldout( string label, bool value )
+	{
+		return foldout( label, value, false, 0 );
+	}
+	public static bool foldout( string label, bool value, bool is_bold )
+	{
+		return foldout( label, value, is_bold, 0 );
+	}
+	public static bool foldout( string label, bool value, bool is_bold, int indent )
+	{
+		const int indent_multiplier = 10;
+
+		GUIStyle style = new GUIStyle( GUI.skin.FindStyle( "Foldout" ) );
+		RectOffset rect_offset	= style.margin;
+		rect_offset.left		+= indent * indent_multiplier;
+		style.margin			= rect_offset;
+
+		if ( is_bold )
+			style.fontStyle = FontStyle.Bold;
+
+		return EditorGUILayout.Foldout( value, 
+										new GUIContent( label ),
+										style );
+	}
 	
 	public static bool dropdown< T >( string name, string label, 
 									  ref T value,
