@@ -288,6 +288,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				mesh_saver.prGameObject = part_node;
 				mesh_saver.prMeshName = prAssetName + "_" + part_node.name;
 			}
+#if FALSE // Particles can get a bit annoying right now since our filter for what is a particle system is too broad.
 			else if ( part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
 			{
 				// Get position attributes.
@@ -357,6 +358,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 				particle_emitter.particles = particles;
 			}
+#endif
 		}
 
 		// Set visibility.
