@@ -87,6 +87,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 											false,	// unload_asset_first
 											false,	// serialization_recovery_only
 											false,	// force_reconnect
+											myAsset.prCookingTriggersDownCooks,
 											true	// use_progress_bar_delay
 										);
 					}
@@ -140,6 +141,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 								true,			// unload_asset_first
 								false,			// serializatin_recovery_only
 								false,			// force_reconnect
+								myAsset.prCookingTriggersDownCooks,
 								true			// use_delay_for_progress_bar
 							);
 
@@ -304,6 +306,19 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 	private void generateCookingOptions()
 	{
+		// Cooking Triggers Downstream Cooks Toggle
+		{
+			bool value = myAsset.prCookingTriggersDownCooks;
+			HAPI_GUI.toggle( "cooking_triggers_downstream_cooks", "Cooking Triggers Downstream Cooks", ref value );
+			if ( value != myAsset.prCookingTriggersDownCooks && value )
+			{
+				myAsset.prCookingTriggersDownCooks = value;
+				myAsset.buildClientSide();
+			}
+			else
+				myAsset.prCookingTriggersDownCooks = value;
+		}
+
 		// Enable Cooking Toggle
 		{
 			bool value = myAsset.prEnableCooking;

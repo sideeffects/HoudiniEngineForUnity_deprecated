@@ -163,6 +163,8 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myTransformChangeTriggersCooks = value; } }
 	public bool						prEnableCooking {				get { return myEnableCooking; }
 																	set { myEnableCooking = value; } }
+	public bool						prCookingTriggersDownCooks {	get { return myCookingTriggersDownCooks; }
+																	set { myCookingTriggersDownCooks = value; } }
 	public bool						prHideGeometryOnLinking {		get { return myHideWhenFedToOtherAsset; }
 																	set { myHideWhenFedToOtherAsset = value; } }
 	public bool						prShowVertexColours {			get { return myShowVertexColours; }
@@ -361,7 +363,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		int object_id;
 		int geo_id;
 		int node_id;		
-		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id, out node_id );		
+		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id, out node_id );
 		
 		HAPI_GeoInputControl input_control = asset.GetComponent< HAPI_GeoInputControl >();
 		input_control.prInputObjectId = object_id;
@@ -450,6 +452,7 @@ public abstract class HAPI_Asset : HAPI_Control
 						false,	// unload_asset_first
 						true,	// serializatin_recovery_only
 						false,	// force_reconnect
+						true,	// cook_downstream_assets
 						true	// use_delay_for_progress_bar
 					);
 			}
@@ -461,6 +464,7 @@ public abstract class HAPI_Asset : HAPI_Control
 						true,	// unload_asset_first
 						false,	// serializatin_recovery_only
 						true,	// force_reconnect
+						true,	// cook_downstream_assets
 						false	// use_delay_for_progress_bar
 					);
 			}
@@ -546,6 +550,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prPushUnityTransformToHoudini	= true;
 		prTransformChangeTriggersCooks	= false;
 		prEnableCooking					= true;
+		prCookingTriggersDownCooks		= true;
 		myHideWhenFedToOtherAsset		= true;
 		prShowVertexColours				= false;
 		prShowPinnedInstances			= true;
@@ -574,6 +579,7 @@ public abstract class HAPI_Asset : HAPI_Control
 						true,	// unload_asset_first
 						false,	// serializatin_recovery_only
 						false,	// force_reconnect
+						prCookingTriggersDownCooks,	// cook_downstream_assets
 						false	// use_delay_for_progress_bar
 					);
 	}
@@ -584,6 +590,7 @@ public abstract class HAPI_Asset : HAPI_Control
 						false,	// unload_asset_first
 						false,	// serializatin_recovery_only
 						false,	// force_reconnect
+						prCookingTriggersDownCooks,	// cook_downstream_assets
 						true	// use_delay_for_progress_bar
 					);
 	}
@@ -591,6 +598,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	public virtual bool build( bool reload_asset, bool unload_asset_first,
 							   bool serialization_recovery_only,
 							   bool force_reconnect,
+							   bool cook_downstream_assets,
 							   bool use_delay_for_progress_bar )
 	{
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
@@ -826,8 +834,9 @@ public abstract class HAPI_Asset : HAPI_Control
 				buildCreateObjects( reload_asset, ref progress_bar );
 			
 				// Process dependent assets.
-				processDependentAssets( serialization_recovery_only, force_reconnect, 
-										use_delay_for_progress_bar );
+				if ( cook_downstream_assets )
+					processDependentAssets( serialization_recovery_only, force_reconnect, 
+											use_delay_for_progress_bar );
 			}
 		}
 		catch ( HAPI_ErrorIgnorable ) {}
@@ -1208,6 +1217,7 @@ public abstract class HAPI_Asset : HAPI_Control
 										false, // unload_asset_first
 										false, // serialization_recovery_only
 										false, // force_reconnect
+										downstream_asset.prCookingTriggersDownCooks,
 										use_delay_for_progress_bar );
 				prEnableCooking = true;
 			}
@@ -1221,6 +1231,7 @@ public abstract class HAPI_Asset : HAPI_Control
 										false, // unload_asset_first
 										false, // serialization_recovery_only
 										false, // force_reconnect
+										downstream_asset.prCookingTriggersDownCooks,
 										use_delay_for_progress_bar );
 				prEnableCooking = true;
 			}
@@ -1287,6 +1298,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					false, // unload_asset_first
 					false, // serialization_recovery_only
 					false, // force_reconnect
+					true,  // cook_downstream_assets
 					use_delay_for_progress_bar );
 		}
 	}
@@ -1377,6 +1389,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myPushUnityTransformToHoudini;
 	[SerializeField] private bool					myTransformChangeTriggersCooks;
 	[SerializeField] private bool					myEnableCooking;
+	[SerializeField] private bool					myCookingTriggersDownCooks;
 	[SerializeField] private bool					myHideWhenFedToOtherAsset;
 	[SerializeField] private bool					myShowVertexColours;
 	[SerializeField] private bool					myShowPinnedInstances;

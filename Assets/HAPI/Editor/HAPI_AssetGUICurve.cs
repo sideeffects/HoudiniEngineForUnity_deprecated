@@ -115,24 +115,39 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 				myAssetCurve.buildClientSide();
 			}
 
-			// Draw Auto Select Asset Node Toggle
+			// Auto Select Asset Node Toggle
 			{
 				bool value = myAsset.prAutoSelectAssetNode;
 				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
 				myAsset.prAutoSelectAssetNode = value;
 			}
 
-			// Sync Asset Transform Toggle
+			// Cooking Triggers Downstream Cooks Toggle
+			{
+				bool value = myAsset.prCookingTriggersDownCooks;
+				HAPI_GUI.toggle( "cooking_triggers_downstream_cooks", 
+								 "Cooking Triggers Downstream Cooks", ref value );
+				if ( value != myAsset.prCookingTriggersDownCooks && value )
+				{
+					myAsset.prCookingTriggersDownCooks = value;
+					myAsset.buildClientSide();
+				}
+				else
+					myAsset.prCookingTriggersDownCooks = value;
+			}
+
+			// Push Unity Transform To Houdini Engine Toggle
 			{
 				bool value = myAsset.prPushUnityTransformToHoudini;
-				HAPI_GUI.toggle( "sync_asset_transform", "Sync Asset Transform", ref value );
+				HAPI_GUI.toggle( "push_unity_transform_to_houdini", 
+								 "Push Unity Transform To Houdini Engine", ref value );
 				myAsset.prPushUnityTransformToHoudini = value;
 			}
 
-			// Live Transform Propagation Toggle
+			// Transform Change Triggers Cooks Toggle
 			{
 				bool value = myAsset.prTransformChangeTriggersCooks;
-				HAPI_GUI.toggle( "live_transform_propagation", "Live Transform Propagation", ref value );
+				HAPI_GUI.toggle( "transform_change_triggers_cooks", "Transform Change Triggers Cooks", ref value );
 				myAsset.prTransformChangeTriggersCooks = value;
 			}
 		} // if

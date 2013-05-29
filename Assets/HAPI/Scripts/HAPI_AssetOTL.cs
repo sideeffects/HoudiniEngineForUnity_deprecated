@@ -87,6 +87,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 							unload_asset_first,
 							false,	// serializatin_recovery_only
 							false,	// force_reconnect
+							prCookingTriggersDownCooks,
 							false	// use_delay_for_progress_bar
 						);
 	}
@@ -94,6 +95,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 	public override bool build( bool reload_asset, bool unload_asset_first,
 								bool serialization_recovery_only,
 								bool force_reconnect,
+								bool cook_downstream_assets,
 								bool use_delay_for_progress_bar ) 
 	{
 		unload_asset_first = unload_asset_first 
@@ -101,7 +103,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 							 && !serialization_recovery_only;
 
 		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
-									  force_reconnect, use_delay_for_progress_bar );
+									  force_reconnect, cook_downstream_assets,
+									  use_delay_for_progress_bar );
 		if ( !base_built )
 			return false;
 
