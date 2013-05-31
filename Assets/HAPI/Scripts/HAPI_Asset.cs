@@ -167,8 +167,8 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myCookingTriggersDownCooks = value; } }
 	public bool						prHideGeometryOnLinking {		get { return myHideWhenFedToOtherAsset; }
 																	set { myHideWhenFedToOtherAsset = value; } }
-	public bool						prShowVertexColours {			get { return myShowVertexColours; }
-																	set { myShowVertexColours = value; } }
+	public bool						prShowOnlyVertexColours {		get { return myShowOnlyVertexColours; }
+																	set { myShowOnlyVertexColours = value; } }
 	public bool						prShowPinnedInstances {			get { return myShowPinnedInstances; }
 																	set { myShowPinnedInstances = value; } }
 	public bool						prPlaymodePerFrameCooking {		get { return myPlaymodePerFrameCooking; }
@@ -552,7 +552,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prEnableCooking					= true;
 		prCookingTriggersDownCooks		= true;
 		myHideWhenFedToOtherAsset		= true;
-		prShowVertexColours				= false;
+		prShowOnlyVertexColours				= false;
 		prShowPinnedInstances			= true;
 		prPlaymodePerFrameCooking		= false;
 
@@ -1391,7 +1391,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myEnableCooking;
 	[SerializeField] private bool					myCookingTriggersDownCooks;
 	[SerializeField] private bool					myHideWhenFedToOtherAsset;
-	[SerializeField] private bool					myShowVertexColours;
+	[SerializeField] private bool					myShowOnlyVertexColours;
 	[SerializeField] private bool					myShowPinnedInstances;
 	[SerializeField] private bool					myPlaymodePerFrameCooking;
 	

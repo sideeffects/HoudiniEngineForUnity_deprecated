@@ -592,7 +592,7 @@ public class HAPI_AssetUtility
 			if ( renderer.sharedMaterial == null )
 				renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
 
-			if ( asset.prShowVertexColours )
+			if ( asset.prShowOnlyVertexColours )
 			{
 				renderer.sharedMaterial.mainTexture = null;
 				renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );

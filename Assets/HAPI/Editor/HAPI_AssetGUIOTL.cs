@@ -294,11 +294,11 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 		// Show Vertex Colours
 		{
-			bool value = myAsset.prShowVertexColours;
-			bool changed = HAPI_GUI.toggle( "show_vertex_colours", "Show Vertex Colors", ref value );
+			bool value = myAsset.prShowOnlyVertexColours;
+			bool changed = HAPI_GUI.toggle( "show_only_vertex_colours", "Show Only Vertex Colors", ref value );
 			if ( changed )
 			{
-				myAsset.prShowVertexColours = value;
+				myAsset.prShowOnlyVertexColours = value;
 				HAPI_AssetUtility.reApplyMaterials( myAsset );
 			}
 		}
@@ -306,23 +306,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 	private void generateCookingOptions()
 	{
-		// Cooking Triggers Downstream Cooks Toggle
-		{
-			bool value = myAsset.prCookingTriggersDownCooks;
-			HAPI_GUI.toggle( "cooking_triggers_downstream_cooks", "Cooking Triggers Downstream Cooks", ref value );
-			if ( value != myAsset.prCookingTriggersDownCooks && value )
-			{
-				myAsset.prCookingTriggersDownCooks = value;
-				myAsset.buildClientSide();
-			}
-			else
-				myAsset.prCookingTriggersDownCooks = value;
-		}
-
 		// Enable Cooking Toggle
 		{
 			bool value = myAsset.prEnableCooking;
-			if ( HAPI_Host.prEnableCooking == false )
+			if ( !HAPI_Host.prEnableCooking )
 			{
 				GUI.enabled = false;
 				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking (overwritted by global setting)", ref value );
@@ -333,12 +320,51 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			myAsset.prEnableCooking = value;
 		}
 
+		HAPI_GUI.separator();
+
+		// Cooking Triggers Downstream Cooks Toggle
+		{
+			bool value		= myAsset.prCookingTriggersDownCooks;
+			string name		= "cooking_triggers_downstream_cooks";
+			string label	= "Cooking Triggers Downstream Cooks";
+			if ( !myAsset.prEnableCooking || !HAPI_Host.prEnableCooking )
+			{
+				label += " (all cooking disabled)";
+				GUI.enabled = false;
+				HAPI_GUI.toggle( name, label, ref value );
+				GUI.enabled = true;
+			}
+			else
+				HAPI_GUI.toggle( name, label, ref value );
+
+			if ( value != myAsset.prCookingTriggersDownCooks && value )
+			{
+				myAsset.prCookingTriggersDownCooks = value;
+				myAsset.buildClientSide();
+			}
+			else
+				myAsset.prCookingTriggersDownCooks = value;
+		}
+
 		// Playmode Per-Frame Cooking Toggle
 		{
 			bool value = myAsset.prPlaymodePerFrameCooking;
-			HAPI_GUI.toggle( "playmode_per_frame_cooking", "Playmode Per-Frame Cooking", ref value );
+			string name = "playmode_per_frame_cooking";
+			string label = "Playmode Per-Frame Cooking";
+			if ( !myAsset.prEnableCooking || !HAPI_Host.prEnableCooking )
+			{
+				label += " (all cooking disabled)";
+				GUI.enabled = false;
+				HAPI_GUI.toggle( name, label, ref value );
+				GUI.enabled = true;
+			}
+			else
+				HAPI_GUI.toggle( name, label, ref value );
+
 			myAsset.prPlaymodePerFrameCooking = value;
 		}
+
+		HAPI_GUI.separator();
 
 		// Push Unity Transform To Houdini Engine Toggle
 		{
@@ -351,7 +377,25 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Transform Change Triggers Cooks Toggle
 		{
 			bool value = myAsset.prTransformChangeTriggersCooks;
-			HAPI_GUI.toggle( "transform_change_triggers_cooks", "Transform Change Triggers Cooks", ref value );
+			string name = "transform_change_triggers_cooks";
+			string label = "Transform Change Triggers Cooks";
+			if ( !myAsset.prEnableCooking || !HAPI_Host.prEnableCooking )
+			{
+				label += " (all cooking disabled)";
+				GUI.enabled = false;
+				HAPI_GUI.toggle( name, label, ref value );
+				GUI.enabled = true;
+			}
+			else if ( !myAsset.prPushUnityTransformToHoudini )
+			{
+				label += " (transform push disabled)";
+				GUI.enabled = false;
+				HAPI_GUI.toggle( name, label, ref value );
+				GUI.enabled = true;
+			}
+			else
+				HAPI_GUI.toggle( name, label, ref value );
+
 			myAsset.prTransformChangeTriggersCooks = value;
 		}
 	}

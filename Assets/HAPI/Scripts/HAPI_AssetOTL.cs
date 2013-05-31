@@ -387,7 +387,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( prAssetId, part_info.materialId );
 
 				// Assign vertex color shader if the flag says so.
-				if ( prShowVertexColours )
+				if ( prShowOnlyVertexColours )
 				{
 					mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
 				}

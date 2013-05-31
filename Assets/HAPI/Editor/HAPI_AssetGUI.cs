@@ -102,7 +102,7 @@ public class HAPI_AssetGUI : Editor
 										   ref join_last, ref no_label_toggle_last );
 
 						HAPI_GeoInputFormat value				= (HAPI_GeoInputFormat) input_format_value[ 0 ];
-						myAsset.prGeoInputFormats[ input_index ]			= value;
+						myAsset.prGeoInputFormats[ input_index ]= value;
 
 						if ( value == HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_OBJECT )
 						{
@@ -125,7 +125,7 @@ public class HAPI_AssetGUI : Editor
 								}
 								
 								if ( !obj )
-								{																		
+								{
 									myAsset.removeGeoInput( input_index );
 									myAsset.prUpStreamGeoObjects[ input_index ] = null;
 									myAsset.prUpStreamGeoAssets[ input_index ] = null;
@@ -527,7 +527,7 @@ public class HAPI_AssetGUI : Editor
 			// count from the stack as well as decrement the parent count as we're about to parse 
 			// another parameter.
 			if ( parent_id_stack.Count != 0 )
-		    {
+			{
 				current_parent_id = parent_id_stack.Peek();
 				
 				if ( parent_count_stack.Count == 0 ) Debug.LogError( "" );
@@ -540,7 +540,7 @@ public class HAPI_AssetGUI : Editor
 				{
 					current_index++;
 					continue;
-				}				
+				}
 				
 				int current_parent_count = parent_count_stack.Peek();
 				current_parent_count--;
@@ -558,7 +558,7 @@ public class HAPI_AssetGUI : Editor
 					parent_count_stack.Pop();
 					parent_count_stack.Push( current_parent_count );
 				}
-		    }
+			}
 			else if ( parms[ current_index ].parentId != current_parent_id )
 			{
 				// If the current parameter does not belong to the current active parent then skip it.
