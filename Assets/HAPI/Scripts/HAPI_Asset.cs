@@ -138,48 +138,70 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
-	public HAPI_ShaderType			prMaterialShaderType {			get { return myMaterialShaderType; }
-																	set { myMaterialShaderType = value; } }
 	public bool 					prShowHoudiniControls {			get { return myShowHoudiniControls; } 
 																	set { myShowHoudiniControls = value; } }
 	public bool 					prShowAssetControls {			get { return myShowAssetControls; } 
 																	set { myShowAssetControls = value; } }
-	public bool 					prShowAssetOptions {			get { return myShowAssetOptions; } 
-																	set { myShowAssetOptions = value; } }
+	public bool 					prShowAssetSettings {			get { return myShowAssetSettings; } 
+																	set { myShowAssetSettings = value; } }
 	public bool 					prShowBakeOptions {				get { return myShowBakeOptions; } 
 																	set { myShowBakeOptions = value; } }
 	public bool						prShowInputControls {			get { return myShowInputControls; } 
 																	set { myShowInputControls = value; } }
-	public int						prAssetOptionsCategory {		get { return myAssetOptionsCategory; }
+	public int						prAssetSettingsCategory {		get { return myAssetOptionsCategory; }
 																	set { myAssetOptionsCategory = value; } }
-
-	public bool						prAutoSelectAssetNode {			get { return myAutoSelectAssetNode; } 
-																	set { myAutoSelectAssetNode = value; } }
-	public bool						prEnableLogging {				get { return myEnableLogging; } 
-																	set { myEnableLogging = value; } }
-	public bool						prPushUnityTransformToHoudini {	get { return myPushUnityTransformToHoudini; } 
-																	set { myPushUnityTransformToHoudini = value; } }
-	public bool						prTransformChangeTriggersCooks{ get { return myTransformChangeTriggersCooks; } 
-																	set { myTransformChangeTriggersCooks = value; } }
-	public bool						prEnableCooking {				get { return myEnableCooking; }
-																	set { myEnableCooking = value; } }
-	public bool						prCookingTriggersDownCooks {	get { return myCookingTriggersDownCooks; }
-																	set { myCookingTriggersDownCooks = value; } }
-	public bool						prHideGeometryOnLinking {		get { return myHideWhenFedToOtherAsset; }
-																	set { myHideWhenFedToOtherAsset = value; } }
-	public bool						prShowOnlyVertexColours {		get { return myShowOnlyVertexColours; }
-																	set { myShowOnlyVertexColours = value; } }
-	public bool						prShowPinnedInstances {			get { return myShowPinnedInstances; }
-																	set { myShowPinnedInstances = value; } }
-	public bool						prPlaymodePerFrameCooking {		get { return myPlaymodePerFrameCooking; }
-																	set { myPlaymodePerFrameCooking = value; } }
-
-	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
-																	set { myLastChangedParmId = value; } }
 
 	public bool						prIsGeoVisible {				get { return myIsGeoVisible; }
 																	set { myIsGeoVisible = value; } }
-	
+	public bool						prShowPinnedInstances {			get { return myShowPinnedInstances; }
+																	set { myShowPinnedInstances = value; } }
+	public bool	prAutoSelectAssetRootNode {		get { return (	myAutoSelectAssetRootNode && 
+																HAPI_Host.isAutoSelectAssetRootNodeDefault() )
+														  || (	HAPI_Host.prAutoSelectAssetRootNode &&
+																!HAPI_Host.isAutoSelectAssetRootNodeDefault() ); } 
+												set { myAutoSelectAssetRootNode = value; } }
+	public bool	prHideGeometryOnLinking {		get { return (	myHideGeometryOnLinking && 
+																HAPI_Host.isHideGeometryOnLinkingDefault() )
+														  || (	HAPI_Host.prHideGeometryOnLinking &&
+																!HAPI_Host.isHideGeometryOnLinkingDefault() ); } 
+												set { myHideGeometryOnLinking = value; } }
+
+	public HAPI_ShaderType			prMaterialShaderType {			get { return myMaterialShaderType; }
+																	set { myMaterialShaderType = value; } }
+	public bool						prShowOnlyVertexColours {		get { return myShowOnlyVertexColours; }
+																	set { myShowOnlyVertexColours = value; } }
+
+	public bool	prEnableCooking {				get { return (	myEnableCooking && 
+																HAPI_Host.isEnableCookingDefault() )
+														  || (	HAPI_Host.prEnableCooking &&
+																!HAPI_Host.isEnableCookingDefault() ); } 
+												set { myEnableCooking = value; } }
+	public bool	prCookingTriggersDownCooks {	get { return (	myCookingTriggersDownCooks && 
+																HAPI_Host.isCookingTriggersDownCooksDefault() )
+														  || (	HAPI_Host.prCookingTriggersDownCooks &&
+																!HAPI_Host.isCookingTriggersDownCooksDefault() ); } 
+												set { myCookingTriggersDownCooks = value; } }
+	public bool	prPlaymodePerFrameCooking {		get { return (	myPlaymodePerFrameCooking && 
+																HAPI_Host.isPlaymodePerFrameCookingDefault() )
+														  || (	HAPI_Host.prPlaymodePerFrameCooking &&
+																!HAPI_Host.isPlaymodePerFrameCookingDefault() ); } 
+												set { myPlaymodePerFrameCooking = value; } }
+	public bool	prPushUnityTransformToHoudini {	get { return (	myPushUnityTransformToHoudini && 
+																HAPI_Host.isPushUnityTransformToHoudiniDefault() )
+														  || (	HAPI_Host.prPushUnityTransformToHoudini &&
+																!HAPI_Host.isPushUnityTransformToHoudiniDefault() ); } 
+												set { myPushUnityTransformToHoudini = value; } }
+	public bool	prTransformChangeTriggersCooks{ get { return (	myTransformChangeTriggersCooks && 
+																HAPI_Host.isTransformChangeTriggersCooksDefault() )
+														  || (	HAPI_Host.prTransformChangeTriggersCooks &&
+																!HAPI_Host.isTransformChangeTriggersCooksDefault() ); } 
+												set { myTransformChangeTriggersCooks = value; } }
+
+	public bool						prEnableLogging {				get { return myEnableLogging; } 
+																	set { myEnableLogging = value; } }
+	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
+																	set { myLastChangedParmId = value; } }
+
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
 	/// 	A 1:1 mapping with myFolderListSelectionIds.
@@ -537,29 +559,30 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		// GUI ------------------------------------------------------------------------------------------------------
 		
-		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
 		prShowHoudiniControls 			= true;
 		prShowAssetControls 			= true;
-		prShowAssetOptions				= true;
+		prShowAssetSettings				= true;
 		prShowBakeOptions				= false;
 		prShowInputControls 			= true;
-		prAssetOptionsCategory			= 0;
+		prAssetSettingsCategory			= 0;
 
-		prAutoSelectAssetNode 			= true;
-		prEnableLogging					= false;
-		prPushUnityTransformToHoudini	= true;
-		prTransformChangeTriggersCooks	= false;
-		prEnableCooking					= true;
-		prCookingTriggersDownCooks		= true;
-		myHideWhenFedToOtherAsset		= true;
-		prShowOnlyVertexColours				= false;
+		prIsGeoVisible					= true;
 		prShowPinnedInstances			= true;
-		prPlaymodePerFrameCooking		= false;
+		prAutoSelectAssetRootNode 		= HAPI_Host.myDefaultAutoSelectAssetRootNode;
+		prHideGeometryOnLinking			= HAPI_Host.myDefaultHideGeometryOnLinking;
 
+		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
+		prShowOnlyVertexColours			= false;
+
+		prEnableCooking					= HAPI_Host.myDefaultEnableCooking;
+		prCookingTriggersDownCooks		= HAPI_Host.myDefaultCookingTriggersDownCooks;
+		prPlaymodePerFrameCooking		= false;
+		prPushUnityTransformToHoudini	= HAPI_Host.myDefaultPushUnityTransformToHoudini;
+		prTransformChangeTriggersCooks	= HAPI_Host.myDefaultTransformChangeTriggersCooks;
+
+		prEnableLogging					= false;
 		prLastChangedParmId 			= -1;
 
-		myIsGeoVisible					= true;
-		
 		prFolderListSelections 			= new List< int >();
 		prFolderListSelectionIds 		= new List< int >();
 		prFolderListSelections.Add( 0 );
@@ -607,7 +630,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			return false;
 		}
 
-		if ( !prEnableCooking || !HAPI_Host.prEnableCooking )
+		if ( !prEnableCooking )
 			return false;
 
 		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
@@ -1376,28 +1399,29 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
-	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
 	[SerializeField] private bool 					myShowHoudiniControls;
 	[SerializeField] private bool 					myShowAssetControls;
-	[SerializeField] private bool 					myShowAssetOptions;
+	[SerializeField] private bool 					myShowAssetSettings;
 	[SerializeField] private bool 					myShowBakeOptions;
 	[SerializeField] private bool					myShowInputControls;
 	[SerializeField] private int					myAssetOptionsCategory;
 
-	[SerializeField] private bool					myAutoSelectAssetNode;
-	[SerializeField] private bool					myEnableLogging;
-	[SerializeField] private bool					myPushUnityTransformToHoudini;
-	[SerializeField] private bool					myTransformChangeTriggersCooks;
+	[SerializeField] private bool					myIsGeoVisible;
+	[SerializeField] private bool					myShowPinnedInstances;
+	[SerializeField] private bool					myAutoSelectAssetRootNode;
+	[SerializeField] private bool					myHideGeometryOnLinking;
+
+	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
+	[SerializeField] private bool					myShowOnlyVertexColours;
+
 	[SerializeField] private bool					myEnableCooking;
 	[SerializeField] private bool					myCookingTriggersDownCooks;
-	[SerializeField] private bool					myHideWhenFedToOtherAsset;
-	[SerializeField] private bool					myShowOnlyVertexColours;
-	[SerializeField] private bool					myShowPinnedInstances;
 	[SerializeField] private bool					myPlaymodePerFrameCooking;
+	[SerializeField] private bool					myPushUnityTransformToHoudini;
+	[SerializeField] private bool					myTransformChangeTriggersCooks;
 	
+	[SerializeField] private bool					myEnableLogging;
 	[SerializeField] private int					myLastChangedParmId;
-
-	[SerializeField] private bool					myIsGeoVisible;
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.

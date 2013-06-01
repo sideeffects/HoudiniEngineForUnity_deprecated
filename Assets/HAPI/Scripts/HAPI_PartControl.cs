@@ -68,7 +68,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 	public void selectParent()
 	{
-		if ( prAsset != null && prAsset.prAutoSelectAssetNode && HAPI_Host.prAutoSelectParent )
+		if ( prAsset != null && prAsset.prAutoSelectAssetRootNode && HAPI_Host.prAutoSelectAssetRootNode )
 		{
 			GameObject[] selection 	= new GameObject[ 1 ];
 			selection[ 0 ] 			= prAsset.gameObject;

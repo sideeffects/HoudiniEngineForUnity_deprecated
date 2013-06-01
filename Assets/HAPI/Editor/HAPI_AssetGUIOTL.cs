@@ -109,14 +109,12 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
-		// Draw Asset Options
-		//	These don't affect the asset directly so they don't 
-		//	trigger rebuilds.
-		//
+		// Draw Asset Settings
+		//		These don't affect the asset directly so they don't trigger rebuilds.
 
-		myAssetOTL.prShowAssetOptions = HAPI_GUI.foldout( "Asset Options", myAssetOTL.prShowAssetOptions, true );
-		if ( myAssetOTL.prShowAssetOptions )
-			generateAssetOptions();
+		myAssetOTL.prShowAssetSettings = HAPI_GUI.foldout( "Asset Settings", myAssetOTL.prShowAssetSettings, true );
+		if ( myAssetOTL.prShowAssetSettings )
+			generateAssetSettings();
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Baking Controls
@@ -217,7 +215,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		}
 	}
 
-	private void generateViewOptions()
+	private void generateViewSettings()
 	{
 		// Show Geometries
 		{
@@ -247,36 +245,40 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			}
 		}
 
-		// Auto Select Asset Node Toggle
+		// Auto Select Asset Root Node Toggle
 		{
-			bool value = myAsset.prAutoSelectAssetNode;
-			if ( HAPI_Host.prAutoSelectParent == false )
-			{
-				GUI.enabled = false;
-				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent (overwritted by global setting)", ref value );
-				GUI.enabled = true;
-			}
-			else
-				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
-			myAsset.prAutoSelectAssetNode = value;
+			bool value		= myAsset.prAutoSelectAssetRootNode;
+			string name		= "auto_select_asset_root_node";
+			string label	= "Auto Select Asset Root Node";
+
+			GUI.enabled = ( HAPI_Host.prAutoSelectAssetRootNode == HAPI_Host.myDefaultAutoSelectAssetRootNode );
+			if ( !GUI.enabled ) 
+				label += " (overwritted by global setting)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
+				myAsset.prAutoSelectAssetRootNode = value;
 		}
 		
 		// Hide When Fed to Other Asset
 		{
-			bool value = myAsset.prHideGeometryOnLinking;
-			if ( HAPI_Host.prHideGeometryOnLinking == false )
-			{
-				GUI.enabled = false;
-				HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking (overwritted by global setting)", ref value );
-				GUI.enabled = true;
-			}
-			else
-				HAPI_GUI.toggle( "hide_geometry_on_linking", "Hide Geometry On Linking", ref value );
-			myAsset.prHideGeometryOnLinking = value;
+			bool value		= myAsset.prHideGeometryOnLinking;
+			string name		= "hide_geometry_on_linking";
+			string label	= "Hide Geometry On Linking";
+
+			GUI.enabled = ( HAPI_Host.prHideGeometryOnLinking == HAPI_Host.myDefaultHideGeometryOnLinking );
+			if ( !GUI.enabled ) 
+				label += " (overwritted by global setting)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
+				myAsset.prHideGeometryOnLinking = value;
 		}
 	}
 	
-	private void generateMaterialOptions()
+	private void generateMaterialSettings()
 	{
 		// Material Shader Type
 		{
@@ -304,20 +306,22 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		}
 	}
 
-	private void generateCookingOptions()
+	private void generateCookingSettings()
 	{
 		// Enable Cooking Toggle
 		{
-			bool value = myAsset.prEnableCooking;
-			if ( !HAPI_Host.prEnableCooking )
-			{
-				GUI.enabled = false;
-				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking (overwritted by global setting)", ref value );
-				GUI.enabled = true;
-			}
-			else
-				HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value );
-			myAsset.prEnableCooking = value;
+			bool value		= myAsset.prEnableCooking;
+			string name		= "enable_cooking";
+			string label	= "Enable Cooking";
+
+			GUI.enabled = ( HAPI_Host.prEnableCooking == HAPI_Host.myDefaultEnableCooking );
+			if ( !GUI.enabled ) 
+				label += " (overwritted by global setting)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
+				myAsset.prEnableCooking = value;
 		}
 
 		HAPI_GUI.separator();
@@ -327,93 +331,104 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			bool value		= myAsset.prCookingTriggersDownCooks;
 			string name		= "cooking_triggers_downstream_cooks";
 			string label	= "Cooking Triggers Downstream Cooks";
-			if ( !myAsset.prEnableCooking || !HAPI_Host.prEnableCooking )
-			{
-				label += " (all cooking disabled)";
-				GUI.enabled = false;
-				HAPI_GUI.toggle( name, label, ref value );
-				GUI.enabled = true;
-			}
-			else
-				HAPI_GUI.toggle( name, label, ref value );
 
-			if ( value != myAsset.prCookingTriggersDownCooks && value )
-			{
-				myAsset.prCookingTriggersDownCooks = value;
-				myAsset.buildClientSide();
-			}
-			else
+			bool global_overwrite = ( HAPI_Host.prCookingTriggersDownCooks != 
+									  HAPI_Host.myDefaultCookingTriggersDownCooks );
+			bool local_overwrite  = ( myAsset.prEnableCooking == false );
+
+			GUI.enabled = ( !global_overwrite && !local_overwrite );
+			if ( !GUI.enabled ) 
+				if ( global_overwrite )
+					label += " (overwritted by global setting)";
+				else // local_overwrite
+					label += " (all cooking is disabled)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
 				myAsset.prCookingTriggersDownCooks = value;
 		}
 
 		// Playmode Per-Frame Cooking Toggle
 		{
-			bool value = myAsset.prPlaymodePerFrameCooking;
-			string name = "playmode_per_frame_cooking";
-			string label = "Playmode Per-Frame Cooking";
-			if ( !myAsset.prEnableCooking || !HAPI_Host.prEnableCooking )
-			{
-				label += " (all cooking disabled)";
-				GUI.enabled = false;
-				HAPI_GUI.toggle( name, label, ref value );
-				GUI.enabled = true;
-			}
-			else
-				HAPI_GUI.toggle( name, label, ref value );
+			bool value		= myAsset.prPlaymodePerFrameCooking;
+			string name		= "playmode_per_frame_cooking";
+			string label	= "Playmode Per-Frame Cooking";
 
-			myAsset.prPlaymodePerFrameCooking = value;
+			bool global_overwrite = ( HAPI_Host.prPlaymodePerFrameCooking != 
+									  HAPI_Host.myDefaultPlaymodePerFrameCooking );
+			bool local_overwrite  = ( myAsset.prEnableCooking == false );
+
+			GUI.enabled = ( !global_overwrite && !local_overwrite );
+			if ( !GUI.enabled ) 
+				if ( global_overwrite )
+					label += " (overwritted by global setting)";
+				else // local_overwrite
+					label += " (all cooking is disabled)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
+				myAsset.prPlaymodePerFrameCooking = value;
 		}
 
 		HAPI_GUI.separator();
 
 		// Push Unity Transform To Houdini Engine Toggle
 		{
-			bool value = myAsset.prPushUnityTransformToHoudini;
-			HAPI_GUI.toggle( "push_unity_transform_to_houdini_engine", 
-							 "Push Unity Transform To Houdini Engine", ref value );
-			myAsset.prPushUnityTransformToHoudini = value;
+			bool value		= myAsset.prPushUnityTransformToHoudini;
+			string name		= "push_unity_transform_to_houdini_engine";
+			string label	= "Push Unity Transform To Houdini Engine";
+
+			GUI.enabled = ( HAPI_Host.prPushUnityTransformToHoudini == 
+							HAPI_Host.myDefaultPushUnityTransformToHoudini );
+			if ( !GUI.enabled ) 
+				label += " (overwritted by global setting)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
+				myAsset.prPushUnityTransformToHoudini = value;
 		}
 
 		// Transform Change Triggers Cooks Toggle
 		{
-			bool value = myAsset.prTransformChangeTriggersCooks;
-			string name = "transform_change_triggers_cooks";
-			string label = "Transform Change Triggers Cooks";
-			if ( !myAsset.prEnableCooking || !HAPI_Host.prEnableCooking )
-			{
-				label += " (all cooking disabled)";
-				GUI.enabled = false;
-				HAPI_GUI.toggle( name, label, ref value );
-				GUI.enabled = true;
-			}
-			else if ( !myAsset.prPushUnityTransformToHoudini )
-			{
-				label += " (transform push disabled)";
-				GUI.enabled = false;
-				HAPI_GUI.toggle( name, label, ref value );
-				GUI.enabled = true;
-			}
-			else
-				HAPI_GUI.toggle( name, label, ref value );
+			bool value		= myAsset.prTransformChangeTriggersCooks;
+			string name		= "transform_change_triggers_cooks";
+			string label	= "Transform Change Triggers Cooks";
 
-			myAsset.prTransformChangeTriggersCooks = value;
+			bool global_overwrite = ( HAPI_Host.prTransformChangeTriggersCooks != 
+									  HAPI_Host.myDefaultTransformChangeTriggersCooks );
+			bool local_overwrite  = ( myAsset.prEnableCooking == false );
+
+			GUI.enabled = ( !global_overwrite && !local_overwrite );
+			if ( !GUI.enabled ) 
+				if ( global_overwrite )
+					label += " (overwritted by global setting)";
+				else // local_overwrite
+					label += " (all cooking is disabled)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
+				myAsset.prTransformChangeTriggersCooks = value;
 		}
 	}
 
-	private void generateAssetOptions()
+	private void generateAssetSettings()
 	{
 		GUIContent[] modes = new GUIContent[ 3 ];
 		modes[ 0 ] = new GUIContent( "View" );
 		modes[ 1 ] = new GUIContent( "Materials" );
 		modes[ 2 ] = new GUIContent( "Cooking" );
-		myAsset.prAssetOptionsCategory = GUILayout.Toolbar( myAsset.prAssetOptionsCategory, modes );
+		myAsset.prAssetSettingsCategory = GUILayout.Toolbar( myAsset.prAssetSettingsCategory, modes );
 
-		switch ( myAsset.prAssetOptionsCategory )
+		switch ( myAsset.prAssetSettingsCategory )
 		{
-			case 0: generateViewOptions(); break;
-			case 1: generateMaterialOptions(); break;
-			case 2: generateCookingOptions(); break;
-			default: Debug.LogError( "Invalid Asset Options Category." ); break;
+			case 0: generateViewSettings(); break;
+			case 1: generateMaterialSettings(); break;
+			case 2: generateCookingSettings(); break;
+			default: Debug.LogError( "Invalid Asset Settings Tab." ); break;
 		}
 	}
 	

@@ -190,7 +190,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 		base.reset();
 		
 		// Overwrite some settings that should be different by default for curves than other asset types.
-		prAutoSelectAssetNode		= true;
+		prAutoSelectAssetRootNode		= true;
 		prHideGeometryOnLinking		= false;
 		prAssetType					= AssetType.TYPE_CURVE;
 

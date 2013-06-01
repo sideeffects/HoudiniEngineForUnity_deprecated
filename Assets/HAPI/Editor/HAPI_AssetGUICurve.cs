@@ -117,9 +117,9 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 
 			// Auto Select Asset Node Toggle
 			{
-				bool value = myAsset.prAutoSelectAssetNode;
+				bool value = myAsset.prAutoSelectAssetRootNode;
 				HAPI_GUI.toggle( "auto_select_parent", "Auto Select Parent", ref value );
-				myAsset.prAutoSelectAssetNode = value;
+				myAsset.prAutoSelectAssetRootNode = value;
 			}
 
 			// Cooking Triggers Downstream Cooks Toggle

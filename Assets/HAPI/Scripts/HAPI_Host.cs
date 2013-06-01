@@ -84,24 +84,31 @@ namespace HAPI
 	[ InitializeOnLoad ]
 	public static partial class HAPI_Host
 	{
+		// Global Settings Defaults ---------------------------------------------------------------------------------
+
 		private const string myDefaultCollisionGroupName					= "collision_geo";
 		private const string myDefaultRenderedCollisionGroupName			= "rendered_collision_geo";
-
-		private const bool myDefaultEnableDragAndDrop						= true;
-		private const bool myDefaultEnableSupportWarnings					= true;
-
-		private const bool myDefaultEnableCooking							= true;
-		private const bool myDefaultAutoSelectParent						= true;
-		private const bool myDefaultHideGeometryOnLinking					= true;
 
 		private const float myDefaultPinSize								= 1.0f;
 		private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
 		private const bool myDefaultAutoPinInstances						= true;
 
-		private static KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
+		private const bool myDefaultEnableDragAndDrop						= true;
+		private const bool myDefaultEnableSupportWarnings					= true;
+
+		public const bool myDefaultAutoSelectAssetRootNode					= true;
+		public const bool myDefaultHideGeometryOnLinking					= true;
+
+		public const bool myDefaultEnableCooking							= true;
+		public const bool myDefaultCookingTriggersDownCooks					= true;
+		public const bool myDefaultPlaymodePerFrameCooking					= false;
+		public const bool myDefaultPushUnityTransformToHoudini				= true;
+		public const bool myDefaultTransformChangeTriggersCooks				= false;
+
+		private const KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
 
-		private static KeyCode myDefaultEditingPointsModeHotKey				= KeyCode.LeftControl;
+		private const KeyCode myDefaultEditingPointsModeHotKey				= KeyCode.LeftControl;
 		private static Color myDefaultEditingPointsModeColour				= new Color( 0.7f, 0.7f, 0.9f, 1.0f );
 
 		private static Color myDefaultWireframeColour						= new Color( 0.0f, 1.0f, 0.0f, 1.0f );
@@ -116,6 +123,8 @@ namespace HAPI
 
 		private const int myDefaultCurvePrimitiveTypeDefault				= 1;
 		private const int myDefaultCurveMethodDefault						= 1;
+
+		// Global Settings Initializations --------------------------------------------------------------------------
 
 		static HAPI_Host()
 		{
@@ -135,16 +144,21 @@ namespace HAPI
 			setString(	"HAPI_CollisionGroupName", myDefaultCollisionGroupName, true );
 			setString(	"HAPI_RenderedCollisionGroupName", myDefaultRenderedCollisionGroupName, true );
 
-			setBool(	"HAPI_EnableDragAndDrop", myDefaultEnableDragAndDrop, true );
-			setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
-			
-			setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
-			setBool(	"HAPI_AutoSelectParent", myDefaultAutoSelectParent, true );
-			setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
-			
 			setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 			setColour(	"HAPI_PinColour", myDefaultPinColour, true );
 			setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
+
+			setBool(	"HAPI_EnableDragAndDrop", myDefaultEnableDragAndDrop, true );
+			setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
+			
+			setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
+			setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
+
+			setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
+			setBool(	"HAPI_CookingTriggersDownCooks", myDefaultCookingTriggersDownCooks, true );
+			setBool(	"HAPI_PlaymodePerFrameCooking", myDefaultPlaymodePerFrameCooking, true );
+			setBool(	"HAPI_PushUnityTransformToHoudini", myDefaultPushUnityTransformToHoudini, true );
+			setBool(	"HAPI_TransformChangeTriggersCooks", myDefaultTransformChangeTriggersCooks, true );
 
 			setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 			setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
@@ -173,6 +187,8 @@ namespace HAPI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Public
 
+		// Global Settings Properties -------------------------------------------------------------------------------
+
 		public static bool prHoudiniSceneExists {
 												get { return getBool( "HAPI_HoudiniSceneExists" ); } 
 												private set { setBool( "HAPI_HoudiniSceneExists", value ); } }
@@ -187,23 +203,6 @@ namespace HAPI
 												get { return getString( "HAPI_RenderedCollisionGroupName" ); }
 												set { setString( "HAPI_RenderedCollisionGroupName", value ); } }
 
-		public static bool prEnableDragAndDrop {
-												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
-												set { setBool( "HAPI_EnableDragAndDrop", value ); } }
-		public static bool prEnableSupportWarnings {
-												get { return getBool( "HAPI_EnableSupportWarnings" ); } 
-												set { setBool( "HAPI_EnableSupportWarnings", value ); } }
-
-		public static bool prEnableCooking {
-												get { return getBool( "HAPI_EnableCooking" ); }
-												set { setBool( "HAPI_EnableCooking", value ); } }
-		public static bool prAutoSelectParent {
-												get { return getBool( "HAPI_AutoSelectParent" ); } 
-												set { setBool( "HAPI_AutoSelectParent", value ); } }
-		public static bool prHideGeometryOnLinking {
-												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
-												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
-
 		public static float prPinSize {
 												get { return getFloat( "HAPI_PinSize" ); }
 												set { setFloat( "HAPI_PinSize", value ); } }
@@ -213,6 +212,36 @@ namespace HAPI
 		public static bool prAutoPinInstances {
 												get { return getBool( "HAPI_AutopinInstances" ); } 
 												set { setBool( "HAPI_AutopinInstances", value ); } }
+
+		public static bool prEnableDragAndDrop {
+												get { return getBool( "HAPI_EnableDragAndDrop" ); } 
+												set { setBool( "HAPI_EnableDragAndDrop", value ); } }
+		public static bool prEnableSupportWarnings {
+												get { return getBool( "HAPI_EnableSupportWarnings" ); } 
+												set { setBool( "HAPI_EnableSupportWarnings", value ); } }
+
+		public static bool prAutoSelectAssetRootNode {
+												get { return getBool( "HAPI_AutoSelectAssetRootNode" ); } 
+												set { setBool( "HAPI_AutoSelectAssetRootNode", value ); } }
+		public static bool prHideGeometryOnLinking {
+												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
+												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
+
+		public static bool prEnableCooking {
+												get { return getBool( "HAPI_EnableCooking" ); }
+												set { setBool( "HAPI_EnableCooking", value ); } }
+		public static bool prCookingTriggersDownCooks {
+												get { return getBool( "HAPI_CookingTriggersDownCooks" ); }
+												set { setBool( "HAPI_CookingTriggersDownCooks", value ); } }
+		public static bool prPlaymodePerFrameCooking {
+												get { return getBool( "HAPI_PlaymodePerFrameCooking" ); }
+												set { setBool( "HAPI_PlaymodePerFrameCooking", value ); } }
+		public static bool prPushUnityTransformToHoudini {
+												get { return getBool( "HAPI_PushUnityTransformToHoudini" ); }
+												set { setBool( "HAPI_PushUnityTransformToHoudini", value ); } }
+		public static bool prTransformChangeTriggersCooks {
+												get { return getBool( "HAPI_TransformChangeTriggersCooks" ); }
+												set { setBool( "HAPI_TransformChangeTriggersCooks", value ); } }
 
 		public static KeyCode prAddingPointsModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_AddingPointsModeHotKey" );
@@ -269,26 +298,124 @@ namespace HAPI
 												get { return getInt( "HAPI_CurveMethodDefault" ); }
 												set { setInt( "HAPI_CurveMethodDefault", value ); } }
 
-		public static RepaintDelegate			myRepaintDelegate;
-		public static DeselectionDelegate		myDeselectionDelegate;
+		// Global Settings Default Checks ---------------------------------------------------------------------------
 
-		public static HAPI_Asset				mySelectionTarget;
+		public static bool isCollisionGroupNameDefault()
+												{ return	prCollisionGroupName == 
+															myDefaultCollisionGroupName; }
+		public static bool isRenderedCollisionGroupNameDefault()
+												{ return	prRenderedCollisionGroupName == 
+															myDefaultRenderedCollisionGroupName; }
+
+		public static bool isPinSizeDefault()
+												{ return	prPinSize == 
+															myDefaultPinSize; }
+		public static bool isPinColourDefault()
+												{ return	prPinColour == 
+															myDefaultPinColour; }
+		public static bool isAutoPinInstancesDefault()
+												{ return	prAutoPinInstances == 
+															myDefaultAutoPinInstances; }
+
+		public static bool isEnableDragAndDropDefault()
+												{ return	prEnableDragAndDrop == 
+															myDefaultEnableDragAndDrop; }
+		public static bool isEnableSupportWarningsDefault()
+												{ return	prEnableSupportWarnings == 
+															myDefaultEnableSupportWarnings; }
+
+		public static bool isAutoSelectAssetRootNodeDefault()
+												{ return	prAutoSelectAssetRootNode == 
+															myDefaultAutoSelectAssetRootNode; }
+		public static bool isHideGeometryOnLinkingDefault()
+												{ return	prHideGeometryOnLinking == 
+															myDefaultHideGeometryOnLinking; }
+
+		public static bool isEnableCookingDefault()
+												{ return	prEnableCooking == 
+															myDefaultEnableCooking; }
+		public static bool isCookingTriggersDownCooksDefault()
+												{ return	prCookingTriggersDownCooks == 
+															myDefaultCookingTriggersDownCooks; }
+		public static bool isPlaymodePerFrameCookingDefault()
+												{ return	prPlaymodePerFrameCooking == 
+															myDefaultPlaymodePerFrameCooking; }
+		public static bool isPushUnityTransformToHoudiniDefault()
+												{ return	prPushUnityTransformToHoudini == 
+															myDefaultPushUnityTransformToHoudini; }
+		public static bool isTransformChangeTriggersCooksDefault()
+												{ return	prTransformChangeTriggersCooks == 
+															myDefaultTransformChangeTriggersCooks; }
+
+		public static bool isAddingPointsModeHotKeyDefault()
+												{ return	prAddingPointsModeHotKey == 
+															myDefaultAddingPointsModeHotKey; }
+		public static bool isAddingPointsModeColourDefault()
+												{ return	prAddingPointsModeColour == 
+															myDefaultAddingPointsModeColour; }
+
+		public static bool isEditingPointsModeHotKeyDefault()
+												{ return	prEditingPointsModeHotKey == 
+															myDefaultEditingPointsModeHotKey; }
+		public static bool isEditingPointsModeColourDefault()
+												{ return	prEditingPointsModeColour == 
+															myDefaultEditingPointsModeColour; }
+
+		public static bool isWireframeColourDefault()
+												{ return	prWireframeColour == 
+															myDefaultWireframeColour; }
+		public static bool isGuideWireframeColourDefault()
+												{ return	prGuideWireframeColour == 
+															myDefaultGuideWireframeColour; }
+		public static bool isUnselectableGuideWireframeColourDefault()
+												{ return	prUnselectableGuideWireframeColour == 
+															myDefaultUnselectableGuideWireframeColour; }
+		public static bool isUnselectedGuideWireframeColourDefault()
+												{ return	prUnselectedGuideWireframeColour == 
+															myDefaultUnselectedGuideWireframeColour; }
+		public static bool isSelectedGuideWireframeColourDefault()
+												{ return	prSelectedGuideWireframeColour == 
+															myDefaultSelectedGuideWireframeColour; }
+
+		public static bool isGuidePointSizeDefault()
+												{ return	prGuidePointSize == 
+															myDefaultGuidePointSize; }
+		public static bool isMinDistanceForPointSelectionDefault()
+												{ return	prMinDistanceForPointSelection == 
+															myDefaultMinDistanceForPointSelection; }
+		public static bool isGuideMinDistanceForMidPointInsertionDefault()
+												{ return	prGuideMinDistanceForMidPointInsertion == 
+															myDefaultGuideMinDistanceForMidPointInsertion; }
+
+		public static bool isCurvePrimitiveTypeDefaultDefault()
+												{ return	prCurvePrimitiveTypeDefault == 
+															myDefaultCurvePrimitiveTypeDefault; }
+		public static bool isCurveMethodDefaultDefault()
+												{ return	prCurveMethodDefault == 
+															myDefaultCurveMethodDefault; }
+
+		// Global Settings Revert To Defaults -----------------------------------------------------------------------
 
 		public static void revertAllSettingsToDefaults()
 		{
 			prCollisionGroupName					= myDefaultCollisionGroupName;
 			prRenderedCollisionGroupName			= myDefaultRenderedCollisionGroupName;
-			
-			prEnableDragAndDrop						= myDefaultEnableDragAndDrop;
-			prEnableSupportWarnings					= myDefaultEnableSupportWarnings;
-
-			prEnableCooking							= myDefaultEnableCooking;
-			prAutoSelectParent						= myDefaultAutoSelectParent;
-			prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
 
 			prPinSize 								= myDefaultPinSize;
 			prPinColour								= myDefaultPinColour;
 			prAutoPinInstances						= myDefaultAutoPinInstances;
+
+			prEnableDragAndDrop						= myDefaultEnableDragAndDrop;
+			prEnableSupportWarnings					= myDefaultEnableSupportWarnings;
+
+			prAutoSelectAssetRootNode				= myDefaultAutoSelectAssetRootNode;
+			prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
+
+			prEnableCooking							= myDefaultEnableCooking;
+			prCookingTriggersDownCooks				= myDefaultCookingTriggersDownCooks;
+			prPlaymodePerFrameCooking				= myDefaultPlaymodePerFrameCooking;
+			prPushUnityTransformToHoudini			= myDefaultPushUnityTransformToHoudini;
+			prTransformChangeTriggersCooks			= myDefaultTransformChangeTriggersCooks;
 
 			prAddingPointsModeHotKey				= myDefaultAddingPointsModeHotKey;
 			prAddingPointsModeColour				= myDefaultAddingPointsModeColour;
@@ -305,7 +432,15 @@ namespace HAPI
 			prGuidePointSize						= myDefaultGuidePointSize;
 			prMinDistanceForPointSelection			= myDefaultMinDistanceForPointSelection;
 			prGuideMinDistanceForMidPointInsertion	= myDefaultGuideMinDistanceForMidPointInsertion;
+
+			prCurvePrimitiveTypeDefault				= myDefaultCurvePrimitiveTypeDefault;
+			prCurveMethodDefault					= myDefaultCurveMethodDefault;
 		}
+
+		public static RepaintDelegate			myRepaintDelegate;
+		public static DeselectionDelegate		myDeselectionDelegate;
+
+		public static HAPI_Asset				mySelectionTarget;
 
 		public static bool hasScene() 
 		{
