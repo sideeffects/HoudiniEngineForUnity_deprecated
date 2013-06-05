@@ -697,9 +697,17 @@ public class HAPI_AssetUtility
 		}
 		else if ( shader_type == HAPI_ShaderType.HAPI_SHADER_MANTRA )
 		{
+			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+			progress_bar.prTitle		= "Rendering Material using Houdini Mantra";
+			progress_bar.prMessage		= "Rendering...";
+			progress_bar.prStartTime	= System.DateTime.Now;
+			progress_bar.prUseDelay		= false;
+			progress_bar.displayProgressBar();
 			string texture_file_path	= HAPI_Host.renderMaterialToFile( material_info.assetId, material_info.id, 
 																		  HAPI_ShaderType.HAPI_SHADER_MANTRA,
 																		  folder_path );
+			progress_bar.clearProgressBar();
+
 			relative_file_path 			= texture_file_path.Replace(	  Application.dataPath, 
 																		  "Assets" );
 
