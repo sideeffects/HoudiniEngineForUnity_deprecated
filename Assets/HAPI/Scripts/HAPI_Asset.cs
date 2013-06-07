@@ -679,7 +679,10 @@ public abstract class HAPI_Asset : HAPI_Control
 					progress_bar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
-
+					
+					if ( prPushUnityTransformToHoudini )
+						pushAssetTransformToHoudini();
+					
 					if ( !serialization_recovery_only )
 						Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
 				}
@@ -901,35 +904,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				return;
 			myLastLocalToWorld = local_to_world;
 
-			HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
-			HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );
-
-			int parm = -1;
-			float [] parm_data = new float[ 3 ];
-
-			parm = findParm( "t" );
-			if ( parm > 0 )
-			{
-				HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
-				for ( int i = 0; i < 3; ++i )
-					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
-			}
-
-			parm = findParm( "r" );
-			if ( parm > 0 )
-			{
-				HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
-				for ( int i = 0; i < 3; ++i )
-					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
-			}
-
-			parm = findParm( "s" );
-			if ( parm > 0 )
-			{
-				HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
-				for ( int i = 0; i < 3; ++i )
-					prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
-			}
+			pushAssetTransformToHoudini();
+			savePreset();
 
 			// Process dependent assets.
 			// TODO: These steps here might be too slow for some assets and can grind Unity to
@@ -1150,6 +1126,40 @@ public abstract class HAPI_Asset : HAPI_Control
 		return -1;
 	}
 	
+	protected void pushAssetTransformToHoudini()
+	{
+		Matrix4x4 local_to_world = transform.localToWorldMatrix;
+
+		HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
+		HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );
+
+		int parm = -1;
+		float [] parm_data = new float[ 3 ];
+
+		parm = findParm( "t" );
+		if ( parm > 0 )
+		{
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+			for ( int i = 0; i < 3; ++i )
+				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+		}
+
+		parm = findParm( "r" );
+		if ( parm > 0 )
+		{
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+			for ( int i = 0; i < 3; ++i )
+				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+		}
+
+		parm = findParm( "s" );
+		if ( parm > 0 )
+		{
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+			for ( int i = 0; i < 3; ++i )
+				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+		}
+	}
 	
 	protected void initAssetConnections()
 	{

@@ -240,6 +240,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
 						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
+						myAsset.savePreset();
 					} // if changed
 				}
 				else if ( myManipMode == XformManipMode.Rotate )
@@ -279,7 +280,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
 						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
-					} // if changed			
+						myAsset.savePreset();
+					} // if changed
 				}
 				else if ( myManipMode == XformManipMode.Scale )
 				{
@@ -301,6 +303,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
 						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
+						myAsset.savePreset();
 					} // if changed
 				} // if myManipMode
 			} // if typeName
