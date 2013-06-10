@@ -601,7 +601,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		return build(	true,	// reload_asset
 						true,	// unload_asset_first
 						false,	// serializatin_recovery_only
-						false,	// force_reconnect
+						true,	// force_reconnect
 						prCookingTriggersDownCooks,	// cook_downstream_assets
 						false	// use_delay_for_progress_bar
 					);
@@ -679,9 +679,6 @@ public abstract class HAPI_Asset : HAPI_Control
 					progress_bar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
-					
-					if ( prPushUnityTransformToHoudini )
-						pushAssetTransformToHoudini();
 					
 					if ( !serialization_recovery_only )
 						Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
@@ -784,7 +781,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.incrementProgressBar( prParmChoiceCount );
 				
 				// Add input fields.
-				if ( !serialization_recovery_only && !force_reconnect )
+				if ( is_first_time_build || ( !serialization_recovery_only && !force_reconnect ) )
 					initAssetConnections();
 
 				if ( !serialization_recovery_only )
@@ -941,14 +938,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			buildClientSide();
 			
 			int num_objects = prObjects.Length;
-			for( int ii = 0; ii < num_objects; ii++ )
+			for ( int ii = 0; ii < num_objects; ii++ )
 			{
 				GameObject game_object = prGameObjects[ ii ];
 				HAPI_ObjectInfo obj_info = prObjects[ ii ];
 				
-				if( game_object != null )
+				if ( game_object != null )
 				{
-					if( !obj_info.isInstancer )					
+					if ( !obj_info.isInstancer )
 					{
 						HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
 						obj_control.beginBakeAnimation();
@@ -978,10 +975,9 @@ public abstract class HAPI_Asset : HAPI_Control
 					
 				while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 				{
-					state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );	
-					
+					state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
 				}
-						
+
 				if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 				{
 					state = HAPI_State.HAPI_STATE_READY;
@@ -992,14 +988,14 @@ public abstract class HAPI_Asset : HAPI_Control
 				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
 						 			 object_transforms, prObjectCount );
 				
-				for( int ii = 0; ii < num_objects; ii++ )
+				for ( int ii = 0; ii < num_objects; ii++ )
 				{
 					GameObject game_object = prGameObjects[ ii ];
 					HAPI_ObjectInfo obj_info = prObjects[ ii ];
 					
-					if( game_object != null )
+					if ( game_object != null )
 					{
-						if( !obj_info.isInstancer )					
+						if ( !obj_info.isInstancer )
 						{
 							HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
 							obj_control.bakeAnimation( curr_time, parent_object, object_transforms[ ii ] );
@@ -1019,30 +1015,29 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 						
 			bool found_anim = false;
-			for( int ii = 0; ii < num_objects; ii++ )
+			for ( int ii = 0; ii < num_objects; ii++ )
 			{
 				GameObject game_object = prGameObjects[ ii ];
 				HAPI_ObjectInfo obj_info = prObjects[ ii ];
 				
-				if( game_object != null )
+				if ( game_object != null )
 				{
-					if( !obj_info.isInstancer )					
+					if ( !obj_info.isInstancer )
 					{
 						HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
-						if( obj_control.endBakeAnimation() )
+						if ( obj_control.endBakeAnimation() )
 							found_anim = true;
 					}
 					else
 					{
 						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
-						if( instancer.endBakeAnimation( parent_object ) )
+						if ( instancer.endBakeAnimation( parent_object ) )
 							found_anim = true;
 					}
-										
 				}
 			}
 			
-			if( !found_anim )
+			if ( !found_anim )
 			{
 				EditorUtility.DisplayDialog( "Bake Error", "No animation was found to bake", "OK" );
 			}

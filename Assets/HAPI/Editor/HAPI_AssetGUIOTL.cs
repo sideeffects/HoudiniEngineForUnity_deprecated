@@ -86,7 +86,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						myAssetOTL.build(	true,	// reload_asset
 											false,	// unload_asset_first
 											false,	// serialization_recovery_only
-											false,	// force_reconnect
+											true,	// force_reconnect
 											myAsset.prCookingTriggersDownCooks,
 											true	// use_progress_bar_delay
 										);

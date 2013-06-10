@@ -86,7 +86,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		return base.build(	true,	// reload_asset
 							unload_asset_first,
 							false,	// serializatin_recovery_only
-							false,	// force_reconnect
+							true,	// force_reconnect
 							prCookingTriggersDownCooks,
 							false	// use_delay_for_progress_bar
 						);
