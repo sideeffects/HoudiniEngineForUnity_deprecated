@@ -663,36 +663,44 @@ public class HAPI_AssetUtility
 			if ( diffuse_map_parm_id >= 0 )
 			{
 				// Figure out the source file path and name.
-				string texture_file_path	= HAPI_Host.extractTextureToFile( material_info.nodeId, 
+				try
+				{
+					string texture_file_path= HAPI_Host.extractTextureToFile( material_info.nodeId, 
 																			  diffuse_map_parm_id, 
 																			  folder_path );
-				relative_file_path 			= texture_file_path.Replace(	  Application.dataPath, 
+
+					relative_file_path 		= texture_file_path.Replace(	  Application.dataPath, 
 																			  "Assets" );
 		
-				// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths
-				// relative to the project folder.
-				Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-				if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
-				{
-					// Asset has not been imported yet so import and try again.
-					AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
-					tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-				}
+					// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
+					// understands paths relative to the project folder.
+					Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+					if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+					{
+						// Asset has not been imported yet so import and try again.
+						AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+						tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+					}
 		
-				// Assign main texture.
-				material.mainTexture = (Texture2D) tex_obj;
+					// Assign main texture.
+					material.mainTexture = (Texture2D) tex_obj;
+				}
+				catch ( HAPI_ErrorInvalidArgument )
+				{
+					// No diffuse map.
+				}
 
 				// Assign shader properties.
 
 				material.SetFloat( "_Shininess", 
-								   1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
-
+									1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
+	
 				Color diffuse_colour	= getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
 				diffuse_colour.a		= getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
 				material.SetColor( "_Color", diffuse_colour );
-
+	
 				material.SetColor( "_SpecColor", 
-								   getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
+									getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
 			}
 		}
 		else if ( shader_type == HAPI_ShaderType.HAPI_SHADER_MANTRA )

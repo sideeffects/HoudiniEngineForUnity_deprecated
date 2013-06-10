@@ -56,6 +56,15 @@ namespace HAPI
 		
 		protected string myErrorMessage;
 	}
+
+	public class HAPI_ErrorInvalidArgument : HAPI_Error
+	{
+		public HAPI_ErrorInvalidArgument()
+		{
+			myErrorMessage = "Invalid arugment error.";
+		}
+		public HAPI_ErrorInvalidArgument( string msg ) : base( msg ) {}
+	}
 	
 	public class HAPI_ErrorProgressCancelled : HAPI_Error 
 	{
@@ -569,10 +578,16 @@ namespace HAPI
 		public static void throwRuntimeError()
 		{
 			int buffer_size = 4000;
+			int code;
+			HAPI_GetStatus( (int) HAPI_StatusType.HAPI_STATUS_RESULT, out code );
 			HAPI_GetStatusStringBufLength( (int) HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
 			StringBuilder error_str = new StringBuilder( buffer_size );
 			HAPI_GetStatusString( (int) HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
-			throw new HAPI_Error( error_str.ToString() );
+
+			if ( code == (int) HAPI_Result.HAPI_RESULT_INVALID_ARGUMENT )
+				throw new HAPI_ErrorInvalidArgument( error_str.ToString() );
+			else
+				throw new HAPI_Error( error_str.ToString() );
 		}
 
 		public static bool isRuntimeInitialized()
