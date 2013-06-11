@@ -126,6 +126,17 @@ public class HAPI_WindowSettings : EditorWindow
 
 		HAPI_GUI.separator();
 
+		// Unity Material Attrib Name
+		{
+			string value = HAPI_Host.prUnityMaterialAttribName;
+			bool changed = HAPI_GUI.stringField( "unity_material_attrib_name", 
+												 "Unity Mat. Attrib.", ref value );
+			if ( changed )
+				HAPI_Host.prUnityMaterialAttribName = value;
+		}
+
+		HAPI_GUI.separator();
+
 		// Pin Size
 		{
 			float value = HAPI_Host.prPinSize;

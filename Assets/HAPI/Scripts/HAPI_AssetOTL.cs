@@ -364,46 +364,47 @@ public class HAPI_AssetOTL : HAPI_Asset
 #endif
 		}
 
-		// Set visibility.
 		if ( part_control.prPartName != HAPI_Host.prCollisionGroupName && is_mesh )
 		{
 			part_control.prMaterialId = part_info.materialId;
-			
+		
 			MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
 			if ( !mesh_renderer )
 				throw new HAPI_Error( "No mesh renderer!" );
 
 			mesh_renderer.enabled = 
-				part_control.prObjectVisible && 
-					( prIsGeoVisible || part_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT );
-		
-			// Set material.
-			if ( mesh_renderer.sharedMaterial == null )
-				mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+			part_control.prObjectVisible && 
+				( prIsGeoVisible || part_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT );
 
-			if ( ( reload_asset || has_material_changed || mesh_renderer.sharedMaterial.mainTexture == null ) 
-				 && part_info.materialId >= 0 )
+			if ( !Utility.assignUnityMaterial( part_control, part_node, mesh_renderer ) )
 			{
-				HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( prAssetId, part_info.materialId );
+				if ( mesh_renderer.sharedMaterial == null )
+					mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
 
-				// Assign vertex color shader if the flag says so.
-				if ( prShowOnlyVertexColours )
+				if ( ( reload_asset || has_material_changed || mesh_renderer.sharedMaterial.mainTexture == null ) 
+						&& part_info.materialId >= 0 )
 				{
-					mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-				}
-				else
-				{
-					// Assign the transparency shader if this material is transparent or unassign it otherwise.
-					if ( Utility.isMaterialTransparent( material_info ) )
-						mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
-					else
+					HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( prAssetId, part_info.materialId );
+
+					// Assign vertex color shader if the flag says so.
+					if ( prShowOnlyVertexColours )
+					{
 						mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+					}
+					else
+					{
+						// Assign the transparency shader if this material is transparent or unassign it otherwise.
+						if ( Utility.isMaterialTransparent( material_info ) )
+							mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
+						else
+							mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
 
-					Material material = mesh_renderer.sharedMaterial;
-					string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
-										 part_control.prAsset.prAssetName;
-					Utility.assignMaterial( ref material, material_info, folder_path, 
-											prMaterialShaderType );
+						Material material = mesh_renderer.sharedMaterial;
+						string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
+												part_control.prAsset.prAssetName;
+						Utility.assignMaterial( ref material, material_info, folder_path, 
+												prMaterialShaderType );
+					}
 				}
 			}
 		}

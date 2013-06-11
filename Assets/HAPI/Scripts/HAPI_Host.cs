@@ -98,6 +98,8 @@ namespace HAPI
 		private const string myDefaultCollisionGroupName					= "collision_geo";
 		private const string myDefaultRenderedCollisionGroupName			= "rendered_collision_geo";
 
+		private const string myDefaultUnityMaterialAttribName				= "unity_material";
+
 		private const float myDefaultPinSize								= 1.0f;
 		private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
 		private const bool myDefaultAutoPinInstances						= true;
@@ -152,6 +154,8 @@ namespace HAPI
 			
 			setString(	"HAPI_CollisionGroupName", myDefaultCollisionGroupName, true );
 			setString(	"HAPI_RenderedCollisionGroupName", myDefaultRenderedCollisionGroupName, true );
+
+			setString(	"HAPI_UnityMaterialAttribName", myDefaultUnityMaterialAttribName, true );
 
 			setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 			setColour(	"HAPI_PinColour", myDefaultPinColour, true );
@@ -211,6 +215,10 @@ namespace HAPI
 		public static string prRenderedCollisionGroupName {
 												get { return getString( "HAPI_RenderedCollisionGroupName" ); }
 												set { setString( "HAPI_RenderedCollisionGroupName", value ); } }
+
+		public static string prUnityMaterialAttribName {
+												get { return getString( "HAPI_UnityMaterialAttribName" ); }
+												set { setString( "HAPI_UnityMaterialAttribName", value ); } }
 
 		public static float prPinSize {
 												get { return getFloat( "HAPI_PinSize" ); }
@@ -316,6 +324,10 @@ namespace HAPI
 												{ return	prRenderedCollisionGroupName == 
 															myDefaultRenderedCollisionGroupName; }
 
+		public static bool isUnityMaterialAttribNameDefault()
+												{ return	prUnityMaterialAttribName ==
+															myDefaultUnityMaterialAttribName; }
+
 		public static bool isPinSizeDefault()
 												{ return	prPinSize == 
 															myDefaultPinSize; }
@@ -409,6 +421,8 @@ namespace HAPI
 		{
 			prCollisionGroupName					= myDefaultCollisionGroupName;
 			prRenderedCollisionGroupName			= myDefaultRenderedCollisionGroupName;
+
+			prUnityMaterialAttribName				= myDefaultUnityMaterialAttribName;
 
 			prPinSize 								= myDefaultPinSize;
 			prPinColour								= myDefaultPinColour;

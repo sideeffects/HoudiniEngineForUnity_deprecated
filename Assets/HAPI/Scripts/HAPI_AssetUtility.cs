@@ -748,6 +748,38 @@ public class HAPI_AssetUtility
 		// Refresh all assets just in case.
 		AssetDatabase.Refresh();
 	}
+
+	public static bool assignUnityMaterial( HAPI_PartControl part_control, GameObject part_node,
+											MeshRenderer mesh_renderer )
+	{
+		// Get position attributes.
+		int asset_id	= part_control.prAssetId;
+		int object_id	= part_control.prObjectId;
+		int geo_id		= part_control.prGeoId;
+		int part_id		= part_control.prPartId;
+
+		HAPI_AttributeInfo material_attr_info = new HAPI_AttributeInfo( HAPI_Host.prUnityMaterialAttribName );
+		int[] material_attr = new int[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Host.prUnityMaterialAttribName, 
+					  ref material_attr_info, ref material_attr, HAPI_Host.getAttributeStrData );
+
+		if ( material_attr_info.exists )
+		{
+			string material_path = HAPI_Host.getString( material_attr[ 0 ] );
+			Material material = (Material) Resources.Load( material_path, typeof( Material ) );
+
+			if ( material == null )
+			{
+				AssetDatabase.ImportAsset( material_path, ImportAssetOptions.Default );
+				material = (Material) AssetDatabase.LoadAssetAtPath( material_path, typeof( Material ) );
+			}
+			mesh_renderer.sharedMaterial = material;
+
+			return true;
+		}
+		else
+			return false;
+	}
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 	
