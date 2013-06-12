@@ -376,6 +376,105 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		HAPI_Host.setFileInput( prAssetId, index, path );
 	}
+	
+	private void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponentType transform_component )
+	{
+		HAPI_Keyframe[] keys = new HAPI_Keyframe[ curve.length ];
+		for( int ii = 0; ii < curve.length; ii++ )
+		{
+			Keyframe unity_key = curve.keys[ ii ];
+			keys[ ii ].time = unity_key.time;
+			keys[ ii ].value = unity_key.value;
+			keys[ ii ].inTangent = unity_key.inTangent;
+			keys[ ii ].outTangent = unity_key.outTangent;
+			
+			if( transform_component == HAPI_TransformComponentType.HAPI_TRANSFORM_TX )
+			{
+				keys[ ii ].value *= -1;
+			}
+			
+			if( transform_component == HAPI_TransformComponentType.HAPI_TRANSFORM_RY ||
+				transform_component == HAPI_TransformComponentType.HAPI_TRANSFORM_RZ )
+			{
+				keys[ ii ].value *= -1;
+			}
+			
+		}
+		
+		HAPI_Host.HAPI_SetTransformAnimCurve( node_id, (int)transform_component, keys, curve.length );
+		
+	}
+	
+	private void marshalRotation( int node_id, AnimationClipCurveData[] curve_datas )
+	{
+		AnimationCurve qx = null, qy = null, qz = null, qw = null;
+		
+		foreach ( AnimationClipCurveData curve_data in curve_datas )
+		{
+			if( curve_data.propertyName == "m_LocalRotation.x" )
+				qx = curve_data.curve;
+			else if( curve_data.propertyName == "m_LocalRotation.y" )
+				qy = curve_data.curve;
+			else if( curve_data.propertyName == "m_LocalRotation.z" )
+				qz = curve_data.curve;
+			else if( curve_data.propertyName == "m_LocalRotation.w" )
+				qw = curve_data.curve;
+
+			if( qx != null && qy != null && qz != null && qw != null )
+				break;
+						
+		}
+		
+		if( qx != null && qy != null && qz != null && qw != null )
+		{
+			AnimationCurve rx = new AnimationCurve();
+			AnimationCurve ry = new AnimationCurve();
+			AnimationCurve rz = new AnimationCurve();
+			for( int ii = 0; ii < qx.length; ii++ )
+			{
+				Keyframe key_qx = qx.keys[ ii ];
+				Keyframe key_qy = qy.keys[ ii ];
+				Keyframe key_qz = qz.keys[ ii ];
+				Keyframe key_qw = qw.keys[ ii ];
+				
+				Quaternion quat = new Quaternion( key_qx.value, key_qy.value, key_qz.value, key_qw.value );
+				Vector3 eulerAngle = quat.eulerAngles;
+				
+				HAPI_AssetUtility.addKeyToCurve( key_qx.time, eulerAngle.x, rx );
+				HAPI_AssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.y, ry );
+				HAPI_AssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.z, rz );
+								
+			}
+			
+			marshalAnimCurve( node_id, rx, HAPI_TransformComponentType.HAPI_TRANSFORM_RX );
+			marshalAnimCurve( node_id, ry, HAPI_TransformComponentType.HAPI_TRANSFORM_RY );
+			marshalAnimCurve( node_id, rz, HAPI_TransformComponentType.HAPI_TRANSFORM_RZ );
+			
+		}
+	}
+	
+	private void marshalCurvesFromClip( int node_id, AnimationClip clip )
+	{
+		AnimationClipCurveData[] curve_datas = AnimationUtility.GetAllCurves( clip );
+		foreach ( AnimationClipCurveData curve_data in curve_datas )
+		{
+			if( curve_data.propertyName == "m_LocalPosition.x" )
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_TX );
+			else if( curve_data.propertyName == "m_LocalPosition.y" )
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_TY );
+			else if( curve_data.propertyName == "m_LocalPosition.z" )
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_TZ );
+			else if( curve_data.propertyName == "m_LocalScale.x" )
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_SX );
+			else if( curve_data.propertyName == "m_LocalScale.y" )
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_SY );
+			else if( curve_data.propertyName == "m_LocalScale.z" )
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_SZ );
+						
+		}
+		
+		marshalRotation( node_id, curve_datas );
+	}
 
 	public void addGeoAsGeoInput( GameObject asset, int index )
 	{
@@ -386,6 +485,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		int geo_id;
 		int node_id;		
 		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id, out node_id );
+		
 		
 		HAPI_GeoInputControl input_control = asset.GetComponent< HAPI_GeoInputControl >();
 		input_control.prInputObjectId = object_id;
@@ -400,6 +500,30 @@ public abstract class HAPI_Asset : HAPI_Control
 		// Apply the input asset transform to the marshaled object in the Houdini scene.
 		HAPI_TransformEuler trans = Utility.getHapiTransform( asset.transform.localToWorldMatrix );
 		HAPI_Host.setObjectTransform( 0, object_id, trans );
+		
+		Animation anim_component = asset.GetComponent< Animation >();
+		if( anim_component == null )
+			return;
+		
+		if( anim_component.clip != null )
+		{
+			marshalCurvesFromClip( node_id, anim_component.clip );
+		}
+		else 
+		{	
+		
+			foreach ( AnimationState anim_state in anim_component )
+			{			
+				AnimationClip clip = anim_component.GetClip( anim_state.name );
+				if( clip != null )
+				{
+					marshalCurvesFromClip( node_id, clip );
+					break;
+				}
+				
+			}
+		}
+		
 	}
 	
 	public void removeGeoInput( int index )

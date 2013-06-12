@@ -373,25 +373,6 @@ public class HAPI_Instancer : MonoBehaviour {
 	}
 	
 	
-	private void addKeyToCurve( float time, float val, AnimationCurve curve )
-	{
-		Keyframe curr_key = new Keyframe( time, val, 0, 0 );
-		
-		if( curve.length > 0 )
-		{
-			Keyframe prev_key = curve.keys[ curve.length - 1 ];
-			float tangent = (val - prev_key.value) / (time - prev_key.time );
-			prev_key.outTangent = tangent;
-			curr_key.inTangent = tangent;
-			
-			curve.RemoveKey( curve.length - 1 );
-			curve.AddKey( prev_key );			
-		}
-		
-		curve.AddKey( curr_key );
-		
-	}
-	
 	private void cacheNumInstances()
 	{
 		HAPI_ObjectInfo object_info = prAsset.prObjects[ prObjectId ];
@@ -498,16 +479,16 @@ public class HAPI_Instancer : MonoBehaviour {
 				
 				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];						
 				
-				addKeyToCurve( curr_time, pos[0], curves.tx );
-				addKeyToCurve( curr_time, pos[1], curves.ty );
-				addKeyToCurve( curr_time, pos[2], curves.tz );
-				addKeyToCurve( curr_time, quat.x, curves.qx );
-				addKeyToCurve( curr_time, quat.y, curves.qy );
-				addKeyToCurve( curr_time, quat.z, curves.qz );
-				addKeyToCurve( curr_time, quat.w, curves.qw );
-				addKeyToCurve( curr_time, scale.x, curves.sx );
-				addKeyToCurve( curr_time, scale.y, curves.sy );
-				addKeyToCurve( curr_time, scale.z, curves.sz );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, pos[0], curves.tx );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, pos[1], curves.ty );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, pos[2], curves.tz );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.x, curves.qx );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.y, curves.qy );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.z, curves.qz );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.w, curves.qw );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, scale.x, curves.sx );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, scale.y, curves.sy );
+				HAPI_AssetUtility.addKeyToCurve( curr_time, scale.z, curves.sz );
 				
 				
 				

@@ -1072,4 +1072,24 @@ public class HAPI_AssetUtility
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
 	}
 	
+	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
+	public static void addKeyToCurve( float time, float val, AnimationCurve curve )
+	{
+		Keyframe curr_key = new Keyframe( time, val, 0, 0 );
+		
+		if( curve.length > 0 )
+		{
+			Keyframe prev_key = curve.keys[ curve.length - 1 ];
+			float tangent = (val - prev_key.value) / (time - prev_key.time );
+			prev_key.outTangent = tangent;
+			curr_key.inTangent = tangent;
+			
+			curve.RemoveKey( curve.length - 1 );
+			curve.AddKey( prev_key );			
+		}
+		
+		curve.AddKey( curr_key );
+		
+	}
+	
 }
