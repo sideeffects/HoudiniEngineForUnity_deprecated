@@ -263,7 +263,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				// Get mesh.
 				try
 				{
-					Utility.getMesh( part_control, part_mesh );
+					Utility.getMesh( part_control, part_mesh, prGenerateTangents && HAPI_Host.prGenerateTangents );
 				}
 				catch ( HAPI_ErrorIgnorable ) {}
 				catch ( HAPI_Error error )
@@ -295,10 +295,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 			else if ( part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
 			{
 				// Get position attributes.
-				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 				float[] pos_attr = new float[ 0 ];
 				Utility.getAttribute( prAssetId, part_control.prObjectId, part_control.prGeoId, 
-									  part_control.prPartId, "P", ref pos_attr_info, ref pos_attr, 
+									  part_control.prPartId, HAPI_Constants.HAPI_ATTRIB_POSITION, ref pos_attr_info, ref pos_attr, 
 									  HAPI_Host.getAttributeFloatData );
 				if ( !pos_attr_info.exists )
 					throw new HAPI_Error( "No position attribute found." );
@@ -306,11 +306,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 					throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
 
 				// Get colour attributes.
-				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( "Cd" );
+				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_COLOUR );
 				float[] colour_attr = new float[ 0 ];
 				Utility.getAttribute( prAssetId, part_control.prObjectId, part_control.prGeoId, 
-									  part_control.prPartId, "Cd", ref colour_attr_info, ref colour_attr, 
-									  HAPI_Host.getAttributeFloatData );
+									  part_control.prPartId, HAPI_Constants.HAPI_ATTRIB_COLOUR, 
+									  ref colour_attr_info, ref colour_attr, HAPI_Host.getAttributeFloatData );
 
 				ParticleEmitter particle_emitter = part_node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
 				particle_emitter.emit = false;

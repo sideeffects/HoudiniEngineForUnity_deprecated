@@ -220,6 +220,25 @@ public class HAPI_WindowSettings : EditorWindow
 					HAPI_Host.myRepaintDelegate();
 			}
 		}
+
+		HAPI_GUI.separator();
+
+		// Generate Tangents
+		{
+			bool value = HAPI_Host.prGenerateTangents;
+			bool changed = HAPI_GUI.toggle( "generate_tangents", "Generate Tangents", ref value );
+			if ( changed )
+			{
+				HAPI_Host.prGenerateTangents = value;
+				if ( HAPI_Host.myRepaintDelegate != null )
+					HAPI_Host.myRepaintDelegate();
+
+				EditorUtility.DisplayDialog(	"Rebuilds Required",
+												"You will need to rebuild existing assets for tangents "+
+												"to be removed/generated.", 
+												"Ok" );
+			}
+		}
 	}
 
 	private static void generateCookingSettings()

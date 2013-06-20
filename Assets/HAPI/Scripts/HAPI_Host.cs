@@ -110,6 +110,8 @@ namespace HAPI
 		public const bool myDefaultAutoSelectAssetRootNode					= true;
 		public const bool myDefaultHideGeometryOnLinking					= true;
 
+		public const bool myDefaultGenerateTangents							= true;
+
 		public const bool myDefaultEnableCooking							= true;
 		public const bool myDefaultCookingTriggersDownCooks					= true;
 		public const bool myDefaultPlaymodePerFrameCooking					= false;
@@ -166,6 +168,8 @@ namespace HAPI
 			
 			setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
 			setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
+
+			setBool(	"HAPI_GenerateTangents", myDefaultGenerateTangents, true );
 
 			setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
 			setBool(	"HAPI_CookingTriggersDownCooks", myDefaultCookingTriggersDownCooks, true );
@@ -243,6 +247,10 @@ namespace HAPI
 		public static bool prHideGeometryOnLinking {
 												get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
 												set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
+
+		public static bool prGenerateTangents {
+												get { return getBool( "HAPI_GenerateTangents" ); } 
+												set { setBool( "HAPI_GenerateTangents", value ); } }
 
 		public static bool prEnableCooking {
 												get { return getBool( "HAPI_EnableCooking" ); }
@@ -352,6 +360,10 @@ namespace HAPI
 												{ return	prHideGeometryOnLinking == 
 															myDefaultHideGeometryOnLinking; }
 
+		public static bool isGenerateTangentsDefault()
+												{ return	prGenerateTangents ==
+															myDefaultGenerateTangents; }
+
 		public static bool isEnableCookingDefault()
 												{ return	prEnableCooking == 
 															myDefaultEnableCooking; }
@@ -433,6 +445,8 @@ namespace HAPI
 
 			prAutoSelectAssetRootNode				= myDefaultAutoSelectAssetRootNode;
 			prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
+
+			prGenerateTangents						= myDefaultGenerateTangents;
 
 			prEnableCooking							= myDefaultEnableCooking;
 			prCookingTriggersDownCooks				= myDefaultCookingTriggersDownCooks;

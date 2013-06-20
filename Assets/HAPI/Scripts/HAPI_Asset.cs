@@ -166,10 +166,15 @@ public abstract class HAPI_Asset : HAPI_Control
 																!HAPI_Host.isHideGeometryOnLinkingDefault() ); } 
 												set { myHideGeometryOnLinking = value; } }
 
-	public HAPI_ShaderType			prMaterialShaderType {			get { return myMaterialShaderType; }
-																	set { myMaterialShaderType = value; } }
-	public bool						prShowOnlyVertexColours {		get { return myShowOnlyVertexColours; }
-																	set { myShowOnlyVertexColours = value; } }
+	public HAPI_ShaderType			prMaterialShaderType {	get { return myMaterialShaderType; }
+															set { myMaterialShaderType = value; } }
+	public bool						prShowOnlyVertexColours{get { return myShowOnlyVertexColours; }
+															set { myShowOnlyVertexColours = value; } }
+	public bool						prGenerateTangents {	get { return (	myGenerateTangents && 
+																			HAPI_Host.isGenerateTangentsDefault() )
+																	|| (	HAPI_Host.prGenerateTangents &&
+																			!HAPI_Host.isGenerateTangentsDefault() ); } 
+															set { myGenerateTangents = value; } }
 
 	public bool	prEnableCooking {				get { return (	myEnableCooking && 
 																HAPI_Host.isEnableCookingDefault() )
@@ -697,6 +702,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
 		prShowOnlyVertexColours			= false;
+		prGenerateTangents				= true;
 
 		prEnableCooking					= HAPI_Host.myDefaultEnableCooking;
 		prCookingTriggersDownCooks		= HAPI_Host.myDefaultCookingTriggersDownCooks;
@@ -1542,6 +1548,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
 	[SerializeField] private bool					myShowOnlyVertexColours;
+	[SerializeField] private bool					myGenerateTangents;
 
 	[SerializeField] private bool					myEnableCooking;
 	[SerializeField] private bool					myCookingTriggersDownCooks;

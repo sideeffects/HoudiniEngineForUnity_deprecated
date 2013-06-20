@@ -133,6 +133,86 @@ public class HAPI_AssetUtility
 											hapi_transform.scale[ 2 ] );
 	}
 
+	public static void calculateMeshTangents( Mesh mesh )
+	{
+		// Speed up math by copying the mesh arrays.
+		int[] triangles		= mesh.triangles;
+		Vector3[] vertices	= mesh.vertices;
+		Vector2[] uv		= mesh.uv;
+		Vector3[] normals	= mesh.normals;
+	 
+		// Variable Definitions
+		int triangleCount	= triangles.Length;
+		int vertexCount		= vertices.Length;
+	 
+		Vector3[] tan1		= new Vector3[vertexCount];
+		Vector3[] tan2		= new Vector3[vertexCount];
+	 
+		Vector4[] tangents	= new Vector4[vertexCount];
+	 
+		for ( long a = 0; a < triangleCount; a += 3 )
+		{
+			long i1 = triangles[ a + 0 ];
+			long i2 = triangles[ a + 1 ];
+			long i3 = triangles[ a + 2 ];
+	 
+			Vector3 v1 = vertices[ i1 ];
+			Vector3 v2 = vertices[ i2 ];
+			Vector3 v3 = vertices[ i3 ];
+	 
+			Vector2 w1 = uv[ i1 ];
+			Vector2 w2 = uv[ i2 ];
+			Vector2 w3 = uv[ i3 ];
+	 
+			float x1 = v2.x - v1.x;
+			float x2 = v3.x - v1.x;
+			float y1 = v2.y - v1.y;
+			float y2 = v3.y - v1.y;
+			float z1 = v2.z - v1.z;
+			float z2 = v3.z - v1.z;
+	 
+			float s1 = w2.x - w1.x;
+			float s2 = w3.x - w1.x;
+			float t1 = w2.y - w1.y;
+			float t2 = w3.y - w1.y;
+			
+			float div = s1 * t2 - s2 * t1;
+			float r = div == 0.0f ? 0.0f : 1.0f / div;
+			//float r = 1.0f / (s1 * t2 - s2 * t1);      //Above code fixes div by zero.
+	 
+			Vector3 sdir = new Vector3( ( t2 * x1 - t1 * x2 ) * r, 
+										( t2 * y1 - t1 * y2 ) * r, 
+										( t2 * z1 - t1 * z2 ) * r);
+			Vector3 tdir = new Vector3( ( s1 * x2 - s2 * x1 ) * r, 
+										( s1 * y2 - s2 * y1 ) * r, 
+										( s1 * z2 - s2 * z1 ) * r);
+			tan1[ i1 ] += sdir;
+			tan1[ i2 ] += sdir;
+			tan1[ i3 ] += sdir;
+
+			tan2[ i1 ] += tdir;
+			tan2[ i2 ] += tdir;
+			tan2[ i3 ] += tdir;
+		}
+
+		for ( long a = 0; a < vertexCount; ++a )
+		{
+			Vector3 n = normals[ a ];
+			Vector3 t = tan1[ a ];
+	 
+			//Vector3 tmp = (t - n * Vector3.Dot(n, t)).normalized;
+			//tangents[a] = new Vector4(tmp.x, tmp.y, tmp.z);
+			Vector3.OrthoNormalize( ref n, ref t );
+			tangents[ a ].x = t.x;
+			tangents[ a ].y = t.y;
+			tangents[ a ].z = t.z;
+	 
+			tangents[ a ].w = ( Vector3.Dot( Vector3.Cross( n, t ), tan2[ a ] ) < 0.0f ) ? -1.0f : 1.0f;
+		}
+	 
+		mesh.tangents = tangents;
+	}
+
 	// GET ----------------------------------------------------------------------------------------------------------
 	
 	public delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
@@ -782,8 +862,8 @@ public class HAPI_AssetUtility
 	}
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
-	
-	public static void getMesh( HAPI_PartControl part_control, Mesh mesh )
+
+	public static void getMesh( HAPI_PartControl part_control, Mesh mesh, bool generate_tangents )
 	{
 		int asset_id	= part_control.prAssetId;
 		int object_id	= part_control.prObjectId;
@@ -813,33 +893,39 @@ public class HAPI_AssetUtility
 					 vertex_list, part_info.vertexCount );
 		
 		// Get position attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 		float[] pos_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, "P", ref pos_attr_info, ref pos_attr, 
-					  HAPI_Host.getAttributeFloatData );
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Constants.HAPI_ATTRIB_POSITION, 
+					  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 		if ( !pos_attr_info.exists )
 			throw new HAPI_Error( "No position attribute found." );
 		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
 				
 		// Get uv attributes.
-		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( "uv" );
+		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_UV );
 		uv_attr_info.tupleSize = 2;
 		float[] uv_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, "uv", ref uv_attr_info, ref uv_attr, 
-					  HAPI_Host.getAttributeFloatData );
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Constants.HAPI_ATTRIB_UV, 
+					  ref uv_attr_info, ref uv_attr, HAPI_Host.getAttributeFloatData );
 		
 		// Get normal attributes.
-		HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( "N" );
+		HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_NORMAL );
 		float[] normal_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, "N", ref normal_attr_info, ref normal_attr, 
-					  HAPI_Host.getAttributeFloatData );
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Constants.HAPI_ATTRIB_NORMAL, 
+					  ref normal_attr_info, ref normal_attr, HAPI_Host.getAttributeFloatData );
 
 		// Get colour attributes.
-		HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( "Cd" );
+		HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_COLOUR );
 		float[] colour_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, "Cd", ref colour_attr_info, ref colour_attr, 
-					  HAPI_Host.getAttributeFloatData );
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Constants.HAPI_ATTRIB_COLOUR, 
+					  ref colour_attr_info, ref colour_attr, HAPI_Host.getAttributeFloatData );
+
+		// Get tangent attributes.
+		HAPI_AttributeInfo tangent_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_TANGENT );
+		float[] tangent_attr = new float[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Constants.HAPI_ATTRIB_TANGENT, 
+					  ref tangent_attr_info, ref tangent_attr, HAPI_Host.getAttributeFloatData );
 		
 		// Save properties.
 		part_control.prVertexList			= vertex_list;
@@ -850,6 +936,7 @@ public class HAPI_AssetUtility
 		Vector2[] uvs 		= new Vector2[ 	part_info.vertexCount ];
 		Vector3[] normals 	= new Vector3[ 	part_info.vertexCount ];
 		Color[] colours		= new Color[	part_info.vertexCount ];
+		Vector4[] tangents	= generate_tangents ? new Vector4[ part_info.vertexCount ] : null;
 		
 		// Fill Unity-specific data objects with data from the runtime.
 		for ( int i = 0; i < part_info.vertexCount; ++i ) 
@@ -917,6 +1004,47 @@ public class HAPI_AssetUtility
 					}
 			}
 
+			// Fill tangents.
+			if ( generate_tangents && tangent_attr_info.exists )
+			{
+				int tuple_size = tangent_attr_info.tupleSize;
+
+				// If the tangents are per vertex just query directly into the tangents array we filled above.
+				if ( tangent_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+					for ( int j = 0; j < tuple_size; ++j )
+					{
+						tangents[ i ][ j ] = tangent_attr[ i * tuple_size + j ];
+						// Flip the x coordinate.
+						if ( j == 0 )
+							tangents[ i ][ j ] *= -1;
+						
+					}
+				
+				// If the tangent are per point use the vertex list array point indicies to query into
+				// the tangent array we filled above.
+				else if ( tangent_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					for ( int j = 0; j < tuple_size; ++j )
+					{
+						tangents[ i ][ j ] = tangent_attr[ vertex_list[ i ] * tuple_size + j ];
+						// Flip the x coordinate.
+						if ( j == 0 )
+							tangents[ i ][ j ] *= -1;
+					}
+				
+				// If the tangents are per face divide the vertex index by the number of vertices per face
+				// which should always be HAPI_MAX_VERTICES_PER_FACE.
+				else if ( tangent_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+					for ( int j = 0; j < tuple_size; ++j )
+					{
+						int face_index = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
+						tangents[ i ][ j ] 
+							= tangent_attr[ face_index * HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE * tuple_size + j ];
+						// Flip the x coordinate.
+						if ( j == 0 )
+							tangents[ i ][ j ] *= -1;
+					}
+			}
+
 			// Fill colours.
 			colours[ i ].r = 1.0f;
 			colours[ i ].g = 1.0f;
@@ -949,7 +1077,7 @@ public class HAPI_AssetUtility
 		
 		for ( int i = 0; i < part_info.faceCount; ++i ) 
 			for ( int j = 0; j < 3; ++j )
-				triangles[ i * 3 + j ] 	= i * 3 + j;
+				triangles[ i * 3 + j ] = i * 3 + j;
 		
 		// Load into vertices and face into mesh.
 		mesh.vertices 	= vertices;
@@ -957,11 +1085,16 @@ public class HAPI_AssetUtility
 		mesh.uv 		= uvs;
 		mesh.normals 	= normals;
 		mesh.colors		= colours;
+		if ( generate_tangents )
+			mesh.tangents	= tangents;
 		
 		mesh.RecalculateBounds();
 		
 		if ( !normal_attr_info.exists )
 			mesh.RecalculateNormals();
+
+		if ( generate_tangents && !tangent_attr_info.exists )
+			calculateMeshTangents( mesh );
 	}
 	
 	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh, 
@@ -1033,13 +1166,14 @@ public class HAPI_AssetUtility
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
 		
 		// Set position attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 		pos_attr_info.exists 		= true;
 		pos_attr_info.owner 		= (int) HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 		pos_attr_info.storage 		= (int) HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
 		pos_attr_info.count 		= part_info.pointCount;
 		pos_attr_info.tupleSize 	= 3;
-		HAPI_Host.addAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info );
+		HAPI_Host.addAttribute( asset_id, object_id, geo_id, 
+								HAPI_Constants.HAPI_ATTRIB_POSITION, ref pos_attr_info );
 		
 		float[] pos_attr = new float[ part_info.pointCount * 3 ];
 		
@@ -1066,30 +1200,29 @@ public class HAPI_AssetUtility
 			}
 		}
 		
-		setAttribute( asset_id, object_id, geo_id, "P", ref pos_attr_info, ref pos_attr, 
-					  HAPI_Host.setAttributeFloatData );
+		setAttribute( asset_id, object_id, geo_id, HAPI_Constants.HAPI_ATTRIB_POSITION, 
+					  ref pos_attr_info, ref pos_attr, HAPI_Host.setAttributeFloatData );
 		
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
 	}
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
+	
 	public static void addKeyToCurve( float time, float val, AnimationCurve curve )
 	{
 		Keyframe curr_key = new Keyframe( time, val, 0, 0 );
 		
-		if( curve.length > 0 )
+		if ( curve.length > 0 )
 		{
-			Keyframe prev_key = curve.keys[ curve.length - 1 ];
-			float tangent = (val - prev_key.value) / (time - prev_key.time );
-			prev_key.outTangent = tangent;
-			curr_key.inTangent = tangent;
+			Keyframe prev_key		= curve.keys[ curve.length - 1 ];
+			float tangent			= ( val - prev_key.value ) / ( time - prev_key.time );
+			prev_key.outTangent		= tangent;
+			curr_key.inTangent		= tangent;
 			
 			curve.RemoveKey( curve.length - 1 );
-			curve.AddKey( prev_key );			
+			curve.AddKey( prev_key );
 		}
 		
 		curve.AddKey( curr_key );
-		
 	}
-	
 }

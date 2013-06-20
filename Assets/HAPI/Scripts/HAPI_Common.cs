@@ -39,7 +39,14 @@ namespace HAPI
 		public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 3;
 		public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 		public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
-		
+
+		// Default Attributes' Names
+		public const string HAPI_ATTRIB_POSITION			= "P";
+		public const string HAPI_ATTRIB_UV					= "uv";
+		public const string HAPI_ATTRIB_NORMAL				= "N";
+		public const string HAPI_ATTRIB_TANGENT				= "tangentu";
+		public const string HAPI_ATTRIB_COLOUR				= "Cd";
+
 		// Shared Constants -------------------------------------------------
 
 		public const int HAPI_POSITION_VECTOR_SIZE			= 3;

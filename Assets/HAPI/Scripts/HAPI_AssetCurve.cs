@@ -314,10 +314,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 		try
 		{
 			// Get position attributes (this is all we get for the curve's geometry).
-			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
-			Utility.getAttribute( prAssetId, object_id, 0, 0, "P", ref pos_attr_info, ref pos_attr, 
-								  HAPI_Host.getAttributeFloatData );
+			Utility.getAttribute( prAssetId, object_id, 0, 0, HAPI_Constants.HAPI_ATTRIB_POSITION, 
+								  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );
 

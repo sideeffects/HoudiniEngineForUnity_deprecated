@@ -304,6 +304,25 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				HAPI_AssetUtility.reApplyMaterials( myAsset );
 			}
 		}
+
+		// Generate Tangents
+		{
+			bool value		= myAsset.prGenerateTangents;
+			string name		= "generate_tangents";
+			string label	= "Generate Tangents";
+
+			GUI.enabled = HAPI_Host.isGenerateTangentsDefault();
+			if ( !GUI.enabled ) 
+				label += " (overwritted by global setting)";
+			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			GUI.enabled = true;
+
+			if ( changed )
+			{
+				myAsset.prGenerateTangents = value;
+				myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true );
+			}
+		}
 	}
 
 	private void generateCookingSettings()

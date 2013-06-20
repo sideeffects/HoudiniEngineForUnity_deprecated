@@ -31,16 +31,15 @@ public class HAPI_PartControlGUI : Editor
 	{
 		HAPI_PartControl control = target as HAPI_PartControl;
 		control.selectParent();
-		
-		
+
 		if ( control.prShowPointNumbers )
 		{
 			// Get position attributes.
-			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( "P" );
+			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
 			HAPI_AssetUtility.getAttribute( myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId, 
-						  myPartControl.prPartId, "P", ref pos_attr_info, ref pos_attr, 
-						  HAPI_Host.getAttributeFloatData );
+						  myPartControl.prPartId, HAPI_Constants.HAPI_ATTRIB_POSITION, 
+						  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );
 			
