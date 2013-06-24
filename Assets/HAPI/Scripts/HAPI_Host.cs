@@ -99,6 +99,8 @@ namespace HAPI
 		private const string myDefaultRenderedCollisionGroupName			= "rendered_collision_geo";
 
 		private const string myDefaultUnityMaterialAttribName				= "unity_material";
+		private const string myDefaultUnitySubMaterialNameAttribName		= "unity_sub_material_name";
+		private const string myDefaultUnitySubMaterialIndexAttribName		= "unity_sub_material_index";
 
 		private const float myDefaultPinSize								= 1.0f;
 		private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
@@ -158,6 +160,8 @@ namespace HAPI
 			setString(	"HAPI_RenderedCollisionGroupName", myDefaultRenderedCollisionGroupName, true );
 
 			setString(	"HAPI_UnityMaterialAttribName", myDefaultUnityMaterialAttribName, true );
+			setString(	"HAPI_UnitySubMaterialNameAttribName", myDefaultUnitySubMaterialNameAttribName, true );
+			setString(	"HAPI_UnitySubMaterialIndexAttribName", myDefaultUnitySubMaterialIndexAttribName, true );
 
 			setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 			setColour(	"HAPI_PinColour", myDefaultPinColour, true );
@@ -223,6 +227,12 @@ namespace HAPI
 		public static string prUnityMaterialAttribName {
 												get { return getString( "HAPI_UnityMaterialAttribName" ); }
 												set { setString( "HAPI_UnityMaterialAttribName", value ); } }
+		public static string prUnitySubMaterialNameAttribName {
+												get { return getString( "HAPI_UnitySubMaterialNameAttribName" ); }
+												set { setString( "HAPI_UnitySubMaterialNameAttribName", value ); } }
+		public static string prUnitySubMaterialIndexAttribName {
+												get { return getString( "HAPI_UnitySubMaterialIndexAttribName" ); }
+												set { setString( "HAPI_UnitySubMaterialIndexAttribName", value ); } }
 
 		public static float prPinSize {
 												get { return getFloat( "HAPI_PinSize" ); }
@@ -335,6 +345,12 @@ namespace HAPI
 		public static bool isUnityMaterialAttribNameDefault()
 												{ return	prUnityMaterialAttribName ==
 															myDefaultUnityMaterialAttribName; }
+		public static bool isUnitySubMaterialNameAttribNameDefault()
+												{ return	prUnitySubMaterialNameAttribName ==
+															myDefaultUnitySubMaterialNameAttribName; }
+		public static bool isUnitySubMaterialIndexAttribNameDefault()
+												{ return	prUnitySubMaterialIndexAttribName ==
+															myDefaultUnitySubMaterialIndexAttribName; }
 
 		public static bool isPinSizeDefault()
 												{ return	prPinSize == 
@@ -435,6 +451,8 @@ namespace HAPI
 			prRenderedCollisionGroupName			= myDefaultRenderedCollisionGroupName;
 
 			prUnityMaterialAttribName				= myDefaultUnityMaterialAttribName;
+			prUnitySubMaterialNameAttribName		= myDefaultUnitySubMaterialNameAttribName;
+			prUnitySubMaterialIndexAttribName		= myDefaultUnitySubMaterialIndexAttribName;
 
 			prPinSize 								= myDefaultPinSize;
 			prPinColour								= myDefaultPinColour;

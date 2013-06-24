@@ -135,6 +135,24 @@ public class HAPI_WindowSettings : EditorWindow
 				HAPI_Host.prUnityMaterialAttribName = value;
 		}
 
+		// Unity Sub Material Name Attrib Name
+		{
+			string value = HAPI_Host.prUnitySubMaterialNameAttribName;
+			bool changed = HAPI_GUI.stringField( "unity_sub_material_name_attrib_name", 
+												 "Unity SubMat. Name Attrib.", ref value );
+			if ( changed )
+				HAPI_Host.prUnitySubMaterialNameAttribName = value;
+		}
+
+		// Unity Sub Material Index Attrib Name
+		{
+			string value = HAPI_Host.prUnitySubMaterialIndexAttribName;
+			bool changed = HAPI_GUI.stringField( "unity_sub_material_index_attrib_name", 
+												 "Unity SubMat. Index Attrib.", ref value );
+			if ( changed )
+				HAPI_Host.prUnitySubMaterialIndexAttribName = value;
+		}
+
 		HAPI_GUI.separator();
 
 		// Pin Size

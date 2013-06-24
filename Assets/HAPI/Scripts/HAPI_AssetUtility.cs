@@ -666,48 +666,15 @@ public class HAPI_AssetUtility
 	
 	public static void reApplyMaterials( HAPI_Asset asset )
 	{
-		foreach ( MeshRenderer renderer in asset.GetComponentsInChildren< MeshRenderer >() )
+		foreach ( HAPI_PartControl part_control in asset.GetComponentsInChildren< HAPI_PartControl >() )
 		{
-			// Set material.
-			if ( renderer.sharedMaterial == null )
-				renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
-
-			if ( asset.prShowOnlyVertexColours )
+			try
 			{
-				renderer.sharedMaterial.mainTexture = null;
-				renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+				assignMaterial( part_control, asset, true );
 			}
-			else
+			catch ( HAPI_Error error )
 			{
-				Transform parent = renderer.transform;
-				HAPI_PartControl part_control = parent.GetComponent< HAPI_PartControl >();
-						
-				if ( part_control.prMaterialId >= 0 )
-				{
-					try
-					{
-						HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( asset.prAssetId, 
-																				 part_control.prMaterialId );
-								
-						bool is_transparent = HAPI_AssetUtility.isMaterialTransparent( material_info );
-						if ( is_transparent )
-							renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
-						else
-							renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-								
-						Material material  = renderer.sharedMaterial;
-						string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
-											 part_control.prAsset.prAssetName;
-						HAPI_AssetUtility.assignMaterial( ref material, material_info, folder_path, 
-														  asset.prMaterialShaderType );
-					}
-					catch ( HAPI_Error error )
-					{
-						Debug.LogError( error.ToString() );
-					}
-				}
-				else
-					renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+				Debug.Log( error.ToString() );
 			}
 		}
 	}
@@ -719,8 +686,63 @@ public class HAPI_AssetUtility
 		return ( alpha < 0.95f );
 	}
 
-	public static void assignMaterial( ref Material material, HAPI_MaterialInfo material_info,
-									   string folder_path, HAPI_ShaderType shader_type )
+	public static void assignMaterial( HAPI_PartControl part_control, HAPI_Asset asset, 
+									   bool update_houdini_material )
+	{
+		GameObject part_node = part_control.gameObject;
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Host.getPartInfo( asset.prAssetId, part_control.prObjectId, part_control.prGeoId, 
+							   part_control.prPartId, out part_info );
+		bool is_mesh = ( part_info.vertexCount > 0 );
+
+		if ( part_control.prPartName != HAPI_Host.prCollisionGroupName && is_mesh )
+		{
+			part_control.prMaterialId = part_info.materialId;
+		
+			MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
+			if ( !mesh_renderer )
+				throw new HAPI_Error( "No mesh renderer!" );
+
+			mesh_renderer.enabled = 
+			part_control.prObjectVisible && 
+				( asset.prIsGeoVisible || part_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT );
+
+			if ( !assignUnityMaterial( part_control, part_node, mesh_renderer ) )
+			{
+				if ( mesh_renderer.sharedMaterial == null )
+					mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+
+				if ( ( update_houdini_material || mesh_renderer.sharedMaterial.mainTexture == null ) 
+						&& part_control.prMaterialId >= 0 )
+				{
+					HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( asset.prAssetId, part_info.materialId );
+
+					// Assign vertex color shader if the flag says so.
+					if ( asset.prShowOnlyVertexColours )
+					{
+						mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+					}
+					else
+					{
+						// Assign the transparency shader if this material is transparent or unassign it otherwise.
+						if ( isMaterialTransparent( material_info ) )
+							mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/AlphaSpecularVertexColor" );
+						else
+							mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+
+						Material material = mesh_renderer.sharedMaterial;
+						string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
+											 part_control.prAsset.prAssetName;
+						assignHoudiniMaterial( ref material, material_info, folder_path, 
+											   asset.prMaterialShaderType );
+					}
+				}
+			}
+		}
+	}
+
+	public static void assignHoudiniMaterial( ref Material material, HAPI_MaterialInfo material_info,
+											  string folder_path, HAPI_ShaderType shader_type )
 	{
 		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
 		DirectoryInfo textures_dir = new DirectoryInfo( folder_path );
@@ -843,16 +865,74 @@ public class HAPI_AssetUtility
 		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Host.prUnityMaterialAttribName, 
 					  ref material_attr_info, ref material_attr, HAPI_Host.getAttributeStrData );
 
+		// Need to get the material path here because the next call to HAPI_Host.getAttributeStrData will
+		// overwrite the string ids in material_attr.
+		string material_path = HAPI_Host.getString( material_attr[ 0 ] );
+
+		HAPI_AttributeInfo sub_material_name_attr_info = new HAPI_AttributeInfo( 
+																HAPI_Host.prUnitySubMaterialNameAttribName );
+		int[] sub_material_name_attr = new int[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Host.prUnitySubMaterialNameAttribName, 
+					  ref sub_material_name_attr_info, ref sub_material_name_attr, HAPI_Host.getAttributeStrData );
+
+		HAPI_AttributeInfo sub_material_index_attr_info = new HAPI_AttributeInfo( 
+																HAPI_Host.prUnitySubMaterialIndexAttribName );
+		int[] sub_material_index_attr = new int[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Host.prUnitySubMaterialIndexAttribName, 
+					  ref sub_material_index_attr_info, ref sub_material_index_attr, HAPI_Host.getAttributeIntData );
+
+		bool has_sub_material_name		= sub_material_name_attr_info.exists && 
+										  HAPI_Host.getString( sub_material_name_attr[ 0 ] ) != "";
+		bool has_sub_material_index		= sub_material_index_attr_info.exists;
+
 		if ( material_attr_info.exists )
 		{
-			string material_path = HAPI_Host.getString( material_attr[ 0 ] );
-			Material material = (Material) Resources.Load( material_path, typeof( Material ) );
+			string sub_material_name	= has_sub_material_name ? HAPI_Host.getString( sub_material_name_attr[ 0 ] ) 
+																: "";
+			int sub_material_index		= has_sub_material_index ? sub_material_index_attr[ 0 ] : 0;
+			Material material			= (Material) Resources.Load( material_path, typeof( Material ) );
+
+			Debug.Log( material_path );
+			Debug.Log( sub_material_name );
+			Debug.Log( sub_material_index );
 
 			if ( material == null )
 			{
+				// Try explicit import.
 				AssetDatabase.ImportAsset( material_path, ImportAssetOptions.Default );
 				material = (Material) AssetDatabase.LoadAssetAtPath( material_path, typeof( Material ) );
 			}
+			
+			if ( material != null && ( has_sub_material_name || has_sub_material_index ) )
+			{
+				// Try Substance materials.
+				string abs_path = AssetDatabase.GetAssetPath( material );
+
+				SubstanceImporter substance_importer = AssetImporter.GetAtPath( abs_path ) as SubstanceImporter;
+				
+				if ( has_sub_material_name )
+				{
+					ProceduralMaterial[] procedural_materials = substance_importer.GetMaterials();
+					for ( int i = 0; i < procedural_materials.Length; ++i )
+					{
+						if ( procedural_materials[ i ].name == sub_material_name )
+						{
+							material = procedural_materials[ i ];
+							break;
+						}
+					}
+				}
+				else if ( sub_material_index >= 0 && 
+						  sub_material_index < substance_importer.GetMaterialCount() )
+				{
+					material = substance_importer.GetMaterials()[ sub_material_index ];
+					Debug.Log( "HAAA" + sub_material_index );
+				}
+				else
+					Debug.LogWarning( "sub_material_index (" + sub_material_index + ") out of range for " +
+									  "material: " + abs_path );
+			}
+
 			mesh_renderer.sharedMaterial = material;
 
 			return true;
@@ -1206,7 +1286,7 @@ public class HAPI_AssetUtility
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
 	}
 	
-	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
+	// ANIMATION KEYS -----------------------------------------------------------------------------------------------
 	
 	public static void addKeyToCurve( float time, float val, AnimationCurve curve )
 	{
