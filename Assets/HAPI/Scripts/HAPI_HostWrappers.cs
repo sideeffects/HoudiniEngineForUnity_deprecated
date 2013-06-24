@@ -1649,6 +1649,7 @@ namespace HAPI
 			int shader_type_int = (int) shader_type;
 			int status_code = HAPI_RenderMaterialToFile( asset_id, material_id, shader_type_int,
 														 destination_folder_path,
+														 null, // destination_file_name
 														 ref destination_file_path_sh );
 			processStatusCode( (HAPI_Result) status_code );
 
@@ -1675,7 +1676,9 @@ namespace HAPI
 		public static string extractTextureToFile( int node_id, int parm_id, string destination_folder_path )
 		{
 			int destination_file_path_sh = 0;
-			int status_code = HAPI_ExtractTextureToFile( node_id, parm_id, destination_folder_path,
+			int status_code = HAPI_ExtractTextureToFile( node_id, parm_id, 
+														 destination_folder_path,
+														 null, // destination_file_name
 														 ref destination_file_path_sh );
 			processStatusCode( (HAPI_Result) status_code );
 

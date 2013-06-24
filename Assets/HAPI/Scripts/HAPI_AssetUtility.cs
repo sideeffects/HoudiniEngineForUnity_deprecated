@@ -867,7 +867,8 @@ public class HAPI_AssetUtility
 
 		// Need to get the material path here because the next call to HAPI_Host.getAttributeStrData will
 		// overwrite the string ids in material_attr.
-		string material_path = HAPI_Host.getString( material_attr[ 0 ] );
+		string material_path = material_attr_info.exists ? HAPI_Host.getString( material_attr[ 0 ] )
+														 : "";
 
 		HAPI_AttributeInfo sub_material_name_attr_info = new HAPI_AttributeInfo( 
 																HAPI_Host.prUnitySubMaterialNameAttribName );
