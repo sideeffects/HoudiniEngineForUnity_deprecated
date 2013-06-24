@@ -892,10 +892,6 @@ public class HAPI_AssetUtility
 			int sub_material_index		= has_sub_material_index ? sub_material_index_attr[ 0 ] : 0;
 			Material material			= (Material) Resources.Load( material_path, typeof( Material ) );
 
-			Debug.Log( material_path );
-			Debug.Log( sub_material_name );
-			Debug.Log( sub_material_index );
-
 			if ( material == null )
 			{
 				// Try explicit import.
@@ -926,7 +922,6 @@ public class HAPI_AssetUtility
 						  sub_material_index < substance_importer.GetMaterialCount() )
 				{
 					material = substance_importer.GetMaterials()[ sub_material_index ];
-					Debug.Log( "HAAA" + sub_material_index );
 				}
 				else
 					Debug.LogWarning( "sub_material_index (" + sub_material_index + ") out of range for " +
