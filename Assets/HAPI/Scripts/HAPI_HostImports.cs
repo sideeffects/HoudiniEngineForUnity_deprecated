@@ -384,6 +384,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_RenderMaterialToFile(	int asset_id, int material_id,
 																int shader_type,
+																string image_plane,
 																string destination_folder_path,
 																string destination_file_name,
 																ref int destination_file_path );

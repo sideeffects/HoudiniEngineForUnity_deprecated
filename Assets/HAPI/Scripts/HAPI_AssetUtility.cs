@@ -815,6 +815,7 @@ public class HAPI_AssetUtility
 			progress_bar.displayProgressBar();
 			string texture_file_path	= HAPI_Host.renderMaterialToFile( material_info.assetId, material_info.id, 
 																		  HAPI_ShaderType.HAPI_SHADER_MANTRA,
+																		  "C",
 																		  folder_path );
 			progress_bar.clearProgressBar();
 

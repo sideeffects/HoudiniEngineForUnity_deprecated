@@ -1635,6 +1635,12 @@ namespace HAPI
 		/// <param name="shader_type">
 		///		The HAPI_ShaderType to use to render the material.
 		/// </param>
+		/// <param name="image_plane">
+		///		This is the image plane that you want to export. The default and almost guaranteed 
+		///		to exist is the diffuse plane: "C". To get the full list of available planes 
+		///		you'll need to either ask the asset creator or query the COP Channel Copy node's 
+		///		copyfrom1 parameter. See HAPI_Host.getRenderNodes().
+		/// </param>
 		/// <param name="destination_folder_path">
 		///		The folder path of where you wish the texture file to be extracted.
 		/// </param>
@@ -1643,11 +1649,12 @@ namespace HAPI
 		///		to the extracted file.
 		/// </return>
 		public static string renderMaterialToFile( int asset_id, int material_id, HAPI_ShaderType shader_type, 
-												   string destination_folder_path )
+												   string image_plane, string destination_folder_path )
 		{
 			int destination_file_path_sh = 0;
 			int shader_type_int = (int) shader_type;
 			int status_code = HAPI_RenderMaterialToFile( asset_id, material_id, shader_type_int,
+														 image_plane,
 														 destination_folder_path,
 														 null, // destination_file_name
 														 ref destination_file_path_sh );
