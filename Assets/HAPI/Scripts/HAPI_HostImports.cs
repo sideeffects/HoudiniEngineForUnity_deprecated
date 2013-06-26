@@ -171,6 +171,9 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetNodeInfo( int node_id, ref HAPI_NodeInfo node_info );
 
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetSpecialNodes( out HAPI_SpecialNodes special_nodes );
+
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -402,14 +405,13 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetTexture(		int node_id, int parm_id,
 														[Out] byte[] buffer );
-		
-		
+
 		// ANIMATIONS -----------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_SetTransformAnimCurve( int node_id, int transform_component,
-															  HAPI_Keyframe[] curve_keyframes,
-															  int keyframe_count );
+															 HAPI_Keyframe[] curve_keyframes,
+															 int keyframe_count );
 	}
 
 }

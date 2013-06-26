@@ -385,6 +385,14 @@ namespace HAPI
 		public int parmChoiceCount;
 	}
 
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_SpecialNodes 
+	{
+		public int defaultCamera;
+		public int defaultLight;
+		public int mantraRenderer;
+	}
+
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
 	
 	[ StructLayout( LayoutKind.Sequential ) ]

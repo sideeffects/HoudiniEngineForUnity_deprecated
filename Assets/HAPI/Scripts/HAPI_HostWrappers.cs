@@ -434,10 +434,10 @@ namespace HAPI
 		/// </summary>
 		///
 		/// <param name="asset_id">
-		///			The asset id returned by HAPI_LoadOTLFile().
+		///		The asset id returned by HAPI_LoadOTLFile().
 		/// </param>
 		/// <param name="file_name">
-		///			Absolute path to the .hip file to be exported.
+		///		Absolute path to the .hip file to be exported.
 		/// </param>
 		public static void exportAssetToHIPFile( int asset_id, string file_name )
 		{
@@ -450,12 +450,12 @@ namespace HAPI
 		///		the same asset found in the hip file.
 		/// </summary>
 		/// <param name="asset_id">
-		///			The asset id returned by HAPI_LoadOTLFile().
+		///		The asset id returned by HAPI_LoadOTLFile().
 		/// </param>
 		/// <param name="file_name">
-		///			Absolute path to the .hip file where the asset instance
-		///			is to be found.
-		///  </param>
+		///		Absolute path to the .hip file where the asset instance
+		///		is to be found.
+		/// </param>
 		public static void replaceAssetFromHIPFile( int asset_id, string file_name )
 		{
 			int status_code = HAPI_ReplaceAssetFromHIPFile( asset_id, file_name );
@@ -477,6 +477,20 @@ namespace HAPI
 			int status_code = HAPI_GetNodeInfo( node_id, ref node_info );
 			processStatusCode( (HAPI_Result) status_code );
 			return node_info;
+		}
+
+		/// <summary>
+		/// 	Get an special nodes struct.
+		/// </summary>
+		/// <returns>
+		///		The struct containing the special nodes by node id.
+		/// </returns>
+		public static HAPI_SpecialNodes getSpecialNodes()
+		{
+			HAPI_SpecialNodes special_nodes = new HAPI_SpecialNodes();
+			int status_code = HAPI_GetSpecialNodes( out special_nodes );
+			processStatusCode( (HAPI_Result) status_code );
+			return special_nodes;
 		}
 
 		// PARAMETERS -----------------------------------------------------------------------------------------------
