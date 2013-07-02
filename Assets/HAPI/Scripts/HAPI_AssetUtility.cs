@@ -662,10 +662,34 @@ public class HAPI_AssetUtility
 		return new Color( values[ 0 ], values[ 1 ], values[ 2 ], values[ 3 ] );
 	}
 
+	public static void setRenderResolution( Vector2 resolution )
+	{
+		HAPI_GlobalNodes global_nodes = HAPI_Host.getGlobalNodes();
+
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( global_nodes.defaultCamera );
+
+		// Get all parameters.
+		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
+		getArray1Id( global_nodes.defaultCamera, HAPI_Host.getParameters, parms, node_info.parmCount );
+
+		int parm_id = findParm( ref parms, "res" );
+		if ( parm_id < 0 )
+			return;
+
+		int values_index = parms[ parm_id ].intValuesIndex;
+		int[] values = new int[ 2 ];
+		values[ 0 ] = (int) resolution.x;
+		values[ 1 ] = (int) resolution.y;
+
+		HAPI_Host.setParmIntValues( global_nodes.defaultCamera, values, values_index, 2 );
+	}
+
 	// TEXTURES -----------------------------------------------------------------------------------------------------
 	
 	public static void reApplyMaterials( HAPI_Asset asset )
 	{
+		setRenderResolution( asset.prRenderResolution );
+
 		foreach ( HAPI_PartControl part_control in asset.GetComponentsInChildren< HAPI_PartControl >() )
 		{
 			try

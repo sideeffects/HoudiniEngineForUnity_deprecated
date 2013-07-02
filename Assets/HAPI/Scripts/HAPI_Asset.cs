@@ -168,6 +168,8 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public HAPI_ShaderType			prMaterialShaderType {	get { return myMaterialShaderType; }
 															set { myMaterialShaderType = value; } }
+	public Vector2					prRenderResolution {	get { return myRenderResolution; }
+															set { myRenderResolution = value; } }
 	public bool						prShowOnlyVertexColours{get { return myShowOnlyVertexColours; }
 															set { myShowOnlyVertexColours = value; } }
 	public bool						prGenerateTangents {	get { return (	myGenerateTangents && 
@@ -701,6 +703,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prHideGeometryOnLinking			= HAPI_Host.myDefaultHideGeometryOnLinking;
 
 		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
+		prRenderResolution				= new Vector2( 1000, 1000 );
 		prShowOnlyVertexColours			= false;
 		prGenerateTangents				= true;
 
@@ -1547,6 +1550,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myHideGeometryOnLinking;
 
 	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
+	[SerializeField] private Vector2				myRenderResolution;
 	[SerializeField] private bool					myShowOnlyVertexColours;
 	[SerializeField] private bool					myGenerateTangents;
 

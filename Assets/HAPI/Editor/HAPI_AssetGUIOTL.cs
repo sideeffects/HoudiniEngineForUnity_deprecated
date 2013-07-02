@@ -280,6 +280,11 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	private void generateMaterialSettings()
 	{
+		if ( GUILayout.Button( "Re-Render" ) ) 
+		{
+			HAPI_AssetUtility.reApplyMaterials( myAsset );
+		}
+
 		// Material Shader Type
 		{
 			int value = (int) myAsset.prMaterialShaderType;
@@ -291,6 +296,21 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			{
 				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
 				HAPI_AssetUtility.reApplyMaterials( myAsset );
+			}
+		}
+
+		// Render Resolution
+		{
+			bool delay_build = false;
+			int[] values = new int[ 2 ];
+			values[ 0 ] = (int) myAsset.prRenderResolution[ 0 ];
+			values[ 1 ] = (int) myAsset.prRenderResolution[ 1 ];
+			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "render_resolution", "Render Resolution", 2 );
+			bool changed = HAPI_GUI.intField( ref gui_parm, ref delay_build, ref values );
+			if ( changed )
+			{
+				Vector2 new_resolution = new Vector2( (float) values[ 0 ], (float) values[ 1 ] );
+				myAsset.prRenderResolution = new_resolution;
 			}
 		}
 
