@@ -1638,6 +1638,40 @@ namespace HAPI
 		}
 
 		/// <summary>
+		/// 	Get the image planes (ie. color plane, normal, tangent, alpha, etc.) exposed
+		/// 	by an asset's material.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <return>
+		///		A list of strings representing the image planes' names.
+		/// </return>
+		public static List< string > getAvailableImagePlanes( int asset_id, int material_id )
+		{
+			int status_code = (int) HAPI_Result.HAPI_RESULT_SUCCESS;
+
+			int image_plane_count = 0;
+			status_code = HAPI_GetAvailableImagePlaneCount( asset_id, material_id, out image_plane_count );
+			processStatusCode( (HAPI_Result) status_code );
+
+			int[] image_plane_names_array = new int[ image_plane_count ];
+			status_code = HAPI_GetAvailableImagePlanes( asset_id, material_id, 
+														image_plane_names_array,
+														image_plane_count );
+			processStatusCode( (HAPI_Result) status_code );
+
+			List< string > image_plane_names = new List< string >( image_plane_count );
+			for ( int i = 0; i < image_plane_count; ++i )
+				image_plane_names.Add( getString( image_plane_names_array[ i ] ) );
+
+			return image_plane_names;
+		}
+
+		/// <summary>
 		/// 	Use the specified shader to render the material onto a texture.
 		/// </summary>
 	    /// <param name="asset_id">

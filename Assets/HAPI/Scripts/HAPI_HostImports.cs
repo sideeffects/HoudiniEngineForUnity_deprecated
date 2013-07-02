@@ -385,6 +385,15 @@ namespace HAPI
 														out HAPI_MaterialInfo material_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAvailableImagePlaneCount(	int asset_id, int material_id,
+																	out int image_plane_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAvailableImagePlanes(	int asset_id, int material_id,
+																[Out] int[] image_plane_names,
+																int image_plane_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_RenderMaterialToFile(	int asset_id, int material_id,
 																int shader_type,
 																string image_plane,
