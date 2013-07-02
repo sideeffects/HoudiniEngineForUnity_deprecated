@@ -1685,9 +1685,10 @@ namespace HAPI
 		/// </param>
 		/// <param name="image_plane">
 		///		This is the image plane that you want to export. The default and almost guaranteed 
-		///		to exist is the diffuse plane: "C". To get the full list of available planes 
-		///		you'll need to either ask the asset creator or query the COP Channel Copy node's 
-		///		copyfrom1 parameter. See HAPI_Host.getRenderNodes().
+		///		to exist is the diffuse plane: "C". To get the full list of available planes use 
+		///		<see cref="HAPI_Host.getAvailableImagePlanes"/>. Note that you can expose more 
+		///		or less image planes by using the default Mantra render node's parameters which 
+		///		you can get via <see cref="HAPI_Host.getGlobalNodes"/>.
 		/// </param>
 		/// <param name="destination_folder_path">
 		///		The folder path of where you wish the texture file to be extracted.
