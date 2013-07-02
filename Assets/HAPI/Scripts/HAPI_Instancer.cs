@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 using Utility = HAPI_AssetUtility;
+using System;
 
 using HAPI;
 
@@ -143,8 +144,11 @@ public class HAPI_Instancer : MonoBehaviour {
 			Vector3 scale = override_info.scale;
 			
 			GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiatePath );
+			
+			//FIXME: we need to cache the scripts currently attached as well as the other info 
+			// for now this is not preserved.
 			instanceObject( object_to_instantiate, 
-							pos, euler, override_info.instancePointNumber, true, scale );
+							pos, euler, override_info.instancePointNumber, true, scale, false, "" );
 			
 			if ( override_info.instancePointNumber < total_points )
 				exclusion_list.Add( override_info.instancePointNumber );
@@ -160,16 +164,103 @@ public class HAPI_Instancer : MonoBehaviour {
 		}
 	}
 	
+	private void attachScript( GameObject obj, string attach_script )
+	{
+		JSONObject json_object = new JSONObject( attach_script );
+		Dictionary< string, string > dictionary = json_object.ToDictionary();
+		
+		if( !dictionary.ContainsKey("script") )
+		{
+			Debug.LogError("script key not found in scripts attribute!");
+			return;
+		}
+											
+		if( (dictionary.Count - 1) % 3 != 0 )
+		{
+			Debug.LogError("Improper number of entries in scripts attribute!");
+			return;
+		}
+					
+		Component comp = obj.AddComponent( dictionary["script"] );
+		if( comp == null )
+		{
+			Debug.LogError("Unable to attach component " + dictionary["script"] );
+			return;
+		}
+		
+		int num_args = (dictionary.Count - 1) / 3;
+		
+		for( int ii = 0; ii < num_args; ii++ )
+		{
+			string arg_name_str = "arg" + ii + "Name";
+			string arg_type_str = "arg" + ii + "Type";
+			string arg_value_str = "arg" + ii + "Value";
+			
+			if( !dictionary.ContainsKey( arg_name_str ) ||
+				!dictionary.ContainsKey( arg_type_str ) ||
+				!dictionary.ContainsKey( arg_value_str ) )
+			{
+				Debug.LogError("Unable to find expected information " 
+								+ arg_name_str + "||" 
+								+ arg_type_str + "||"
+								+ arg_value_str );
+				return;
+			}
+			
+			string arg_name = dictionary[ arg_name_str ];
+			string arg_type = dictionary[ arg_type_str ];
+			string arg_value = dictionary[ arg_value_str ];
+			
+			try
+			{
+				System.Reflection.FieldInfo fi = comp.GetType().GetField( arg_name );
+				switch( arg_type )
+				{
+					case "int":
+						{
+							int val = (int) int.Parse( arg_value );
+							fi.SetValue( comp, val );
+						}					
+						break;
+					case "float":
+						{
+							float val = (float) float.Parse( arg_value );
+							fi.SetValue( comp, val );
+						}				
+						break;
+					case "string":
+						{
+							fi.SetValue( comp, arg_value );
+						}				
+						break;
+					default:
+						{
+							Debug.LogError("Unknown Type: " + arg_type + " Found in scripts attribute");
+						}
+						break;
+				}
+			}
+			catch( System.Exception e )
+			{
+				Debug.LogError("Unable to set property " + arg_name_str );
+				return;
+			}
+						
+		}
+	}
 	
 	private void instanceObject( GameObject objToInstantiate, 
 								 Vector3 pos,
 								 Vector3 euler,
 								 int point_index,
 								 bool scale_exists,
-								 Vector3 scale )
+								 Vector3 scale,
+								 bool attach_script_exists,
+								 string attach_script )
 	{
 		
-		GameObject obj;
+		GameObject obj;		
+		
 		
 		if ( !prOverrideInstances )
 		{
@@ -235,8 +326,13 @@ public class HAPI_Instancer : MonoBehaviour {
 			if( scale_exists )
 				obj.transform.localScale = scale;
 		}
-		
+					
 		obj.transform.parent = transform;
+		
+		if ( attach_script_exists )
+		{
+			attachScript( obj, attach_script );			
+		}
 		
 	}
 	
@@ -607,6 +703,18 @@ public class HAPI_Instancer : MonoBehaviour {
 			if ( scale_attr_info.exists && scale_attr.Length != myNumInstances * 3 )
 				throw new HAPI_Error( "Unexpected scale array length found for asset: " + prAsset.prAssetId + "!" );
 			
+						
+			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
+			int[] script_attr = new int[ 0 ];
+			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "Unity_Script",
+								  ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
+			
+			if ( script_attr_info.exists && script_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as point attributes!" );
+			
+			if ( script_attr_info.exists && script_attr.Length != myNumInstances )
+				throw new HAPI_Error( "Unexpected Unity_Script array length found for asset: " + prAsset.prAssetId + "!" );
+						
 			
 			int[] instance_attr = null;
 			int[] name_attr = null;
@@ -704,13 +812,18 @@ public class HAPI_Instancer : MonoBehaviour {
 					Vector3 scale = new Vector3 ( instance_transforms[ ii ].scale[ 0 ],
 												  instance_transforms[ ii ].scale[ 1 ],
 												  instance_transforms[ ii ].scale[ 2 ] );
-							
+						
+					string script_to_attach = "";
+					if( script_attr_info.exists )
+						script_to_attach = HAPI_Host.getString( script_attr[ ii ] );
 					instanceObject( objToInstantiate, 
 								 	pos,
 									euler,									
 								 	ii,
 									scale_attr_info.exists,
-									scale );
+									scale,
+									script_attr_info.exists,
+									script_to_attach );
 						
 					if ( !prOverrideInstances )
 					{
