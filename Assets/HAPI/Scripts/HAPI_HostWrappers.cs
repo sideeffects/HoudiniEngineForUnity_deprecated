@@ -480,17 +480,17 @@ namespace HAPI
 		}
 
 		/// <summary>
-		/// 	Get an special nodes struct.
+		/// 	Get an global nodes struct.
 		/// </summary>
 		/// <returns>
-		///		The struct containing the special nodes by node id.
+		///		The struct containing the global nodes by node id.
 		/// </returns>
-		public static HAPI_SpecialNodes getSpecialNodes()
+		public static HAPI_GlobalNodes getGlobalNodes()
 		{
-			HAPI_SpecialNodes special_nodes = new HAPI_SpecialNodes();
-			int status_code = HAPI_GetSpecialNodes( out special_nodes );
+			HAPI_GlobalNodes global_nodes = new HAPI_GlobalNodes();
+			int status_code = HAPI_GetGlobalNodes( out global_nodes );
 			processStatusCode( (HAPI_Result) status_code );
-			return special_nodes;
+			return global_nodes;
 		}
 
 		// PARAMETERS -----------------------------------------------------------------------------------------------

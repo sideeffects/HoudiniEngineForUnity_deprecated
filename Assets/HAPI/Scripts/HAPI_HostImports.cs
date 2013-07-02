@@ -172,7 +172,7 @@ namespace HAPI
 		private static extern int HAPI_GetNodeInfo( int node_id, ref HAPI_NodeInfo node_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetSpecialNodes( out HAPI_SpecialNodes special_nodes );
+		private static extern int HAPI_GetGlobalNodes( out HAPI_GlobalNodes global_nodes );
 
 		// PARAMETERS -----------------------------------------------------------------------------------------------
 		

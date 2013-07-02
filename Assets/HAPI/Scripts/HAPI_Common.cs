@@ -386,7 +386,7 @@ namespace HAPI
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_SpecialNodes 
+	public struct HAPI_GlobalNodes 
 	{
 		public int defaultCamera;
 		public int defaultLight;
