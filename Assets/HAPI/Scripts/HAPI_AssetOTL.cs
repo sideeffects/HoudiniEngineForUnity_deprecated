@@ -421,10 +421,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 		
 		geo_info.hasMaterialChanged = false;
 		
-		if( first_time || reload_asset )
+		if( (first_time || reload_asset) && geo_info.partCount > 0 )
 		{
 			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
 			int[] script_attr = new int[ 0 ];
+			
 			Utility.getAttribute( prAssetId, geo_control.prObjectId, geo_control.prGeoId, 0, "Unity_Script",
 								  ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
 			
