@@ -942,23 +942,41 @@ public abstract class HAPI_Asset : HAPI_Control
 				HAPI_Host.cookAsset( prAssetId );
 				progress_bar.statusCheckLoop();
 
+				// Get the node info again
+				HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prAssetNodeId );
+
+				prParmCount 			= node_info.parmCount;
+				prParmIntValueCount		= node_info.parmIntValueCount;
+				prParmFloatValueCount	= node_info.parmFloatValueCount;
+				prParmStringValueCount	= node_info.parmStringValueCount;
+				prParmChoiceCount		= node_info.parmChoiceCount;
+
 				// We need to get the parameter values again because they could have been
 				// changed by a script.
 
+				// Get all parameters.
+				prParms = new HAPI_ParmInfo[ prParmCount ];
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParameters, prParms, prParmCount );
+				
 				// Get parameter int values.
+				prParmIntValues = new int[ prParmIntValueCount ];
 				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmIntValues, 
 									 prParmIntValues, prParmIntValueCount );
-				progress_bar.incrementProgressBar( prParmIntValueCount );
 				
 				// Get parameter float values.
+				prParmFloatValues = new float[ prParmFloatValueCount ];
 				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmFloatValues, 
 									 prParmFloatValues, prParmFloatValueCount );
-				progress_bar.incrementProgressBar( prParmFloatValueCount );
 				
 				// Get parameter string (handle) values.
+				prParmStringValues = new int[ prParmStringValueCount ];
 				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
 									 prParmStringValueCount );
-				progress_bar.incrementProgressBar( prParmStringValueCount );
+				
+				// Get parameter choice lists.
+				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
+				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmChoiceLists, 
+									 prParmChoiceLists, prParmChoiceCount );
 			}
 			
 			// Refresh object info arrays as they are lost after serialization.
