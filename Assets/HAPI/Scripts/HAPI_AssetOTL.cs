@@ -418,8 +418,26 @@ public class HAPI_AssetOTL : HAPI_Asset
 			foreach ( Transform part_trans in geo_node.transform )
 				createPart( part_trans.gameObject, reload_asset, geo_info.hasGeoChanged, 
 							geo_info.hasMaterialChanged );
-
+		
 		geo_info.hasMaterialChanged = false;
+		
+		if( first_time || reload_asset )
+		{
+			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
+			int[] script_attr = new int[ 0 ];
+			Utility.getAttribute( prAssetId, geo_control.prObjectId, geo_control.prGeoId, 0, "Unity_Script",
+								  ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
+			
+			if ( script_attr_info.exists && script_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL )
+				throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as detail attributes!" );
+			
+			if( script_attr_info.exists && script_attr.Length > 0 )
+			{
+				string script_to_attach = HAPI_Host.getString( script_attr[ 0 ] );
+				HAPI_AssetUtility.attachScript( geo_node, script_to_attach );
+			}
+		}
+				
 	}
 	
 	private void createObject( int object_id, bool reload_asset )

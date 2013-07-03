@@ -164,91 +164,6 @@ public class HAPI_Instancer : MonoBehaviour {
 		}
 	}
 	
-	private void attachScript( GameObject obj, string attach_script )
-	{
-		JSONObject json_object = new JSONObject( attach_script );
-		Dictionary< string, string > dictionary = json_object.ToDictionary();
-		
-		if( !dictionary.ContainsKey("script") )
-		{
-			Debug.LogError("script key not found in scripts attribute!");
-			return;
-		}
-											
-		if( (dictionary.Count - 1) % 3 != 0 )
-		{
-			Debug.LogError("Improper number of entries in scripts attribute!");
-			return;
-		}
-					
-		Component comp = obj.AddComponent( dictionary["script"] );
-		if( comp == null )
-		{
-			Debug.LogError("Unable to attach component " + dictionary["script"] );
-			return;
-		}
-		
-		int num_args = (dictionary.Count - 1) / 3;
-		
-		for( int ii = 0; ii < num_args; ii++ )
-		{
-			string arg_name_str = "arg" + ii + "Name";
-			string arg_type_str = "arg" + ii + "Type";
-			string arg_value_str = "arg" + ii + "Value";
-			
-			if( !dictionary.ContainsKey( arg_name_str ) ||
-				!dictionary.ContainsKey( arg_type_str ) ||
-				!dictionary.ContainsKey( arg_value_str ) )
-			{
-				Debug.LogError("Unable to find expected information " 
-								+ arg_name_str + "||" 
-								+ arg_type_str + "||"
-								+ arg_value_str );
-				return;
-			}
-			
-			string arg_name = dictionary[ arg_name_str ];
-			string arg_type = dictionary[ arg_type_str ];
-			string arg_value = dictionary[ arg_value_str ];
-			
-			try
-			{
-				System.Reflection.FieldInfo fi = comp.GetType().GetField( arg_name );
-				switch( arg_type )
-				{
-					case "int":
-						{
-							int val = (int) int.Parse( arg_value );
-							fi.SetValue( comp, val );
-						}					
-						break;
-					case "float":
-						{
-							float val = (float) float.Parse( arg_value );
-							fi.SetValue( comp, val );
-						}				
-						break;
-					case "string":
-						{
-							fi.SetValue( comp, arg_value );
-						}				
-						break;
-					default:
-						{
-							Debug.LogError("Unknown Type: " + arg_type + " Found in scripts attribute");
-						}
-						break;
-				}
-			}
-			catch( System.Exception e )
-			{
-				Debug.LogError("Unable to set property " + arg_name_str );
-				return;
-			}
-						
-		}
-	}
-	
 	private void instanceObject( GameObject objToInstantiate, 
 								 Vector3 pos,
 								 Vector3 euler,
@@ -331,7 +246,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		
 		if ( attach_script_exists )
 		{
-			attachScript( obj, attach_script );			
+			HAPI_AssetUtility.attachScript( obj, attach_script );			
 		}
 		
 	}
