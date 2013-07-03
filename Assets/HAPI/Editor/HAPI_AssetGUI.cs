@@ -266,12 +266,12 @@ public class HAPI_AssetGUI : Editor
 		return changed;
 	}
 
-	protected bool generateAssetControl( int id, ref bool join_last, ref bool no_label_toggle_last )
+	protected bool generateAssetControl( int index, ref bool join_last, ref bool no_label_toggle_last )
 	{
 		if ( myAsset.prParms == null )
 			return false;
 		
-		if ( myAsset.prParms[ id ].invisible )
+		if ( myAsset.prParms[ index ].invisible )
 			return false;
 		
 		bool changed 				= false;
@@ -279,7 +279,7 @@ public class HAPI_AssetGUI : Editor
 		int node_id					= myAsset.prAssetNodeId;
 		
 		HAPI_ParmInfo[] parms 		= myAsset.prParms;
-		HAPI_ParmInfo parm			= parms[ id ];
+		HAPI_ParmInfo parm			= parms[ index ];
 		
 		int[] parm_int_values		= myAsset.prParmIntValues;
 		float[] parm_float_values	= myAsset.prParmFloatValues;
@@ -303,7 +303,7 @@ public class HAPI_AssetGUI : Editor
 				return false;
 			values_index = parm.floatValuesIndex;
 		}
-		else if ( parms[ id ].isString() )
+		else if ( parm.isString() )
 		{
 			if ( parm.stringValuesIndex < 0 || parm_string_values == null )
 				return false;
@@ -312,7 +312,12 @@ public class HAPI_AssetGUI : Editor
 		
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter
-		if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_INT )
+		if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+		{
+			changed = HAPI_GUI.intField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
+										 ref join_last, ref no_label_toggle_last );
+		}
+		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_INT )
 		{
 			if ( parm.choiceCount > 0 && parm.choiceIndex >= 0 )
 			{
@@ -323,10 +328,10 @@ public class HAPI_AssetGUI : Editor
 				// Go through our choices.
 				for ( int i = 0; i < parm.choiceCount; ++i )
 				{
-					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != id )
+					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != parm.id )
 						Debug.LogError( "Parm choice parent parm id (" 
 										+ myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
-										+ ") not matching current parm id (" + id + ")!\n"
+										+ ") not matching current parm id (" + parm.id + ")!\n"
 										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
 										+ "Choice count: " + parm.choiceCount );
 					
@@ -364,10 +369,10 @@ public class HAPI_AssetGUI : Editor
 				// Go through our choices.
 				for ( int i = 0; i < parm.choiceCount; ++i )
 				{
-					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != id )
+					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != parm.id )
 						Debug.LogError( "Parm choice parent parm id (" 
 										+ myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
-										+ ") not matching current parm id (" + id + ")!\n"
+										+ ") not matching current parm id (" + parm.id + ")!\n"
 										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
 										+ "Choice count: " + parm.choiceCount );
 					
@@ -384,7 +389,7 @@ public class HAPI_AssetGUI : Editor
 											 ref join_last, ref no_label_toggle_last );
 
 				if ( changed )
-					HAPI_Host.setParmStringValue( node_id, values_temp[ 0 ], id, 0 );
+					HAPI_Host.setParmStringValue( node_id, values_temp[ 0 ], parm.id, 0 );
 			}
 			else
 			{
@@ -400,7 +405,7 @@ public class HAPI_AssetGUI : Editor
 			
 				if ( changed )
 					for ( int p = 0; p < parm_size; ++p )
-						HAPI_Host.setParmStringValue( node_id, values[ p ], id, p );
+						HAPI_Host.setParmStringValue( node_id, values[ p ], parm.id, p );
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
@@ -413,7 +418,7 @@ public class HAPI_AssetGUI : Editor
 										  ref join_last, ref no_label_toggle_last );
 			
 			if ( changed )
-				HAPI_Host.setParmStringValue( node_id, path, id, 0 );
+				HAPI_Host.setParmStringValue( node_id, path, parm.id, 0 );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
@@ -442,10 +447,10 @@ public class HAPI_AssetGUI : Editor
 				// Go through our choices.
 				for ( int i = 0; i < parm.choiceCount; ++i )
 				{
-					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != id )
+					if ( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != parm.id )
 						Debug.LogError( "Parm choice parent parm id (" 
 										+ myAsset.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
-										+ ") not matching current parm id (" + id + ")!\n"
+										+ ") not matching current parm id (" + parm.id + ")!\n"
 										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
 										+ "Choice count: " + parm.choiceCount );
 					
@@ -469,14 +474,14 @@ public class HAPI_AssetGUI : Editor
 			HAPI_GUI.separator();
 		}
 		
-		if ( myAsset.hasProgressBarBeenUsed() && id == myAsset.prLastChangedParmId )
+		if ( myAsset.hasProgressBarBeenUsed() && parm.id == myAsset.prLastChangedParmId )
 		{
 			// TODO: Set the focus back to this control since the progress bar would have stolen it.	
 		}
 		
 		if ( changed )
 		{
-			myAsset.prLastChangedParmId = id;
+			myAsset.prLastChangedParmId = parm.id;
 		
 			if ( parm.isInt() )
 			{
@@ -568,7 +573,16 @@ public class HAPI_AssetGUI : Editor
 			
 			HAPI_ParmType parm_type = (HAPI_ParmType) parms[ current_index ].type;
 			
-			if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
+			if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+			{
+				int 		instance_count  = myAsset.prParmIntValues[ parms[ current_index ].intValuesIndex ];
+
+				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
+
+				parent_id_stack.Push( parms[ current_index ].id );
+				parent_count_stack.Push( parms[ current_index ].instanceLength * instance_count );
+			}
+			else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
 			{
 				// The current parameter is a folder list which means the next parms[ current_index ].size
 				// parameters will be folders belonging to this folder list. Push to the stack a new

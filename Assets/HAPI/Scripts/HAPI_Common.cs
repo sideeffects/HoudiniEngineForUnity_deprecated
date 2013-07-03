@@ -99,6 +99,7 @@ namespace HAPI
 	public enum HAPI_ParmType
 	{
 		HAPI_PARMTYPE_INT = 0,
+    	HAPI_PARMTYPE_MULTIPARMLIST,
 		HAPI_PARMTYPE_TOGGLE,
 		HAPI_PARMTYPE_BUTTON,
 		
@@ -109,6 +110,7 @@ namespace HAPI
 		HAPI_PARMTYPE_FILE,
 		
 		HAPI_PARMTYPE_FOLDERLIST,
+
 		HAPI_PARMTYPE_FOLDER,
 		HAPI_PARMTYPE_SEPARATOR,
 		
@@ -124,8 +126,11 @@ namespace HAPI
 		
 		HAPI_PARMTYPE_STR_START	    	= HAPI_PARMTYPE_STRING,
 		HAPI_PARMTYPE_STR_END	    	= HAPI_PARMTYPE_FILE,
+
+		HAPI_PARMTYPE_CONTAINER_START 	= HAPI_PARMTYPE_FOLDERLIST,
+		HAPI_PARMTYPE_CONTAINER_END 	= HAPI_PARMTYPE_FOLDERLIST,
 		
-		HAPI_PARMTYPE_NONVALUE_START	= HAPI_PARMTYPE_FOLDERLIST,
+		HAPI_PARMTYPE_NONVALUE_START	= HAPI_PARMTYPE_FOLDER,
 		HAPI_PARMTYPE_NONVALUE_END		= HAPI_PARMTYPE_SEPARATOR
 	}
 	
@@ -401,7 +406,8 @@ namespace HAPI
 		public bool isInt()
 		{
 			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_INT_START &&
-				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_INT_END );
+				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_INT_END )
+				|| type == (int) HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST;
 		}
 		public bool isFloat()
 		{
@@ -471,6 +477,8 @@ namespace HAPI
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isMultiParm;
+
+		public int instanceLength;
 		
 		// Accessors
 		public int getNameSH()
