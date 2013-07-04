@@ -572,15 +572,17 @@ public class HAPI_AssetGUI : Editor
 			}
 			
 			HAPI_ParmType parm_type = (HAPI_ParmType) parms[ current_index ].type;
-			
+
 			if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 			{
-				int 		instance_count  = myAsset.prParmIntValues[ parms[ current_index ].intValuesIndex ];
-
 				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
 
+				int[] instance_count = new int[ 1 ];
+				HAPI_Host.getParmIntValues( myAsset.prAssetNodeId, instance_count,
+											parms[ current_index ].intValuesIndex, 1 );
+
 				parent_id_stack.Push( parms[ current_index ].id );
-				parent_count_stack.Push( parms[ current_index ].instanceLength * instance_count );
+				parent_count_stack.Push( parms[ current_index ].instanceLength * instance_count[0] );
 			}
 			else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
 			{

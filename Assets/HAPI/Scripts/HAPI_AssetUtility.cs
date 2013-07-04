@@ -591,7 +591,7 @@ public class HAPI_AssetUtility
 		for ( int i = 0; i < parms.Length; ++i )
 		{
 			if ( parms[ i ].name == name )
-				return i;
+				return parms[ i ].id;
 		}
 		return -1;
 	}
