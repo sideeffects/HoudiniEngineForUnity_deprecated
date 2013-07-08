@@ -34,6 +34,8 @@ public struct HAPI_GUIParm
 		
 		joinNext 		= false;
 		labelNone 		= false;
+
+		isMultiParm 	= false;
 		
 		valuesIndex		= 0;
 	}
@@ -60,6 +62,8 @@ public struct HAPI_GUIParm
 		
 		joinNext 		= info.joinNext;
 		labelNone 		= info.labelNone;
+
+		isMultiParm 	= info.isMultiParm;
 		
 		if ( info.isInt() )
 			valuesIndex = info.intValuesIndex;
@@ -91,6 +95,8 @@ public struct HAPI_GUIParm
 	
 	public bool joinNext;
 	public bool labelNone;
+
+	public bool isMultiParm;
 	
 	public int valuesIndex;
 }
@@ -284,7 +290,7 @@ public class HAPI_GUI : Editor
 				EditorGUILayout.EndHorizontal();
 				EditorGUILayout.BeginHorizontal();
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
-				EditorGUILayout.LabelField( "", myLabelWidthGUI );
+				EditorGUILayout.LabelField( "", getLabelWidth( parm ) );
 				per_line = 0;
 			}
 			
@@ -386,7 +392,7 @@ public class HAPI_GUI : Editor
 				EditorGUILayout.EndHorizontal();
 				EditorGUILayout.BeginHorizontal();
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
-				EditorGUILayout.LabelField( "", myLabelWidthGUI );
+				EditorGUILayout.LabelField( "", getLabelWidth( parm ) );
 				per_line = 0;
 			}
 			
@@ -474,7 +480,7 @@ public class HAPI_GUI : Editor
 				EditorGUILayout.EndHorizontal();
 				EditorGUILayout.BeginHorizontal();
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
-				EditorGUILayout.LabelField( "", myLabelWidthGUI );
+				EditorGUILayout.LabelField( "", getLabelWidth( parm ) );
 				per_line = 0;
 			}
 			
@@ -637,7 +643,7 @@ public class HAPI_GUI : Editor
 			// Add padding for the toggle column.
 			EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
 			// Add empty space to align with fields.
-			EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
+			EditorGUILayout.LabelField( myNullContent, getLabelWidth( parm ) );
 		}
 		
 		// Get old value.
@@ -766,7 +772,7 @@ public class HAPI_GUI : Editor
 			// Add padding for the toggle column.
 			EditorGUILayout.LabelField( myNullContent, myToggleWidthGUI );
 			// Add empty space to align with fields.
-			EditorGUILayout.LabelField( myNullContent, myLabelWidthGUI );
+			EditorGUILayout.LabelField( myNullContent, getLabelWidth( parm ) );
 		}
 
 		// Buttons should be only as wide as the text in them.
@@ -801,6 +807,8 @@ public class HAPI_GUI : Editor
 	public const float myLineHeight 				= 16;
 	public const float myLabelWidth 				= 120;
 	public const float myToggleWidth 				= 12;
+	public const float myLabelWidthMulti 			= 100;
+	public const float myMultiButtonWidth 			= 5;
 	public const float myDummyLabelMinWidth			= 20;
 	
 	public const float myDefaultUIMin 				= 0.0f;
@@ -808,10 +816,16 @@ public class HAPI_GUI : Editor
 	
 	public static GUILayoutOption 	myLineHeightGUI 			= GUILayout.Height( myLineHeight );
 	public static GUILayoutOption 	myLabelWidthGUI 			= GUILayout.Width( myLabelWidth );
+	public static GUILayoutOption 	myLabelWidthMultiGUI		= GUILayout.Width( myLabelWidthMulti );
 	public static GUILayoutOption 	myToggleWidthGUI 			= GUILayout.Width( myToggleWidth );
 	public static GUILayoutOption	myDummyLabelMinWidthGUI		= GUILayout.MinWidth( myDummyLabelMinWidth );
 	
 	public static GUIContent 		myNullContent 				= new GUIContent( "" );
+
+	private static GUILayoutOption getLabelWidth( HAPI_GUIParm parm )
+	{
+		return parm.isMultiParm ? myLabelWidthMultiGUI : myLabelWidthGUI;
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
@@ -849,7 +863,8 @@ public class HAPI_GUI : Editor
 	{
 		if ( !parm.labelNone )
 		{
-			float label_final_width = myLabelWidth + (float) parm.labelExtraWidth;
+			float label_final_width =
+				(parm.isMultiParm ? myLabelWidthMulti : myLabelWidth) + (float) parm.labelExtraWidth;
 			if ( join_last && !no_label_toggle_last )
 			{
 				float min_width;

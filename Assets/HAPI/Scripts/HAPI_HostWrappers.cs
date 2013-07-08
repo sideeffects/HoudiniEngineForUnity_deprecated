@@ -692,6 +692,52 @@ namespace HAPI
 			int status_code = HAPI_SetParmStringValue( node_id, value, parm_id, index );
 			processStatusCode( (HAPI_Result) status_code );
 		}
+
+		/// <summary>
+		/// 	Insert an instance of a multiparm after instance_position.
+		/// </summary>
+		///
+		/// <param name="node_id">
+		/// 	The node id given by either a HAPI_AssetInfo
+		/// 	struct or a HAPI_MaterialInfo struct
+		/// </param>
+		/// <param name="parm_id">
+		/// 	A parm id given by a HAPI_ParmInfo struct that
+		/// 	has type HAPI_PARMTYPE_MULTIPARMLIST
+		/// </param>
+		/// <param name="instance_position">
+		/// 	The new instance will be inserted one after this
+		/// 	instance_position. The first instance has position 1.
+		/// </param>
+		public static void insertMultiparmInstance( 	int node_id, int multiparmlist_id,
+														int instance_position )
+		{
+			int status_code = HAPI_InsertMultiparmInstance( node_id, multiparmlist_id, instance_position );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
+		/// 	Remove the instance of a multiparm given by instance_position.
+		/// </summary>
+		///
+		/// <param name="node_id">
+		/// 	The node id given by either a HAPI_AssetInfo
+		/// 	struct or a HAPI_MaterialInfo struct
+		/// </param>
+		/// <param name="parm_id">
+		/// 	A parm id given by a HAPI_ParmInfo struct that
+		/// 	has type HAPI_PARMTYPE_MULTIPARMLIST
+		/// </param>
+		/// <param name="instance_position">
+		/// 	The new instance will be inserted one after this
+		/// 	instance_position. The first instance has position 1.
+		/// </param>
+		public static void removeMultiparmInstance( 	int node_id, int multiparmlist_id,
+														int instance_position )
+		{
+			int status_code = HAPI_RemoveMultiparmInstance( node_id, multiparmlist_id, instance_position );
+			processStatusCode( (HAPI_Result) status_code );
+		}
 		
 		// HANDLES --------------------------------------------------------------------------------------------------
 

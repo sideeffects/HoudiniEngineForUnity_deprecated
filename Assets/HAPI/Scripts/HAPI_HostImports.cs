@@ -207,6 +207,14 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_SetParmStringValue( 	int node_id, string value, 
 															int parm_id, int index );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_InsertMultiparmInstance( int node_id, int parm_id,
+																int instance_position );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_RemoveMultiparmInstance( int node_id, int parm_id,
+																int instance_position );
 		
 		// HANDLES --------------------------------------------------------------------------------------------------
 		

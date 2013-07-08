@@ -522,6 +522,7 @@ public class HAPI_AssetGUI : Editor
 		// parameters are still contained in the current folder.
 		Stack< int > parent_id_stack 		= new Stack< int >();
 		Stack< int > parent_count_stack 	= new Stack< int >();
+		int 	     instance_length = -1;
 		
 		// Loop through all the parameters.
 		while ( current_index < myAsset.prParmCount )
@@ -577,12 +578,18 @@ public class HAPI_AssetGUI : Editor
 			{
 				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
 
-				int[] instance_count = new int[ 1 ];
-				HAPI_Host.getParmIntValues( myAsset.prAssetNodeId, instance_count,
-											parms[ current_index ].intValuesIndex, 1 );
-
-				parent_id_stack.Push( parms[ current_index ].id );
-				parent_count_stack.Push( parms[ current_index ].instanceLength * instance_count[0] );
+				//int[] instance_count = new int[ 1 ];
+				int instance_count = myAsset.prParmIntValues[ parms[ current_index ].intValuesIndex ];
+				instance_length = parms[ current_index ].instanceLength;
+				if ( instance_length > 0 )
+				{
+					for (int i = 0; i < instance_count; i++)
+					{
+						parent_id_stack.Push( parms[ current_index ].id );
+						parent_count_stack.Push( 1 );
+					}
+				}
+				current_index++;
 			}
 			else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
 			{
@@ -644,18 +651,64 @@ public class HAPI_AssetGUI : Editor
 					parent_id_stack.Push( 		tab_ids[ selected_folder ] );
 					parent_count_stack.Push( 	tab_sizes[ selected_folder ] );
 				}
+				current_index++;
+			}
+			else if ( parms[ current_index ].isMultiParm )
+			{
+				GUILayout.BeginHorizontal();
+
+				// Create the add / remove buttons
+				var style = new GUIStyle( GUI.skin.button );
+				style.richText = true;
+				style.fixedWidth = 22;
+				bool removed_instance = false;
+				
+				GUILayout.BeginHorizontal();
+				if ( GUILayout.Button( "<b>-</b>", style ) ) 
+				{
+					HAPI_Host.removeMultiparmInstance( myAsset.prAssetNodeId, parms[ current_index ].parentId,
+													   parms[ current_index ].instanceNum );
+					removed_instance = true;
+					changed = true;
+				}
+				if ( GUILayout.Button( "<b>+</b>", style ) )
+				{
+					HAPI_Host.insertMultiparmInstance( myAsset.prAssetNodeId, parms[ current_index ].parentId,
+													   parms[ current_index ].instanceNum );
+					changed = true;
+				}
+				GUILayout.EndHorizontal();
+
+				// Create the parms within the multiparm
+				GUILayout.BeginVertical();
+				if ( !removed_instance )
+				{
+					for ( int i = 0; i < instance_length; i++ )
+					{
+						changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
+						current_index++;
+					}
+				}
+				else
+				{
+					current_index += instance_length;
+				}
+				GUILayout.EndVertical();
+
+				GUILayout.EndHorizontal();
+				if ( instance_length > 1 )
+					HAPI_GUI.separator();
 			}
 			else
 			{
 				// The current parameter is a simple parameter so just draw it.
-				
 				if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					Debug.LogError( "All folders should have been parsed in the folder list if clause!" );
-				
+
 				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
+
+				current_index++;
 			}
-			
-			current_index++;
 		}
 		
 		return changed;
