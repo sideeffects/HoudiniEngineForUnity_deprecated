@@ -1455,7 +1455,7 @@ public class HAPI_AssetUtility
 						break;
 				}
 			}
-			catch( System.Exception e )
+			catch
 			{
 				Debug.LogError("Unable to set property " + arg_name_str );
 				return;
