@@ -855,6 +855,10 @@ public abstract class HAPI_Asset : HAPI_Control
 				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
 				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
 
+				// Try to load presets.
+				if ( unload_asset_first )
+					loadPreset();
+
 				HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prAssetNodeId );
 
 				prParmCount 			= node_info.parmCount;
@@ -874,10 +878,6 @@ public abstract class HAPI_Asset : HAPI_Control
 													  + prParmChoiceCount
 													  + prObjectCount
 													  + prHandleCount;
-				
-				// Try to load presets.
-				if ( unload_asset_first )
-					loadPreset();
 				
 				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
@@ -912,6 +912,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmChoiceLists, 
 									 prParmChoiceLists, prParmChoiceCount );
 				progress_bar.incrementProgressBar( prParmChoiceCount );
+				
 				
 				// Add input fields.
 				if ( is_first_time_build || ( !serialization_recovery_only && !force_reconnect ) )

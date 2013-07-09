@@ -473,12 +473,12 @@ namespace HAPI
 		public int stringValuesIndex;
 		public int choiceIndex;
 		
-		public int instanceNum;
-
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isMultiParm;
+		public int instanceNum;
 
 		public int instanceLength;
+		public int instanceCount;  
 		
 		// Accessors
 		public int getNameSH()
