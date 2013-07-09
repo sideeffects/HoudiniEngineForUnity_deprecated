@@ -1418,6 +1418,36 @@ public class HAPI_AssetUtility
 							fi.SetValue( comp, arg_value );
 						}				
 						break;
+					case "bool":
+						{
+							bool val = (bool) bool.Parse( arg_value );
+							fi.SetValue( comp, val );
+						}
+						break;					
+					case "Vector3":
+						{
+							char [] separators = {',','(',')' } ;
+							string[] values = arg_value.Split( separators );
+							
+							int num_values_found = 0;
+							Vector3 vec3 = new Vector3( 0, 0, 0 );
+							foreach( string val in values )
+							{
+								if( val.Length > 0 )
+								{
+									vec3[ num_values_found ] = float.Parse( val );
+									num_values_found++;
+								}							
+							}
+							if( num_values_found != 3 )
+							{
+								Debug.LogError("Bad formatting found in Vector3: " + arg_value );
+								break;
+							}
+																										
+							fi.SetValue( comp, vec3 );
+						}
+						break;
 					default:
 						{
 							Debug.LogError("Unknown Type: " + arg_type + " Found in scripts attribute");
