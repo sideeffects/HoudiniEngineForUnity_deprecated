@@ -13,6 +13,7 @@
  * COMMENTS:
  * 
  */
+#define ENABLE_PARTICLES
 
 using UnityEngine;
 using UnityEditor;
@@ -21,6 +22,7 @@ using System.Collections;
 using System.Collections.Generic;
 using HAPI;
 using Utility = HAPI_AssetUtility;
+
 
 [ ExecuteInEditMode ]
 public class HAPI_AssetOTL : HAPI_Asset 
@@ -291,7 +293,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				mesh_saver.prGameObject = part_node;
 				mesh_saver.prMeshName = prAssetName + "_" + part_node.name;
 			}
-#if FALSE // Particles can get a bit annoying right now since our filter for what is a particle system is too broad.
+#if ENABLE_PARTICLES // Particles can get a bit annoying right now since our filter for what is a particle system is too broad.
 			else if ( part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
 			{
 				// Get position attributes.
@@ -316,8 +318,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 				particle_emitter.emit = false;
 				particle_emitter.useWorldSpace = true;
 
-				particle_emitter.maxSize = 0.6f;
-				particle_emitter.minSize = 0.2f;
+				particle_emitter.maxSize = 0.06f;
+				particle_emitter.minSize = 0.02f;
 				//particle_emitter.maxSize = 0.06f;
 				//particle_emitter.minSize = 0.02f;
 
@@ -347,7 +349,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 				Particle[] particles = particle_emitter.particles;
 
-				for ( int i = 0; i < part_info.pointCount; ++i )
+				if ( particle_emitter.particles.Length < part_info.pointCount )
+					Debug.LogWarning( "Geo has too many particles. Expected less than "
+									  + particle_emitter.particles.Length
+									  + " but found " + part_info.pointCount + ". "
+									  + " Only using the first "
+									  + particle_emitter.particles.Length + ".");
+
+
+				for ( int i = 0; i < particle_emitter.particles.Length; ++i )
 				{
 					particles[ i ].position = new Vector3( pos_attr[ i * 3 + 0 ], 
 														   pos_attr[ i * 3 + 1 ], 
