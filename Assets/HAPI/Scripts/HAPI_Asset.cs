@@ -1563,7 +1563,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		if ( id == -1 )
 			return;
-		Debug.Log ( "A parameter has changed" );
 		HAPI_ParmInfo parm = myParmMap[ id ];
 		if ( (HAPI_ParmType)parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
@@ -1571,7 +1570,6 @@ public abstract class HAPI_Asset : HAPI_Control
 			HAPI_Host.getParmIntValues( prAssetNodeId, values, parm.intValuesIndex, 1);
 
 			int difference = prParmIntValues[ parm.intValuesIndex ] - values[ 0 ];
-			Debug.Log ( " difference is " + difference );
 			if ( difference > 0 )
 				appendMultiparmInstances( parm, difference );
 			else if ( difference < 0 )

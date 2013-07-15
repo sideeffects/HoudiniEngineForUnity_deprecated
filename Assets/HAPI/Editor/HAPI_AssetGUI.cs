@@ -654,8 +654,8 @@ public class HAPI_AssetGUI : Editor
 
 		if ( myLastFocusedControl != GUI.GetNameOfFocusedControl() )
 		{
-			// We changed focus. Somehow signal a build
-			Debug.Log( "changed focus from " + myLastFocusedControl + " to " + GUI.GetNameOfFocusedControl() );
+			//Debug.Log( "Changed focus from " + myLastFocusedControl + " to " + GUI.GetNameOfFocusedControl() );
+			// We changed focus. Signal a build
 			myLastFocusedControl = GUI.GetNameOfFocusedControl();
 			myFocusChanged = true;
 			myDelayBuild = false;
