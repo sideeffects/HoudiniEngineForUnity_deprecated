@@ -37,6 +37,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	{
 		myParmChanges = false;
 		myDelayBuild = false;
+		myFocusChanged = false;
 		
 		base.OnInspectorGUI();
 		
@@ -133,7 +134,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		if ( myAssetOTL.prShowAssetControls )
 			myParmChanges |= generateAssetControls();
 
-		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
+		if ( ( myParmChanges && !myDelayBuild )
+				|| ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) )
 		{
 			myAssetOTL.build(	myReloadAsset,	// reload_asset
 								true,			// unload_asset_first

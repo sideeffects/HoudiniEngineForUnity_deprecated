@@ -933,6 +933,7 @@ public abstract class HAPI_Asset : HAPI_Control
 									   + prParmFloatValueCount + prParmStringValueCount;
 
 				setChangedParametersIntoHost();
+				getParameterValues();
 			}
 			
 			// Refresh object info arrays as they are lost after serialization.
@@ -1531,19 +1532,12 @@ public abstract class HAPI_Asset : HAPI_Control
 					last_instance + i );
 	}
 
-	public void appendChangedParm( int id )
-	{
-		myChangedParmIds.Add( id );
-	}
-
 	private void setChangedParametersIntoHost()
 	{
-		foreach( int id in myChangedParmIds )
-			setChangedParameterIntoHost( id );
+		setChangedParameterIntoHost( prLastChangedParmId );
 
 		if ( myToInsertInstance )
 		{
-			Debug.Log( "About to insert instance. " );
 			HAPI_Host.insertMultiparmInstance(
 					prAssetNodeId,
 					myNewMultiparmInstancePos.parentId, // The multiparm list

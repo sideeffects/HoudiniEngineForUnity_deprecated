@@ -36,6 +36,7 @@ public struct HAPI_GUIParm
 		labelNone 		= false;
 
 		isMultiParm 	= false;
+		instanceNum 	= -1;
 		
 		valuesIndex		= 0;
 	}
@@ -64,6 +65,8 @@ public struct HAPI_GUIParm
 		labelNone 		= info.labelNone;
 
 		isMultiParm 	= info.isMultiParm;
+
+		instanceNum 	= info.instanceNum;
 		
 		if ( info.isInt() )
 			valuesIndex = info.intValuesIndex;
@@ -97,6 +100,7 @@ public struct HAPI_GUIParm
 	public bool labelNone;
 
 	public bool isMultiParm;
+	public int 	instanceNum;
 	
 	public int valuesIndex;
 }
@@ -298,6 +302,9 @@ public class HAPI_GUI : Editor
 			int old_value = values[ parm.valuesIndex + p ];
 			
 			// Draw field.
+			GUI.SetNextControlName( parm.name +
+									" " + parm.instanceNum +
+									" " + p + " int_field" );
 			int new_value = EditorGUILayout.IntField( old_value );
 			if ( new_value != old_value ) // Check if the field is being used instead of the slider.
 				delay_build = true;
@@ -310,6 +317,12 @@ public class HAPI_GUI : Editor
 				Rect lastDoubleRect = getLastDoubleRect();
 				mySliderStyle.stretchWidth = false;
 				mySliderStyle.fixedWidth = lastDoubleRect.width;
+
+				// Set the name of the UI that we generate to approximately the paramter name
+				GUI.SetNextControlName( parm.name +
+										" " + parm.instanceNum +
+										" " + p + " int_slider" );
+
 				new_value = (int) GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
 														mySliderStyle, mySliderThumbStyle );
 			}
@@ -356,6 +369,7 @@ public class HAPI_GUI : Editor
 		int old_value = values[ parm.valuesIndex ];
 
 		// Draw field.
+		GUI.SetNextControlName( parm.name + " multiparm_field" );
 		int new_value = EditorGUILayout.IntField( old_value );
 		if ( new_value != old_value ) 
 			delay_build = true;
@@ -444,6 +458,9 @@ public class HAPI_GUI : Editor
 			float old_value = values[ parm.valuesIndex + p ];
 			
 			// Draw field.
+			GUI.SetNextControlName( parm.name +
+									" " + parm.instanceNum +
+									" " + p + " float_field" );
 			float new_value = EditorGUILayout.FloatField( old_value );
 			if ( new_value != old_value ) // Check if the field is being used instead of the slider.
 				delay_build = true;
@@ -456,6 +473,9 @@ public class HAPI_GUI : Editor
 				Rect lastDoubleRect = getLastDoubleRect();
 				mySliderStyle.stretchWidth = false;
 				mySliderStyle.fixedWidth = lastDoubleRect.width;
+				GUI.SetNextControlName( parm.name +
+										" " + parm.instanceNum +
+										" " + p + " float_slider" );
 				new_value = GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
 												  mySliderStyle, mySliderThumbStyle );
 			}
@@ -532,6 +552,9 @@ public class HAPI_GUI : Editor
 			string old_value = values[ parm.valuesIndex + p ];
 			
 			// Draw field.
+			GUI.SetNextControlName( parm.name +
+									" " + parm.instanceNum +
+									" " + p + " string_field" );
 			string new_value = EditorGUILayout.TextField( old_value );
 			if ( new_value != old_value ) // Check if the field is being used instead of the slider.
 				delay_build = true;
@@ -628,6 +651,9 @@ public class HAPI_GUI : Editor
 		label( ref parm, ref join_last, ref no_label_toggle_last );
 		
 		string old_path = path;
+		GUI.SetNextControlName( parm.name +
+								" " + parm.instanceNum +
+								" " + " file_field" );
 		string new_path = EditorGUILayout.TextField( old_path );
 		if ( new_path != old_path ) // Check if the field is being used instead of the slider.
 			delay_build = true;

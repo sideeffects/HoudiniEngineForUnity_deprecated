@@ -34,6 +34,7 @@ public class HAPI_AssetGUI : Editor
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
 		myReloadAsset		= false;
+		myFocusChanged 		= true;
 	}
 
 	public virtual void OnDisable()
@@ -273,7 +274,7 @@ public class HAPI_AssetGUI : Editor
 		
 		if ( myAsset.prParms[ index ].invisible )
 			return false;
-		
+
 		bool changed 				= false;
 		
 		int node_id					= myAsset.prAssetNodeId;
@@ -453,9 +454,10 @@ public class HAPI_AssetGUI : Editor
 		{
 			// TODO: Set the focus back to this control since the progress bar would have stolen it.	
 		}
-		
+
+
 		if ( changed )
-			myAsset.appendChangedParm( parm.id );
+			myAsset.prLastChangedParmId = parm.id;
 		
 		return changed;
 	}
@@ -654,6 +656,15 @@ public class HAPI_AssetGUI : Editor
 			}
 		}
 
+		if ( myLastFocusedControl != GUI.GetNameOfFocusedControl() )
+		{
+			// We changed focus. Somehow signal a build
+			Debug.Log( "changed focus from " + myLastFocusedControl + " to " + GUI.GetNameOfFocusedControl() );
+			myLastFocusedControl = GUI.GetNameOfFocusedControl();
+			myFocusChanged = true;
+			myDelayBuild = false;
+		}
+
 		return changed;
 	}
 	
@@ -661,7 +672,10 @@ public class HAPI_AssetGUI : Editor
 	protected bool			myDelayBuild;
 	protected bool			myParmChanges;
 	protected bool			myUnbuiltChanges;
+	protected bool 			myFocusChanged;
 	protected bool			myReloadAsset;
+
+	private string 			myLastFocusedControl;
 
 	private const int		myInputFormatDropdownWidth = 62;
 }
