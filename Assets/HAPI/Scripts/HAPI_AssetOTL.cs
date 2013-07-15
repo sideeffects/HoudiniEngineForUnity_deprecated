@@ -294,7 +294,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 				mesh_saver.prMeshName = prAssetName + "_" + part_node.name;
 			}
 #if ENABLE_PARTICLES // Particles can get a bit annoying right now since our filter for what is a particle system is too broad.
-			else if ( part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
+			else if ( HAPI_Host.prEnablePointsAsParticles && part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
 			{
 				// Get position attributes.
 				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );

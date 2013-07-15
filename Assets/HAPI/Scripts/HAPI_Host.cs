@@ -139,6 +139,8 @@ namespace HAPI
 		private const int myDefaultCurvePrimitiveTypeDefault				= 1;
 		private const int myDefaultCurveMethodDefault						= 1;
 
+		private const bool myDefaultEnablePointsAsParticles 				= true;
+
 		// Global Settings Initializations --------------------------------------------------------------------------
 
 		static HAPI_Host()
@@ -199,6 +201,8 @@ namespace HAPI
 
 			setInt(		"HAPI_CurvePrimitiveTypeDefault", myDefaultCurvePrimitiveTypeDefault, true );
 			setInt(		"HAPI_CurveMethodDefault", myDefaultCurveMethodDefault, true );
+
+			setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
 
 			myRepaintDelegate		= null;
 			myDeselectionDelegate	= null;
@@ -332,6 +336,10 @@ namespace HAPI
 		public static int prCurveMethodDefault {
 												get { return getInt( "HAPI_CurveMethodDefault" ); }
 												set { setInt( "HAPI_CurveMethodDefault", value ); } }
+
+		public static bool prEnablePointsAsParticles {
+												get { return getBool( "HAPI_EnablePointsAsParticles" ); }
+												set { setBool( "HAPI_EnablePointsAsParticles", value ); } }
 
 		// Global Settings Default Checks ---------------------------------------------------------------------------
 
@@ -490,6 +498,8 @@ namespace HAPI
 
 			prCurvePrimitiveTypeDefault				= myDefaultCurvePrimitiveTypeDefault;
 			prCurveMethodDefault					= myDefaultCurveMethodDefault;
+
+			prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
 		}
 
 		public static RepaintDelegate			myRepaintDelegate;

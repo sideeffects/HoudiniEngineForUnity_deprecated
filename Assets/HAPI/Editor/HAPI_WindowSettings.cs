@@ -504,6 +504,18 @@ public class HAPI_WindowSettings : EditorWindow
 					HAPI_Host.myRepaintDelegate();
 			}
 		}
+
+		// Enable particles
+		{
+			bool value = HAPI_Host.prEnablePointsAsParticles;
+			bool changed = HAPI_GUI.toggle( "enable_points_as_particles",
+											"Create points as particles (temporary setting)",
+											ref value );
+			if ( changed )
+			{
+				HAPI_Host.prEnablePointsAsParticles = value;
+			}
+		}
 	}
 
 	private static void generateCurveSettings()
