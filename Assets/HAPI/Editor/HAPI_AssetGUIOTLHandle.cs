@@ -102,7 +102,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				
 				if ( myTranslateParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myTranslateParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.findParm( myTranslateParmId );
 					
 					tx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					ty = parm_float_values[ parm_info.floatValuesIndex + 1 ];
@@ -111,7 +111,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				
 				if ( myRotateParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myRotateParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.findParm( myRotateParmId );
 					
 					rx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					ry = parm_float_values[ parm_info.floatValuesIndex + 1 ];
@@ -120,7 +120,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				
 				if ( myScaleParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myScaleParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.findParm( myScaleParmId );
 					
 					sx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					sy = parm_float_values[ parm_info.floatValuesIndex + 1 ];
@@ -129,13 +129,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				
 				if ( myRstOrderParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myRstOrderParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.findParm( myRstOrderParmId );
 					rstOrder = (HAPI_RSTOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}
 				
 				if ( myXyzOrderParmId >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myXyzOrderParmId ];
+					HAPI_ParmInfo parm_info = myAssetOTL.findParm( myXyzOrderParmId );
 					xyzOrder = (HAPI_XYZOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}				
 				
@@ -228,7 +228,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							new_position.z 		= xform.position[ 2 ];
 						}
 						
-						HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myTranslateParmId ];
+						HAPI_ParmInfo parm_info = myAssetOTL.findParm( myTranslateParmId );
 						
 						// the - in the x coordinate is to convert back to "Houdini" coordinates
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = -new_position.x; 
@@ -268,7 +268,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						
 						HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
 						
-						HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myRotateParmId ];
+						HAPI_ParmInfo parm_info = myAssetOTL.findParm( myRotateParmId );
 						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = xform.rotationEuler[ 0 ];
 						// the - in the y & z coordinate is to convert back to "Houdini" coordinates
@@ -292,7 +292,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					
 					if ( GUI.changed )
 					{
-						HAPI_ParmInfo parm_info = myAssetOTL.prParms[ myScaleParmId ];
+						HAPI_ParmInfo parm_info = myAssetOTL.findParm( myScaleParmId );
 						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = newScale.x;
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = newScale.y;

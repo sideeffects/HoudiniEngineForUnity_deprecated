@@ -1215,7 +1215,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			DestroyImmediate( child );
 	}
 
-	protected virtual HAPI_ParmInfo findParm( int id )
+	public virtual HAPI_ParmInfo findParm( int id )
 	{
 		return myParmMap[ id ];
 	}
@@ -1246,25 +1246,25 @@ public abstract class HAPI_Asset : HAPI_Control
 		parm = findParm( "t" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+				prParmFloatValues[ findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
 
 		parm = findParm( "r" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+				prParmFloatValues[ findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
 
 		parm = findParm( "s" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms[ parm ].floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ prParms[ parm ].floatValuesIndex + i ] = parm_data[ i ];
+				prParmFloatValues[ findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
 	}
 	

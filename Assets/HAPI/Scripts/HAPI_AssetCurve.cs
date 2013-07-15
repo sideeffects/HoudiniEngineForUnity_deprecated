@@ -157,7 +157,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 			return;
 
 		string point_list = 
-			HAPI_Host.getString( prParmStringValues[ prParms[ coords_parm_id ].stringValuesIndex ] );
+			HAPI_Host.getString( prParmStringValues[ findParm( coords_parm_id ).stringValuesIndex ] );
 
 		if ( point_list == null )
 			return;
@@ -274,8 +274,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 		int primitive_type_parm_default		= HAPI_Host.prCurvePrimitiveTypeDefault;
 		int method_parm_default				= HAPI_Host.prCurveMethodDefault;
 
-		int primitive_type_parm_int_values	= prParms[ primitive_type_parm ].intValuesIndex;
-		int method_parm_int_values			= prParms[ method_parm ].intValuesIndex;
+		int primitive_type_parm_int_values	= findParm( primitive_type_parm ).intValuesIndex;
+		int method_parm_int_values			= findParm( method_parm ).intValuesIndex;
 
 		prParmIntValues[ primitive_type_parm_int_values ]	= primitive_type_parm_default;
 		prParmIntValues[ method_parm_int_values ]			= method_parm_default;
@@ -283,10 +283,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 		int[] temp_int_values = new int[ 1 ];
 
 		temp_int_values[ 0 ] = primitive_type_parm_default;
-		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, prParms[ primitive_type_parm ].intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, findParm( primitive_type_parm ).intValuesIndex, 1 );
 		
 		temp_int_values[ 0 ] = method_parm_default;
-		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, prParms[ method_parm ].intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, findParm( method_parm ).intValuesIndex, 1 );
 		
 		HAPI_Host.cookAsset( prAssetId );
 	}
