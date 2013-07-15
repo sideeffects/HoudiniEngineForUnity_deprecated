@@ -337,6 +337,50 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 
+	public static bool multiparmField( 	ref HAPI_GUIParm parm,
+								 		ref bool delay_build,
+										ref int[] values,
+										ref bool join_last, ref bool no_label_toggle_last )
+	{
+		initializeConstants();
+		
+		bool changed = false;
+		
+		// Decide whether to join with the previous parameter on the same line or not.
+		GUILayout.BeginHorizontal();
+		label( ref parm, ref join_last, ref no_label_toggle_last );
+		
+		int per_line = 0;
+			
+		// Get old value.
+		int old_value = values[ parm.valuesIndex ];
+
+		// Draw field.
+		int new_value = EditorGUILayout.IntField( old_value );
+		if ( new_value != old_value ) 
+			delay_build = true;
+
+		if ( GUILayout.Button( "+" ) )
+			new_value++;
+
+		if ( GUILayout.Button( "-" ) && new_value > 0)
+			new_value--;
+
+		if ( GUILayout.Button( "Clear" ) )
+			new_value = 0;
+
+		GUILayout.EndHorizontal();
+
+		// Determine if value changed and update parameter value.
+		if ( new_value != old_value )
+		{
+			values[ parm.valuesIndex ] = new_value;
+			Debug.Log( "changed" );
+		}
+		
+		return new_value != old_value;
+	}
+
 	public static bool floatField( string name, string label, ref float value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );

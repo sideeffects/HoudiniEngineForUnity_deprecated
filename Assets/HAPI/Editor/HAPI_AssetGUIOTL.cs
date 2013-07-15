@@ -132,7 +132,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		if ( myAssetOTL.prShowAssetControls )
 			myParmChanges |= generateAssetControls();
-		
+
 		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
 		{
 			myAssetOTL.build(	myReloadAsset,	// reload_asset

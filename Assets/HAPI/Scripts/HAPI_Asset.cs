@@ -16,6 +16,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -98,7 +99,7 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myprParmStringValueCoun = value; } }
 	public int						prParmChoiceCount {				get { return myprParmChoiceCount; } 
 																	set { myprParmChoiceCount = value; } }
-	
+
 	public HAPI_ParmInfo[] 			prParms {						get { return myParms; } 
 																	set { myParms = value; } }
 	public int[]					prParmIntValues {				get { return myParmIntValues; } 
@@ -291,6 +292,30 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 		}
 		return null;
+	}
+
+	public void removeMultiparmInstance( HAPI_ParmInfo parm )
+	{
+		myOldMultiparmInstancePos = parm;
+		myToRemoveInstance = true;
+	}
+
+	public void insertMultiparmInstance( HAPI_ParmInfo parm )
+	{
+		myNewMultiparmInstancePos = parm;
+		myToInsertInstance = true;
+	}
+
+	// This will retrieve the cached copy of the string
+	public string[] getParmStrings( HAPI_ParmInfo parm )
+	{
+		return myParmStrings[ parm.id ];
+	}
+
+	// Set into dictionary to later be set into the host
+	public void setParmStrings( HAPI_ParmInfo parm, string[] strings )
+	{
+		myParmStrings[ parm.id ] = strings;
 	}
 	
 	// Transform related connection methods -------------------------------------------------------
@@ -715,6 +740,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		prEnableLogging					= false;
 		prLastChangedParmId 			= -1;
+		myChangedParmIds 				= new List< int >();
 
 		prFolderListSelections 			= new List< int >();
 		prFolderListSelectionIds 		= new List< int >();
@@ -847,6 +873,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				prAssetId 				= prAssetInfo.id;
 				prAssetValidationId		= prAssetInfo.validationId;
 				prAssetNodeId			= prAssetInfo.nodeId;
+				prObjectCount 			= prAssetInfo.objectCount;
+				prHandleCount 			= prAssetInfo.handleCount;
 
 				prAssetName				= prAssetInfo.name;
 				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
@@ -859,16 +887,6 @@ public abstract class HAPI_Asset : HAPI_Control
 				if ( unload_asset_first )
 					loadPreset();
 
-				HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prAssetNodeId );
-
-				prParmCount 			= node_info.parmCount;
-				prParmIntValueCount		= node_info.parmIntValueCount;
-				prParmFloatValueCount	= node_info.parmFloatValueCount;
-				prParmStringValueCount	= node_info.parmStringValueCount;
-				prParmChoiceCount		= node_info.parmChoiceCount;
-				
-				prObjectCount 			= prAssetInfo.objectCount;
-				prHandleCount 			= prAssetInfo.handleCount;
 				
 				progress_bar.prCurrentValue			= 0;
 				progress_bar.prTotal				= prParmCount
@@ -883,36 +901,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				myProgressBarJustUsed = true;
 				
 				progress_bar.prMessage = "Loading parameter information...";
-				
-				// Get all parameters.
-				prParms = new HAPI_ParmInfo[ prParmCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParameters, prParms, prParmCount );
-				progress_bar.incrementProgressBar( prParmCount );
-				
-				// Get parameter int values.
-				prParmIntValues = new int[ prParmIntValueCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmIntValues, 
-									 prParmIntValues, prParmIntValueCount );
-				progress_bar.incrementProgressBar( prParmIntValueCount );
-				
-				// Get parameter float values.
-				prParmFloatValues = new float[ prParmFloatValueCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmFloatValues, 
-									 prParmFloatValues, prParmFloatValueCount );
-				progress_bar.incrementProgressBar( prParmFloatValueCount );
-				
-				// Get parameter string (handle) values.
-				prParmStringValues = new int[ prParmStringValueCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
-									 prParmStringValueCount );
-				progress_bar.incrementProgressBar( prParmStringValueCount );
-				
-				// Get parameter choice lists.
-				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmChoiceLists, 
-									 prParmChoiceLists, prParmChoiceCount );
-				progress_bar.incrementProgressBar( prParmChoiceCount );
-				
+
+				getParameterValues();
 				
 				// Add input fields.
 				if ( is_first_time_build || ( !serialization_recovery_only && !force_reconnect ) )
@@ -935,49 +925,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			else
 			{				
 				progress_bar.displayProgressBar();
+				HAPI_Host.cookAsset( prAssetId );
+
 				myProgressBarJustUsed = true;
 				
 				progress_bar.prTotal = prObjectCount + prParmIntValueCount 
 									   + prParmFloatValueCount + prParmStringValueCount;
 
-				HAPI_Host.cookAsset( prAssetId );
-				progress_bar.statusCheckLoop();
-
-				// Get the node info again
-				HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prAssetNodeId );
-
-				prParmCount 			= node_info.parmCount;
-				prParmIntValueCount		= node_info.parmIntValueCount;
-				prParmFloatValueCount	= node_info.parmFloatValueCount;
-				prParmStringValueCount	= node_info.parmStringValueCount;
-				prParmChoiceCount		= node_info.parmChoiceCount;
-
-				// We need to get the parameter values again because they could have been
-				// changed by a script.
-
-				// Get all parameters.
-				prParms = new HAPI_ParmInfo[ prParmCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParameters, prParms, prParmCount );
-				
-				// Get parameter int values.
-				prParmIntValues = new int[ prParmIntValueCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmIntValues, 
-									 prParmIntValues, prParmIntValueCount );
-				
-				// Get parameter float values.
-				prParmFloatValues = new float[ prParmFloatValueCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmFloatValues, 
-									 prParmFloatValues, prParmFloatValueCount );
-				
-				// Get parameter string (handle) values.
-				prParmStringValues = new int[ prParmStringValueCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
-									 prParmStringValueCount );
-				
-				// Get parameter choice lists.
-				prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-				Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmChoiceLists, 
-									 prParmChoiceLists, prParmChoiceCount );
+				setChangedParametersIntoHost();
 			}
 			
 			// Refresh object info arrays as they are lost after serialization.
@@ -1259,7 +1214,12 @@ public abstract class HAPI_Asset : HAPI_Control
 		foreach ( GameObject child in children )
 			DestroyImmediate( child );
 	}
-	
+
+	protected virtual HAPI_ParmInfo findParm( int id )
+	{
+		return myParmMap[ id ];
+	}
+
 	protected virtual int findParm( string name )
 	{
 		if ( prParms == null )
@@ -1268,7 +1228,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		for ( int i = 0; i < prParms.Length; ++i )
 		{
 			if ( prParms[ i ].name == name )
-				return i;
+				return prParms[ i ].id;
 		}
 		return -1;
 	}
@@ -1482,6 +1442,169 @@ public abstract class HAPI_Asset : HAPI_Control
 					use_delay_for_progress_bar );
 		}
 	}
+
+	private void cacheStringsFromHost()
+	{
+		// For each string parameter, cache the string from the host
+		foreach ( HAPI_ParmInfo parm in prParms )
+		{
+			if ( parm.isString() )
+			{
+				myParmStrings[ parm.id ] = new string[ parm.size ];
+				for ( int p = 0; p < parm.size; ++p )
+					myParmStrings[ parm.id ][ p ] =
+						HAPI_Host.getString( prParmStringValues[ parm.stringValuesIndex + p ] );
+			}
+		}
+	}
+
+	private void getParameterValues()
+	{
+		// Get the node info again
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prAssetNodeId );
+
+		prParmCount 			= node_info.parmCount;
+		prParmIntValueCount		= node_info.parmIntValueCount;
+		prParmFloatValueCount	= node_info.parmFloatValueCount;
+		prParmStringValueCount	= node_info.parmStringValueCount;
+		prParmChoiceCount		= node_info.parmChoiceCount;
+
+		// We need to get the parameter values again because they could have been
+		// changed by a script.
+
+		// Get all parameters.
+		prParms = new HAPI_ParmInfo[ prParmCount ];
+		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParameters, prParms, prParmCount );
+
+		// Get parameter int values.
+		prParmIntValues = new int[ prParmIntValueCount ];
+		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmIntValues, 
+				prParmIntValues, prParmIntValueCount );
+
+		// Get parameter float values.
+		prParmFloatValues = new float[ prParmFloatValueCount ];
+		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmFloatValues, 
+				prParmFloatValues, prParmFloatValueCount );
+
+		// Get parameter string (handle) values.
+		prParmStringValues = new int[ prParmStringValueCount ];
+		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
+				prParmStringValueCount );
+
+		// Get parameter choice lists.
+		prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
+		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmChoiceLists, 
+				prParmChoiceLists, prParmChoiceCount );
+
+		// Build the map of parm id -> parm
+		for ( int i = 0; i < prParms.Length; ++i )
+			myParmMap[ prParms[ i ].id ] = prParms[ i ];
+
+		cacheStringsFromHost();
+	}
+
+	private void removeMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
+	{
+		int[] values = new int[ 1 ];
+		HAPI_Host.getParmIntValues( prAssetNodeId, values, multiparm.intValuesIndex, 1);
+
+		int last_instance = values[ 0 ];
+
+		for ( int i = 0; i < num_instances; ++i )
+			HAPI_Host.removeMultiparmInstance(
+					prAssetNodeId,
+					multiparm.id, // The multiparm list
+					last_instance - i);
+	}
+
+	private void appendMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
+	{
+		int[] values = new int[1];
+		HAPI_Host.getParmIntValues( prAssetNodeId, values, multiparm.intValuesIndex, 1);
+
+		int last_instance = values[ 0 ];
+
+		for ( int i = 0; i < num_instances; ++i )
+			HAPI_Host.insertMultiparmInstance(
+					prAssetNodeId,
+					multiparm.id, // The multiparm list
+					last_instance + i );
+	}
+
+	public void appendChangedParm( int id )
+	{
+		myChangedParmIds.Add( id );
+	}
+
+	private void setChangedParametersIntoHost()
+	{
+		foreach( int id in myChangedParmIds )
+			setChangedParameterIntoHost( id );
+
+		if ( myToInsertInstance )
+		{
+			Debug.Log( "About to insert instance. " );
+			HAPI_Host.insertMultiparmInstance(
+					prAssetNodeId,
+					myNewMultiparmInstancePos.parentId, // The multiparm list
+					myNewMultiparmInstancePos.instanceNum
+					);
+		}
+
+		if ( myToRemoveInstance )
+			HAPI_Host.removeMultiparmInstance(
+					prAssetNodeId,
+					myOldMultiparmInstancePos.parentId, // The multiparm list
+					myOldMultiparmInstancePos.instanceNum  
+					);
+
+		if ( myToRemoveInstance || myToInsertInstance )
+			getParameterValues();
+
+
+		myToInsertInstance = false;
+		myToRemoveInstance = false;
+		myChangedParmIds.Clear();
+	}
+
+	private void setChangedParameterIntoHost( int id )
+	{
+		if ( id == -1 )
+			return;
+		Debug.Log ( "A parameter has changed" );
+		HAPI_ParmInfo parm = myParmMap[ id ];
+		if ( (HAPI_ParmType)parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+		{
+			int[] values = new int[ 1 ];
+			HAPI_Host.getParmIntValues( prAssetNodeId, values, parm.intValuesIndex, 1);
+
+			int difference = prParmIntValues[ parm.intValuesIndex ] - values[ 0 ];
+			Debug.Log ( " difference is " + difference );
+			if ( difference > 0 )
+				appendMultiparmInstances( parm, difference );
+			else if ( difference < 0 )
+				removeMultiparmInstances( parm, -difference );
+
+			getParameterValues();
+		}
+		else if ( parm.isFloat() )
+		{
+			float[] values = new float[ parm.size ];
+			Array.Copy( prParmFloatValues, parm.floatValuesIndex, values, 0, parm.size);
+			HAPI_Host.setParmFloatValues( prAssetNodeId, values, parm.floatValuesIndex, parm.size );
+		}
+		else if ( parm.isInt() && (HAPI_ParmType)parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+		{
+			int[] values = new int[ parm.size ];
+			Array.Copy( prParmIntValues, parm.intValuesIndex, values, 0, parm.size);
+			HAPI_Host.setParmIntValues( prAssetNodeId, values, parm.intValuesIndex, parm.size );
+		}
+		else if ( parm.isString() )
+		{
+			for ( int p = 0; p < myParmStrings[ parm.id ].Length; ++p )
+				HAPI_Host.setParmStringValue( prAssetNodeId, myParmStrings[ parm.id ][ p ], parm.id, p );
+		}
+	}
 	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
@@ -1531,12 +1654,21 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private int					myprParmStringValueCoun;
 	[SerializeField] private int					myprParmChoiceCount;
 	
-	[SerializeField] private HAPI_ParmInfo[] 		myParms;
+	[SerializeField] private HAPI_ParmInfo[]  		myParms;
 	[SerializeField] private int[]					myParmIntValues;
 	[SerializeField] private float[]				myParmFloatValues;
 	[SerializeField] private int[]					myParmStringValues; // string handles (SH)
 	[SerializeField] private HAPI_ParmChoiceInfo[]	myParmChoiceLists;
-	
+
+	// A mapping from parm id to the parm's string values
+	private Dictionary<int, string[]>  				myParmStrings = new Dictionary<int, string[]>();
+	private Dictionary<int, HAPI_ParmInfo> 			myParmMap = new Dictionary<int, HAPI_ParmInfo>();
+
+	private HAPI_ParmInfo 						myNewMultiparmInstancePos;
+	private HAPI_ParmInfo 						myOldMultiparmInstancePos;
+	private bool 								myToInsertInstance = false;
+	private bool 								myToRemoveInstance = false;
+
 	// Objects ------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private int 					myObjectCount;
@@ -1581,6 +1713,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	[SerializeField] private bool					myEnableLogging;
 	[SerializeField] private int					myLastChangedParmId;
+
+	private List< int > 							myChangedParmIds;
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.

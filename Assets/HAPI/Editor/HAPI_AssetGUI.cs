@@ -283,39 +283,17 @@ public class HAPI_AssetGUI : Editor
 		
 		int[] parm_int_values		= myAsset.prParmIntValues;
 		float[] parm_float_values	= myAsset.prParmFloatValues;
-		int[] parm_string_values	= myAsset.prParmStringValues;
 		
 		HAPI_ParmType parm_type 	= (HAPI_ParmType) parm.type;
-		int parm_size				= parm.size;
 		
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( parm );
-		
-		int values_index = -1;
-		if ( parm.isInt() )
-		{
-			if ( parm.intValuesIndex < 0 || parm_int_values == null )
-				return false;
-			values_index = parm.intValuesIndex;
-		}
-		else if ( parm.isFloat() )
-		{
-			if ( parm.floatValuesIndex < 0 || parm_float_values == null )
-				return false;
-			values_index = parm.floatValuesIndex;
-		}
-		else if ( parm.isString() )
-		{
-			if ( parm.stringValuesIndex < 0 || parm_string_values == null )
-				return false;
-			values_index = parm.stringValuesIndex;
-		}
 		
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter
 		if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
-			changed = HAPI_GUI.intField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
-										 ref join_last, ref no_label_toggle_last );
+			changed = HAPI_GUI.multiparmField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
+											   ref join_last, ref no_label_toggle_last );
 		}
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_INT )
 		{
@@ -380,22 +358,19 @@ public class HAPI_AssetGUI : Editor
 					values.Add( myAsset.prParmChoiceLists[ parm.choiceIndex + i ].value );
 				}
 				
-				string[] values_temp = new string[ 1 ];
-				values_temp[ 0 ] = HAPI_Host.getString( parm_string_values[ values_index ] );
+				string[] values_temp = myAsset.getParmStrings( parm );
 				gui_parm.valuesIndex = 0; // Since we're piping a de-handled temp array.
 
 				changed = HAPI_GUI.dropdown( ref gui_parm, ref values_temp,
 											 labels.ToArray(), values.ToArray(),
 											 ref join_last, ref no_label_toggle_last );
 
-				if ( changed )
-					HAPI_Host.setParmStringValue( node_id, values_temp[ 0 ], parm.id, 0 );
+				if ( changed ) 
+					myAsset.setParmStrings( parm, values_temp );
 			}
 			else
 			{
-				string[] values = new string[ parm_size ];
-				for ( int p = 0; p < parm_size; ++p )
-					values[ p ] = HAPI_Host.getString( parm_string_values[ values_index + p ] );
+				string[] values = myAsset.getParmStrings( parm ); 
 			
 				// The given string array is only for this parm so we need to set the values index to 0.
 				gui_parm.valuesIndex = 0;
@@ -403,22 +378,22 @@ public class HAPI_AssetGUI : Editor
 				changed = HAPI_GUI.stringField( ref gui_parm, ref myDelayBuild, ref values,
 												ref join_last, ref no_label_toggle_last );
 			
+				// Set the to be changed strings into the cache
 				if ( changed )
-					for ( int p = 0; p < parm_size; ++p )
-						HAPI_Host.setParmStringValue( node_id, values[ p ], parm.id, p );
+					myAsset.setParmStrings( parm, values );
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
 		// File Field
 		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FILE )
 		{
-			string path = HAPI_Host.getString( parm_string_values[ values_index ] );
+			string[] path = myAsset.getParmStrings( parm );
 			
-			changed = HAPI_GUI.fileField( ref gui_parm, ref myDelayBuild, ref path,
+			changed = HAPI_GUI.fileField( ref gui_parm, ref myDelayBuild, ref path[ 0 ],
 										  ref join_last, ref no_label_toggle_last );
 			
 			if ( changed )
-				HAPI_Host.setParmStringValue( node_id, path, parm.id, 0 );
+				myAsset.setParmStrings( parm, path );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
@@ -480,26 +455,7 @@ public class HAPI_AssetGUI : Editor
 		}
 		
 		if ( changed )
-		{
-			myAsset.prLastChangedParmId = parm.id;
-		
-			if ( parm.isInt() )
-			{
-				int[] temp_int_values = new int[ parm_size ];
-				for ( int p = 0; p < parm_size; ++p )
-					temp_int_values[ p ] = parm_int_values[ values_index + p ];
-				HAPI_Host.setParmIntValues( node_id, temp_int_values, values_index, parm_size );
-			}
-			else if ( parm.isFloat() )
-			{
-				float[] temp_float_values = new float[ parm_size ];
-				for ( int p = 0; p < parm_size; ++p )
-					temp_float_values[ p ] = parm_float_values[ values_index + p ];
-				HAPI_Host.setParmFloatValues( node_id, temp_float_values, values_index, parm_size );
-			}
-			
-			// Note: String parameters update their values themselves so no need to do anything here.
-		}
+			myAsset.appendChangedParm( parm.id );
 		
 		return changed;
 	}
@@ -578,8 +534,8 @@ public class HAPI_AssetGUI : Editor
 			{
 				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
 
-				//int[] instance_count = new int[ 1 ];
-				int instance_count = myAsset.prParmIntValues[ parms[ current_index ].intValuesIndex ];
+				//int instance_count = myAsset.prParmIntValues[ parms[ current_index ].intValuesIndex ];
+				int instance_count = parms[ current_index ].instanceCount;
 				instance_length = parms[ current_index ].instanceLength;
 				if ( instance_length > 0 )
 				{
@@ -658,40 +614,27 @@ public class HAPI_AssetGUI : Editor
 				GUILayout.BeginHorizontal();
 
 				// Create the add / remove buttons
-				var style = new GUIStyle( GUI.skin.button );
-				style.richText = true;
-				style.fixedWidth = 22;
 				bool removed_instance = false;
 				
 				GUILayout.BeginHorizontal();
-				if ( GUILayout.Button( "<b>-</b>", style ) ) 
+				if ( GUILayout.Button( "X" ) ) 
 				{
-					HAPI_Host.removeMultiparmInstance( myAsset.prAssetNodeId, parms[ current_index ].parentId,
-													   parms[ current_index ].instanceNum );
-					removed_instance = true;
+					myAsset.removeMultiparmInstance( parms[ current_index ] );
 					changed = true;
 				}
-				if ( GUILayout.Button( "<b>+</b>", style ) )
+				if ( GUILayout.Button( "+" ) )
 				{
-					HAPI_Host.insertMultiparmInstance( myAsset.prAssetNodeId, parms[ current_index ].parentId,
-													   parms[ current_index ].instanceNum );
+					myAsset.insertMultiparmInstance( parms[ current_index ] );
 					changed = true;
 				}
 				GUILayout.EndHorizontal();
 
 				// Create the parms within the multiparm
 				GUILayout.BeginVertical();
-				if ( !removed_instance )
+				for ( int i = 0; i < instance_length; i++ )
 				{
-					for ( int i = 0; i < instance_length; i++ )
-					{
-						changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
-						current_index++;
-					}
-				}
-				else
-				{
-					current_index += instance_length;
+					changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
+					current_index++;
 				}
 				GUILayout.EndVertical();
 
@@ -710,7 +653,7 @@ public class HAPI_AssetGUI : Editor
 				current_index++;
 			}
 		}
-		
+
 		return changed;
 	}
 	
