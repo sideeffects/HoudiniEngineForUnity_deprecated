@@ -357,14 +357,10 @@ public class HAPI_GUI : Editor
 	{
 		initializeConstants();
 		
-		bool changed = false;
-		
 		// Decide whether to join with the previous parameter on the same line or not.
 		GUILayout.BeginHorizontal();
 		label( ref parm, ref join_last, ref no_label_toggle_last );
 		
-		int per_line = 0;
-			
 		// Get old value.
 		int old_value = values[ parm.valuesIndex ];
 

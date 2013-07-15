@@ -277,8 +277,6 @@ public class HAPI_AssetGUI : Editor
 
 		bool changed 				= false;
 		
-		int node_id					= myAsset.prAssetNodeId;
-		
 		HAPI_ParmInfo[] parms 		= myAsset.prParms;
 		HAPI_ParmInfo parm			= parms[ index ];
 		
@@ -616,8 +614,6 @@ public class HAPI_AssetGUI : Editor
 				GUILayout.BeginHorizontal();
 
 				// Create the add / remove buttons
-				bool removed_instance = false;
-				
 				GUILayout.BeginHorizontal();
 				if ( GUILayout.Button( "X" ) ) 
 				{
@@ -631,7 +627,7 @@ public class HAPI_AssetGUI : Editor
 				}
 				GUILayout.EndHorizontal();
 
-				// Create the parms within the multiparm
+				// Create the parms within the multiparm instance
 				GUILayout.BeginVertical();
 				for ( int i = 0; i < instance_length; i++ )
 				{
