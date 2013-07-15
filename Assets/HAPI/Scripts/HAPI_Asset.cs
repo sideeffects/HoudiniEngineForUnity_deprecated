@@ -296,13 +296,13 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public void removeMultiparmInstance( HAPI_ParmInfo parm )
 	{
-		myOldMultiparmInstancePos = parm;
+		myMultiparmInstancePos = parm;
 		myToRemoveInstance = true;
 	}
 
 	public void insertMultiparmInstance( HAPI_ParmInfo parm )
 	{
-		myNewMultiparmInstancePos = parm;
+		myMultiparmInstancePos = parm;
 		myToInsertInstance = true;
 	}
 
@@ -740,7 +740,6 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		prEnableLogging					= false;
 		prLastChangedParmId 			= -1;
-		myChangedParmIds 				= new List< int >();
 
 		prFolderListSelections 			= new List< int >();
 		prFolderListSelectionIds 		= new List< int >();
@@ -1515,13 +1514,13 @@ public abstract class HAPI_Asset : HAPI_Control
 			HAPI_Host.removeMultiparmInstance(
 					prAssetNodeId,
 					multiparm.id, // The multiparm list
-					last_instance - i);
+					last_instance - i );
 	}
 
 	private void appendMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
 	{
 		int[] values = new int[1];
-		HAPI_Host.getParmIntValues( prAssetNodeId, values, multiparm.intValuesIndex, 1);
+		HAPI_Host.getParmIntValues( prAssetNodeId, values, multiparm.intValuesIndex, 1 );
 
 		int last_instance = values[ 0 ];
 
@@ -1540,16 +1539,16 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			HAPI_Host.insertMultiparmInstance(
 					prAssetNodeId,
-					myNewMultiparmInstancePos.parentId, // The multiparm list
-					myNewMultiparmInstancePos.instanceNum
+					myMultiparmInstancePos.parentId, // The multiparm list
+					myMultiparmInstancePos.instanceNum
 					);
 		}
 
 		if ( myToRemoveInstance )
 			HAPI_Host.removeMultiparmInstance(
 					prAssetNodeId,
-					myOldMultiparmInstancePos.parentId, // The multiparm list
-					myOldMultiparmInstancePos.instanceNum  
+					myMultiparmInstancePos.parentId, // The multiparm list
+					myMultiparmInstancePos.instanceNum  
 					);
 
 		if ( myToRemoveInstance || myToInsertInstance )
@@ -1558,7 +1557,6 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		myToInsertInstance = false;
 		myToRemoveInstance = false;
-		myChangedParmIds.Clear();
 	}
 
 	private void setChangedParameterIntoHost( int id )
@@ -1655,11 +1653,10 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private HAPI_ParmChoiceInfo[]	myParmChoiceLists;
 
 	// A mapping from parm id to the parm's string values
-	private Dictionary<int, string[]>  				myParmStrings = new Dictionary<int, string[]>();
-	private Dictionary<int, HAPI_ParmInfo> 			myParmMap = new Dictionary<int, HAPI_ParmInfo>();
+	private Dictionary< int, string[] >  			myParmStrings = new Dictionary<int, string[]>();
+	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary<int, HAPI_ParmInfo>();
 
-	private HAPI_ParmInfo 						myNewMultiparmInstancePos;
-	private HAPI_ParmInfo 						myOldMultiparmInstancePos;
+	private HAPI_ParmInfo 						myMultiparmInstancePos;
 	private bool 								myToInsertInstance = false;
 	private bool 								myToRemoveInstance = false;
 
@@ -1707,8 +1704,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	[SerializeField] private bool					myEnableLogging;
 	[SerializeField] private int					myLastChangedParmId;
-
-	private List< int > 							myChangedParmIds;
 	
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
