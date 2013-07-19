@@ -922,8 +922,11 @@ public abstract class HAPI_Asset : HAPI_Control
 				buildFullBuildCustomWork( ref progress_bar );
 			}
 			else
-			{				
+			{
 				progress_bar.displayProgressBar();
+
+				setChangedParametersIntoHost();
+
 				HAPI_Host.cookAsset( prAssetId );
 
 				myProgressBarJustUsed = true;
@@ -931,7 +934,6 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.prTotal = prObjectCount + prParmIntValueCount 
 									   + prParmFloatValueCount + prParmStringValueCount;
 
-				setChangedParametersIntoHost();
 				getParameterValues();
 			}
 			
@@ -1569,7 +1571,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( id == -1 )
 			return;
 		HAPI_ParmInfo parm = myParmMap[ id ];
-		if ( (HAPI_ParmType)parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+		if ( (HAPI_ParmType) parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			int[] values = new int[ 1 ];
 			HAPI_Host.getParmIntValues( prAssetNodeId, values, parm.intValuesIndex, 1);
@@ -1585,13 +1587,13 @@ public abstract class HAPI_Asset : HAPI_Control
 		else if ( parm.isFloat() )
 		{
 			float[] values = new float[ parm.size ];
-			Array.Copy( prParmFloatValues, parm.floatValuesIndex, values, 0, parm.size);
+			Array.Copy( prParmFloatValues, parm.floatValuesIndex, values, 0, parm.size );
 			HAPI_Host.setParmFloatValues( prAssetNodeId, values, parm.floatValuesIndex, parm.size );
 		}
-		else if ( parm.isInt() && (HAPI_ParmType)parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+		else if ( parm.isInt() && (HAPI_ParmType) parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			int[] values = new int[ parm.size ];
-			Array.Copy( prParmIntValues, parm.intValuesIndex, values, 0, parm.size);
+			Array.Copy( prParmIntValues, parm.intValuesIndex, values, 0, parm.size );
 			HAPI_Host.setParmIntValues( prAssetNodeId, values, parm.intValuesIndex, parm.size );
 		}
 		else if ( parm.isString() )
