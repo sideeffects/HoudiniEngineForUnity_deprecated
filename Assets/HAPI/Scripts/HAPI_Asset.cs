@@ -1346,6 +1346,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	protected virtual void processDependentAssets( bool serialization_recovery_only, bool force_reconnect, 
 												   bool use_delay_for_progress_bar )
 	{
+		bool has_built_something_upstream = false;
+		
 		if ( !serialization_recovery_only && !force_reconnect )
 		{
 			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
@@ -1393,6 +1395,7 @@ public abstract class HAPI_Asset : HAPI_Control
 							prEnableCooking = false;
 							asset.OnEnable();
 							prEnableCooking = true;
+							has_built_something_upstream = true;
 						}
 						addAssetAsTransformInput( asset, i );
 					}
@@ -1425,6 +1428,7 @@ public abstract class HAPI_Asset : HAPI_Control
 							prEnableCooking = false;
 							asset.OnEnable();
 							prEnableCooking = true;
+							has_built_something_upstream = true;
 						}
 						addAssetAsGeoInput( asset, object_index, i );
 					}
@@ -1434,12 +1438,13 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 
 			// Need to rebuild because now we're connected to other assets.
-			build(	false, // reload_asset
-					false, // unload_asset_first
-					false, // serialization_recovery_only
-					false, // force_reconnect
-					true,  // cook_downstream_assets
-					use_delay_for_progress_bar );
+			if ( has_built_something_upstream )
+				build(	false, // reload_asset
+						false, // unload_asset_first
+						false, // serialization_recovery_only
+						false, // force_reconnect
+						true,  // cook_downstream_assets
+						use_delay_for_progress_bar );
 		}
 	}
 
