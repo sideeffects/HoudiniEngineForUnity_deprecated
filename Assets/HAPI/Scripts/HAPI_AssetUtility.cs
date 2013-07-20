@@ -587,10 +587,14 @@ public class HAPI_AssetUtility
 	{
 		if ( parms == null )
 			return -1;
-
+		
 		for ( int i = 0; i < parms.Length; ++i )
 		{
-			if ( parms[ i ].name == name )
+			string current_parm_name = parms[ i ].name;
+			if ( parms[ i ].isMultiParm )
+				current_parm_name = current_parm_name.Replace( "#", parms[ i ].instanceNum.ToString() );
+			
+			if ( current_parm_name == name )
 				return parms[ i ].id;
 		}
 		return -1;
@@ -813,7 +817,9 @@ public class HAPI_AssetUtility
 		if ( shader_type == HAPI_ShaderType.HAPI_SHADER_OPENGL )
 		{
 			// Extract diffuse map file from material.
-			int diffuse_map_parm_id = findParm( ref parms, "baseColorMap" );
+			int diffuse_map_parm_id = findParm( ref parms, "ogl_tex1" );
+			if ( diffuse_map_parm_id < 0 )
+				diffuse_map_parm_id = findParm( ref parms, "baseColorMap" );
 			if ( diffuse_map_parm_id < 0 )
 				diffuse_map_parm_id = findParm( ref parms, "map" );
 			if ( diffuse_map_parm_id >= 0 )
@@ -844,20 +850,26 @@ public class HAPI_AssetUtility
 				catch ( HAPI_ErrorInvalidArgument )
 				{
 					// No diffuse map.
+					// Rest main texture.
+					material.mainTexture = null;
 				}
-
-				// Assign shader properties.
-
-				material.SetFloat( "_Shininess", 
-									1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
-	
-				Color diffuse_colour	= getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
-				diffuse_colour.a		= getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
-				material.SetColor( "_Color", diffuse_colour );
-	
-				material.SetColor( "_SpecColor", 
-									getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
 			}
+			else
+			{
+				// No diffuse map.
+				// Rest main texture.
+				material.mainTexture = null;
+			}
+			
+			// Assign shader properties.
+
+			material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
+
+			Color diffuse_colour	= getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
+			diffuse_colour.a		= getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
+			material.SetColor( "_Color", diffuse_colour );
+
+			material.SetColor( "_SpecColor", getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
 		}
 		else if ( shader_type == HAPI_ShaderType.HAPI_SHADER_MANTRA )
 		{
