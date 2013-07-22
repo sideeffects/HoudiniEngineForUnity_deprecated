@@ -173,18 +173,28 @@ public class HAPI_Instancer : MonoBehaviour {
 								 bool attach_script_exists,
 								 string attach_script )
 	{
+		if ( objToInstantiate == null )
+		{
+			Debug.LogError( "No object to instantiate for instancer '" + this.name + "' and point index " + point_index + "!" );
+			return;
+		}
 		
-		GameObject obj;		
-		
+		GameObject obj;
 		
 		if ( !prOverrideInstances )
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
 			
-			HAPI_PartControl child_part_control = obj.GetComponentInChildren<HAPI_PartControl>();
+			HAPI_PartControl child_part_control = obj.GetComponentInChildren< HAPI_PartControl >();
+			
+			if ( child_part_control == null )
+			{
+				Debug.LogError( "No child_part_control on instantiated object (name: " + obj.name + ")" );
+				return;
+			}
+			
 			child_part_control.prInstancePointNumber = point_index;
 			child_part_control.prObjectToInstantiate = objToInstantiate;
-			
 			
 			if ( scale_exists )
 			{

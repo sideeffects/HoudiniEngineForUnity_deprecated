@@ -669,22 +669,42 @@ namespace HAPI
 
 		private static void update()
 		{
-			if ( HAPI_Host.mySelectionTarget != null && myDeselectionDelegate != null )
+			// We need to catch any exceptions here because if we let any out they will stall
+			// the entire callback chain bound to EditorApplication.update which
+			// causes other bound functions in this callback list to never be called.
+			try
 			{
-				GameObject selected = Selection.activeGameObject;
-				if ( selected != null )
+				if ( HAPI_Host.mySelectionTarget != null && myDeselectionDelegate != null )
 				{
-					HAPI_Asset selected_asset = selected.GetComponent< HAPI_Asset >();
-					if ( selected_asset != mySelectionTarget )
-						myDeselectionDelegate();
+					GameObject selected = Selection.activeGameObject;
+					if ( selected != null )
+					{
+						HAPI_Asset selected_asset = selected.GetComponent< HAPI_Asset >();
+						if ( selected_asset != mySelectionTarget )
+							myDeselectionDelegate();
+					}
 				}
+			}
+			catch ( System.Exception error )
+			{
+				Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 			}
 		}
 
 		private static void playmodeStateChanged()
 		{
-			prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
-			setTime( 0.0f );
+			// We need to catch any exceptions here because if we let any out they will stall
+			// the entire callback chain bound to EditorApplication.playmodeStateChanged which
+			// causes other bound functions in this callback list to never be called.
+			try
+			{
+				prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
+				setTime( 0.0f );
+			}
+			catch ( System.Exception error )
+			{
+				Debug.Log( error.ToString() + "\nSource: " + error.Source );	
+			}
 		}
 
 		private static bool hasCallFailed( HAPI_Result code )

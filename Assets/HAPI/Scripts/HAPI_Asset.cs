@@ -978,15 +978,15 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( EditorApplication.isPlaying )
 				prPlaymodePerFrameCooking = false;
 
-			Debug.LogError( error.ToString() );
+			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
 		catch ( HAPI_Error error )
 		{
-			Debug.LogError( error.ToString() );
+			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
 		catch ( System.Exception error )
 		{
-			Debug.LogError( error.ToString() );
+			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
 		finally
 		{

@@ -364,11 +364,45 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 	private void playmodeStateChanged()
 	{
-		MeshRenderer renderer = gameObject.GetComponent< MeshRenderer >();
-		if ( renderer != null )
-			renderer.enabled = !EditorApplication.isPlaying;
-		else
-			Debug.LogError( "Why does your curve not have a mesh renderer?" );
+		// In certain situations, sepcifically after loading a scene, the gameObject "function"
+		// may throw an exception here along the lines of:
+		//
+		// UnityEngine.MissingReferenceException: The object of type 'HAPI_AssetCurve' has been destroyed but you are still trying to access it.
+		// Your script should either check if it is null or you should not destroy the object.
+		//  at (wrapper managed-to-native) UnityEngine.Component:InternalGetGameObject ()
+		//	  at UnityEngine.Component.get_gameObject () [0x00000] in C:\BuildAgent\work\7535de4ca26c26ac\Runtime\ExportGenerated\Editor\UnityEngineComponent.cs:170 
+		//	  at HAPI_AssetCurve.playmodeStateChanged () [0x00000] in D:\Storage\Projects\Unity4EmptyProject\Assets\HAPI\Scripts\HAPI_AssetCurve.cs:369 
+		//	Source: UnityEngine
+		//	UnityEngine.Debug:Log(Object)
+		//	HAPI_AssetCurve:playmodeStateChanged() (at Assets/HAPI/Scripts/HAPI_AssetCurve.cs:384)
+		//	UnityEditor.Toolbar:OnGUI()
+		//
+		// This is not good since we don't know why the curve does not yet have an initialization.
+		// This is 100% reproducible using Erwin's scene but I could not reproduce otherwise
+		// For now we need to catch this exception because if we let it out it will stall
+		// the entire callback chain bound to EditorApplication.playmodeStateChanged which
+		// causes other bound functions in this callback list to never be called, leading to
+		// bug: #56253.
+		
+		try
+		{	
+			if ( gameObject != null )
+			{
+				MeshRenderer renderer = gameObject.GetComponent< MeshRenderer >();
+				if ( renderer != null )
+					renderer.enabled = !EditorApplication.isPlaying;
+				else
+					Debug.LogError( "Why does your curve not have a mesh renderer?" );
+			}
+			else
+			{
+				Debug.Log( "Why is this curve without a gameObject?\nName: " + prAssetName + "\nId: " + prAssetId );	
+			}
+		}
+		catch ( System.Exception error )
+		{
+			Debug.Log( error.ToString() + "\nSource: " + error.Source );	
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
