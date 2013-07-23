@@ -582,14 +582,7 @@ namespace HAPI
 			
 			int result = HAPI_UnloadOTLFile( asset_id );
 			
-			try
-			{
-				processStatusCode( (HAPI_Result) result );
-			}
-			catch ( HAPI_Error error )
-			{
-				Debug.LogError( "Asset failed to unload: " + error.ToString() );
-			}
+			processStatusCode( (HAPI_Result) result );
 			
 			return true;
 		}

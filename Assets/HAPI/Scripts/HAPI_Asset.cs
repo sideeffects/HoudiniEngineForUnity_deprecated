@@ -614,7 +614,15 @@ public abstract class HAPI_Asset : HAPI_Control
 			prUpStreamTransformAssets.Clear();
 			prDownStreamTransformAssets.Clear();
 			
-			HAPI_Host.unloadOTL( prAssetId );
+			try
+			{
+				HAPI_Host.unloadOTL( prAssetId );
+			}
+			catch ( HAPI_Error error )
+			{
+				Debug.LogError( "Asset failed to unload: " + error.ToString() );
+			}
+
 			prAssetId = -1;
 		}
 	}
