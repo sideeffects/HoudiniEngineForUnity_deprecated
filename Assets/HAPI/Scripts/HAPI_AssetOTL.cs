@@ -477,9 +477,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 				HAPI_VolumeInfo volume = new HAPI_VolumeInfo();
 				HAPI_Host.getVolumeInfo( prAssetId, part_control.prObjectId, part_control.prGeoId, 
 										 part_control.prPartId, ref volume );
-				volume.transform.scale[0] *= 20;
-				volume.transform.scale[1] *= 20;
-				volume.transform.scale[2] *= 20;
 
 
 				// Iterate through the voxels and print out the data,
