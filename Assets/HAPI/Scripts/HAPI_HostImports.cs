@@ -429,6 +429,25 @@ namespace HAPI
 		public static extern int HAPI_SetTransformAnimCurve( int node_id, int transform_component,
 															 HAPI_Keyframe[] curve_keyframes,
 															 int keyframe_count );
+
+		// VOLUMES --------------------------------------------------------------------------------------------------
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetVolumeInfo( int asset_id, int object_id, int geo_id,
+													 int part_id, ref HAPI_VolumeInfo volume_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetFirstVolumeTile( int asset_id, int object_id, int geo_id,
+														  int part_id, ref HAPI_VolumeTile tile );
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetNextVolumeTile( int asset_id, int object_id, int geo_id,
+														 int part_id, ref HAPI_VolumeTile next );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		public static extern int HAPI_GetVolumeTileFloatData( int asset_id, int object_id, int geo_id,
+															  int part_id, ref HAPI_VolumeTile tile,
+															  [Out] float[] values );
 	}
 
 }

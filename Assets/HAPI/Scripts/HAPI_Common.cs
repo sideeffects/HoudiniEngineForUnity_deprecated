@@ -693,4 +693,42 @@ namespace HAPI
 		public float   outTangent;
 	
 	}
+
+	/// This represents a volume primitive--sans the actual voxel values,
+	/// which can be retrieved on a per-tile basis
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_VolumeInfo
+	{
+		// Dimensions of the index space axis aligned bounding box of the volume
+		int	    xLength; 
+		int	    yLength;
+		int	    zLength;
+
+		// Number of values per voxel
+		int     tupleSize;
+
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		bool    hasTaper;
+
+		[ MarshalAs( UnmanagedType.R4 ) ]
+		float   xTaper;
+
+		[ MarshalAs( UnmanagedType.R4 ) ]
+		float   yTaper;
+
+		[ MarshalAs( UnmanagedType.Struct ) ]
+		HAPI_Transform transform;
+
+	};
+
+	/// A HAPI_VolumeTile represents an 8x8x8 section of a volume with
+	/// bbox [(minX, minY, minZ), (minX+8, minY+8, minZ+8))
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_VolumeTile
+	{
+		int minX;
+		int minY;
+		int minZ;
+	};
+
 }

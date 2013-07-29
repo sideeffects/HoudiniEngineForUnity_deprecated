@@ -1786,6 +1786,34 @@ namespace HAPI
 
 			return getString( destination_file_path_sh ).Replace( "\\", "/" );
 		}
-	}
 
+		// VOLUMES --------------------------------------------------------------------------------------------------
+		public static void getVolumeInfo( int asset_id, int object_id, int geo_id, int part_id,
+										   ref HAPI_VolumeInfo volume_info )
+		{
+			int status_code = HAPI_GetVolumeInfo( asset_id, object_id, geo_id, part_id, ref volume_info );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		public static void  getFirstVolumeTile( int asset_id, int object_id, int geo_id, int part_id,
+												ref HAPI_VolumeTile tile )
+		{
+			int status_code = HAPI_GetFirstVolumeTile( asset_id, object_id, geo_id, part_id, ref tile );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		public static void  getNextVolumeTile( int asset_id, int object_id, int geo_id, int part_id,
+											   ref HAPI_VolumeTile next )
+		{
+			int status_code = HAPI_GetNextVolumeTile( asset_id, object_id, geo_id, part_id, ref next );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		public static void  getVolumeTileFloatData ( int asset_id, int object_id, int geo_id, int part_id,
+													 ref HAPI_VolumeTile tile, [Out] float[] values )
+		{
+			int status_code = HAPI_GetVolumeTileFloatData( asset_id, object_id, geo_id, part_id, ref tile, values );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+	}
 }
