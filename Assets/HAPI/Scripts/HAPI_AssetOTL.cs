@@ -221,6 +221,105 @@ public class HAPI_AssetOTL : HAPI_Asset
 		instancer.instanceObjects( progress_bar );
 	}
 
+	private Material createSoftCircle( Color color )
+	{
+		Material mat = new Material( Shader.Find( "Particles/Additive (Soft)" ) );
+		int width = 20;
+		int length = 20;
+		Texture2D tex = new Texture2D( width, length, TextureFormat.RGBA32, false );
+		for ( int x = 0; x < width; ++x ) 
+		{
+			for ( int y = 0; y < length; ++y ) 
+			{
+				float dist = (x - 10) * (x-10) + (y-10) * (y-10);
+				//dist = Mathf.Sqrt( dist );
+				float alpha_f = 1.0f - dist / 100.0f;
+				color.a = Mathf.Lerp( 0.0f, 1.0f, alpha_f );
+				tex.SetPixel( x, y, color );
+			}
+		}
+		tex.Apply();
+		mat.mainTexture = tex;
+		mat.color = new Color( 1.0f, 1.0f, 1.0f );
+		return mat;
+	}
+
+	private Material createSoftSquare( Color color )
+	{
+		Material mat = new Material( Shader.Find( "Particles/Additive (Soft)" ) );
+		int width = 20;
+		int length = 20;
+		Texture2D tex = new Texture2D( width, length, TextureFormat.RGBA32, false );
+		for ( int x = 0; x < width; ++x ) 
+		{
+			for ( int y = 0; y < length; ++y ) 
+			{
+				Vector2 pos = new Vector2(x - width / 2, y - length / 2);
+				float linear_dist = Mathf.Max( Mathf.Abs( pos.x ), Mathf.Abs( pos.y ) );
+				float alpha =  linear_dist / ( width / 2 );
+				alpha = 1.0f - alpha;
+				color.a = alpha;
+				tex.SetPixel( x, y, color );
+			}
+		}
+		tex.Apply();
+		mat.mainTexture = tex;
+		mat.color = new Color( 1.0f, 1.0f, 1.0f );
+		return mat;
+	}
+
+	private void createFogVolume( GameObject node, float[] data, HAPI_VolumeTile tile, HAPI_VolumeInfo volume )
+	{
+		// Create a particle with alpha = to the data format
+		const float particle_epsilon = 0.0f;
+		int nparticles = 0;
+		for ( int i = 0; i < data.Length; ++i )
+			if ( data[ i ] > particle_epsilon )
+				nparticles++;
+		if ( nparticles == 0 )
+		{
+			DestroyImmediate( node );
+			return;
+		}
+
+		ParticleEmitter particle_emitter = node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
+		particle_emitter.emit = false;
+		particle_emitter.maxSize = volume.transform.scale[0]*2;
+		particle_emitter.minSize = volume.transform.scale[1]*2;
+		particle_emitter.ClearParticles();
+		particle_emitter.Emit( nparticles );
+
+		Vector3 tileMin = new Vector3( tile.minX, tile.minY, tile.minZ );
+		int part_index = 0;
+		Particle[] particles = particle_emitter.particles;
+		for ( int z = 0; z < 8; ++z )
+			for ( int y = 0; y < 8; ++y )
+				  for ( int x = 0; x < 8; ++x )
+				  {
+					  int index = z * 64 + y * 8 + x;
+					  if ( data[ index ] > particle_epsilon
+						   && part_index < particles.Length )
+					  {
+						  particles[ part_index ].position =
+							  node.transform.parent.TransformPoint( new Vector3( (float)x, (float)y, (float)z )
+																	+ tileMin );
+						  particles[ part_index ].color    =
+							  new Color( data[ index ], data[ index ], data[ index ], data[ index ] );
+						  part_index++;
+					  }
+				  }
+		particle_emitter.particles = particles;
+
+		ParticleRenderer renderer = node.GetComponent< ParticleRenderer >();
+		if ( renderer == null ) 
+			renderer = node.AddComponent< ParticleRenderer >();
+
+		renderer.material = createSoftCircle( new Color( Random.Range( 0.5f, 1.0f ),
+														 Random.Range( 0.5f, 1.0f ),
+														 Random.Range( 0.5f, 1.0f ) ) );
+	}
+
+
 	private void createPart( GameObject part_node, bool reload_asset, bool has_geo_changed, 
 							 bool has_material_changed )
 	{
@@ -372,6 +471,41 @@ public class HAPI_AssetOTL : HAPI_Asset
 				particle_emitter.particles = particles;
 			}
 #endif
+			if ( part_info.hasVolume )
+			{
+				// If we have a volume, retrieve the volume info
+				HAPI_VolumeInfo volume = new HAPI_VolumeInfo();
+				HAPI_Host.getVolumeInfo( prAssetId, part_control.prObjectId, part_control.prGeoId, 
+										 part_control.prPartId, ref volume );
+				volume.transform.scale[0] *= 20;
+				volume.transform.scale[1] *= 20;
+				volume.transform.scale[2] *= 20;
+
+				// Iterate through the voxels and print out the data,
+				// for now.
+				HAPI_VolumeTile tile = new HAPI_VolumeTile();
+				HAPI_Host.getFirstVolumeTile( prAssetId, part_control.prObjectId, part_control.prGeoId,
+											  part_control.prPartId, ref tile );
+				float[] values = new float[ 8*8*8 ];
+				int tile_num = 0;
+
+				Utility.applyTransform( volume.transform, part_node.transform );
+
+				while ( tile.isValid() )
+				{
+					HAPI_Host.getVolumeTileFloatData( prAssetId, part_control.prObjectId, part_control.prGeoId,
+											  part_control.prPartId, ref tile, values );
+
+					tile_num += 1;
+					GameObject tile_node = new GameObject( "tile (" + tile.minX + ", " + tile.minY + ", " + tile.minZ + ")" );
+					tile_node.transform.parent = part_node.transform;
+
+					createFogVolume( tile_node, values, tile, volume );
+
+					HAPI_Host.getNextVolumeTile( prAssetId, part_control.prObjectId, part_control.prGeoId,
+												 part_control.prPartId, ref tile );
+				}
+			}
 		}
 
 		Utility.assignMaterial( part_control, this, 

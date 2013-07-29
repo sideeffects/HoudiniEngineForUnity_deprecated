@@ -630,6 +630,9 @@ namespace HAPI
 		public int		vertexAttributeCount;
 		public int		detailAttributeCount;
 
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool 	hasVolume;
+
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
@@ -700,24 +703,24 @@ namespace HAPI
 	public struct HAPI_VolumeInfo
 	{
 		// Dimensions of the index space axis aligned bounding box of the volume
-		int	    xLength; 
-		int	    yLength;
-		int	    zLength;
+		public int	    xLength; 
+		public int	    yLength;
+		public int	    zLength;
 
 		// Number of values per voxel
-		int     tupleSize;
+		public int     tupleSize;
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
-		bool    hasTaper;
+		public bool    hasTaper;
 
 		[ MarshalAs( UnmanagedType.R4 ) ]
-		float   xTaper;
+		public float   xTaper;
 
 		[ MarshalAs( UnmanagedType.R4 ) ]
-		float   yTaper;
+		public float   yTaper;
 
 		[ MarshalAs( UnmanagedType.Struct ) ]
-		HAPI_Transform transform;
+		public HAPI_Transform transform;
 
 	};
 
@@ -726,9 +729,15 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_VolumeTile
 	{
-		int minX;
-		int minY;
-		int minZ;
+
+		public bool isValid() 
+		{
+			return minX < int.MaxValue && minY < int.MaxValue && minZ < int.MaxValue;
+		}
+
+		public int minX;
+		public int minY;
+		public int minZ;
 	};
 
 }
