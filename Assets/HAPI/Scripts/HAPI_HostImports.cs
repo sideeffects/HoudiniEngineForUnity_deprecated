@@ -438,15 +438,15 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_GetFirstVolumeTile( int asset_id, int object_id, int geo_id,
-														  int part_id, ref HAPI_VolumeTile tile );
+														  int part_id, ref HAPI_VolumeTileInfo tile );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_GetNextVolumeTile( int asset_id, int object_id, int geo_id,
-														 int part_id, ref HAPI_VolumeTile next );
+														 int part_id, ref HAPI_VolumeTileInfo next );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_GetVolumeTileFloatData( int asset_id, int object_id, int geo_id,
-															  int part_id, ref HAPI_VolumeTile tile,
+															  int part_id, ref HAPI_VolumeTileInfo tile,
 															  [Out] float[] values );
 	}
 

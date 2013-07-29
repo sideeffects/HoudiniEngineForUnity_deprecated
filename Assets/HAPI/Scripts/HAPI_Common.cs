@@ -712,6 +712,9 @@ namespace HAPI
 
 		public int 		tileSize;
 
+		[ MarshalAs( UnmanagedType.Struct ) ]
+		public HAPI_Transform transform;
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool    hasTaper;
 
@@ -721,15 +724,12 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.R4 ) ]
 		public float   yTaper;
 
-		[ MarshalAs( UnmanagedType.Struct ) ]
-		public HAPI_Transform transform;
-
 	};
 
-	/// A HAPI_VolumeTile represents an 8x8x8 section of a volume with
+	/// A HAPI_VolumeTileInfo represents an 8x8x8 section of a volume with
 	/// bbox [(minX, minY, minZ), (minX+8, minY+8, minZ+8))
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_VolumeTile
+	public struct HAPI_VolumeTileInfo
 	{
 
 		public bool isValid() 

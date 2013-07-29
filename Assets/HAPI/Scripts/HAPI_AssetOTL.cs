@@ -268,7 +268,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		return mat;
 	}
 
-	private void createFogVolume( GameObject node, float[] data, HAPI_VolumeTile tile, HAPI_VolumeInfo volume )
+	private void createFogVolume( GameObject node, float[] data, HAPI_VolumeTileInfo tile, HAPI_VolumeInfo volume )
 	{
 		// Create a particle with alpha = to the data format
 		const float particle_epsilon = 0.0f;
@@ -484,7 +484,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 				// Iterate through the voxels and print out the data,
 				// for now.
-				HAPI_VolumeTile tile = new HAPI_VolumeTile();
+				HAPI_VolumeTileInfo tile = new HAPI_VolumeTileInfo();
 				HAPI_Host.getFirstVolumeTile( prAssetId, part_control.prObjectId, part_control.prGeoId,
 											  part_control.prPartId, ref tile );
 				float[] values = new float[ volume.tileSize * volume.tileSize * volume.tileSize ];
