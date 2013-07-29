@@ -292,11 +292,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 		Vector3 tileMin = new Vector3( tile.minX, tile.minY, tile.minZ );
 		int part_index = 0;
 		Particle[] particles = particle_emitter.particles;
-		for ( int z = 0; z < 8; ++z )
-			for ( int y = 0; y < 8; ++y )
-				  for ( int x = 0; x < 8; ++x )
+		for ( int z = 0; z < volume.tileSize; ++z )
+			for ( int y = 0; y < volume.tileSize; ++y )
+				  for ( int x = 0; x < volume.tileSize; ++x )
 				  {
-					  int index = z * 64 + y * 8 + x;
+					  int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
 					  if ( data[ index ] > particle_epsilon
 						   && part_index < particles.Length )
 					  {
@@ -481,23 +481,28 @@ public class HAPI_AssetOTL : HAPI_Asset
 				volume.transform.scale[1] *= 20;
 				volume.transform.scale[2] *= 20;
 
+
 				// Iterate through the voxels and print out the data,
 				// for now.
 				HAPI_VolumeTile tile = new HAPI_VolumeTile();
 				HAPI_Host.getFirstVolumeTile( prAssetId, part_control.prObjectId, part_control.prGeoId,
 											  part_control.prPartId, ref tile );
-				float[] values = new float[ 8*8*8 ];
+				float[] values = new float[ volume.tileSize * volume.tileSize * volume.tileSize ];
 				int tile_num = 0;
 
 				Utility.applyTransform( volume.transform, part_node.transform );
 
 				while ( tile.isValid() )
 				{
+					for ( int i = 0; i < values.Length; ++i )
+						values[i] = 0;
 					HAPI_Host.getVolumeTileFloatData( prAssetId, part_control.prObjectId, part_control.prGeoId,
 											  part_control.prPartId, ref tile, values );
 
 					tile_num += 1;
-					GameObject tile_node = new GameObject( "tile (" + tile.minX + ", " + tile.minY + ", " + tile.minZ + ")" );
+					GameObject tile_node = new GameObject( "tile (" + tile.minX +
+														   ", " + tile.minY +
+														   ", " + tile.minZ + ")" );
 					tile_node.transform.parent = part_node.transform;
 
 					createFogVolume( tile_node, values, tile, volume );

@@ -708,7 +708,9 @@ namespace HAPI
 		public int	    zLength;
 
 		// Number of values per voxel
-		public int     tupleSize;
+		public int 		tupleSize;
+
+		public int 		tileSize;
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool    hasTaper;
