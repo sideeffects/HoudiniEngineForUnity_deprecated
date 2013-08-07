@@ -48,9 +48,6 @@ namespace HAPI
 		// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_PrintNetwork( StringBuilder buffer );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetStatus( int status_code, out int status );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
