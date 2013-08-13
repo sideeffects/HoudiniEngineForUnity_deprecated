@@ -34,6 +34,20 @@ namespace HAPI
 		// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 
 		/// <summary>
+		/// 	Gives back a certain environment integer like version number.
+		/// </summary>
+		/// <param name="int_type">
+		/// 	On of <see cref="HAPI_EnvIntType"/>.
+		/// </param>
+		public static int getEnvInt( HAPI_EnvIntType int_type )
+		{
+			int value;
+			int status_code = HAPI_GetEnvInt( (int) int_type, out value );
+			processStatusCode( (HAPI_Result) status_code );
+			return value;
+		}
+		
+		/// <summary>
 		/// 	Gives back the status code for a specific status type.
 		/// </summary>
 		/// <param name="status_type">

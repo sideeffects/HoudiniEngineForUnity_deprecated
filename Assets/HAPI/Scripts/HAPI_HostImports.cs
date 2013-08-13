@@ -46,7 +46,10 @@ namespace HAPI
 		private static extern int HAPI_Cleanup();
 
 		// DIAGNOSTICS ----------------------------------------------------------------------------------------------
-
+		
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetEnvInt( int int_type, out int value );
+		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetStatus( int status_code, out int status );
 

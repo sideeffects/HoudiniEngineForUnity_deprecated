@@ -222,6 +222,42 @@ namespace HAPI
 		HAPI_SHADER_MANTRA,
 		HAPI_SHADER_MAX
 	};
+	
+	public enum HAPI_EnvIntType
+	{
+		HAPI_ENVINT_INVALID = -1,
+		
+		// The three components of the Houdini version that HAPI is
+		// expecting to compile against.
+		HAPI_ENVINT_VERSION_HOUDINI_MAJOR,
+		HAPI_ENVINT_VERSION_HOUDINI_MINOR,
+		HAPI_ENVINT_VERSION_HOUDINI_BUILD,
+		
+		// The three components of the Houdini version that HAPI belongs to.
+		// The HAPI library itself can come from a different baseline than
+		// the Houdini it is being compiled against when we do something like 
+		// "backgrafting" where we take, say, a 13.0 (1.5) HAPI and ship it
+		// with a Houdini 12.5. This version is always locked with the
+		// actual Houdini Engine version (below) because Houdini Engine is in
+		// the same baseline as Houdini so their releases always coincide.
+		HAPI_ENVINT_VERSION_ORIG_HOUDINI_MAJOR,
+		HAPI_ENVINT_VERSION_ORIG_HOUDINI_MINOR,
+		HAPI_ENVINT_VERSION_ORIG_HOUDINI_BUILD,
+		
+		// The two components of the Houdini Engine (marketed) version.
+		HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR,
+		HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR,
+		
+		// This is a monotonously increasing API version number that can be used
+		// to lock against a certain API for compatibility purposes. Basically,
+		// when this number changes code compiled against the HAPI.h methods
+		// might no longer compile. Semantic changes to the methods will also
+		// cause this version to increase. This number will be reset to 0
+		// every time the Houdini Engine version is bumped.
+		HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API,
+		
+		HAPI_ENVINT_MAX,
+	};
 
 	// Unity-Only:
 

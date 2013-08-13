@@ -602,6 +602,38 @@ namespace HAPI
 				HAPI_Result status_code;
 				try
 				{
+					// Check version match.
+					
+					int houdini_major 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MAJOR );
+					int houdini_minor 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MINOR );
+					int houdini_build 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_BUILD );
+					int houdini_engine_major 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR );
+					int houdini_engine_minor 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR );
+					int houdini_engine_api 		= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API );
+					
+					Debug.Log(  "Running Houdini Engine Unity Plugin Version: " +
+								HAPI_Version.HOUDINI_ENGINE_MAJOR + "." + 
+								HAPI_Version.HOUDINI_ENGINE_MINOR + "." +
+								", API: " + HAPI_Version.HOUDINI_ENGINE_API );
+					
+					Debug.Log(  "Linking Against Houdini Engine Version: " + 
+								houdini_engine_major + "." + houdini_engine_minor +
+								", API: " + houdini_engine_api );
+					
+					Debug.Log(  "Underlying Houdini Core Version: " + 
+								houdini_major + "." + houdini_minor + "." + houdini_build );
+					
+					// Make sure we are linking against the expected Houdini Engine API version.
+					// Note: We don't need to be so strict as to require the BUILD to match.
+					if ( houdini_engine_major != HAPI_Version.HOUDINI_ENGINE_MAJOR ||
+						 houdini_engine_minor != HAPI_Version.HOUDINI_ENGINE_MINOR ||
+						 houdini_engine_api	  != HAPI_Version.HOUDINI_ENGINE_API )
+					{
+						throw new HAPI_Error( "Cannot link to Houdini Engine because of version mismatch." );	
+					}
+					
+					// Initialize.
+					
 					status_code = (HAPI_Result) HAPI_Initialize( HAPI_SetPath.prHoudiniPath, otls_path,
 																 dsos_path, true, -1 );
 					if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
