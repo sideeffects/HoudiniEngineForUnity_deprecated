@@ -37,23 +37,21 @@ namespace HAPI
 				// HAPI_PATH variable not set therefore we must find another way to detect an installation of
 				// Houdini. This step is platform dependant hence the #if's.
 				
-				string current_active_version_key_name = "ActiveEngineVersion";
 				string current_app_name = "Houdini Engine";
 				while ( true )
 				{
 					try
 					{
-						houdini_app_path = getAppPath( current_active_version_key_name, current_app_name );
+						houdini_app_path = getAppPath( current_app_name );
 					}
-					catch ( HAPI_Error error )
+					catch ( HAPI_Error )
 					{
 						if ( current_app_name == "Houdini" )
 						{
-							Debug.LogError( error.ToString() );
+							throw; // No correct installed app found.
 						}
 						else
 						{
-							current_active_version_key_name = "ActiveVersion";
 							current_app_name = "Houdini";
 							continue;
 						}
@@ -70,30 +68,38 @@ namespace HAPI
 			if ( prIsPathSet )
 				return;
 			
-			string houdini_app_path = getHoudiniPath();
-			string houdini_bin_path = houdini_app_path + "/bin";
+			try
+			{
+				string houdini_app_path = getHoudiniPath();
+				string houdini_bin_path = houdini_app_path + "/bin";
 
-			string path = System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Machine );
+				string path = System.Environment.GetEnvironmentVariable( "PATH", 
+																		 System.EnvironmentVariableTarget.Machine );
 			
-			if ( !path.Contains( houdini_bin_path ) )
-				if ( path != "" )
-					path = houdini_bin_path + ";" + path;
-				else
-					path = houdini_bin_path;
+				if ( !path.Contains( houdini_bin_path ) )
+					if ( path != "" )
+						path = houdini_bin_path + ";" + path;
+					else
+						path = houdini_bin_path;
 			
-			System.Environment.SetEnvironmentVariable( "PATH", path, System.EnvironmentVariableTarget.Process );
-			Debug.Log( "DLL search path set to: " + path );
+				System.Environment.SetEnvironmentVariable( "PATH", path, System.EnvironmentVariableTarget.Process );
+				Debug.Log( "DLL search path set to: " + path );
 			
-			prHoudiniPath = houdini_app_path;
-			myIsPathSet = true;
+				prHoudiniPath = houdini_app_path;
+				myIsPathSet = true;
+			}
+			catch ( HAPI_Error error )
+			{
+				Debug.LogError( error.ToString() );
+			}
 		}
 		
 		public static bool prIsPathSet { get { return myIsPathSet; } private set {} }
 		public static string prHoudiniPath { get; private set; }
 
-		private static string getAppPath( string active_version_key_name, string app_name )
+		private static string getAppPath( string app_name )
 		{
-			string install_path = "";
+			string app_path = "";
 
 #if UNITY_STANDALONE_WIN
 			// For Windows, we look at the registry entries made by the Houdini installer. We look for the 
@@ -103,34 +109,35 @@ namespace HAPI
 
 			RegistryKey local_machine = Registry.LocalMachine;
 
-			RegistryKey sesi_key = local_machine.OpenSubKey( "Software\\Side Effects Software" );
+			RegistryKey sesi_key = local_machine.OpenSubKey( "Software\\Side Effects Software\\" + app_name );
 			if ( sesi_key == null )
-				throw new HAPI_Error( "No 32-bit Houdini installation found!" );
+				throw new HAPI_Error( "No 32-bit " + app_name + " installation found!" );
 
-			string active_version = (string) sesi_key.GetValue( active_version_key_name );
-			if ( active_version == null )
-				throw new HAPI_Error( "No 32-bit Houdini active version registry found!" );
+			string correct_version = HAPI_Version.HOUDINI_MAJOR + "." + HAPI_Version.HOUDINI_MINOR + 
+									 HAPI_Version.HOUDINI_BUILD;
 
-			RegistryKey active_houdini_key = sesi_key.OpenSubKey( app_name + " " + active_version );
-			if ( active_houdini_key == null )
-				throw new HAPI_Error( "Specified active 32-bit Houdini version is not installed!" );
+			// Note the extra 0 for the "minor-minor" version that's needed here.
+			string correct_version_key = HAPI_Version.HOUDINI_MAJOR + "." + HAPI_Version.HOUDINI_MINOR + 
+										 ".0." + HAPI_Version.HOUDINI_BUILD;
 
-			install_path = (string) active_houdini_key.GetValue( "InstallPath" );
-			if ( install_path == null || install_path.Length == 0 )
-				throw new HAPI_Error( "Specified active 32-bit Houdini install path not valid!" );
+			app_path = (string) sesi_key.GetValue( correct_version_key );
+			if ( app_path == null || app_path.Length == 0 )
+				throw new HAPI_Error( "The correct version (" + correct_version + ") of " + app_name + 
+									  " was not found on the system!" );
+			else if ( app_path.EndsWith( "\\" ) || app_path.EndsWith( "/" ) )
+				app_path = app_path.Remove( app_path.Length - 1 );
 
-			Debug.Log( "Active " + app_name + " Version: " + active_version );
-			Debug.Log( "Active " + app_name + " Install Path: " + install_path );
+			Debug.Log( "Linked-To " + app_name + " Install Path: " + app_path );
 #else
 			// TODO: Add support for other platforms (only whichever platforms the Unity Editor supports).
-				
+
 			#error "Your current platform is not yet fully supported. Binaries search path not set."
 			Debug.LogError( "Your current platform is not yet full support. Binaries search path not set." );
 			return;
 
 #endif // UNITY_STANDALONE_WIN
 
-			return install_path;
+			return app_path;
 		}
 
 		private static bool myIsPathSet = false;

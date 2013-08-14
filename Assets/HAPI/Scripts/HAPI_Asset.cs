@@ -769,7 +769,7 @@ public abstract class HAPI_Asset : HAPI_Control
 						false,	// serializatin_recovery_only
 						true,	// force_reconnect
 						prCookingTriggersDownCooks,	// cook_downstream_assets
-						false	// use_delay_for_progress_bar
+						true	// use_delay_for_progress_bar
 					);
 	}
 

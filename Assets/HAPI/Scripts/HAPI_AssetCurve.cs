@@ -378,7 +378,18 @@ public class HAPI_AssetCurve : HAPI_Asset
 		//	UnityEditor.Toolbar:OnGUI()
 		//
 		// This is not good since we don't know why the curve does not yet have an initialization.
-		// This is 100% reproducible using Erwin's scene but I could not reproduce otherwise
+		//
+		// This is 100% reproducible like so:
+		//		1. Create a simple Houdini curve (2-3 points).
+		//		2. Instatiate a simple asset that takes a curve as an input (like the metaballworm asset).
+		//		3. Save the Unity scene.
+		//		4. Go to play mode and exit play mode.
+		//		5. Reload the saved Unity scene whithin the same session of Unity.
+		//		6. Go to play mode.
+		// You should see a message (white speech bubble) about UnityEngine.MissingReferenceException. This is
+		// triggered somewhere in this function. It's harmless but it was the cause of the stalled state
+		// change callback queue calls. 
+		//
 		// For now we need to catch this exception because if we let it out it will stall
 		// the entire callback chain bound to EditorApplication.playmodeStateChanged which
 		// causes other bound functions in this callback list to never be called, leading to
