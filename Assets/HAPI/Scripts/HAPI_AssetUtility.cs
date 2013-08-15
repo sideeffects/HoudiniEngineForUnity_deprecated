@@ -591,7 +591,7 @@ public class HAPI_AssetUtility
 		for ( int i = 0; i < parms.Length; ++i )
 		{
 			string current_parm_name = parms[ i ].name;
-			if ( parms[ i ].isMultiParm )
+			if ( parms[ i ].isChildOfMultiParm )
 				current_parm_name = current_parm_name.Replace( "#", parms[ i ].instanceNum.ToString() );
 			
 			if ( current_parm_name == name )

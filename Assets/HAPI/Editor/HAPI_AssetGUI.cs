@@ -609,7 +609,7 @@ public class HAPI_AssetGUI : Editor
 				}
 				current_index++;
 			}
-			else if ( parms[ current_index ].isMultiParm )
+			else if ( parms[ current_index ].isChildOfMultiParm )
 			{
 				GUILayout.BeginHorizontal();
 

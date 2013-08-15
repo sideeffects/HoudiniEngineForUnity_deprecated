@@ -510,7 +510,7 @@ namespace HAPI
 		public int choiceIndex;
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool isMultiParm;
+		public bool isChildOfMultiParm;
 		public int instanceNum;
 
 		public int instanceLength;

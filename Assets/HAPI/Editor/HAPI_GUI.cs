@@ -35,8 +35,8 @@ public struct HAPI_GUIParm
 		joinNext 		= false;
 		labelNone 		= false;
 
-		isMultiParm 	= false;
-		instanceNum 	= -1;
+		isChildOfMultiParm 	= false;
+		instanceNum 		= -1;
 		
 		valuesIndex		= 0;
 	}
@@ -64,7 +64,7 @@ public struct HAPI_GUIParm
 		joinNext 		= info.joinNext;
 		labelNone 		= info.labelNone;
 
-		isMultiParm 	= info.isMultiParm;
+		isChildOfMultiParm 	= info.isChildOfMultiParm;
 
 		instanceNum 	= info.instanceNum;
 		
@@ -99,7 +99,7 @@ public struct HAPI_GUIParm
 	public bool joinNext;
 	public bool labelNone;
 
-	public bool isMultiParm;
+	public bool isChildOfMultiParm;
 	public int 	instanceNum;
 	
 	public int valuesIndex;
@@ -890,7 +890,7 @@ public class HAPI_GUI : Editor
 
 	private static GUILayoutOption getLabelWidth( HAPI_GUIParm parm )
 	{
-		return parm.isMultiParm ? myLabelWidthMultiGUI : myLabelWidthGUI;
+		return parm.isChildOfMultiParm ? myLabelWidthMultiGUI : myLabelWidthGUI;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -930,7 +930,7 @@ public class HAPI_GUI : Editor
 		if ( !parm.labelNone )
 		{
 			float label_final_width =
-				(parm.isMultiParm ? myLabelWidthMulti : myLabelWidth) + (float) parm.labelExtraWidth;
+				(parm.isChildOfMultiParm ? myLabelWidthMulti : myLabelWidth) + (float) parm.labelExtraWidth;
 			if ( join_last && !no_label_toggle_last )
 			{
 				float min_width;
