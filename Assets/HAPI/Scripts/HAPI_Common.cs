@@ -95,6 +95,13 @@ namespace HAPI
 		HAPI_STATE_LOADING,
 		HAPI_STATE_MAX
 	};
+
+	public enum HAPI_RampType
+	{
+		HAPI_RAMPTYPE_FLOAT = 0,
+		HAPI_RAMPTYPE_COLOR,
+		HAPI_RAMPTYPE_MAX
+	};
 	
 	public enum HAPI_ParmType
 	{
@@ -514,7 +521,9 @@ namespace HAPI
 		public int instanceNum;
 
 		public int instanceLength;
-		public int instanceCount;  
+		public int instanceCount;
+
+		public int rampType;
 		
 		// Accessors
 		public int getNameSH()

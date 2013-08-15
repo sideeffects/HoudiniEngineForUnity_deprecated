@@ -36,6 +36,7 @@ public struct HAPI_GUIParm
 		labelNone 		= false;
 
 		isChildOfMultiParm 	= false;
+		isRamp				= false;
 		instanceNum 		= -1;
 		
 		valuesIndex		= 0;
@@ -65,6 +66,7 @@ public struct HAPI_GUIParm
 		labelNone 		= info.labelNone;
 
 		isChildOfMultiParm 	= info.isChildOfMultiParm;
+		isRamp		    = info.rampType != (int)HAPI.HAPI_RampType.HAPI_RAMPTYPE_MAX;
 
 		instanceNum 	= info.instanceNum;
 		
@@ -101,6 +103,8 @@ public struct HAPI_GUIParm
 
 	public bool isChildOfMultiParm;
 	public int 	instanceNum;
+	
+	public bool isRamp;
 	
 	public int valuesIndex;
 }
