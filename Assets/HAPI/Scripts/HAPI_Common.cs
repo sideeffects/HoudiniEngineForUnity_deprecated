@@ -745,6 +745,7 @@ namespace HAPI
 
 		// Number of values per voxel
 		public int 		tupleSize;
+		public int		storage; // enum HAPI_StorageType
 
 		public int 		tileSize;
 
