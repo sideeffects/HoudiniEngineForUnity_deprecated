@@ -629,11 +629,10 @@ namespace HAPI
 						 houdini_engine_minor != HAPI_Version.HOUDINI_ENGINE_MINOR ||
 						 houdini_engine_api	  != HAPI_Version.HOUDINI_ENGINE_API )
 					{
-						throw new HAPI_Error( "Cannot link to Houdini Engine because of version mismatch." );	
+						throw new HAPI_Error( "Cannot link to Houdini Engine because of version mismatch." );
 					}
 					
 					// Initialize.
-					
 					status_code = (HAPI_Result) HAPI_Initialize( HAPI_SetPath.prHoudiniPath, otls_path,
 																 dsos_path, true, -1 );
 					if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
