@@ -1572,6 +1572,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		myToInsertInstance = false;
 		myToRemoveInstance = false;
+		prLastChangedParmId = -1;
 	}
 
 	private void setChangedParameterIntoHost( int id )
