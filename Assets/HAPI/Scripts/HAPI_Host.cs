@@ -101,6 +101,7 @@ namespace HAPI
 		private const string myDefaultUnityMaterialAttribName				= "unity_material";
 		private const string myDefaultUnitySubMaterialNameAttribName		= "unity_sub_material_name";
 		private const string myDefaultUnitySubMaterialIndexAttribName		= "unity_sub_material_index";
+		private const bool myDefaultDontCreateTextureFiles					= false;
 
 		private const float myDefaultPinSize								= 1.0f;
 		private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
@@ -164,6 +165,7 @@ namespace HAPI
 			setString(	"HAPI_UnityMaterialAttribName", myDefaultUnityMaterialAttribName, true );
 			setString(	"HAPI_UnitySubMaterialNameAttribName", myDefaultUnitySubMaterialNameAttribName, true );
 			setString(	"HAPI_UnitySubMaterialIndexAttribName", myDefaultUnitySubMaterialIndexAttribName, true );
+			setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
 
 			setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 			setColour(	"HAPI_PinColour", myDefaultPinColour, true );
@@ -237,6 +239,9 @@ namespace HAPI
 		public static string prUnitySubMaterialIndexAttribName {
 												get { return getString( "HAPI_UnitySubMaterialIndexAttribName" ); }
 												set { setString( "HAPI_UnitySubMaterialIndexAttribName", value ); } }
+		public static bool prDontCreateTextureFiles {
+												get { return getBool( "HAPI_DontCreateTextureFiles" ); }
+												set { setBool( "HAPI_DontCreateTextureFiles", value ); } }
 
 		public static float prPinSize {
 												get { return getFloat( "HAPI_PinSize" ); }
@@ -359,6 +364,9 @@ namespace HAPI
 		public static bool isUnitySubMaterialIndexAttribNameDefault()
 												{ return	prUnitySubMaterialIndexAttribName ==
 															myDefaultUnitySubMaterialIndexAttribName; }
+		public static bool isDontCreateTextureFilesDefault()
+												{ return	prDontCreateTextureFiles ==
+															myDefaultDontCreateTextureFiles; }
 
 		public static bool isPinSizeDefault()
 												{ return	prPinSize == 
@@ -461,6 +469,7 @@ namespace HAPI
 			prUnityMaterialAttribName				= myDefaultUnityMaterialAttribName;
 			prUnitySubMaterialNameAttribName		= myDefaultUnitySubMaterialNameAttribName;
 			prUnitySubMaterialIndexAttribName		= myDefaultUnitySubMaterialIndexAttribName;
+			prDontCreateTextureFiles				= myDefaultDontCreateTextureFiles;
 
 			prPinSize 								= myDefaultPinSize;
 			prPinColour								= myDefaultPinColour;

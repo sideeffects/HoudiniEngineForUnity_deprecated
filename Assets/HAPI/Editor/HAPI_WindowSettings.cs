@@ -83,19 +83,21 @@ public class HAPI_WindowSettings : EditorWindow
 
 		HAPI_GUI.separator();
 
-		GUIContent[] modes = new GUIContent[ 4 ];
+		GUIContent[] modes = new GUIContent[ 5 ];
 		modes[ 0 ] = new GUIContent( "General" );
-		modes[ 1 ] = new GUIContent( "Cooking" );
-		modes[ 2 ] = new GUIContent( "Geometry" );
-		modes[ 3 ] = new GUIContent( "Curves" );
+		modes[ 1 ] = new GUIContent( "Materials" );
+		modes[ 2 ] = new GUIContent( "Cooking" );
+		modes[ 3 ] = new GUIContent( "Geometry" );
+		modes[ 4 ] = new GUIContent( "Curves" );
 		mySettingsTabSelection = GUILayout.Toolbar( mySettingsTabSelection, modes );
 
 		switch ( mySettingsTabSelection )
 		{
 			case 0: generateGeneralSettings(); break;
-			case 1: generateCookingSettings(); break;
-			case 2: generateGeometrySettings(); break;
-			case 3: generateCurveSettings(); break;
+			case 1: generateMaterialSettings(); break;
+			case 2: generateCookingSettings(); break;
+			case 3: generateGeometrySettings(); break;
+			case 4: generateCurveSettings(); break;
 			default: Debug.LogError( "Invalid Settings Tab." ); break;
 		}
 
@@ -122,35 +124,6 @@ public class HAPI_WindowSettings : EditorWindow
 													"Rendered Colli. Grp.", ref value );
 			if ( changed )
 				HAPI_Host.prRenderedCollisionGroupName = value;
-		}
-
-		HAPI_GUI.separator();
-
-		// Unity Material Attrib Name
-		{
-			string value = HAPI_Host.prUnityMaterialAttribName;
-			bool changed = HAPI_GUI.stringField( "unity_material_attrib_name", 
-												 "Unity Mat. Attrib.", ref value );
-			if ( changed )
-				HAPI_Host.prUnityMaterialAttribName = value;
-		}
-
-		// Unity Sub Material Name Attrib Name
-		{
-			string value = HAPI_Host.prUnitySubMaterialNameAttribName;
-			bool changed = HAPI_GUI.stringField( "unity_sub_material_name_attrib_name", 
-												 "Unity SubMat. Name Attrib.", ref value );
-			if ( changed )
-				HAPI_Host.prUnitySubMaterialNameAttribName = value;
-		}
-
-		// Unity Sub Material Index Attrib Name
-		{
-			string value = HAPI_Host.prUnitySubMaterialIndexAttribName;
-			bool changed = HAPI_GUI.stringField( "unity_sub_material_index_attrib_name", 
-												 "Unity SubMat. Index Attrib.", ref value );
-			if ( changed )
-				HAPI_Host.prUnitySubMaterialIndexAttribName = value;
 		}
 
 		HAPI_GUI.separator();
@@ -241,6 +214,50 @@ public class HAPI_WindowSettings : EditorWindow
 
 		HAPI_GUI.separator();
 
+		// Enable particles
+		{
+			bool value = HAPI_Host.prEnablePointsAsParticles;
+			bool changed = HAPI_GUI.toggle( "enable_points_as_particles",
+											"Create Points as Particles", 
+											ref value );
+			if ( changed )
+			{
+				HAPI_Host.prEnablePointsAsParticles = value;
+			}
+		}
+	}
+
+	private static void generateMaterialSettings()
+	{
+		// Unity Material Attrib Name
+		{
+			string value = HAPI_Host.prUnityMaterialAttribName;
+			bool changed = HAPI_GUI.stringField( "unity_material_attrib_name", 
+												 "Unity Mat. Attrib.", ref value );
+			if ( changed )
+				HAPI_Host.prUnityMaterialAttribName = value;
+		}
+
+		// Unity Sub Material Name Attrib Name
+		{
+			string value = HAPI_Host.prUnitySubMaterialNameAttribName;
+			bool changed = HAPI_GUI.stringField( "unity_sub_material_name_attrib_name", 
+												 "Unity SubMat. Name Attrib.", ref value );
+			if ( changed )
+				HAPI_Host.prUnitySubMaterialNameAttribName = value;
+		}
+
+		// Unity Sub Material Index Attrib Name
+		{
+			string value = HAPI_Host.prUnitySubMaterialIndexAttribName;
+			bool changed = HAPI_GUI.stringField( "unity_sub_material_index_attrib_name", 
+												 "Unity SubMat. Index Attrib.", ref value );
+			if ( changed )
+				HAPI_Host.prUnitySubMaterialIndexAttribName = value;
+		}
+
+		HAPI_GUI.separator();
+
 		// Generate Tangents
 		{
 			bool value = HAPI_Host.prGenerateTangents;
@@ -258,15 +275,20 @@ public class HAPI_WindowSettings : EditorWindow
 			}
 		}
 
-		// Enable particles
+		// Don't Create Texture Files
 		{
-			bool value = HAPI_Host.prEnablePointsAsParticles;
-			bool changed = HAPI_GUI.toggle( "enable_points_as_particles",
-											"Create points as particles", 
-											ref value );
+			bool value = HAPI_Host.prDontCreateTextureFiles;
+			bool changed = HAPI_GUI.toggle( "dont_create_texture_files", "Don't Create Texture Files", ref value );
 			if ( changed )
 			{
-				HAPI_Host.prEnablePointsAsParticles = value;
+				HAPI_Host.prDontCreateTextureFiles = value;
+				if ( HAPI_Host.myRepaintDelegate != null )
+					HAPI_Host.myRepaintDelegate();
+
+				EditorUtility.DisplayDialog(	"Rebuilds Required",
+												"This change will take affect for new instantiations or rebuilds.\n" +
+												"A full Unity restart is recommended.", 
+												"Ok" );
 			}
 		}
 	}

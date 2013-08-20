@@ -1801,9 +1801,36 @@ namespace HAPI
 			return getString( destination_file_path_sh ).Replace( "\\", "/" );
 		}
 
+		/// <summary>
+		/// 	Extract a texture map to memory (byte stream).
+		/// </summary>
+	    /// <param name="node_id">
+	    ///		The node id given by the <see cref="HAPI_MaterialInfo"/> struct from 
+		///		<see cref="HAPI_Host.getMaterial"/>.
+		/// </param>
+		/// <param name="parm_id">
+		///		This is the index in the parameter list of the material node with the above node_id.
+		/// </param>
+		/// <return>
+		///		The byte stream containing the texture binary data.
+		/// </return>
+		public static byte[] extractTextureToMemory( int node_id, int parm_id )
+		{
+			int texture_size = 0;
+			int status_code = HAPI_GetTextureSize( node_id, parm_id, out texture_size );
+			processStatusCode( (HAPI_Result) status_code );
+
+			byte[] buffer = new byte[ texture_size ];
+			status_code = HAPI_GetTexture( buffer, texture_size );
+			processStatusCode( (HAPI_Result) status_code );
+
+			return buffer;
+		}
+
 		// VOLUMES --------------------------------------------------------------------------------------------------
+
 		public static void getVolumeInfo( int asset_id, int object_id, int geo_id, int part_id,
-										   ref HAPI_VolumeInfo volume_info )
+										  ref HAPI_VolumeInfo volume_info )
 		{
 			int status_code = HAPI_GetVolumeInfo( asset_id, object_id, geo_id, part_id, ref volume_info );
 			processStatusCode( (HAPI_Result) status_code );

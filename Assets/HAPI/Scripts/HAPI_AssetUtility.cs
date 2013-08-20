@@ -802,17 +802,10 @@ public class HAPI_AssetUtility
 	public static void assignHoudiniMaterial( ref Material material, HAPI_MaterialInfo material_info,
 											  string folder_path, HAPI_ShaderType shader_type )
 	{
-		// Navigate to the Assets/Textures directory and create it if it doesn't exist.
-		DirectoryInfo textures_dir = new DirectoryInfo( folder_path );
-		if ( !textures_dir.Exists )
-			textures_dir.Create();
-
 		// Get all parameters.
 		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( material_info.nodeId );
 		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
 		getArray1Id( material_info.nodeId, HAPI_Host.getParameters, parms, node_info.parmCount );
-
-		string relative_file_path = "";
 
 		if ( shader_type == HAPI_ShaderType.HAPI_SHADER_OPENGL )
 		{
@@ -824,40 +817,57 @@ public class HAPI_AssetUtility
 				diffuse_map_parm_id = findParm( ref parms, "map" );
 			if ( diffuse_map_parm_id >= 0 )
 			{
-				// Figure out the source file path and name.
 				try
 				{
-					string texture_file_path= HAPI_Host.extractTextureToFile( material_info.nodeId, 
-																			  diffuse_map_parm_id, 
-																			  folder_path );
-
-					relative_file_path 		= texture_file_path.Replace(	  Application.dataPath, 
-																			  "Assets" );
-		
-					// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
-					// understands paths relative to the project folder.
-					Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-					if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+					if ( HAPI_Host.prDontCreateTextureFiles )
 					{
-						// Asset has not been imported yet so import and try again.
-						AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
-						tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+						// Initial size doesn't matter as LoadImage() will change the size and format.
+						Texture2D tex = new Texture2D( 1, 1 );
+						byte[] image_data = HAPI_Host.extractTextureToMemory( material_info.nodeId, 
+																			  diffuse_map_parm_id );
+						tex.LoadImage( image_data );
+
+						material.mainTexture = tex;
 					}
-		
-					// Assign main texture.
-					material.mainTexture = (Texture2D) tex_obj;
+					else // Figure out the source file path and name.
+					{
+						// Navigate to the Assets/Textures directory and create it if it doesn't exist.
+						DirectoryInfo textures_dir = new DirectoryInfo( folder_path );
+						if ( !textures_dir.Exists )
+							textures_dir.Create();
+
+						string texture_file_path= HAPI_Host.extractTextureToFile( material_info.nodeId, 
+																				  diffuse_map_parm_id, 
+																				  folder_path );
+
+						string relative_file_path = texture_file_path.Replace(	  Application.dataPath, 
+																				  "Assets" );
+
+						// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
+						// understands paths relative to the project folder.
+						Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+						if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+						{
+							// Asset has not been imported yet so import and try again.
+							AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+							tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+						}
+
+						// Assign main texture.
+						material.mainTexture = (Texture2D) tex_obj;
+					}
 				}
-				catch ( HAPI_ErrorInvalidArgument )
+				catch ( HAPI_Error )
 				{
 					// No diffuse map.
-					// Rest main texture.
+					// Reset main texture.
 					material.mainTexture = null;
 				}
 			}
 			else
 			{
 				// No diffuse map.
-				// Rest main texture.
+				// Reset main texture.
 				material.mainTexture = null;
 			}
 			
