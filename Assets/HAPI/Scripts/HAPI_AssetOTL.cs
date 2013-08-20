@@ -300,9 +300,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 					  if ( data[ index ] > particle_epsilon
 						   && part_index < particles.Length )
 					  {
+						  Vector3 pos = new Vector3( (float)x, (float)y, (float)z );
+						  pos = 2 * ( ( pos + tileMin ) - new Vector3( 0.5f, 0.5f, 0.5f ) );
+
 						  particles[ part_index ].position =
-							  node.transform.parent.TransformPoint( new Vector3( (float)x, (float)y, (float)z )
-																	+ tileMin );
+							  node.transform.parent.TransformPoint( pos );
 						  particles[ part_index ].color    =
 							  new Color( data[ index ], data[ index ], data[ index ], data[ index ] );
 						  part_index++;
