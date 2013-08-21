@@ -483,7 +483,7 @@ public class HAPI_AssetGUI : Editor
 		// Loop through all the parameters.
 		while ( current_index < myAsset.prParmCount )
 		{
-			int current_parent_id = -1; // The root has parent id -1.
+			int current_parent_id = HAPI_Constants.HAPI_INVALID_PARM_ID; // The root has parent id -1.
 			
 			// If we're not at the root (empty parent stack), get the current parent id and parent 
 			// count from the stack as well as decrement the parent count as we're about to parse 
@@ -595,7 +595,7 @@ public class HAPI_AssetGUI : Editor
 					if ( myAsset.prFolderListSelections.Count <= folder_list_count )
 					{
 						myAsset.prFolderListSelections.Add( 0 );
-						myAsset.prFolderListSelectionIds.Add( -1 );
+						myAsset.prFolderListSelectionIds.Add( HAPI_Constants.HAPI_INVALID_PARM_ID );
 					}
 					
 					int selected_folder 	= myAsset.prFolderListSelections[ folder_list_count ];

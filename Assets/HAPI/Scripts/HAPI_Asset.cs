@@ -1551,13 +1551,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		setChangedParameterIntoHost( prLastChangedParmId );
 
 		if ( myToInsertInstance )
-		{
 			HAPI_Host.insertMultiparmInstance(
 					prAssetNodeId,
 					myMultiparmInstancePos.parentId, // The multiparm list
 					myMultiparmInstancePos.instanceNum
 					);
-		}
 
 		if ( myToRemoveInstance )
 			HAPI_Host.removeMultiparmInstance(
@@ -1572,7 +1570,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		myToInsertInstance = false;
 		myToRemoveInstance = false;
-		prLastChangedParmId = -1;
+		prLastChangedParmId = HAPI_Constants.HAPI_INVALID_PARM_ID;
 	}
 
 	private void setChangedParameterIntoHost( int id )

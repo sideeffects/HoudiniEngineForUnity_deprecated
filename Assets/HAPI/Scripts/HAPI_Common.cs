@@ -58,6 +58,8 @@ namespace HAPI
 		public const int HAPI_COLOR_VECTOR_SIZE				= 4;
 
 		public const int HAPI_PRIM_MAX_VERTEX_COUNT			= 16;
+
+		public const int HAPI_INVALID_PARM_ID 				= -1;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
