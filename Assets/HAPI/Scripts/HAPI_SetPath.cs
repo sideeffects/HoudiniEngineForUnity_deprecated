@@ -113,7 +113,7 @@ namespace HAPI
 			if ( sesi_key == null )
 				throw new HAPI_Error( "No 32-bit " + app_name + " installation found!" );
 
-			string correct_version = HAPI_Version.HOUDINI_MAJOR + "." + HAPI_Version.HOUDINI_MINOR + 
+			string correct_version = HAPI_Version.HOUDINI_MAJOR + "." + HAPI_Version.HOUDINI_MINOR + "." +
 									 HAPI_Version.HOUDINI_BUILD;
 
 			// Note the extra 0 for the "minor-minor" version that's needed here.

@@ -626,7 +626,9 @@ public class HAPI_Instancer : MonoBehaviour {
 				throw new HAPI_ErrorIgnorable( "I only understand scale as point attributes!" );
 			
 			if ( scale_attr_info.exists && scale_attr.Length != myNumInstances * 3 )
-				throw new HAPI_Error( "Unexpected scale array length found for asset: " + prAsset.prAssetId + "!" );
+				throw new HAPI_Error( 
+					"Unexpected scale array length found for asset: " + prAsset.prAssetId + "!\n" +
+					"Expected length of: " + myNumInstances * 3 + " but given: " + scale_attr.Length );
 			
 						
 			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
