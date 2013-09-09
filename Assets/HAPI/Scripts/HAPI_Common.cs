@@ -753,6 +753,9 @@ namespace HAPI
 		public int	    xLength; 
 		public int	    yLength;
 		public int	    zLength;
+		public int 	    minX;
+		public int 	    minY;
+		public int 	    minZ;
 
 		// Number of values per voxel
 		public int 		tupleSize;
