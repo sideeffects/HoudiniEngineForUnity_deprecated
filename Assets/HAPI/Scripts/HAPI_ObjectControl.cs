@@ -56,13 +56,15 @@ public class HAPI_ObjectControl : HAPI_Control
 	public void init( HAPI_ObjectControl object_control )
 	{
 		prAssetId		= object_control.prAssetId;
+		prAsset			= object_control.prAsset;
 		prObjectId		= object_control.prObjectId;
 		prObjectName	= object_control.prObjectName;
 		prObjectVisible = object_control.prObjectVisible;
 	}
-	public void init( int asset_id, int object_id, string object_name, bool object_visible )
+	public void init( int asset_id, HAPI_Asset asset, int object_id, string object_name, bool object_visible )
 	{
 		prAssetId		= asset_id;
+		prAsset			= asset;
 		prObjectId		= object_id;
 		prObjectName	= object_name;
 		prObjectVisible = object_visible;
@@ -70,29 +72,26 @@ public class HAPI_ObjectControl : HAPI_Control
 	
 	private void addKeyToCurve( float time, float val, AnimationCurve curve )
 	{
-		Keyframe curr_key = new Keyframe( time, val, 0, 0 );						
-		curve.AddKey( curr_key );		
+		Keyframe curr_key = new Keyframe( time, val, 0, 0 );
+		curve.AddKey( curr_key );
 	}
 	
 	
 	public void beginBakeAnimation()
 	{
-		myCurveCollection = new HAPI_CurvesCollection();					
+		myCurveCollection = new HAPI_CurvesCollection();
 	}
 	
 		
-	public void bakeAnimation(  float curr_time, GameObject parent_object, HAPI_Transform hapi_transform )
+	public void bakeAnimation( float curr_time, GameObject parent_object, HAPI_Transform hapi_transform )
 	{
 		try
 		{
-						
 			Matrix4x4 parent_xform_inverse = Matrix4x4.identity;
-				
-			if( parent_object != null )
+
+			if ( parent_object != null )
 				parent_xform_inverse = parent_object.transform.localToWorldMatrix.inverse;
-			
-													
-										
+
 			Vector3 pos = new Vector3();
 			
 			// Apply object transforms.
@@ -125,21 +124,20 @@ public class HAPI_ObjectControl : HAPI_Control
 			
 			if( parent_object != null )
 			{
-				
 				Matrix4x4 world_mat = Matrix4x4.identity;
-				world_mat.SetTRS( pos, quat, scale );					
-				Matrix4x4 local_mat = parent_xform_inverse  * world_mat;					
+				world_mat.SetTRS( pos, quat, scale );
+				Matrix4x4 local_mat = parent_xform_inverse  * world_mat;
 				
 				quat = HAPI_AssetUtility.getQuaternion( local_mat );
 				scale = HAPI_AssetUtility.getScale( local_mat );
 				pos = HAPI_AssetUtility.getPosition( local_mat );
 			}
+
+			HAPI_CurvesCollection curves = myCurveCollection;
 			
-			HAPI_CurvesCollection curves = myCurveCollection;						
-			
-			addKeyToCurve( curr_time, pos[0], curves.tx );
-			addKeyToCurve( curr_time, pos[1], curves.ty );
-			addKeyToCurve( curr_time, pos[2], curves.tz );
+			addKeyToCurve( curr_time, pos[ 0 ], curves.tx );
+			addKeyToCurve( curr_time, pos[ 1 ], curves.ty );
+			addKeyToCurve( curr_time, pos[ 2 ], curves.tz );
 			addKeyToCurve( curr_time, quat.x, curves.qx );
 			addKeyToCurve( curr_time, quat.y, curves.qy );
 			addKeyToCurve( curr_time, quat.z, curves.qz );
@@ -147,8 +145,6 @@ public class HAPI_ObjectControl : HAPI_Control
 			addKeyToCurve( curr_time, scale.x, curves.sx );
 			addKeyToCurve( curr_time, scale.y, curves.sy );
 			addKeyToCurve( curr_time, scale.z, curves.sz );
-			
-			
 		}
 		catch ( HAPI_Error error )
 		{
@@ -156,33 +152,29 @@ public class HAPI_ObjectControl : HAPI_Control
 			return;
 		}
 	}
-		
-	
+
 	public bool endBakeAnimation()
 	{
 		try
-		{						
-						
+		{
 			HAPI_CurvesCollection curves = myCurveCollection;
-						
 			AnimationClip clip = curves.assignCurvesToClip();
-			
-			if( clip != null )
+
+			if ( clip != null )
 			{				
 				
 				Animation anim_component = gameObject.GetComponent< Animation >();
-				if( anim_component == null )
+				if ( anim_component == null )
 				{
 					gameObject.AddComponent< Animation >();
 					anim_component = gameObject.GetComponent< Animation >();
 				}
-				
-				anim_component.clip = clip;																						
+
+				anim_component.clip = clip;
 				return true;
 			}
 			
 			return false;
-						
 		}
 		catch ( HAPI_Error error )
 		{

@@ -665,6 +665,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		// Assets ---------------------------------------------------------------------------------------------------
 		
+		prAsset							= this;
 		prAssetInfo 					= new HAPI_AssetInfo();
 		prPreset 						= null;
 		prAssetValidationId				= -1;
