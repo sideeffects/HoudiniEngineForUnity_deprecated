@@ -1811,17 +1811,19 @@ namespace HAPI
 		/// <param name="parm_id">
 		///		This is the index in the parameter list of the material node with the above node_id.
 		/// </param>
+		/// <param name="tex_info">
+		///		Extra texture information.
+		/// </param>
 		/// <return>
 		///		The byte stream containing the texture binary data.
 		/// </return>
-		public static byte[] extractTextureToMemory( int node_id, int parm_id )
+		public static byte[] extractTextureToMemory( int node_id, int parm_id, out HAPI_TextureInfo tex_info )
 		{
-			int texture_size = 0;
-			int status_code = HAPI_GetTextureSize( node_id, parm_id, out texture_size );
+			int status_code = HAPI_GetTextureInfo( node_id, parm_id, out tex_info );
 			processStatusCode( (HAPI_Result) status_code );
 
-			byte[] buffer = new byte[ texture_size ];
-			status_code = HAPI_GetTexture( buffer, texture_size );
+			byte[] buffer = new byte[ tex_info.bufferSize ];
+			status_code = HAPI_GetTexture( buffer, tex_info.bufferSize );
 			processStatusCode( (HAPI_Result) status_code );
 
 			return buffer;

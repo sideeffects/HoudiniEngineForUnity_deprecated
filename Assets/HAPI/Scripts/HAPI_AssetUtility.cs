@@ -821,13 +821,44 @@ public class HAPI_AssetUtility
 				{
 					if ( HAPI_Host.prDontCreateTextureFiles )
 					{
-						// Initial size doesn't matter as LoadImage() will change the size and format.
-						Texture2D tex = new Texture2D( 1, 1 );
-						byte[] image_data = HAPI_Host.extractTextureToMemory( material_info.nodeId, 
-																			  diffuse_map_parm_id );
-						tex.LoadImage( image_data );
+						HAPI_TextureInfo tex_info = new HAPI_TextureInfo();
+						byte[] image_data = HAPI_Host.extractTextureToMemory( 
+							material_info.nodeId, diffuse_map_parm_id, out tex_info );
+						
+						if ( tex_info.fileFormat == (int) HAPI_TextureFileFormat.HAPI_TEX_FORMAT_RAW )
+						{
+							int width = 1;
+							int height = 1;
+							if ( tex_info.xRes >= 0 && tex_info.yRes >= 0 )
+							{
+								width = tex_info.xRes;
+								height = tex_info.yRes;
+							}
 
-						material.mainTexture = tex;
+							TextureFormat format = TextureFormat.RGBA32;
+							if ( 
+								tex_info.dataFormat == (int) HAPI_TextureDataFormat.HAPI_TEX_DATA_FLOAT32 
+								&& tex_info.packing == (int) HAPI_TexturePacking.HAPI_TEX_PACKING_RGBA )
+							{
+								format = TextureFormat.RGBA32;
+							}
+
+							bool isLinear = ( 
+								tex_info.colorSpace == (int) HAPI_TextureColorSpace.HAPI_TEX_COLOR_SPACE_LINEAR );
+
+							Texture2D tex = new Texture2D( width, height, format, true, isLinear );
+							tex.LoadImage( image_data );
+
+							material.mainTexture = tex;
+						}
+						else
+						{
+							// Initial size doesn't matter as LoadImage() will change the size and format.
+							Texture2D tex = new Texture2D( 1, 1 );
+							tex.LoadImage( image_data );
+
+							material.mainTexture = tex;
+						}
 					}
 					else // Figure out the source file path and name.
 					{

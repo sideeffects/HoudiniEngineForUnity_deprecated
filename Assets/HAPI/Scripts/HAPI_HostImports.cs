@@ -416,8 +416,8 @@ namespace HAPI
 																ref int destination_file_path );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetTextureSize(	int node_id, int parm_id,
-														out int texture_size );
+		private static extern int HAPI_GetTextureInfo(	int node_id, int parm_id,
+														out HAPI_TextureInfo texture_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetTexture(		[Out] byte[] buffer, int size );

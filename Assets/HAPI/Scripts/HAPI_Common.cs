@@ -231,7 +231,51 @@ namespace HAPI
 		HAPI_SHADER_MANTRA,
 		HAPI_SHADER_MAX
 	};
-	
+
+	public enum HAPI_TextureDataFormat
+	{
+		HAPI_TEX_DATA_UNKNOWN = -1,
+		HAPI_TEX_DATA_INT8,
+		HAPI_TEX_DATA_INT16,
+		HAPI_TEX_DATA_INT32,
+		HAPI_TEX_DATA_FLOAT16,
+		HAPI_TEX_DATA_FLOAT32,
+		HAPI_TEX_DATA_MAX
+	};
+
+	public enum HAPI_TexturePacking
+	{
+		HAPI_TEX_PACKING_UNKNOWN = -1,
+		HAPI_TEX_PACKING_SINGLE,	// Single Channel
+		HAPI_TEX_PACKING_DUAL,		// 2 channel interleaved + 1 black channel. (12B12B).
+		HAPI_TEX_PACKING_DUAL_NI,	// 2 channel, non-interleaved (11111....12222222...2)
+		HAPI_TEX_PACKING_RGB,		// RGB interleaved (rgbrgb...rgb)
+		HAPI_TEX_PACKING_RGBA,		// RGBA interleaved 
+		HAPI_TEX_PACKING_RGB_NI,	// RGB non-interleaved (rrr...rggg...gbbb..b)
+		HAPI_TEX_PACKING_RGBA_NI,	// RGBA non-interleaved
+		HAPI_TEX_PACKING_MAX
+	};
+
+	public enum HAPI_TextureColorSpace
+	{
+		HAPI_TEX_COLOR_SPACE_UNKNOWN = -1,
+		HAPI_TEX_COLOR_SPACE_LINEAR,
+		HAPI_TEX_COLOR_SPACE_GAMMA2_2,
+		HAPI_TEX_COLOR_SPACE_CUSTOM_GAMMA,
+		HAPI_TEX_COLOR_SPACE_SRGB,
+		HAPI_TEX_COLOR_SPACE_REC709,
+		HAPI_TEX_COLOR_SPACE_MAX
+	};
+
+	public enum HAPI_TextureFileFormat // Supported export formats.
+	{
+		HAPI_TEX_FORMAT_UNKNOWN = -1,
+		HAPI_TEX_FORMAT_RAW,
+		HAPI_TEX_FORMAT_PNG,
+		HAPI_TEX_FORMAT_JPEG,
+		HAPI_TEX_FORMAT_MAX
+	};
+
 	public enum HAPI_EnvIntType
 	{
 		HAPI_ENVINT_INVALID = -1,
@@ -700,14 +744,14 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool		exists;
 		
-		public int		owner;  // enum HAPI_AttributeOwner
-		public int		storage; // enum HAPI_StorageType
+		public int		owner;		// enum HAPI_AttributeOwner
+		public int		storage;	// enum HAPI_StorageType
 		public int		count;
 		public int		tupleSize;
 	}
 	
 	// MATERIALS ----------------------------------------------------------------------------------------------------
-	
+
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_MaterialInfo
 	{
@@ -715,8 +759,21 @@ namespace HAPI
 		public int assetId;
 		public int nodeId;
 	}
-	
-	
+
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_TextureInfo
+	{
+		public int xRes;
+		public int yRes;
+		public int bufferSize;
+
+		public int dataFormat;	// enum HAPI_TextureDataFormat
+		public int packing;		// enum HAPI_TexturePacking
+		public int colorSpace;	// enum HAPI_TextureColorSpace
+
+		public int fileFormat;	// enum HAPI_TextureFileFormat
+	}
+
 	// ANIMATION ----------------------------------------------------------------------------------------------------
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Keyframe
