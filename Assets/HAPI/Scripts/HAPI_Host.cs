@@ -18,10 +18,12 @@
 
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;
 
 namespace HAPI 
 {
@@ -603,14 +605,14 @@ namespace HAPI
 
 		public static bool initialize()
 		{
-			string otls_path = Application.dataPath + "/OTLs/Scanned";
-			string dsos_path = Application.dataPath + "/DSOs";
-
 			if ( !prHoudiniSceneExists )
 			{
 				HAPI_Result status_code;
 				try
 				{
+					string otls_path = getAllFoldersInPath( Application.dataPath + "/OTLs/Scanned" );
+					string dsos_path = getAllFoldersInPath( Application.dataPath + "/DSOs" );
+
 					// Check version match.
 					
 					int houdini_major 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MAJOR );
@@ -738,6 +740,20 @@ namespace HAPI
 			{
 				Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 			}
+		}
+
+		private static string getAllFoldersInPath( string path )
+		{
+			string paths = "";
+
+			if ( !Directory.Exists( path ) )
+				return "";
+
+			DirectoryInfo di = new DirectoryInfo( path );
+			foreach ( DirectoryInfo child_directory in di.GetDirectories() )
+				paths += ";" + getAllFoldersInPath( child_directory.FullName );
+
+			return path + paths;
 		}
 
 		private static bool hasCallFailed( HAPI_Result code )
