@@ -848,7 +848,11 @@ public abstract class HAPI_Asset : HAPI_Control
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
 					
 					if ( !serialization_recovery_only )
-						Debug.Log( "Asset Loaded - Path: " + prAssetInfo.instancePath + ", ID: " + prAssetInfo.id );
+						Debug.Log( 
+							"Asset Loaded - Path: " + prAssetInfo.instancePath + "\n" +
+							"ID: " + prAssetInfo.id + "\n" +
+							"Version: " + prAssetInfo.version + "\n" + 
+							"Full Name: " + prAssetInfo.fullOpName );
 				}
 				catch ( HAPI_Error error )
 				{

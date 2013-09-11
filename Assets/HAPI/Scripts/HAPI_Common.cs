@@ -393,27 +393,26 @@ namespace HAPI
 			rotationOrder 	= 0;
 			rstOrder 		= 0;
 		}
-		
-	    public int id;
-	
-	    [ MarshalAs( UnmanagedType.ByValArray, 
+
+		public int id;
+
+		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
 					 ArraySubType = UnmanagedType.R4 ) ]
 		public float[] position;
-		
+
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_EULER_VECTOR_SIZE, 
 					 ArraySubType = UnmanagedType.R4 ) ]
-		public float[] rotationEuler;			    
-		
-		
-	    [ MarshalAs( UnmanagedType.ByValArray, 
+		public float[] rotationEuler;
+
+		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
 					 ArraySubType = UnmanagedType.R4 ) ]
 		public float[] scale;
-	
-	    public int rotationOrder;
-	    public int rstOrder;
+
+		public int rotationOrder;
+		public int rstOrder;
 	}
 	
 	// ASSETS -------------------------------------------------------------------------------------------------------
@@ -441,6 +440,9 @@ namespace HAPI
 		private int labelSH;		// string handle (SH)
 		private int instancePathSH;	// string handle (SH)
 		private int filePathSH;		// string handle (SH)
+
+		private int versionSH;		// string handle (SH)
+		private int fullOpNameSH;	// full operator name with namespace (SH)
 		
 		public int objectCount;
 		public int handleCount;
@@ -463,6 +465,10 @@ namespace HAPI
 		{ get { return HAPI_Host.getString( instancePathSH ); } private set {} }
 		public string filePath
 		{ get { return HAPI_Host.getString( filePathSH ); } private set {} }
+		public string version
+		{ get { return HAPI_Host.getString( versionSH ); } private set {} }
+		public string fullOpName
+		{ get { return HAPI_Host.getString( fullOpNameSH ); } private set {} }
 	}
 	
 	// NODES --------------------------------------------------------------------------------------------------------
