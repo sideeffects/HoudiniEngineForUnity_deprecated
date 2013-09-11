@@ -205,9 +205,9 @@ public class HAPI_GUI : Editor
 		// Decide whether to join with the previous parameter on the same line or not.
 		if ( !join_last || parm_size > 1 )
 			EditorGUILayout.BeginHorizontal();
-		
+
 		label( ref parm, ref join_last, ref no_label_toggle_last );
-		
+
 		// Get old value.
 		T old_value = values[ parm.valuesIndex ];
 
@@ -223,30 +223,43 @@ public class HAPI_GUI : Editor
 				old_mapped_value = i;
 				break;
 			}
+
 		if ( old_mapped_value < 0 )
 		{
-			// Current value not possible!
-			EditorGUILayout.TextField( "Dropdown value outside range of possible values!" );
-			return false;
-		}
-		
-		// Draw popup.
-		int new_mapped_value = 0;
-		if ( parm.width >= 0 )
-			new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values,
-														 GUILayout.Width( parm.width ) );
-		else
-			new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values );
-		
-		T new_value = dropdown_values[ new_mapped_value ];
+			string error_message = 
+				"Dropdown value outside range of possible values!\n" +
+				"Type: " + typeof( T ) + "\n" +
+				"Parm Choicecount: " + parm.choiceCount + "\n" +
+				"Old Value: " + old_value + "\n" +
+				"Dropdown Values: ";
 
-		// Determine if value changed and update parameter value.
-		if ( !new_value.Equals( old_value ) )
-		{
-			values[ parm.valuesIndex ] = new_value;
-			changed |= true;
+			for ( int i = 0; i < dropdown_values.Length; ++i )
+				error_message += "\n    " + dropdown_values[ i ] + ", ";
+
+			// Current value not possible!
+			EditorGUILayout.SelectableLabel( 
+				error_message, GUILayout.Height( myLineHeight * dropdown_values.Length + 4 * myLineHeight ) );
 		}
-		
+		else
+		{
+			// Draw popup.
+			int new_mapped_value = 0;
+			if ( parm.width >= 0 )
+				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values,
+															 GUILayout.Width( parm.width ) );
+			else
+				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values );
+
+			T new_value = dropdown_values[ new_mapped_value ];
+
+			// Determine if value changed and update parameter value.
+			if ( !new_value.Equals( old_value ) )
+			{
+				values[ parm.valuesIndex ] = new_value;
+				changed |= true;
+			}
+		}
+
 		// Decide whether to join with the next parameter on the same line or not
 		// but also save our status for the next parameter.
 		join_last = ( parm.joinNext && parm_size <= 1 );
