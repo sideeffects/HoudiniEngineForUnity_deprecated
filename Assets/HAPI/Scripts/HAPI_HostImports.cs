@@ -401,6 +401,14 @@ namespace HAPI
 															 int parm_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetImageInfo(	int asset_id, int material_id,
+														out HAPI_ImageInfo image_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_SetImageInfo(	int asset_id, int material_id,
+														HAPI_ImageInfo image_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetImagePlaneCount( int asset_id, int material_id,
 														   out int image_plane_count );
 
@@ -410,14 +418,14 @@ namespace HAPI
 														int image_plane_count );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetImagePlaneProperties( int asset_id, int material_id,
-																string image_plane,
-																out HAPI_ImageProperties properties );
+		private static extern int HAPI_GetImagePlaneInfo(	int asset_id, int material_id,
+															string image_plane,
+															out HAPI_ImagePlaneInfo plane_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetImagePlaneProperties( int asset_id, int material_id,
-																string image_plane,
-																HAPI_ImageProperties properties );
+		private static extern int HAPI_SetImagePlaneInfo(	int asset_id, int material_id,
+															string image_plane,
+															HAPI_ImagePlaneInfo plane_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ExtractImageToFile(	int asset_id, int material_id,
@@ -429,10 +437,15 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ExtractImageToMemory(	int asset_id, int material_id,
 																string image_planes,
-																[Out] byte[] buffer, int buffer_size );
+																out int buffer_size );
 
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetImageMemoryBuffer(	int asset_id, int material_id,
+																[Out] byte[] buffer,
+																int buffer_size );
 
-
+		// Old Stuffs
+		// {
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetAvailableImagePlaneCount(	int asset_id, int material_id,
 																	out int image_plane_count );
@@ -462,6 +475,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetTexture(		[Out] byte[] buffer, int size );
+		// }
 
 		// ANIMATIONS -----------------------------------------------------------------------------------------------
 		

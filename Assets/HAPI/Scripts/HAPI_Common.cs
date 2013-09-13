@@ -769,14 +769,17 @@ namespace HAPI
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_ImageProperties
+	public struct HAPI_ImageInfo
 	{
 		public HAPI_ImageFileFormat fileFormat;
 
 		public int xRes;
 		public int yRes;
-		public int bufferSize; // Cannot be changed.
+	}
 
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_ImagePlaneInfo
+	{
 		public HAPI_ImageDataFormat dataFormat;
 
 		// The vector size cannot be changed, only interleaving mode can.
