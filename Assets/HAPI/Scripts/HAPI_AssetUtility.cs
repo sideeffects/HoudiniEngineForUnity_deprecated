@@ -825,7 +825,7 @@ public class HAPI_AssetUtility
 						byte[] image_data = HAPI_Host.extractTextureToMemory( 
 							material_info.nodeId, diffuse_map_parm_id, out tex_info );
 						
-						if ( tex_info.fileFormat == (int) HAPI_TextureFileFormat.HAPI_TEX_FORMAT_RAW )
+						if ( tex_info.fileFormat == HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_RAW )
 						{
 							int width = 1;
 							int height = 1;
@@ -837,14 +837,13 @@ public class HAPI_AssetUtility
 
 							TextureFormat format = TextureFormat.RGBA32;
 							if ( 
-								tex_info.dataFormat == (int) HAPI_TextureDataFormat.HAPI_TEX_DATA_FLOAT32 
-								&& tex_info.packing == (int) HAPI_TexturePacking.HAPI_TEX_PACKING_RGBA )
+								tex_info.dataFormat == HAPI_ImageDataFormat.HAPI_IMAGE_DATA_FLOAT32 
+								&& tex_info.packing == HAPI_ImagePacking.HAPI_IMAGE_PACKING_RGBA )
 							{
 								format = TextureFormat.RGBA32;
 							}
 
-							bool isLinear = ( 
-								tex_info.colorSpace == (int) HAPI_TextureColorSpace.HAPI_TEX_COLOR_SPACE_LINEAR );
+							bool isLinear = true;
 
 							Texture2D tex = new Texture2D( width, height, format, true, isLinear );
 							tex.LoadImage( image_data );

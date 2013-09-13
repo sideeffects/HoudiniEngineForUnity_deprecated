@@ -232,48 +232,37 @@ namespace HAPI
 		HAPI_SHADER_MAX
 	};
 
-	public enum HAPI_TextureDataFormat
+	public enum HAPI_ImageDataFormat
 	{
-		HAPI_TEX_DATA_UNKNOWN = -1,
-		HAPI_TEX_DATA_INT8,
-		HAPI_TEX_DATA_INT16,
-		HAPI_TEX_DATA_INT32,
-		HAPI_TEX_DATA_FLOAT16,
-		HAPI_TEX_DATA_FLOAT32,
-		HAPI_TEX_DATA_MAX
+		HAPI_IMAGE_DATA_UNKNOWN = -1,
+		HAPI_IMAGE_DATA_INT8,
+		HAPI_IMAGE_DATA_INT16,
+		HAPI_IMAGE_DATA_INT32,
+		HAPI_IMAGE_DATA_FLOAT16,
+		HAPI_IMAGE_DATA_FLOAT32,
+		HAPI_IMAGE_DATA_MAX
 	};
 
-	public enum HAPI_TexturePacking
+	public enum HAPI_ImagePacking
 	{
-		HAPI_TEX_PACKING_UNKNOWN = -1,
-		HAPI_TEX_PACKING_SINGLE,	// Single Channel
-		HAPI_TEX_PACKING_DUAL,		// 2 channel interleaved + 1 black channel. (12B12B).
-		HAPI_TEX_PACKING_DUAL_NI,	// 2 channel, non-interleaved (11111....12222222...2)
-		HAPI_TEX_PACKING_RGB,		// RGB interleaved (rgbrgb...rgb)
-		HAPI_TEX_PACKING_RGBA,		// RGBA interleaved 
-		HAPI_TEX_PACKING_RGB_NI,	// RGB non-interleaved (rrr...rggg...gbbb..b)
-		HAPI_TEX_PACKING_RGBA_NI,	// RGBA non-interleaved
-		HAPI_TEX_PACKING_MAX
+		HAPI_IMAGE_PACKING_UNKNOWN = -1,
+		HAPI_IMAGE_PACKING_SINGLE,	// Single Channel
+		HAPI_IMAGE_PACKING_DUAL,	// 2 channel interleaved + 1 black channel. (12B12B).
+		HAPI_IMAGE_PACKING_DUAL_NI,	// 2 channel, non-interleaved (11111....12222222...2)
+		HAPI_IMAGE_PACKING_RGB,		// RGB interleaved (rgbrgb...rgb)
+		HAPI_IMAGE_PACKING_RGBA,	// RGBA interleaved 
+		HAPI_IMAGE_PACKING_RGB_NI,	// RGB non-interleaved (rrr...rggg...gbbb..b)
+		HAPI_IMAGE_PACKING_RGBA_NI,	// RGBA non-interleaved
+		HAPI_IMAGE_PACKING_MAX
 	};
 
-	public enum HAPI_TextureColorSpace
+	public enum HAPI_ImageFileFormat // Supported export formats.
 	{
-		HAPI_TEX_COLOR_SPACE_UNKNOWN = -1,
-		HAPI_TEX_COLOR_SPACE_LINEAR,
-		HAPI_TEX_COLOR_SPACE_GAMMA2_2,
-		HAPI_TEX_COLOR_SPACE_CUSTOM_GAMMA,
-		HAPI_TEX_COLOR_SPACE_SRGB,
-		HAPI_TEX_COLOR_SPACE_REC709,
-		HAPI_TEX_COLOR_SPACE_MAX
-	};
-
-	public enum HAPI_TextureFileFormat // Supported export formats.
-	{
-		HAPI_TEX_FORMAT_UNKNOWN = -1,
-		HAPI_TEX_FORMAT_RAW,
-		HAPI_TEX_FORMAT_PNG,
-		HAPI_TEX_FORMAT_JPEG,
-		HAPI_TEX_FORMAT_MAX
+		HAPI_IMAGE_FILE_FORMAT_UNKNOWN = -1,
+		HAPI_IMAGE_FILE_FORMAT_RAW,
+		HAPI_IMAGE_FILE_FORMAT_PNG,
+		HAPI_IMAGE_FILE_FORMAT_JPEG,
+		HAPI_IMAGE_FILE_FORMAT_MAX
 	};
 
 	public enum HAPI_EnvIntType
@@ -773,14 +762,29 @@ namespace HAPI
 		public int yRes;
 		public int bufferSize;
 
-		public int dataFormat;	// enum HAPI_TextureDataFormat
-		public int packing;		// enum HAPI_TexturePacking
-		public int colorSpace;	// enum HAPI_TextureColorSpace
+		public HAPI_ImageDataFormat dataFormat;
+		public HAPI_ImagePacking packing;
 
-		public int fileFormat;	// enum HAPI_TextureFileFormat
+		public HAPI_ImageFileFormat fileFormat;
+	}
+
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_ImageProperties
+	{
+		public HAPI_ImageFileFormat fileFormat;
+
+		public int xRes;
+		public int yRes;
+		public int bufferSize; // Cannot be changed.
+
+		public HAPI_ImageDataFormat dataFormat;
+
+		// The vector size cannot be changed, only interleaving mode can.
+		public HAPI_ImagePacking packing;
 	}
 
 	// ANIMATION ----------------------------------------------------------------------------------------------------
+	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Keyframe
 	{
@@ -806,6 +810,8 @@ namespace HAPI
 		public float   outTangent;
 	
 	}
+
+	// VOLUMES ------------------------------------------------------------------------------------------------------
 
 	/// This represents a volume primitive--sans the actual voxel values,
 	/// which can be retrieved on a per-tile basis
