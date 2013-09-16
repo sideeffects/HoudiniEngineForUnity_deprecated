@@ -1697,6 +1697,225 @@ namespace HAPI
 			return material_info;
 		}
 
+		/// <summary>
+		/// 	Render the entire material to an image for later extraction. This process will use the 
+		/// 	shader specified to render the object assigned with the material you specified (by id) in
+		///		UV space, flattening the material into an image that can be later mapped back onto the object.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="shader_type">
+		///		The shader that will be used to bake this material.
+		/// </param>
+		public static void renderMaterialToImage( int asset_id, int material_id, HAPI_ShaderType shader_type )
+		{
+			int status_code = HAPI_RenderMaterialToImage( asset_id, material_id, shader_type );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
+		/// 	Render only a single texture to an image for later extraction. An example use of this method 
+		/// 	might be to render the diffuse, normal, and bump texture maps of a material to individual
+		///		texture files for use within the client application.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="parm_id">
+		///		This is the index in the parameter list of the material_id's node of the parameter 
+		///		containing the texture map file path.
+		/// </param>
+		public static void renderTextureToImage( int asset_id, int material_id, int parm_id )
+		{
+			int status_code = HAPI_RenderTextureToImage( asset_id, material_id, parm_id );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
+		/// 	Get information about the image that was just rendered, like resolution and default file 
+		/// 	format. This information will be used when extracting planes to an image.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <returns>
+		///		A <see cref="HAPI_ImageInfo"/> with the image's information.
+		/// </returns>
+		public static HAPI_ImageInfo getImageInfo( int asset_id, int material_id )
+		{
+			HAPI_ImageInfo image_info = new HAPI_ImageInfo();
+			int status_code = HAPI_GetImageInfo( asset_id, material_id, out image_info );
+			processStatusCode( (HAPI_Result) status_code );
+			return image_info;
+		}
+
+		/// <summary>
+		/// 	Set image information like resolution and file format. This information will be used when 
+		/// 	extracting planes to an image.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="image_info">
+		///		A <see cref="HAPI_ImageInfo"/> with the new image information.
+		/// </param>
+		public static void setImageInfo( int asset_id, int material_id, HAPI_ImageInfo image_info )
+		{
+			int status_code = HAPI_SetImageInfo( asset_id, material_id, image_info );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
+		/// 	Get the names of the image planes of the just rendered image.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <returns>
+		///		A list of image plane names.
+		/// </returns>
+		public static List< string > getImagePlanes( int asset_id, int material_id )
+		{
+			int status_code = (int) HAPI_Result.HAPI_RESULT_SUCCESS;
+
+			int image_plane_count = 0;
+			status_code = HAPI_GetImagePlaneCount( asset_id, material_id, out image_plane_count );
+			processStatusCode( (HAPI_Result) status_code );
+
+			int[] image_plane_names_array = new int[ image_plane_count ];
+			status_code = HAPI_GetImagePlanes( 
+				asset_id, material_id, image_plane_names_array, image_plane_count );
+			processStatusCode( (HAPI_Result) status_code );
+
+			List< string > image_plane_names = new List< string >( image_plane_count );
+			for ( int i = 0; i < image_plane_count; ++i )
+				image_plane_names.Add( getString( image_plane_names_array[ i ] ) );
+
+			return image_plane_names;
+		}
+
+		/// <summary>
+		/// 	Get a specific image plane's information like data format. This information will be used 
+		/// 	when extracting planes to an image.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="image_plane">
+		///		The single image plane, by name, who's information to get.
+		/// </param>
+		/// <returns>
+		///		A <see cref="HAPI_ImagePlaneInfo"/> with the image plane's information.
+		/// </returns>
+		public static HAPI_ImagePlaneInfo getImagePlaneInfo( int asset_id, int material_id, string image_plane )
+		{
+			HAPI_ImagePlaneInfo plane_info = new HAPI_ImagePlaneInfo();
+			int status_code = HAPI_GetImagePlaneInfo( asset_id, material_id, image_plane, out plane_info );
+			processStatusCode( (HAPI_Result) status_code );
+			return plane_info;
+		}
+
+		/// <summary>
+		/// 	Set a specific image plane's information like data format. This information will be used 
+		/// 	when extracting planes to an image.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="image_plane">
+		///		The single image plane, by name, who's information to get.
+		/// </param>
+		/// <param name="plane_info">
+		///		The struct containing the new image plane info.
+		/// </param>
+		public static void setImagePlaneInfo( 
+			int asset_id, int material_id, string image_plane, HAPI_ImagePlaneInfo plane_info )
+		{
+			int status_code = HAPI_SetImagePlaneInfo( asset_id, material_id, image_plane, plane_info );
+			processStatusCode( (HAPI_Result) status_code );
+		}
+
+		/// <summary>
+		/// 	Extract a rendered image to a file.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="image_planes">
+		///		The image planes you wish to extract into the file. Multiple image planes should be 
+		///		separated by spaces.
+		/// </param>
+		/// <param name="destination_folder_path">
+		///		The folder where the image file should be created.
+		/// </param>
+		public static string extractImageToFile( 
+			int asset_id, int material_id, string image_planes, string destination_folder_path )
+		{
+			int destination_file_path_sh = 0;
+
+			int status_code = HAPI_ExtractImageToFile( 
+				asset_id, material_id, image_planes, destination_folder_path, null, out destination_file_path_sh );
+			processStatusCode( (HAPI_Result) status_code );
+			
+			string destination_file_path = getString( destination_file_path_sh );
+			return destination_file_path;
+		}
+
+		/// <summary>
+		/// 	Extract a rendered image to memory.
+		/// </summary>
+	    /// <param name="asset_id">
+	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="material_id">
+		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
+		/// </param>
+		/// <param name="image_planes">
+		///		The image planes you wish to extract into the file. Multiple image planes should be 
+		///		separated by spaces.
+		/// </param>
+		/// <returns>
+		///		The byte stream with the extracted image binary data.
+		/// </returns>
+		public static byte[] extractImageToMemory( int asset_id, int material_id, string image_planes )
+		{
+			int buffer_size = 0;
+
+			int status_code = HAPI_ExtractImageToMemory( asset_id, material_id, image_planes, out buffer_size );
+			processStatusCode( (HAPI_Result) status_code );
+
+			byte[] buffer = new byte[ buffer_size ];
+			status_code = HAPI_GetImageMemoryBuffer( asset_id, material_id, buffer, buffer_size );
+			processStatusCode( (HAPI_Result) status_code );
+
+			return buffer;
+		}
+
 		// Old Stuffs
 		// {
 
