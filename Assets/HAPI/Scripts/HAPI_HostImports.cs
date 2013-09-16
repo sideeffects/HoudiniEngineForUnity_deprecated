@@ -475,6 +475,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetTexture(		[Out] byte[] buffer, int size );
+
 		// }
 
 		// ANIMATIONS -----------------------------------------------------------------------------------------------

@@ -989,8 +989,8 @@ namespace HAPI
 		/// <param name="geo_info">
 		/// 	<see cref="HAPI_GeoInfo"/> out parameter.
 		/// </param>
-		public static void getGeoInfo(			int asset_id, int object_id, int geo_id,
-												out HAPI_GeoInfo geo_info )
+		public static void getGeoInfo(	int asset_id, int object_id, int geo_id,
+										out HAPI_GeoInfo geo_info )
 		{
 			int status_code = HAPI_GetGeoInfo( asset_id, object_id, geo_id, out geo_info );
 			processStatusCode( (HAPI_Result) status_code );
@@ -1014,8 +1014,8 @@ namespace HAPI
 		/// <param name="part_info">
 		/// 	<see cref="HAPI_PartInfo"/> out parameter.
 		/// </param>
-		public static void getPartInfo(			int asset_id, int object_id, int geo_id, int part_id,
-												out HAPI_PartInfo part_info )
+		public static void getPartInfo(	int asset_id, int object_id, int geo_id, int part_id,
+										out HAPI_PartInfo part_info )
 		{
 			int status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
 			processStatusCode( (HAPI_Result) status_code );
@@ -1579,7 +1579,7 @@ namespace HAPI
 			processStatusCode( (HAPI_Result) status_code );
 		}
 		
-		// Inter Asset ---------------------------------------------------------------------------------------------
+		// INTER-ASSET ----------------------------------------------------------------------------------------------
 		
 		/// <summary>	Connect two assets of compatible types together.  For 
 		///		example we can connect two object level assets or
@@ -1696,6 +1696,9 @@ namespace HAPI
 			processStatusCode( (HAPI_Result) status_code );
 			return material_info;
 		}
+
+		// Old Stuffs
+		// {
 
 		/// <summary>
 		/// 	Get the image planes (ie. color plane, normal, tangent, alpha, etc.) exposed
@@ -1828,6 +1831,8 @@ namespace HAPI
 
 			return buffer;
 		}
+
+		// }
 
 		// VOLUMES --------------------------------------------------------------------------------------------------
 
