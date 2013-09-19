@@ -840,12 +840,14 @@ public class HAPI_AssetUtility
 						if ( !textures_dir.Exists )
 							textures_dir.Create();
 
-						string texture_file_path= HAPI_Host.extractTextureToFile( material_info.nodeId, 
-																				  diffuse_map_parm_id, 
-																				  folder_path );
+						HAPI_Host.renderTextureToImage( 
+							material_info.assetId, material_info.id, diffuse_map_parm_id );
 
-						string relative_file_path = texture_file_path.Replace(	  Application.dataPath, 
-																				  "Assets" );
+						string texture_file_path = HAPI_Host.extractImageToFile(
+							material_info.assetId, material_info.id, "C A", folder_path );
+
+						string relative_file_path = texture_file_path.Replace(
+							Application.dataPath, "Assets" );
 
 						// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
 						// understands paths relative to the project folder.
