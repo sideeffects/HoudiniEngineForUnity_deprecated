@@ -769,39 +769,65 @@ public class HAPI_AssetUtility
 		}
 	}
 
-	public static Texture2D getHoudiniImagePlane( HAPI_MaterialInfo material_info, string folder_path,
-												  string image_plane )
+	public static Texture2D extractHoudiniImageToTexture( 
+		HAPI_MaterialInfo material_info, string folder_path, string image_planes )
 	{
-		HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
-		progress_bar.prTitle		= "Rendering Material using Houdini Mantra";
-		progress_bar.prMessage		= "Rendering...";
-		progress_bar.prStartTime	= System.DateTime.Now;
-		progress_bar.prUseDelay		= false;
-		progress_bar.displayProgressBar();
-		string texture_file_path	= HAPI_Host.renderMaterialToFile(	material_info.assetId, material_info.id, 
-																		HAPI_ShaderType.HAPI_SHADER_MANTRA,
-																		image_plane, folder_path );
-		progress_bar.clearProgressBar();
-
-		string relative_file_path 	= texture_file_path.Replace(		Application.dataPath, 
-																		"Assets" );
-
-		// Load the texture and assign it to the material. Note that LoadAssetAtPath only understands paths
-		// relative to the project folder.
-		Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-		if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+		Texture2D result = null;
+		try
 		{
-			// Asset has not been imported yet so import and try again.
-			AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
-			tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+			if ( HAPI_Host.prDontCreateTextureFiles )
+			{
+				byte[] image_data = HAPI_Host.extractImageToMemory( 
+					material_info.assetId, material_info.id, image_planes );
+
+				// Initial size doesn't matter as LoadImage() will change the size and format.
+				Texture2D tex = new Texture2D( 1, 1 );
+				tex.LoadImage( image_data );
+
+				result = tex;
+			}
+			else // Figure out the source file path and name.
+			{
+				// Navigate to the Assets/Textures directory and create it if it doesn't exist.
+				DirectoryInfo textures_dir = new DirectoryInfo( folder_path );
+				if ( !textures_dir.Exists )
+					textures_dir.Create();
+
+				string texture_file_path = HAPI_Host.extractImageToFile(
+					material_info.assetId, material_info.id, image_planes, folder_path );
+
+				string relative_file_path = texture_file_path.Replace(
+					Application.dataPath, "Assets" );
+
+				// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
+				// understands paths relative to the project folder.
+				Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+				if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
+				{
+					// Asset has not been imported yet so import and try again.
+					AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+					tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
+				}
+
+				// Assign main texture.
+				result = (Texture2D) tex_obj;
+			}
+		}
+		catch ( HAPI_Error )
+		{
+			result = null;
 		}
 
-		return (Texture2D) tex_obj;
+		return result;
 	}
 
-	public static void assignHoudiniMaterial( ref Material material, HAPI_MaterialInfo material_info,
-											  string folder_path, HAPI_ShaderType shader_type )
+	public static void assignHoudiniMaterial( 
+		ref Material material, HAPI_MaterialInfo material_info, string folder_path, HAPI_ShaderType shader_type )
 	{
+		// Reset textures.
+		material.mainTexture = null;
+		material.SetTexture( "_NormalMap", null );
+
 		// Get all parameters.
 		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( material_info.nodeId );
 		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
@@ -819,105 +845,57 @@ public class HAPI_AssetUtility
 			{
 				try
 				{
-					if ( HAPI_Host.prDontCreateTextureFiles )
-					{
-						HAPI_Host.renderTextureToImage( 
-							material_info.assetId, material_info.id, diffuse_map_parm_id );
+					HAPI_Host.renderTextureToImage( 
+						material_info.assetId, material_info.id, diffuse_map_parm_id );
 
-						byte[] image_data = HAPI_Host.extractImageToMemory( 
-							material_info.assetId, material_info.id, "C A" );
-
-						// Initial size doesn't matter as LoadImage() will change the size and format.
-						Texture2D tex = new Texture2D( 1, 1 );
-						tex.LoadImage( image_data );
-
-						material.mainTexture = tex;
-					}
-					else // Figure out the source file path and name.
-					{
-						// Navigate to the Assets/Textures directory and create it if it doesn't exist.
-						DirectoryInfo textures_dir = new DirectoryInfo( folder_path );
-						if ( !textures_dir.Exists )
-							textures_dir.Create();
-
-						HAPI_Host.renderTextureToImage( 
-							material_info.assetId, material_info.id, diffuse_map_parm_id );
-
-						string texture_file_path = HAPI_Host.extractImageToFile(
-							material_info.assetId, material_info.id, "C A", folder_path );
-
-						string relative_file_path = texture_file_path.Replace(
-							Application.dataPath, "Assets" );
-
-						// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
-						// understands paths relative to the project folder.
-						Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-						if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
-						{
-							// Asset has not been imported yet so import and try again.
-							AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
-							tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-						}
-
-						// Assign main texture.
-						material.mainTexture = (Texture2D) tex_obj;
-					}
+					material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" );
+					material.SetTexture( 
+						"_NormalMap", extractHoudiniImageToTexture( material_info, folder_path, "N" ) );
 				}
-				catch ( HAPI_Error )
-				{
-					// No diffuse map.
-					// Reset main texture.
-					material.mainTexture = null;
-				}
-			}
-			else
-			{
-				// No diffuse map.
-				// Reset main texture.
-				material.mainTexture = null;
+				catch ( HAPI_Error ) {}
 			}
 			
 			// Assign shader properties.
 
 			material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
 
-			Color diffuse_colour	= getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
-			diffuse_colour.a		= getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
+			Color diffuse_colour = getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
+			diffuse_colour.a = getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
 			material.SetColor( "_Color", diffuse_colour );
 
 			material.SetColor( "_SpecColor", getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
+
 		}
 		else if ( shader_type == HAPI_ShaderType.HAPI_SHADER_MANTRA )
 		{
-			List< string > available_image_planes = HAPI_Host.getAvailableImagePlanes( material_info.assetId,
-																					   material_info.id );
-			bool has_colour_map = false;
-			bool has_normal_map = false;
-			foreach ( string plane in available_image_planes )
+			// Render the material to image.
+			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+			progress_bar.prTitle		= "Rendering Material using Houdini Mantra";
+			progress_bar.prMessage		= "Rendering...";
+			progress_bar.prStartTime	= System.DateTime.Now;
+			progress_bar.prUseDelay		= false;
+			progress_bar.displayProgressBar();
+			try
 			{
-				if ( plane == "C" )
-					has_colour_map = true;
-				if ( plane == "N" )
-					has_normal_map = true;
-			}
+				HAPI_Host.renderMaterialToImage( 
+					material_info.assetId, material_info.id, HAPI_ShaderType.HAPI_SHADER_MANTRA );
 
-			// Assign textures.
-			if ( has_colour_map )
-				material.mainTexture = getHoudiniImagePlane( material_info, folder_path, "C" );
-			if ( has_normal_map )
-				material.SetTexture( "_NormalMap", getHoudiniImagePlane( material_info, folder_path, "N" ) );
-		
+				// Extract and assign textures.
+				material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" ); 
+				material.SetTexture( "_NormalMap", extractHoudiniImageToTexture( material_info, folder_path, "N" ) );
+			}
+			catch ( HAPI_Error ) {}
+			progress_bar.clearProgressBar();
+
 			// Assign shader properties.
 
-			material.SetFloat( "_Shininess", 
-							   1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
+			material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
 
-			Color diffuse_colour	= getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
-			diffuse_colour.a		= getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
+			Color diffuse_colour = getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
+			diffuse_colour.a = getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
 			material.SetColor( "_Color", diffuse_colour );
 
-			material.SetColor( "_SpecColor", 
-							   getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
+			material.SetColor( "_SpecColor", getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
 		}
 		
 		// Refresh all assets just in case.
