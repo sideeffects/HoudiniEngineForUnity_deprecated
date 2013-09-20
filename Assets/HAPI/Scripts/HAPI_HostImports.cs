@@ -444,40 +444,6 @@ namespace HAPI
 																[Out] byte[] buffer,
 																int buffer_size );
 
-		// Old Stuffs
-		// {
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAvailableImagePlaneCount(	int asset_id, int material_id,
-																	out int image_plane_count );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAvailableImagePlanes(	int asset_id, int material_id,
-																[Out] int[] image_plane_names,
-																int image_plane_count );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_RenderMaterialToFile(	int asset_id, int material_id,
-																int shader_type,
-																string image_plane,
-																string destination_folder_path,
-																string destination_file_name,
-																ref int destination_file_path );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_ExtractTextureToFile(	int node_id, int parm_id,
-																string destination_folder_path,
-																string destination_file_name,
-																ref int destination_file_path );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetTextureInfo(	int node_id, int parm_id,
-														out HAPI_TextureInfo texture_info );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetTexture(		[Out] byte[] buffer, int size );
-
-		// }
-
 		// ANIMATIONS -----------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
