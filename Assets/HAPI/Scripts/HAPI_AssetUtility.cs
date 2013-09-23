@@ -777,6 +777,16 @@ public class HAPI_AssetUtility
 		{
 			if ( HAPI_Host.prDontCreateTextureFiles )
 			{
+				// Make sure the image format selected is supported by Unity's in-memory texture loading.
+				HAPI_ImageInfo image_info = HAPI_Host.getImageInfo( material_info.assetId, material_info.id );
+				if ( image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_PNG &&
+					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG )
+				{
+					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG;
+					HAPI_Host.setImageInfo( material_info.assetId, material_info.id, image_info );
+				}
+
+				// Extract image to memory.
 				byte[] image_data = HAPI_Host.extractImageToMemory( 
 					material_info.assetId, material_info.id, image_planes );
 
@@ -793,6 +803,18 @@ public class HAPI_AssetUtility
 				if ( !textures_dir.Exists )
 					textures_dir.Create();
 
+				// Make sure the image format selected is supported by Unity.
+				HAPI_ImageInfo image_info = HAPI_Host.getImageInfo( material_info.assetId, material_info.id );
+				if ( image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_PNG &&
+					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG &&
+					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_BMP &&
+					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_TGA )
+				{
+					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG;
+					HAPI_Host.setImageInfo( material_info.assetId, material_info.id, image_info );
+				}
+
+				// Extract image to file.
 				string texture_file_path = HAPI_Host.extractImageToFile(
 					material_info.assetId, material_info.id, image_planes, folder_path );
 

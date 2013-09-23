@@ -444,8 +444,8 @@ namespace HAPI
 																[Out] byte[] buffer,
 																int buffer_size );
 
-		// ANIMATIONS -----------------------------------------------------------------------------------------------
-		
+		// SIMULATION/ANIMATIONS ------------------------------------------------------------------------------------
+
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		public static extern int HAPI_SetTransformAnimCurve( int node_id, int transform_component,
 															 HAPI_Keyframe[] curve_keyframes,
