@@ -782,7 +782,7 @@ public class HAPI_AssetUtility
 				if ( image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_PNG &&
 					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG )
 				{
-					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG;
+					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_DEFAULT;
 					HAPI_Host.setImageInfo( material_info.assetId, material_info.id, image_info );
 				}
 
@@ -810,7 +810,7 @@ public class HAPI_AssetUtility
 					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_BMP &&
 					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_TGA )
 				{
-					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG;
+					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_DEFAULT;
 					HAPI_Host.setImageInfo( material_info.assetId, material_info.id, image_info );
 				}
 
