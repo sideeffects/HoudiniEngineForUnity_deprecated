@@ -897,8 +897,15 @@ public abstract class HAPI_Asset : HAPI_Control
 
 				// Try to load presets.
 				if ( unload_asset_first )
+				{
 					loadPreset();
-
+					
+					// Transform may not have been saved as part of the presets so we have to rely on the serialized value.
+					transform.localPosition = Utility.getPosition( myLastLocalToWorld );
+					transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
+					transform.localScale = Utility.getScale( myLastLocalToWorld );
+					pushAssetTransformToHoudini();
+				}
 				
 				progress_bar.prCurrentValue			= 0;
 				progress_bar.prTotal				= prParmCount
