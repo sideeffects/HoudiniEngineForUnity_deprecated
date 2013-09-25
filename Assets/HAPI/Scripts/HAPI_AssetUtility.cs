@@ -11,8 +11,6 @@
  *		416-504-9876
  *
  * COMMENTS:
- * 		Contains the main script attached to a Unity game object that corresponds to a Houdini asset instance on the 
- *		Houdini side. 
  * 
  */
 
@@ -24,17 +22,27 @@ using System.Collections.Generic;
 using System.IO;
 using HAPI;
 
-/// <summary>
-/// 	Main script attached to an Unity game object that corresponds to a Houdini asset instance on the 
-/// 	Houdini side.
-/// </summary>
 public class HAPI_AssetUtility
 {
 	// TRANSFORMS ------------------------------------------------------------------------------------------------------
 
 	public static Quaternion getQuaternion( Matrix4x4 m )
 	{
-		return Quaternion.LookRotation( m.GetColumn( 2 ), m.GetColumn( 1 ) );
+		// Check to stop warning about "Look rotation viewing vector is zero" from Quaternion.LookRotation().
+		if ( 
+			Mathf.Approximately( 0.0f, m.GetColumn( 2 ).x ) &&
+			Mathf.Approximately( 0.0f, m.GetColumn( 2 ).y ) &&
+			Mathf.Approximately( 0.0f, m.GetColumn( 2 ).z ) &&
+			Mathf.Approximately( 0.0f, m.GetColumn( 2 ).w ) &&
+			Mathf.Approximately( 0.0f, m.GetColumn( 1 ).x ) &&
+			Mathf.Approximately( 0.0f, m.GetColumn( 1 ).y ) &&
+			Mathf.Approximately( 0.0f, m.GetColumn( 1 ).z ) &&
+			Mathf.Approximately( 0.0f, m.GetColumn( 1 ).w ) )
+		{
+			return new Quaternion();
+		}
+		else
+			return Quaternion.LookRotation( m.GetColumn( 2 ), m.GetColumn( 1 ) );
 	}
 
 	public static Vector3 getPosition( Matrix4x4 m )
