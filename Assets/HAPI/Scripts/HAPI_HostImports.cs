@@ -418,16 +418,6 @@ namespace HAPI
 														int image_plane_count );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetImagePlaneInfo(	int asset_id, int material_id,
-															string image_plane,
-															out HAPI_ImagePlaneInfo plane_info );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetImagePlaneInfo(	int asset_id, int material_id,
-															string image_plane,
-															HAPI_ImagePlaneInfo plane_info );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ExtractImageToFile(	int asset_id, int material_id,
 															string image_planes,
 															string destination_folder_path,

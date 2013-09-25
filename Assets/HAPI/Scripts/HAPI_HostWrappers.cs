@@ -1811,53 +1811,6 @@ namespace HAPI
 		}
 
 		/// <summary>
-		/// 	Get a specific image plane's information like data format. This information will be used 
-		/// 	when extracting planes to an image.
-		/// </summary>
-	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
-		/// </param>
-		/// <param name="material_id">
-		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-		/// </param>
-		/// <param name="image_plane">
-		///		The single image plane, by name, who's information to get.
-		/// </param>
-		/// <returns>
-		///		A <see cref="HAPI_ImagePlaneInfo"/> with the image plane's information.
-		/// </returns>
-		public static HAPI_ImagePlaneInfo getImagePlaneInfo( int asset_id, int material_id, string image_plane )
-		{
-			HAPI_ImagePlaneInfo plane_info = new HAPI_ImagePlaneInfo();
-			int status_code = HAPI_GetImagePlaneInfo( asset_id, material_id, image_plane, out plane_info );
-			processStatusCode( (HAPI_Result) status_code );
-			return plane_info;
-		}
-
-		/// <summary>
-		/// 	Set a specific image plane's information like data format. This information will be used 
-		/// 	when extracting planes to an image.
-		/// </summary>
-	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
-		/// </param>
-		/// <param name="material_id">
-		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-		/// </param>
-		/// <param name="image_plane">
-		///		The single image plane, by name, who's information to get.
-		/// </param>
-		/// <param name="plane_info">
-		///		The struct containing the new image plane info.
-		/// </param>
-		public static void setImagePlaneInfo( 
-			int asset_id, int material_id, string image_plane, HAPI_ImagePlaneInfo plane_info )
-		{
-			int status_code = HAPI_SetImagePlaneInfo( asset_id, material_id, image_plane, plane_info );
-			processStatusCode( (HAPI_Result) status_code );
-		}
-
-		/// <summary>
 		/// 	Extract a rendered image to a file.
 		/// </summary>
 	    /// <param name="asset_id">

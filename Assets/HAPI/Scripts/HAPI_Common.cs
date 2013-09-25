@@ -247,13 +247,15 @@ namespace HAPI
 	{
 		HAPI_IMAGE_PACKING_UNKNOWN = -1,
 		HAPI_IMAGE_PACKING_SINGLE,	// Single Channel
-		HAPI_IMAGE_PACKING_DUAL,	// 2 channel interleaved + 1 black channel. (12B12B).
-		HAPI_IMAGE_PACKING_DUAL_NI,	// 2 channel, non-interleaved (11111....12222222...2)
-		HAPI_IMAGE_PACKING_RGB,		// RGB interleaved (rgbrgb...rgb)
-		HAPI_IMAGE_PACKING_RGBA,	// RGBA interleaved 
-		HAPI_IMAGE_PACKING_RGB_NI,	// RGB non-interleaved (rrr...rggg...gbbb..b)
-		HAPI_IMAGE_PACKING_RGBA_NI,	// RGBA non-interleaved
-		HAPI_IMAGE_PACKING_MAX
+		HAPI_IMAGE_PACKING_DUAL,	// Dual Channel
+		HAPI_IMAGE_PACKING_RGB,		// RGB
+		HAPI_IMAGE_PACKING_BGR,		// RGB Reveresed
+		HAPI_IMAGE_PACKING_RGBA,	// RGBA
+		HAPI_IMAGE_PACKING_ABGR,	// RGBA Reversed
+		HAPI_IMAGE_PACKING_MAX,
+
+		HAPI_IMAGE_PACKING_DEFAULT3 = HAPI_IMAGE_PACKING_RGB,
+		HAPI_IMAGE_PACKING_DEFAULT4 = HAPI_IMAGE_PACKING_RGBA
 	};
 
 	public enum HAPI_ImageFileFormat // Supported export formats.
@@ -768,14 +770,13 @@ namespace HAPI
 
 		public int xRes;
 		public int yRes;
-	}
 
-	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_ImagePlaneInfo
-	{
+		public int strideLength; // In bytes and readonly.
 		public HAPI_ImageDataFormat dataFormat;
 
-		// The vector size cannot be changed, only interleaving mode can.
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool interleaved; // ex: true = RGBRGBRGB, false = RRRGGGBBB
+
 		public HAPI_ImagePacking packing;
 	}
 
