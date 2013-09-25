@@ -762,19 +762,6 @@ namespace HAPI
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
-	public struct HAPI_TextureInfo
-	{
-		public int xRes;
-		public int yRes;
-		public int bufferSize;
-
-		public HAPI_ImageDataFormat dataFormat;
-		public HAPI_ImagePacking packing;
-
-		public HAPI_ImageFileFormat fileFormat;
-	}
-
-	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ImageInfo
 	{
 		public HAPI_ImageFileFormat fileFormat;
