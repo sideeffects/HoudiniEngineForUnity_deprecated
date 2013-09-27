@@ -899,12 +899,23 @@ public abstract class HAPI_Asset : HAPI_Control
 				if ( unload_asset_first )
 				{
 					loadPreset();
-					
-					// Transform may not have been saved as part of the presets so we have to rely on the serialized value.
-					transform.localPosition = Utility.getPosition( myLastLocalToWorld );
-					transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
-					transform.localScale = Utility.getScale( myLastLocalToWorld );
-					pushAssetTransformToHoudini();
+
+					// Transform may not have been saved as part of the presets so we have to rely 
+					// on the serialized value.
+					if ( myLastLocalToWorld != Matrix4x4.zero )
+					{
+						transform.localPosition = Utility.getPosition( myLastLocalToWorld );
+						transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
+
+						Vector3 scale = Utility.getScale( myLastLocalToWorld );
+						if ( !Mathf.Approximately( 0.0f, scale.x )
+							&& !Mathf.Approximately( 0.0f, scale.y )
+							&& !Mathf.Approximately( 0.0f, scale.z ) )
+						{
+							transform.localScale = Utility.getScale( myLastLocalToWorld );
+						}
+						pushAssetTransformToHoudini();
+					}
 				}
 				
 				progress_bar.prCurrentValue			= 0;
@@ -966,19 +977,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			{
 				// Set asset's transform.
 				if ( prPushUnityTransformToHoudini )
-				{
-					HAPI_TransformEuler hapi_transform;
-					HAPI_Host.getAssetTransform( prAssetId, (int) HAPI_RSTOrder.SRT, 
-												 (int) HAPI_XYZOrder.ZXY, out hapi_transform );
-					if ( Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
-						 Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
-						 Mathf.Approximately( 0.0f, hapi_transform.scale[ 2 ] ) )
-					{
-						Debug.LogWarning( "Asset(id: " + prAssetId + ", name: " + prAssetName + "): Scale has a zero component!" );
-					}
-
-					Utility.applyTransform( hapi_transform, transform );
-				}
+					Utility.getHoudiniTransformAndApply( prAssetId, prAssetName, transform );
 			
 				progress_bar.prMessage = "Loading and composing objects...";
 			

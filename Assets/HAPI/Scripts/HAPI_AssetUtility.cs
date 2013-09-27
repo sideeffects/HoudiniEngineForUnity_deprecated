@@ -141,6 +141,22 @@ public class HAPI_AssetUtility
 											hapi_transform.scale[ 2 ] );
 	}
 
+	public static void getHoudiniTransformAndApply( int asset_id, string asset_name, Transform transform )
+	{
+		HAPI_TransformEuler hapi_transform;
+		HAPI_Host.getAssetTransform( 
+			asset_id, (int) HAPI_RSTOrder.SRT, (int) HAPI_XYZOrder.ZXY, out hapi_transform );
+		if ( 
+			Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
+			Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
+			Mathf.Approximately( 0.0f, hapi_transform.scale[ 2 ] ) )
+		{
+			Debug.LogWarning( "Asset(id: " + asset_id + ", name: " + asset_name + "): Scale has a zero component!" );
+		}
+
+		applyTransform( hapi_transform, transform );
+	}
+
 	public static void calculateMeshTangents( Mesh mesh )
 	{
 		// Speed up math by copying the mesh arrays.
