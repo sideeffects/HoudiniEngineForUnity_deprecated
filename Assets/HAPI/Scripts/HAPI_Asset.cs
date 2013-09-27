@@ -908,9 +908,9 @@ public abstract class HAPI_Asset : HAPI_Control
 						transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
 
 						Vector3 scale = Utility.getScale( myLastLocalToWorld );
-						if ( !Mathf.Approximately( 0.0f, scale.x )
-							&& !Mathf.Approximately( 0.0f, scale.y )
-							&& !Mathf.Approximately( 0.0f, scale.z ) )
+						if ( !( Mathf.Approximately( 0.0f, scale.x )
+							&& Mathf.Approximately( 0.0f, scale.y )
+							&& Mathf.Approximately( 0.0f, scale.z ) ) )
 						{
 							transform.localScale = Utility.getScale( myLastLocalToWorld );
 						}
