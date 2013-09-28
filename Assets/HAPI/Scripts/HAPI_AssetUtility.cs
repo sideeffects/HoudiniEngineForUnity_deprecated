@@ -801,6 +801,7 @@ public class HAPI_AssetUtility
 		{
 			if ( HAPI_Host.prDontCreateTextureFiles )
 			{
+#if true
 				// Make sure the image format selected is supported by Unity's in-memory texture loading.
 				HAPI_ImageInfo image_info = HAPI_Host.getImageInfo( material_info.assetId, material_info.id );
 				if ( image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_PNG &&
@@ -817,6 +818,36 @@ public class HAPI_AssetUtility
 				// Initial size doesn't matter as LoadImage() will change the size and format.
 				Texture2D tex = new Texture2D( 1, 1 );
 				tex.LoadImage( image_data );
+#else
+				HAPI_ImageInfo image_info = HAPI_Host.getImageInfo( material_info.assetId, material_info.id );
+				
+				image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_RAW;
+				image_info.dataFormat = HAPI_ImageDataFormat.HAPI_IMAGE_DATA_INT8;
+				image_info.interleaved = true;
+				image_info.packing = HAPI_ImagePacking.HAPI_IMAGE_PACKING_RGBA;
+
+				HAPI_Host.setImageInfo( material_info.assetId, material_info.id, image_info );
+
+				// Extract image to memory.
+				byte[] image_data = HAPI_Host.extractImageToMemory( 
+					material_info.assetId, material_info.id, image_planes );
+
+				int byte_data_size = image_data.Length;
+				int colour_data_size = image_info.xRes * image_info.yRes;
+				Debug.Log( "byte: " + byte_data_size + ", colour: " + colour_data_size );
+
+				Color32[] colour_data = new Color32[ colour_data_size ];
+				for ( int i = 0; i < colour_data_size; ++i )
+				{
+					colour_data[ i ].r = image_data[ i * 4 + 0 ];
+					colour_data[ i ].g = image_data[ i * 4 + 1 ];
+					colour_data[ i ].b = image_data[ i * 4 + 2 ];
+					colour_data[ i ].a = image_data[ i * 4 + 3 ];
+				}
+
+				Texture2D tex = new Texture2D( image_info.xRes, image_info.yRes, TextureFormat.ARGB32, false );
+				tex.SetPixels32( colour_data );
+#endif
 
 				result = tex;
 			}
