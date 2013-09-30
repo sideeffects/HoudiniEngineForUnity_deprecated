@@ -275,10 +275,12 @@ public class HAPI_WindowSettings : EditorWindow
 			}
 		}
 
+		HAPI_GUI.separator();
+
 		// Don't Create Texture Files
 		{
 			bool value = HAPI_Host.prDontCreateTextureFiles;
-			bool changed = HAPI_GUI.toggle( "dont_create_texture_files", "Don't Create Texture Files", ref value );
+			bool changed = HAPI_GUI.toggle( "dont_create_texture_files", "Don't Create Texture Files (use in-memory textures)", ref value );
 			if ( changed )
 			{
 				HAPI_Host.prDontCreateTextureFiles = value;
@@ -290,6 +292,21 @@ public class HAPI_WindowSettings : EditorWindow
 												"A full Unity restart is recommended.", 
 												"Ok" );
 			}
+		}
+
+		// Extract Textures In Raw Format
+		{
+			bool value = HAPI_Host.prExtractTexturesInRawFormat;
+			bool was_gui_enabled = GUI.enabled;
+			GUI.enabled = HAPI_Host.prDontCreateTextureFiles;
+			bool changed = HAPI_GUI.toggle( "extract_textures_in_raw_format", "Extract Textures In Raw Format (only works for in-memory textures)", ref value );
+			if ( changed )
+			{
+				HAPI_Host.prExtractTexturesInRawFormat = value;
+				if ( HAPI_Host.myRepaintDelegate != null )
+					HAPI_Host.myRepaintDelegate();
+			}
+			GUI.enabled = was_gui_enabled;
 		}
 	}
 

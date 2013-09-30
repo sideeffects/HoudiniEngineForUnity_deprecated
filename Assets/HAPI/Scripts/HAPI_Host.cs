@@ -104,6 +104,7 @@ namespace HAPI
 		private const string myDefaultUnitySubMaterialNameAttribName		= "unity_sub_material_name";
 		private const string myDefaultUnitySubMaterialIndexAttribName		= "unity_sub_material_index";
 		private const bool myDefaultDontCreateTextureFiles					= false;
+		private const bool myDefaultExtractTexturesInRawFormat				= false;
 
 		private const float myDefaultPinSize								= 1.0f;
 		private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
@@ -168,6 +169,7 @@ namespace HAPI
 			setString(	"HAPI_UnitySubMaterialNameAttribName", myDefaultUnitySubMaterialNameAttribName, true );
 			setString(	"HAPI_UnitySubMaterialIndexAttribName", myDefaultUnitySubMaterialIndexAttribName, true );
 			setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
+			setBool(	"HAPI_ExtractTexturesInRawFormat", myDefaultExtractTexturesInRawFormat, true );
 
 			setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 			setColour(	"HAPI_PinColour", myDefaultPinColour, true );
@@ -244,6 +246,9 @@ namespace HAPI
 		public static bool prDontCreateTextureFiles {
 												get { return getBool( "HAPI_DontCreateTextureFiles" ); }
 												set { setBool( "HAPI_DontCreateTextureFiles", value ); } }
+		public static bool prExtractTexturesInRawFormat {
+												get { return getBool( "HAPI_ExtractTexturesInRawFormat" ); }
+												set { setBool( "HAPI_ExtractTexturesInRawFormat", value ); } }
 
 		public static float prPinSize {
 												get { return getFloat( "HAPI_PinSize" ); }
@@ -369,6 +374,9 @@ namespace HAPI
 		public static bool isDontCreateTextureFilesDefault()
 												{ return	prDontCreateTextureFiles ==
 															myDefaultDontCreateTextureFiles; }
+		public static bool isExtractTexturesInRawFormatDefault()
+												{ return	prExtractTexturesInRawFormat ==
+															myDefaultExtractTexturesInRawFormat; }
 
 		public static bool isPinSizeDefault()
 												{ return	prPinSize == 
@@ -472,6 +480,7 @@ namespace HAPI
 			prUnitySubMaterialNameAttribName		= myDefaultUnitySubMaterialNameAttribName;
 			prUnitySubMaterialIndexAttribName		= myDefaultUnitySubMaterialIndexAttribName;
 			prDontCreateTextureFiles				= myDefaultDontCreateTextureFiles;
+			prExtractTexturesInRawFormat			= myDefaultExtractTexturesInRawFormat;
 
 			prPinSize 								= myDefaultPinSize;
 			prPinColour								= myDefaultPinColour;
