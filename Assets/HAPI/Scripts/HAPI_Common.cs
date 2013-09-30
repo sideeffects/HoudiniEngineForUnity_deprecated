@@ -771,7 +771,6 @@ namespace HAPI
 		public int xRes;
 		public int yRes;
 
-		public int strideLength; // In bytes and readonly.
 		public HAPI_ImageDataFormat dataFormat;
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
