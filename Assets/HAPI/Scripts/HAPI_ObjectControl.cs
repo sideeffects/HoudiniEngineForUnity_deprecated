@@ -17,6 +17,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
 
 using HAPI;
 
@@ -31,6 +32,8 @@ public class HAPI_ObjectControl : HAPI_Control
 	public int		prObjectId {		get { return myObjectId; }			set { myObjectId = value; } }
 	public string	prObjectName {		get { return myObjectName; }		set { myObjectName = value; } }
 	public bool		prObjectVisible {	get { return myObjectVisible; }		set { myObjectVisible = value; } }
+
+	public List< GameObject > prGeos {	get { return myGeos; }				set { myGeos = value; } }
 
 	public HAPI_ObjectControl() 
 	{
@@ -51,6 +54,8 @@ public class HAPI_ObjectControl : HAPI_Control
 		myObjectId		= -1;
 		myObjectName	= "object_name";
 		myObjectVisible	= false;
+
+		myGeos = new List< GameObject >( 0 );
 	}
 
 	public void init( HAPI_ObjectControl object_control )
@@ -61,6 +66,7 @@ public class HAPI_ObjectControl : HAPI_Control
 		prObjectName	= object_control.prObjectName;
 		prObjectVisible = object_control.prObjectVisible;
 	}
+
 	public void init( int asset_id, HAPI_Asset asset, int object_id, string object_name, bool object_visible )
 	{
 		prAssetId		= asset_id;
@@ -69,20 +75,40 @@ public class HAPI_ObjectControl : HAPI_Control
 		prObjectName	= object_name;
 		prObjectVisible = object_visible;
 	}
-	
-	private void addKeyToCurve( float time, float val, AnimationCurve curve )
+
+	public void refresh( bool reload_asset, HAPI_ObjectInfo object_info )
 	{
-		Keyframe curr_key = new Keyframe( time, val, 0, 0 );
-		curve.AddKey( curr_key );
+		if ( reload_asset )
+		{
+			for ( int i = 0; i < myGeos.Count; ++i )
+				HAPI_AssetUtility.destroyGameObject( myGeos[ i ] );
+			myGeos.Clear();
+		}
+		
+		if ( reload_asset || object_info.haveGeosChanged )
+		{
+			// Add new geos as needed.
+			while ( myGeos.Count < object_info.geoCount )
+				myGeos.Add( createGeo( myGeos.Count ) );
+
+			// Remove stale geos.
+			while ( myGeos.Count > object_info.geoCount )
+			{
+				HAPI_AssetUtility.destroyGameObject( myGeos[ object_info.geoCount ] );
+				myGeos.RemoveAt( object_info.geoCount );
+			}
+
+			// Refresh all geos.
+			for ( int i = 0; i < myGeos.Count; ++i )
+				myGeos[ i ].GetComponent< HAPI_GeoControl >().refresh( reload_asset );
+		}
 	}
-	
-	
+
 	public void beginBakeAnimation()
 	{
 		myCurveCollection = new HAPI_CurvesCollection();
 	}
-	
-		
+
 	public void bakeAnimation( float curr_time, GameObject parent_object, HAPI_Transform hapi_transform )
 	{
 		try
@@ -184,11 +210,41 @@ public class HAPI_ObjectControl : HAPI_Control
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private Methods
+
+	private GameObject createGeo( int geo_id )
+	{
+		GameObject child = new GameObject( "uninitialized_geo" );
+		child.transform.parent = gameObject.transform;
+
+		// Need to reset position here because the assignment above will massage the child's
+		// position in order to be in the same place it was in the global namespace.
+		child.transform.localPosition	= new Vector3();
+		child.transform.localRotation	= new Quaternion();
+		child.transform.localScale		= new Vector3( 1.0f, 1.0f, 1.0f );
+
+		HAPI_GeoControl control = child.AddComponent< HAPI_GeoControl >();
+		control.init( this );
+		control.prGeoId = geo_id;
+		control.prObjectControl = this;
+
+		return child;
+	}
+
+	private void addKeyToCurve( float time, float val, AnimationCurve curve )
+	{
+		Keyframe curr_key = new Keyframe( time, val, 0, 0 );
+		curve.AddKey( curr_key );
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
 	[SerializeField] private int		myObjectId;
 	[SerializeField] private string		myObjectName;
 	[SerializeField] private bool		myObjectVisible;
+
+	[SerializeField] private List< GameObject > myGeos;
 	
 	private HAPI_CurvesCollection myCurveCollection = null;
 }

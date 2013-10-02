@@ -10,8 +10,6 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public HAPI_Asset prObjectControl { get; set; }
-	
 	public GameObject prGameObject { get; set; }	
 	public string prMeshName { get; set; }
 	public string prPathToPrefab { get; set; }
@@ -21,7 +19,6 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	
 	public HAPI_MeshToPrefab () 
 	{
-		prObjectControl = null;
 		prGameObject = null;
 		prPathToPrefab = "Assets/";
 	}
@@ -70,7 +67,7 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 		mesh.normals = inputMesh.normals;
 		mesh.name = prMeshName;
 	
-		AssetDatabase.AddObjectToAsset( mesh , prefab );		
+		AssetDatabase.AddObjectToAsset( mesh , prefab );
 		AssetDatabase.SaveAssets();
 		
 		

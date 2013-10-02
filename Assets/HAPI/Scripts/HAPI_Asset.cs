@@ -1225,38 +1225,6 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// -------------------------------------------------------------------------------------------------------------
 
-	protected virtual void destroyChildren( Transform trans ) 
-	{
-		List< GameObject > children = new List< GameObject >();
-		
-		foreach ( Transform child in trans )
-			children.Add( child.gameObject );
-		
-		foreach ( GameObject child in children )
-		{
-			// Added to ensure shared mesh is deleted.
-			if ( child.GetComponent< MeshFilter >() != null ) {
-				Mesh m = child.GetComponent< MeshFilter >().sharedMesh;
-				// Destroy it, but not if it is an asset.
-				if ( m != null ) 
-					DestroyImmediate( m, false );
-			}
-
-			// Ensure sharedmaterials are deleted.
-			if ( child.GetComponent< Renderer >() != null ) {
-				Material[] ms = child.GetComponent< Renderer >().sharedMaterials;
-				// It's a copied array, but it still refers to each the sharedMaterials.
-				foreach ( Material m in ms ) {
-					// Destroy it, but not if it is an asset.
-					if ( m != null ) 
-						DestroyImmediate( m, false );
-				}
-			}
-
-			DestroyImmediate( child );
-		}
-	}
-
 	public virtual HAPI_ParmInfo findParm( int id )
 	{
 		return myParmMap[ id ];

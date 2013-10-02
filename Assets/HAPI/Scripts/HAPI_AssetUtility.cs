@@ -1432,8 +1432,32 @@ public class HAPI_AssetUtility
 		curve.AddKey( curr_key );
 	}
 	
+	// MISC ---------------------------------------------------------------------------------------------------------
 	
-	// MISC --------- -----------------------------------------------------------------------------------------------
+	public static void destroyGameObject( GameObject obj )
+	{
+		// Added to ensure shared mesh is deleted.
+		if ( obj.GetComponent< MeshFilter >() != null ) {
+			Mesh m = obj.GetComponent< MeshFilter >().sharedMesh;
+			// Destroy it, but not if it is an asset.
+			if ( m != null ) 
+				GameObject.DestroyImmediate( m, false );
+		}
+
+		// Ensure sharedmaterials are deleted.
+		if ( obj.GetComponent< Renderer >() != null ) {
+			Material[] ms = obj.GetComponent< Renderer >().sharedMaterials;
+			// It's a copied array, but it still refers to each the sharedMaterials.
+			foreach ( Material m in ms ) {
+				// Destroy it, but not if it is an asset.
+				if ( m != null ) 
+					GameObject.DestroyImmediate( m, false );
+			}
+		}
+
+		GameObject.DestroyImmediate( obj );
+	}
+
 	public static void attachScript( GameObject obj, string attach_script )
 	{
 		JSONObject json_object = new JSONObject( attach_script );
@@ -1444,7 +1468,7 @@ public class HAPI_AssetUtility
 			Debug.LogError("script key not found in scripts attribute!");
 			return;
 		}
-											
+
 		if( (dictionary.Count - 1) % 3 != 0 )
 		{
 			Debug.LogError("Improper number of entries in scripts attribute!");
@@ -1529,7 +1553,7 @@ public class HAPI_AssetUtility
 								Debug.LogError("Bad formatting found in Vector3: " + arg_value );
 								break;
 							}
-																										
+
 							fi.SetValue( comp, vec3 );
 						}
 						break;
