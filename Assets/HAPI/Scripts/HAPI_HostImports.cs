@@ -379,7 +379,6 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ConnectAssetGeometry( int asset_id_from, 
 															 int object_id_from,
-															 int group_id_from,
 															 int asset_id_to, 
 															 int input_idx );
 		

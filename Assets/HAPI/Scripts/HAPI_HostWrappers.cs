@@ -1641,9 +1641,6 @@ namespace HAPI
 		///			The object within the asset that contains the geometry
 		///			to send.
 		/// </param>
-		/// <param name="group_id_from">
-		///			The id of the group within the object 
-		/// </param>
 		/// <param name="asset_id_to">
 		///			The asset id of the destination asset
 		/// </param>
@@ -1651,10 +1648,10 @@ namespace HAPI
 		///			The index on the destination asset where the connection
 		///			should be made.
 		/// </param>		
-		public static void connectAssetGeometry( int asset_id_from, int object_id_from,	int group_id_from,
+		public static void connectAssetGeometry( int asset_id_from, int object_id_from,
 													int asset_id_to, int input_idx )
 		{
-			int status_code = HAPI_ConnectAssetGeometry( asset_id_from, object_id_from, group_id_from, 
+			int status_code = HAPI_ConnectAssetGeometry( asset_id_from, object_id_from, 
 														 asset_id_to, input_idx );
 			processStatusCode( (HAPI_Result) status_code );
 		}

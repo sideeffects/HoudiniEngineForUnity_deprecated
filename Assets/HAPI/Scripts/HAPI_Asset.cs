@@ -385,7 +385,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prUpStreamGeoAssets[ index ] = asset;
 		
 		// TODO: It's hard coded to be the 0th group - fix this!
-		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, 0, prAssetId, index );
+		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 
 		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideGeometryOnLinking )
