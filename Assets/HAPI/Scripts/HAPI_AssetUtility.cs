@@ -765,6 +765,10 @@ public class HAPI_AssetUtility
 				if ( ( update_houdini_material || mesh_renderer.sharedMaterial.mainTexture == null ) 
 						&& part_control.prMaterialId >= 0 )
 				{
+					// Reset textures.
+					mesh_renderer.sharedMaterial.mainTexture = null;
+					mesh_renderer.sharedMaterial.SetTexture( "_NormalMap", null );
+					
 					HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( asset.prAssetId, part_info.materialId );
 
 					// Assign vertex color shader if the flag says so.
@@ -903,10 +907,6 @@ public class HAPI_AssetUtility
 	public static void assignHoudiniMaterial( 
 		ref Material material, HAPI_MaterialInfo material_info, string folder_path, HAPI_ShaderType shader_type )
 	{
-		// Reset textures.
-		material.mainTexture = null;
-		material.SetTexture( "_NormalMap", null );
-
 		// Get all parameters.
 		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( material_info.nodeId );
 		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
