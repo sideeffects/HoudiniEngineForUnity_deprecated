@@ -821,20 +821,25 @@ public class HAPI_AssetUtility
 						material_info.assetId, material_info.id, image_planes );
 
 					int colour_data_size = image_info.xRes * image_info.yRes;
-
-					Color32[] colour_data = new Color32[ colour_data_size ];
-					for ( int i = 0; i < colour_data_size; ++i )
+					
+					if ( colour_data_size * 4 != image_data.Length )
+						Debug.LogError( "Image data corrupt some how. Try not using in-memory textures." );
+					else
 					{
-						colour_data[ i ].r = image_data[ i * 4 + 0 ];
-						colour_data[ i ].g = image_data[ i * 4 + 1 ];
-						colour_data[ i ].b = image_data[ i * 4 + 2 ];
-						colour_data[ i ].a = image_data[ i * 4 + 3 ];
-					}
+						Color32[] colour_data = new Color32[ colour_data_size ];
+						for ( int i = 0; i < colour_data_size; ++i )
+						{
+							colour_data[ i ].r = image_data[ i * 4 + 0 ];
+							colour_data[ i ].g = image_data[ i * 4 + 1 ];
+							colour_data[ i ].b = image_data[ i * 4 + 2 ];
+							colour_data[ i ].a = image_data[ i * 4 + 3 ];
+						}
 
-					Texture2D tex = new Texture2D( image_info.xRes, image_info.yRes, TextureFormat.ARGB32, false );
-					tex.SetPixels32( colour_data );
-					tex.Apply();
-					result = tex;
+						Texture2D tex = new Texture2D( image_info.xRes, image_info.yRes, TextureFormat.ARGB32, false );
+						tex.SetPixels32( colour_data );
+						tex.Apply();
+						result = tex;
+					}
 				}
 				else
 				{
