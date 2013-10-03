@@ -814,6 +814,8 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_VolumeInfo
 	{
+		public int 		nameSH;
+
 		// Dimensions of the index space axis aligned bounding box of the volume
 		public int	    xLength; 
 		public int	    yLength;
