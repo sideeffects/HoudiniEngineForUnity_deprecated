@@ -51,6 +51,8 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myAssetNodeId = value; } }
  	public string					prAssetName {					get { return myAssetName; }
 																	set { myAssetName = value; } }
+	public string					prAssetHelp {					get { return myAssetHelp; }
+																	set { myAssetHelp = value; } }
 	public AssetType				prAssetType {					get { return myAssetType; } 
 																	set { myAssetType = value; } }
 	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; } 
@@ -141,6 +143,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public bool 					prShowHoudiniControls {			get { return myShowHoudiniControls; } 
 																	set { myShowHoudiniControls = value; } }
+	public bool 					prShowHelp {					get { return myShowHelp; } 
+																	set { myShowHelp = value; } }
 	public bool 					prShowAssetControls {			get { return myShowAssetControls; } 
 																	set { myShowAssetControls = value; } }
 	public bool 					prShowAssetSettings {			get { return myShowAssetSettings; } 
@@ -671,6 +675,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prAssetValidationId				= -1;
 		prAssetNodeId					= -1;
 		prAssetName						= "ASSET_NAME";
+		prAssetHelp						= "ASSET_HELP";
 		prAssetType						= AssetType.TYPE_INVALID;
 		prHAPIAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 					= 0;
@@ -725,6 +730,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		// GUI ------------------------------------------------------------------------------------------------------
 		
 		prShowHoudiniControls 			= true;
+		prShowHelp						= false;
 		prShowAssetControls 			= true;
 		prShowAssetSettings				= true;
 		prShowBakeOptions				= false;
@@ -852,7 +858,8 @@ public abstract class HAPI_Asset : HAPI_Control
 							"Asset Loaded - Path: " + prAssetInfo.instancePath + "\n" +
 							"ID: " + prAssetInfo.id + "\n" +
 							"Version: " + prAssetInfo.version + "\n" + 
-							"Full Name: " + prAssetInfo.fullOpName );
+							"Full Name: " + prAssetInfo.fullOpName + "\n" +
+							"Fuller Name: " + prAssetInfo.definitionSource );
 				}
 				catch ( HAPI_Error error )
 				{
@@ -889,6 +896,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				prHandleCount 			= prAssetInfo.handleCount;
 
 				prAssetName				= prAssetInfo.name;
+				prAssetHelp				= prAssetInfo.helpText;
 				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
 				prMinTransInputCount	= prAssetInfo.minTransInputCount;
 				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;
@@ -1629,6 +1637,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private int					myAssetValidationId;
 	[SerializeField] private int					myAssetNodeId;
 	[SerializeField] private string					myAssetName;
+	[SerializeField] private string					myAssetHelp;
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
 	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
@@ -1692,6 +1701,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private bool 					myShowHoudiniControls;
+	[SerializeField] private bool					myShowHelp;
 	[SerializeField] private bool 					myShowAssetControls;
 	[SerializeField] private bool 					myShowAssetSettings;
 	[SerializeField] private bool 					myShowBakeOptions;

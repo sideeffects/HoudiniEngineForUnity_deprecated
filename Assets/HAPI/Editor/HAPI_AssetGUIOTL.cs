@@ -31,6 +31,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	{
 		base.OnEnable();
 		myAssetOTL = myAsset as HAPI_AssetOTL;
+		myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 	}
 	
 	public override void OnInspectorGUI() 
@@ -108,10 +109,27 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				myReloadAsset			 = true;
 			}
 		} // if
+
+		// Draw Help Pane
+		myAssetOTL.prShowHelp = HAPI_GUI.foldout( "Asset Help", myAssetOTL.prShowHelp, true );
+		if ( myAssetOTL.prShowHelp )
+		{
+			myHelpScrollPosition = EditorGUILayout.BeginScrollView(
+				myHelpScrollPosition, GUILayout.MaxHeight( 200 ) );
+			float height = GUI.skin.label.CalcHeight( 
+				new GUIContent( myAssetOTL.prAssetHelp ), (float) Screen.width );
+			GUIStyle sel_label = GUI.skin.label;
+			sel_label.stretchWidth = true;
+			sel_label.wordWrap = true;
+			EditorGUILayout.SelectableLabel( 
+				myAssetOTL.prAssetHelp, sel_label, GUILayout.Height( height ), 
+				GUILayout.Width( Screen.width - 30 ) );
+			EditorGUILayout.EndScrollView();
+		}
 		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Asset Settings
-		//		These don't affect the asset directly so they don't trigger rebuilds.
+		// These don't affect the asset directly so they don't trigger rebuilds.
 
 		myAssetOTL.prShowAssetSettings = HAPI_GUI.foldout( "Asset Settings", myAssetOTL.prShowAssetSettings, true );
 		if ( myAssetOTL.prShowAssetSettings )
@@ -474,4 +492,5 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	}
 	
 	private HAPI_AssetOTL myAssetOTL;
+	private Vector2 myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 }

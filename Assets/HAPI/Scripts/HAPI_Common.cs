@@ -19,6 +19,8 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
+using HAPI_StringHandle = System.Int32;
+
 namespace HAPI 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -442,14 +444,16 @@ namespace HAPI
 		// Use the node id to get the asset's parameters.
 		public int nodeId;
 		
-		private int nameSH;			// string handle (SH)
-		private int labelSH;		// string handle (SH)
-		private int instancePathSH;	// string handle (SH)
-		private int filePathSH;		// string handle (SH)
+		private HAPI_StringHandle nameSH; // Instance name (the label + a number).
+		private HAPI_StringHandle labelSH;
+		private HAPI_StringHandle instancePathSH; // Instance path inside Houdini scene.
+		private HAPI_StringHandle filePathSH; // Path to the .otl file for this asset.
 
-		private int versionSH;		// string handle (SH)
-		private int fullOpNameSH;	// full operator name with namespace (SH)
-		
+		private HAPI_StringHandle versionSH; // User-defined asset version.
+		private HAPI_StringHandle fullOpNameSH; // Full asset name and namespace.
+		private HAPI_StringHandle definitionSourceSH; // Even more verbose asset name.
+		private HAPI_StringHandle helpTextSH; // Asset help marked-up text.
+
 		public int objectCount;
 		public int handleCount;
 		public int materialCount;
@@ -475,6 +479,10 @@ namespace HAPI
 		{ get { return HAPI_Host.getString( versionSH ); } private set {} }
 		public string fullOpName
 		{ get { return HAPI_Host.getString( fullOpNameSH ); } private set {} }
+		public string definitionSource
+		{ get { return HAPI_Host.getString( definitionSourceSH ); } private set {} }
+		public string helpText
+		{ get { return HAPI_Host.getString( helpTextSH ); } private set {} }
 	}
 	
 	// NODES --------------------------------------------------------------------------------------------------------
@@ -775,9 +783,9 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ImageFileFormat
 	{
-		public int nameSH;				// string handle (SH)
-		public int descriptionSH;		// string handle (SH)
-		public int defaultExtensionSH;	// string handle (SH)
+		public HAPI_StringHandle nameSH;
+		public HAPI_StringHandle descriptionSH;
+		public HAPI_StringHandle defaultExtensionSH;
 
 		// Accessors
 		public string name
@@ -791,7 +799,13 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ImageInfo
 	{
-		public int imageFileFormatNameSH; // string handle (SH) & Readonly
+		// Unlike the other members of this struct changing imageFileFormatNameSH and 
+		// giving this struct back to HAPI_Host.setImageInfo() nothing will happen.
+		// Use this member variable to derive which image file format will be used
+		// by the HAPI_Host.extractImageTo...() functions if called with image_file_format_name
+		// set to (null). This way, you can decide whether to ask for a file format
+		// conversion (slower) or not (faster).
+		public HAPI_StringHandle imageFileFormatNameSH; // Readonly
 
 		public int xRes;
 		public int yRes;
