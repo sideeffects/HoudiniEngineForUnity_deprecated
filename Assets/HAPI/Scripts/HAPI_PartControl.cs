@@ -185,10 +185,10 @@ public class HAPI_PartControl : HAPI_GeoControl
 					throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
 
 				// Get colour attributes.
-				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_COLOUR );
+				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_COLOR );
 				float[] colour_attr = new float[ 0 ];
 				HAPI_AssetUtility.getAttribute( 
-					prAssetId, prObjectId, prGeoId, prPartId, HAPI_Constants.HAPI_ATTRIB_COLOUR,
+					prAssetId, prObjectId, prGeoId, prPartId, HAPI_Constants.HAPI_ATTRIB_COLOR,
 					ref colour_attr_info, ref colour_attr, HAPI_Host.getAttributeFloatData );
 
 				ParticleEmitter particle_emitter = part_node.GetComponent< ParticleEmitter >();

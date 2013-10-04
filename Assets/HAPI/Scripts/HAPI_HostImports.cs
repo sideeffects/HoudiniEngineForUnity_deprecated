@@ -400,6 +400,13 @@ namespace HAPI
 															 int parm_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetSupportedImageFileFormatCount( out int file_format_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetSupportedImageFileFormats(	[Out] HAPI_ImageFileFormat[] formats,
+																		int file_format_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetImageInfo(	int asset_id, int material_id,
 														out HAPI_ImageInfo image_info );
 
@@ -418,6 +425,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ExtractImageToFile(	int asset_id, int material_id,
+															string image_file_format_name,
 															string image_planes,
 															string destination_folder_path,
 															string destination_file_name,
@@ -425,6 +433,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_ExtractImageToMemory(	int asset_id, int material_id,
+																string image_file_format_name,
 																string image_planes,
 																out int buffer_size );
 

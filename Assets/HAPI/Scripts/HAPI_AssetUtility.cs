@@ -720,7 +720,8 @@ public class HAPI_AssetUtility
 		{
 			try
 			{
-				assignMaterial( part_control, asset, true );
+				if ( part_control.gameObject.GetComponent< MeshRenderer >() )
+					assignMaterial( part_control, asset, true );
 			}
 			catch ( HAPI_Error error )
 			{
@@ -809,7 +810,6 @@ public class HAPI_AssetUtility
 				{
 					HAPI_ImageInfo image_info = HAPI_Host.getImageInfo( material_info.assetId, material_info.id );
 
-					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_RAW;
 					image_info.dataFormat = HAPI_ImageDataFormat.HAPI_IMAGE_DATA_INT8;
 					image_info.interleaved = true;
 					image_info.packing = HAPI_ImagePacking.HAPI_IMAGE_PACKING_RGBA;
@@ -818,7 +818,7 @@ public class HAPI_AssetUtility
 
 					// Extract image to memory.
 					byte[] image_data = HAPI_Host.extractImageToMemory( 
-						material_info.assetId, material_info.id, image_planes );
+						material_info.assetId, material_info.id, HAPI_Constants.HAPI_RAW_FORMAT_NAME, image_planes );
 
 					int colour_data_size = image_info.xRes * image_info.yRes;
 					
@@ -844,17 +844,17 @@ public class HAPI_AssetUtility
 				else
 				{
 					// Make sure the image format selected is supported by Unity's in-memory texture loading.
+					string desired_file_format = null;
 					HAPI_ImageInfo image_info = HAPI_Host.getImageInfo( material_info.assetId, material_info.id );
-					if ( image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_PNG &&
-						 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG )
+					if ( !image_info.isImageFileFormat( HAPI_Constants.HAPI_PNG_FORMAT_NAME ) &&
+						 !image_info.isImageFileFormat( HAPI_Constants.HAPI_JPEG_FORMAT_NAME ) )
 					{
-						image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_DEFAULT;
-						HAPI_Host.setImageInfo( material_info.assetId, material_info.id, image_info );
+						desired_file_format = HAPI_Constants.HAPI_PNG_FORMAT_NAME;
 					}
 
 					// Extract image to memory.
 					byte[] image_data = HAPI_Host.extractImageToMemory( 
-						material_info.assetId, material_info.id, image_planes );
+						material_info.assetId, material_info.id, desired_file_format, image_planes );
 
 					// Initial size doesn't matter as LoadImage() will change the size and format.
 					Texture2D tex = new Texture2D( 1, 1 );
@@ -870,19 +870,19 @@ public class HAPI_AssetUtility
 					textures_dir.Create();
 
 				// Make sure the image format selected is supported by Unity.
+				string desired_file_format = null;
 				HAPI_ImageInfo image_info = HAPI_Host.getImageInfo( material_info.assetId, material_info.id );
-				if ( image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_PNG &&
-					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_JPG &&
-					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_BMP &&
-					 image_info.fileFormat != HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_TGA )
+				if ( !image_info.isImageFileFormat( HAPI_Constants.HAPI_PNG_FORMAT_NAME ) &&
+					 !image_info.isImageFileFormat( HAPI_Constants.HAPI_JPEG_FORMAT_NAME ) &&
+					 !image_info.isImageFileFormat( HAPI_Constants.HAPI_BMP_FORMAT_NAME ) &&
+					 !image_info.isImageFileFormat( HAPI_Constants.HAPI_TGA_FORMAT_NAME ) )
 				{
-					image_info.fileFormat = HAPI_ImageFileFormat.HAPI_IMAGE_FILE_FORMAT_DEFAULT;
-					HAPI_Host.setImageInfo( material_info.assetId, material_info.id, image_info );
+					desired_file_format = HAPI_Constants.HAPI_PNG_FORMAT_NAME;
 				}
 
 				// Extract image to file.
 				string texture_file_path = HAPI_Host.extractImageToFile(
-					material_info.assetId, material_info.id, image_planes, folder_path );
+					material_info.assetId, material_info.id, desired_file_format, image_planes, folder_path );
 
 				string relative_file_path = texture_file_path.Replace(
 					Application.dataPath, "Assets" );
@@ -1127,9 +1127,9 @@ public class HAPI_AssetUtility
 					  ref normal_attr_info, ref normal_attr, HAPI_Host.getAttributeFloatData );
 
 		// Get colour attributes.
-		HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_COLOUR );
+		HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_COLOR );
 		float[] colour_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Constants.HAPI_ATTRIB_COLOUR, 
+		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Constants.HAPI_ATTRIB_COLOR, 
 					  ref colour_attr_info, ref colour_attr, HAPI_Host.getAttributeFloatData );
 
 		// Get tangent attributes.

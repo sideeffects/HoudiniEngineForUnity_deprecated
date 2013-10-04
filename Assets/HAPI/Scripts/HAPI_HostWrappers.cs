@@ -1736,6 +1736,35 @@ namespace HAPI
 		}
 
 		/// <summary>
+		/// 	Get the number of supported texture file formats.
+		/// </summary>
+		/// <returns>
+		///		The number of supported image file formats.
+		/// </returns>
+		public static int getSupportedImageFileFormatCount()
+		{
+			int format_count = 0;
+			int status_code = HAPI_GetSupportedImageFileFormatCount( out format_count );
+			processStatusCode( (HAPI_Result) status_code );
+			return format_count;
+		}
+
+		/// <summary>
+		///		Get the names, descriptions, and default extensions of all supported file formats.
+		/// </summary>
+		/// <returns>
+		///		An array of <see cref="HAPI_ImageFileFormat"/>.
+		/// </returns>
+		public static HAPI_ImageFileFormat[] getSupportedImageFileFormats()
+		{
+			int format_count = getSupportedImageFileFormatCount();
+			HAPI_ImageFileFormat[] formats = new HAPI_ImageFileFormat[ format_count ];
+			int status_code = HAPI_GetSupportedImageFileFormats( formats, format_count );
+			processStatusCode( (HAPI_Result) status_code );
+			return formats;
+		}
+
+		/// <summary>
 		/// 	Get information about the image that was just rendered, like resolution and default file 
 		/// 	format. This information will be used when extracting planes to an image.
 		/// </summary>
@@ -1816,6 +1845,27 @@ namespace HAPI
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
 		/// </param>
+		/// <param name="image_file_format_name">
+		///		The image file format name you wish the image to be
+		///		extracted as. You can leave this parameter (null) to
+		///		get the image in the original format if it comes from
+		///		another texture file or in the default HAPI format,
+		///		which is HAPI_Constants.HAPI_DEFAULT_IMAGE_FORMAT_NAME, 
+		///		if the image is generated.
+		///
+		///		You can get some of the very common standard image
+		///		file format names from HAPI_Common.cs under the 
+		///		HAPI_Constants enum (ie. HAPI_PNG_FORMAT_NAME).
+		///
+		///		You can also get a list of all supported file formats
+		///		(and the exact names this parameter expects)
+		///		by using getSupportedImageFileFormats(). This
+		///		list will include custom file formats you created via
+		///		custom DSOs (see HDK docs about IMG_Format). You 
+		///		will get back a list of HAPI_ImageFileFormat(s). 
+		///		This parameter expects the HAPI_ImageFileFormat::name
+		///		of a given image file format.
+		/// </param>
 		/// <param name="image_planes">
 		///		The image planes you wish to extract into the file. Multiple image planes should be 
 		///		separated by spaces.
@@ -1824,12 +1874,14 @@ namespace HAPI
 		///		The folder where the image file should be created.
 		/// </param>
 		public static string extractImageToFile( 
-			int asset_id, int material_id, string image_planes, string destination_folder_path )
+			int asset_id, int material_id, string image_file_format_name, 
+			string image_planes, string destination_folder_path )
 		{
 			int destination_file_path_sh = 0;
 
 			int status_code = HAPI_ExtractImageToFile( 
-				asset_id, material_id, image_planes, destination_folder_path, null, out destination_file_path_sh );
+				asset_id, material_id, image_file_format_name, image_planes, 
+				destination_folder_path, null, out destination_file_path_sh );
 			processStatusCode( (HAPI_Result) status_code );
 			
 			string destination_file_path = getString( destination_file_path_sh );
@@ -1845,6 +1897,27 @@ namespace HAPI
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
 		/// </param>
+		/// <param name="image_file_format_name">
+		///		The image file format name you wish the image to be
+		///		extracted as. You can leave this parameter (null) to
+		///		get the image in the original format if it comes from
+		///		another texture file or in the default HAPI format,
+		///		which is HAPI_Constants.HAPI_DEFAULT_IMAGE_FORMAT_NAME, 
+		///		if the image is generated.
+		///
+		///		You can get some of the very common standard image
+		///		file format names from HAPI_Common.cs under the 
+		///		HAPI_Constants enum (ie. HAPI_PNG_FORMAT_NAME).
+		///
+		///		You can also get a list of all supported file formats
+		///		(and the exact names this parameter expects)
+		///		by using getSupportedImageFileFormats(). This
+		///		list will include custom file formats you created via
+		///		custom DSOs (see HDK docs about IMG_Format). You 
+		///		will get back a list of HAPI_ImageFileFormat(s). 
+		///		This parameter expects the HAPI_ImageFileFormat::name
+		///		of a given image file format.
+		/// </param>
 		/// <param name="image_planes">
 		///		The image planes you wish to extract into the file. Multiple image planes should be 
 		///		separated by spaces.
@@ -1852,11 +1925,13 @@ namespace HAPI
 		/// <returns>
 		///		The byte stream with the extracted image binary data.
 		/// </returns>
-		public static byte[] extractImageToMemory( int asset_id, int material_id, string image_planes )
+		public static byte[] extractImageToMemory( 
+			int asset_id, int material_id, string image_file_format_name, string image_planes )
 		{
 			int buffer_size = 0;
 
-			int status_code = HAPI_ExtractImageToMemory( asset_id, material_id, image_planes, out buffer_size );
+			int status_code = HAPI_ExtractImageToMemory( 
+				asset_id, material_id, image_file_format_name, image_planes, out buffer_size );
 			processStatusCode( (HAPI_Result) status_code );
 
 			byte[] buffer = new byte[ buffer_size ];

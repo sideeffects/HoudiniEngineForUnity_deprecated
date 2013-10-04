@@ -27,6 +27,8 @@ namespace HAPI
 	public struct HAPI_Constants
 	{
 		// Unity-Only Constants ---------------------------------------------
+		//
+		// You may change these values if you wish. Nothing should break terribly.
 
 		public const string HAPI_PRODUCT_NAME				= "Houdini Engine";
 		
@@ -40,14 +42,12 @@ namespace HAPI
 		public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 		public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
 
-		// Default Attributes' Names
-		public const string HAPI_ATTRIB_POSITION			= "P";
-		public const string HAPI_ATTRIB_UV					= "uv";
-		public const string HAPI_ATTRIB_NORMAL				= "N";
-		public const string HAPI_ATTRIB_TANGENT				= "tangentu";
-		public const string HAPI_ATTRIB_COLOUR				= "Cd";
-
 		// Shared Constants -------------------------------------------------
+		//
+		// IMPORTANT: Changes to these constants will not change the behavior of the
+		// underlying Houdini Engine. These are here to serve as C# duplicates of the
+		// constants defined in the HAPI_Common.h C++ header. In fact, if you
+		// change any of these you will most likely break the Unity plugin.
 
 		public const int HAPI_POSITION_VECTOR_SIZE			= 3;
 		public const int HAPI_SCALE_VECTOR_SIZE				= 3;
@@ -60,6 +60,30 @@ namespace HAPI
 		public const int HAPI_PRIM_MAX_VERTEX_COUNT			= 16;
 
 		public const int HAPI_INVALID_PARM_ID 				= -1;
+
+		// Default Attributes' Names
+		public const string HAPI_ATTRIB_POSITION			= "P";
+		public const string HAPI_ATTRIB_UV					= "uv";
+		public const string HAPI_ATTRIB_NORMAL				= "N";
+		public const string HAPI_ATTRIB_TANGENT				= "tangentu";
+		public const string HAPI_ATTRIB_COLOR				= "Cd";
+
+		// Common image file format names (to use with the material extract APIs).
+		// Note that you may still want to check if they are supported via
+		// HAPI_GetSupportedImageFileFormats() since all formats are loaded 
+		// dynamically by Houdini on-demand so just because these formats are defined
+		// here doesn't mean they are supported in your instance.
+		public const string HAPI_RAW_FORMAT_NAME			= "HAPI_RAW"; // HAPI-only Raw Format
+		public const string HAPI_PNG_FORMAT_NAME			= "PNG";
+		public const string HAPI_JPEG_FORMAT_NAME			= "JPEG";
+		public const string HAPI_BMP_FORMAT_NAME			= "Bitmap";
+		public const string HAPI_TIFF_FORMAT_NAME			= "TIFF";
+		public const string HAPI_TGA_FORMAT_NAME			= "Targa";
+
+		// Default image file format's name - used when the image generated and has
+		// no "original" file format and the user does not specify a format to
+		// convert to.
+		public const string HAPI_DEFAULT_IMAGE_FORMAT_NAME	= HAPI_PNG_FORMAT_NAME;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,21 +280,6 @@ namespace HAPI
 
 		HAPI_IMAGE_PACKING_DEFAULT3 = HAPI_IMAGE_PACKING_RGB,
 		HAPI_IMAGE_PACKING_DEFAULT4 = HAPI_IMAGE_PACKING_RGBA
-	};
-
-	public enum HAPI_ImageFileFormat // Supported export formats.
-	{
-		HAPI_IMAGE_FILE_FORMAT_UNKNOWN = -1,
-		HAPI_IMAGE_FILE_FORMAT_RAW, // Custom RAW format.
-		HAPI_IMAGE_FILE_FORMAT_PIC, // Houdini .pic file format.
-		HAPI_IMAGE_FILE_FORMAT_PNG, // PNG file format.
-		HAPI_IMAGE_FILE_FORMAT_JPG, // JPEG file format.
-		HAPI_IMAGE_FILE_FORMAT_BMP, // Bitmap file format.
-		HAPI_IMAGE_FILE_FORMAT_TIF, // TIFF file format.
-		HAPI_IMAGE_FILE_FORMAT_TGA, // Targa file format.
-		HAPI_IMAGE_FILE_FORMAT_MAX,
-
-		HAPI_IMAGE_FILE_FORMAT_DEFAULT = HAPI_IMAGE_FILE_FORMAT_PNG
 	};
 
 	public enum HAPI_EnvIntType
@@ -764,9 +773,25 @@ namespace HAPI
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_ImageFileFormat
+	{
+		public int nameSH;				// string handle (SH)
+		public int descriptionSH;		// string handle (SH)
+		public int defaultExtensionSH;	// string handle (SH)
+
+		// Accessors
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+		public string description
+		{ get { return HAPI_Host.getString( descriptionSH ); } private set {} }
+		public string defaultExtension
+		{ get { return HAPI_Host.getString( defaultExtensionSH ); } private set {} }
+	};
+
+	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ImageInfo
 	{
-		public HAPI_ImageFileFormat fileFormat;
+		public int imageFileFormatNameSH; // string handle (SH) & Readonly
 
 		public int xRes;
 		public int yRes;
@@ -777,6 +802,14 @@ namespace HAPI
 		public bool interleaved; // ex: true = RGBRGBRGB, false = RRRGGGBBB
 
 		public HAPI_ImagePacking packing;
+
+		// Accessors
+		public string imageFileFormatName
+		{ get { return HAPI_Host.getString( imageFileFormatNameSH ); } private set {} }
+
+		// Utility
+		public bool isImageFileFormat( string image_file_format_name )
+		{ return ( imageFileFormatName == image_file_format_name ); }
 	}
 
 	// ANIMATION ----------------------------------------------------------------------------------------------------
