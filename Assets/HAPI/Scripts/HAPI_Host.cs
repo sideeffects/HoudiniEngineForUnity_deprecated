@@ -210,9 +210,10 @@ namespace HAPI
 
 			setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
 
-			myRepaintDelegate		= null;
-			myDeselectionDelegate	= null;
-			mySelectionTarget		= null;
+			myRepaintDelegate			= null;
+			myDeselectionDelegate		= null;
+			mySelectionTarget			= null;
+			mySelectionTargetIsPrefab 	= false;
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -526,6 +527,7 @@ namespace HAPI
 		public static DeselectionDelegate		myDeselectionDelegate;
 
 		public static HAPI_Asset				mySelectionTarget;
+		public static bool						mySelectionTargetIsPrefab;
 
 		public static bool hasScene() 
 		{

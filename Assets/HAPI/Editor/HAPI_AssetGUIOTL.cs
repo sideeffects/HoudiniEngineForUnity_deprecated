@@ -152,8 +152,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		if ( myAssetOTL.prShowAssetControls )
 			myParmChanges |= generateAssetControls();
 
-		if ( ( myParmChanges && !myDelayBuild )
-				|| ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) )
+		if ( !myAssetIsPrefab && 
+			 ( ( myParmChanges && !myDelayBuild ) || 
+			 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
 		{
 			myAssetOTL.build(	myReloadAsset,	// reload_asset
 								true,			// unload_asset_first

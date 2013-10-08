@@ -35,6 +35,7 @@ public class HAPI_AssetGUI : Editor
 		myUnbuiltChanges 	= false;
 		myReloadAsset		= false;
 		myFocusChanged 		= true;
+		myAssetIsPrefab 	= PrefabUtility.GetPrefabType( myAsset ) == PrefabType.Prefab;
 	}
 
 	public virtual void OnDisable()
@@ -60,6 +61,7 @@ public class HAPI_AssetGUI : Editor
 			HAPI_Host.myRepaintDelegate = this.refresh;
 			HAPI_Host.myDeselectionDelegate = this.deselect;
 			HAPI_Host.mySelectionTarget = myAsset;
+			HAPI_Host.mySelectionTargetIsPrefab = myAssetIsPrefab;
 
 			myDelayBuild	= false;
 			myParmChanges	= false;
@@ -227,6 +229,7 @@ public class HAPI_AssetGUI : Editor
 		HAPI_Host.myRepaintDelegate			= this.refresh;
 		HAPI_Host.myDeselectionDelegate		= this.deselect;
 		HAPI_Host.mySelectionTarget			= myAsset;
+		HAPI_Host.mySelectionTargetIsPrefab = myAssetIsPrefab;
 	}
 	
 	protected bool setTransformInput( int index )
@@ -670,6 +673,7 @@ public class HAPI_AssetGUI : Editor
 	protected bool			myUnbuiltChanges;
 	protected bool 			myFocusChanged;
 	protected bool			myReloadAsset;
+	protected bool			myAssetIsPrefab;
 
 	private string 			myLastFocusedControl;
 

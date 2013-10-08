@@ -635,7 +635,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		if ( prAssetId >= 0 )
 		{
-			if ( HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
+			if ( !HAPI_Host.mySelectionTargetIsPrefab &&
+				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
@@ -1192,6 +1193,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			if ( myPreset != null && myPreset.Length > 0 )
 				HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
+				HAPI_Host.cookAsset ( prAssetId );
 		}
 		catch ( HAPI_Error error )
 		{
