@@ -756,7 +756,7 @@ public class HAPI_AssetUtility
 
 			mesh_renderer.enabled = 
 			part_control.prObjectVisible && 
-				( asset.prIsGeoVisible || part_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT );
+				( asset.prIsGeoVisible || part_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
 
 			if ( !assignUnityMaterial( part_control, part_node, mesh_renderer ) )
 			{

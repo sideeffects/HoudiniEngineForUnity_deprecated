@@ -144,11 +144,11 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Asset Controls
-		
+
 		EditorGUILayout.Separator();
 		myAssetOTL.prShowAssetControls = HAPI_GUI.foldout( "Asset Controls", 
 														   myAssetOTL.prShowAssetControls, true );
-		
+
 		if ( myAssetOTL.prShowAssetControls )
 			myParmChanges |= generateAssetControls();
 
@@ -185,20 +185,16 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		{
 			float value = myAsset.prBakeStartTime;
 			bool changed = HAPI_GUI.floatField( "bake_start_time", "Start Time", ref value );
-			if( changed )
-			{
+			if ( changed )
 				myAsset.prBakeStartTime = value;
-			}
 		}
 		
 		// End Time
 		{
 			float value = myAsset.prBakeEndTime;
 			bool changed = HAPI_GUI.floatField( "bake_end_time", "End Time", ref value );
-			if( changed )
-			{
+			if ( changed )
 				myAsset.prBakeEndTime = value;
-			}
 		}
 		
 		// Samples per second
@@ -248,7 +244,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					myAsset.GetComponentsInChildren< HAPI_PartControl >();
 				foreach ( HAPI_PartControl control in controls )
 				{
-					if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
+					if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
 							&& control.gameObject.GetComponent< MeshRenderer >() != null )
 						control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
 				}

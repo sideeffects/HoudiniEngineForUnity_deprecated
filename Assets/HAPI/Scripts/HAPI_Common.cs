@@ -19,7 +19,14 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
+// Typedefs
+
 using HAPI_StringHandle = System.Int32;
+using HAPI_NodeId = System.Int32;
+using HAPI_AssetId = System.Int32;
+using HAPI_ObjectId = System.Int32;
+using HAPI_GeoId = System.Int32;
+using HAPI_PartId = System.Int32;
 
 namespace HAPI 
 {
@@ -219,9 +226,11 @@ namespace HAPI
 
 	public enum HAPI_GeoType
 	{
-		HAPI_GEOTYPE_DEFAULT = 0,
-		HAPI_GEOTYPE_EXPOSED_EDIT,
+		HAPI_GEOTYPE_INVALID = -1,
+		HAPI_GEOTYPE_DISPLAY,
+		HAPI_GEOTYPE_INTERMEDIATE,
 		HAPI_GEOTYPE_INPUT,
+		HAPI_GEOTYPE_CURVE,
 		HAPI_GEOTYPE_MAX
 	};
 	
@@ -654,33 +663,30 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ObjectInfo 
 	{
-		public int id;
-		
-		private int nameSH; 				// string handle (SH)
-		private int objectInstancePathSH; 	// string handle (SH)
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool hasTransformChanged;
+		public HAPI_ObjectId id;
 
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool haveGeosChanged;
+		private HAPI_StringHandle nameSH;
+		private HAPI_StringHandle objectInstancePathSH;
+
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasTransformChanged;
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool haveGeosChanged;
 		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool isVisible;
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool isInstancer;
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool isVisible;
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool isInstancer;
 
 		public int geoCount;
 
-    	public int objectToInstanceId;
-		
+		// Use the node id to get the node's parameters.
+		// Only valid if this is an Instancer object.
+		public HAPI_NodeId nodeId;
+
+		public HAPI_ObjectId objectToInstanceId;
+
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 		public string objectInstancePath
 		{ get { return HAPI_Host.getString( objectInstancePathSH ); } private set {} }
-
 	}
 	
 	// GEOMETRY -----------------------------------------------------------------------------------------------------
@@ -688,17 +694,20 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_GeoInfo
 	{
-		public int		id;
-		public int		type;
-		private int		nameSH; // string handle (SH)
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool		hasGeoChanged;
-		
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool		hasMaterialChanged;
+		public HAPI_GeoId id;
+		public HAPI_GeoType type;
+		private HAPI_StringHandle nameSH;
 
-		public int		partCount;
+		// Use the node id to get the node's parameters.
+		// Only valid if this geo is exposed (is editable or is a curve).
+		public HAPI_NodeId nodeId;
+
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool isEditable;
+		
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasGeoChanged;
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasMaterialChanged;
+
+		public int partCount;
 
 		// Accessors
 		public string name

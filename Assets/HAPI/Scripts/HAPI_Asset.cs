@@ -398,7 +398,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			HAPI_PartControl[] controls = asset.GetComponentsInChildren< HAPI_PartControl >();
 			foreach ( HAPI_PartControl control in controls )
 			{
-				if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT
+				if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
 					 && control.gameObject.GetComponent< MeshRenderer >() != null )
 					control.gameObject.GetComponent< MeshRenderer >().enabled = false;
 			}
@@ -967,6 +967,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				setChangedParametersIntoHost();
 
 				HAPI_Host.cookAsset( prAssetId );
+				progress_bar.statusCheckLoop();
 
 				myProgressBarJustUsed = true;
 				

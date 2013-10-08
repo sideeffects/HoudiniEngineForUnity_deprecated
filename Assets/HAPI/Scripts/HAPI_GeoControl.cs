@@ -54,7 +54,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		
 		prGeoId			= -1;
 		prGeoName		= "geo_name";
-		prGeoType		= HAPI_GeoType.HAPI_GEOTYPE_DEFAULT;
+		prGeoType		= HAPI_GeoType.HAPI_GEOTYPE_DISPLAY;
 		prObjectControl	= null;
 
 		myParts			= new List< GameObject >( 0 );
@@ -90,8 +90,14 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAssetId, prObjectId, prGeoId, out geo_info );
 
-		if ( geo_info.type == (int) HAPI.HAPI_GeoType.HAPI_GEOTYPE_INPUT )
+		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_INPUT )
 			return;
+
+		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
+			if ( geo_info.isEditable )
+				Debug.Log( "Editable Curve: " + geo_info.name + " nodeId: " + geo_info.nodeId );
+			else
+				Debug.Log( "Static Curve: " + geo_info.name + " nodeId: " + geo_info.nodeId );
 
 		if ( !reload_asset && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
 			return;

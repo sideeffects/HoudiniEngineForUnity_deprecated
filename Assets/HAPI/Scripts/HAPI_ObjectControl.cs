@@ -84,7 +84,7 @@ public class HAPI_ObjectControl : HAPI_Control
 				HAPI_AssetUtility.destroyGameObject( myGeos[ i ] );
 			myGeos.Clear();
 		}
-		
+
 		if ( reload_asset || object_info.haveGeosChanged )
 		{
 			// Add new geos as needed.

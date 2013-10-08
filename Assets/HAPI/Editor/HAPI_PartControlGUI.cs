@@ -181,7 +181,7 @@ public class HAPI_PartControlGUI : Editor
 			}
 		}
 		
-		if ( myPartControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_EXPOSED_EDIT )
+		if ( myPartControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 		{
 			if ( GUILayout.Button( "Update Intermediate Result" ) ) 
 			{
