@@ -12,16 +12,17 @@ public class TestScript : MonoBehaviour {
 	
 	TestScript()
 	{
-		//Debug.Log( "TestScript: CONSTRUCTOR(1) - " + value );
+		Debug.Log( "TestScript: CONSTRUCTOR(1) - " + value );
 		value = 1;
 		prArr = null;
 
-		EditorApplication.playmodeStateChanged = playmodeStateChanged;
+		EditorApplication.playmodeStateChanged += playmodeStateChanged;
 	}
 	
 	~TestScript()
 	{
-		//Debug.Log( "TestScript: DESTRUCTOR - " + value );
+		Debug.Log( "TestScript: DESTRUCTOR - " + value );
+		EditorApplication.playmodeStateChanged -= playmodeStateChanged;
 	}
 	
 	public void playmodeStateChanged()
@@ -34,17 +35,23 @@ public class TestScript : MonoBehaviour {
 		Debug.Log( "TestScript: OnApplicationQuit - " + value );
 	}
 
+	public void Reset()
+	{
+		Debug.Log( "TestScript: Reset - " + value );
+	}
+
 	public void Awake()
 	{
-		//Debug.Log( "TestScript: Awake - " + value );
+		Debug.Log( "TestScript: Awake - " + value );
 	}
 	
-	public void Start () 
+	public void Start() 
 	{
-		//Debug.Log( "TestScript: Start - " + value );
+		Debug.Log( "TestScript: Start - " + value );
 	}
 	
-	public void Update () {
+	public void Update () 
+	{
 		//Debug.Log( "TestScript: Update - " + value );
 	}
 	
