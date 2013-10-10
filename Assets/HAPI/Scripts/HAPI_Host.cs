@@ -526,7 +526,7 @@ namespace HAPI
 		public static RepaintDelegate			myRepaintDelegate;
 		public static DeselectionDelegate		myDeselectionDelegate;
 
-		public static HAPI_Asset				mySelectionTarget;
+		public static GameObject				mySelectionTarget;
 		public static bool						mySelectionTargetIsPrefab;
 
 		public static bool hasScene() 
@@ -723,12 +723,8 @@ namespace HAPI
 				if ( HAPI_Host.mySelectionTarget != null && myDeselectionDelegate != null )
 				{
 					GameObject selected = Selection.activeGameObject;
-					if ( selected != null )
-					{
-						HAPI_Asset selected_asset = selected.GetComponent< HAPI_Asset >();
-						if ( selected_asset != mySelectionTarget )
-							myDeselectionDelegate();
-					}
+					if ( selected != mySelectionTarget )
+						myDeselectionDelegate();
 				}
 			}
 			catch ( System.Exception error )

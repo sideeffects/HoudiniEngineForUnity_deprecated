@@ -90,9 +90,6 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		base.OnInspectorGUI();
 		
 		Event current_event = Event.current;
-		bool commitChanges = false;
-		if ( current_event.isKey && current_event.type == EventType.KeyUp && current_event.keyCode == KeyCode.Return )
-			commitChanges = true;
 
 		// Decide modes.
 		decideModes( ref current_event );
@@ -153,52 +150,26 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 		} // if
 		
 		///////////////////////////////////////////////////////////////////////
-		// Draw Asset Controls
-		
+		// Draw Curve Controls
+
 		EditorGUILayout.Separator();
-		myAssetCurve.prShowAssetControls = 
-			EditorGUILayout.Foldout( myAssetCurve.prShowAssetControls, new GUIContent( "Asset Controls" ) );
-		
-		myDelayBuild = false;
-		if ( myAssetCurve.prShowAssetControls )
-		{
-			GUIContent[] modes = new GUIContent[ 3 ];
-			modes[ 0 ] = new GUIContent( "View" );
-			modes[ 1 ] = new GUIContent( "Add Points" );
-			modes[ 2 ] = new GUIContent( "Edit Points" );
-			HAPI_AssetCurve.Mode last_mode = myAssetCurve.prCurrentMode;
-			myAssetCurve.prCurrentMode = 
-				(HAPI_AssetCurve.Mode) GUILayout.Toolbar( (int) last_mode, modes );
 
-			if ( myAssetCurve.prCurrentMode != last_mode )
-				refresh();
+		GUIContent[] modes = new GUIContent[ 3 ];
+		modes[ 0 ] = new GUIContent( "View" );
+		modes[ 1 ] = new GUIContent( "Add Points" );
+		modes[ 2 ] = new GUIContent( "Edit Points" );
+		HAPI_AssetCurve.Mode last_mode = myAssetCurve.prCurrentMode;
+		myAssetCurve.prCurrentMode = 
+			(HAPI_AssetCurve.Mode) GUILayout.Toolbar( (int) last_mode, modes );
 
-			HAPI_GUI.separator();
-
-			Object target = (Object) myTarget;
-			if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
-			{
-				myTarget = (GameObject) target;
-			}
-			myParmChanges |= generateAssetControls();
-			
-			GUI.enabled = true;
-		}
-
-		if ( ( myParmChanges && !myDelayBuild ) || ( myUnbuiltChanges && commitChanges ) )
-		{
-			myAssetCurve.syncPointsWithParm();
-			myAssetCurve.buildClientSide();
-			myUnbuiltChanges = false;
+		if ( myAssetCurve.prCurrentMode != last_mode )
 			refresh();
-			
-			// To keep things consistent with Unity workflow, we should not save parameter changes
-			// while in Play mode.
-			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
-				myAssetCurve.savePreset();
-		}
-		else if ( myParmChanges )
-			myUnbuiltChanges = true;
+
+		HAPI_GUI.separator();
+
+		Object target = (Object) myTarget;
+		if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
+			myTarget = (GameObject) target;
 	}
 	
 	public override void OnSceneGUI() 

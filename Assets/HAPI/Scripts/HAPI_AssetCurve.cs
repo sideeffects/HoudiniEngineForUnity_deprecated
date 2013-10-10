@@ -152,12 +152,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 	public void syncPointsWithParm()
 	{
 		// Find the parm.
-		int coords_parm_id = findParm( "coords" );
+		int coords_parm_id = prParms.findParm( "coords" );
 		if ( coords_parm_id < 0 )
 			return;
 
 		string point_list = 
-			HAPI_Host.getString( prParmStringValues[ findParm( coords_parm_id ).stringValuesIndex ] );
+			HAPI_Host.getString( prParms.prParmStringValues[ prParms.findParm( coords_parm_id ).stringValuesIndex ] );
 
 		if ( point_list == null )
 			return;
@@ -269,24 +269,24 @@ public class HAPI_AssetCurve : HAPI_Asset
 		// TODO: Make the defaults editable.
 		// TODO: Make generic update parm value functions.
 
-		int primitive_type_parm				= findParm( "type" );
-		int method_parm						= findParm( "method" );
+		int primitive_type_parm				= prParms.findParm( "type" );
+		int method_parm						= prParms.findParm( "method" );
 		int primitive_type_parm_default		= HAPI_Host.prCurvePrimitiveTypeDefault;
 		int method_parm_default				= HAPI_Host.prCurveMethodDefault;
 
-		int primitive_type_parm_int_values	= findParm( primitive_type_parm ).intValuesIndex;
-		int method_parm_int_values			= findParm( method_parm ).intValuesIndex;
+		int primitive_type_parm_int_values	= prParms.findParm( primitive_type_parm ).intValuesIndex;
+		int method_parm_int_values			= prParms.findParm( method_parm ).intValuesIndex;
 
-		prParmIntValues[ primitive_type_parm_int_values ]	= primitive_type_parm_default;
-		prParmIntValues[ method_parm_int_values ]			= method_parm_default;
+		prParms.prParmIntValues[ primitive_type_parm_int_values ]	= primitive_type_parm_default;
+		prParms.prParmIntValues[ method_parm_int_values ]			= method_parm_default;
 
 		int[] temp_int_values = new int[ 1 ];
 
 		temp_int_values[ 0 ] = primitive_type_parm_default;
-		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, findParm( primitive_type_parm ).intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, prParms.findParm( primitive_type_parm ).intValuesIndex, 1 );
 		
 		temp_int_values[ 0 ] = method_parm_default;
-		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, findParm( method_parm ).intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prAssetNodeId, temp_int_values, prParms.findParm( method_parm ).intValuesIndex, 1 );
 		
 		HAPI_Host.cookAsset( prAssetId );
 	}

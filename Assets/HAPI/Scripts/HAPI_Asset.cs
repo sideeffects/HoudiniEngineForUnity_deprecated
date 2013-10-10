@@ -88,31 +88,16 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myUpStreamGeoObjects = value; } }
 	public List< bool >				prUpStreamGeoAdded {			get { return myUpStreamGeoAdded; } 
 																	set { myUpStreamGeoAdded = value; } }
-	
-	// Parameters ---------------------------------------------------------------------------------------------------
-	
-	public int 						prParmCount {					get { return myParmCount; } 
-																	set { myParmCount = value; } }
-	public int						prParmIntValueCount {			get { return myParmIntValueCount; } 
-																	set { myParmIntValueCount = value; } }
-	public int						prParmFloatValueCount {			get { return myParmFloatValueCount; } 
-																	set { myParmFloatValueCount = value; } }
-	public int						prParmStringValueCount {		get { return myprParmStringValueCoun; } 
-																	set { myprParmStringValueCoun = value; } }
-	public int						prParmChoiceCount {				get { return myprParmChoiceCount; } 
-																	set { myprParmChoiceCount = value; } }
 
-	public HAPI_ParmInfo[] 			prParms {						get { return myParms; } 
-																	set { myParms = value; } }
-	public int[]					prParmIntValues {				get { return myParmIntValues; } 
-																	set { myParmIntValues = value; } }
-	public float[]					prParmFloatValues {				get { return myParmFloatValues; } 
-																	set { myParmFloatValues = value; } }
-	public int[]					prParmStringValues {			get { return myParmStringValues; }
-																	set { myParmStringValues = value; } } // SH
-	public HAPI_ParmChoiceInfo[]	prParmChoiceLists {				get { return myParmChoiceLists; } 
-																	set { myParmChoiceLists = value; } }
-	
+	// Parameters ---------------------------------------------------------------------------------------------------
+
+	public HAPI_Parms				prParms {						get { 
+																		HAPI_Parms parms = 
+																			getOrCreateComponent< HAPI_Parms >();
+																		parms.prAsset = this;
+																		return parms; }
+																	private set { } }
+
 	// Objects ------------------------------------------------------------------------------------------------------
 	
 	public int 						prObjectCount {					get { return myObjectCount; } 
@@ -127,26 +112,24 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myGameObjects = value; } }
 	public HAPI_Transform[] 		prObjectTransforms {			get { return myObjectTransforms; } 
 																	set { myObjectTransforms = value; } }
-	
-	
+
 	// Baking ------------------------------------------------------------------------------------------------------
+
 	public float					prBakeStartTime {				get { return myBakeStartTime; }
 																	set { myBakeStartTime = value; } }
-	
+
 	public float					prBakeEndTime {					get { return myBakeEndTime; }
 																	set { myBakeEndTime = value; } }
-	
+
 	public int						prBakeSamplesPerSecond {		get { return myBakeSamplesPerSecond; }
 																	set { myBakeSamplesPerSecond = value; } }
-	
+
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	public bool 					prShowHoudiniControls {			get { return myShowHoudiniControls; } 
 																	set { myShowHoudiniControls = value; } }
 	public bool 					prShowHelp {					get { return myShowHelp; } 
 																	set { myShowHelp = value; } }
-	public bool 					prShowAssetControls {			get { return myShowAssetControls; } 
-																	set { myShowAssetControls = value; } }
 	public bool 					prShowAssetSettings {			get { return myShowAssetSettings; } 
 																	set { myShowAssetSettings = value; } }
 	public bool 					prShowBakeOptions {				get { return myShowBakeOptions; } 
@@ -211,22 +194,6 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
 																	set { myEnableLogging = value; } }
-	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
-																	set { myLastChangedParmId = value; } }
-
-	/// <summary>
-	/// 	Indices of the currently selected folders in the Inspector.
-	/// 	A 1:1 mapping with myFolderListSelectionIds.
-	/// </summary>
-	public List< int > 				prFolderListSelections {		get { return myFolderListSelections; } 
-																	set { myFolderListSelections = value; } }
-	
-	/// <summary>
-	/// 	Parameter ids of the currently selected folders in the Inspector. 
-	/// 	A 1:1 mapping with myFolderListSelections.
-	/// </summary>
-	public List< int > 				prFolderListSelectionIds {		get { return myFolderListSelectionIds; } 
-																	set { myFolderListSelectionIds = value; } }
 
 	public List< string >			prTransInputNames {				get { return myTransInputNames; }
 																	set { myTransInputNames = value; } }
@@ -248,7 +215,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			Debug.Log( "HAPI_Asset created!" );
 		
 		HAPI.HAPI_SetPath.setPath();
-		
+
 		reset();
 	}
 	
@@ -298,30 +265,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		return null;
 	}
 
-	public void removeMultiparmInstance( HAPI_ParmInfo parm )
-	{
-		myMultiparmInstancePos = parm;
-		myToRemoveInstance = true;
-	}
-
-	public void insertMultiparmInstance( HAPI_ParmInfo parm )
-	{
-		myMultiparmInstancePos = parm;
-		myToInsertInstance = true;
-	}
-
-	// This will retrieve the cached copy of the string
-	public string[] getParmStrings( HAPI_ParmInfo parm )
-	{
-		return myParmStrings[ parm.id ];
-	}
-
-	// Set into dictionary to later be set into the host
-	public void setParmStrings( HAPI_ParmInfo parm, string[] strings )
-	{
-		myParmStrings[ parm.id ] = strings;
-	}
-	
 	// Transform related connection methods -------------------------------------------------------
 	
 	public void addAssetAsTransformInput( HAPI_Asset asset, int index )
@@ -697,21 +640,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prUpStreamGeoAssets 			= new List< HAPI_Asset >();
 		prUpStreamGeoObjects 			= new List< GameObject >();
 		prUpStreamGeoAdded 				= new List< bool >();
-		
-		// Parameters -----------------------------------------------------------------------------------------------
-		
-		prParmCount 					= 0;
-		prParmIntValueCount 			= 0;
-		prParmFloatValueCount 			= 0;
-		prParmStringValueCount 			= 0;
-		prParmChoiceCount 				= 0;
-		
-		prParms 						= null;
-		prParmIntValues 				= new int[ 0 ];
-		prParmFloatValues 				= new float[ 0 ];
-		prParmStringValues 				= new int[ 0 ]; // string handles (SH)
-		prParmChoiceLists 				= new HAPI_ParmChoiceInfo[ 0 ];
-		
+
 		// Objects --------------------------------------------------------------------------------------------------
 		
 		prObjectCount 					= 0;
@@ -732,7 +661,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		prShowHoudiniControls 			= true;
 		prShowHelp						= false;
-		prShowAssetControls 			= true;
 		prShowAssetSettings				= true;
 		prShowBakeOptions				= false;
 		prShowInputControls 			= true;
@@ -755,12 +683,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		prTransformChangeTriggersCooks	= HAPI_Host.myDefaultTransformChangeTriggersCooks;
 
 		prEnableLogging					= false;
-		prLastChangedParmId 			= -1;
-
-		prFolderListSelections 			= new List< int >();
-		prFolderListSelectionIds 		= new List< int >();
-		prFolderListSelections.Add( 0 );
-		prFolderListSelectionIds.Add( -1 );
 
 		prTransInputNames				= new List< string >();
 		prGeoInputNames					= new List< string >();
@@ -928,11 +850,11 @@ public abstract class HAPI_Asset : HAPI_Control
 				}
 				
 				progress_bar.prCurrentValue			= 0;
-				progress_bar.prTotal				= prParmCount
-													  + prParmIntValueCount
-													  + prParmFloatValueCount
-													  + prParmStringValueCount
-													  + prParmChoiceCount
+				progress_bar.prTotal				= prParms.prParmCount
+													  + prParms.prParmIntValueCount
+													  + prParms.prParmFloatValueCount
+													  + prParms.prParmStringValueCount
+													  + prParms.prParmChoiceCount
 													  + prObjectCount
 													  + prHandleCount;
 				
@@ -941,7 +863,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				
 				progress_bar.prMessage = "Loading parameter information...";
 
-				getParameterValues();
+				prParms.getParameterValues();
 				
 				// Add input fields.
 				if ( is_first_time_build || ( !serialization_recovery_only && !force_reconnect ) )
@@ -965,17 +887,17 @@ public abstract class HAPI_Asset : HAPI_Control
 			{
 				progress_bar.displayProgressBar();
 
-				setChangedParametersIntoHost();
+				prParms.setChangedParametersIntoHost();
 
 				HAPI_Host.cookAsset( prAssetId );
 				progress_bar.statusCheckLoop();
 
 				myProgressBarJustUsed = true;
 				
-				progress_bar.prTotal = prObjectCount + prParmIntValueCount 
-									   + prParmFloatValueCount + prParmStringValueCount;
+				progress_bar.prTotal = prObjectCount + prParms.prParmIntValueCount 
+									   + prParms.prParmFloatValueCount + prParms.prParmStringValueCount;
 
-				getParameterValues();
+				prParms.getParameterValues();
 			}
 			
 			// Refresh object info arrays as they are lost after serialization.
@@ -1236,24 +1158,6 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// -------------------------------------------------------------------------------------------------------------
 
-	public virtual HAPI_ParmInfo findParm( int id )
-	{
-		return myParmMap[ id ];
-	}
-
-	protected virtual int findParm( string name )
-	{
-		if ( prParms == null )
-			return -1;
-
-		for ( int i = 0; i < prParms.Length; ++i )
-		{
-			if ( prParms[ i ].name == name )
-				return prParms[ i ].id;
-		}
-		return -1;
-	}
-	
 	protected void pushAssetTransformToHoudini()
 	{
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
@@ -1264,28 +1168,28 @@ public abstract class HAPI_Asset : HAPI_Control
 		int parm = -1;
 		float [] parm_data = new float[ 3 ];
 
-		parm = findParm( "t" );
+		parm = prParms.findParm( "t" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, findParm( parm ).floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
+				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
 
-		parm = findParm( "r" );
+		parm = prParms.findParm( "r" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, findParm( parm ).floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
+				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
 
-		parm = findParm( "s" );
+		parm = prParms.findParm( "s" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, findParm( parm ).floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParmFloatValues[ findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
+				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
 	}
 	
@@ -1469,158 +1373,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 	}
 
-	private void cacheStringsFromHost()
-	{
-		// For each string parameter, cache the string from the host
-		foreach ( HAPI_ParmInfo parm in prParms )
-		{
-			if ( parm.isString() )
-			{
-				myParmStrings[ parm.id ] = new string[ parm.size ];
-				for ( int p = 0; p < parm.size; ++p )
-					myParmStrings[ parm.id ][ p ] =
-						HAPI_Host.getString( prParmStringValues[ parm.stringValuesIndex + p ] );
-			}
-		}
-	}
-
-	private void getParameterValues()
-	{
-		// Get the node info again
-		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prAssetNodeId );
-
-		prParmCount 			= node_info.parmCount;
-		prParmIntValueCount		= node_info.parmIntValueCount;
-		prParmFloatValueCount	= node_info.parmFloatValueCount;
-		prParmStringValueCount	= node_info.parmStringValueCount;
-		prParmChoiceCount		= node_info.parmChoiceCount;
-
-		// We need to get the parameter values again because they could have been
-		// changed by a script.
-
-		// Get all parameters.
-		prParms = new HAPI_ParmInfo[ prParmCount ];
-		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParameters, prParms, prParmCount );
-
-		// Get parameter int values.
-		prParmIntValues = new int[ prParmIntValueCount ];
-		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmIntValues, 
-				prParmIntValues, prParmIntValueCount );
-
-		// Get parameter float values.
-		prParmFloatValues = new float[ prParmFloatValueCount ];
-		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmFloatValues, 
-				prParmFloatValues, prParmFloatValueCount );
-
-		// Get parameter string (handle) values.
-		prParmStringValues = new int[ prParmStringValueCount ];
-		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
-				prParmStringValueCount );
-
-		// Get parameter choice lists.
-		prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-		Utility.getArray1Id( prAssetNodeId, HAPI_Host.getParmChoiceLists, 
-				prParmChoiceLists, prParmChoiceCount );
-
-		// Build the map of parm id -> parm
-		for ( int i = 0; i < prParms.Length; ++i )
-			myParmMap[ prParms[ i ].id ] = prParms[ i ];
-
-		cacheStringsFromHost();
-	}
-
-	private void removeMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
-	{
-		int[] values = new int[ 1 ];
-		HAPI_Host.getParmIntValues( prAssetNodeId, values, multiparm.intValuesIndex, 1);
-
-		int last_instance = values[ 0 ];
-
-		for ( int i = 0; i < num_instances; ++i )
-			HAPI_Host.removeMultiparmInstance(
-					prAssetNodeId,
-					multiparm.id, // The multiparm list
-					last_instance - i );
-	}
-
-	private void appendMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
-	{
-		int[] values = new int[1];
-		HAPI_Host.getParmIntValues( prAssetNodeId, values, multiparm.intValuesIndex, 1 );
-
-		int last_instance = values[ 0 ];
-
-		for ( int i = 0; i < num_instances; ++i )
-			HAPI_Host.insertMultiparmInstance(
-					prAssetNodeId,
-					multiparm.id, // The multiparm list
-					last_instance + i );
-	}
-
-	private void setChangedParametersIntoHost()
-	{
-		setChangedParameterIntoHost( prLastChangedParmId );
-
-		if ( myToInsertInstance )
-			HAPI_Host.insertMultiparmInstance(
-					prAssetNodeId,
-					myMultiparmInstancePos.parentId, // The multiparm list
-					myMultiparmInstancePos.instanceNum
-					);
-
-		if ( myToRemoveInstance )
-			HAPI_Host.removeMultiparmInstance(
-					prAssetNodeId,
-					myMultiparmInstancePos.parentId, // The multiparm list
-					myMultiparmInstancePos.instanceNum  
-					);
-
-		if ( myToRemoveInstance || myToInsertInstance )
-			getParameterValues();
-
-
-		myToInsertInstance = false;
-		myToRemoveInstance = false;
-		prLastChangedParmId = HAPI_Constants.HAPI_INVALID_PARM_ID;
-	}
-
-	private void setChangedParameterIntoHost( int id )
-	{
-		if ( id == -1 )
-			return;
-		HAPI_ParmInfo parm = myParmMap[ id ];
-		if ( (HAPI_ParmType) parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
-		{
-			int[] values = new int[ 1 ];
-			HAPI_Host.getParmIntValues( prAssetNodeId, values, parm.intValuesIndex, 1);
-
-			int difference = prParmIntValues[ parm.intValuesIndex ] - values[ 0 ];
-			if ( difference > 0 )
-				appendMultiparmInstances( parm, difference );
-			else if ( difference < 0 )
-				removeMultiparmInstances( parm, -difference );
-
-			getParameterValues();
-		}
-		else if ( parm.isFloat() )
-		{
-			float[] values = new float[ parm.size ];
-			Array.Copy( prParmFloatValues, parm.floatValuesIndex, values, 0, parm.size );
-			HAPI_Host.setParmFloatValues( prAssetNodeId, values, parm.floatValuesIndex, parm.size );
-		}
-		else if ( parm.isInt() && (HAPI_ParmType) parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
-		{
-			int[] values = new int[ parm.size ];
-			Array.Copy( prParmIntValues, parm.intValuesIndex, values, 0, parm.size );
-			HAPI_Host.setParmIntValues( prAssetNodeId, values, parm.intValuesIndex, parm.size );
-		}
-		else if ( parm.isString() )
-		{
-			for ( int p = 0; p < myParmStrings[ parm.id ].Length; ++p )
-				HAPI_Host.setParmStringValue( prAssetNodeId, myParmStrings[ parm.id ][ p ], parm.id, p );
-		}
-	}
-	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
 	public bool hasProgressBarBeenUsed()
@@ -1661,28 +1413,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private List< HAPI_Asset >		myUpStreamGeoAssets;
 	[SerializeField] private List< GameObject >		myUpStreamGeoObjects;
 	[SerializeField] private List< bool >			myUpStreamGeoAdded;
-	
-	// Parameters ---------------------------------------------------------------------------------------------------
-	
-	[SerializeField] private int 					myParmCount;
-	[SerializeField] private int					myParmIntValueCount;
-	[SerializeField] private int					myParmFloatValueCount;
-	[SerializeField] private int					myprParmStringValueCoun;
-	[SerializeField] private int					myprParmChoiceCount;
-	
-	[SerializeField] private HAPI_ParmInfo[]  		myParms;
-	[SerializeField] private int[]					myParmIntValues;
-	[SerializeField] private float[]				myParmFloatValues;
-	[SerializeField] private int[]					myParmStringValues; // string handles (SH)
-	[SerializeField] private HAPI_ParmChoiceInfo[]	myParmChoiceLists;
-
-	// A mapping from parm id to the parm's string values
-	private Dictionary< int, string[] >  			myParmStrings = new Dictionary<int, string[]>();
-	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary<int, HAPI_ParmInfo>();
-
-	private HAPI_ParmInfo 						myMultiparmInstancePos;
-	private bool 								myToInsertInstance = false;
-	private bool 								myToRemoveInstance = false;
 
 	// Objects ------------------------------------------------------------------------------------------------------
 	
@@ -1705,7 +1435,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	[SerializeField] private bool 					myShowHoudiniControls;
 	[SerializeField] private bool					myShowHelp;
-	[SerializeField] private bool 					myShowAssetControls;
 	[SerializeField] private bool 					myShowAssetSettings;
 	[SerializeField] private bool 					myShowBakeOptions;
 	[SerializeField] private bool					myShowInputControls;
@@ -1728,19 +1457,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myTransformChangeTriggersCooks;
 	
 	[SerializeField] private bool					myEnableLogging;
-	[SerializeField] private int					myLastChangedParmId;
-	
-	/// <summary>
-	/// 	Indices of the currently selected folders in the Inspector.
-	/// 	A 1:1 mapping with myFolderListSelectionIds.
-	/// </summary>
-	[SerializeField] private List< int > 			myFolderListSelections;
-	
-	/// <summary>
-	/// 	Parameter ids of the currently selected folders in the Inspector.
-	/// 	A 1:1 mapping with myFolderListSelections.
-	/// </summary>
-	[SerializeField] private List< int > 			myFolderListSelectionIds;
 
 	[SerializeField] private List< string >			myTransInputNames;
 	[SerializeField] private List< string >			myGeoInputNames;

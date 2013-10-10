@@ -42,11 +42,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		base.OnInspectorGUI();
 		
-		Event curr_event = Event.current;
-		bool commitChanges = false;
-		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
-			commitChanges = true;
-		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
@@ -115,7 +110,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		if ( myAssetOTL.prShowHelp )
 		{
 			myHelpScrollPosition = EditorGUILayout.BeginScrollView(
-				myHelpScrollPosition, GUILayout.MaxHeight( 200 ) );
+				myHelpScrollPosition, GUILayout.Height( 200 ) );
 			float height = GUI.skin.label.CalcHeight( 
 				new GUIContent( myAssetOTL.prAssetHelp ), (float) Screen.width );
 			GUIStyle sel_label = GUI.skin.label;
@@ -123,7 +118,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			sel_label.wordWrap = true;
 			EditorGUILayout.SelectableLabel( 
 				myAssetOTL.prAssetHelp, sel_label, GUILayout.Height( height ), 
-				GUILayout.Width( Screen.width - 30 ) );
+				GUILayout.Width( Screen.width - 40 ) );
 			EditorGUILayout.EndScrollView();
 		}
 		
@@ -142,39 +137,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		if ( myAssetOTL.prShowBakeOptions )
 			generateAssetBakeControls();
 
-		///////////////////////////////////////////////////////////////////////
-		// Draw Asset Controls
-
-		EditorGUILayout.Separator();
-		myAssetOTL.prShowAssetControls = HAPI_GUI.foldout( "Asset Controls", 
-														   myAssetOTL.prShowAssetControls, true );
-
-		if ( myAssetOTL.prShowAssetControls )
-			myParmChanges |= generateAssetControls();
-
-		if ( !myAssetIsPrefab && 
-			 ( ( myParmChanges && !myDelayBuild ) || 
-			 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
-		{
-			myAssetOTL.build(	myReloadAsset,	// reload_asset
-								true,			// unload_asset_first
-								false,			// serializatin_recovery_only
-								false,			// force_reconnect
-								myAsset.prCookingTriggersDownCooks,
-								true			// use_delay_for_progress_bar
-							);
-
-			myUnbuiltChanges	= false;
-			myParmChanges		= false;
-			myReloadAsset		= false;
-
-			// To keep things consistent with Unity workflow, we should not save parameter changes
-			// while in Play mode.
-			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
-				myAssetOTL.savePreset();
-		}
-		else if ( myParmChanges )
-			myUnbuiltChanges = true;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
