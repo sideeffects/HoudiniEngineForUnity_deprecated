@@ -91,12 +91,18 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
-	public HAPI_Parms				prParms {						get { 
-																		HAPI_Parms parms = 
-																			getOrCreateComponent< HAPI_Parms >();
-																		parms.prAsset = this;
-																		return parms; }
-																	private set { } }
+	public HAPI_Parms				prParms {	get { 
+													HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
+													if ( parms == null )
+													{
+														parms = gameObject.AddComponent< HAPI_Parms >();
+														parms.prAsset = this;
+														if ( prAssetId >= 0 )
+															parms.getParameterValues();
+													}
+													return parms; 
+												}
+												private set { } }
 
 	// Objects ------------------------------------------------------------------------------------------------------
 	
@@ -850,13 +856,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				}
 				
 				progress_bar.prCurrentValue			= 0;
-				progress_bar.prTotal				= prParms.prParmCount
-													  + prParms.prParmIntValueCount
-													  + prParms.prParmFloatValueCount
-													  + prParms.prParmStringValueCount
-													  + prParms.prParmChoiceCount
-													  + prObjectCount
-													  + prHandleCount;
+				progress_bar.prTotal				= prObjectCount + prHandleCount;
 				
 				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
@@ -894,8 +894,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 				myProgressBarJustUsed = true;
 				
-				progress_bar.prTotal = prObjectCount + prParms.prParmIntValueCount 
-									   + prParms.prParmFloatValueCount + prParms.prParmStringValueCount;
+				progress_bar.prTotal = prObjectCount;
 
 				prParms.getParameterValues();
 			}
