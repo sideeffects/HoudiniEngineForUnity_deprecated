@@ -162,8 +162,7 @@ public class HAPI_Parms : MonoBehaviour
 	}
 
 	public virtual void Update()
-	{
-	}
+	{}
 
 	// -------------------------------------------------------------------------------------------------------------
 
@@ -178,10 +177,9 @@ public class HAPI_Parms : MonoBehaviour
 			return -1;
 
 		for ( int i = 0; i < prParms.Length; ++i )
-		{
 			if ( prParms[ i ].name == name )
 				return prParms[ i ].id;
-		}
+
 		return -1;
 	}
 
@@ -223,23 +221,23 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Get parameter int values.
 		prParmIntValues = new int[ prParmIntValueCount ];
-		Utility.getArray1Id( prAsset.prAssetNodeId, HAPI_Host.getParmIntValues, 
-				prParmIntValues, prParmIntValueCount );
+		Utility.getArray1Id( 
+			prAsset.prAssetNodeId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
 
 		// Get parameter float values.
 		prParmFloatValues = new float[ prParmFloatValueCount ];
-		Utility.getArray1Id( prAsset.prAssetNodeId, HAPI_Host.getParmFloatValues, 
-				prParmFloatValues, prParmFloatValueCount );
+		Utility.getArray1Id( 
+			prAsset.prAssetNodeId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
 
 		// Get parameter string (handle) values.
 		prParmStringValues = new int[ prParmStringValueCount ];
-		Utility.getArray1Id( prAsset.prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, 
-				prParmStringValueCount );
+		Utility.getArray1Id( 
+			prAsset.prAssetNodeId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
 
 		// Get parameter choice lists.
 		prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-		Utility.getArray1Id( prAsset.prAssetNodeId, HAPI_Host.getParmChoiceLists, 
-				prParmChoiceLists, prParmChoiceCount );
+		Utility.getArray1Id( 
+			prAsset.prAssetNodeId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
 
 		// Build the map of parm id -> parm
 		for ( int i = 0; i < prParms.Length; ++i )
@@ -260,9 +258,9 @@ public class HAPI_Parms : MonoBehaviour
 
 		for ( int i = 0; i < num_instances; ++i )
 			HAPI_Host.removeMultiparmInstance(
-					prAsset.prAssetNodeId,
-					multiparm.id, // The multiparm list
-					last_instance - i );
+				prAsset.prAssetNodeId,
+				multiparm.id, // The multiparm list
+				last_instance - i );
 	}
 
 	public void appendMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
@@ -277,9 +275,9 @@ public class HAPI_Parms : MonoBehaviour
 
 		for ( int i = 0; i < num_instances; ++i )
 			HAPI_Host.insertMultiparmInstance(
-					prAsset.prAssetNodeId,
-					multiparm.id, // The multiparm list
-					last_instance + i );
+				prAsset.prAssetNodeId,
+				multiparm.id, // The multiparm list
+				last_instance + i );
 	}
 
 	public void setChangedParametersIntoHost()
@@ -291,21 +289,18 @@ public class HAPI_Parms : MonoBehaviour
 
 		if ( myToInsertInstance )
 			HAPI_Host.insertMultiparmInstance(
-					prAsset.prAssetNodeId,
-					myMultiparmInstancePos.parentId, // The multiparm list
-					myMultiparmInstancePos.instanceNum
-					);
+				prAsset.prAssetNodeId,
+				myMultiparmInstancePos.parentId, // The multiparm list
+				myMultiparmInstancePos.instanceNum );
 
 		if ( myToRemoveInstance )
 			HAPI_Host.removeMultiparmInstance(
-					prAsset.prAssetNodeId,
-					myMultiparmInstancePos.parentId, // The multiparm list
-					myMultiparmInstancePos.instanceNum  
-					);
+				prAsset.prAssetNodeId,
+				myMultiparmInstancePos.parentId, // The multiparm list
+				myMultiparmInstancePos.instanceNum );
 
 		if ( myToRemoveInstance || myToInsertInstance )
 			getParameterValues();
-
 
 		myToInsertInstance = false;
 		myToRemoveInstance = false;
@@ -375,12 +370,12 @@ public class HAPI_Parms : MonoBehaviour
 	[SerializeField] private HAPI_ParmChoiceInfo[]	myParmChoiceLists;
 
 	// A mapping from parm id to the parm's string values
-	private Dictionary< int, string[] >  			myParmStrings = new Dictionary<int, string[]>();
-	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary<int, HAPI_ParmInfo>();
+	private Dictionary< int, string[] >  			myParmStrings = new Dictionary< int, string[] >();
+	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary< int, HAPI_ParmInfo >();
 
-	private HAPI_ParmInfo 						myMultiparmInstancePos;
-	private bool 								myToInsertInstance = false;
-	private bool 								myToRemoveInstance = false;
+	private HAPI_ParmInfo 							myMultiparmInstancePos;
+	private bool 									myToInsertInstance = false;
+	private bool 									myToRemoveInstance = false;
 
 	[SerializeField] private int					myLastChangedParmId;
 	
