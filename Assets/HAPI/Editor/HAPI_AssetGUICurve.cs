@@ -970,21 +970,24 @@ public class HAPI_AssetGUICurve : HAPI_AssetGUI
 	}
 
 	public static bool mySceneWindowHasFocus {
-		get {
+		get
+		{
 			return EditorWindow.focusedWindow == SceneView.lastActiveSceneView;
 		}
 	}
 
 	public static bool myIsTransformHandleHidden {
-		get {
-			System.Type type = typeof (Tools);
-			FieldInfo field = type.GetField ("s_Hidden", BindingFlags.NonPublic | BindingFlags.Static);
-			return ((bool) field.GetValue (null));
+		get
+		{
+			System.Type type = typeof( Tools );
+			FieldInfo field = type.GetField( "s_Hidden", BindingFlags.NonPublic | BindingFlags.Static );
+			return ( (bool) field.GetValue( null ) );
 		}
-		set {
-			System.Type type = typeof (Tools);
-			FieldInfo field = type.GetField ("s_Hidden", BindingFlags.NonPublic | BindingFlags.Static);
-			field.SetValue (null, value);
+		set
+		{
+			System.Type type = typeof( Tools );
+			FieldInfo field = type.GetField( "s_Hidden", BindingFlags.NonPublic | BindingFlags.Static );
+			field.SetValue( null, value );
 		}
 	}
 	

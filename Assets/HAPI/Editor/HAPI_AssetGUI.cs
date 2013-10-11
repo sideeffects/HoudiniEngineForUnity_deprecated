@@ -36,11 +36,17 @@ public class HAPI_AssetGUI : Editor
 		myReloadAsset		= false;
 		myFocusChanged 		= true;
 		myAssetIsPrefab 	= PrefabUtility.GetPrefabType( myAsset ) == PrefabType.Prefab;
+
+		HAPI_Host.myRepaintDelegate += this.refresh;
+		HAPI_Host.myDeselectionDelegate += this.deselect;
+		HAPI_Host.mySelectionTarget = myAsset.gameObject;
 	}
 
 	public virtual void OnDisable()
 	{
-
+		HAPI_Host.myRepaintDelegate -= this.refresh;
+		HAPI_Host.myDeselectionDelegate -= this.deselect;
+		HAPI_Host.mySelectionTarget = null;
 	}
 
 	public virtual void refresh()
@@ -52,20 +58,13 @@ public class HAPI_AssetGUI : Editor
 	public virtual void deselect()
 	{
 		if ( HAPI_Host.mySelectionTarget == myAsset.gameObject )
-		{
-			HAPI_Host.myRepaintDelegate = null;
-			HAPI_Host.myDeselectionDelegate = null;
 			HAPI_Host.mySelectionTarget = null;
-		}
 	}
 
 	public override void OnInspectorGUI() 
 	{
 		try
 		{
-			HAPI_Host.myRepaintDelegate = this.refresh;
-			HAPI_Host.myDeselectionDelegate = this.deselect;
-			HAPI_Host.mySelectionTarget = myAsset.gameObject;
 			HAPI_Host.mySelectionTargetIsPrefab = myAssetIsPrefab;
 
 			myDelayBuild	= false;
@@ -231,9 +230,6 @@ public class HAPI_AssetGUI : Editor
 
 	public virtual void OnSceneGUI()
 	{
-		HAPI_Host.myRepaintDelegate			= this.refresh;
-		HAPI_Host.myDeselectionDelegate		= this.deselect;
-		HAPI_Host.mySelectionTarget			= myAsset.gameObject;
 		HAPI_Host.mySelectionTargetIsPrefab = myAssetIsPrefab;
 	}
 	
