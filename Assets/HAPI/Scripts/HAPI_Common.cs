@@ -20,7 +20,6 @@ using System.Collections;
 using System.Runtime.InteropServices;
 
 // Typedefs
-
 using HAPI_StringHandle = System.Int32;
 using HAPI_NodeId = System.Int32;
 using HAPI_AssetId = System.Int32;
