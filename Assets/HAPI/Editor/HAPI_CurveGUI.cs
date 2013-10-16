@@ -54,7 +54,7 @@ public class HAPI_CurveGUI : Editor
 		myConnectionMesh		= null;
 		myConnectionMaterial	= null;
 
-		myLastMode				= HAPI_AssetCurve.Mode.NONE;
+		myLastMode				= HAPI_Curve.Mode.NONE;
 	}
 
 	public void OnDisable()
@@ -604,23 +604,23 @@ public class HAPI_CurveGUI : Editor
 		myConnectionMesh.SetIndices( connection_indices, MeshTopology.LineStrip, 0 );
 	}
 
-	private void changeModes( ref bool add_points_mode, ref bool edit_points_mode, HAPI_AssetCurve.Mode mode )
+	private void changeModes( ref bool add_points_mode, ref bool edit_points_mode, HAPI_Curve.Mode mode )
 	{
 		switch ( mode )
 		{
-			case HAPI_AssetCurve.Mode.NONE: 
+			case HAPI_Curve.Mode.NONE: 
 				{
 					add_points_mode = false;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_AssetCurve.Mode.ADD:
+			case HAPI_Curve.Mode.ADD:
 				{
 					add_points_mode = true;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_AssetCurve.Mode.EDIT:
+			case HAPI_Curve.Mode.EDIT:
 				{
 					add_points_mode = false;
 					edit_points_mode = true;
@@ -644,7 +644,7 @@ public class HAPI_CurveGUI : Editor
 		{
 			if ( !mode_change_wait && edit_points_mode_key )
 			{
-				myLastMode			= HAPI_AssetCurve.Mode.ADD;
+				myLastMode			= HAPI_Curve.Mode.ADD;
 
 				add_points_mode		= false;
 				edit_points_mode	= true;
@@ -660,7 +660,7 @@ public class HAPI_CurveGUI : Editor
 		{
 			if ( !mode_change_wait && add_points_mode_key )
 			{
-				myLastMode			= HAPI_AssetCurve.Mode.EDIT;
+				myLastMode			= HAPI_Curve.Mode.EDIT;
 
 				add_points_mode		= true;
 				edit_points_mode	= false;
@@ -678,13 +678,13 @@ public class HAPI_CurveGUI : Editor
 			{
 				add_points_mode		= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_AssetCurve.Mode.NONE;
+				myLastMode			= HAPI_Curve.Mode.NONE;
 			}
 			else if ( edit_points_mode_key )
 			{
 				edit_points_mode	= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_AssetCurve.Mode.NONE;
+				myLastMode			= HAPI_Curve.Mode.NONE;
 			}
 		}
 
@@ -947,5 +947,5 @@ public class HAPI_CurveGUI : Editor
 	private Mesh				myConnectionMesh;
 	private Material			myConnectionMaterial;
 
-	private HAPI_AssetCurve.Mode myLastMode;
+	private HAPI_Curve.Mode myLastMode;
 }

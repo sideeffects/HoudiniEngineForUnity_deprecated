@@ -243,7 +243,7 @@ public class HAPI_Curve : MonoBehaviour
 		}
 	}
 
-	public void createObject( int object_id )
+	public void createObject( int object_id, int geo_id )
 	{
 		HAPI_ObjectInfo object_info = prAsset.prObjects[ object_id ];
 		
@@ -252,7 +252,7 @@ public class HAPI_Curve : MonoBehaviour
 			// Get position attributes (this is all we get for the curve's geometry).
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
-			Utility.getAttribute( prAsset.prAssetId, object_id, 0, 0, HAPI_Constants.HAPI_ATTRIB_POSITION, 
+			Utility.getAttribute( prAsset.prAssetId, object_id, geo_id, 0, HAPI_Constants.HAPI_ATTRIB_POSITION, 
 								  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );

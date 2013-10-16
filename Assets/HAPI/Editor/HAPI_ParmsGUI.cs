@@ -63,45 +63,58 @@ public class HAPI_ParmsGUI : Editor
 	
 	public override void OnInspectorGUI() 
 	{
-		myDelayBuild	= false;
-		myParmChanges	= false;
-
-		myParmChanges = false;
-		myDelayBuild = false;
-		myFocusChanged = false;
-		
-		Event curr_event = Event.current;
-		bool commitChanges = false;
-		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
-			commitChanges = true;
-		
-		///////////////////////////////////////////////////////////////////////
-		// Draw Asset Controls
-
-		myParmChanges |= generateAssetControls();
-
-		if ( ( ( myParmChanges && !myDelayBuild ) || 
-			 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
+		try
 		{
-			myAsset.build(		myReloadAsset,	// reload_asset
-								true,			// unload_asset_first
-								false,			// serializatin_recovery_only
-								false,			// force_reconnect
-								myAsset.prCookingTriggersDownCooks,
-								true			// use_delay_for_progress_bar
-							);
-
-			myUnbuiltChanges	= false;
-			myParmChanges		= false;
-			myReloadAsset		= false;
-
-			// To keep things consistent with Unity workflow, we should not save parameter changes
-			// while in Play mode.
-			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
-				myAsset.savePreset();
+				
+			myDelayBuild	= false;
+			myParmChanges	= false;
+	
+			myParmChanges = false;
+			myDelayBuild = false;
+			myFocusChanged = false;
+			
+			Event curr_event = Event.current;
+			bool commitChanges = false;
+			if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
+				commitChanges = true;
+			
+			///////////////////////////////////////////////////////////////////////
+			// Draw Asset Controls
+	
+			myParmChanges |= generateAssetControls();
+	
+			if ( ( ( myParmChanges && !myDelayBuild ) || 
+				 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
+			{
+				myAsset.build(		myReloadAsset,	// reload_asset
+									true,			// unload_asset_first
+									false,			// serializatin_recovery_only
+									false,			// force_reconnect
+									myAsset.prCookingTriggersDownCooks,
+									true			// use_delay_for_progress_bar
+								);
+	
+				myUnbuiltChanges	= false;
+				myParmChanges		= false;
+				myReloadAsset		= false;
+	
+				// To keep things consistent with Unity workflow, we should not save parameter changes
+				// while in Play mode.
+				if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
+					myAsset.savePreset();
+			}
+			else if ( myParmChanges )
+				myUnbuiltChanges = true;
 		}
-		else if ( myParmChanges )
-			myUnbuiltChanges = true;
+		catch ( HAPI_ErrorIgnorable ) {}
+		catch ( HAPI_Error error )
+		{
+			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
+		}
+		catch ( System.Exception error )
+		{
+			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
+		}
 	}
 
 	public virtual void OnSceneGUI()

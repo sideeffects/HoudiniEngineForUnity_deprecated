@@ -93,16 +93,10 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_INPUT )
 			return;
 
-		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
-			if ( geo_info.isEditable )
-				Debug.Log( "Editable Curve: " + geo_info.name + " nodeId: " + geo_info.nodeId );
-			else
-				Debug.Log( "Static Curve: " + geo_info.name + " nodeId: " + geo_info.nodeId );
-
 		if ( !reload_asset && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
 			return;
 
-		if ( reload_asset )
+		if ( reload_asset || geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
 			for ( int i = 0; i < myParts.Count; ++i )
 				HAPI_AssetUtility.destroyGameObject( myParts[ i ] );
@@ -116,46 +110,80 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 			// Set node name.
 			geo_node.name = prGeoName + "_geo" + prGeoId;
-
-			// Add new geos as needed.
-			while ( myParts.Count < geo_info.partCount )
-				myParts.Add( createPart( myParts.Count ) );
-
-			// Remove stale geos.
-			while ( myParts.Count > geo_info.partCount )
-			{
-				HAPI_AssetUtility.destroyGameObject( myParts[ geo_info.partCount ] );
-				myParts.RemoveAt( geo_info.partCount );
-			}
 		}
-		
-		// Refresh all geos.
-		for ( int i = 0; i < myParts.Count; ++i )
-			myParts[ i ].GetComponent< HAPI_PartControl >().refresh( 
-				reload_asset, geo_info.hasGeoChanged, geo_info.hasMaterialChanged );
 
-		if ( reload_asset && geo_info.partCount > 0 )
+		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
-			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
-			int[] script_attr = new int[ 0 ];
-			
-			HAPI_AssetUtility.getAttribute( 
-				prAssetId, prObjectId, prGeoId, 0, "Unity_Script",
-				ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
-			
-			if ( script_attr_info.exists && script_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL )
-				throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as detail attributes!" );
-			
-			if( script_attr_info.exists && script_attr.Length > 0 )
+			createCurve( geo_info.nodeId, prObjectId, prGeoId, geo_info.isEditable );
+		}
+		else
+		{
+			if ( reload_asset || geo_info.hasGeoChanged )
 			{
-				string script_to_attach = HAPI_Host.getString( script_attr[ 0 ] );
-				HAPI_AssetUtility.attachScript( geo_node, script_to_attach );
+				// Add new geos as needed.
+				while ( myParts.Count < geo_info.partCount )
+					myParts.Add( createPart( myParts.Count ) );
+
+				// Remove stale geos.
+				while ( myParts.Count > geo_info.partCount )
+				{
+					HAPI_AssetUtility.destroyGameObject( myParts[ geo_info.partCount ] );
+					myParts.RemoveAt( geo_info.partCount );
+				}
+			}
+		
+			// Refresh all geos.
+			for ( int i = 0; i < myParts.Count; ++i )
+				myParts[ i ].GetComponent< HAPI_PartControl >().refresh( 
+					reload_asset, geo_info.hasGeoChanged, geo_info.hasMaterialChanged );
+
+			if ( reload_asset && geo_info.partCount > 0 )
+			{
+				HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
+				int[] script_attr = new int[ 0 ];
+			
+				HAPI_AssetUtility.getAttribute( 
+					prAssetId, prObjectId, prGeoId, 0, "Unity_Script",
+					ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
+			
+				if ( script_attr_info.exists && script_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL )
+					throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as detail attributes!" );
+			
+				if ( script_attr_info.exists && script_attr.Length > 0 )
+				{
+					string script_to_attach = HAPI_Host.getString( script_attr[ 0 ] );
+					HAPI_AssetUtility.attachScript( geo_node, script_to_attach );
+				}
 			}
 		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
+
+	private void createCurve( int node_id, int object_id, int geo_id, bool editable )
+	{
+		HAPI_Parms parms = getOrCreateComponent< HAPI_Parms >();
+		parms.prAsset = prAsset;
+		parms.prNodeId = node_id;
+		parms.getParameterValues();
+
+		HAPI_Curve curve = getOrCreateComponent< HAPI_Curve >();
+		curve.prAsset = prAsset;
+		curve.prParms = parms;
+		curve.prNodeId = node_id;
+
+		try
+		{
+			curve.syncPointsWithParm();
+			curve.createObject( object_id, geo_id );
+		}
+		catch ( HAPI_Error )
+		{
+			// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
+			//Debug.LogWarning( error.ToString() );
+		}
+	}
 
 	private GameObject createPart( int part_id )
 	{

@@ -26,16 +26,6 @@ using Utility = HAPI_AssetUtility;
 public class HAPI_AssetCurve : HAPI_Asset
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Public Enums
-	
-	public enum Mode
-	{
-		NONE,
-		ADD,
-		EDIT
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
@@ -111,7 +101,7 @@ public class HAPI_AssetCurve : HAPI_Asset
 	{
 		try
 		{
-			prCurve.createObject( 0 );
+			prCurve.createObject( 0, 0 );
 		}
 		catch ( HAPI_Error )
 		{

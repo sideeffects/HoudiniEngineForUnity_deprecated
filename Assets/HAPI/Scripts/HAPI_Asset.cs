@@ -97,6 +97,7 @@ public abstract class HAPI_Asset : HAPI_Control
 													{
 														parms = gameObject.AddComponent< HAPI_Parms >();
 														parms.prAsset = this;
+														parms.prNodeId = this.prAssetNodeId;
 														if ( prAssetId >= 0 )
 															parms.getParameterValues();
 													}
