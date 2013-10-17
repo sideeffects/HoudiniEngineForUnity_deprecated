@@ -861,6 +861,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.prMessage = "Loading parameter information...";
 
 				prParms.getParameterValues();
+				foreach ( HAPI_Parms parms in GetComponentsInChildren< HAPI_Parms >() )
+					parms.getParameterValues();
 				
 				// Add input fields.
 				if ( is_first_time_build || ( !serialization_recovery_only && !force_reconnect ) )
