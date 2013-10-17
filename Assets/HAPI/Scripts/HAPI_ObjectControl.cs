@@ -60,16 +60,18 @@ public class HAPI_ObjectControl : HAPI_Control
 
 	public void init( HAPI_ObjectControl object_control )
 	{
-		prAssetId		= object_control.prAssetId;
-		prAsset			= object_control.prAsset;
+		init( (HAPI_Control) object_control );
+
 		prObjectId		= object_control.prObjectId;
 		prObjectName	= object_control.prObjectName;
 		prObjectVisible = object_control.prObjectVisible;
 	}
 
-	public void init( int asset_id, HAPI_Asset asset, int object_id, string object_name, bool object_visible )
+	public void init( 
+		int asset_id, int node_id, HAPI_Asset asset, int object_id, string object_name, bool object_visible )
 	{
 		prAssetId		= asset_id;
+		prNodeId		= node_id;
 		prAsset			= asset;
 		prObjectId		= object_id;
 		prObjectName	= object_name;

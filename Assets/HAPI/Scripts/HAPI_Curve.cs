@@ -45,12 +45,10 @@ public class HAPI_Curve : MonoBehaviour
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 	
-	public HAPI_Asset		prAsset {					get { return myAsset; }
-														set { myAsset = value; } }
+	public HAPI_Control		prControl {					get { return myControl; } 
+														set { myControl = value; } }
 	public HAPI_Parms		prParms {					get { return myParms; }
 														set { myParms = value; } }
-	public HAPI_NodeId		prNodeId {					get { return myNodeId; }
-														set { myNodeId = value; } }
 
 	public List< Vector3 > 	prPoints {					get { return myPoints; } 
 														set { myPoints = value; } }
@@ -139,6 +137,9 @@ public class HAPI_Curve : MonoBehaviour
 	
 	public void updatePoints()
 	{
+		if ( prControl == null )
+			return;
+
 		string parm = "";
 		for ( int i = 0; i < prPoints.Count; ++i )
 		{
@@ -150,11 +151,11 @@ public class HAPI_Curve : MonoBehaviour
 			parm += " ";
 		}
 		
-		HAPI_Host.setParmStringValue( prNodeId, parm, 2, 0 );
+		HAPI_Host.setParmStringValue( prControl.prNodeId, parm, 2, 0 );
 		
-		prAsset.buildClientSide();
+		prControl.prAsset.buildClientSide();
 
-		prAsset.savePreset();
+		prControl.prAsset.savePreset();
 	}
 
 	public void syncPointsWithParm()
@@ -197,9 +198,8 @@ public class HAPI_Curve : MonoBehaviour
 	{
 		// Please keep these in the same order and grouping as their declarations at the top.
 
-		prAsset				= null;
+		prControl			= null;
 		prParms				= null;
-		prNodeId			= -1;
 
 		prPoints 			= new List< Vector3 >();
 		prVertices 			= new Vector3[ 0 ];
@@ -245,14 +245,14 @@ public class HAPI_Curve : MonoBehaviour
 
 	public void createObject( int object_id, int geo_id )
 	{
-		HAPI_ObjectInfo object_info = prAsset.prObjects[ object_id ];
+		HAPI_ObjectInfo object_info = prControl.prAsset.prObjects[ object_id ];
 		
 		try
 		{
 			// Get position attributes (this is all we get for the curve's geometry).
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
-			Utility.getAttribute( prAsset.prAssetId, object_id, geo_id, 0, HAPI_Constants.HAPI_ATTRIB_POSITION, 
+			Utility.getAttribute( prControl.prAsset.prAssetId, object_id, geo_id, 0, HAPI_Constants.HAPI_ATTRIB_POSITION, 
 								  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HAPI_Error( "No position attribute found." );
@@ -318,12 +318,12 @@ public class HAPI_Curve : MonoBehaviour
 		int[] temp_int_values = new int[ 1 ];
 
 		temp_int_values[ 0 ] = primitive_type_parm_default;
-		HAPI_Host.setParmIntValues( prNodeId, temp_int_values, prParms.findParm( primitive_type_parm ).intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, prParms.findParm( primitive_type_parm ).intValuesIndex, 1 );
 		
 		temp_int_values[ 0 ] = method_parm_default;
-		HAPI_Host.setParmIntValues( prNodeId, temp_int_values, prParms.findParm( method_parm ).intValuesIndex, 1 );
+		HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, prParms.findParm( method_parm ).intValuesIndex, 1 );
 		
-		HAPI_Host.cookAsset( prAsset.prAssetId );
+		HAPI_Host.cookAsset( prControl.prAsset.prAssetId );
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -376,7 +376,7 @@ public class HAPI_Curve : MonoBehaviour
 			{
 				Debug.Log( 
 					"Why is this curve without a gameObject?\nName: " + 
-					prAsset.prAssetName + "\nId: " + prAsset.prAssetId );
+					prControl.prAsset.prAssetName + "\nId: " + prControl.prAsset.prAssetId );
 			}
 		}
 		catch ( System.Exception error )
@@ -388,9 +388,8 @@ public class HAPI_Curve : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-	[SerializeField] private HAPI_Asset			myAsset;
+	[SerializeField] private HAPI_Control		myControl;
 	[SerializeField] private HAPI_Parms			myParms;
-	[SerializeField] private HAPI_NodeId		myNodeId;
 	
 	[SerializeField] private List< Vector3 >	myPoints;
 	[SerializeField] private Vector3[]			myVertices;

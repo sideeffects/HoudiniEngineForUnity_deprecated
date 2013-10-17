@@ -30,7 +30,7 @@ public class HAPI_ParmsGUI : Editor
 	public void OnEnable()
 	{
 		myParms = target as HAPI_Parms;
-		myAsset = myParms.prAsset;
+		myAsset = myParms.prControl.prAsset;
 
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
@@ -65,10 +65,9 @@ public class HAPI_ParmsGUI : Editor
 	{
 		try
 		{
-				
-			myDelayBuild	= false;
-			myParmChanges	= false;
-	
+			myDelayBuild = false;
+			myParmChanges = false;
+
 			myParmChanges = false;
 			myDelayBuild = false;
 			myFocusChanged = false;

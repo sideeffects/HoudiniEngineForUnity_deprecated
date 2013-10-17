@@ -18,8 +18,10 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
-
 using HAPI;
+
+// Typedefs
+using HAPI_NodeId = System.Int32;
 
 [ ExecuteInEditMode ]
 public class HAPI_PartControl : HAPI_GeoControl 
@@ -91,8 +93,9 @@ public class HAPI_PartControl : HAPI_GeoControl
 		prMaterialId	= part_control.prMaterialId;
 	}
 
-	public void init( int part_id, string part_name, int material_id )
+	public void init( HAPI_NodeId node_id, int part_id, string part_name, int material_id )
 	{
+		prNodeId		= node_id;
 		prPartId		= part_id;
 		prPartName		= part_name;
 		prMaterialId	= material_id;
@@ -122,7 +125,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 		if ( reload_asset || has_geo_changed )
 		{
 			// Initialize our part control.
-			init( part_info.id, part_info.name, part_info.materialId );
+			init( -1, part_info.id, part_info.name, part_info.materialId );
 
 			// Overwrite name.
 			part_node.name = part_info.name + "_part" + prPartId;

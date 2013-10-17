@@ -21,6 +21,10 @@ using System.Collections.Generic;
 
 using HAPI;
 
+// Typedefs
+using HAPI_NodeId = System.Int32;
+using HAPI_AssetId = System.Int32;
+
 public class HAPI_Control : MonoBehaviour 
 {
 
@@ -29,7 +33,8 @@ public class HAPI_Control : MonoBehaviour
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Control.reset().
 
-	public int prAssetId { get { return myAssetId; } set { myAssetId = value; } }
+	public HAPI_AssetId prAssetId { get { return myAssetId; } set { myAssetId = value; } }
+	public HAPI_NodeId prNodeId { get { return myNodeId; } set { myNodeId = value; } }
 	public HAPI_Asset prAsset { get { return myAsset; } set { myAsset = value; } }
 
 	public HAPI_Control() 
@@ -47,7 +52,15 @@ public class HAPI_Control : MonoBehaviour
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
 		prAssetId = -1;
+		prNodeId = -1;
 		prAsset = null;
+	}
+
+	public void init( HAPI_Control control )
+	{
+		prAssetId	= control.prAssetId;
+		prNodeId	= control.prNodeId;
+		prAsset		= control.prAsset;
 	}
 	
 	public T getOrCreateComponent< T >() where T : Component {
@@ -71,6 +84,7 @@ public class HAPI_Control : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-	[SerializeField] private int myAssetId;
+	[SerializeField] private HAPI_AssetId myAssetId;
+	[SerializeField] private HAPI_NodeId myNodeId;
 	[SerializeField] private HAPI_Asset myAsset;
 }

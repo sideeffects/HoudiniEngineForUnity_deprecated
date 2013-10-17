@@ -47,8 +47,6 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myPreset = value; } }
 	public int						prAssetValidationId {			get { return myAssetValidationId; }
 																	protected set { myAssetValidationId = value; } }
-	public int						prAssetNodeId {					get { return myAssetNodeId; }
-																	set { myAssetNodeId = value; } }
  	public string					prAssetName {					get { return myAssetName; }
 																	set { myAssetName = value; } }
 	public string					prAssetHelp {					get { return myAssetHelp; }
@@ -96,8 +94,7 @@ public abstract class HAPI_Asset : HAPI_Control
 													if ( parms == null )
 													{
 														parms = gameObject.AddComponent< HAPI_Parms >();
-														parms.prAsset = this;
-														parms.prNodeId = this.prAssetNodeId;
+														parms.prControl = this;
 														if ( prAssetId >= 0 )
 															parms.getParameterValues();
 													}
@@ -624,7 +621,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		prAssetInfo 					= new HAPI_AssetInfo();
 		prPreset 						= null;
 		prAssetValidationId				= -1;
-		prAssetNodeId					= -1;
 		prAssetName						= "ASSET_NAME";
 		prAssetHelp						= "ASSET_HELP";
 		prAssetType						= AssetType.TYPE_INVALID;
@@ -821,7 +817,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				// variables is required in order to maintain state between serialization cycles.
 				prAssetId 				= prAssetInfo.id;
 				prAssetValidationId		= prAssetInfo.validationId;
-				prAssetNodeId			= prAssetInfo.nodeId;
+				prNodeId			= prAssetInfo.nodeId;
 				prObjectCount 			= prAssetInfo.objectCount;
 				prHandleCount 			= prAssetInfo.handleCount;
 
@@ -1171,7 +1167,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		parm = prParms.findParm( "t" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
 				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
@@ -1179,7 +1175,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		parm = prParms.findParm( "r" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
 				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
@@ -1187,7 +1183,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		parm = prParms.findParm( "s" );
 		if ( parm > 0 )
 		{
-			HAPI_Host.getParmFloatValues( prAssetNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
+			HAPI_Host.getParmFloatValues( prNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
 				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
 		}
@@ -1390,7 +1386,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private HAPI_AssetInfo			myAssetInfo;
 	[SerializeField] private byte[]					myPreset;
 	[SerializeField] private int					myAssetValidationId;
-	[SerializeField] private int					myAssetNodeId;
 	[SerializeField] private string					myAssetName;
 	[SerializeField] private string					myAssetHelp;
 	[SerializeField] private AssetType				myAssetType;

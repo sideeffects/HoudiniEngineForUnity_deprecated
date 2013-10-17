@@ -18,8 +18,10 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
-
 using HAPI;
+
+// Typedefs
+using HAPI_NodeId = System.Int32;
 
 public class HAPI_GeoControl : HAPI_ObjectControl 
 {
@@ -69,8 +71,9 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		prGeoType		= geo_control.prGeoType;
 	}
 
-	public void init( int geo_id, string geo_name, HAPI_GeoType geo_type )
+	public void init( HAPI_NodeId node_id, int geo_id, string geo_name, HAPI_GeoType geo_type )
 	{
+		prNodeId		= node_id;
 		prGeoId			= geo_id;
 		prGeoName		= geo_name;
 		prGeoType		= geo_type;
@@ -106,7 +109,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		if ( reload_asset || geo_info.hasGeoChanged )
 		{
 			// Initialize our geo control.
-			init( prGeoId, geo_info.name, (HAPI_GeoType) geo_info.type );
+			init( geo_info.nodeId, prGeoId, geo_info.name, (HAPI_GeoType) geo_info.type );
 
 			// Set node name.
 			geo_node.name = prGeoName + "_geo" + prGeoId;
@@ -164,14 +167,12 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	private void createCurve( int node_id, int object_id, int geo_id, bool editable )
 	{
 		HAPI_Parms parms = getOrCreateComponent< HAPI_Parms >();
-		parms.prAsset = prAsset;
-		parms.prNodeId = node_id;
+		parms.prControl = this;
 		parms.getParameterValues();
 
 		HAPI_Curve curve = getOrCreateComponent< HAPI_Curve >();
-		curve.prAsset = prAsset;
+		curve.prControl = this;
 		curve.prParms = parms;
-		curve.prNodeId = node_id;
 
 		try
 		{
@@ -181,7 +182,6 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		catch ( HAPI_Error )
 		{
 			// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
-			//Debug.LogWarning( error.ToString() );
 		}
 	}
 

@@ -35,9 +35,8 @@ public class HAPI_AssetCurve : HAPI_Asset
 													if ( curve == null )
 													{
 														curve = gameObject.AddComponent< HAPI_Curve >();
-														curve.prAsset = this;
+														curve.prControl = this;
 														curve.prParms = this.prParms;
-														curve.prNodeId = this.prAssetNodeId;
 													}
 													return curve;
 												}

@@ -233,7 +233,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			prGameObjects[ object_id ].transform.parent = transform;
 
 			object_control = prGameObjects[ object_id ].AddComponent< HAPI_ObjectControl >();
-			object_control.init( prAssetId, prAsset, object_id, object_info.name, object_info.isVisible );
+			object_control.init( prAssetId, object_info.nodeId, prAsset, object_id, object_info.name, object_info.isVisible );
 		}
 		else
 		{

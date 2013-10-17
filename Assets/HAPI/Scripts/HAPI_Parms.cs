@@ -24,6 +24,7 @@ using HAPI;
 using Utility = HAPI_AssetUtility;
 
 // Typedefs
+using HAPI_StringHandle = System.Int32;
 using HAPI_NodeId = System.Int32;
 
 [ RequireComponent( typeof( HAPI_Control ) ) ]
@@ -44,10 +45,8 @@ public class HAPI_Parms : MonoBehaviour
 
 	// Assets -------------------------------------------------------------------------------------------------------
 
-	public HAPI_Asset				prAsset {						get { return myAsset; } 
-																	set { myAsset = value; } }
-	public HAPI_NodeId				prNodeId {						get { return myNodeId; } 
-																	set { myNodeId = value; } }
+	public HAPI_Control				prControl {						get { return myControl; } 
+																	set { myControl = value; } }
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
@@ -68,8 +67,8 @@ public class HAPI_Parms : MonoBehaviour
 																	set { myParmIntValues = value; } }
 	public float[]					prParmFloatValues {				get { return myParmFloatValues; } 
 																	set { myParmFloatValues = value; } }
-	public int[]					prParmStringValues {			get { return myParmStringValues; }
-																	set { myParmStringValues = value; } } // SH
+	public HAPI_StringHandle[]		prParmStringValues {			get { return myParmStringValues; }
+																	set { myParmStringValues = value; } }
 	public HAPI_ParmChoiceInfo[]	prParmChoiceLists {				get { return myParmChoiceLists; } 
 																	set { myParmChoiceLists = value; } }
 
@@ -142,7 +141,7 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Assets -------------------------------------------------------------------------------------------------------
 
-		prAsset							= null;
+		prControl						= null;
 
 		// Parameters -----------------------------------------------------------------------------------------------
 		
@@ -155,7 +154,7 @@ public class HAPI_Parms : MonoBehaviour
 		prParms 						= null;
 		prParmIntValues 				= new int[ 0 ];
 		prParmFloatValues 				= new float[ 0 ];
-		prParmStringValues 				= new int[ 0 ]; // string handles (SH)
+		prParmStringValues 				= new HAPI_StringHandle[ 0 ];
 		prParmChoiceLists 				= new HAPI_ParmChoiceInfo[ 0 ];
 		
 		prLastChangedParmId 			= -1;
@@ -205,11 +204,13 @@ public class HAPI_Parms : MonoBehaviour
 
 	public void getParameterValues()
 	{
-		if ( prAsset == null )
+		if ( prControl == null )
+			return;
+		if ( prControl.prAsset == null )
 			return;
 
 		// Get the node info again
-		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prNodeId );
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prControl.prNodeId );
 
 		prParmCount 			= node_info.parmCount;
 		prParmIntValueCount		= node_info.parmIntValueCount;
@@ -222,27 +223,27 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Get all parameters.
 		prParms = new HAPI_ParmInfo[ prParmCount ];
-		Utility.getArray1Id( prNodeId, HAPI_Host.getParameters, prParms, prParmCount );
+		Utility.getArray1Id( prControl.prNodeId, HAPI_Host.getParameters, prParms, prParmCount );
 
 		// Get parameter int values.
 		prParmIntValues = new int[ prParmIntValueCount ];
 		Utility.getArray1Id( 
-			prNodeId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+			prControl.prNodeId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
 
 		// Get parameter float values.
 		prParmFloatValues = new float[ prParmFloatValueCount ];
 		Utility.getArray1Id( 
-			prNodeId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+			prControl.prNodeId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
 
 		// Get parameter string (handle) values.
 		prParmStringValues = new int[ prParmStringValueCount ];
 		Utility.getArray1Id( 
-			prNodeId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
+			prControl.prNodeId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
 
 		// Get parameter choice lists.
 		prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
 		Utility.getArray1Id( 
-			prNodeId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
+			prControl.prNodeId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
 
 		// Build the map of parm id -> parm
 		for ( int i = 0; i < prParms.Length; ++i )
@@ -253,54 +254,60 @@ public class HAPI_Parms : MonoBehaviour
 
 	public void removeMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
 	{
-		if ( prAsset == null )
+		if ( prControl == null )
+			return;
+		if ( prControl.prAsset == null )
 			return;
 
 		int[] values = new int[ 1 ];
-		HAPI_Host.getParmIntValues( prNodeId, values, multiparm.intValuesIndex, 1);
+		HAPI_Host.getParmIntValues( prControl.prNodeId, values, multiparm.intValuesIndex, 1);
 
 		int last_instance = values[ 0 ];
 
 		for ( int i = 0; i < num_instances; ++i )
 			HAPI_Host.removeMultiparmInstance(
-				prNodeId,
+				prControl.prNodeId,
 				multiparm.id, // The multiparm list
 				last_instance - i );
 	}
 
 	public void appendMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
 	{
-		if ( prAsset == null )
+		if ( prControl == null )
+			return;
+		if ( prControl.prAsset == null )
 			return;
 
 		int[] values = new int[1];
-		HAPI_Host.getParmIntValues( prNodeId, values, multiparm.intValuesIndex, 1 );
+		HAPI_Host.getParmIntValues( prControl.prNodeId, values, multiparm.intValuesIndex, 1 );
 
 		int last_instance = values[ 0 ];
 
 		for ( int i = 0; i < num_instances; ++i )
 			HAPI_Host.insertMultiparmInstance(
-				prNodeId,
+				prControl.prNodeId,
 				multiparm.id, // The multiparm list
 				last_instance + i );
 	}
 
 	public void setChangedParametersIntoHost()
 	{
-		if ( prAsset == null )
+		if ( prControl == null )
+			return;
+		if ( prControl.prAsset == null )
 			return;
 
 		setChangedParameterIntoHost( prLastChangedParmId );
 
 		if ( myToInsertInstance )
 			HAPI_Host.insertMultiparmInstance(
-				prNodeId,
+				prControl.prNodeId,
 				myMultiparmInstancePos.parentId, // The multiparm list
 				myMultiparmInstancePos.instanceNum );
 
 		if ( myToRemoveInstance )
 			HAPI_Host.removeMultiparmInstance(
-				prNodeId,
+				prControl.prNodeId,
 				myMultiparmInstancePos.parentId, // The multiparm list
 				myMultiparmInstancePos.instanceNum );
 
@@ -314,7 +321,9 @@ public class HAPI_Parms : MonoBehaviour
 
 	public void setChangedParameterIntoHost( int id )
 	{
-		if ( prAsset == null )
+		if ( prControl == null )
+			return;
+		if ( prControl.prAsset == null )
 			return;
 
 		if ( id == -1 )
@@ -324,7 +333,7 @@ public class HAPI_Parms : MonoBehaviour
 		if ( (HAPI_ParmType) parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			int[] values = new int[ 1 ];
-			HAPI_Host.getParmIntValues( prNodeId, values, parm.intValuesIndex, 1);
+			HAPI_Host.getParmIntValues( prControl.prNodeId, values, parm.intValuesIndex, 1);
 
 			int difference = prParmIntValues[ parm.intValuesIndex ] - values[ 0 ];
 			if ( difference > 0 )
@@ -338,18 +347,18 @@ public class HAPI_Parms : MonoBehaviour
 		{
 			float[] values = new float[ parm.size ];
 			Array.Copy( prParmFloatValues, parm.floatValuesIndex, values, 0, parm.size );
-			HAPI_Host.setParmFloatValues( prNodeId, values, parm.floatValuesIndex, parm.size );
+			HAPI_Host.setParmFloatValues( prControl.prNodeId, values, parm.floatValuesIndex, parm.size );
 		}
 		else if ( parm.isInt() && (HAPI_ParmType) parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			int[] values = new int[ parm.size ];
 			Array.Copy( prParmIntValues, parm.intValuesIndex, values, 0, parm.size );
-			HAPI_Host.setParmIntValues( prNodeId, values, parm.intValuesIndex, parm.size );
+			HAPI_Host.setParmIntValues( prControl.prNodeId, values, parm.intValuesIndex, parm.size );
 		}
 		else if ( parm.isString() )
 		{
 			for ( int p = 0; p < myParmStrings[ parm.id ].Length; ++p )
-				HAPI_Host.setParmStringValue( prNodeId, myParmStrings[ parm.id ][ p ], parm.id, p );
+				HAPI_Host.setParmStringValue( prControl.prNodeId, myParmStrings[ parm.id ][ p ], parm.id, p );
 		}
 	}
 	
@@ -358,8 +367,7 @@ public class HAPI_Parms : MonoBehaviour
 	
 	// Assets -------------------------------------------------------------------------------------------------------
 
-	[SerializeField] private HAPI_Asset				myAsset;
-	[SerializeField] private HAPI_NodeId			myNodeId;
+	[SerializeField] private HAPI_Control			myControl;
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 	
@@ -372,7 +380,7 @@ public class HAPI_Parms : MonoBehaviour
 	[SerializeField] private HAPI_ParmInfo[]  		myParms;
 	[SerializeField] private int[]					myParmIntValues;
 	[SerializeField] private float[]				myParmFloatValues;
-	[SerializeField] private int[]					myParmStringValues; // string handles (SH)
+	[SerializeField] private HAPI_StringHandle[]	myParmStringValues;
 	[SerializeField] private HAPI_ParmChoiceInfo[]	myParmChoiceLists;
 
 	// A mapping from parm id to the parm's string values
