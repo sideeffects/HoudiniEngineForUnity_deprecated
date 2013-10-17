@@ -860,10 +860,11 @@ public abstract class HAPI_Asset : HAPI_Control
 				
 				progress_bar.prMessage = "Loading parameter information...";
 
+				// Need to re-acquire all the params for all the child controls that have parms exposed.
 				prParms.getParameterValues();
 				foreach ( HAPI_Parms parms in GetComponentsInChildren< HAPI_Parms >() )
 					parms.getParameterValues();
-				
+
 				// Add input fields.
 				if ( is_first_time_build || ( !serialization_recovery_only && !force_reconnect ) )
 					initAssetConnections();
