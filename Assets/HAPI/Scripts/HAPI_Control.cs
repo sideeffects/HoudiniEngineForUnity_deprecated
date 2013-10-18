@@ -62,7 +62,9 @@ public class HAPI_Control : MonoBehaviour
 		prNodeId	= control.prNodeId;
 		prAsset		= control.prAsset;
 	}
-	
+
+	public virtual void onParmChange( bool reload_asset ) {}
+
 	public T getOrCreateComponent< T >() where T : Component {
 		T component = gameObject.GetComponent< T >();
 		if ( component == null )

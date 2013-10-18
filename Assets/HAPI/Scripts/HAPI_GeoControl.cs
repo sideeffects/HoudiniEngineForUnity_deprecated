@@ -34,6 +34,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	public int prGeoId {				get { return myGeoId; }		set { myGeoId = value; } }
 	public string prGeoName {			get { return myGeoName; }	set { myGeoName = value; } }
 	public HAPI_GeoType prGeoType {		get { return myGeoType; }	set { myGeoType = value; } }
+	public bool prIsEditable {				get { return myIsEditable; }	set { myIsEditable = value; } }
 	public HAPI_ObjectControl prObjectControl { get { return myObjectControl; } set { myObjectControl = value; } }
 
 	public List< GameObject > prParts {	get { return myParts; }		set { myParts = value; } }
@@ -57,6 +58,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		prGeoId			= -1;
 		prGeoName		= "geo_name";
 		prGeoType		= HAPI_GeoType.HAPI_GEOTYPE_DISPLAY;
+		prIsEditable		= false;
 		prObjectControl	= null;
 
 		myParts			= new List< GameObject >( 0 );
@@ -69,14 +71,17 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		prGeoId			= geo_control.prGeoId;
 		prGeoName		= geo_control.prGeoName;
 		prGeoType		= geo_control.prGeoType;
+		prIsEditable		= geo_control.prIsEditable;
 	}
 
-	public void init( HAPI_NodeId node_id, int geo_id, string geo_name, HAPI_GeoType geo_type )
+	public void init( 
+		HAPI_NodeId node_id, int geo_id, string geo_name, HAPI_GeoType geo_type, bool editable )
 	{
 		prNodeId		= node_id;
 		prGeoId			= geo_id;
 		prGeoName		= geo_name;
 		prGeoType		= geo_type;
+		prIsEditable		= editable;
 	}
 
 	public void refresh( bool reload_asset )
@@ -109,7 +114,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		if ( reload_asset || geo_info.hasGeoChanged )
 		{
 			// Initialize our geo control.
-			init( geo_info.nodeId, prGeoId, geo_info.name, (HAPI_GeoType) geo_info.type );
+			init( geo_info.nodeId, prGeoId, geo_info.name, (HAPI_GeoType) geo_info.type, geo_info.isEditable );
 
 			// Set node name.
 			geo_node.name = prGeoName + "_geo" + prGeoId;
@@ -117,7 +122,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
-			createCurve( geo_info.nodeId, prObjectId, prGeoId, geo_info.isEditable );
+			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
 		}
 		else
 		{
@@ -161,18 +166,46 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		}
 	}
 
+	public override void onParmChange( bool reload_asset )
+	{
+		base.onParmChange( reload_asset );
+
+		if ( prGeoType == HAPI_GeoType.HAPI_GEOTYPE_CURVE && prIsEditable )
+		{
+			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
+
+			if ( prAsset )
+				prAsset.build(
+					reload_asset,	// reload_asset
+					true,			// unload_asset_first
+					false,			// serializatin_recovery_only
+					false,			// force_reconnect
+					prAsset.prCookingTriggersDownCooks,
+					true			// use_delay_for_progress_bar
+				);
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
 
-	private void createCurve( int node_id, int object_id, int geo_id, bool editable )
+	private void createAndInitCurve( int node_id, int object_id, int geo_id, bool editable )
 	{
-		HAPI_Parms parms = getOrCreateComponent< HAPI_Parms >();
-		parms.prControl = this;
-		parms.getParameterValues();
+		HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
+		if ( parms == null )
+		{
+			parms = gameObject.AddComponent< HAPI_Parms >();
+			parms.prControl = this;
+			parms.getParameterValues();
+		}
 
-		HAPI_Curve curve = getOrCreateComponent< HAPI_Curve >();
-		curve.prControl = this;
-		curve.prParms = parms;
+		HAPI_Curve curve = gameObject.GetComponent< HAPI_Curve >();
+		if ( curve == null )
+		{
+			curve = gameObject.AddComponent< HAPI_Curve >();
+			curve.prControl = this;
+			curve.prParms = parms;
+		}
 
 		try
 		{
@@ -210,6 +243,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	[SerializeField] private int			myGeoId;
 	[SerializeField] private string			myGeoName;
 	[SerializeField] private HAPI_GeoType	myGeoType;
+	[SerializeField] private bool			myIsEditable;
 	[SerializeField] private HAPI_ObjectControl myObjectControl;
 
 	[SerializeField] private List< GameObject > myParts;

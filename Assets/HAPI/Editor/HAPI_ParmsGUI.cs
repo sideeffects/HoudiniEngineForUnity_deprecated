@@ -67,9 +67,6 @@ public class HAPI_ParmsGUI : Editor
 		{
 			myDelayBuild = false;
 			myParmChanges = false;
-
-			myParmChanges = false;
-			myDelayBuild = false;
 			myFocusChanged = false;
 			
 			Event curr_event = Event.current;
@@ -85,13 +82,7 @@ public class HAPI_ParmsGUI : Editor
 			if ( ( ( myParmChanges && !myDelayBuild ) || 
 				 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
 			{
-				myAsset.build(		myReloadAsset,	// reload_asset
-									true,			// unload_asset_first
-									false,			// serializatin_recovery_only
-									false,			// force_reconnect
-									myAsset.prCookingTriggersDownCooks,
-									true			// use_delay_for_progress_bar
-								);
+				myParms.prControl.onParmChange( myReloadAsset );
 	
 				myUnbuiltChanges	= false;
 				myParmChanges		= false;
@@ -506,15 +497,17 @@ public class HAPI_ParmsGUI : Editor
 				current_index++;
 			}
 		}
-
+		
+		/*
+		TODO: This is broken right now. It is triggered on mouse hover most of the time.
 		if ( myLastFocusedControl != GUI.GetNameOfFocusedControl() )
 		{
-			//Debug.Log( "Changed focus from " + myLastFocusedControl + " to " + GUI.GetNameOfFocusedControl() );
+			Debug.Log( "Changed focus from " + myLastFocusedControl + " to " + GUI.GetNameOfFocusedControl() );
 			// We changed focus. Signal a build
 			myLastFocusedControl = GUI.GetNameOfFocusedControl();
 			myFocusChanged = true;
 			myDelayBuild = false;
-		}
+		}*/
 
 		return changed;
 	}

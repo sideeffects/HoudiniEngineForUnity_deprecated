@@ -695,6 +695,20 @@ public abstract class HAPI_Asset : HAPI_Control
 		myProgressBarJustUsed 			= false;
 	}
 
+	public override void onParmChange( bool reload_asset )
+	{
+		base.onParmChange( reload_asset );
+
+		build(	
+			reload_asset,	// reload_asset
+			true,			// unload_asset_first
+			false,			// serializatin_recovery_only
+			false,			// force_reconnect
+			prCookingTriggersDownCooks,
+			true			// use_delay_for_progress_bar
+		);
+	}
+
 	public virtual bool buildAll()
 	{
 		return build(	true,	// reload_asset
