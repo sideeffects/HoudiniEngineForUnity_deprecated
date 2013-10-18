@@ -86,10 +86,10 @@ public class HAPI_AssetGUI : Editor
 			// Draw Game Object Controls
 
 			if ( ( myAsset.prMaxTransInputCount > 0 || myAsset.prMaxGeoInputCount > 0 ) &&
-				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
+				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE &&
+				 !myAsset.isPrefab() )
 			{
-				myAsset.prShowInputControls = myAsset.isPrefab() && 
-											  HAPI_GUI.foldout( "Inputs", myAsset.prShowInputControls, true );
+				myAsset.prShowInputControls = HAPI_GUI.foldout( "Inputs", myAsset.prShowInputControls, true );
 			
 				if ( myAsset.prShowInputControls )
 				{

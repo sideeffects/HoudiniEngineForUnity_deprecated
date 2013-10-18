@@ -368,7 +368,7 @@ public class HAPI_GUI : Editor
 	}
 
 	public static bool multiparmField( 	ref HAPI_GUIParm parm,
-								 		ref bool delay_build,
+										ref bool delay_build,
 										ref int[] values,
 										ref bool join_last, ref bool no_label_toggle_last )
 	{
@@ -390,7 +390,7 @@ public class HAPI_GUI : Editor
 		if ( GUILayout.Button( "+" ) )
 			new_value++;
 
-		if ( GUILayout.Button( "-" ) && new_value > 0)
+		if ( GUILayout.Button( "-" ) && new_value > 0 )
 			new_value--;
 
 		if ( GUILayout.Button( "Clear" ) )
@@ -400,10 +400,7 @@ public class HAPI_GUI : Editor
 
 		// Determine if value changed and update parameter value.
 		if ( new_value != old_value )
-		{
 			values[ parm.valuesIndex ] = new_value;
-			Debug.Log( "changed" );
-		}
 		
 		return new_value != old_value;
 	}

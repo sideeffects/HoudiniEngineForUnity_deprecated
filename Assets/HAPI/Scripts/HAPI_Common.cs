@@ -498,7 +498,8 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_NodeInfo 
 	{
-		public int id;
+		public HAPI_NodeId id;
+		public HAPI_AssetId assetId;
 		
 		public int parmCount;
 		public int parmIntValueCount;
@@ -510,9 +511,9 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_GlobalNodes 
 	{
-		public int defaultCamera;
-		public int defaultLight;
-		public int mantraRenderer;
+		public HAPI_NodeId defaultCamera;
+		public HAPI_NodeId defaultLight;
+		public HAPI_NodeId mantraRenderer;
 	}
 
 	// PARAMETERS ---------------------------------------------------------------------------------------------------

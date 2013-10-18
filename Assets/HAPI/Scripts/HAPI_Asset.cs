@@ -1190,8 +1190,8 @@ public abstract class HAPI_Asset : HAPI_Control
 		try
 		{
 			if ( myPreset != null && myPreset.Length > 0 )
-				HAPI_Host.setPreset( prAssetId, myPreset, myPreset.Length );
-				HAPI_Host.cookAsset ( prAssetId );
+				HAPI_Host.setPreset( prNodeId, myPreset, myPreset.Length );
+				HAPI_Host.cookAsset( prAssetId );
 		}
 		catch ( HAPI_Error error )
 		{
@@ -1207,7 +1207,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		try
 		{
-			myPreset = HAPI_Host.getPreset( prAssetId );
+			myPreset = HAPI_Host.getPreset( prNodeId );
 		}
 		catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
 	}

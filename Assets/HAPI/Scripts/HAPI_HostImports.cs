@@ -22,6 +22,14 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
+// Typedefs
+using HAPI_StringHandle = System.Int32;
+using HAPI_NodeId = System.Int32;
+using HAPI_AssetId = System.Int32;
+using HAPI_ObjectId = System.Int32;
+using HAPI_GeoId = System.Int32;
+using HAPI_PartId = System.Int32;
+
 namespace HAPI 
 {	
 	/// <summary>
@@ -232,13 +240,13 @@ namespace HAPI
 		// PRESETS --------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetPresetBufLength( int asset_id, ref int buffer_length );
+		private static extern int HAPI_GetPresetBufLength( HAPI_NodeId node_id, ref int buffer_length );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetPreset( int asset_id, [Out] byte[] preset, int buffer_length );
+		private static extern int HAPI_GetPreset( HAPI_NodeId node_id, [Out] byte[] preset, int buffer_length );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetPreset( int asset_id, byte[] preset, int buffer_length );
+		private static extern int HAPI_SetPreset( HAPI_NodeId node_id, byte[] preset, int buffer_length );
 		
 		// OBJECTS --------------------------------------------------------------------------------------------------
 		
