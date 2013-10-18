@@ -42,9 +42,8 @@ public class HAPI_AssetGUI : Editor
 		
 		// if selection is a prefab build it ( only get parameters ) to
 		// allow editing of parameters
-		if( PrefabUtility.GetPrefabType( myAsset.gameObject ) == PrefabType.Prefab &&
-			( myAsset.prAssetId != myAsset.prBackupAssetId ||
-			  !HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) ) )
+		if( myAsset.isPrefab() && ( myAsset.prAssetId != myAsset.prBackupAssetId ||
+			!HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) ) )
 		{
 			myAsset.prAssetId = -1;
 			myAsset.build( true,	// reload_asset
@@ -89,7 +88,7 @@ public class HAPI_AssetGUI : Editor
 			if ( ( myAsset.prMaxTransInputCount > 0 || myAsset.prMaxGeoInputCount > 0 ) &&
 				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
 			{
-				myAsset.prShowInputControls = PrefabUtility.GetPrefabType( myAsset ) != PrefabType.Prefab && 
+				myAsset.prShowInputControls = myAsset.isPrefab() && 
 											  HAPI_GUI.foldout( "Inputs", myAsset.prShowInputControls, true );
 			
 				if ( myAsset.prShowInputControls )

@@ -215,6 +215,9 @@ public abstract class HAPI_Asset : HAPI_Control
 	public int prBackupAssetValidationId {	get { return myBackupAssetValidationId; }
 											set { myBackupAssetValidationId = value; } }
 	
+	public bool isPrefab() 			{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab; }
+	public bool isPrefabInstance()	{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance; }
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
@@ -582,30 +585,42 @@ public abstract class HAPI_Asset : HAPI_Control
 			prAssetId = -1;
 		}
 	}
+	
+	// Methods for determining where OnEnable is being called from -------------------------------
+	
+	public bool isRevertingPrefabInstance()
+	{
+		return ( isPrefabInstance() && 
+				 prAssetId != prBackupAssetId &&
+				 HAPI_Host.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) );
+	}
+	
+	public bool isInstantiatingPrefab()
+	{
+		if( isPrefabInstance() && prBackupAssetId < 0 )
+		{
+			GameObject prefab = PrefabUtility.GetPrefabParent( gameObject ) as GameObject;
+			HAPI_Asset prefab_asset = prefab.GetComponent<HAPI_Asset>();
+			if( prefab_asset )
+			{
+				return prAssetId == prefab_asset.prAssetId;
+			}
+		}
+		return false;		 
+	}
 
 	public virtual void OnEnable()
 	{
-		// Restore asset id from backup if this asset is a prefab instance
-		if( PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance && 
-			prAssetId != prBackupAssetId && 
-			HAPI_Host.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) )
+		// If this asset is a prefab instance that is being reverted restore 
+		// it's asset id and asset validation id from the backup
+		if( isRevertingPrefabInstance() )
 		{
-			prAssetId = prBackupAssetId;
-			prAssetValidationId = prBackupAssetValidationId;
-			
-			// rebuild asset
-			build( true,	// reload_asset
-				   false,	// unload_asset_first
-				   false,	// serializatin_recovery_only
-				   true,	// force_reconnect
-				   false,	// cook_downstream_assets
-				   false	// use_delay_for_progress_bar
-				 );
+			restoreAssetFromBackup();
 		}
 		else if ( prAssetId >= 0 )
 		{	
-			if ( ( prBackupAssetId < 0 || prAssetId == prBackupAssetId ) && 
-				   HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
+			if ( !isInstantiatingPrefab() &&
+				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
@@ -725,7 +740,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		base.onParmChange( reload_asset );
 
-		if ( PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab )
+		if ( isPrefab() )
 		{
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			try 
@@ -889,7 +904,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 				// Try to load presets.
 				if ( unload_asset_first || 
-					 ( reload_asset && PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance ) )
+					 ( reload_asset && isPrefabInstance() ) )
 				{
 					loadPreset();
 
@@ -1432,6 +1447,22 @@ public abstract class HAPI_Asset : HAPI_Control
 						true,  // cook_downstream_assets
 						use_delay_for_progress_bar );
 		}
+	}
+	
+	protected void restoreAssetFromBackup()
+	{
+		// restore asset id and asset validation id from the backup
+		prAssetId = prBackupAssetId;
+		prAssetValidationId = prBackupAssetValidationId;
+			
+		// reload asset
+		build( true,	// reload_asset
+			   false,	// unload_asset_first
+			   false,	// serializatin_recovery_only
+			   true,	// force_reconnect
+			   false,	// cook_downstream_assets
+			   false	// use_delay_for_progress_bar
+			 );
 	}
 
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------

@@ -103,7 +103,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		unload_asset_first = unload_asset_first 
 							 && prAssetType == HAPI_Asset.AssetType.TYPE_OTL 
 							 && ( !serialization_recovery_only || 
-								  PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab );
+								  isPrefab() );
 
 		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
 									  force_reconnect, cook_downstream_assets, use_delay_for_progress_bar );

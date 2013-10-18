@@ -45,7 +45,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
-		myAssetOTL.prShowHoudiniControls = PrefabUtility.GetPrefabType( myAssetOTL ) != PrefabType.Prefab && 
+		myAssetOTL.prShowHoudiniControls = myAssetOTL.isPrefab() && 
 										   HAPI_GUI.foldout( "Houdini Controls", 
 															 myAssetOTL.prShowHoudiniControls, true );
 		if ( myAssetOTL.prShowHoudiniControls ) 
@@ -127,7 +127,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Draw Asset Settings
 		// These don't affect the asset directly so they don't trigger rebuilds.
 
-		myAssetOTL.prShowAssetSettings = PrefabUtility.GetPrefabType( myAssetOTL ) != PrefabType.Prefab && 
+		myAssetOTL.prShowAssetSettings = myAssetOTL.isPrefab() && 
 										 HAPI_GUI.foldout( "Asset Settings", myAssetOTL.prShowAssetSettings, true );
 		if ( myAssetOTL.prShowAssetSettings )
 			generateAssetSettings();
@@ -135,7 +135,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		///////////////////////////////////////////////////////////////////////
 		// Draw Baking Controls
 
-		myAssetOTL.prShowBakeOptions = PrefabUtility.GetPrefabType( myAssetOTL ) != PrefabType.Prefab &&
+		myAssetOTL.prShowBakeOptions = myAssetOTL.isPrefab() &&
 									   HAPI_GUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
 		if ( myAssetOTL.prShowBakeOptions )
 			generateAssetBakeControls();
