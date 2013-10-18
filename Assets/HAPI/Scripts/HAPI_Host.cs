@@ -213,7 +213,6 @@ namespace HAPI
 			myRepaintDelegate			= null;
 			myDeselectionDelegate		= null;
 			mySelectionTarget			= null;
-			mySelectionTargetIsPrefab 	= false;
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -527,7 +526,6 @@ namespace HAPI
 		public static DeselectionDelegate		myDeselectionDelegate;
 
 		public static GameObject				mySelectionTarget;
-		public static bool						mySelectionTargetIsPrefab;
 
 		public static bool hasScene() 
 		{

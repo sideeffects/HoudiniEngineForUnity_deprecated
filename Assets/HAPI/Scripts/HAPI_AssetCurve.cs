@@ -72,11 +72,12 @@ public class HAPI_AssetCurve : HAPI_Asset
 								bool cook_downstream_assets,
 								bool use_delay_for_progress_bar ) 
 	{
-		unload_asset_first = unload_asset_first && !serialization_recovery_only;
+		unload_asset_first = unload_asset_first && 
+							 ( !serialization_recovery_only || 
+							   PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab );
 
 		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
-									  force_reconnect, cook_downstream_assets,
-									  use_delay_for_progress_bar );
+									  force_reconnect, cook_downstream_assets, use_delay_for_progress_bar );
 		if ( !base_built )
 			return false;
 		

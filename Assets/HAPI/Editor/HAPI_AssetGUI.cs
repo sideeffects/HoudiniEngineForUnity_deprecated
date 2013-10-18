@@ -35,11 +35,26 @@ public class HAPI_AssetGUI : Editor
 		myUnbuiltChanges 	= false;
 		myReloadAsset		= false;
 		myFocusChanged 		= true;
-		myAssetIsPrefab 	= PrefabUtility.GetPrefabType( myAsset ) == PrefabType.Prefab;
 
 		HAPI_Host.myRepaintDelegate += this.refresh;
 		HAPI_Host.myDeselectionDelegate += this.deselect;
 		HAPI_Host.mySelectionTarget = myAsset.gameObject;
+		
+		// if selection is a prefab build it ( only get parameters ) to
+		// allow editing of parameters
+		if( PrefabUtility.GetPrefabType( myAsset.gameObject ) == PrefabType.Prefab &&
+			( myAsset.prAssetId != myAsset.prBackupAssetId ||
+			  !HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) ) )
+		{
+			myAsset.prAssetId = -1;
+			myAsset.build( true,	// reload_asset
+						   true,	// unload_asset_first
+						   true,	// serializatin_recovery_only
+						   false,	// force_reconnect
+						   false,	// cook_downstream_assets
+						   false	// use_delay_for_progress_bar
+				 		 );
+		}
 	}
 
 	public virtual void OnDisable()
@@ -65,8 +80,6 @@ public class HAPI_AssetGUI : Editor
 	{
 		try
 		{
-			HAPI_Host.mySelectionTargetIsPrefab = myAssetIsPrefab;
-
 			myDelayBuild	= false;
 			myParmChanges	= false;
 		
@@ -76,8 +89,8 @@ public class HAPI_AssetGUI : Editor
 			if ( ( myAsset.prMaxTransInputCount > 0 || myAsset.prMaxGeoInputCount > 0 ) &&
 				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
 			{
-				myAsset.prShowInputControls = HAPI_GUI.foldout( 
-					"Inputs", myAsset.prShowInputControls, true );
+				myAsset.prShowInputControls = PrefabUtility.GetPrefabType( myAsset ) != PrefabType.Prefab && 
+											  HAPI_GUI.foldout( "Inputs", myAsset.prShowInputControls, true );
 			
 				if ( myAsset.prShowInputControls )
 				{
@@ -230,7 +243,6 @@ public class HAPI_AssetGUI : Editor
 
 	public virtual void OnSceneGUI()
 	{
-		HAPI_Host.mySelectionTargetIsPrefab = myAssetIsPrefab;
 	}
 	
 	protected bool setTransformInput( int index )
@@ -277,7 +289,6 @@ public class HAPI_AssetGUI : Editor
 	protected bool			myUnbuiltChanges;
 	protected bool 			myFocusChanged;
 	protected bool			myReloadAsset;
-	protected bool			myAssetIsPrefab;
 
 	private string 			myLastFocusedControl;
 

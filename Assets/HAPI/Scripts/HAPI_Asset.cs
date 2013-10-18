@@ -46,7 +46,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	public byte[]					prPreset {						get { return myPreset; } 
 																	set { myPreset = value; } }
 	public int						prAssetValidationId {			get { return myAssetValidationId; }
-																	protected set { myAssetValidationId = value; } }
+																	set { myAssetValidationId = value; } }
  	public string					prAssetName {					get { return myAssetName; }
 																	set { myAssetName = value; } }
 	public string					prAssetHelp {					get { return myAssetHelp; }
@@ -116,7 +116,7 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myGameObjects = value; } }
 	public HAPI_Transform[] 		prObjectTransforms {			get { return myObjectTransforms; } 
 																	set { myObjectTransforms = value; } }
-
+	
 	// Baking ------------------------------------------------------------------------------------------------------
 
 	public float					prBakeStartTime {				get { return myBakeStartTime; }
@@ -209,6 +209,11 @@ public abstract class HAPI_Asset : HAPI_Control
 	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances { get { return myOverriddenInstances; }
 																	  set {	myOverriddenInstances = value; } }
 	
+	// Prefabs ------------------------------------------------------------------------------------------------------
+	public int prBackupAssetId {			get { return myBackupAssetId; }
+											set { myBackupAssetId = value; } }
+	public int prBackupAssetValidationId {	get { return myBackupAssetValidationId; }
+											set { myBackupAssetValidationId = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -216,7 +221,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	public HAPI_Asset() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset created!" );
+			Debug.Log( "HAPI_Asset created - Instance Id: " + GetInstanceID() );
 		
 		HAPI.HAPI_SetPath.setPath();
 
@@ -226,7 +231,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	~HAPI_Asset() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset destroyed!" );
+			Debug.Log( "HAPI_Asset destroyed - Instance Id:" + GetInstanceID() );
 	}
 	
 	public int findObjectByName( string object_name )
@@ -580,10 +585,27 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void OnEnable()
 	{
-		if ( prAssetId >= 0 )
+		// Restore asset id from backup if this asset is a prefab instance
+		if( PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance && 
+			prAssetId != prBackupAssetId && 
+			HAPI_Host.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) )
 		{
-			if ( !HAPI_Host.mySelectionTargetIsPrefab &&
-				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
+			prAssetId = prBackupAssetId;
+			prAssetValidationId = prBackupAssetValidationId;
+			
+			// rebuild asset
+			build( true,	// reload_asset
+				   false,	// unload_asset_first
+				   false,	// serializatin_recovery_only
+				   true,	// force_reconnect
+				   false,	// cook_downstream_assets
+				   false	// use_delay_for_progress_bar
+				 );
+		}
+		else if ( prAssetId >= 0 )
+		{	
+			if ( ( prBackupAssetId < 0 || prAssetId == prBackupAssetId ) && 
+				   HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
@@ -693,20 +715,40 @@ public abstract class HAPI_Asset : HAPI_Control
 		prOverriddenInstances 			= new List< HAPI_InstancerOverrideInfo >();
 		
 		myProgressBarJustUsed 			= false;
+		
+		// Prefabs ------------------------------------------------------------------------------------------------------
+		prBackupAssetId					= -1;
+		prBackupAssetValidationId		= -1;
 	}
 
 	public override void onParmChange( bool reload_asset )
 	{
 		base.onParmChange( reload_asset );
 
-		build(	
-			reload_asset,	// reload_asset
-			true,			// unload_asset_first
-			false,			// serializatin_recovery_only
-			false,			// force_reconnect
-			prCookingTriggersDownCooks,
-			true			// use_delay_for_progress_bar
-		);
+		if ( PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab )
+		{
+			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+			try 
+			{
+				updateParameters( progress_bar );
+			}
+			catch {}
+			finally 
+			{
+				progress_bar.clearProgressBar();
+			}
+		}
+		else
+		{
+			build(	
+				reload_asset,	// reload_asset
+				true,			// unload_asset_first
+				false,			// serializatin_recovery_only
+				false,			// force_reconnect
+				prCookingTriggersDownCooks,
+				true			// use_delay_for_progress_bar
+			);
+		}
 	}
 
 	public virtual bool buildAll()
@@ -754,7 +796,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			progress_bar.prStartTime = System.DateTime.Now;
 			
-			if ( reload_asset || serialization_recovery_only ) 
+			if ( reload_asset ) 
 			{
 				if ( unload_asset_first )
 				{
@@ -788,12 +830,13 @@ public abstract class HAPI_Asset : HAPI_Control
 					// We need to update the prAssetId in case the cook is aborted/fails 
 					// and we need to clean up (unload the asset) in the catch.
 					prAssetId = asset_id;
+					prBackupAssetId = asset_id;
 
 					progress_bar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
 					
-					if ( !serialization_recovery_only )
+					if ( reload_asset )
 						Debug.Log( 
 							"Asset Loaded - Path: " + prAssetInfo.instancePath + "\n" +
 							"ID: " + prAssetInfo.id + "\n" +
@@ -829,22 +872,24 @@ public abstract class HAPI_Asset : HAPI_Control
 				// For convenience we copy some asset info properties locally (since they are constant anyway).
 				// More imporantly, structs are not serialized and therefore putting them into their own
 				// variables is required in order to maintain state between serialization cycles.
-				prAssetId 				= prAssetInfo.id;
-				prAssetValidationId		= prAssetInfo.validationId;
-				prNodeId			= prAssetInfo.nodeId;
-				prObjectCount 			= prAssetInfo.objectCount;
-				prHandleCount 			= prAssetInfo.handleCount;
+				prAssetId 					= prAssetInfo.id;
+				prAssetValidationId			= prAssetInfo.validationId;
+				prBackupAssetValidationId 	= prAssetValidationId;
+				prNodeId					= prAssetInfo.nodeId;
+				prObjectCount 				= prAssetInfo.objectCount;
+				prHandleCount 				= prAssetInfo.handleCount;
 
-				prAssetName				= prAssetInfo.name;
-				prAssetHelp				= prAssetInfo.helpText;
-				prHAPIAssetType			= (HAPI_AssetType) prAssetInfo.type;
-				prMinTransInputCount	= prAssetInfo.minTransInputCount;
-				prMaxTransInputCount	= prAssetInfo.maxTransInputCount;
-				prMinGeoInputCount 		= prAssetInfo.minGeoInputCount;
-				prMaxGeoInputCount		= prAssetInfo.maxGeoInputCount;
+				prAssetName					= prAssetInfo.name;
+				prAssetHelp					= prAssetInfo.helpText;
+				prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
+				prMinTransInputCount		= prAssetInfo.minTransInputCount;
+				prMaxTransInputCount		= prAssetInfo.maxTransInputCount;
+				prMinGeoInputCount 			= prAssetInfo.minGeoInputCount;
+				prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
 
 				// Try to load presets.
-				if ( unload_asset_first )
+				if ( unload_asset_first || 
+					 ( reload_asset && PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance ) )
 				{
 					loadPreset();
 
@@ -871,24 +916,22 @@ public abstract class HAPI_Asset : HAPI_Control
 				
 				progress_bar.displayProgressBar();
 				myProgressBarJustUsed = true;
-				
-				progress_bar.prMessage = "Loading parameter information...";
 
+				// Add input fields.
+				if ( is_first_time_build || !force_reconnect )
+					initAssetConnections();
+				
+				// Clean up.
+				destroyChildren( transform );
+				prGameObjects = new GameObject[ prObjectCount ];
+			}
+				
+			if ( reload_asset || serialization_recovery_only )
+			{
 				// Need to re-acquire all the params for all the child controls that have parms exposed.
 				prParms.getParameterValues();
 				foreach ( HAPI_Parms parms in GetComponentsInChildren< HAPI_Parms >() )
 					parms.getParameterValues();
-
-				// Add input fields.
-				if ( is_first_time_build || ( !serialization_recovery_only && !force_reconnect ) )
-					initAssetConnections();
-
-				if ( !serialization_recovery_only )
-				{
-					// Clean up.
-					destroyChildren( transform );
-					prGameObjects = new GameObject[ prObjectCount ];
-				}
 
 				// Create local object info caches (transforms need to be stored in a parallel array).
 				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
@@ -897,20 +940,11 @@ public abstract class HAPI_Asset : HAPI_Control
 				// Custom work during a full build (custom to each subclass).
 				buildFullBuildCustomWork( ref progress_bar );
 			}
-			else
+			
+			if ( !reload_asset && !serialization_recovery_only )
 			{
 				progress_bar.displayProgressBar();
-
-				prParms.setChangedParametersIntoHost();
-
-				HAPI_Host.cookAsset( prAssetId );
-				progress_bar.statusCheckLoop();
-
-				myProgressBarJustUsed = true;
-				
-				progress_bar.prTotal = prObjectCount;
-
-				prParms.getParameterValues();
+				updateParameters( progress_bar );
 			}
 			
 			// Refresh object info arrays as they are lost after serialization.
@@ -960,6 +994,20 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		
 		return true;
+	}
+	
+	public void updateParameters( HAPI_ProgressBar progress_bar )
+	{
+		prParms.setChangedParametersIntoHost();
+
+		HAPI_Host.cookAsset( prAssetId );
+		progress_bar.statusCheckLoop();
+
+		myProgressBarJustUsed = true;
+		
+		progress_bar.prTotal = prObjectCount;
+
+		prParms.getParameterValues();
 	}
 
 	public virtual void Update()
@@ -1436,7 +1484,6 @@ public abstract class HAPI_Asset : HAPI_Control
 					 private HAPI_ObjectInfo[] 		myObjects;
 					 private HAPI_Transform[] 		myObjectTransforms;
 	
-	
 	// Baking -------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private float 					myBakeStartTime;
@@ -1480,4 +1527,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	// Private Temporary Data
 	[SerializeField] private Matrix4x4				myLastLocalToWorld;
+	
+	// Prefabs ------------------------------------------------------------------------------------------------------
+	private int myBackupAssetId;
+	private int myBackupAssetValidationId;
 }

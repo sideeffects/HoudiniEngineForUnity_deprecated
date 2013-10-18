@@ -43,7 +43,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 	public HAPI_AssetOTL() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset created!" );
+			Debug.Log( "HAPI_AssetOTL created - Instance Id: " + GetInstanceID() );
 		
 		// These variables need to keep between asset reloads.
 		prAssetPath = "";
@@ -102,11 +102,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 	{
 		unload_asset_first = unload_asset_first 
 							 && prAssetType == HAPI_Asset.AssetType.TYPE_OTL 
-							 && !serialization_recovery_only;
+							 && ( !serialization_recovery_only || 
+								  PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab );
 
 		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
-									  force_reconnect, cook_downstream_assets,
-									  use_delay_for_progress_bar );
+									  force_reconnect, cook_downstream_assets, use_delay_for_progress_bar );
 		if ( !base_built )
 			return false;
 
