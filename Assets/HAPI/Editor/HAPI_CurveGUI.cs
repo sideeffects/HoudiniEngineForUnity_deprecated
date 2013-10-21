@@ -55,11 +55,18 @@ public class HAPI_CurveGUI : Editor
 		myConnectionMaterial	= null;
 
 		myLastMode				= HAPI_Curve.Mode.NONE;
+
+		HAPI_Host.myRepaintDelegate += this.refresh;
+		HAPI_Host.myDeselectionDelegate += this.deselect;
+		HAPI_Host.mySelectionTarget = myCurve.gameObject;
 	}
 
 	public void OnDisable()
 	{
 		// This is called after OnSceneGUI sometimes for some reason.
+		HAPI_Host.myRepaintDelegate -= this.refresh;
+		HAPI_Host.myDeselectionDelegate -= this.deselect;
+		HAPI_Host.mySelectionTarget = null;
 	}
 
 	public void refresh()

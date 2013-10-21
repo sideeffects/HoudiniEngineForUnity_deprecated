@@ -99,7 +99,10 @@ public class HAPI_AssetCurve : HAPI_Asset
 	{
 		try
 		{
+			prCurve.syncPointsWithParm();
 			prCurve.createObject( 0, 0 );
+			if ( HAPI_Host.myRepaintDelegate != null )
+				HAPI_Host.myRepaintDelegate();
 		}
 		catch ( HAPI_Error )
 		{
