@@ -154,8 +154,8 @@ public class HAPI_Curve : MonoBehaviour
 		HAPI_Host.setParmStringValue( prControl.prNodeId, parm, 2, 0 );
 		
 		prControl.prAsset.buildClientSide();
-
 		prControl.prAsset.savePreset();
+		prParms.getParameterValues();
 	}
 
 	public void syncPointsWithParm()
