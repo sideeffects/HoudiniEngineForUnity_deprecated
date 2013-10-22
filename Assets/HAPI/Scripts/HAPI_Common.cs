@@ -368,16 +368,13 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Transform 
 	{
-		public HAPI_Transform( int id_in )
+		public HAPI_Transform( bool initialize_fields )
 		{
-			id					= id_in;
 			position			= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 			rotationQuaternion	= new float[ HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE ];
 			scale				= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
 			rstOrder			= (int) HAPI_RSTOrder.SRT;
 		}
-
-		public int id;
 		
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
@@ -405,12 +402,9 @@ namespace HAPI
 			position 		= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 			rotationEuler 	= new float[ HAPI_Constants.HAPI_EULER_VECTOR_SIZE ];
 			scale 			= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
-			id 				= 0;
 			rotationOrder 	= 0;
 			rstOrder 		= 0;
 		}
-
-		public int id;
 
 		[ MarshalAs( UnmanagedType.ByValArray, 
 					 SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
