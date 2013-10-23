@@ -24,24 +24,10 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 					{
 						prPrefabToReplace = null;
 					}
-					else if( prefab_asset )
+					else if( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
 					{
-						// prefab is being created for the first time
-						if( prefab_asset.prBackupAssetId < 0 )
-						{
-							prPrefabToReplace = prefab;
-							EditorApplication.delayCall += ReplacePrefab;
-						}
-						// prefab has already been created and this is called due to an Apply on
-						// one of the prefab instances so we need to restore the prefab's asset
-						// id and asset validation id so it's not replaced by the instance's values
-						else if( prefab_asset.prAssetId != prefab_asset.prBackupAssetId &&
-								 HAPI_Host.isAssetValid( prefab_asset.prBackupAssetId, 
-														 prefab_asset.prBackupAssetValidationId ) )
-						{
-							prefab_asset.prAssetId = prefab_asset.prBackupAssetId;
-							prefab_asset.prAssetValidationId = prefab_asset.prBackupAssetValidationId;
-						}
+						prPrefabToReplace = prefab;
+						EditorApplication.delayCall += ReplacePrefab;
 					}
 				}
 			}
@@ -50,27 +36,56 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 	
 	static void ReplacePrefab()
 	{
-		if( prPrefabToReplace )
+		HAPI_Asset prefab_asset = prPrefabToReplace.GetComponent<HAPI_Asset>();
+		if ( prPrefabToReplace && prefab_asset )
 		{
 			foreach ( GameObject obj in GameObject.FindObjectsOfType( typeof( GameObject ) ) )
 			{
 				HAPI_Asset asset = obj.GetComponent< HAPI_Asset >();
 				GameObject prefab_parent = PrefabUtility.GetPrefabParent( obj ) as GameObject;
-				if( asset &&  PrefabUtility.Equals( prefab_parent, prPrefabToReplace ) )
+				if ( asset && PrefabUtility.Equals( prefab_parent, prPrefabToReplace ) )
 				{
-					// replace prefab with original asset with all children game objects removed
-					asset.destroyChildren( asset.transform );
-					PrefabUtility.ReplacePrefab( asset.gameObject, prPrefabToReplace );
+					// this is the asset the prefab is being created/changed from
+					if ( asset.prAssetId == prefab_asset.prAssetId )
+					{
+						// if prefab's backup id refers to a valid asset then delete this asset
+						// since we are re-creating the prefab
+						if ( HAPI_Host.isAssetValid( prefab_asset.prBackupAssetId, 
+													 prefab_asset.prBackupAssetValidationId ) )
+						{
+							try
+							{
+								HAPI_Host.unloadOTL( prefab_asset.prBackupAssetId );
+							}
+							catch ( HAPI_Error error )
+							{
+								Debug.LogError( "Asset failed to unload: " + error.ToString() );
+							}
+							
+							prefab_asset.reset();
+							prefab_asset.prParms.reset();
+						}
+						
+						// replace prefab with original asset with all children game objects removed
+						asset.destroyChildren( asset.transform );
+						PrefabUtility.ReplacePrefab( asset.gameObject, prPrefabToReplace );
 					
-					// rebuild original asset so it re-creates game objects
-					asset.build( true,	// reload_asset
-								 false,	// unload_asset_first
-								 false,	// serializatin_recovery_only
-								 true,	// force_reconnect
-								 false,	// cook_downstream_assets
-								 false	// use_delay_for_progress_bar
-								);
-					break;
+						// rebuild original asset so it re-creates game objects
+						asset.build( true,	// reload_asset
+									 false,	// unload_asset_first
+									 false,	// serializatin_recovery_only
+									 true,	// force_reconnect
+									 false,	// cook_downstream_assets
+									 false	// use_delay_for_progress_bar
+									);
+						
+						// set asset id of prefab to -1 since it has not been built yet
+						prefab_asset.prAssetId = -1;
+					}
+					else
+					{
+						// TO DO: Propogate changes to prefab to all other prefab instances
+					}
 				}
 			}
 		}

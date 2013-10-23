@@ -597,25 +597,40 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public bool isInstantiatingPrefab()
 	{
-		if( isPrefabInstance() && prBackupAssetId < 0 )
+		if ( isPrefabInstance() && prBackupAssetId < 0 )
 		{
 			GameObject prefab = PrefabUtility.GetPrefabParent( gameObject ) as GameObject;
 			HAPI_Asset prefab_asset = prefab.GetComponent<HAPI_Asset>();
-			if( prefab_asset )
+			if ( prefab_asset )
 			{
 				return prAssetId == prefab_asset.prAssetId;
 			}
 		}
 		return false;		 
 	}
+	
+	public bool isApplyingChangesToPrefab()
+	{
+		return ( isPrefab() && 
+			     prAssetId != prBackupAssetId && 
+				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) );
+	}
 
 	public virtual void OnEnable()
 	{
-		// If this asset is a prefab instance that is being reverted restore 
-		// it's asset id and asset validation id from the backup
+		// If this asset is a prefab instance that is being reverted 
+		// reload the asset in order to restore it's asset id and 
+		// asset validation id from the backup and to load the preset
+		// from the prefab
 		if( isRevertingPrefabInstance() )
 		{
-			restoreAssetFromBackup();
+			build( true,	// reload_asset
+			   	   false,	// unload_asset_first
+			   	   false,	// serializatin_recovery_only
+			   	   true,	// force_reconnect
+			   	   false,	// cook_downstream_assets
+			   	   false	// use_delay_for_progress_bar
+			 );
 		}
 		else if ( prAssetId >= 0 )
 		{	
@@ -745,7 +760,10 @@ public abstract class HAPI_Asset : HAPI_Control
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			try 
 			{
+				// update parameters for prefab
 				updateParameters( progress_bar );
+				
+				// TODO: Propogate changes to all prefab instances
 			}
 			catch {}
 			finally 
@@ -813,6 +831,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 			if ( reload_asset ) 
 			{
+				bool is_reverting_prefab_instance = isRevertingPrefabInstance();
+				if ( is_reverting_prefab_instance )
+				{
+					// restore asset id and asset validation id from the backup
+					prAssetId = prBackupAssetId;
+					prAssetValidationId = prBackupAssetValidationId;
+				}
+				
 				if ( unload_asset_first )
 				{
 					// There's no reason to abort the whole rebuild process because we can't unload
@@ -903,26 +929,34 @@ public abstract class HAPI_Asset : HAPI_Control
 				prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
 
 				// Try to load presets.
-				if ( unload_asset_first || 
-					 ( reload_asset && isPrefabInstance() ) )
+				if ( unload_asset_first || is_reverting_prefab_instance )
 				{
 					loadPreset();
-
+					
 					// Transform may not have been saved as part of the presets so we have to rely 
 					// on the serialized value.
 					if ( myLastLocalToWorld != Matrix4x4.zero )
 					{
-						transform.localPosition = Utility.getPosition( myLastLocalToWorld );
-						transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
-
-						Vector3 scale = Utility.getScale( myLastLocalToWorld );
-						if ( !( Mathf.Approximately( 0.0f, scale.x )
-							&& Mathf.Approximately( 0.0f, scale.y )
-							&& Mathf.Approximately( 0.0f, scale.z ) ) )
+						// If this is a prefab instance being reverted we don't want to use the 
+						// serialized value so don't change transform. 
+						if ( !is_reverting_prefab_instance )
 						{
-							transform.localScale = Utility.getScale( myLastLocalToWorld );
+							transform.localPosition = Utility.getPosition( myLastLocalToWorld );
+							transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
+	
+							Vector3 scale = Utility.getScale( myLastLocalToWorld );
+							if ( !( Mathf.Approximately( 0.0f, scale.x )
+								&& Mathf.Approximately( 0.0f, scale.y )
+								&& Mathf.Approximately( 0.0f, scale.z ) ) )
+							{
+								transform.localScale = Utility.getScale( myLastLocalToWorld );
+							}
 						}
-						pushAssetTransformToHoudini();
+						
+						if ( prPushUnityTransformToHoudini )
+						{
+							pushAssetTransformToHoudini();
+						}
 					}
 				}
 				
@@ -1449,22 +1483,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 	}
 	
-	protected void restoreAssetFromBackup()
-	{
-		// restore asset id and asset validation id from the backup
-		prAssetId = prBackupAssetId;
-		prAssetValidationId = prBackupAssetValidationId;
-			
-		// reload asset
-		build( true,	// reload_asset
-			   false,	// unload_asset_first
-			   false,	// serializatin_recovery_only
-			   true,	// force_reconnect
-			   false,	// cook_downstream_assets
-			   false	// use_delay_for_progress_bar
-			 );
-	}
-
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
 	
 	public bool hasProgressBarBeenUsed()
