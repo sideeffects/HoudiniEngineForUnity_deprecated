@@ -210,6 +210,7 @@ public abstract class HAPI_Asset : HAPI_Control
 																	  set {	myOverriddenInstances = value; } }
 	
 	// Prefabs ------------------------------------------------------------------------------------------------------
+	
 	public int prBackupAssetId {			get { return myBackupAssetId; }
 											set { myBackupAssetId = value; } }
 	public int prBackupAssetValidationId {	get { return myBackupAssetValidationId; }
@@ -235,6 +236,19 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset destroyed - Instance Id:" + GetInstanceID() );
+		
+		// Only place to unload OTL when prefab is being deleted
+		if ( myCleanUpPrefabOTL )
+		{
+			try
+			{
+				HAPI_Host.unloadOTL( prAssetId );
+			}
+			catch ( HAPI_Error error )
+			{
+				Debug.LogError( "Asset failed to unload: " + error.ToString() );
+			}
+		}
 	}
 	
 	public int findObjectByName( string object_name )
@@ -747,10 +761,31 @@ public abstract class HAPI_Asset : HAPI_Control
 		myProgressBarJustUsed 			= false;
 		
 		// Prefabs ------------------------------------------------------------------------------------------------------
+		
 		prBackupAssetId					= -1;
 		prBackupAssetValidationId		= -1;
+		myCleanUpPrefabOTL 				= false;
 	}
-
+	
+	public void propagateParmChangeToPrefabInstances()
+	{
+		if ( isPrefab() )
+		{
+			foreach ( GameObject obj in GameObject.FindObjectsOfType( typeof( GameObject ) ) )
+			{
+				HAPI_Asset asset = obj.GetComponent< HAPI_Asset >();
+				GameObject prefab_parent = PrefabUtility.GetPrefabParent( obj ) as GameObject;
+				if ( asset && PrefabUtility.Equals( prefab_parent, gameObject ) )
+				{
+					asset.prPreset = prPreset;
+					asset.loadPreset();
+					asset.buildClientSide();
+				}
+			}
+		}
+		
+	}
+	
 	public override void onParmChange( bool reload_asset )
 	{
 		base.onParmChange( reload_asset );
@@ -760,10 +795,8 @@ public abstract class HAPI_Asset : HAPI_Control
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			try 
 			{
-				// update parameters for prefab
+				// only need to update parameters for prefab
 				updateParameters( progress_bar );
-				
-				// TODO: Propogate changes to all prefab instances
 			}
 			catch {}
 			finally 
@@ -820,6 +853,9 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		if ( !prEnableCooking )
 			return false;
+		
+		if ( isPrefab() )
+			myCleanUpPrefabOTL = true;
 
 		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
 		progress_bar.prUseDelay			= use_delay_for_progress_bar;
@@ -1578,6 +1614,8 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private Matrix4x4				myLastLocalToWorld;
 	
 	// Prefabs ------------------------------------------------------------------------------------------------------
+	
 	private int myBackupAssetId;
 	private int myBackupAssetValidationId;
+	private bool myCleanUpPrefabOTL;
 }

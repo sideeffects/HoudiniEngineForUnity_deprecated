@@ -82,9 +82,16 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						// set asset id of prefab to -1 since it has not been built yet
 						prefab_asset.prAssetId = -1;
 					}
+					// this is not the prefab instance this prefab is being created from 
+					// so apply changes being made to prefab to this prefab instance 
+					// NOTE: if this gets called before the prefab is replaced it is okay 
+					// because the preset on the original prefab will be the same as the 
+					// one it is replaced with
 					else
 					{
-						// TO DO: Propogate changes to prefab to all other prefab instances
+						asset.prPreset = prefab_asset.prPreset;
+						asset.loadPreset();
+						asset.buildClientSide();
 					}
 				}
 			}
