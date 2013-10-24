@@ -131,22 +131,20 @@ public class HAPI_ParmsGUI : Editor
 		
 		HAPI_ParmInfo[] parms 		= myParms.prParms;
 		HAPI_ParmInfo parm			= parms[ index ];
-		
+
 		int[] parm_int_values		= myParms.prParmIntValues;
 		float[] parm_float_values	= myParms.prParmFloatValues;
-		
-		HAPI_ParmType parm_type 	= (HAPI_ParmType) parm.type;
-		
+
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( parm );
-		
+
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter
-		if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+		if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			changed = HAPI_GUI.multiparmField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
 											   ref join_last, ref no_label_toggle_last );
 		}
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_INT )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_INT )
 		{
 			if ( parm.choiceCount > 0 && parm.choiceIndex >= 0 )
 			{
@@ -177,17 +175,17 @@ public class HAPI_ParmsGUI : Editor
 				changed = HAPI_GUI.intField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
 											 ref join_last, ref no_label_toggle_last );
 			} // if parm.choiceCount
-		} // if parm_type is INT
+		} // if parm.type is INT
 		///////////////////////////////////////////////////////////////////////
 		// Float Parameter
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
 			changed = HAPI_GUI.floatField( ref gui_parm, ref myDelayBuild, ref parm_float_values, 
 										   ref join_last, ref no_label_toggle_last );
-		} // if parm_type is FLOAT
+		} // if parm.type is FLOAT
 		///////////////////////////////////////////////////////////////////////
 		// String Parameter
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_STRING )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_STRING )
 		{
 			if ( parm.choiceCount > 0 && parm.choiceIndex >= 0 )
 			{
@@ -236,7 +234,7 @@ public class HAPI_ParmsGUI : Editor
 		}
 		///////////////////////////////////////////////////////////////////////
 		// File Field
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FILE )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FILE )
 		{
 			string[] path = myParms.getParmStrings( parm );
 			
@@ -248,21 +246,21 @@ public class HAPI_ParmsGUI : Editor
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
 			changed = HAPI_GUI.toggle( ref gui_parm, ref parm_int_values,
 									   ref join_last, ref no_label_toggle_last );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Color Parameter
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_COLOUR )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_COLOUR )
 		{
 			changed = HAPI_GUI.colourField( ref gui_parm, ref myDelayBuild, ref parm_float_values,
 											ref join_last, ref no_label_toggle_last );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Button Parameter
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_BUTTON )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_BUTTON )
 		{
 			if ( parm.choiceCount > 0 && parm.choiceIndex >= 0 )
 			{
@@ -295,7 +293,7 @@ public class HAPI_ParmsGUI : Editor
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Separator
-		else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_SEPARATOR )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_SEPARATOR )
 		{
 			HAPI_GUI.separator();
 		}
@@ -379,10 +377,8 @@ public class HAPI_ParmsGUI : Editor
 				current_index++;
 				continue;
 			}
-			
-			HAPI_ParmType parm_type = (HAPI_ParmType) parms[ current_index ].type;
 
-			if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+			if ( parms[ current_index ].type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 			{
 				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );
 
@@ -399,7 +395,7 @@ public class HAPI_ParmsGUI : Editor
 				}
 				current_index++;
 			}
-			else if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
+			else if ( parms[ current_index ].type == HAPI_ParmType.HAPI_PARMTYPE_FOLDERLIST )
 			{
 				// The current parameter is a folder list which means the next parms[ current_index ].size
 				// parameters will be folders belonging to this folder list. Push to the stack a new
@@ -418,7 +414,7 @@ public class HAPI_ParmsGUI : Editor
 				bool has_visible_folders	= false;
 				for ( current_index = first_folder_index; current_index <= last_folder_index; ++current_index )
 				{
-					if ( parms[ current_index ].type != (int) HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
+					if ( parms[ current_index ].type != HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					{
 						Debug.LogError( "We should be iterating through folders only here!"
 							+ "\nCurrent Index: " + current_index + ", folder_count: " + folder_count );
@@ -495,7 +491,7 @@ public class HAPI_ParmsGUI : Editor
 			else
 			{
 				// The current parameter is a simple parameter so just draw it.
-				if ( parm_type == HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
+				if ( parms[ current_index ].type == HAPI_ParmType.HAPI_PARMTYPE_FOLDER )
 					Debug.LogError( "All folders should have been parsed in the folder list if clause!" );
 
 				changed |= generateAssetControl( current_index, ref join_last, ref no_label_toggle_last );

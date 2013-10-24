@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 // Typedefs
 using HAPI_StringHandle = System.Int32;
 using HAPI_NodeId = System.Int32;
+using HAPI_ParmId = System.Int32;
 using HAPI_AssetId = System.Int32;
 using HAPI_ObjectId = System.Int32;
 using HAPI_GeoId = System.Int32;
@@ -517,83 +518,95 @@ namespace HAPI
 	{
 		public bool isInt()
 		{
-			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_INT_START &&
-				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_INT_END )
-				|| type == (int) HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST;
+			return ( type >= HAPI_ParmType.HAPI_PARMTYPE_INT_START &&
+				type <= HAPI_ParmType.HAPI_PARMTYPE_INT_END )
+				|| type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST;
 		}
 		public bool isFloat()
 		{
-			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_FLOAT_START &&
-				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_FLOAT_END );
+			return ( type >= HAPI_ParmType.HAPI_PARMTYPE_FLOAT_START &&
+				type <= HAPI_ParmType.HAPI_PARMTYPE_FLOAT_END );
 		}
 		public bool isString()
 		{
-			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_STR_START &&
-				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_STR_END );
+			return ( type >= HAPI_ParmType.HAPI_PARMTYPE_STR_START &&
+				type <= HAPI_ParmType.HAPI_PARMTYPE_STR_END );
 		}
 		public bool isNonValue()
 		{
-			return ( type >= (int) HAPI_ParmType.HAPI_PARMTYPE_NONVALUE_START &&
-				type <= (int) HAPI_ParmType.HAPI_PARMTYPE_NONVALUE_END );
+			return ( type >= HAPI_ParmType.HAPI_PARMTYPE_NONVALUE_START &&
+				type <= HAPI_ParmType.HAPI_PARMTYPE_NONVALUE_END );
 		}
-		
-		public int id;
-		public int parentId;
-		
-		public int type;
-		public int size;
+
+		// The parent id points to the id of the parent parm
+		// of this parm. The parent parm is something like a folder.
+		public HAPI_ParmId id;
+		public HAPI_ParmId parentId;
+
+		public HAPI_ParmType type;
+		public int size; // Tuple Size
 		public int choiceCount;
-		
-		private int nameSH;
-		private int labelSH;
-		
+
+		// Note that folders are not real parameters in Houdini so they do not
+		// have names. The folder names given here are generated from the name
+		// of the folderlist (or switcher) parameter which is a parameter. The
+		// folderlist parameter simply defines how many of the "next" parameters
+		// belong to the first folder, how many of the parameters after that
+		// belong to the next folder, and so on. This means that folder names
+		// can change just by reordering the folders around so don't rely on
+		// them too much. The only guarantee here is that the folder names will
+		// be unique among all other parameter names.
+		private HAPI_StringHandle nameSH;
+		private HAPI_StringHandle labelSH;
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasMin;
-		
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasMax;
-		
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasUIMin;
-		
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasUIMax;
-		
+
 		[ MarshalAs( UnmanagedType.R4) ]
 		public float min;
-		
+
 		[ MarshalAs( UnmanagedType.R4) ]
 		public float max;
-		
+
 		[ MarshalAs( UnmanagedType.R4) ]
 		public float UIMin;
-		
+
 		[ MarshalAs( UnmanagedType.R4) ]
 		public float UIMax;
-		
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool invisible;
-		
+
+		// Whether this parm should be on the same line as the next parm.
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool joinNext;
-		
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool labelNone;
-		
+
 		public int intValuesIndex;
 		public int floatValuesIndex;
 		public int stringValuesIndex;
 		public int choiceIndex;
-		
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isChildOfMultiParm;
-		public int instanceNum;
 
+		public int instanceNum;
 		public int instanceLength;
 		public int instanceCount;
 
-		public int rampType;
-		
+		public HAPI_RampType rampType;
+
 		// Accessors
 		public int getNameSH()
 		{ return nameSH; }
@@ -608,9 +621,9 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_ParmChoiceInfo
 	{
-		public int parentParmId;
-		private int labelSH;		// string handle (SH)
-		private int valueSH;		// string handle (SH)
+		public HAPI_ParmId parentParmId;
+		private HAPI_StringHandle labelSH;
+		private HAPI_StringHandle valueSH;
 		
 		// Accessors
 		public string label

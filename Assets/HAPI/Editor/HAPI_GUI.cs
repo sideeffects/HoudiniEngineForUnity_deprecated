@@ -65,8 +65,8 @@ public struct HAPI_GUIParm
 		joinNext 		= info.joinNext;
 		labelNone 		= info.labelNone;
 
-		isChildOfMultiParm 	= info.isChildOfMultiParm;
-		isRamp		    = info.rampType != (int)HAPI.HAPI_RampType.HAPI_RAMPTYPE_MAX;
+		isChildOfMultiParm = info.isChildOfMultiParm;
+		isRamp = info.rampType != HAPI.HAPI_RampType.HAPI_RAMPTYPE_MAX;
 
 		instanceNum 	= info.instanceNum;
 		
