@@ -27,6 +27,7 @@ using HAPI_AssetId = System.Int32;
 using HAPI_ObjectId = System.Int32;
 using HAPI_GeoId = System.Int32;
 using HAPI_PartId = System.Int32;
+using HAPI_MaterialId = System.Int32;
 
 namespace HAPI 
 {
@@ -743,21 +744,21 @@ namespace HAPI
 			}
 		}
 
-		public int		id;
-		private int		nameSH; // string handle (SH)
+		public HAPI_PartId id;
+		private HAPI_StringHandle nameSH;
 
-		public int 		materialId;
+		public HAPI_MaterialId materialId;
 		
-		public int		faceCount;
-		public int		vertexCount;
-		public int		pointCount;
-		public int		pointAttributeCount;
-		public int		faceAttributeCount;
-		public int		vertexAttributeCount;
-		public int		detailAttributeCount;
+		public int faceCount;
+		public int vertexCount;
+		public int pointCount;
+		public int pointAttributeCount;
+		public int faceAttributeCount;
+		public int vertexAttributeCount;
+		public int detailAttributeCount;
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool 	hasVolume;
+		public bool hasVolume;
 
 		// Accessors
 		public string name
@@ -770,19 +771,20 @@ namespace HAPI
 		public HAPI_AttributeInfo( string attr_name )
 		{
 			exists 		= false;
-			owner 		= (int) HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
-			storage 	= (int) HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
+			owner 		= HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
+			storage 	= HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
 			count 		= 0;
 			tupleSize 	= 0;
 		}
 		
 		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool		exists;
+		public bool exists;
 		
-		public int		owner;		// enum HAPI_AttributeOwner
-		public int		storage;	// enum HAPI_StorageType
-		public int		count;
-		public int		tupleSize;
+		public HAPI_AttributeOwner owner;
+		public HAPI_StorageType storage;
+
+		public int count;
+		public int tupleSize;
 	}
 	
 	// MATERIALS ----------------------------------------------------------------------------------------------------
@@ -790,9 +792,12 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_MaterialInfo
 	{
-		public int id;
-		public int assetId;
-		public int nodeId;
+		public HAPI_MaterialId	id;
+		public HAPI_AssetId		assetId;
+		public HAPI_NodeId		nodeId;
+
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasChanged;
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -846,7 +851,6 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Keyframe
 	{
-	
 		HAPI_Keyframe( float t, float v, float in_tangent, float out_tangent )
 		{
 			time = t;
@@ -856,16 +860,16 @@ namespace HAPI
 		}
 		
 		[ MarshalAs( UnmanagedType.R4) ]
-		public float   time;
+		public float time;
 		
 		[ MarshalAs( UnmanagedType.R4) ]
-		public float   value;
+		public float value;
 		
 		[ MarshalAs( UnmanagedType.R4) ]
-		public float   inTangent;
+		public float inTangent;
 		
 		[ MarshalAs( UnmanagedType.R4) ]
-		public float   outTangent;
+		public float outTangent;
 	
 	}
 

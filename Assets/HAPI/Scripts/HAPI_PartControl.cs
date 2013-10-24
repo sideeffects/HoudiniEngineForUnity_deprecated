@@ -184,7 +184,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 					ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 				if ( !pos_attr_info.exists )
 					throw new HAPI_Error( "No position attribute found." );
-				else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				else if ( pos_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
 
 				// Get colour attributes.

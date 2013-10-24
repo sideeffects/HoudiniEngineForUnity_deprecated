@@ -525,9 +525,9 @@ public class HAPI_AssetUtility
 										  ref HAPI_AttributeInfo info, ref T[] data,
 										  getAttrArrayInputFunc< T > get_func )
 	{
-		int original_tuple_size = info.tupleSize;		
+		int original_tuple_size = info.tupleSize;
 		
-		for ( int type = 0; type < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
+		for ( HAPI_AttributeOwner type = 0; type < HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
 			info.owner = type;
 			HAPI_Host.getAttributeInfo( asset_id, object_id, geo_id, part_id, name, ref info );
@@ -763,14 +763,15 @@ public class HAPI_AssetUtility
 				if ( mesh_renderer.sharedMaterial == null )
 					mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
 
+				HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( asset.prAssetId, part_info.materialId );
+				update_houdini_material &= material_info.hasChanged;
+
 				if ( ( update_houdini_material || mesh_renderer.sharedMaterial.mainTexture == null ) 
 						&& part_control.prMaterialId >= 0 )
 				{
 					// Reset textures.
 					mesh_renderer.sharedMaterial.mainTexture = null;
 					mesh_renderer.sharedMaterial.SetTexture( "_NormalMap", null );
-					
-					HAPI_MaterialInfo material_info = HAPI_Host.getMaterial( asset.prAssetId, part_info.materialId );
 
 					// Assign vertex color shader if the flag says so.
 					if ( asset.prShowOnlyVertexColours )
@@ -1110,7 +1111,7 @@ public class HAPI_AssetUtility
 					  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
 		if ( !pos_attr_info.exists )
 			throw new HAPI_Error( "No position attribute found." );
-		else if ( pos_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+		else if ( pos_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
 				
 		// Get uv attributes.
@@ -1165,13 +1166,13 @@ public class HAPI_AssetUtility
 			if ( uv_attr_info.exists )
 			{
 				// If the UVs are per vertex just query directly into the UV array we filled above.
-				if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( uv_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
 				
 				// If the UVs are per point use the vertex list array point indicies to query into
 				// the UV array we filled above.
-				else if ( uv_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				else if ( uv_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
 			}
@@ -1180,7 +1181,7 @@ public class HAPI_AssetUtility
 			if ( normal_attr_info.exists )
 			{
 				// If the normals are per vertex just query directly into the normals array we filled above.
-				if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 					for ( int j = 0; j < 3; ++j )
 					{
 						normals[ i ][ j ] = normal_attr[ i * 3 + j ];
@@ -1192,7 +1193,7 @@ public class HAPI_AssetUtility
 				
 				// If the normals are per point use the vertex list array point indicies to query into
 				// the normal array we filled above.
-				else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				else if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					for ( int j = 0; j < 3; ++j )
 					{
 						normals[ i ][ j ] = normal_attr[ vertex_list[ i ] * 3 + j ];
@@ -1203,7 +1204,7 @@ public class HAPI_AssetUtility
 				
 				// If the normals are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
-				else if ( normal_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				else if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
 					for ( int j = 0; j < 3; ++j )
 					{
 						int face_index = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
@@ -1221,7 +1222,7 @@ public class HAPI_AssetUtility
 				int tuple_size = tangent_attr_info.tupleSize;
 
 				// If the tangents are per vertex just query directly into the tangents array we filled above.
-				if ( tangent_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 					for ( int j = 0; j < tuple_size; ++j )
 					{
 						tangents[ i ][ j ] = tangent_attr[ i * tuple_size + j ];
@@ -1233,7 +1234,7 @@ public class HAPI_AssetUtility
 				
 				// If the tangent are per point use the vertex list array point indicies to query into
 				// the tangent array we filled above.
-				else if ( tangent_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				else if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					for ( int j = 0; j < tuple_size; ++j )
 					{
 						tangents[ i ][ j ] = tangent_attr[ vertex_list[ i ] * tuple_size + j ];
@@ -1244,7 +1245,7 @@ public class HAPI_AssetUtility
 				
 				// If the tangents are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
-				else if ( tangent_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				else if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
 					for ( int j = 0; j < tuple_size; ++j )
 					{
 						int face_index = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
@@ -1264,19 +1265,19 @@ public class HAPI_AssetUtility
 			if ( colour_attr_info.exists )
 			{
 				// If the colours are per vertex just query directly into the normals array we filled above.
-				if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
 					for ( int j = 0; j < 3; ++j )
 						colours[ i ][ j ] = colour_attr[ i * 3 + j ];
 				
 				// If the colours are per point use the vertex list array point indicies to query into
 				// the normal array we filled above.
-				else if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					for ( int j = 0; j < 3; ++j )
 						colours[ i ][ j ] = colour_attr[ vertex_list[ i ] * 3 + j ];
 				
 				// If the colours are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
-				else if ( colour_attr_info.owner == (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
 				{
 					int face_index = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
 					for ( int j = 0; j < 3; ++j )
@@ -1379,8 +1380,8 @@ public class HAPI_AssetUtility
 		// Set position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 		pos_attr_info.exists 		= true;
-		pos_attr_info.owner 		= (int) HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
-		pos_attr_info.storage 		= (int) HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+		pos_attr_info.owner 		= HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+		pos_attr_info.storage 		= HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
 		pos_attr_info.count 		= part_info.pointCount;
 		pos_attr_info.tupleSize 	= 3;
 		HAPI_Host.addAttribute( asset_id, object_id, geo_id, 

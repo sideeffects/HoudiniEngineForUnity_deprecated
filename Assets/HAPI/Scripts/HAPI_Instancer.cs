@@ -538,7 +538,7 @@ public class HAPI_Instancer : MonoBehaviour {
 		if ( !instance_attr_info.exists )
 			return;
 		
-		if ( instance_attr_info.exists && instance_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+		if ( instance_attr_info.exists && instance_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_ErrorIgnorable( "I only understand instance as point attributes!" );
 		
 		if ( instance_attr_info.exists && instance_attr.Length != myNumInstances )
@@ -551,7 +551,7 @@ public class HAPI_Instancer : MonoBehaviour {
 							  ref name_attr_info, ref name_attr, HAPI_Host.getAttributeStrData );
 					
 		
-		if ( name_attr_info.exists && name_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+		if ( name_attr_info.exists && name_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HAPI_ErrorIgnorable( "I only understand name as point attributes!" );
 		
 		if ( name_attr_info.exists && name_attr.Length != myNumInstances )
@@ -622,7 +622,7 @@ public class HAPI_Instancer : MonoBehaviour {
 			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "scale",
 								  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
 			
-			if ( scale_attr_info.exists && scale_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+			if ( scale_attr_info.exists && scale_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 				throw new HAPI_ErrorIgnorable( "I only understand scale as point attributes!" );
 			
 			if ( scale_attr_info.exists && scale_attr.Length != myNumInstances * 3 )
@@ -636,7 +636,7 @@ public class HAPI_Instancer : MonoBehaviour {
 			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "Unity_Script",
 								  ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
 			
-			if ( script_attr_info.exists && script_attr_info.owner != (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+			if ( script_attr_info.exists && script_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 				throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as point attributes!" );
 			
 			if ( script_attr_info.exists && script_attr.Length != myNumInstances )
