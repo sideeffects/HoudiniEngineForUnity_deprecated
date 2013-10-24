@@ -431,9 +431,9 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_AssetInfo 
 	{
-		public int id;
-		public int type;
-		public int subType;
+		public HAPI_AssetId			id;
+		public HAPI_AssetType		type;
+		public HAPI_AssetSubType	subType;
 
 		// This id is primarily used to check whether the asset still exists
 		// within the Houdini scene running inside the runtime. The asset id
@@ -445,7 +445,7 @@ namespace HAPI
 		public int validationId;
 
 		// Use the node id to get the asset's parameters.
-		public int nodeId;
+		public HAPI_NodeId nodeId;
 		
 		private HAPI_StringHandle nameSH; // Instance name (the label + a number).
 		private HAPI_StringHandle labelSH;
@@ -459,7 +459,6 @@ namespace HAPI
 
 		public int objectCount;
 		public int handleCount;
-		public int materialCount;
 		
 		public int minTransInputCount;
 		public int maxTransInputCount;
