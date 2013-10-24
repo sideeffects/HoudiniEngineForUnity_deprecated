@@ -34,7 +34,6 @@ public class HAPI_ParmsGUI : Editor
 
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
-		myReloadAsset		= false;
 		myFocusChanged 		= true;
 
 		HAPI_Host.myRepaintDelegate += this.refresh;
@@ -68,25 +67,27 @@ public class HAPI_ParmsGUI : Editor
 			myDelayBuild = false;
 			myParmChanges = false;
 			myFocusChanged = false;
-			
+
 			Event curr_event = Event.current;
 			bool commitChanges = false;
 			if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
 				commitChanges = true;
-			
+
 			///////////////////////////////////////////////////////////////////////
 			// Draw Asset Controls
 	
 			myParmChanges |= generateAssetControls();
-	
+
+			///////////////////////////////////////////////////////////////////////
+			// Apply Changes
+
 			if ( ( ( myParmChanges && !myDelayBuild ) || 
 				 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
 			{
-				myParms.prControl.onParmChange( myReloadAsset );
+				myParms.prControl.onParmChange( false ); // We never need to reload the asset here.
 	
 				myUnbuiltChanges	= false;
 				myParmChanges		= false;
-				myReloadAsset		= false;
 	
 				// To keep things consistent with Unity workflow, we should not save parameter changes
 				// while in Play mode.
@@ -95,9 +96,7 @@ public class HAPI_ParmsGUI : Editor
 				
 				// If asset is a prefab then propagate parameter change to all prefab instances
 				if ( myAsset.isPrefab() )
-				{
 					myAsset.propagateParmChangeToPrefabInstances();
-				}
 			}
 			else if ( myParmChanges )
 				myUnbuiltChanges = true;

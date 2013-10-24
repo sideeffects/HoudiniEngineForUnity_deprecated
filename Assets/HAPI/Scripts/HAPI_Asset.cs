@@ -89,19 +89,27 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
-	public HAPI_Parms				prParms {	get { 
-													HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
-													if ( parms == null )
-													{
-														parms = gameObject.AddComponent< HAPI_Parms >();
-														parms.prControl = this;
-														if ( prAssetId >= 0 )
-															parms.getParameterValues();
-													}
-													return parms; 
-												}
-												private set { } }
-
+	public HAPI_Parms prParms 
+	{	
+		get { 
+			HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
+			if ( parms == null )
+				parms = gameObject.AddComponent< HAPI_Parms >();
+			if ( parms.prControl == false )
+			{
+				parms.prControl = this;
+				if ( prAssetId >= 0 )
+					parms.getParameterValues();
+			}
+			return parms; 
+		}
+		private set { 
+			HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
+			if ( parms != null )
+				parms.reset();
+		}
+	}
+										
 	// Objects ------------------------------------------------------------------------------------------------------
 	
 	public int 						prObjectCount {					get { return myObjectCount; } 
@@ -888,6 +896,9 @@ public abstract class HAPI_Asset : HAPI_Control
 
 					// Once an asset is unloaded its id will is obviously no longer valid, so reset it here.
 					prAssetId = -1;
+					
+					// Need to reset the parms as well.
+					prParms = null;
 				}
 				
 				bool is_first_time_build = false;

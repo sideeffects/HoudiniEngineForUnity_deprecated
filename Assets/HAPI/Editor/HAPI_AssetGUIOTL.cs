@@ -39,15 +39,20 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		myParmChanges = false;
 		myDelayBuild = false;
 		myFocusChanged = false;
-		
+
+		Event curr_event = Event.current;
+		bool commitChanges = false;
+		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
+			commitChanges = true;
+
 		base.OnInspectorGUI();
 
 		if ( myAssetOTL.isPrefab() )
 			return;
-		
+
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
-		
+
 		myAssetOTL.prShowHoudiniControls 
 			= HAPI_GUI.foldout( "Houdini Controls", myAssetOTL.prShowHoudiniControls, true );
 		if ( myAssetOTL.prShowHoudiniControls ) 
@@ -139,6 +144,21 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		myAssetOTL.prShowBakeOptions = HAPI_GUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
 		if ( myAssetOTL.prShowBakeOptions )
 			generateAssetBakeControls();
+
+		///////////////////////////////////////////////////////////////////////
+		// Apply Changes
+
+		if ( ( ( myParmChanges && !myDelayBuild ) || 
+				( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
+		{
+			myAssetOTL.onParmChange( myReloadAsset );
+	
+			myUnbuiltChanges	= false;
+			myParmChanges		= false;
+			myReloadAsset		= false;
+		}
+		else if ( myParmChanges )
+			myUnbuiltChanges = true;
 
 	}
 	
