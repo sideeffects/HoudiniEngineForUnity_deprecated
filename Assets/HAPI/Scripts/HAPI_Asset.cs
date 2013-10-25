@@ -33,7 +33,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		TYPE_CURVE,
 		TYPE_INVALID
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -57,7 +57,20 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myHAPIAssetType = value; } }
 	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; } 
 																	set { myAssetSubType = value; } }
-	
+
+	// Parameters ---------------------------------------------------------------------------------------------------
+
+	public HAPI_PresetMap prPresetsMap 
+	{					
+		get 
+		{ 
+			if ( myPresetsMap == null )
+				myPresetsMap = ScriptableObject.CreateInstance< HAPI_PresetMap >();
+			return myPresetsMap;
+		}
+		private set { }
+	}
+
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
 	public int 						prMinTransInputCount {			get { return myMinTransInputCount; } 
@@ -700,7 +713,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		prAssetType						= AssetType.TYPE_INVALID;
 		prHAPIAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
 		prAssetSubType 					= 0;
-		
+
+		// Parameters -----------------------------------------------------------------------------------------------
+
+		prPresetsMap					= null;
+
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
 		prMinTransInputCount 			= 0;
@@ -1613,6 +1630,10 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private List< HAPI_Asset >		myUpStreamGeoAssets;
 	[SerializeField] private List< GameObject >		myUpStreamGeoObjects;
 	[SerializeField] private List< bool >			myUpStreamGeoAdded;
+
+	// Parameters ---------------------------------------------------------------------------------------------------
+
+	[SerializeField] private HAPI_PresetMap			myPresetsMap;
 
 	// Objects ------------------------------------------------------------------------------------------------------
 	

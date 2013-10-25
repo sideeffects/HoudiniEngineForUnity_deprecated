@@ -67,6 +67,15 @@ namespace HAPI
 		}
 		public HAPI_ErrorInvalidArgument( string msg ) : base( msg ) {}
 	}
+
+	public class HAPI_ErrorNotFound : HAPI_ErrorInvalidArgument
+	{
+		public HAPI_ErrorNotFound()
+		{
+			myErrorMessage = "Item not found.";
+		}
+		public HAPI_ErrorNotFound( string msg ) : base( msg ) {}
+	}
 	
 	public class HAPI_ErrorProgressCancelled : HAPI_Error 
 	{

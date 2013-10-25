@@ -88,7 +88,7 @@ public class HAPI_Parms : MonoBehaviour
 	/// </summary>
 	public List< int > 				prFolderListSelectionIds {		get { return myFolderListSelectionIds; } 
 																	set { myFolderListSelectionIds = value; } }
-	
+
 	/// <summary>
 	/// 	Booleans indicating whether the value of the parameter at the
 	/// 	same index in myParms has been changed from the value of the 
@@ -97,7 +97,10 @@ public class HAPI_Parms : MonoBehaviour
 	/// </summary>
 	public bool[]					prOverriddenParms {				get { return myOverriddenParms; }
 																	set { myOverriddenParms = value; } }
-	
+
+	public bool						prPostSerialization {			get { return myPostSerialization; }
+																	set { myPostSerialization = value; } }
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
@@ -171,8 +174,12 @@ public class HAPI_Parms : MonoBehaviour
 		prFolderListSelectionIds 		= new List< int >();
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
-		
+
 		prOverriddenParms				= null;
+
+		// Control -------------------------------------------------------------------------------------------------
+
+		myPostSerialization				= true;
 	}
 
 	public virtual void Update()
@@ -506,5 +513,8 @@ public class HAPI_Parms : MonoBehaviour
 	///     used if these parameters are the parameters of a prefab instance.
 	/// </summary>
 	[SerializeField] private bool[] 				myOverriddenParms;
-	
+
+	// Control ------------------------------------------------------------------------------------------------------
+
+	private bool myPostSerialization;
 }
