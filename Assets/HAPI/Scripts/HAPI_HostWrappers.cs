@@ -850,12 +850,9 @@ namespace HAPI
 		/// <param name="preset">
 		/// 	Buffer to hold the preset data.
 		/// </param>
-		/// <param name="buffer_length">
-		/// 	Size of the buffer.
-		/// </param>
-		public static void setPreset( HAPI_NodeId node_id, byte[] preset, int buffer_length )
+		public static void setPreset( HAPI_NodeId node_id, byte[] preset )
 		{
-			int status_code = HAPI_SetPreset( node_id, preset, buffer_length );
+			int status_code = HAPI_SetPreset( node_id, preset, preset.Length );
 			processStatusCode( (HAPI_Result) status_code );
 		}
 

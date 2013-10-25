@@ -36,6 +36,15 @@ public class HAPI_Control : MonoBehaviour
 	public HAPI_AssetId prAssetId { get { return myAssetId; } set { myAssetId = value; } }
 	public HAPI_NodeId prNodeId { get { return myNodeId; } set { myNodeId = value; } }
 	public HAPI_Asset prAsset { get { return myAsset; } set { myAsset = value; } }
+	public bool prParmsNeedInit
+	{
+		get
+		{
+			HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
+			return ( parms == null ) || ( parms.prPostSerialization );
+		}
+		private set {}
+	}
 	public HAPI_Parms prParms
 	{
 		get
@@ -53,7 +62,7 @@ public class HAPI_Control : MonoBehaviour
 
 			return parms;
 		}
-		private set { }
+		private set {}
 	}
 
 	public HAPI_Control() 

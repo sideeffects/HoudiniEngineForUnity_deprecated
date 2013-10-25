@@ -859,6 +859,15 @@ public abstract class HAPI_Asset : HAPI_Control
 				true			// use_delay_for_progress_bar
 			);
 		}
+
+		// To keep things consistent with Unity workflow, we should not save parameter changes
+		// while in Play mode.
+		if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
+			savePreset();
+
+		// If asset is a prefab then propagate parameter change to all prefab instances
+		if ( isPrefab() )
+			propagateParmChangeToPrefabInstances();
 	}
 
 	public virtual bool buildAll()
@@ -1308,7 +1317,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			if ( myPreset != null && myPreset.Length > 0 )
 			{
-				HAPI_Host.setPreset( prNodeId, myPreset, myPreset.Length );
+				HAPI_Host.setPreset( prNodeId, myPreset );
 				HAPI_Host.cookAsset( prAssetId );
 			}
 		}

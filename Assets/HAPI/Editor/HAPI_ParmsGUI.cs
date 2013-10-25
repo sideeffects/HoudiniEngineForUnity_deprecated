@@ -88,15 +88,6 @@ public class HAPI_ParmsGUI : Editor
 	
 				myUnbuiltChanges	= false;
 				myParmChanges		= false;
-	
-				// To keep things consistent with Unity workflow, we should not save parameter changes
-				// while in Play mode.
-				if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
-					myAsset.savePreset();
-				
-				// If asset is a prefab then propagate parameter change to all prefab instances
-				if ( myAsset.isPrefab() )
-					myAsset.propagateParmChangeToPrefabInstances();
 			}
 			else if ( myParmChanges )
 				myUnbuiltChanges = true;
