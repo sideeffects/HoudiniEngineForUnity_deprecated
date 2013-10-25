@@ -172,7 +172,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 		if ( prGeoType == HAPI_GeoType.HAPI_GEOTYPE_CURVE && prIsEditable )
 		{
-			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
+			prParms.setChangedParametersIntoHost();
 
 			if ( prAsset )
 				prAsset.build(
@@ -183,6 +183,8 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 					prAsset.prCookingTriggersDownCooks,
 					true			// use_delay_for_progress_bar
 				);
+
+			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
 		}
 	}
 
@@ -191,26 +193,20 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 	private void createAndInitCurve( int node_id, int object_id, int geo_id, bool editable )
 	{
-		HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
-		if ( parms == null )
-		{
-			parms = gameObject.AddComponent< HAPI_Parms >();
-			parms.prControl = this;
-			parms.getParameterValues();
-		}
-
 		HAPI_Curve curve = gameObject.GetComponent< HAPI_Curve >();
 		if ( curve == null )
 		{
 			curve = gameObject.AddComponent< HAPI_Curve >();
 			curve.prControl = this;
-			curve.prParms = parms;
+			curve.prParms = prParms;
 		}
 
 		try
 		{
 			curve.syncPointsWithParm();
 			curve.createObject( object_id, geo_id );
+			if ( HAPI_Host.myRepaintDelegate != null )
+				HAPI_Host.myRepaintDelegate();
 		}
 		catch ( HAPI_Error )
 		{

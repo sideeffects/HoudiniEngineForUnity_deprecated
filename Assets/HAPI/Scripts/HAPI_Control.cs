@@ -36,6 +36,25 @@ public class HAPI_Control : MonoBehaviour
 	public HAPI_AssetId prAssetId { get { return myAssetId; } set { myAssetId = value; } }
 	public HAPI_NodeId prNodeId { get { return myNodeId; } set { myNodeId = value; } }
 	public HAPI_Asset prAsset { get { return myAsset; } set { myAsset = value; } }
+	public HAPI_Parms prParms
+	{
+		get
+		{
+			HAPI_Parms parms = getOrCreateComponent< HAPI_Parms >();
+
+			if ( parms.prControl == false )
+				parms.prControl = this;
+
+			if ( parms.prPostSerialization )
+			{
+				parms.getParameterValues();
+				parms.prPostSerialization = false;
+			}
+
+			return parms;
+		}
+		private set { }
+	}
 
 	public HAPI_Control() 
 	{

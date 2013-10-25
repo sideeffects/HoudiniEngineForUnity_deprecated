@@ -225,6 +225,8 @@ public class HAPI_Parms : MonoBehaviour
 			return;
 		if ( prControl.prAsset == null )
 			return;
+		if ( prControl.prAssetId < 0 )
+			return;
 
 		// Get the node info again
 		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prControl.prNodeId );

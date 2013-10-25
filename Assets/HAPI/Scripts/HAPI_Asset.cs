@@ -100,29 +100,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	public List< bool >				prUpStreamGeoAdded {			get { return myUpStreamGeoAdded; } 
 																	set { myUpStreamGeoAdded = value; } }
 
-	// Parameters ---------------------------------------------------------------------------------------------------
-
-	public HAPI_Parms prParms 
-	{	
-		get { 
-			HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
-			if ( parms == null )
-				parms = gameObject.AddComponent< HAPI_Parms >();
-			if ( parms.prControl == false )
-			{
-				parms.prControl = this;
-				if ( prAssetId >= 0 )
-					parms.getParameterValues();
-			}
-			return parms; 
-		}
-		private set { 
-			HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
-			if ( parms != null )
-				parms.reset();
-		}
-	}
-										
 	// Objects ------------------------------------------------------------------------------------------------------
 	
 	public int 						prObjectCount {					get { return myObjectCount; } 
@@ -957,7 +934,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					prAssetId = -1;
 					
 					// Need to reset the parms as well.
-					prParms = null;
+					prParms.reset();
 				}
 				
 				bool is_first_time_build = false;
