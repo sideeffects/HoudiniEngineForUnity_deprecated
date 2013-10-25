@@ -654,7 +654,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			   	   false	// use_delay_for_progress_bar
 			 );
 		}
-		else if ( prAssetId >= 0 )
+		else if ( prAssetId >= 0 || isInstantiatingPrefab() )
 		{	
 			if ( !isInstantiatingPrefab() &&
 				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
@@ -783,11 +783,53 @@ public abstract class HAPI_Asset : HAPI_Control
 			{
 				HAPI_Asset asset = obj.GetComponent< HAPI_Asset >();
 				GameObject prefab_parent = PrefabUtility.GetPrefabParent( obj ) as GameObject;
-				if ( asset && PrefabUtility.Equals( prefab_parent, gameObject ) )
+				if ( asset && 
+					 asset.isPrefabInstance() && 
+					 PrefabUtility.Equals( prefab_parent, gameObject ) )
 				{
-					asset.prPreset = prPreset;
-					asset.loadPreset();
-					asset.buildClientSide();
+					// loop through parameters on prefab and only change the ones on the
+					// asset that have not been overridden
+					HAPI_Parms asset_parms = asset.prParms;
+					for ( int ii = 0; ii < asset_parms.prParmCount; ii++ )
+					{
+						HAPI_ParmInfo asset_parm_info = asset_parms.prParms[ ii ];
+						
+						// if this parameter has not been overridden and it's 
+						// value differs from the value of this parameter on 
+						// the prefab the change the value on the asset to
+						// match the value of the prefab
+						if ( !asset_parms.prOverriddenParms[ ii ] && 
+							 !asset_parms.isParmSameInPrefab( asset_parm_info.id, prParms ) )
+						{
+							HAPI_ParmInfo parm_info = prParms.findParm( asset_parm_info.id );
+							
+							if ( asset_parm_info.isFloat() )
+							{
+								for ( int jj = 0; jj < asset_parm_info.size; jj++ )
+								{
+									int index = parm_info.floatValuesIndex + jj;
+									int asset_index = asset_parm_info.floatValuesIndex + jj;
+									asset_parms.prParmFloatValues[ asset_index ] = prParms.prParmFloatValues[ index ];
+								}
+							}
+							else if ( asset_parm_info.isInt() )
+							{
+								for ( int jj = 0; jj < asset_parm_info.size; jj++ )
+								{
+									int index = parm_info.intValuesIndex + jj;
+									int asset_index = asset_parm_info.intValuesIndex + jj;
+									asset_parms.prParmIntValues[ asset_index ] = prParms.prParmIntValues[ index ];
+								}
+							}
+							else if ( asset_parm_info.isString() )
+							{
+								string[] values = prParms.getParmStrings( parm_info );
+								asset_parms.setParmStrings( asset_parm_info, values );
+							}
+							asset_parms.setChangedParameterIntoHost( asset_parm_info.id );
+							asset.buildClientSide();
+						}
+					}
 				}
 			}
 		}
@@ -918,7 +960,6 @@ public abstract class HAPI_Asset : HAPI_Control
 					// We need to update the prAssetId in case the cook is aborted/fails 
 					// and we need to clean up (unload the asset) in the catch.
 					prAssetId = asset_id;
-					prBackupAssetId = asset_id;
 
 					progress_bar.statusCheckLoop();
 
@@ -961,6 +1002,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				// More imporantly, structs are not serialized and therefore putting them into their own
 				// variables is required in order to maintain state between serialization cycles.
 				prAssetId 					= prAssetInfo.id;
+				prBackupAssetId				= prAssetId;
 				prAssetValidationId			= prAssetInfo.validationId;
 				prBackupAssetValidationId 	= prAssetValidationId;
 				prNodeId					= prAssetInfo.nodeId;
@@ -982,7 +1024,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					
 					// Transform may not have been saved as part of the presets so we have to rely 
 					// on the serialized value.
-					if ( myLastLocalToWorld != Matrix4x4.zero )
+					if ( myLastLocalToWorld != Matrix4x4.zero && !isPrefab() )
 					{
 						// If this is a prefab instance being reverted we don't want to use the 
 						// serialized value so don't change transform. 
@@ -1271,8 +1313,10 @@ public abstract class HAPI_Asset : HAPI_Control
 		try
 		{
 			if ( myPreset != null && myPreset.Length > 0 )
+			{
 				HAPI_Host.setPreset( prNodeId, myPreset, myPreset.Length );
 				HAPI_Host.cookAsset( prAssetId );
+			}
 		}
 		catch ( HAPI_Error error )
 		{

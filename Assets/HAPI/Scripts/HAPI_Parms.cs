@@ -89,6 +89,14 @@ public class HAPI_Parms : MonoBehaviour
 	public List< int > 				prFolderListSelectionIds {		get { return myFolderListSelectionIds; } 
 																	set { myFolderListSelectionIds = value; } }
 	
+	/// <summary>
+	/// 	Booleans indicating whether the value of the parameter at the
+	/// 	same index in myParms has been changed from the value of the 
+	///     same parameter in the associated prefab. These values are only 
+	///     used if these parameters are the parameters of a prefab instance.
+	/// </summary>
+	public bool[]					prOverriddenParms {				get { return myOverriddenParms; }
+																	set { myOverriddenParms = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -163,6 +171,8 @@ public class HAPI_Parms : MonoBehaviour
 		prFolderListSelectionIds 		= new List< int >();
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
+		
+		prOverriddenParms				= null;
 	}
 
 	public virtual void Update()
@@ -250,6 +260,90 @@ public class HAPI_Parms : MonoBehaviour
 			myParmMap[ prParms[ i ].id ] = prParms[ i ];
 
 		cacheStringsFromHost();
+		
+		// Set which parameter values have been overridden
+		prOverriddenParms = new bool[ prParmCount ];
+		if ( prControl && prControl.prAsset && prControl.prAsset.isPrefabInstance() )
+		{
+			GameObject prefab = PrefabUtility.GetPrefabParent( prControl.prAsset.gameObject ) as GameObject;
+			if ( prefab )
+			{
+				HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();
+				if ( prefab_asset && prefab_asset.prParms.prParms != null )
+				{
+					// loop through parameter values and determine which ones have been
+					// overridden (ie. changed from corresponding parameter value on prefab)
+					for ( int ii = 0; ii < prParmCount; ii++ )
+					{
+						prOverriddenParms[ ii ] = !isParmSameInPrefab( prParms[ ii ].id, prefab_asset.prParms );
+					}
+				}
+			}
+		}
+	}
+	
+	// Checks if the parameter with the given id parm_id represents the same parameter 
+	// with the same value in this set of parameters and another set of parameters parmsB.
+	public bool isParmSameInPrefab( int parm_id, HAPI_Parms parmsB )
+	{
+		HAPI_ParmInfo parm_infoA = findParm( parm_id );
+		HAPI_ParmInfo parm_infoB = parmsB.findParm( parm_id );
+		
+		if ( parm_infoA.GetType() != parm_infoB.GetType() ||
+			 parm_infoA.size != parm_infoB.size ||
+			 parm_infoA.name != parm_infoB.name || 
+			 parm_infoA.label != parm_infoB.label )
+		{
+			Debug.LogError( "Parameter structure is different from prefab" );
+			return false;
+		}
+		
+		// only need to check type and size of one because already checked that
+		// parameter infos have  type and size
+		if ( parm_infoA.isFloat() )
+		{
+			for ( int ii = 0; ii < parm_infoA.size; ii++ )
+			{
+				float valueA = prParmFloatValues[ parm_infoA.floatValuesIndex + ii ];
+				float valueB = parmsB.prParmFloatValues[ parm_infoB.floatValuesIndex + ii ];
+				if ( valueA != valueB )
+				{
+					return false;
+				}
+			}
+		}
+		else if ( parm_infoB.isInt() )
+		{
+			for ( int ii = 0; ii < parm_infoA.size; ii++ )
+			{
+				int valueA = prParmIntValues[ parm_infoA.intValuesIndex + ii ];
+				int valueB = parmsB.prParmIntValues[ parm_infoB.intValuesIndex + ii ];
+				if ( valueA != valueB )
+				{
+					return false;
+				}
+			}
+		}
+		else if ( parm_infoB.isString() )
+		{
+			string[] valuesA = getParmStrings( parm_infoA );
+			string[] valuesB = parmsB.getParmStrings( parm_infoB );
+			
+			if ( valuesA.Length != valuesB.Length )
+			{
+				return false;
+			}
+			
+			for ( int ii = 0; ii < valuesA.Length; ii++ )
+			{
+				if ( valuesA[ ii ] != valuesB[ ii ] )
+				{
+					return false;
+				}
+			}
+		}
+		
+	    return true;
 	}
 
 	public void removeMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
@@ -404,4 +498,13 @@ public class HAPI_Parms : MonoBehaviour
 	/// 	A 1:1 mapping with myFolderListSelections.
 	/// </summary>
 	[SerializeField] private List< int > 			myFolderListSelectionIds;
+	
+	/// <summary>
+	/// 	Booleans indicating whether the value of the parameter at the
+	/// 	same index in myParms has been changed from the value of the 
+	///     same parameter in the associated prefab. These values are only 
+	///     used if these parameters are the parameters of a prefab instance.
+	/// </summary>
+	[SerializeField] private bool[] 				myOverriddenParms;
+	
 }
