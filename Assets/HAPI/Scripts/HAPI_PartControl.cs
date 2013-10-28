@@ -101,6 +101,11 @@ public class HAPI_PartControl : HAPI_GeoControl
 		prMaterialId	= material_id;
 	}
 
+	public override string getFullControlNameAndPath()
+	{
+		return base.getFullControlNameAndPath() + "/" + prPartName;
+	}
+
 	public void refresh( bool reload_asset, bool has_geo_changed, bool has_material_changed )
 	{
 		if ( prGeoControl == null )

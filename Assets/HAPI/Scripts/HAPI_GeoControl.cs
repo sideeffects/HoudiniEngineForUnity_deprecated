@@ -84,6 +84,11 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		prIsEditable		= editable;
 	}
 
+	public override string getFullControlNameAndPath()
+	{
+		return base.getFullControlNameAndPath() + "/" + prGeoName;
+	}
+
 	public void refresh( bool reload_asset )
 	{
 		if ( prObjectControl == null )
@@ -189,7 +194,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 			// To keep things consistent with Unity workflow, we should not save parameter changes
 			// while in Play mode.
 			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
-				prAsset.prPresetsMap.set( prGeoName + "_geo", HAPI_Host.getPreset( prNodeId ) );
+				prAsset.prPresetsMap.set( getFullControlNameAndPath(), HAPI_Host.getPreset( prNodeId ) );
 		}
 	}
 
@@ -198,8 +203,12 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 	private void createAndInitCurve( int node_id, int object_id, int geo_id, bool editable )
 	{
-		if ( prParmsNeedInit && prAsset.prPresetsMap.contains( prGeoName + "_geo" ) )
-			HAPI_Host.setPreset( prNodeId, prAsset.prPresetsMap.get( prGeoName + "_geo" ) );
+		if ( prParmsNeedInit && prAsset.prPresetsMap.contains( getFullControlNameAndPath() ) )
+		{
+			HAPI_PresetMap map = prAsset.prPresetsMap;
+			byte[] preset = map.get( getFullControlNameAndPath() );
+			HAPI_Host.setPreset( prNodeId, preset );
+		}
 
 		HAPI_Curve curve = gameObject.GetComponent< HAPI_Curve >();
 		if ( curve == null )

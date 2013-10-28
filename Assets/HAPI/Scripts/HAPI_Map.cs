@@ -20,7 +20,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 [ System.Serializable ]
-public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< KEY > {
+public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< KEY >
+{
 
 	public HAPI_Map( string name )
 	{
@@ -29,14 +30,16 @@ public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< K
 		myValues = new List< VALUE >();
 	}
 
-	public void set( KEY key, VALUE value )
+	public virtual void set( KEY key, VALUE value )
 	{
 		int index = myKeys.FindIndex( delegate( KEY k ) { return k.Equals( key ); } );
 		if ( index >= 0 )
 			myValues[ index ] = value;
+		else
+			add( key, value );
 	}
 
-	public void add( KEY key, VALUE value )
+	public virtual void add( KEY key, VALUE value )
 	{
 		if ( myKeys.Contains( key ) )
 			set( key, value );
@@ -49,7 +52,7 @@ public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< K
 		}
 	}
 
-	public void remove( KEY key )
+	public virtual void remove( KEY key )
 	{
 		int index = myKeys.FindIndex( delegate( KEY k ) { return k.Equals( key ); } );
 		if ( index >= 0 )
@@ -61,13 +64,25 @@ public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< K
 		}
 	}
 
-	public bool contains( KEY key )
+	public virtual bool contains( KEY key )
 	{
 		return myKeys.Contains( key );
 	}
 
-	public VALUE get( KEY key )
+	public virtual bool isEmpty()
 	{
+		if ( myKeys.Count != myValues.Count )
+			Debug.LogError( myName + " dictionary has missmatched key/value pairs." );
+		return myKeys.Count == 0;
+	}
+
+	public virtual VALUE get( KEY key )
+	{
+		if ( myKeys.Count != myValues.Count )
+		{
+			Debug.LogError( myName + " dictionary has unserializable values." );
+			throw new HAPI.HAPI_ErrorNotFound();
+		}
 		int index = myKeys.FindIndex( delegate( KEY k ) { return k.Equals( key ); } );
 		if ( index >= 0 )
 			return myValues[ index ];
@@ -75,8 +90,8 @@ public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< K
 			throw new HAPI.HAPI_ErrorNotFound();
 	}
 
-	[SerializeField] private string myName;
-	[SerializeField] private List< KEY > myKeys;
-	[SerializeField] private List< VALUE > myValues;
+	[SerializeField] protected string myName;
+	[SerializeField] protected List< KEY > myKeys;
+	[SerializeField] protected List< VALUE > myValues;
 
 }

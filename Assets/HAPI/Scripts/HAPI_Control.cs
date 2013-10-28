@@ -91,6 +91,11 @@ public class HAPI_Control : MonoBehaviour
 		prAsset		= control.prAsset;
 	}
 
+	public virtual string getFullControlNameAndPath()
+	{
+		return "CONTROL";
+	}
+
 	public virtual void onParmChange( bool reload_asset ) {}
 
 	public T getOrCreateComponent< T >() where T : Component {

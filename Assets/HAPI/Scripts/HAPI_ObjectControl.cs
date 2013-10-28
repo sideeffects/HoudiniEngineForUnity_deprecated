@@ -78,6 +78,11 @@ public class HAPI_ObjectControl : HAPI_Control
 		prObjectVisible = object_visible;
 	}
 
+	public override string getFullControlNameAndPath()
+	{
+		return base.getFullControlNameAndPath() + "/" + prObjectName;
+	}
+
 	public void refresh( bool reload_asset, HAPI_ObjectInfo object_info )
 	{
 		if ( reload_asset )
