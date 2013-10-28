@@ -739,7 +739,20 @@ public class HAPI_Instancer : MonoBehaviour {
 					Vector3 scale = new Vector3 ( instance_transforms[ ii ].scale[ 0 ],
 												  instance_transforms[ ii ].scale[ 1 ],
 												  instance_transforms[ ii ].scale[ 2 ] );
+					
+					
+					
+					Matrix4x4 local_mat = new Matrix4x4();
+					local_mat.SetTRS( pos, Quaternion.Euler( euler ), scale );
+					Matrix4x4 global_mat = transform.localToWorldMatrix * local_mat;
+					
+					euler = HAPI_AssetUtility.getQuaternion( global_mat ).eulerAngles;
+					pos = HAPI_AssetUtility.getPosition( global_mat );
+					scale = HAPI_AssetUtility.getScale( global_mat );
+					
 						
+					//mat.SetTRS( pos, 
+					
 					string script_to_attach = "";
 					if( script_attr_info.exists )
 						script_to_attach = HAPI_Host.getString( script_attr[ ii ] );
