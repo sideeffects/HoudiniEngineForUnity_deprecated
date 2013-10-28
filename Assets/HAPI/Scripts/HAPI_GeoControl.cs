@@ -34,7 +34,8 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	public int prGeoId {				get { return myGeoId; }		set { myGeoId = value; } }
 	public string prGeoName {			get { return myGeoName; }	set { myGeoName = value; } }
 	public HAPI_GeoType prGeoType {		get { return myGeoType; }	set { myGeoType = value; } }
-	public bool prIsEditable {				get { return myIsEditable; }	set { myIsEditable = value; } }
+	public bool prIsEditable {			get { return myIsEditable; }set { myIsEditable = value; } }
+	public bool prIsDisplay {			get { return myIsDisplay; }	set { myIsDisplay = value; } }
 	public HAPI_ObjectControl prObjectControl { get { return myObjectControl; } set { myObjectControl = value; } }
 
 	public List< GameObject > prParts {	get { return myParts; }		set { myParts = value; } }
@@ -57,8 +58,9 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		
 		prGeoId			= -1;
 		prGeoName		= "geo_name";
-		prGeoType		= HAPI_GeoType.HAPI_GEOTYPE_DISPLAY;
-		prIsEditable		= false;
+		prGeoType		= HAPI_GeoType.HAPI_GEOTYPE_DEFAULT;
+		prIsEditable	= false;
+		prIsDisplay		= true;
 		prObjectControl	= null;
 
 		myParts			= new List< GameObject >( 0 );
@@ -71,17 +73,19 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		prGeoId			= geo_control.prGeoId;
 		prGeoName		= geo_control.prGeoName;
 		prGeoType		= geo_control.prGeoType;
-		prIsEditable		= geo_control.prIsEditable;
+		prIsEditable	= geo_control.prIsEditable;
+		prIsDisplay		= geo_control.prIsDisplay;
 	}
 
 	public void init( 
-		HAPI_NodeId node_id, int geo_id, string geo_name, HAPI_GeoType geo_type, bool editable )
+		HAPI_NodeId node_id, int geo_id, string geo_name, HAPI_GeoType geo_type, bool editable, bool display )
 	{
 		prNodeId		= node_id;
 		prGeoId			= geo_id;
 		prGeoName		= geo_name;
 		prGeoType		= geo_type;
-		prIsEditable		= editable;
+		prIsEditable	= editable;
+		prIsDisplay		= display;
 	}
 
 	public override string getFullControlNameAndPath()
@@ -119,7 +123,9 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		if ( reload_asset || geo_info.hasGeoChanged )
 		{
 			// Initialize our geo control.
-			init( geo_info.nodeId, prGeoId, geo_info.name, (HAPI_GeoType) geo_info.type, geo_info.isEditable );
+			init( 
+				geo_info.nodeId, prGeoId, geo_info.name, (HAPI_GeoType) geo_info.type, 
+				geo_info.isEditable, geo_info.isDisplayGeo );
 
 			// Set node name.
 			geo_node.name = prGeoName + "_geo" + prGeoId;
@@ -257,6 +263,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	[SerializeField] private string			myGeoName;
 	[SerializeField] private HAPI_GeoType	myGeoType;
 	[SerializeField] private bool			myIsEditable;
+	[SerializeField] private bool			myIsDisplay;
 	[SerializeField] private HAPI_ObjectControl myObjectControl;
 
 	[SerializeField] private List< GameObject > myParts;

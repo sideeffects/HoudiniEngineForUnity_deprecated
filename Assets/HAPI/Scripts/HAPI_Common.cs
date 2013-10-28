@@ -228,7 +228,7 @@ namespace HAPI
 	public enum HAPI_GeoType
 	{
 		HAPI_GEOTYPE_INVALID = -1,
-		HAPI_GEOTYPE_DISPLAY,
+		HAPI_GEOTYPE_DEFAULT,
 		HAPI_GEOTYPE_INTERMEDIATE,
 		HAPI_GEOTYPE_INPUT,
 		HAPI_GEOTYPE_CURVE,
@@ -710,6 +710,7 @@ namespace HAPI
 		public HAPI_NodeId nodeId;
 
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool isEditable;
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool isDisplayGeo; // Final Result (Display SOP)
 		
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasGeoChanged;
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasMaterialChanged;
