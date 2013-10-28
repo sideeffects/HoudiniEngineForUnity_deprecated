@@ -272,9 +272,9 @@ public class HAPI_Parms : MonoBehaviour
 		
 		// Set which parameter values have been overridden
 		prOverriddenParms = new bool[ prParmCount ];
-		if ( prControl && prControl.prAsset && prControl.prAsset.isPrefabInstance() )
+		if ( prControl && prControl.isPrefabInstance() )
 		{
-			GameObject prefab = PrefabUtility.GetPrefabParent( prControl.prAsset.gameObject ) as GameObject;
+			GameObject prefab = PrefabUtility.GetPrefabParent( prControl.gameObject ) as GameObject;
 			if ( prefab )
 			{
 				HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();

@@ -214,9 +214,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	public int prBackupAssetValidationId {	get { return myBackupAssetValidationId; }
 											set { myBackupAssetValidationId = value; } }
 	
-	public bool isPrefab() 			{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab; }
-	public bool isPrefabInstance()	{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance; }
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
@@ -1108,7 +1105,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 			// A bit of a hack (but not terrible). If we have presets for other child controls
 			// they set their presets by now so we need to rebuild with the new presets.
-			if ( reload_asset && !myPresetsMap.isEmpty() )
+			if ( reload_asset && !prPresetsMap.isEmpty() )
 				build( false, false, false, false, false, true );
 		}
 		catch ( HAPI_ErrorIgnorable ) {}

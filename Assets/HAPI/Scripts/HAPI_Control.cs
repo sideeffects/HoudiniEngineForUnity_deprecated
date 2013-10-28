@@ -64,6 +64,9 @@ public class HAPI_Control : MonoBehaviour
 		}
 		private set {}
 	}
+	
+	public bool isPrefab() 			{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab; }
+	public bool isPrefabInstance()	{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance; }
 
 	public HAPI_Control() 
 	{
