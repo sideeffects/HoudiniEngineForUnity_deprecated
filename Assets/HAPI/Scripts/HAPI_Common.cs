@@ -882,34 +882,37 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_VolumeInfo
 	{
-		public int 		nameSH;
+		public HAPI_StringHandle nameSH;
 
-		// Dimensions of the index space axis aligned bounding box of the volume
-		public int	    xLength; 
-		public int	    yLength;
-		public int	    zLength;
-		public int 	    minX;
-		public int 	    minY;
-		public int 	    minZ;
+		// Each voxel is identified with an index. The indices will range between:
+		// [ ( minX, minY, minZ ), ( minX+xLength, minY+yLength, minZ+zLength ) )
+		public int xLength; 
+		public int yLength;
+		public int zLength;
+		public int minX;
+		public int minY;
+		public int minZ;
 
-		// Number of values per voxel
-		public int 		tupleSize;
-		public int		storage; // enum HAPI_StorageType
+		// Number of values per voxel.
+		public int tupleSize;
+		public HAPI_StorageType storage;
 
-		public int 		tileSize;
+		// The dimensions of each tile.
+		public int tileSize;
+
+		// The transform of the volume with respect to the above lengths.
 
 		[ MarshalAs( UnmanagedType.Struct ) ]
 		public HAPI_Transform transform;
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool    hasTaper;
+		public bool hasTaper;
 
 		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float   xTaper;
+		public float xTaper;
 
 		[ MarshalAs( UnmanagedType.R4 ) ]
-		public float   yTaper;
-
+		public float yTaper;
 	};
 
 	/// A HAPI_VolumeTileInfo represents an 8x8x8 section of a volume with
