@@ -601,9 +601,10 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isChildOfMultiParm;
 
-		public int instanceNum;
-		public int instanceLength;
-		public int instanceCount;
+		public int instanceNum; // The index of the instance in the multiparm.
+		public int instanceLength; // The number of parms in a multiparm instance.
+		public int instanceCount; // The number of instances in a multiparm.
+		public int instanceStartOffset; // First instanceNum either 0 or 1.
 
 		public HAPI_RampType rampType;
 
