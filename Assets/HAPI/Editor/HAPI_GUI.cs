@@ -40,6 +40,8 @@ public struct HAPI_GUIParm
 		instanceNum 		= -1;
 		
 		valuesIndex		= 0;
+		
+		isBold 			= false;
 	}
 	
 	public HAPI_GUIParm( HAPI.HAPI_ParmInfo info )
@@ -78,6 +80,8 @@ public struct HAPI_GUIParm
 			valuesIndex = info.stringValuesIndex;
 		else
 			valuesIndex = 0;
+		
+		isBold 			= false;
 	}
 	
 	public int size;
@@ -107,6 +111,8 @@ public struct HAPI_GUIParm
 	public bool isRamp;
 	
 	public int valuesIndex;
+	
+	public bool isBold;
 }
 
 public class HAPI_GUI : Editor 
@@ -239,13 +245,20 @@ public class HAPI_GUI : Editor
 		}
 		else
 		{
+			// Get Style
+			GUIStyle popup_style = new GUIStyle( EditorStyles.popup );
+			if ( parm.isBold )
+			{
+				popup_style.fontStyle = FontStyle.Bold;
+			}
+			
 			// Draw popup.
 			int new_mapped_value = 0;
 			if ( parm.width >= 0 )
 				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values,
-															 GUILayout.Width( parm.width ) );
+															 popup_style, GUILayout.Width( parm.width ) );
 			else
-				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values );
+				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values, popup_style );
 
 			T new_value = dropdown_values[ new_mapped_value ];
 
@@ -315,11 +328,18 @@ public class HAPI_GUI : Editor
 			// Get old value.
 			int old_value = values[ parm.valuesIndex + p ];
 			
+			// Get style
+			GUIStyle int_field_style = new GUIStyle( EditorStyles.numberField );
+			if ( parm.isBold )
+			{
+				int_field_style.fontStyle	= FontStyle.Bold;
+			}
+			
 			// Draw field.
 			GUI.SetNextControlName( parm.name +
 									" " + parm.instanceNum +
 									" " + p + " int_field" );
-			int new_value = EditorGUILayout.IntField( old_value );
+			int new_value = EditorGUILayout.IntField( old_value, int_field_style );
 			if ( new_value != old_value ) // Check if the field is being used instead of the slider.
 				delay_build = true;
 			
@@ -377,10 +397,17 @@ public class HAPI_GUI : Editor
 		
 		// Get old value.
 		int old_value = values[ parm.valuesIndex ];
+		
+		// Get style
+		GUIStyle int_field_style = new GUIStyle( EditorStyles.numberField );
+		if ( parm.isBold )
+		{
+			int_field_style.fontStyle = FontStyle.Bold;
+		}
 
 		// Draw field.
 		GUI.SetNextControlName( parm.name + " multiparm_field" );
-		int new_value = EditorGUILayout.IntField( old_value );
+		int new_value = EditorGUILayout.IntField( old_value, int_field_style );
 		if ( new_value != old_value ) 
 			delay_build = true;
 
@@ -464,11 +491,18 @@ public class HAPI_GUI : Editor
 			// Get old value.
 			float old_value = values[ parm.valuesIndex + p ];
 			
+			// Get style
+			GUIStyle float_field_style = new GUIStyle( EditorStyles.numberField );
+			if ( parm.isBold )
+			{
+				float_field_style.fontStyle	= FontStyle.Bold;
+			}
+			
 			// Draw field.
 			GUI.SetNextControlName( parm.name +
 									" " + parm.instanceNum +
 									" " + p + " float_field" );
-			float new_value = EditorGUILayout.FloatField( old_value );
+			float new_value = EditorGUILayout.FloatField( old_value, float_field_style );
 			if ( new_value != old_value ) // Check if the field is being used instead of the slider.
 				delay_build = true;
 			
@@ -558,11 +592,18 @@ public class HAPI_GUI : Editor
 			// Get old value.
 			string old_value = values[ parm.valuesIndex + p ];
 			
+			// Get style
+			GUIStyle text_field_style = new GUIStyle( EditorStyles.textField );
+			if ( parm.isBold )
+			{
+				text_field_style.fontStyle	= FontStyle.Bold;
+			}
+			
 			// Draw field.
 			GUI.SetNextControlName( parm.name +
 									" " + parm.instanceNum +
 									" " + p + " string_field" );
-			string new_value = EditorGUILayout.TextField( old_value );
+			string new_value = EditorGUILayout.TextField( old_value, text_field_style );
 			if ( new_value != old_value ) // Check if the field is being used instead of the slider.
 				delay_build = true;
 			
@@ -657,11 +698,18 @@ public class HAPI_GUI : Editor
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
 		
+		// Get style
+		GUIStyle text_field_style = new GUIStyle( EditorStyles.textField );
+		if ( parm.isBold )
+		{
+			text_field_style.fontStyle	= FontStyle.Bold;
+		}
+		
 		string old_path = path;
 		GUI.SetNextControlName( parm.name +
 								" " + parm.instanceNum +
 								" " + " file_field" );
-		string new_path = EditorGUILayout.TextField( old_path );
+		string new_path = EditorGUILayout.TextField( old_path, text_field_style );
 		if ( new_path != old_path ) // Check if the field is being used instead of the slider.
 			delay_build = true;
 		
@@ -726,11 +774,18 @@ public class HAPI_GUI : Editor
 		// Get old value.
 		int old_value = values[ parm.valuesIndex ];
 		
+		// Get style
+		GUIStyle label_style = new GUIStyle( EditorStyles.label );
+		if ( parm.isBold )
+		{
+			label_style.fontStyle = FontStyle.Bold;
+		}
+		
 		// Draw toggle with its label.
 		bool toggle_result = EditorGUILayout.Toggle( old_value != 0, myToggleWidthGUI );
 		int new_value = ( toggle_result ? 1 : 0 );
 		if ( !parm.labelNone )
-			EditorGUILayout.SelectableLabel( parm.label, myLineHeightGUI );
+			EditorGUILayout.SelectableLabel( parm.label, label_style, myLineHeightGUI );
 		else
 			no_label_toggle_last = true;
 		
@@ -942,6 +997,16 @@ public class HAPI_GUI : Editor
 		{
 			float label_final_width =
 				(parm.isChildOfMultiParm ? myLabelWidthMulti : myLabelWidth) + (float) parm.labelExtraWidth;
+			
+			if ( parm.isBold )
+			{
+				myLabelStyle.fontStyle = FontStyle.Bold;
+			}
+			else
+			{
+				myLabelStyle.fontStyle = FontStyle.Normal;
+			}
+			
 			if ( join_last && !no_label_toggle_last )
 			{
 				float min_width;

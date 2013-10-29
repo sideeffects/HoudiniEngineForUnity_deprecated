@@ -133,7 +133,8 @@ public class HAPI_ParmsGUI : Editor
 		int[] parm_int_values		= myParms.prParmIntValues;
 		float[] parm_float_values	= myParms.prParmFloatValues;
 
-		HAPI_GUIParm gui_parm = new HAPI_GUIParm( parm );
+		HAPI_GUIParm gui_parm 		= new HAPI_GUIParm( parm );
+		gui_parm.isBold				= myParms.prOverriddenParms[ index ];
 
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter
