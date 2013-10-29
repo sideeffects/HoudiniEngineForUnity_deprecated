@@ -114,6 +114,17 @@ public class HAPI_CurveGUI : Editor
 		Vector3 mouse_position		= getMousePosition( ref current_event );
 
 		// Set appropriate handles matrix.
+		// TODO: Fix.
+		/*
+		Vector3 handle_pos = HAPI_AssetUtility.getPosition( myCurve.transform.localToWorldMatrix );
+		Quaternion handle_rot = HAPI_AssetUtility.getQuaternion( myCurve.transform.localToWorldMatrix );
+		Matrix4x4 handle_matrix = Matrix4x4.identity;
+		handle_matrix.SetTRS( handle_pos, handle_rot, new Vector3( 1.0f, 1.0f, 1.0f ) );
+		//Debug.Log( handle_pos );
+		//Debug.Log( handle_rot );
+		//Debug.Log( handle_matrix );
+		Handles.matrix = handle_matrix;
+		 */
 		Handles.matrix = myCurve.transform.localToWorldMatrix;
 
 		// Determine key state.
