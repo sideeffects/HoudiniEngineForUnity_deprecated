@@ -75,8 +75,16 @@ public class HAPI_ParmsGUI : Editor
 
 			///////////////////////////////////////////////////////////////////////
 			// Draw Asset Controls
-	
+
+			if ( !myParms.prEditable )
+				HAPI_GUI.help( "The parameters on this node are readonly.", MessageType.Info );
+
+			bool gui_enable = GUI.enabled;
+			GUI.enabled = myParms.prEditable;
+
 			myParmChanges |= generateAssetControls();
+
+			GUI.enabled = gui_enable;
 
 			///////////////////////////////////////////////////////////////////////
 			// Apply Changes

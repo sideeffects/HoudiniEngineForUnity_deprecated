@@ -50,6 +50,9 @@ public class HAPI_Parms : MonoBehaviour
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
+	public bool						prEditable {					get { return myEditable; }
+																	set { myEditable = value; } }
+
 	public int 						prParmCount {					get { return myParmCount; } 
 																	set { myParmCount = value; } }
 	public int						prParmIntValueCount {			get { return myParmIntValueCount; } 
@@ -155,19 +158,21 @@ public class HAPI_Parms : MonoBehaviour
 		prControl						= null;
 
 		// Parameters -----------------------------------------------------------------------------------------------
-		
+
+		prEditable						= true;
+
 		prParmCount 					= 0;
 		prParmIntValueCount 			= 0;
 		prParmFloatValueCount 			= 0;
 		prParmStringValueCount 			= 0;
 		prParmChoiceCount 				= 0;
-		
+
 		prParms 						= null;
 		prParmIntValues 				= new int[ 0 ];
 		prParmFloatValues 				= new float[ 0 ];
 		prParmStringValues 				= new HAPI_StringHandle[ 0 ];
 		prParmChoiceLists 				= new HAPI_ParmChoiceInfo[ 0 ];
-		
+
 		prLastChangedParmId 			= -1;
 
 		prFolderListSelections 			= new List< int >();
@@ -473,7 +478,9 @@ public class HAPI_Parms : MonoBehaviour
 	[SerializeField] private HAPI_Control			myControl;
 
 	// Parameters ---------------------------------------------------------------------------------------------------
-	
+
+	[SerializeField] private bool					myEditable;
+
 	[SerializeField] private int 					myParmCount;
 	[SerializeField] private int					myParmIntValueCount;
 	[SerializeField] private int					myParmFloatValueCount;

@@ -54,6 +54,9 @@ public class HAPI_Curve : MonoBehaviour
 														set { myPoints = value; } }
 	public Vector3[]		prVertices {				get { return myVertices; } 
 														set { myVertices = value; } }
+
+	public bool				prEditable {				get { return myEditable; }
+														set { myEditable = value; } }
 	
 	public Mode				prCurrentMode {				get { return myCurrentMode; }
 														set { myCurrentMode = value; } }
@@ -204,6 +207,8 @@ public class HAPI_Curve : MonoBehaviour
 
 		prPoints 			= new List< Vector3 >();
 		prVertices 			= new Vector3[ 0 ];
+
+		prEditable			= true;
 
 		prCurrentMode		= Mode.ADD;
 		myModeChangeWait	= false;
@@ -394,6 +399,8 @@ public class HAPI_Curve : MonoBehaviour
 	
 	[SerializeField] private List< Vector3 >	myPoints;
 	[SerializeField] private Vector3[]			myVertices;
+
+	[SerializeField] private bool				myEditable;
 
 	[SerializeField] private Mode				myCurrentMode;
 	[SerializeField] private bool				myModeChangeWait;

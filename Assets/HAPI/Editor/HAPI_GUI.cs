@@ -134,15 +134,12 @@ public class HAPI_GUI : Editor
 	{
 		initializeConstants();
 
-		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last )
-			EditorGUILayout.BeginHorizontal();
+		
+	}
 
-		EditorGUILayout.SelectableLabel( value, myLabelStyle, GUILayout.Width( width ), myLineHeightGUI );
-
-		join_last = join_next;
-		if ( !join_next )
-			EditorGUILayout.EndHorizontal();
+	public static void help( string value, MessageType message_type )
+	{
+		EditorGUILayout.HelpBox( value, message_type );
 	}
 
 	public static bool foldout( string label, bool value )

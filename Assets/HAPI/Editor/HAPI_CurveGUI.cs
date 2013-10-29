@@ -85,9 +85,17 @@ public class HAPI_CurveGUI : Editor
 		if ( myCurve == null )
 			return;
 
+		if ( !myCurve.prEditable )
+			HAPI_GUI.help( "This curve is not editable.", MessageType.Info );
+
+		bool gui_enable = GUI.enabled;
+		GUI.enabled = myCurve.prEditable;
+
 		Object target = (Object) myTarget;
 		if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
 			myTarget = (GameObject) target;
+
+		GUI.enabled = gui_enable;
 	}
 	
 	public void OnSceneGUI() 
@@ -640,6 +648,16 @@ public class HAPI_CurveGUI : Editor
 
 	private void decideModes( ref Event current_event )
 	{
+		if ( !myCurve.prEditable )
+		{
+			myLastMode					= HAPI_Curve.Mode.NONE;
+			myCurve.prCurrentMode		= HAPI_Curve.Mode.NONE;
+			myCurve.prIsAddingPoints	= false;
+			myCurve.prIsEditingPoints	= false;
+			myCurve.prModeChangeWait	= false;
+			return;
+		}
+
 		bool add_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prAddingPointsModeHotKey;
 		bool edit_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prEditingPointsModeHotKey;
 
@@ -730,6 +748,10 @@ public class HAPI_CurveGUI : Editor
 		Color box_color = ( skin == 0 ? mySceneUILightColour : mySceneUIDarkColour );
 		Color text_color = Color.white;
 
+		if ( !myCurve.prEditable )
+		{
+			help_text = "This curve is not editable.";
+		}
 		if ( myCurve.prIsAddingPoints )
 		{
 			help_text = "<b>Click</b> in space: add next point | <b>Click</b> a line segment: add midpoint | <b>Backspace</b>: delete last point | <b>ESC</b> or <b>Enter</b>: exit mode";
@@ -741,7 +763,7 @@ public class HAPI_CurveGUI : Editor
 			box_color = HAPI_Host.prEditingPointsModeColour;
 		}
 
-		if ( !mySceneWindowHasFocus )
+		if ( !mySceneWindowHasFocus && myCurve.prEditable )
 			help_text = "Scene window doesn't have focus. <b>Hotkeys may not work</b>. Right click anywhere in the scene to focus.";
 
 		Color original_color		= GUI.color;
@@ -771,7 +793,8 @@ public class HAPI_CurveGUI : Editor
 		float title_box_width		= bold_text_style.CalcSize( new GUIContent( title_text ) ).x;
 		title_box_width				+= double_line_padding;
 
-		float mode_box_width		= mySceneUIModeIndicatorWidth;
+		// The mode box should be nothing if the curve is static since there are no options for static curves.
+		float mode_box_width		= myCurve.prEditable ? mySceneUIModeIndicatorWidth : 0.0f;
 		float help_box_width		= scene_width - title_box_width - mode_box_width - 
 									  ( 2.0f * border_total ) - ( 2.0f * border_padding );
 		
@@ -805,7 +828,8 @@ public class HAPI_CurveGUI : Editor
 		// Draw the background boxes for the Scene UI.
 		GUI.color = box_color;
 		GUI.DrawTexture( title_box_rect, box_texture, ScaleMode.StretchToFill );
-		GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
+		if ( myCurve.prEditable )
+			GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( help_box_rect, box_texture, ScaleMode.StretchToFill );
 
 		// Draw the labels for the curve and the help.
@@ -813,38 +837,41 @@ public class HAPI_CurveGUI : Editor
 		GUI.Label( title_text_rect, title_text, bold_text_style );
  		GUI.Label( help_text_rect, help_text, normal_text_style );
 
-		// Set up mode selection toolbar.
-		GUIStyle button_style	= new GUIStyle( GUI.skin.button );
-		button_style.alignment	= TextAnchor.MiddleCenter;
-		button_style.fontStyle	= FontStyle.Normal;
-		button_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
-		Color toolbar_color		= box_color;
-		toolbar_color.r			+= mySceneUIBrightningFactor;
-		toolbar_color.g			+= mySceneUIBrightningFactor;
-		toolbar_color.b			+= mySceneUIBrightningFactor;
-		GUI.color				= toolbar_color;
-		GUIContent[] modes		= new GUIContent[ 3 ];
-		modes[ 0 ]				= new GUIContent( "View" );
-		modes[ 1 ]				= new GUIContent( "Add" );
-		modes[ 2 ]				= new GUIContent( "Edit" );
-
-		// Draw the mode selection toolbar.
-		// Note: We want to disable the toolbar if a mode key is being held down because
-		// if a button is pressed the current mode will imidiatly switch back to the mode
-		// whos key is being held down...
-		GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
-								  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
-		HAPI_Curve.Mode last_mode = myCurve.prCurrentMode;
-		myCurve.prCurrentMode = (HAPI_Curve.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
-		if ( last_mode != myCurve.prCurrentMode )
-			clearSelection();
-		GUI.enabled = true;
-
-		// Draw selection rectangle.
-		if ( myCurve.prIsEditingPoints )
+		if ( myCurve.prEditable )
 		{
-			GUI.color = Color.white;
-			GUI.Box( mySelectionArea, "" );
+			// Set up mode selection toolbar.
+			GUIStyle button_style	= new GUIStyle( GUI.skin.button );
+			button_style.alignment	= TextAnchor.MiddleCenter;
+			button_style.fontStyle	= FontStyle.Normal;
+			button_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
+			Color toolbar_color		= box_color;
+			toolbar_color.r			+= mySceneUIBrightningFactor;
+			toolbar_color.g			+= mySceneUIBrightningFactor;
+			toolbar_color.b			+= mySceneUIBrightningFactor;
+			GUI.color				= toolbar_color;
+			GUIContent[] modes		= new GUIContent[ 3 ];
+			modes[ 0 ]				= new GUIContent( "View" );
+			modes[ 1 ]				= new GUIContent( "Add" );
+			modes[ 2 ]				= new GUIContent( "Edit" );
+
+			// Draw the mode selection toolbar.
+			// Note: We want to disable the toolbar if a mode key is being held down because
+			// if a button is pressed the current mode will imidiatly switch back to the mode
+			// whos key is being held down...
+			GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
+									  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
+			HAPI_Curve.Mode last_mode = myCurve.prCurrentMode;
+			myCurve.prCurrentMode = (HAPI_Curve.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
+			if ( last_mode != myCurve.prCurrentMode )
+				clearSelection();
+			GUI.enabled = true;
+
+			// Draw selection rectangle.
+			if ( myCurve.prIsEditingPoints )
+			{
+				GUI.color = Color.white;
+				GUI.Box( mySelectionArea, "" );
+			}
 		}
 
 		// Draw yellow mode lines around the Scene view.

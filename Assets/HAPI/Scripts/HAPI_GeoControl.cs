@@ -209,11 +209,16 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 	private void createAndInitCurve( int node_id, int object_id, int geo_id, bool editable )
 	{
-		if ( prParmsNeedInit && prAsset.prPresetsMap.contains( getFullControlNameAndPath() ) )
+		if ( prParmsNeedInit )
 		{
-			HAPI_PresetMap map = prAsset.prPresetsMap;
-			byte[] preset = map.get( getFullControlNameAndPath() );
-			HAPI_Host.setPreset( prNodeId, preset );
+			prParms.prEditable = editable;
+			
+			if ( prAsset.prPresetsMap.contains( getFullControlNameAndPath() ) )
+			{
+				HAPI_PresetMap map = prAsset.prPresetsMap;
+				byte[] preset = map.get( getFullControlNameAndPath() );
+				HAPI_Host.setPreset( prNodeId, preset );
+			}
 		}
 
 		HAPI_Curve curve = gameObject.GetComponent< HAPI_Curve >();
@@ -222,6 +227,8 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 			curve = gameObject.AddComponent< HAPI_Curve >();
 			curve.prControl = this;
 			curve.prParms = prParms;
+			curve.prEditable = editable;
+			curve.prCurrentMode = HAPI_Curve.Mode.NONE;
 		}
 
 		try
