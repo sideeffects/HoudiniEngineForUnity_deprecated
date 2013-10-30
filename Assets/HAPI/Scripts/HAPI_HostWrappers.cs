@@ -1112,15 +1112,20 @@ namespace HAPI
 		/// <param name="name">
 		/// 	Attribute name.
 		/// </param>
-		/// <param name="attr_info">
-		/// 	<see cref="HAPI_AttributeInfo"/> used as input for owner type and as output for the rest of 
-		/// 	the information.
+		/// <param name="owner">
+		/// 	Attribute owner.
 		/// </param>
-		public static void getAttributeInfo(	int asset_id, int object_id, int geo_id, int part_id, string name,
-												ref HAPI_AttributeInfo attr_info )
+		/// <returns>
+		/// 	A filled <see cref="HAPI_AttributeInfo"/>. Check HAPI_AttributeInfo.exists to see if 
+		/// 	this attribute exists.
+		/// </returns>
+		public static HAPI_AttributeInfo getAttributeInfo(
+			int asset_id, int object_id, int geo_id, int part_id, string name, HAPI_AttributeOwner owner )
 		{
-			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, geo_id, part_id, name, ref attr_info );
+			HAPI_AttributeInfo info = new HAPI_AttributeInfo();
+			int status_code = HAPI_GetAttributeInfo( asset_id, object_id, geo_id, part_id, name, owner, ref info );
 			processStatusCode( (HAPI_Result) status_code );
+			return info;
 		}
 
 		/// <summary>

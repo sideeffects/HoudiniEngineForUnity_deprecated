@@ -529,13 +529,12 @@ public class HAPI_AssetUtility
 		
 		for ( HAPI_AttributeOwner type = 0; type < HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
-			info.owner = type;
-			HAPI_Host.getAttributeInfo( asset_id, object_id, geo_id, part_id, name, ref info );
+			info = HAPI_Host.getAttributeInfo( asset_id, object_id, geo_id, part_id, name, type );
 			if ( info.exists )
 				break;
 		}
 		if ( !info.exists )
-			return;			
+			return;
 		
 		if ( original_tuple_size > 0 )
 			info.tupleSize = original_tuple_size;
