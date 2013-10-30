@@ -40,19 +40,39 @@ public class HAPI_AssetGUI : Editor
 		HAPI_Host.myDeselectionDelegate += this.deselect;
 		HAPI_Host.mySelectionTarget = myAsset.gameObject;
 		
-		// if selection is a prefab build it ( only get parameters ) to
-		// allow editing of parameters
-		if( myAsset.isPrefab() && ( myAsset.prAssetId != myAsset.prBackupAssetId ||
-			!HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) ) )
+		// If selection is a prefab build it ( parameters only ) to allow 
+		// editing of parameters. Only need to build once, the first time
+		// it is selected.
+		if ( myAsset.isPrefab() )
 		{
-			myAsset.prAssetId = -1;
-			myAsset.build( true,	// reload_asset
-						   true,	// unload_asset_first
-						   true,	// serializatin_recovery_only
-						   false,	// force_reconnect
-						   false,	// cook_downstream_assets
-						   false	// use_delay_for_progress_bar
-				 		 );
+			// Reloading prefab after play mode change since OnEnable
+			// never gets called for prefab. This only needs to be done
+			// if prefab has already been built.
+			if ( myAsset.prReloadPrefabOnPlaymodeChange &&
+				 HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
+			{
+				myAsset.build(	false,	// reload_asset
+								false,	// unload_asset_first
+								true,	// serializatin_recovery_only
+								false,	// force_reconnect
+								false,	// cook_downstream_assets
+								false	// use_delay_for_progress_bar
+					 		 );
+				myAsset.prReloadPrefabOnPlaymodeChange = false;
+			}
+			else if ( myAsset.prAssetId != myAsset.prBackupAssetId ||
+			   		  !HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
+			{
+				myAsset.prAssetId = -1;
+				myAsset.build( true,	// reload_asset
+							   true,	// unload_asset_first
+							   true,	// serializatin_recovery_only
+							   false,	// force_reconnect
+							   false,	// cook_downstream_assets
+							   false	// use_delay_for_progress_bar
+					 		 );
+				EditorUtility.SetDirty( myAsset );
+			}
 		}
 	}
 

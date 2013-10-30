@@ -209,10 +209,12 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	// Prefabs ------------------------------------------------------------------------------------------------------
 	
-	public int prBackupAssetId {			get { return myBackupAssetId; }
-											set { myBackupAssetId = value; } }
-	public int prBackupAssetValidationId {	get { return myBackupAssetValidationId; }
-											set { myBackupAssetValidationId = value; } }
+	public int prBackupAssetId {					get { return myBackupAssetId; }
+													set { myBackupAssetId = value; } }
+	public int prBackupAssetValidationId {			get { return myBackupAssetValidationId; }
+													set { myBackupAssetValidationId = value; } }
+	public bool prReloadPrefabOnPlaymodeChange {	get { return myReloadPrefabOnPlaymodeChange; }
+													set { myReloadPrefabOnPlaymodeChange = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -232,8 +234,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset destroyed - Instance Id:" + GetInstanceID() );
 		
-		// Only place to unload OTL when prefab is being deleted
-		if ( myCleanUpPrefabOTL )
+		// This is the only place to unload OTL when prefab is being deleted. 
+		// Do not delete prefab if this is being called due to entering play mode.
+		if ( myCleanUpPrefabOTL &&
+			 !prReloadPrefabOnPlaymodeChange &&
+			 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 		{
 			try
 			{
@@ -759,6 +764,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		prBackupAssetId					= -1;
 		prBackupAssetValidationId		= -1;
+		prReloadPrefabOnPlaymodeChange 	= false;
 		myCleanUpPrefabOTL 				= false;
 	}
 	
@@ -780,6 +786,14 @@ public abstract class HAPI_Asset : HAPI_Control
 					for ( int ii = 0; ii < asset_parms.prParmCount; ii++ )
 					{
 						HAPI_ParmInfo asset_parm_info = asset_parms.prParms[ ii ];
+						
+						// do not propogate transform changes
+						if( asset_parm_info.name == "r" || 
+							asset_parm_info.name == "s" ||
+							asset_parm_info.name == "t" )
+						{
+							continue;
+						}
 						
 						// if this parameter has not been overridden and it's 
 						// value differs from the value of this parameter on 
@@ -1677,5 +1691,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	private int myBackupAssetId;
 	private int myBackupAssetValidationId;
+	private bool myReloadPrefabOnPlaymodeChange;
 	private bool myCleanUpPrefabOTL;
 }

@@ -14,17 +14,17 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 	{
 		foreach ( string asset_path in importedAssets )
 		{
-			if( asset_path.EndsWith( ".prefab" ) )
+			if ( asset_path.EndsWith( ".prefab" ) )
 			{
 				GameObject prefab = AssetDatabase.LoadAssetAtPath( asset_path, typeof( GameObject ) ) as GameObject;
-				if( prefab )
+				if ( prefab )
 				{
 					HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();
-					if( prPrefabToReplace && asset_path.Equals( AssetDatabase.GetAssetPath( prPrefabToReplace ) ) )
+					if ( prPrefabToReplace && asset_path.Equals( AssetDatabase.GetAssetPath( prPrefabToReplace ) ) )
 					{
 						prPrefabToReplace = null;
 					}
-					else if( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
+					else if ( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
 					{
 						prPrefabToReplace = prefab;
 						EditorApplication.delayCall += ReplacePrefab;

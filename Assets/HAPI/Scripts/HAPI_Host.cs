@@ -748,6 +748,32 @@ namespace HAPI
 			try
 			{
 				prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
+				
+				// Find all prefabs created from Houdini assets and change the value of 
+				// prReloadPrefabOnPlaymodeChange so that when going into play mode the 
+				// asset will not be unloaded in the destructor and when selected
+				// serialization recovery will occur for the parameters
+				if ( prMidPlaymodeStateChange )
+				{
+					foreach( string asset_path in AssetDatabase.GetAllAssetPaths() )
+					{
+						if ( asset_path.EndsWith( ".prefab" ) )
+						{
+							GameObject prefab = AssetDatabase.LoadAssetAtPath( asset_path, typeof( GameObject ) ) as GameObject;
+							if ( prefab )
+							{
+								// Only need to do this if the prefab has been previously loaded.
+								HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();
+								if ( prefab_asset && 
+									 isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
+								{
+									prefab_asset.prReloadPrefabOnPlaymodeChange = true;
+								}
+							}
+						}
+					}
+				}
+				
 				setTime( 0.0f );
 			}
 			catch ( System.Exception error )
