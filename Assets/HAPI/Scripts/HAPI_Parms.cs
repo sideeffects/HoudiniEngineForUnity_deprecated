@@ -367,16 +367,13 @@ public class HAPI_Parms : MonoBehaviour
 		if ( prControl.prAsset == null )
 			return;
 
-		int[] values = new int[ 1 ];
-		HAPI_Host.getParmIntValues( prControl.prNodeId, values, multiparm.intValuesIndex, 1);
-
-		int last_instance = values[ 0 ];
+		int first_removed_instance = multiparm.instanceCount - num_instances + multiparm.instanceStartOffset;
 
 		for ( int i = 0; i < num_instances; ++i )
 			HAPI_Host.removeMultiparmInstance(
 				prControl.prNodeId,
 				multiparm.id, // The multiparm list
-				last_instance - i );
+				first_removed_instance );
 	}
 
 	public void appendMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
@@ -386,16 +383,13 @@ public class HAPI_Parms : MonoBehaviour
 		if ( prControl.prAsset == null )
 			return;
 
-		int[] values = new int[1];
-		HAPI_Host.getParmIntValues( prControl.prNodeId, values, multiparm.intValuesIndex, 1 );
-
-		int last_instance = values[ 0 ];
+		int insert_position = multiparm.instanceCount + multiparm.instanceStartOffset;
 
 		for ( int i = 0; i < num_instances; ++i )
 			HAPI_Host.insertMultiparmInstance(
 				prControl.prNodeId,
 				multiparm.id, // The multiparm list
-				last_instance + i );
+				insert_position );
 	}
 
 	public void setChangedParametersIntoHost()
