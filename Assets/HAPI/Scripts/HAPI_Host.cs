@@ -552,10 +552,11 @@ namespace HAPI
 				throw new HAPI_Error( "DLL Not Found." );
 			
 			int asset_id = -1;
-			HAPI_Result status_code = (HAPI_Result) HAPI_LoadOTLFile( path,
-																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
-																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
-																	  ref asset_id );
+			HAPI_Result status_code = HAPI_LoadOTLFile(
+				path,
+				HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
+				HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
+				out asset_id );
 			processStatusCode( status_code );
 
 			return asset_id;
@@ -565,11 +566,12 @@ namespace HAPI
 		{
 			if ( !initialize() )
 				throw new HAPI_Error( "DLL Not Found." );
-																
-			HAPI_Result status_code = (HAPI_Result) HAPI_LoadHIPFile( path,
-																	  HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
-																	  HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE );
-			
+
+			HAPI_Result status_code = HAPI_LoadHIPFile(
+				path,
+				HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
+				HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE );
+
 			processStatusCode( status_code );
 		}
 		
@@ -598,7 +600,7 @@ namespace HAPI
 				throw new HAPI_Error( "DLL Not Found." );
 
 			int asset_id = -1;
-			HAPI_Result status_code = (HAPI_Result) HAPI_CreateCurve( out asset_id );
+			HAPI_Result status_code = HAPI_CreateCurve( out asset_id );
 			processStatusCode( status_code );
 
 			return asset_id;
@@ -609,9 +611,9 @@ namespace HAPI
 			if ( asset_id < 0 )
 				return false;
 			
-			int result = HAPI_UnloadOTLFile( asset_id );
+			HAPI_Result result = HAPI_UnloadOTLFile( asset_id );
 			
-			processStatusCode( (HAPI_Result) result );
+			processStatusCode( result );
 			
 			return true;
 		}
