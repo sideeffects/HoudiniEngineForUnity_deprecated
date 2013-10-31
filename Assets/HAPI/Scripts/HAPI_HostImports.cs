@@ -22,14 +22,16 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
-// Typedefs
-using HAPI_AssetLibraryId = System.Int32;
+// Typedefs (copy these from HAPI_Common.cs)
 using HAPI_StringHandle = System.Int32;
-using HAPI_NodeId = System.Int32;
+using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
+using HAPI_NodeId = System.Int32;
+using HAPI_ParmId = System.Int32;
 using HAPI_ObjectId = System.Int32;
 using HAPI_GeoId = System.Int32;
 using HAPI_PartId = System.Int32;
+using HAPI_MaterialId = System.Int32;
 
 namespace HAPI 
 {	
@@ -62,19 +64,19 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_GetEnvInt( int int_type, out int value );
+		HAPI_GetEnvInt( HAPI_EnvIntType int_type, out int value );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_GetStatus( int status_code, out int status );
+		HAPI_GetStatus( HAPI_StatusType status_code, out int status );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_GetStatusStringBufLength( int status_code, out int buffer_size );
+		HAPI_GetStatusStringBufLength( HAPI_StatusType status_code, out int buffer_size );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_GetStatusString( int status_code, StringBuilder buffer );
+		HAPI_GetStatusString( HAPI_StatusType status_code, StringBuilder buffer );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
@@ -123,13 +125,13 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetStringBufLength(
-			int string_handle,
+			HAPI_StringHandle string_handle,
 			out int buffer_length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetString(
-			int string_handle,
+			HAPI_StringHandle string_handle,
 			StringBuilder string_value,
 			int buffer_length );
 
@@ -254,7 +256,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_GetAssetIdsFromLoadHIPFile( [Out] int[] asset_ids );
+		HAPI_GetAssetIdsFromLoadHIPFile( [Out] HAPI_AssetId[] asset_ids );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
@@ -262,17 +264,17 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_ExportAssetToHIPFile( int asset_id, string file_name );
+		HAPI_ExportAssetToHIPFile( HAPI_AssetId asset_id, string file_name );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_ReplaceAssetFromHIPFile( int asset_id, string file_name );
+		HAPI_ReplaceAssetFromHIPFile( HAPI_AssetId asset_id, string file_name );
 
 		// NODES ----------------------------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_GetNodeInfo( int node_id, ref HAPI_NodeInfo node_info );
+		HAPI_GetNodeInfo( HAPI_NodeId node_id, ref HAPI_NodeInfo node_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
@@ -283,72 +285,72 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetParameters(
-			int node_id,
+			HAPI_NodeId node_id,
 			[Out] HAPI_ParmInfo[] parm_infos,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetParmIntValues(
-			int node_id,
+			HAPI_NodeId node_id,
 			[Out] int[] values,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetParmFloatValues(
-			int node_id,
+			HAPI_NodeId node_id,
 			[Out] float[] values,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetParmStringValues(
-			int node_id,
-			[Out] int[] values,
+			HAPI_NodeId node_id,
+			[Out] HAPI_StringHandle[] values,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetParmChoiceLists(
-			int node_id,
+			HAPI_NodeId node_id,
 			[Out] HAPI_ParmChoiceInfo[] parm_choices, 
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetParmIntValues(
-			int node_id,
+			HAPI_NodeId node_id,
 			int[] values,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetParmFloatValues(
-			int node_id,
+			HAPI_NodeId node_id,
 			float[] values,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetParmStringValue(
-			int node_id,
+			HAPI_NodeId node_id,
 			string value,
-			int parm_id,
+			HAPI_ParmId parm_id,
 			int index );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_InsertMultiparmInstance(
-			int node_id,
-			int parm_id,
+			HAPI_NodeId node_id,
+			HAPI_ParmId parm_id,
 			int instance_position );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_RemoveMultiparmInstance(
-			int node_id,
-			int parm_id,
+			HAPI_NodeId node_id,
+			HAPI_ParmId parm_id,
 			int instance_position );
 		
 		// HANDLES --------------------------------------------------------------------------------------------------
@@ -356,14 +358,14 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetHandleInfo(
-			int asset_id, 
+			HAPI_AssetId asset_id, 
 			[Out] HAPI_HandleInfo[] handle_infos,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetHandleBindingInfo(
-			int asset_id,
+			HAPI_AssetId asset_id,
 			int handle_index,
 			[Out] HAPI_HandleBindingInfo[] handle_infos,
 			int start, int length );
@@ -387,14 +389,14 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetObjects(
-			int asset_id,
+			HAPI_AssetId asset_id,
 			[Out] HAPI_ObjectInfo[] object_infos, 
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetObjectTransforms(
-			int asset_id,
+			HAPI_AssetId asset_id,
 			int rst_order,
 			[Out] HAPI_Transform[] transforms,
 			int start, int length );
@@ -402,7 +404,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetInstanceTransforms(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			int rstOrder,
 			[Out] HAPI_Transform[] transforms,
 			int start, int length );
@@ -410,7 +412,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetObjectTransform(
-			int asset_id, int object_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id,
 			HAPI_TransformEuler transform );
 		
 		// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
@@ -418,48 +420,48 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetGeoInfo(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			out HAPI_GeoInfo geo_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetPartInfo(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			out HAPI_PartInfo part_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetFaceCounts(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			[Out] int[] face_counts,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetVertexList(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			[Out] int[] vertex_list,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetAttributeInfo(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			string name, HAPI_AttributeOwner owner,
 			ref HAPI_AttributeInfo attr_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetAttributeNames(
-			int asset_id, int object_id, int geo_id, int part_id,
-			int attribute_type,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			HAPI_AttributeOwner owner,
 			[Out] int[] data,
 			int count );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetAttributeIntData(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			string name,
 			ref HAPI_AttributeInfo attr_info,
 			[Out] int[] data,
@@ -468,7 +470,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetAttributeFloatData(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			string name,
 			ref HAPI_AttributeInfo attr_info,
 			[Out] float[] data,
@@ -477,7 +479,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetAttributeStrData(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			string name,
 			ref HAPI_AttributeInfo attr_info,
 			[Out] int[] data,
@@ -488,40 +490,40 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetGeoInfo(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			ref HAPI_GeoInfo geo_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetPartInfo(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			ref HAPI_PartInfo part_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetFaceCounts(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			int[] face_counts,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetVertexList(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			int[] vertex_list,
 			int start, int length );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_AddAttribute(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			string name,
 			ref HAPI_AttributeInfo attr_info );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetAttributeIntData(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			string name,
 			ref HAPI_AttributeInfo attr_info,
 			int[] data,
@@ -530,7 +532,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetAttributeFloatData(
-			int asset_id, int object_id, int geo_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 			string name,
 			ref HAPI_AttributeInfo attr_info,
 			float[] data,
@@ -538,62 +540,65 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_CommitGeo( int asset_id, int object_id, int geo_id );
+		HAPI_CommitGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_RevertGeo( int asset_id, int object_id, int geo_id );
+		HAPI_RevertGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id );
 		
 		// GEOMETRY INPUT -------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_SetFileInput( int asset_id, int input_idx, string file_name );
+		HAPI_SetFileInput( HAPI_AssetId asset_id, int input_idx, string file_name );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_CreateGeoInput( 
-			int asset_id, int input_idx,
+			HAPI_AssetId asset_id, int input_idx,
 			out HAPI_GeoInputInfo geo_input_info );
 		
 		// INTER ASSET ----------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_ConnectAssetTransform( int asset_id_from, int asset_id_to, int input_idx );
+		HAPI_ConnectAssetTransform(
+			HAPI_AssetId asset_id_from, HAPI_AssetId asset_id_to, int input_idx );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_DisconnectAssetTransform( int asset_id, int input_idx );
+		HAPI_DisconnectAssetTransform( HAPI_AssetId asset_id, int input_idx );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_ConnectAssetGeometry( 
-			int asset_id_from, int object_id_from,
-			int asset_id_to,
+			HAPI_AssetId asset_id_from, HAPI_ObjectId object_id_from,
+			HAPI_AssetId asset_id_to,
 			int input_idx );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_DisconnectAssetGeometry( int asset_id, int input_idx );
+		HAPI_DisconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx );
 		
 		// MATERIALS ------------------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetMaterial(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			out HAPI_MaterialInfo material_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_RenderMaterialToImage(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			HAPI_ShaderType shader_type );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_RenderTextureToImage( int asset_id, int material_id, int parm_id );
+		HAPI_RenderTextureToImage(
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
+			HAPI_ParmId parm_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
@@ -608,32 +613,32 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetImageInfo(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			out HAPI_ImageInfo image_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetImageInfo(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			HAPI_ImageInfo image_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetImagePlaneCount(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			out int image_plane_count );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetImagePlanes(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			[Out] HAPI_StringHandle[] image_planes,
 			int image_plane_count );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_ExtractImageToFile(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			string image_file_format_name,
 			string image_planes,
 			string destination_folder_path,
@@ -643,7 +648,7 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_ExtractImageToMemory(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			string image_file_format_name,
 			string image_planes,
 			out int buffer_size );
@@ -651,45 +656,63 @@ namespace HAPI
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetImageMemoryBuffer(
-			int asset_id, int material_id,
+			HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 			[Out] byte[] buffer,
 			int buffer_size );
 
 		// SIMULATION/ANIMATIONS ------------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern HAPI_Result
-		HAPI_SetTransformAnimCurve(
-			int node_id, int transform_component,
+		private static extern HAPI_Result
+		HAPI_SetAnimCurve(
+			HAPI_NodeId node_id, HAPI_ParmId parm_id,
 			HAPI_Keyframe[] curve_keyframes,
 			int keyframe_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_SetTransformAnimCurve(
+			HAPI_NodeId node_id, int transform_component,
+			HAPI_Keyframe[] curve_keyframes,
+			int keyframe_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_ResetSimulation( HAPI_AssetId asset_id );
 
 		// VOLUMES --------------------------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern HAPI_Result
+		private static extern HAPI_Result
 		HAPI_GetVolumeInfo(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			ref HAPI_VolumeInfo volume_info );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern HAPI_Result
+		private static extern HAPI_Result
 		HAPI_GetFirstVolumeTile(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			ref HAPI_VolumeTileInfo tile );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern HAPI_Result
+		private static extern HAPI_Result
 		HAPI_GetNextVolumeTile(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			ref HAPI_VolumeTileInfo next );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		public static extern HAPI_Result
+		private static extern HAPI_Result
 		HAPI_GetVolumeTileFloatData(
-			int asset_id, int object_id, int geo_id, int part_id,
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			ref HAPI_VolumeTileInfo tile,
 			[Out] float[] values );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetVolumeTileIntData(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			ref HAPI_VolumeTileInfo tile,
+			[Out] int[] values );
 	}
 
 }

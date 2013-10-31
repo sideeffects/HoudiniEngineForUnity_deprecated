@@ -406,7 +406,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 		}
 		
-		HAPI_Host.HAPI_SetTransformAnimCurve( node_id, (int)transform_component, keys, curve.length );
+		HAPI_Host.setTransformAnimCurve( node_id, (int)transform_component, keys, curve.length );
 		
 	}
 	

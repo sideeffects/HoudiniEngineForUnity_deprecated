@@ -21,9 +21,10 @@ using System.Runtime.InteropServices;
 
 // Typedefs
 using HAPI_StringHandle = System.Int32;
+using HAPI_AssetLibraryId = System.Int32;
+using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
 using HAPI_ParmId = System.Int32;
-using HAPI_AssetId = System.Int32;
 using HAPI_ObjectId = System.Int32;
 using HAPI_GeoId = System.Int32;
 using HAPI_PartId = System.Int32;

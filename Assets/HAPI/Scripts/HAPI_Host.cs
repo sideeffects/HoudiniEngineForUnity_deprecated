@@ -690,10 +690,10 @@ namespace HAPI
 		{
 			int buffer_size = 4000;
 			int code;
-			HAPI_GetStatus( (int) HAPI_StatusType.HAPI_STATUS_RESULT, out code );
-			HAPI_GetStatusStringBufLength( (int) HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
+			HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_RESULT, out code );
+			HAPI_GetStatusStringBufLength( HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
 			StringBuilder error_str = new StringBuilder( buffer_size );
-			HAPI_GetStatusString( (int) HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
+			HAPI_GetStatusString( HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
 
 			if ( code == (int) HAPI_Result.HAPI_RESULT_INVALID_ARGUMENT )
 				throw new HAPI_ErrorInvalidArgument( error_str.ToString() );

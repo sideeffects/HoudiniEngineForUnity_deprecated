@@ -559,7 +559,7 @@ public class HAPI_AssetUtility
 		
 		int[] attr_names = new int[ attr_count ]; // string handles (SH)
 		
-		HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, part_id, (int) owner, attr_names, attr_count );
+		HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, part_id, owner, attr_names, attr_count );
 		for ( int ii = 0; ii < attr_count; ++ii )
 			names[ ii ] = HAPI_Host.getString( attr_names[ ii ] );
 		
