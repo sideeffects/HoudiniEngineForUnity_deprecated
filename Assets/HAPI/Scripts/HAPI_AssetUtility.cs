@@ -81,8 +81,8 @@ public class HAPI_AssetUtility
 		transform.scale[ 1 ] = s[ 1 ];
 		transform.scale[ 2 ] = s[ 2 ];
 
-		transform.rotationOrder		= (int) HAPI_XYZOrder.HAPI_ZXY;
-		transform.rstOrder			= (int) HAPI_RSTOrder.HAPI_SRT;
+		transform.rotationOrder = HAPI_XYZOrder.HAPI_ZXY;
+		transform.rstOrder = HAPI_RSTOrder.HAPI_SRT;
 
 		return transform;
 	}
@@ -145,7 +145,7 @@ public class HAPI_AssetUtility
 	{
 		HAPI_TransformEuler hapi_transform;
 		HAPI_Host.getAssetTransform( 
-			asset_id, (int) HAPI_RSTOrder.HAPI_SRT, (int) HAPI_XYZOrder.HAPI_ZXY, out hapi_transform );
+			asset_id, HAPI_RSTOrder.HAPI_SRT, HAPI_XYZOrder.HAPI_ZXY, out hapi_transform );
 		if ( 
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
@@ -240,11 +240,11 @@ public class HAPI_AssetUtility
 	// GET ----------------------------------------------------------------------------------------------------------
 	
 	public delegate void getArray1IdDel< T >( int id1, [Out] T[] data, int start, int end );
-	public delegate void getArray2IdDel< T >( int id1, int id2, [Out] T[] data, int start, int end );
-	public delegate void getArray3IdDel< T >( int id1, int id2, int id3, [Out] T[] data, int start, int end );
-	public delegate void getArray4IdDel< T >( int id1, int id2, int id3, int id4, [Out] T[] data, int start, int end );
-	public delegate void getArray5IdDel< T >( int id1, int id2, int id3, int id4, int id5, 
-											  [Out] T[] data, int start, int end );
+	public delegate void getArray2IdDel< ID2, T >( int id1, ID2 id2, [Out] T[] data, int start, int end );
+	public delegate void getArray3IdDel< ID2, T >( int id1, ID2 id2, int id3, [Out] T[] data, int start, int end );
+	public delegate void getArray4IdDel< ID2, T >( int id1, ID2 id2, int id3, int id4, [Out] T[] data, int start, int end );
+	public delegate void getArray5IdDel< ID2, T >( int id1, ID2 id2, int id3, int id4, int id5, 
+												   [Out] T[] data, int start, int end );
 
 	public static void getArray1Id< T >( int id1, getArray1IdDel< T > func, [Out] T[] data, 
 										 int count )
@@ -257,57 +257,58 @@ public class HAPI_AssetUtility
 		getArray( id1, 0, 0, 0, 0, func, null, null, null, null, data, count, tuple_size );
 	}
 	
-	public static void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
-										 int count )
+	public static void getArray2Id< ID2, T >( int id1, ID2 id2, getArray2IdDel< ID2, T > func, [Out] T[] data, 
+											  int count )
 	{
 		getArray( id1, id2, 0, 0, 0, null, func, null, null, null, data, count, 1 );
 	}
-	public static void getArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+	public static void getArray2Id< ID2, T >( int id1, ID2 id2, getArray2IdDel< ID2, T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
 		getArray( id1, id2, 0, 0, 0, null, func, null, null, null, data, count, tuple_size );
 	}
 	
-	public static void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+	public static void getArray3Id< ID2, T >( int id1, ID2 id2, int id3, getArray3IdDel< ID2, T > func, [Out] T[] data, 
 										 int count )
 	{
 		getArray( id1, id2, id3, 0, 0, null, null, func, null, null, data, count, 1 );
 	}
-	public static void getArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+	public static void getArray3Id< ID2, T >( int id1, ID2 id2, int id3, getArray3IdDel< ID2, T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
 		getArray( id1, id2, id3, 0, 0, null, null, func, null, null, data, count, tuple_size );
 	}
 	
-	public static void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
+	public static void getArray4Id< ID2, T >( int id1, ID2 id2, int id3, int id4, getArray4IdDel< ID2, T > func, [Out] T[] data, 
 										 int count )
 	{
 		getArray( id1, id2, id3, id4, 0, null, null, null, func, null, data, count, 1 );
 	}
-	public static void getArray4Id< T >( int id1, int id2, int id3, int id4, getArray4IdDel< T > func, [Out] T[] data, 
+	public static void getArray4Id< ID2, T >( int id1, ID2 id2, int id3, int id4, getArray4IdDel< ID2, T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
 		getArray( id1, id2, id3, id4, 0, null, null, null, func, null, data, count, tuple_size );
 	}
 
-	public static void getArray5Id< T >( int id1, int id2, int id3, int id4, int id5, 
-										 getArray5IdDel<T> func, [Out] T [] data, int count )
+	public static void getArray5Id< ID2, T >( int id1, ID2 id2, int id3, int id4, int id5, 
+										 getArray5IdDel< ID2, T > func, [Out] T [] data, int count )
 	{
 		getArray( id1, id2, id3, id4, id5, null, null, null, null, func, data, count, 1 );
 	}
-	public static void getArray5Id< T >( int id1, int id2, int id3, int id4, int id5, 
-										 getArray5IdDel<T> func, [Out] T [] data, int count, int tuple_size )
+	public static void getArray5Id< ID2, T >( int id1, ID2 id2, int id3, int id4, int id5, 
+										 getArray5IdDel< ID2,T > func, [Out] T [] data, int count, int tuple_size )
 	{
 		getArray( id1, id2, id3, id4, id5, null, null, null, null, func, data, count, tuple_size );
 	}
 	
-	private static void getArray< T >( int id1, int id2, int id3, int id4, int id5,
-									   getArray1IdDel< T > func_1id, 
-									   getArray2IdDel< T > func_2id, 
-									   getArray3IdDel< T > func_3id,
-									   getArray4IdDel< T > func_4id,
-									   getArray5IdDel< T > func_5id,
-									   [Out] T[] data, int count, int tuple_size )
+	private static void getArray< ID2, T >(
+		int id1, ID2 id2, int id3, int id4, int id5,
+		getArray1IdDel< T > func_1id, 
+		getArray2IdDel< ID2, T > func_2id, 
+		getArray3IdDel< ID2, T > func_3id,
+		getArray4IdDel< ID2, T > func_4id,
+		getArray5IdDel< ID2, T > func_5id,
+		[Out] T[] data, int count, int tuple_size )
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );
 		
@@ -372,32 +373,32 @@ public class HAPI_AssetUtility
 		setArray( id1, 0, 0, func, null, null, data, count, tuple_size );
 	}
 	
-	public static void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+	public static void setArray2Id< ID2, T >( int id1, ID2 id2, getArray2IdDel< ID2, T > func, [Out] T[] data, 
 										 int count )
 	{
 		setArray( id1, id2, 0, null, func, null, data, count, 1 );
 	}
-	public static void setArray2Id< T >( int id1, int id2, getArray2IdDel< T > func, [Out] T[] data, 
+	public static void setArray2Id< ID2, T >( int id1, ID2 id2, getArray2IdDel< ID2, T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
 		setArray( id1, id2, 0, null, func, null, data, count, tuple_size );
 	}
 	
-	public static void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+	public static void setArray3Id< ID2, T >( int id1, ID2 id2, int id3, getArray3IdDel< ID2, T > func, [Out] T[] data, 
 										 int count )
 	{
 		setArray( id1, id2, id3, null, null, func, data, count, 1 );
 	}
-	public static void setArray3Id< T >( int id1, int id2, int id3, getArray3IdDel< T > func, [Out] T[] data, 
+	public static void setArray3Id< ID2, T >( int id1, ID2 id2, int id3, getArray3IdDel< ID2, T > func, [Out] T[] data, 
 										 int count, int tuple_size )
 	{
 		setArray( id1, id2, id3, null, null, func, data, count, tuple_size );
 	}
 	
-	private static void setArray< T >( int id1, int id2, int id3, 
+	private static void setArray< ID2, T >( int id1, ID2 id2, int id3, 
 									   getArray1IdDel< T > func_1id, 
-									   getArray2IdDel< T > func_2id, 
-									   getArray3IdDel< T > func_3id,
+									   getArray2IdDel< ID2, T > func_2id, 
+									   getArray3IdDel< ID2, T > func_3id,
 									   [Out] T[] data, int count, int tuple_size )
 	{
 		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * tuple_size );

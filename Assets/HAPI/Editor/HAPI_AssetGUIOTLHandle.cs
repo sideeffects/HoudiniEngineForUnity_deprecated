@@ -160,8 +160,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					xform.scale[0] = 1;
 					xform.scale[1] = 1;
 					xform.scale[2] = 1;
-					xform.rotationOrder = (int) xyzOrder;
-					xform.rstOrder = (int) rstOrder;
+					xform.rotationOrder = xyzOrder;
+					xform.rstOrder = rstOrder;
 				}
 				else
 				{
@@ -174,11 +174,11 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					xform.scale[0] = 1;
 					xform.scale[1] = 1;
 					xform.scale[2] = 1;
-					xform.rotationOrder = (int) xyzOrder;
-					xform.rstOrder = (int) rstOrder;
+					xform.rotationOrder = xyzOrder;
+					xform.rstOrder = rstOrder;
 				}
 				
-				HAPI_Host.convertTransform( ref xform, (int) HAPI_RSTOrder.HAPI_SRT, (int) HAPI_XYZOrder.HAPI_ZXY );
+				HAPI_Host.convertTransform( ref xform, HAPI_RSTOrder.HAPI_SRT, HAPI_XYZOrder.HAPI_ZXY );
 				
 				// Axis and Rotation conversions:
 				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
@@ -222,7 +222,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							xform.position[ 1 ] = new_position[ 1 ];
 							xform.position[ 2 ] = new_position[ 2 ];
 							
-							HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
+							HAPI_Host.convertTransform( ref xform, rstOrder, xyzOrder );
 							new_position.x 		= xform.position[ 0 ];
 							new_position.y 		= xform.position[ 1 ];
 							new_position.z 		= xform.position[ 2 ];
@@ -263,10 +263,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						xform.scale[0] = 1;
 						xform.scale[1] = 1;
 						xform.scale[2] = 1;
-						xform.rotationOrder = (int) HAPI_XYZOrder.HAPI_ZXY;
-						xform.rstOrder = (int) HAPI_RSTOrder.HAPI_SRT;
+						xform.rotationOrder = HAPI_XYZOrder.HAPI_ZXY;
+						xform.rstOrder = HAPI_RSTOrder.HAPI_SRT;
 						
-						HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
+						HAPI_Host.convertTransform( ref xform, rstOrder, xyzOrder );
 						
 						HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myRotateParmId );
 						

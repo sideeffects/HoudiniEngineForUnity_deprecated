@@ -145,14 +145,13 @@ namespace HAPI
 		/// </param>
 		/// <param name="rst_order">
 		/// 	The desired transform order of the output.
-		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
 		/// </param>
 		///	<param name="rot_order">
 		/// 	The desired rotation order of the output.
-		/// 	XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
 		/// </param>
-		public static void convertTransform(	ref HAPI_TransformEuler transform_in_out,
-												int rst_order, int rot_order )
+		public static void convertTransform(
+			ref HAPI_TransformEuler transform_in_out,
+			HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order )
 		{
 			HAPI_Result status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
 			processStatusCode( status_code );
@@ -166,12 +165,11 @@ namespace HAPI
 		/// </param>
 		/// <param name="rst_order">
 		/// 	The desired transform order of the output.
-		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
 		/// </param>
 		/// <return>
 		///		The converted <see cref="HAPI_Transform"/>.
 		/// </return>
-		public static HAPI_Transform convertMatrixToQuat( Matrix4x4 matrix, int rst_order )
+		public static HAPI_Transform convertMatrixToQuat( Matrix4x4 matrix, HAPI_RSTOrder rst_order )
 		{
 			HAPI_Transform transform = new HAPI_Transform();
 			float[] raw_matrix = new float[ 16 ];
@@ -193,16 +191,15 @@ namespace HAPI
 		/// </param>
 		/// <param name="rst_order">
 		/// 	The desired transform order of the output.
-		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
 		/// </param>
 		///	<param name="rot_order">
 		/// 	The desired rotation order of the output.
-		/// 	XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
 		/// </param>
 		/// <return>
 		///		The converted <see cref="HAPI_TransformEuler"/>.
 		/// </return>
-		public static HAPI_TransformEuler convertMatrixToEuler( Matrix4x4 matrix, int rst_order, int rot_order )
+		public static HAPI_TransformEuler convertMatrixToEuler(
+			Matrix4x4 matrix, HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order )
 		{
 			HAPI_TransformEuler transform = new HAPI_TransformEuler();
 			float[] raw_matrix = new float[ 16 ];
@@ -210,7 +207,8 @@ namespace HAPI
 			for ( int i = 0; i < 16; ++i )
 				raw_matrix[ i ] = matrix[ i ];
 
-			HAPI_Result status_code = HAPI_ConvertMatrixToEuler( raw_matrix, rst_order, rot_order, ref transform );
+			HAPI_Result status_code = HAPI_ConvertMatrixToEuler(
+				raw_matrix, rst_order, rot_order, ref transform );
 			processStatusCode( status_code );
 
 			return transform;
@@ -401,18 +399,17 @@ namespace HAPI
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 		/// <param name="rst_order">
-		/// 	The order of application of translation, rotation and scale:
-		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
+		/// 	The order of application of translation, rotation and scale.
 		/// </param>
 		///	<param name="rot_order">
 		/// 	The desired rotation order of the output.
-		/// 	XYZ = 0, XZY = 1, YXZ = 2, YZX = 3, ZXY = 4, ZYX = 5
 		/// </param>
 		/// <param name="transform">
 		/// 	The actual transform struct.
 		/// </param>
 		public static void getAssetTransform(
-			HAPI_AssetId asset_id, int rst_order, int rot_order, out HAPI_TransformEuler transform )
+			HAPI_AssetId asset_id, HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order,
+			out HAPI_TransformEuler transform )
 		{
 			HAPI_Result status_code = HAPI_GetAssetTransform( asset_id, rst_order, rot_order, out transform );
 			processStatusCode( status_code );
@@ -917,8 +914,7 @@ namespace HAPI
 		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
 		/// </param>
 		/// <param name="rst_order">
-		/// 	The order of application of translation, rotation and scale:
-		/// 	TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
+		/// 	The order of application of translation, rotation and scale.
 		/// </param>
 		/// <param name="transforms">
 		/// 	Array of <see cref="HAPI_Transform"/> at least the size of
@@ -933,7 +929,7 @@ namespace HAPI
 		/// </param>
 		public static void getObjectTransforms(
 			HAPI_AssetId asset_id,
-			int rst_order,
+			HAPI_RSTOrder rst_order,
 			[Out] HAPI_Transform[] transforms,
 			int start, int length )
 		{

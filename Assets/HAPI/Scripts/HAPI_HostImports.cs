@@ -92,20 +92,20 @@ namespace HAPI
 		private static extern HAPI_Result
 		HAPI_ConvertTransform(
 			ref HAPI_TransformEuler transform_in_out,
-			int rst_order, int rot_order );
+			HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_ConvertMatrixToQuat(
 			float[] mat,
-			int rst_order,
+			HAPI_RSTOrder rst_order,
 			ref HAPI_Transform transform_out );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_ConvertMatrixToEuler(
 			float[] mat,
-			int rst_order, int rot_order,
+			HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order,
 			ref HAPI_TransformEuler transform_out );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -225,7 +225,7 @@ namespace HAPI
 		private static extern HAPI_Result
 		HAPI_GetAssetTransform(
 			HAPI_AssetId asset_id,
-			int rst_order, int rot_order,
+			HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order,
 			out HAPI_TransformEuler transform );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -397,7 +397,7 @@ namespace HAPI
 		private static extern HAPI_Result
 		HAPI_GetObjectTransforms(
 			HAPI_AssetId asset_id,
-			int rst_order,
+			HAPI_RSTOrder rst_order,
 			[Out] HAPI_Transform[] transforms,
 			int start, int length );
 		
