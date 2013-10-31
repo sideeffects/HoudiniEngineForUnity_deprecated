@@ -60,8 +60,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				float tx = 0, ty = 0, tz = 0;
 				float rx = 0, ry = 0, rz = 0;
 				float sx = 1, sy = 1, sz = 1;
-				HAPI_RSTOrder rstOrder = HAPI_RSTOrder.SRT;
-				HAPI_XYZOrder xyzOrder = HAPI_XYZOrder.XYZ;
+				HAPI_RSTOrder rstOrder = HAPI_RSTOrder.HAPI_SRT;
+				HAPI_XYZOrder xyzOrder = HAPI_XYZOrder.HAPI_XYZ;
 				
 				HAPI_HandleBindingInfo[] bindingInfos = myAssetOTL.prHandleBindingInfos[ ii ];
 				
@@ -149,7 +149,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				// and translation back together.  Depending whether the order of translation
 				// and roation matches that of the rstOrder setting, we may, or may not
 				// need to convert the translation parameter for use with the handle.
-				if ( rstOrder == HAPI_RSTOrder.TSR || rstOrder == HAPI_RSTOrder.STR || rstOrder == HAPI_RSTOrder.SRT )
+				if ( rstOrder == HAPI_RSTOrder.HAPI_TSR || rstOrder == HAPI_RSTOrder.HAPI_STR || rstOrder == HAPI_RSTOrder.HAPI_SRT )
 				{
 					xform.position[0] = tx;
 					xform.position[1] = ty;
@@ -178,7 +178,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					xform.rstOrder = (int) rstOrder;
 				}
 				
-				HAPI_Host.convertTransform( ref xform, (int) HAPI_RSTOrder.SRT, (int) HAPI_XYZOrder.ZXY );
+				HAPI_Host.convertTransform( ref xform, (int) HAPI_RSTOrder.HAPI_SRT, (int) HAPI_XYZOrder.HAPI_ZXY );
 				
 				// Axis and Rotation conversions:
 				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
@@ -196,7 +196,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				
 				Vector3 position;
 				
-				if( rstOrder == HAPI_RSTOrder.TSR || rstOrder == HAPI_RSTOrder.STR || rstOrder == HAPI_RSTOrder.SRT )
+				if( rstOrder == HAPI_RSTOrder.HAPI_TSR || rstOrder == HAPI_RSTOrder.HAPI_STR || rstOrder == HAPI_RSTOrder.HAPI_SRT )
 					position = new Vector3( xform.position[ 0 ], xform.position[ 1 ], xform.position[ 2 ] );
 				else
 					position = new Vector3( tx, ty, tz );
@@ -214,9 +214,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						
 					if ( GUI.changed )
 					{
-						if ( rstOrder == HAPI_RSTOrder.TSR 
-							 || rstOrder == HAPI_RSTOrder.STR 
-							 || rstOrder == HAPI_RSTOrder.SRT )
+						if ( rstOrder == HAPI_RSTOrder.HAPI_TSR 
+							 || rstOrder == HAPI_RSTOrder.HAPI_STR 
+							 || rstOrder == HAPI_RSTOrder.HAPI_SRT )
 						{
 							xform.position[ 0 ] = new_position[ 0 ];
 							xform.position[ 1 ] = new_position[ 1 ];
@@ -263,8 +263,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						xform.scale[0] = 1;
 						xform.scale[1] = 1;
 						xform.scale[2] = 1;
-						xform.rotationOrder = (int) HAPI_XYZOrder.ZXY;
-						xform.rstOrder = (int) HAPI_RSTOrder.SRT;
+						xform.rotationOrder = (int) HAPI_XYZOrder.HAPI_ZXY;
+						xform.rstOrder = (int) HAPI_RSTOrder.HAPI_SRT;
 						
 						HAPI_Host.convertTransform( ref xform, (int) rstOrder, (int) xyzOrder );
 						

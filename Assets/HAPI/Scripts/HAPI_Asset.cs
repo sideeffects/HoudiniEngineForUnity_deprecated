@@ -1097,7 +1097,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 			// Refresh object info arrays as they are lost after serialization.
 			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
-			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+			Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.HAPI_SRT, HAPI_Host.getObjectTransforms, 
 					 			 prObjectTransforms, prObjectCount );
 			
 			if ( !serialization_recovery_only )
@@ -1259,7 +1259,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				}
 				
 				HAPI_Transform[] object_transforms = new HAPI_Transform[ prObjectCount ];
-				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.SRT, HAPI_Host.getObjectTransforms, 
+				Utility.getArray2Id( prAssetId, (int) HAPI_RSTOrder.HAPI_SRT, HAPI_Host.getObjectTransforms, 
 						 			 object_transforms, prObjectCount );
 				
 				for ( int ii = 0; ii < num_objects; ii++ )

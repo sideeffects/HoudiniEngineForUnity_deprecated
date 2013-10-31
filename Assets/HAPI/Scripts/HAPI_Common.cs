@@ -246,7 +246,7 @@ namespace HAPI
 	
 	public enum HAPI_TransformComponentType
 	{
-		HAPI_TRANSFORM_TX,
+		HAPI_TRANSFORM_TX = 0,
 		HAPI_TRANSFORM_TY,
 		HAPI_TRANSFORM_TZ,
 		HAPI_TRANSFORM_RX,
@@ -260,6 +260,26 @@ namespace HAPI
 		HAPI_TRANSFORM_SY,
 		HAPI_TRANSFORM_SZ
 	};
+
+	public enum HAPI_RSTOrder
+	{
+		HAPI_TRS = 0,
+		HAPI_TSR,
+		HAPI_RTS,
+		HAPI_RST,
+		HAPI_STR,
+		HAPI_SRT
+	}
+	
+	public enum HAPI_XYZOrder
+	{
+		HAPI_XYZ = 0,
+		HAPI_XZY,
+		HAPI_YXZ,
+		HAPI_YZX,
+		HAPI_ZXY,
+		HAPI_ZYX
+	}
 
 	public enum HAPI_ShaderType
 	{
@@ -343,26 +363,6 @@ namespace HAPI
 		HAPI_GEO_INPUT_FORMAT_DEFAULT = HAPI_GEO_INPUT_FORMAT_OBJECT
 	}
 
-	public enum HAPI_RSTOrder
-	{
-		TRS = 0, 
-		TSR, 
-		RTS, 
-		RST, 
-		STR,
-		SRT
-	}
-	
-	public enum HAPI_XYZOrder
-	{
-		XYZ = 0, 
-		XZY, 
-		YXZ, 
-		YZX, 
-		ZXY, 
-		ZYX
-	}
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Main API Structs
 	
@@ -376,7 +376,7 @@ namespace HAPI
 			position			= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 			rotationQuaternion	= new float[ HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE ];
 			scale				= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
-			rstOrder			= (int) HAPI_RSTOrder.SRT;
+			rstOrder			= (int) HAPI_RSTOrder.HAPI_SRT;
 		}
 		
 		[ MarshalAs( UnmanagedType.ByValArray, 

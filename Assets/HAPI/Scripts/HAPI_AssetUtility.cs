@@ -81,8 +81,8 @@ public class HAPI_AssetUtility
 		transform.scale[ 1 ] = s[ 1 ];
 		transform.scale[ 2 ] = s[ 2 ];
 
-		transform.rotationOrder		= (int) HAPI_XYZOrder.ZXY;
-		transform.rstOrder			= (int) HAPI_RSTOrder.SRT;
+		transform.rotationOrder		= (int) HAPI_XYZOrder.HAPI_ZXY;
+		transform.rstOrder			= (int) HAPI_RSTOrder.HAPI_SRT;
 
 		return transform;
 	}
@@ -145,7 +145,7 @@ public class HAPI_AssetUtility
 	{
 		HAPI_TransformEuler hapi_transform;
 		HAPI_Host.getAssetTransform( 
-			asset_id, (int) HAPI_RSTOrder.SRT, (int) HAPI_XYZOrder.ZXY, out hapi_transform );
+			asset_id, (int) HAPI_RSTOrder.HAPI_SRT, (int) HAPI_XYZOrder.HAPI_ZXY, out hapi_transform );
 		if ( 
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
