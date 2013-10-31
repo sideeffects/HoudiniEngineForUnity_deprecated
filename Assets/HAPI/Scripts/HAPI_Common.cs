@@ -639,11 +639,11 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_HandleInfo
 	{
-		private int nameSH;		// string handle (SH)
-		private int typeNameSH;	// string handle (SH)
-		
-	    public int  bindingsCount;
-		
+		private HAPI_StringHandle nameSH;
+		private HAPI_StringHandle typeNameSH;
+
+		public int bindingsCount;
+
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
@@ -654,12 +654,12 @@ namespace HAPI
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_HandleBindingInfo
-	{	    
-		private int handleParmNameSH;	// string handle (SH)
-		private int assetParmNameSH;	// string handle (SH)
-		
-		public int 	assetParmId;
-		
+	{
+		private HAPI_StringHandle handleParmNameSH;
+		private HAPI_StringHandle assetParmNameSH;
+
+		public HAPI_ParmId assetParmId;
+
 		// Accessors
 		public string handleParmName
 		{ get { return HAPI_Host.getString( handleParmNameSH ); } private set {} }
@@ -726,10 +726,10 @@ namespace HAPI
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_GeoInputInfo
-	{				
-		public int		objectId;
-		public int		geoId;
-		public int		objectNodeId;
+	{
+		public HAPI_ObjectId objectId;
+		public HAPI_GeoId geoId;
+		public HAPI_NodeId objectNodeId;
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -795,9 +795,9 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_MaterialInfo
 	{
-		public HAPI_MaterialId	id;
-		public HAPI_AssetId		assetId;
-		public HAPI_NodeId		nodeId;
+		public HAPI_MaterialId id;
+		public HAPI_AssetId assetId;
+		public HAPI_NodeId nodeId;
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasChanged;
