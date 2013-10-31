@@ -440,10 +440,13 @@ namespace HAPI
 		/// <param name="input_type">
 		/// 	Input type (<see cref="HAPI_InputType"/>).
 		/// </param>
+		/// <returns>
+		///		The input name.
+		/// </returns>
 		public static string getInputName( int asset_id, int input_idx, HAPI_InputType input_type )
 		{
-			int name_sh = 0;
-			int status_code = HAPI_GetInputName( asset_id, input_idx, (int) input_type, ref name_sh );
+			HAPI_StringHandle name_sh = 0;
+			int status_code = HAPI_GetInputName( asset_id, input_idx, (int) input_type, out name_sh );
 			processStatusCode( (HAPI_Result) status_code );
 			string name = getString( name_sh );
 			return name;

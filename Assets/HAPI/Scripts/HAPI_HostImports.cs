@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Text;
 
 // Typedefs
+using HAPI_AssetLibraryId = System.Int32;
 using HAPI_StringHandle = System.Int32;
 using HAPI_NodeId = System.Int32;
 using HAPI_AssetId = System.Int32;
@@ -47,7 +48,7 @@ namespace HAPI
 		private static extern int HAPI_Initialize( string houdini_install_path,
 												   string otl_search_path,
 												   string dso_search_path,
-												   [MarshalAs( UnmanagedType.U1 )] bool use_cooking_thread,
+												   [ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
 												   int cooking_thread_stack_size );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -126,31 +127,67 @@ namespace HAPI
 													ref int asset_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_CreateCurve( ref int asset_id );
+		private static extern HAPI_Result 
+		HAPI_LoadAssetLibraryFromFile(	string file_path,
+										int min_vertices_per_primitive,
+										int max_vertices_per_primitive,
+										out HAPI_AssetLibraryId library_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_UnloadOTLFile( int asset_id );
+		private static extern HAPI_Result 
+		HAPI_LoadAssetLibraryFromMemory(	byte[] otl_buffer,
+											int otl_buffer_size,
+											int min_vertices_per_primitive,
+											int max_vertices_per_primitive,
+											out HAPI_AssetLibraryId library_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAssetInfo( int asset_id, ref HAPI_AssetInfo asset_info );
+		private static extern HAPI_Result 
+		HAPI_GetAvailableAssetCount(	HAPI_AssetLibraryId library_id, 
+										out int asset_count );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_CookAsset( int asset_id );
+		private static extern HAPI_Result 
+		HAPI_GetAvailableAssets(	HAPI_AssetLibraryId library_id,
+									[Out] HAPI_StringHandle[] asset_names,
+									int asset_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result 
+		HAPI_InstantiateAsset(	string asset_name, 
+								[ MarshalAs( UnmanagedType.U1 ) ] bool cook_on_load, 
+								out HAPI_AssetId asset_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_CreateCurve( out HAPI_AssetId asset_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_UnloadOTLFile( HAPI_AssetId asset_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result 
+		HAPI_UnloadAsset( HAPI_AssetId asset_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_GetAssetInfo( HAPI_AssetId asset_id, ref HAPI_AssetInfo asset_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern int HAPI_CookAsset( HAPI_AssetId asset_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_Interrupt();
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetAssetTransform( int asset_id, int rst_order, int rot_order,
+		private static extern int HAPI_GetAssetTransform( HAPI_AssetId asset_id, int rst_order, int rot_order,
 														  out HAPI_TransformEuler transform );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_SetAssetTransform( int asset_id, 
+		private static extern int HAPI_SetAssetTransform( HAPI_AssetId asset_id, 
 														  ref HAPI_TransformEuler transform );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern int HAPI_GetInputName( int asset_id, int input_idx, int input_type,
-													 ref int name_sh );
+		private static extern int HAPI_GetInputName( HAPI_AssetId asset_id, int input_idx, int input_type,
+													 out HAPI_StringHandle name );
 
 		// HIP FILES ------------------------------------------------------------------------------------------------
 
@@ -428,7 +465,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern int HAPI_GetImagePlanes(	int asset_id, int material_id,
-														[Out] int[] image_planes,
+														[Out] HAPI_StringHandle[] image_planes,
 														int image_plane_count );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

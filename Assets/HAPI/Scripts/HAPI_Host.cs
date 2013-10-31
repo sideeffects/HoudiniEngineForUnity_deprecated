@@ -598,7 +598,7 @@ namespace HAPI
 				throw new HAPI_Error( "DLL Not Found." );
 
 			int asset_id = -1;
-			HAPI_Result status_code = (HAPI_Result) HAPI_CreateCurve( ref asset_id );
+			HAPI_Result status_code = (HAPI_Result) HAPI_CreateCurve( out asset_id );
 			processStatusCode( status_code );
 
 			return asset_id;
