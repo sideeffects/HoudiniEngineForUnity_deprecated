@@ -165,16 +165,12 @@ namespace HAPI
 		private static extern HAPI_Result 
 		HAPI_LoadAssetLibraryFromFile(
 			string file_path,
-			int min_vertices_per_primitive,
-			int max_vertices_per_primitive,
 			out HAPI_AssetLibraryId library_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result 
 		HAPI_LoadAssetLibraryFromMemory(
 			byte[] otl_buffer, int otl_buffer_size,
-			int min_vertices_per_primitive,
-			int max_vertices_per_primitive,
 			out HAPI_AssetLibraryId library_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -195,6 +191,7 @@ namespace HAPI
 		HAPI_InstantiateAsset(
 			string asset_name,
 			[ MarshalAs( UnmanagedType.U1 ) ] bool cook_on_load,
+			int min_vertices_per_primitive, int max_vertices_per_primitive,
 			out HAPI_AssetId asset_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
