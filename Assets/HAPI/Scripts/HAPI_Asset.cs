@@ -215,6 +215,8 @@ public abstract class HAPI_Asset : HAPI_Control
 													set { myBackupAssetValidationId = value; } }
 	public bool prReloadPrefabOnPlaymodeChange {	get { return myReloadPrefabOnPlaymodeChange; }
 													set { myReloadPrefabOnPlaymodeChange = value; } }
+	public string prUpdatePrefabInstanceParmName {	get { return myUpdatePrefabInstanceParmName; }
+													set { myUpdatePrefabInstanceParmName = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -644,8 +646,14 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		else if ( prAssetId >= 0 || isInstantiatingPrefab() )
 		{	
-			if ( !isInstantiatingPrefab() &&
-				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
+			if ( isPrefabInstance() && 
+				 prUpdatePrefabInstanceParmName != String.Empty )
+			{
+				// Updating prefab instance after parameter change on prefab
+				updatePrefabInstance();
+			}
+			else if ( !isInstantiatingPrefab() &&
+				 	  HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
@@ -658,7 +666,8 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 			else
 			{
-				// Loading Scene (no Houdini scene exists yet)
+				// Loading Scene (no Houdini scene exists yet) or 
+				// instantiating a prefab
 				prAssetId = -1;
 				build(	true,	// reload_asset
 						true,	// unload_asset_first
@@ -766,9 +775,43 @@ public abstract class HAPI_Asset : HAPI_Control
 		prBackupAssetValidationId		= -1;
 		prReloadPrefabOnPlaymodeChange 	= false;
 		myCleanUpPrefabOTL 				= false;
+		prUpdatePrefabInstanceParmName	= "";
 	}
 	
-	public void propagateParmChangeToPrefabInstances()
+	
+	public void updatePrefabInstance()
+	{
+		int parm_id = prParms.findParm( prUpdatePrefabInstanceParmName );
+		
+		if( parm_id >= 0 )
+		{
+			// Do not apply changes from prefab in the following cases: 
+			// Case 1: Parameter on prefab that has been changed is a
+			// transform parameter
+			// Case 2: Parameter on prefab that has been changed has been
+			// overridden on this asset
+			// In these cases parameter values must be re-acquired from
+			// Houdini
+			if( prUpdatePrefabInstanceParmName == "r" || 
+				prUpdatePrefabInstanceParmName == "s" ||
+				prUpdatePrefabInstanceParmName == "t" ||
+				prParms.isParmOverridden( parm_id ) )
+			{
+				// re-acquire parameters
+				prParms.getParameterValues();
+			}
+			// Otherwise set the parameter change for this prefab 
+			// instance and build.
+			else
+			{
+				prParms.setChangedParameterIntoHost( parm_id );
+				buildClientSide();
+			}
+		}
+		prUpdatePrefabInstanceParmName = "";
+	}
+	
+	public void propagateParmChangeToPrefabInstances( string parm_name )
 	{
 		if ( isPrefab() )
 		{
@@ -780,57 +823,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					 asset.isPrefabInstance() && 
 					 PrefabUtility.Equals( prefab_parent, gameObject ) )
 				{
-					// loop through parameters on prefab and only change the ones on the
-					// asset that have not been overridden
-					HAPI_Parms asset_parms = asset.prParms;
-					for ( int ii = 0; ii < asset_parms.prParmCount; ii++ )
-					{
-						HAPI_ParmInfo asset_parm_info = asset_parms.prParms[ ii ];
-						
-						// do not propogate transform changes
-						if( asset_parm_info.name == "r" || 
-							asset_parm_info.name == "s" ||
-							asset_parm_info.name == "t" )
-						{
-							continue;
-						}
-						
-						// if this parameter has not been overridden and it's 
-						// value differs from the value of this parameter on 
-						// the prefab the change the value on the asset to
-						// match the value of the prefab
-						if ( !asset_parms.prOverriddenParms[ ii ] && 
-							 !asset_parms.isParmSameInPrefab( asset_parm_info.id, prParms ) )
-						{
-							HAPI_ParmInfo parm_info = prParms.findParm( asset_parm_info.id );
-							
-							if ( asset_parm_info.isFloat() )
-							{
-								for ( int jj = 0; jj < asset_parm_info.size; jj++ )
-								{
-									int index = parm_info.floatValuesIndex + jj;
-									int asset_index = asset_parm_info.floatValuesIndex + jj;
-									asset_parms.prParmFloatValues[ asset_index ] = prParms.prParmFloatValues[ index ];
-								}
-							}
-							else if ( asset_parm_info.isInt() )
-							{
-								for ( int jj = 0; jj < asset_parm_info.size; jj++ )
-								{
-									int index = parm_info.intValuesIndex + jj;
-									int asset_index = asset_parm_info.intValuesIndex + jj;
-									asset_parms.prParmIntValues[ asset_index ] = prParms.prParmIntValues[ index ];
-								}
-							}
-							else if ( asset_parm_info.isString() )
-							{
-								string[] values = prParms.getParmStrings( parm_info );
-								asset_parms.setParmStrings( asset_parm_info, values );
-							}
-							asset_parms.setChangedParameterIntoHost( asset_parm_info.id );
-							asset.buildClientSide();
-						}
-					}
+					asset.prUpdatePrefabInstanceParmName = parm_name;
 				}
 			}
 		}
@@ -843,6 +836,9 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		if ( isPrefab() )
 		{
+			HAPI_ParmInfo parm_info = prParms.findParm( prParms.prLastChangedParmId );
+			string parm_name = parm_info.name;
+			
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			try 
 			{
@@ -854,6 +850,9 @@ public abstract class HAPI_Asset : HAPI_Control
 			{
 				progress_bar.clearProgressBar();
 			}
+			
+			propagateParmChangeToPrefabInstances( parm_name );
+			EditorUtility.SetDirty( this );
 		}
 		else
 		{
@@ -871,10 +870,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		// while in Play mode.
 		if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
 			savePreset();
-
-		// If asset is a prefab then propagate parameter change to all prefab instances
-		if ( isPrefab() )
-			propagateParmChangeToPrefabInstances();
 	}
 
 	public virtual bool buildAll()
@@ -1008,13 +1003,16 @@ public abstract class HAPI_Asset : HAPI_Control
 					return false; // false for failed :(
 				}
 				
+			}
+			if ( reload_asset )
+			{
+				prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
+				
 				// For convenience we copy some asset info properties locally (since they are constant anyway).
 				// More imporantly, structs are not serialized and therefore putting them into their own
 				// variables is required in order to maintain state between serialization cycles.
 				prAssetId 					= prAssetInfo.id;
-				prBackupAssetId				= prAssetId;
 				prAssetValidationId			= prAssetInfo.validationId;
-				prBackupAssetValidationId 	= prAssetValidationId;
 				prNodeId					= prAssetInfo.nodeId;
 				prObjectCount 				= prAssetInfo.objectCount;
 				prHandleCount 				= prAssetInfo.handleCount;
@@ -1026,7 +1024,10 @@ public abstract class HAPI_Asset : HAPI_Control
 				prMaxTransInputCount		= prAssetInfo.maxTransInputCount;
 				prMinGeoInputCount 			= prAssetInfo.minGeoInputCount;
 				prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
-
+			}
+			
+			if ( reload_asset )
+			{
 				// Try to load presets.
 				if ( unload_asset_first || is_reverting_prefab_instance )
 				{
@@ -1076,6 +1077,10 @@ public abstract class HAPI_Asset : HAPI_Control
 				
 			if ( reload_asset || serialization_recovery_only )
 			{
+				// Set back up asset id and asset validation id
+				prBackupAssetId				= prAssetId;
+				prBackupAssetValidationId 	= prAssetValidationId;
+				
 				// Need to re-acquire all the params for all the child controls that have parms exposed.
 				prParms.getParameterValues();
 				foreach ( HAPI_Parms parms in GetComponentsInChildren< HAPI_Parms >() )
@@ -1693,4 +1698,5 @@ public abstract class HAPI_Asset : HAPI_Control
 	private int myBackupAssetValidationId;
 	private bool myReloadPrefabOnPlaymodeChange;
 	private bool myCleanUpPrefabOTL;
+	private string myUpdatePrefabInstanceParmName;
 }

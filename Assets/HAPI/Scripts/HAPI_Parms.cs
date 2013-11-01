@@ -92,15 +92,6 @@ public class HAPI_Parms : MonoBehaviour
 	public List< int > 				prFolderListSelectionIds {		get { return myFolderListSelectionIds; } 
 																	set { myFolderListSelectionIds = value; } }
 
-	/// <summary>
-	/// 	Booleans indicating whether the value of the parameter at the
-	/// 	same index in myParms has been changed from the value of the 
-	///     same parameter in the associated prefab. These values are only 
-	///     used if these parameters are the parameters of a prefab instance.
-	/// </summary>
-	public bool[]					prOverriddenParms {				get { return myOverriddenParms; }
-																	set { myOverriddenParms = value; } }
-
 	public bool						prPostSerialization {			get { return myPostSerialization; }
 																	set { myPostSerialization = value; } }
 
@@ -180,8 +171,6 @@ public class HAPI_Parms : MonoBehaviour
 		prFolderListSelections.Add( 0 );
 		prFolderListSelectionIds.Add( -1 );
 
-		prOverriddenParms				= null;
-
 		// Control -------------------------------------------------------------------------------------------------
 
 		myPostSerialization				= true;
@@ -207,6 +196,15 @@ public class HAPI_Parms : MonoBehaviour
 				return prParms[ i ].id;
 
 		return -1;
+	}
+	
+	public bool isParmOverridden( int parm_id )
+	{
+		if ( myOverriddenParmsMap.ContainsKey( parm_id ) )
+		{
+			return myOverriddenParmsMap[ parm_id ];
+		}
+		return false;
 	}
 
 	public void cacheStringsFromHost()
@@ -276,7 +274,6 @@ public class HAPI_Parms : MonoBehaviour
 		cacheStringsFromHost();
 		
 		// Set which parameter values have been overridden
-		prOverriddenParms = new bool[ prParmCount ];
 		if ( prControl && prControl.isPrefabInstance() )
 		{
 			GameObject prefab = PrefabUtility.GetPrefabParent( prControl.gameObject ) as GameObject;
@@ -287,9 +284,9 @@ public class HAPI_Parms : MonoBehaviour
 				{
 					// loop through parameter values and determine which ones have been
 					// overridden (ie. changed from corresponding parameter value on prefab)
-					for ( int ii = 0; ii < prParmCount; ii++ )
+					for ( int i = 0; i < prParms.Length; ++i )
 					{
-						prOverriddenParms[ ii ] = !isParmSameInPrefab( prParms[ ii ].id, prefab_asset.prParms );
+						myOverriddenParmsMap[ prParms[ i ].id ] = !isParmSameInPrefab( prParms[ i ].id, prefab_asset.prParms );
 					}
 				}
 			}
@@ -490,6 +487,14 @@ public class HAPI_Parms : MonoBehaviour
 	// A mapping from parm id to the parm's string values
 	private Dictionary< int, string[] >  			myParmStrings = new Dictionary< int, string[] >();
 	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary< int, HAPI_ParmInfo >();
+	
+	/// <summary>
+	/// 	A mapping from parm id to a boolean indicating whether the value 
+	/// 	of the parameter with that id has been changed from the value of 
+	/// 	the same parameter in the associated prefab. These values are only 
+	///     used if these parameters are the parameters of a prefab instance.
+	/// </summary>
+	private Dictionary< int, bool > 				myOverriddenParmsMap = new Dictionary< int, bool >();
 
 	private HAPI_ParmInfo 							myMultiparmInstancePos;
 	private bool 									myToInsertInstance = false;
@@ -508,14 +513,6 @@ public class HAPI_Parms : MonoBehaviour
 	/// 	A 1:1 mapping with myFolderListSelections.
 	/// </summary>
 	[SerializeField] private List< int > 			myFolderListSelectionIds;
-	
-	/// <summary>
-	/// 	Booleans indicating whether the value of the parameter at the
-	/// 	same index in myParms has been changed from the value of the 
-	///     same parameter in the associated prefab. These values are only 
-	///     used if these parameters are the parameters of a prefab instance.
-	/// </summary>
-	[SerializeField] private bool[] 				myOverriddenParms;
 
 	// Control ------------------------------------------------------------------------------------------------------
 

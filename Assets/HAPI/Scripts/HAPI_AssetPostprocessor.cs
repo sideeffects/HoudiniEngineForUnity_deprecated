@@ -81,6 +81,7 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						
 						// set asset id of prefab to -1 since it has not been built yet
 						prefab_asset.prAssetId = -1;
+						prefab_asset.prAssetValidationId = -1;
 					}
 					// this is not the prefab instance this prefab is being created from 
 					// so apply changes being made to prefab to this prefab instance 

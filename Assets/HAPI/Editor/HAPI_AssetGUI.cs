@@ -51,6 +51,7 @@ public class HAPI_AssetGUI : Editor
 			if ( myAsset.prReloadPrefabOnPlaymodeChange &&
 				 HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
 			{
+				myAsset.prReloadPrefabOnPlaymodeChange = false;
 				myAsset.build(	false,	// reload_asset
 								false,	// unload_asset_first
 								true,	// serializatin_recovery_only
@@ -58,7 +59,6 @@ public class HAPI_AssetGUI : Editor
 								false,	// cook_downstream_assets
 								false	// use_delay_for_progress_bar
 					 		 );
-				myAsset.prReloadPrefabOnPlaymodeChange = false;
 			}
 			else if ( myAsset.prAssetId != myAsset.prBackupAssetId ||
 			   		  !HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
