@@ -920,16 +920,10 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			progress_bar.prStartTime = System.DateTime.Now;
 			
+			bool is_first_time_build = false;
+			
 			if ( reload_asset ) 
 			{
-				bool is_reverting_prefab_instance = isRevertingPrefabInstance();
-				if ( is_reverting_prefab_instance )
-				{
-					// restore asset id and asset validation id from the backup
-					prAssetId = prBackupAssetId;
-					prAssetValidationId = prBackupAssetValidationId;
-				}
-				
 				if ( unload_asset_first )
 				{
 					// There's no reason to abort the whole rebuild process because we can't unload
@@ -947,8 +941,6 @@ public abstract class HAPI_Asset : HAPI_Control
 					// Need to reset the parms as well.
 					prParms.reset();
 				}
-				
-				bool is_first_time_build = false;
 
 				try
 				{
@@ -1004,30 +996,36 @@ public abstract class HAPI_Asset : HAPI_Control
 				}
 				
 			}
-			if ( reload_asset )
-			{
-				prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
-				
-				// For convenience we copy some asset info properties locally (since they are constant anyway).
-				// More imporantly, structs are not serialized and therefore putting them into their own
-				// variables is required in order to maintain state between serialization cycles.
-				prAssetId 					= prAssetInfo.id;
-				prAssetValidationId			= prAssetInfo.validationId;
-				prNodeId					= prAssetInfo.nodeId;
-				prObjectCount 				= prAssetInfo.objectCount;
-				prHandleCount 				= prAssetInfo.handleCount;
+			
+			prAssetInfo = HAPI_Host.getAssetInfo( prAssetId );
+			
+			// For convenience we copy some asset info properties locally (since they are constant anyway).
+			// More imporantly, structs are not serialized and therefore putting them into their own
+			// variables is required in order to maintain state between serialization cycles.
+			prAssetId 					= prAssetInfo.id;
+			prAssetValidationId			= prAssetInfo.validationId;
+			prNodeId					= prAssetInfo.nodeId;
+			prObjectCount 				= prAssetInfo.objectCount;
+			prHandleCount 				= prAssetInfo.handleCount;
 
-				prAssetName					= prAssetInfo.name;
-				prAssetHelp					= prAssetInfo.helpText;
-				prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
-				prMinTransInputCount		= prAssetInfo.minTransInputCount;
-				prMaxTransInputCount		= prAssetInfo.maxTransInputCount;
-				prMinGeoInputCount 			= prAssetInfo.minGeoInputCount;
-				prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
-			}
+			prAssetName					= prAssetInfo.name;
+			prAssetHelp					= prAssetInfo.helpText;
+			prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
+			prMinTransInputCount		= prAssetInfo.minTransInputCount;
+			prMaxTransInputCount		= prAssetInfo.maxTransInputCount;
+			prMinGeoInputCount 			= prAssetInfo.minGeoInputCount;
+			prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
 			
 			if ( reload_asset )
 			{
+				bool is_reverting_prefab_instance = isRevertingPrefabInstance();
+				if ( is_reverting_prefab_instance )
+				{
+					// restore asset id and asset validation id from the backup
+					prAssetId = prBackupAssetId;
+					prAssetValidationId = prBackupAssetValidationId;
+				}
+				
 				// Try to load presets.
 				if ( unload_asset_first || is_reverting_prefab_instance )
 				{
