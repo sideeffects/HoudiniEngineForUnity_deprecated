@@ -164,12 +164,12 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 				// Add collider if group name matches. (Should be added after the mesh is set so that it
 				// picks up the mesh automagically)
-				if ( part_info.name.EndsWith( HAPI_Host.prRenderedCollisionGroupName ) )
+				if ( part_info.name.Contains( HAPI_Host.prRenderedCollisionGroupName ) )
 				{
 					getOrCreateComponent< MeshCollider >();
 					getOrCreateComponent< MeshRenderer >();
 				}
-				else if ( part_info.name == HAPI_Host.prCollisionGroupName )
+				else if ( part_info.name.Contains( HAPI_Host.prCollisionGroupName ) )
 					getOrCreateComponent< MeshCollider >();
 				else
 					getOrCreateComponent< MeshRenderer >();

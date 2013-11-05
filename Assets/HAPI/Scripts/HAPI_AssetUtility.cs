@@ -746,7 +746,8 @@ public class HAPI_AssetUtility
 							   part_control.prPartId, out part_info );
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
-		if ( part_control.prPartName != HAPI_Host.prCollisionGroupName && is_mesh )
+		if ( ( !part_control.prPartName.Contains( HAPI_Host.prCollisionGroupName ) || 
+			part_control.prPartName.Contains( HAPI_Host.prRenderedCollisionGroupName ) ) && is_mesh )
 		{
 			part_control.prMaterialId = part_info.materialId;
 		
