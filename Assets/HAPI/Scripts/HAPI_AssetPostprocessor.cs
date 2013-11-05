@@ -68,20 +68,18 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						
 						// replace prefab with original asset with all children game objects removed
 						asset.destroyChildren( asset.transform );
-						PrefabUtility.ReplacePrefab( asset.gameObject, prPrefabToReplace, ReplacePrefabOptions.ConnectToPrefab );
-					
-						// rebuild original asset so it re-creates game objects
-						asset.build( true,	// reload_asset
-									 false,	// unload_asset_first
-									 false,	// serializatin_recovery_only
-									 true,	// force_reconnect
-									 false,	// cook_downstream_assets
-									 false	// use_delay_for_progress_bar
-									);
+						GameObject new_prefab = PrefabUtility.ReplacePrefab( asset.gameObject, 
+																			 prPrefabToReplace, 
+																			 ReplacePrefabOptions.ConnectToPrefab ) as GameObject;
 						
-						// set asset id of prefab to -1 since it has not been built yet
-						prefab_asset.prAssetId = -1;
-						prefab_asset.prAssetValidationId = -1;
+						// Set asset id of prefab to -1 since it has not been built yet.
+						// Call SetDirty so changes to prefab will be saved to disk and
+						// OnEnable will be called on original asset so that it can be
+						// rebuilt in order to re-create its game objects.
+						HAPI_Asset new_prefab_asset = new_prefab.GetComponent< HAPI_Asset >();
+						new_prefab_asset.prAssetId = -1;
+						new_prefab_asset.prAssetValidationId = -1;
+						EditorUtility.SetDirty( new_prefab_asset );
 					}
 					// this is not the prefab instance this prefab is being created from 
 					// so apply changes being made to prefab to this prefab instance 
