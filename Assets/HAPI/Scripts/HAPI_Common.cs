@@ -448,7 +448,10 @@ namespace HAPI
 
 		// Use the node id to get the asset's parameters.
 		public HAPI_NodeId nodeId;
-		
+
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasEverCooked;
+
 		private HAPI_StringHandle nameSH; // Instance name (the label + a number).
 		private HAPI_StringHandle labelSH;
 		private HAPI_StringHandle instancePathSH; // Instance path inside Houdini scene.
