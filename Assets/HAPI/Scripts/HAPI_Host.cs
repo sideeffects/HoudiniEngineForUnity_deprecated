@@ -581,6 +581,8 @@ namespace HAPI
 				out asset_id );
 			processStatusCode( status_code );
 
+			EditorUtility.DisplayDialog( "", "Asset loaded. Proceed to cooking?", "Ok" );
+
 			cookAsset( asset_id );
 #else
 			int asset_id = 0;
