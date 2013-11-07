@@ -715,6 +715,7 @@ namespace HAPI
 		public HAPI_NodeId nodeId;
 
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool isEditable;
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool isTemplated;
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool isDisplayGeo; // Final Result (Display SOP)
 		
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasGeoChanged;
