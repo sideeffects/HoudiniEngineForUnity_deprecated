@@ -295,6 +295,17 @@ public class HAPI_PartControl : HAPI_GeoControl
 			}
 		}
 
+		// Refresh enabled flags.
+		if ( gameObject.GetComponent< MeshCollider >() )
+			gameObject.GetComponent< MeshCollider >().enabled = 
+				prObjectVisible && 
+					( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
+		if ( gameObject.GetComponent< MeshRenderer >() )
+			gameObject.GetComponent< MeshRenderer >().enabled = 
+				prObjectVisible && 
+					( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
+
+		// Assign materials.
 		HAPI_AssetUtility.assignMaterial( this, prAsset, ( reload_asset || has_material_changed ) );
 	}
 

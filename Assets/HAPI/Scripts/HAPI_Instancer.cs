@@ -206,12 +206,14 @@ public class HAPI_Instancer : MonoBehaviour {
 				}
 				obj.transform.localScale = scale;
 			}
-									
-			
+
 			// The original object is probably set to be invisible because it just contains
 			// the raw geometry with no transforms applied. We need to set the newly instanced
 			// object's childrens' mesh renderers to be enabled otherwise the instanced
 			// objects will also be invisible. :)
+			MeshCollider[] mesh_colliders = obj.GetComponentsInChildren< MeshCollider >();
+			foreach ( MeshCollider mesh_collider in mesh_colliders )
+				mesh_collider.enabled = true;
 			MeshRenderer[] mesh_renderers = obj.GetComponentsInChildren< MeshRenderer >();
 			foreach ( MeshRenderer mesh_renderer in mesh_renderers )
 				mesh_renderer.enabled = true;
