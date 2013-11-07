@@ -105,7 +105,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			}
 			
 			string path = myAssetOTL.prAssetPath;
+			bool gui_enabled = GUI.enabled;
+			GUI.enabled = gui_enabled && !myAssetOTL.isPrefab();
 			bool file_path_changed = HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
+			GUI.enabled = gui_enabled;
 			if ( file_path_changed )
 			{
 				myParmChanges			|= file_path_changed;
