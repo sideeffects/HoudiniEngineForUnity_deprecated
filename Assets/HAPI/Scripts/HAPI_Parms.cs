@@ -274,20 +274,16 @@ public class HAPI_Parms : MonoBehaviour
 		cacheStringsFromHost();
 		
 		// Set which parameter values have been overridden
-		if ( prControl && prControl.isPrefabInstance() )
+		if ( prControl && prControl.isPrefabInstance() && gameObject.GetComponent< HAPI_Asset >() != null )
 		{
-			GameObject prefab = PrefabUtility.GetPrefabParent( prControl.gameObject ) as GameObject;
-			if ( prefab )
+			HAPI_Asset prefab_asset = prControl.prAsset.getParentPrefabAsset();
+			if ( prefab_asset && prefab_asset.prParms.prParms != null )
 			{
-				HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();
-				if ( prefab_asset && prefab_asset.prParms.prParms != null )
+				// loop through parameter values and determine which ones have been
+				// overridden (ie. changed from corresponding parameter value on prefab)
+				for ( int i = 0; i < prParms.Length; ++i )
 				{
-					// loop through parameter values and determine which ones have been
-					// overridden (ie. changed from corresponding parameter value on prefab)
-					for ( int i = 0; i < prParms.Length; ++i )
-					{
-						myOverriddenParmsMap[ prParms[ i ].id ] = !isParmSameInPrefab( prParms[ i ].id, prefab_asset.prParms );
-					}
+					myOverriddenParmsMap[ prParms[ i ].id ] = !isParmSameInPrefab( prParms[ i ].id, prefab_asset.prParms );
 				}
 			}
 		}

@@ -611,8 +611,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		if ( isPrefabInstance() && prBackupAssetId < 0 )
 		{
-			GameObject prefab = PrefabUtility.GetPrefabParent( gameObject ) as GameObject;
-			HAPI_Asset prefab_asset = prefab.GetComponent<HAPI_Asset>();
+			HAPI_Asset prefab_asset = getParentPrefabAsset();
 			if ( prefab_asset )
 			{
 				return prAssetId == prefab_asset.prAssetId;
@@ -651,7 +650,8 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		else if ( prAssetId >= 0 || isInstantiatingPrefab() )
 		{	
-			if ( isPrefabInstance() && 
+			if ( isPrefabInstance() &&
+				 !isInstantiatingPrefab() &&
 				 prUpdatePrefabInstanceParmName != String.Empty )
 			{
 				// Updating prefab instance after parameter change on prefab
@@ -1134,6 +1134,24 @@ public abstract class HAPI_Asset : HAPI_Control
 				else
 				{
 					prParms.prLastChangedParmId = parm_id;
+					
+					// if the parameter is a string we need to manually
+					// get the string value from the prefab because the
+					// parameter strings are stored in a dictionary which
+					// is not serialized so the value isn't overridden 
+					// automatically by the prefab value as it is done
+					// with float and int parameters
+					HAPI_ParmInfo parm_info = prParms.findParm( parm_id );
+					if ( parm_info.isString() )
+					{
+						HAPI_Asset prefab_asset = getParentPrefabAsset();
+						if ( prefab_asset )
+						{
+							int prefab_parm_id = prefab_asset.prParms.findParm( prUpdatePrefabInstanceParmName );
+							string[] values = prefab_asset.prParms.getParmStrings( prefab_asset.prParms.findParm( prefab_parm_id ) );
+							prParms.setParmStrings( parm_info, values );
+						}
+					}
 				}
 			}
 			prUpdatePrefabInstanceParmName = "";
@@ -1343,6 +1361,16 @@ public abstract class HAPI_Asset : HAPI_Control
 	public bool isAssetValid()
 	{
 		return HAPI_Host.isAssetValid( prAssetId, prAssetInfo.validationId );
+	}
+	
+	public HAPI_Asset getParentPrefabAsset()
+	{
+		GameObject prefab = PrefabUtility.GetPrefabParent( gameObject ) as GameObject;
+		if ( prefab )
+		{
+			return prefab.GetComponent< HAPI_Asset >();
+		}
+		return null;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

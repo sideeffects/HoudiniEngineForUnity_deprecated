@@ -47,61 +47,62 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 		base.OnInspectorGUI();
 
-		if ( myAssetOTL.isPrefab() )
-			return;
-
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
+		
 
 		myAssetOTL.prShowHoudiniControls 
 			= HAPI_GUI.foldout( "Houdini Controls", myAssetOTL.prShowHoudiniControls, true );
 		if ( myAssetOTL.prShowHoudiniControls ) 
 		{
-			if ( GUILayout.Button( "Rebuild" ) ) 
-				myAssetOTL.buildAll();
-
-			if ( GUILayout.Button( "Recook" ) )
-				myAssetOTL.buildClientSide();
-			
-			EditorGUILayout.BeginHorizontal(); 
+			if ( !myAssetOTL.isPrefab() )
 			{
-				if ( GUILayout.Button( "Export To Hip File..." ) ) 
+				if ( GUILayout.Button( "Rebuild" ) ) 
+					myAssetOTL.buildAll();
+	
+				if ( GUILayout.Button( "Recook" ) )
+					myAssetOTL.buildClientSide();
+			
+				EditorGUILayout.BeginHorizontal(); 
 				{
-					string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
-					if ( hip_file_path != "" && HAPI_Host.hasScene() )
-						HAPI_Host.exportAssetToHIPFile( myAssetOTL.prAssetId, hip_file_path );
-					else
-						Debug.LogError( "Nothing to save." );
-				}
-				
-				if ( GUILayout.Button( "Replace From Hip File..." ) ) 
-				{
-					string hip_file_path = EditorUtility.OpenFilePanel( "Import HIP File", "", "hip" );
-					if ( hip_file_path != "" && HAPI_Host.hasScene() )
+					if ( GUILayout.Button( "Export To Hip File..." ) ) 
 					{
-						try
-						{
-							HAPI_Host.replaceAssetFromHIPFile( myAssetOTL.prAssetId, hip_file_path );
-						}
-						catch ( HAPI_Error error )
-						{
-							Debug.LogError( error.ToString() );
-						}
-						
-						myAssetOTL.build(	true,	// reload_asset
-											false,	// unload_asset_first
-											false,	// serialization_recovery_only
-											true,	// force_reconnect
-											myAsset.prCookingTriggersDownCooks,
-											true	// use_progress_bar_delay
-										);
+						string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
+						if ( hip_file_path != "" && HAPI_Host.hasScene() )
+							HAPI_Host.exportAssetToHIPFile( myAssetOTL.prAssetId, hip_file_path );
+						else
+							Debug.LogError( "Nothing to save." );
 					}
-					else
-						Debug.LogError( "Nothing to save." );
-				}
-				
-			} 
-			EditorGUILayout.EndHorizontal();
+					
+					if ( GUILayout.Button( "Replace From Hip File..." ) ) 
+					{
+						string hip_file_path = EditorUtility.OpenFilePanel( "Import HIP File", "", "hip" );
+						if ( hip_file_path != "" && HAPI_Host.hasScene() )
+						{
+							try
+							{
+								HAPI_Host.replaceAssetFromHIPFile( myAssetOTL.prAssetId, hip_file_path );
+							}
+							catch ( HAPI_Error error )
+							{
+								Debug.LogError( error.ToString() );
+							}
+							
+							myAssetOTL.build(	true,	// reload_asset
+												false,	// unload_asset_first
+												false,	// serialization_recovery_only
+												true,	// force_reconnect
+												myAsset.prCookingTriggersDownCooks,
+												true	// use_progress_bar_delay
+											);
+						}
+						else
+							Debug.LogError( "Nothing to save." );
+					}
+					
+				} 
+				EditorGUILayout.EndHorizontal();
+			}
 			
 			string path = myAssetOTL.prAssetPath;
 			bool file_path_changed = HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
@@ -110,6 +111,12 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				myParmChanges			|= file_path_changed;
 				myAssetOTL.prAssetPath	 = path;
 				myReloadAsset			 = true;
+				
+				// if asset is a prefab instance than break connection to prefab
+				if ( myAssetOTL.isPrefabInstance() )
+				{
+					PrefabUtility.DisconnectPrefabInstance( myAssetOTL.gameObject );
+				}
 			}
 		} // if
 
@@ -140,10 +147,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Baking Controls
-
-		myAssetOTL.prShowBakeOptions = HAPI_GUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
-		if ( myAssetOTL.prShowBakeOptions )
-			generateAssetBakeControls();
+		
+		if( !myAssetOTL.isPrefab() )
+		{
+			myAssetOTL.prShowBakeOptions = HAPI_GUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
+			if ( myAssetOTL.prShowBakeOptions )
+				generateAssetBakeControls();
+		}
 
 		///////////////////////////////////////////////////////////////////////
 		// Apply Changes
@@ -219,10 +229,15 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 	private void generateViewSettings()
 	{
+		// If the asset is a prefab instance then get the prefab parent in order to determine
+		// what view settings need to be bold
+		HAPI_Asset prefab_asset = myAsset.getParentPrefabAsset();
+		
 		// Show Geometries
 		{
 			bool value = myAsset.prIsGeoVisible;
-			bool changed = HAPI_GUI.toggle( "show_geometries", "Show Geometries", ref value );
+			bool is_bold = prefab_asset && prefab_asset.prIsGeoVisible != value;
+			bool changed = HAPI_GUI.toggle( "show_geometries", "Show Geometries", is_bold, ref value );
 			if ( changed )
 			{
 				myAsset.prIsGeoVisible = value;
@@ -240,7 +255,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Show Pinned Instances
 		{
 			bool value = myAsset.prShowPinnedInstances;
-			bool changed = HAPI_GUI.toggle( "show_pinned_instances", "Show Pinned Instances", ref value );
+			bool is_bold = prefab_asset && prefab_asset.prShowPinnedInstances != value;
+			bool changed = HAPI_GUI.toggle( "show_pinned_instances", "Show Pinned Instances", is_bold, ref value );
 			if ( changed )
 			{
 				myAsset.prShowPinnedInstances = value;
@@ -250,13 +266,14 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Auto Select Asset Root Node Toggle
 		{
 			bool value		= myAsset.prAutoSelectAssetRootNode;
+			bool is_bold 	= prefab_asset && prefab_asset.prAutoSelectAssetRootNode != value;
 			string name		= "auto_select_asset_root_node";
 			string label	= "Auto Select Asset Root Node";
 
 			GUI.enabled = ( HAPI_Host.prAutoSelectAssetRootNode == HAPI_Host.myDefaultAutoSelectAssetRootNode );
 			if ( !GUI.enabled ) 
 				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )
@@ -266,13 +283,14 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Hide When Fed to Other Asset
 		{
 			bool value		= myAsset.prHideGeometryOnLinking;
+			bool is_bold 	= prefab_asset && prefab_asset.prHideGeometryOnLinking != value;
 			string name		= "hide_geometry_on_linking";
 			string label	= "Hide Geometry On Linking";
 
 			GUI.enabled = ( HAPI_Host.prHideGeometryOnLinking == HAPI_Host.myDefaultHideGeometryOnLinking );
 			if ( !GUI.enabled ) 
 				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )
@@ -282,6 +300,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	private void generateMaterialSettings()
 	{
+		// If the asset is a prefab instance then get the prefab parent in order to determine
+		// what material settings need to be bold
+		HAPI_Asset prefab_asset = myAsset.getParentPrefabAsset();
+		
 		if ( GUILayout.Button( "Re-Render" ) ) 
 		{
 			HAPI_AssetUtility.reApplyMaterials( myAsset );
@@ -290,10 +312,11 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Material Shader Type
 		{
 			int value = (int) myAsset.prMaterialShaderType;
+			bool is_bold = prefab_asset && (int) prefab_asset.prMaterialShaderType != value;
 			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
 			int[] values = { 0, 1 };
 			bool changed = HAPI_GUI.dropdown( "material_renderer", "Material Renderer", 
-											  ref value, labels, values );
+											  ref value, labels, is_bold, values );
 			if ( changed )
 			{
 				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
@@ -308,6 +331,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			values[ 0 ] = (int) myAsset.prRenderResolution[ 0 ];
 			values[ 1 ] = (int) myAsset.prRenderResolution[ 1 ];
 			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "render_resolution", "Render Resolution", 2 );
+			gui_parm.isBold = prefab_asset && 
+							  (int) prefab_asset.prRenderResolution[ 0 ] != values[ 0 ] &&
+							  (int) prefab_asset.prRenderResolution[ 1 ] != values[ 1 ];
 			bool changed = HAPI_GUI.intField( ref gui_parm, ref delay_build, ref values );
 			if ( changed )
 			{
@@ -319,7 +345,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Show Vertex Colours
 		{
 			bool value = myAsset.prShowOnlyVertexColours;
-			bool changed = HAPI_GUI.toggle( "show_only_vertex_colours", "Show Only Vertex Colors", ref value );
+			bool is_bold = prefab_asset && prefab_asset.prShowOnlyVertexColours != value;
+			bool changed = HAPI_GUI.toggle( "show_only_vertex_colours", "Show Only Vertex Colors", is_bold, ref value );
 			if ( changed )
 			{
 				myAsset.prShowOnlyVertexColours = value;
@@ -330,13 +357,14 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Generate Tangents
 		{
 			bool value		= myAsset.prGenerateTangents;
+			bool is_bold 	= prefab_asset && prefab_asset.prGenerateTangents != value;
 			string name		= "generate_tangents";
 			string label	= "Generate Tangents";
 
 			GUI.enabled = HAPI_Host.isGenerateTangentsDefault();
 			if ( !GUI.enabled ) 
 				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )
@@ -349,16 +377,21 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 	private void generateCookingSettings()
 	{
+		// If the asset is a prefab instance then get the prefab parent in order to determine
+		// what material settings need to be bold
+		HAPI_Asset prefab_asset = myAsset.getParentPrefabAsset();
+		
 		// Enable Cooking Toggle
 		{
 			bool value		= myAsset.prEnableCooking;
+			bool is_bold 	= prefab_asset && prefab_asset.prEnableCooking != value;
 			string name		= "enable_cooking";
 			string label	= "Enable Cooking";
 
 			GUI.enabled = ( HAPI_Host.prEnableCooking == HAPI_Host.myDefaultEnableCooking );
 			if ( !GUI.enabled ) 
 				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )
@@ -370,6 +403,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Cooking Triggers Downstream Cooks Toggle
 		{
 			bool value		= myAsset.prCookingTriggersDownCooks;
+			bool is_bold 	= prefab_asset && prefab_asset.prCookingTriggersDownCooks != value;
 			string name		= "cooking_triggers_downstream_cooks";
 			string label	= "Cooking Triggers Downstream Cooks";
 
@@ -383,7 +417,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					label += " (overwritted by global setting)";
 				else // local_overwrite
 					label += " (all cooking is disabled)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )
@@ -393,6 +427,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Playmode Per-Frame Cooking Toggle
 		{
 			bool value		= myAsset.prPlaymodePerFrameCooking;
+			bool is_bold 	= prefab_asset && prefab_asset.prPlaymodePerFrameCooking != value;
 			string name		= "playmode_per_frame_cooking";
 			string label	= "Playmode Per-Frame Cooking";
 
@@ -406,7 +441,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					label += " (overwritted by global setting)";
 				else // local_overwrite
 					label += " (all cooking is disabled)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )
@@ -418,6 +453,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Push Unity Transform To Houdini Engine Toggle
 		{
 			bool value		= myAsset.prPushUnityTransformToHoudini;
+			bool is_bold 	= prefab_asset && prefab_asset.prPushUnityTransformToHoudini != value;
 			string name		= "push_unity_transform_to_houdini_engine";
 			string label	= "Push Unity Transform To Houdini Engine";
 
@@ -425,7 +461,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							HAPI_Host.myDefaultPushUnityTransformToHoudini );
 			if ( !GUI.enabled ) 
 				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )
@@ -435,6 +471,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Transform Change Triggers Cooks Toggle
 		{
 			bool value		= myAsset.prTransformChangeTriggersCooks;
+			bool is_bold 	= prefab_asset && prefab_asset.prTransformChangeTriggersCooks != value;
 			string name		= "transform_change_triggers_cooks";
 			string label	= "Transform Change Triggers Cooks";
 
@@ -448,7 +485,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					label += " (overwritted by global setting)";
 				else // local_overwrite
 					label += " (all cooking is disabled)";
-			bool changed = HAPI_GUI.toggle( name, label, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
 			GUI.enabled = true;
 
 			if ( changed )

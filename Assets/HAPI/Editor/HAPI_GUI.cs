@@ -182,7 +182,17 @@ public class HAPI_GUI : Editor
 									  string[] dropdown_labels,
 									  T[] dropdown_values )
 	{
+		return dropdown( name, label, ref value, dropdown_labels, false, dropdown_values );
+	}
+	
+	public static bool dropdown< T >( string name, string label, 
+									  ref T value,
+									  string[] dropdown_labels,
+									  bool is_bold,
+									  T[] dropdown_values )
+	{
 		HAPI_GUIParm parm = new HAPI_GUIParm( name, label, 1 );
+		parm.isBold = is_bold;
 		T[] values = new T[ 1 ];
 		values[ 0 ] = value;
 		bool changed = dropdown( ref parm, ref values, dropdown_labels, dropdown_values );
@@ -741,7 +751,13 @@ public class HAPI_GUI : Editor
 	
 	public static bool toggle( string name, string label, ref bool value )
 	{
+		return toggle( name, label, false, ref value );
+	}
+	
+	public static bool toggle( string name, string label, bool is_bold, ref bool value )
+	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
+		gui_parm.isBold = is_bold;
 		int[] values = new int[ 1 ];
 		values[ 0 ] = ( value ? 1 : 0 );
 		bool result = toggle( ref gui_parm, ref values );
