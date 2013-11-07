@@ -154,14 +154,6 @@ namespace HAPI
 			out int answer );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern HAPI_Result
-		HAPI_LoadOTLFile( 
-			string file_path,
-			int min_vertices_per_primitive,
-			int max_vertices_per_primitive,
-			out HAPI_AssetId asset_id );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result 
 		HAPI_LoadAssetLibraryFromFile(
 			string file_path,

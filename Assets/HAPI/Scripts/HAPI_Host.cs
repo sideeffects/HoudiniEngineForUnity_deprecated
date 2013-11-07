@@ -551,7 +551,6 @@ namespace HAPI
 			if ( !initialize() )
 				throw new HAPI_Error( "DLL Not Found." );
 
-#if false
 			int library_id = -1;
 
 			HAPI_Result status_code = HAPI_LoadAssetLibraryFromFile( path, out library_id );
@@ -569,30 +568,17 @@ namespace HAPI
 			for ( int i = 0; i < asset_count; ++i )
 			{
 				asset_names[ i ] = getString( asset_names_sh[ i ] );
-				Debug.Log( asset_names[ i ] );
+				//Debug.Log( asset_names[ i ] );
 			}
 
 			int asset_id = -1;
 			string first_asset_name = asset_names[ 0 ];
 			status_code = HAPI_InstantiateAsset(
-				first_asset_name, false,
+				first_asset_name, true,
 				HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
 				HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
 				out asset_id );
 			processStatusCode( status_code );
-
-			EditorUtility.DisplayDialog( "", "Asset loaded. Proceed to cooking?", "Ok" );
-
-			cookAsset( asset_id );
-#else
-			int asset_id = 0;
-			HAPI_Result status_code = HAPI_LoadOTLFile(
-				path,
-				HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
-				HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
-				out asset_id );
-			processStatusCode( status_code );
-#endif
 
 			return asset_id;
 		}
