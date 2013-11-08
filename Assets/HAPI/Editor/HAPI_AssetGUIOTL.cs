@@ -62,46 +62,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 				if ( GUILayout.Button( "Recook" ) )
 					myAssetOTL.buildClientSide();
-			
-				EditorGUILayout.BeginHorizontal(); 
-				{
-					if ( GUILayout.Button( "Export To Hip File..." ) ) 
-					{
-						string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
-						if ( hip_file_path != "" && HAPI_Host.hasScene() )
-							HAPI_Host.exportAssetToHIPFile( myAssetOTL.prAssetId, hip_file_path );
-						else
-							Debug.LogError( "Nothing to save." );
-					}
-					
-					if ( GUILayout.Button( "Replace From Hip File..." ) ) 
-					{
-						string hip_file_path = EditorUtility.OpenFilePanel( "Import HIP File", "", "hip" );
-						if ( hip_file_path != "" && HAPI_Host.hasScene() )
-						{
-							try
-							{
-								HAPI_Host.replaceAssetFromHIPFile( myAssetOTL.prAssetId, hip_file_path );
-							}
-							catch ( HAPI_Error error )
-							{
-								Debug.LogError( error.ToString() );
-							}
-							
-							myAssetOTL.build(	true,	// reload_asset
-												false,	// unload_asset_first
-												false,	// serialization_recovery_only
-												true,	// force_reconnect
-												myAsset.prCookingTriggersDownCooks,
-												true	// use_progress_bar_delay
-											);
-						}
-						else
-							Debug.LogError( "Nothing to save." );
-					}
-					
-				} 
-				EditorGUILayout.EndHorizontal();
 			}
 			
 			string path = myAssetOTL.prAssetPath;

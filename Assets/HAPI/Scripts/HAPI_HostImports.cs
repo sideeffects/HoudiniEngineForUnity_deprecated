@@ -251,14 +251,6 @@ namespace HAPI
 		private static extern HAPI_Result
 		HAPI_SaveHIPFile( string file_name );
 
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern HAPI_Result
-		HAPI_ExportAssetToHIPFile( HAPI_AssetId asset_id, string file_name );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern HAPI_Result
-		HAPI_ReplaceAssetFromHIPFile( HAPI_AssetId asset_id, string file_name );
-
 		// NODES ----------------------------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
