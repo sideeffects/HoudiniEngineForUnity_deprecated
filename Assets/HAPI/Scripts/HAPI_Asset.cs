@@ -1037,10 +1037,6 @@ public abstract class HAPI_Asset : HAPI_Control
 				foreach ( HAPI_Parms parms in GetComponentsInChildren< HAPI_Parms >() )
 					parms.getParameterValues();
 
-				// Create local object info caches (transforms need to be stored in a parallel array).
-				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
-				prObjectTransforms = new HAPI_Transform[ prObjectCount ];
-
 				// Custom work during a full build (custom to each subclass).
 				buildFullBuildCustomWork( ref progress_bar );
 			}
@@ -1050,6 +1046,13 @@ public abstract class HAPI_Asset : HAPI_Control
 				progress_bar.displayProgressBar();
 				updateParameters( progress_bar );
 			}
+			
+			// Create local object info caches (transforms need to be stored in a parallel array).
+			if ( prObjects == null || prObjects.Length != prObjectCount )
+				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
+			
+			if ( prObjectTransforms == null || prObjectTransforms.Length != prObjectCount )
+				prObjectTransforms = new HAPI_Transform[ prObjectCount ];
 			
 			// Refresh object info arrays as they are lost after serialization.
 			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
