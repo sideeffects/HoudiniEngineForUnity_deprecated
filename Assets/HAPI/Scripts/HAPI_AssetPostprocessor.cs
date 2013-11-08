@@ -55,7 +55,7 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						{
 							try
 							{
-								HAPI_Host.unloadOTL( prefab_asset.prBackupAssetId );
+								HAPI_Host.destroyAsset( prefab_asset.prBackupAssetId );
 							}
 							catch ( HAPI_Error error )
 							{

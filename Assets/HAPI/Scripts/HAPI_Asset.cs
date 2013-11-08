@@ -244,7 +244,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			try
 			{
-				HAPI_Host.unloadOTL( prAssetId );
+				HAPI_Host.destroyAsset( prAssetId );
 			}
 			catch ( HAPI_Error error )
 			{
@@ -587,7 +587,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 			try
 			{
-				HAPI_Host.unloadOTL( prAssetId );
+				HAPI_Host.destroyAsset( prAssetId );
 			}
 			catch ( HAPI_Error error )
 			{
@@ -892,7 +892,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					// to delete this HAPI asset and create a new one for this OTL.
 					try
 					{
-						HAPI_Host.unloadOTL( prAssetId );
+						HAPI_Host.destroyAsset( prAssetId );
 					}
 					catch ( HAPI_Error ) {}
 
@@ -941,7 +941,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					{
 						try
 						{
-							HAPI_Host.unloadOTL( prAssetId );
+							HAPI_Host.destroyAsset( prAssetId );
 						}
 						catch ( HAPI_Error ) {}
 					}

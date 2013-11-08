@@ -186,11 +186,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_UnloadOTLFile( HAPI_AssetId asset_id );
-
-		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
-		private static extern HAPI_Result
-		HAPI_UnloadAsset( HAPI_AssetId asset_id );
+		HAPI_DestroyAsset( HAPI_AssetId asset_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result

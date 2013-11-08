@@ -627,12 +627,12 @@ namespace HAPI
 			return asset_id;
 		}
 		
-		public static bool unloadOTL( int asset_id ) 
+		public static bool destroyAsset( int asset_id ) 
 		{
 			if ( asset_id < 0 )
 				return false;
 			
-			HAPI_Result result = HAPI_UnloadOTLFile( asset_id );
+			HAPI_Result result = HAPI_DestroyAsset( asset_id );
 			
 			processStatusCode( result );
 			
