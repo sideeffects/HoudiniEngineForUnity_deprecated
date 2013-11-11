@@ -928,8 +928,7 @@ public abstract class HAPI_Asset : HAPI_Control
 							"Asset Loaded - Path: " + prAssetInfo.instancePath + "\n" +
 							"ID: " + prAssetInfo.id + "\n" +
 							"Version: " + prAssetInfo.version + "\n" + 
-							"Full Name: " + prAssetInfo.fullOpName + "\n" +
-							"Fuller Name: " + prAssetInfo.definitionSource );
+							"Full Name: " + prAssetInfo.fullOpName );
 				}
 				catch ( HAPI_Error error )
 				{

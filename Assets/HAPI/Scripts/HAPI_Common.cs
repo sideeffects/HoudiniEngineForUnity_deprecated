@@ -459,7 +459,6 @@ namespace HAPI
 
 		private HAPI_StringHandle versionSH; // User-defined asset version.
 		private HAPI_StringHandle fullOpNameSH; // Full asset name and namespace.
-		private HAPI_StringHandle definitionSourceSH; // Even more verbose asset name.
 		private HAPI_StringHandle helpTextSH; // Asset help marked-up text.
 
 		public int objectCount;
@@ -486,8 +485,6 @@ namespace HAPI
 		{ get { return HAPI_Host.getString( versionSH ); } private set {} }
 		public string fullOpName
 		{ get { return HAPI_Host.getString( fullOpNameSH ); } private set {} }
-		public string definitionSource
-		{ get { return HAPI_Host.getString( definitionSourceSH ); } private set {} }
 		public string helpText
 		{ get { return HAPI_Host.getString( helpTextSH ); } private set {} }
 	}
