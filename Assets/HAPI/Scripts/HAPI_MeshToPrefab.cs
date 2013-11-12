@@ -1,11 +1,14 @@
 using UnityEngine;
 using System.Collections;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System.Collections.Generic;
 
 using HAPI;
 
 public class HAPI_MeshToPrefab : MonoBehaviour {
+#if UNITY_EDITOR
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -121,5 +124,5 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	// Private Members
 	
 	
-	
+#endif // UNITY_EDITOR
 }

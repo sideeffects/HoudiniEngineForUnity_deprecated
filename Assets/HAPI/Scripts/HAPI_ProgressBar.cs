@@ -1,12 +1,14 @@
 using UnityEngine;
-using System.Collections;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
+using System.Collections;
 using System.Collections.Generic;
 
 using HAPI;
 
 public class HAPI_ProgressBar  {
-	
+#if UNITY_EDITOR	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -182,5 +184,5 @@ public class HAPI_ProgressBar  {
 	// Used to reduce the update frequency of the progress bar so it doesn't flicker.
 	private int					myLastValue;
 	private string				myLastMsg;
-
+#endif // UNITY_EDITOR
 }

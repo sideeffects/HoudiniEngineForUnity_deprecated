@@ -1,5 +1,7 @@
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 
 #if UNITY_STANDALONE_WIN
 using Microsoft.Win32;
@@ -7,9 +9,11 @@ using Microsoft.Win32;
 
 namespace HAPI 
 {
+#if UNITY_EDITOR
 	[ InitializeOnLoad ]
+#endif // UNITY_EDITOR
 	public class HAPI_SetPath {
-	
+#if UNITY_EDITOR
 		static HAPI_SetPath()
 		{
 			setPath();
@@ -18,6 +22,7 @@ namespace HAPI
 		public static string getHoudiniPath()
 		{
 			string houdini_app_path = "";
+#if UNITY_STANDALONE_WIN
 			string hapi_path = System.Environment.GetEnvironmentVariable( "HAPI_PATH", 
 																		  System.EnvironmentVariableTarget.Machine );
 			if ( hapi_path == null || hapi_path.Length == 0 )
@@ -59,6 +64,7 @@ namespace HAPI
 					break;
 				}
 			}
+#endif // UNITY_STANDALONE_WIN
 
 			return houdini_app_path;
 		}
@@ -73,6 +79,7 @@ namespace HAPI
 				string houdini_app_path = getHoudiniPath();
 				string houdini_bin_path = houdini_app_path + "/bin";
 
+#if UNITY_STANDALONE_WIN
 				string path = System.Environment.GetEnvironmentVariable( "PATH", 
 																		 System.EnvironmentVariableTarget.Machine );
 			
@@ -87,6 +94,7 @@ namespace HAPI
 			
 				prHoudiniPath = houdini_app_path;
 				myIsPathSet = true;
+#endif // UNITY_STANDALONE_WIN
 			}
 			catch ( HAPI_Error error )
 			{
@@ -100,6 +108,9 @@ namespace HAPI
 		private static string getAppPath( string app_name )
 		{
 			string app_path = "";
+
+			if ( BuildPipeline.isBuildingPlayer )
+				return app_path;
 
 #if UNITY_STANDALONE_WIN
 			// For Windows, we look at the registry entries made by the Houdini installer. We look for the 
@@ -131,9 +142,8 @@ namespace HAPI
 #else
 			// TODO: Add support for other platforms (only whichever platforms the Unity Editor supports).
 
-			#error "Your current platform is not yet fully supported. Binaries search path not set."
+			//#error "Your current platform is not yet fully supported. Binaries search path not set."
 			Debug.LogError( "Your current platform is not yet full support. Binaries search path not set." );
-			return;
 
 #endif // UNITY_STANDALONE_WIN
 
@@ -141,6 +151,7 @@ namespace HAPI
 		}
 
 		private static bool myIsPathSet = false;
+#endif // UNITY_EDITOR
 	}
 	
 } // namespace HAPI

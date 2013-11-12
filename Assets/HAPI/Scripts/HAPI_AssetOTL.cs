@@ -16,7 +16,9 @@
 #define ENABLE_PARTICLES
 
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,6 +29,7 @@ using Utility = HAPI_AssetUtility;
 [ ExecuteInEditMode ]
 public class HAPI_AssetOTL : HAPI_Asset 
 {	
+#if UNITY_EDITOR
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -267,5 +270,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	[SerializeField]
 	private string			myAssetPath;
+#endif // UNITY_EDITOR
 	
 }

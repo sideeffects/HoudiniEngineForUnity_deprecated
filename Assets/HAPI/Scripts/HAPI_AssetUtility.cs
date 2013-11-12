@@ -15,7 +15,9 @@
  */
 
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ using HAPI;
 
 public class HAPI_AssetUtility
 {
+#if UNITY_EDITOR
 	// TRANSFORMS ------------------------------------------------------------------------------------------------------
 
 	public static Quaternion getQuaternion( Matrix4x4 m )
@@ -1577,4 +1580,5 @@ public class HAPI_AssetUtility
 						
 		}
 	}
+#endif // UNITY_EDITOR
 }

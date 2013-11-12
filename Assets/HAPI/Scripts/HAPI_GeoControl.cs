@@ -15,7 +15,9 @@
  */
 
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 using HAPI;
@@ -25,6 +27,7 @@ using HAPI_NodeId = System.Int32;
 
 public class HAPI_GeoControl : HAPI_ObjectControl 
 {
+#if UNITY_EDITOR
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -274,4 +277,5 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	[SerializeField] private HAPI_ObjectControl myObjectControl;
 
 	[SerializeField] private List< GameObject > myParts;
+#endif // UNITY_EDITOR
 }

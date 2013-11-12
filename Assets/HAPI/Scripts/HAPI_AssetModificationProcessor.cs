@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Callbacks;
 using System;
 using HAPI;
 
@@ -7,7 +8,7 @@ using HAPI;
 class HAPI_AssetModificationProcessor : UnityEditor.AssetModificationProcessor 
 {
 	
-	static void OnWillCreateAsset( string path )
+	static void OnWillCreateAsset( string assetPath )
 	{
 		//Debug.Log( "Will create asset" );
 	}
@@ -15,26 +16,13 @@ class HAPI_AssetModificationProcessor : UnityEditor.AssetModificationProcessor
 	static AssetDeleteResult OnWillDeleteAsset( string assetPath, RemoveAssetOptions option )
 	{
 		//Debug.Log ( "Will delete asset" );
-		/*if ( assetPath.EndsWith( ".prefab" ) )
-		{
-			GameObject prefab = AssetDatabase.LoadAssetAtPath( assetPath, typeof( GameObject ) ) as GameObject;
-			if ( prefab )
-			{
-				HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();
-				if ( prefab_asset )
-				{
-					try
-					{
-						HAPI_Host.unloadOTL( prefab_asset.prAssetId );
-					}
-					catch ( HAPI_Error error )
-					{
-						Debug.LogError( "Asset failed to unload: " + error.ToString() );
-					}
-				}
-			}
-		}*/
 		return AssetDeleteResult.DidNotDelete;
+	}
+	
+	static string[] OnWillSaveAssets( string[] assetPaths )
+	{
+		//Debug.Log( "Will save assets" );
+		return assetPaths;
 	}
 }
 

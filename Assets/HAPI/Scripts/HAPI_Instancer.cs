@@ -1,6 +1,8 @@
 using UnityEngine;
-using System.Collections;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
+using System.Collections;
 using System.Collections.Generic;
 using Utility = HAPI_AssetUtility;
 using System;
@@ -106,8 +108,9 @@ public class HAPI_CurvesCollection
 	
 }
 
-public class HAPI_Instancer : MonoBehaviour {
-	
+public class HAPI_Instancer : MonoBehaviour 
+{
+#if UNITY_EDITOR	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -809,5 +812,6 @@ public class HAPI_Instancer : MonoBehaviour {
 	[SerializeField] private int myNumInstances;
 	
 	private HAPI_CurvesCollection[] myCurvesCollection;
+#endif // UNITY_EDITOR
 	
 }

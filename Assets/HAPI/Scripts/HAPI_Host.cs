@@ -17,7 +17,9 @@
  */
 
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -101,9 +103,13 @@ namespace HAPI
 	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
 	/// 	Houdini runtime.
 	/// </summary>
+	//
+#if UNITY_EDITOR
 	[ InitializeOnLoad ]
+#endif // UNITY_EDITOR
 	public static partial class HAPI_Host
 	{
+#if UNITY_EDITOR
 		// Global Settings Defaults ---------------------------------------------------------------------------------
 
 		private const string myDefaultCollisionGroupName					= "collision_geo";
@@ -807,13 +813,14 @@ namespace HAPI
 		private static string getAllFoldersInPath( string path )
 		{
 			string paths = "";
-
+#if UNITY_STANDALONE_WIN
 			if ( !Directory.Exists( path ) )
 				return "";
 
 			DirectoryInfo di = new DirectoryInfo( path );
 			foreach ( DirectoryInfo child_directory in di.GetDirectories() )
 				paths += ";" + getAllFoldersInPath( child_directory.FullName );
+#endif // UNITY_STANDALONE_WIN
 
 			return path + paths;
 		}
@@ -920,6 +927,7 @@ namespace HAPI
 				setFloat( name + "_a", value.a );
 			}
 		}
+#endif // UNITY_EDITOR
 	}
 
 } // namespace HAPI

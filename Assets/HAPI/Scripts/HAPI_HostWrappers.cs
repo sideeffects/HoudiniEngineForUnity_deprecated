@@ -17,7 +17,6 @@
  */
 
 using UnityEngine;
-using UnityEditor;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -42,6 +41,7 @@ namespace HAPI
 	/// </summary>
 	public static partial class HAPI_Host
 	{
+#if UNITY_EDITOR
 		// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 
 		/// <summary>
@@ -2013,5 +2013,6 @@ namespace HAPI
 			HAPI_Result status_code = HAPI_GetVolumeTileFloatData( asset_id, object_id, geo_id, part_id, ref tile, values );
 			processStatusCode( status_code );
 		}
+#endif // UNITY_EDITOR
 	}
 }

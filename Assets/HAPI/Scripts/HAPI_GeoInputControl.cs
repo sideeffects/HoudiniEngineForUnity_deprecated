@@ -6,6 +6,7 @@ using HAPI;
 [ ExecuteInEditMode ]
 public class HAPI_GeoInputControl : HAPI_Control 
 {
+#if UNITY_EDITOR
 	public bool						prEnableCooking {				get { return myEnableCooking; }
 																	set { myEnableCooking = value; } }
 	
@@ -80,4 +81,5 @@ public class HAPI_GeoInputControl : HAPI_Control
 	[SerializeField] private bool					myEnableCooking;		
 	[SerializeField] private Matrix4x4				myLastLocalToWorld;
 	[SerializeField] private int					myInputObjectId;
+#endif // UNITY_EDITOR
 }

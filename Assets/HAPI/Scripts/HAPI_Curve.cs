@@ -15,7 +15,9 @@
  */
 
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,6 +32,7 @@ using HAPI_NodeId = System.Int32;
 [ RequireComponent( typeof( HAPI_Parms ) ) ]
 public class HAPI_Curve : MonoBehaviour
 {
+#if UNITY_EDITOR
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
 	
@@ -285,6 +288,9 @@ public class HAPI_Curve : MonoBehaviour
 			if ( gameObject.GetComponent< MeshRenderer >() == null )
 			{
 				MeshRenderer mesh_renderer = gameObject.AddComponent< MeshRenderer >();
+				// This prevents curve from appearing in game (applies to entire game object).
+				// Need this because the HAPI line shader doesn't work when building.
+				mesh_renderer.tag = "EditorOnly"; 
 		
 				// Set generic texture so it's not pink.
 				Material line_material = new Material( Shader.Find( "HAPI/Line" ) );
@@ -404,5 +410,6 @@ public class HAPI_Curve : MonoBehaviour
 
 	[SerializeField] private Mode				myCurrentMode;
 	[SerializeField] private bool				myModeChangeWait;
+#endif // UNITY_EDITOR
 
 }

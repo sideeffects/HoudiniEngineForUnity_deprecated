@@ -16,7 +16,6 @@
  */
 
 using UnityEngine;
-using UnityEditor;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -41,6 +40,7 @@ namespace HAPI
 	/// </summary>
 	public static partial class HAPI_Host
 	{
+#if UNITY_EDITOR
 		// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -683,6 +683,7 @@ namespace HAPI
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			ref HAPI_VolumeTileInfo tile,
 			[Out] int[] values );
+#endif // UNITY_EDITOR
 	}
 
 }

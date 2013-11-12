@@ -367,7 +367,7 @@ namespace HAPI
 	// Main API Structs
 	
 	// GENERICS -----------------------------------------------------------------------------------------------------
-	
+#if UNITY_EDITOR
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Transform 
 	{
@@ -932,5 +932,5 @@ namespace HAPI
 		public int minY;
 		public int minZ;
 	};
-
+#endif // UNITY_EDITOR
 }

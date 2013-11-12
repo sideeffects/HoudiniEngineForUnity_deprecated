@@ -15,7 +15,9 @@
  */
 
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -26,6 +28,7 @@ using Utility = HAPI_AssetUtility;
 [ ExecuteInEditMode ]
 public abstract class HAPI_Asset : HAPI_Control
 {
+#if UNITY_EDITOR
 	public enum AssetType
 	{
 		TYPE_OTL = 0,
@@ -252,6 +255,12 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 		}
 	}
+	
+	public virtual void Awake()
+	{
+		DontDestroyOnLoad( gameObject );
+	}
+
 	
 	public int findObjectByName( string object_name )
 	{
@@ -568,7 +577,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public virtual void OnDestroy()
 	{
-		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() )
+		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() && !BuildPipeline.isBuildingPlayer )
 		{
 			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
 				if ( upstream_asset != null )
@@ -629,6 +638,9 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void OnEnable()
 	{
+		if ( BuildPipeline.isBuildingPlayer )
+			return;
+
 		// If this asset is a prefab instance that is being reverted 
 		// reload the asset in order to restore it's asset id and 
 		// asset validation id from the backup and to load the preset
@@ -1712,4 +1724,5 @@ public abstract class HAPI_Asset : HAPI_Control
 	private bool myReloadPrefabOnPlaymodeChange;
 	private bool myCleanUpPrefabOTL;
 	[SerializeField] private string myUpdatePrefabInstanceParmName;
+#endif // UNITY_EDITOR
 }

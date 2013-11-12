@@ -15,7 +15,6 @@
  */
 
 using UnityEngine;
-using UnityEditor;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +24,7 @@ using Utility = HAPI_AssetUtility;
 [ ExecuteInEditMode ]
 public class HAPI_AssetCurve : HAPI_Asset
 {
+#if UNITY_EDITOR
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -110,5 +110,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 			//Debug.LogWarning( error.ToString() );
 		}
 	}
+#endif // UNITY_EDITOR
 
 }

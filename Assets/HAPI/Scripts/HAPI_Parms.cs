@@ -15,7 +15,9 @@
  */
 
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -30,6 +32,7 @@ using HAPI_NodeId = System.Int32;
 [ RequireComponent( typeof( HAPI_Control ) ) ]
 public class HAPI_Parms : MonoBehaviour
 {
+#if UNITY_EDITOR
 	public enum AssetType
 	{
 		TYPE_OTL = 0,
@@ -530,4 +533,5 @@ public class HAPI_Parms : MonoBehaviour
 	// Control ------------------------------------------------------------------------------------------------------
 
 	private bool myPostSerialization;
+#endif // UNITY_EDITOR
 }

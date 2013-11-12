@@ -16,7 +16,6 @@
  */
 
 using UnityEngine;
-using UnityEditor;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -30,6 +29,7 @@ namespace HAPI
 	/// </summary>
 	public static partial class HAPI_Host
 	{
+#if UNITY_EDITOR
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Public
 		
@@ -53,6 +53,7 @@ namespace HAPI
 		// Private
 		
 		// TODO: We would like to cache some strings eventually.
+#endif // UNITY_EDITOR	
 	}
 
 }

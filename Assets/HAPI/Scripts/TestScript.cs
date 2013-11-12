@@ -1,11 +1,14 @@
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif // UNITY_EDITOR
 using System.Runtime.Serialization;
 using System.Collections;
 
 [ExecuteInEditMode]
-public class TestScript : MonoBehaviour {
-	
+public class TestScript : MonoBehaviour 
+{
+#if UNITY_EDITOR
 	public int value;
 	public int[] prArr { get { return arr; } set { arr = value; } }
 	[SerializeField] int[] arr;
@@ -87,4 +90,5 @@ public class TestScript : MonoBehaviour {
 		Debug.Log( "TestScript: CustomFunc(3) - " + value );
 		value = 3;
 	}
+#endif // UNITY_EDITOR
 }
