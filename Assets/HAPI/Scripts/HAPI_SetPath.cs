@@ -108,9 +108,12 @@ namespace HAPI
 		private static string getAppPath( string app_name )
 		{
 			string app_path = "";
-
+			
+#if UNITY_4_3			
 			if ( BuildPipeline.isBuildingPlayer )
 				return app_path;
+#endif
+			
 
 #if UNITY_STANDALONE_WIN
 			// For Windows, we look at the registry entries made by the Houdini installer. We look for the 

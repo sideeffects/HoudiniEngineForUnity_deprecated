@@ -577,7 +577,13 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public virtual void OnDestroy()
 	{
-		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() && !BuildPipeline.isBuildingPlayer )
+
+		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() 
+#if UNITY_4_3					
+			&& !BuildPipeline.isBuildingPlayer
+#endif			
+			)
+
 		{
 			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
 				if ( upstream_asset != null )
@@ -638,9 +644,10 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void OnEnable()
 	{
+#if UNITY_4_3		
 		if ( BuildPipeline.isBuildingPlayer )
 			return;
-
+#endif
 		// If this asset is a prefab instance that is being reverted 
 		// reload the asset in order to restore it's asset id and 
 		// asset validation id from the backup and to load the preset
