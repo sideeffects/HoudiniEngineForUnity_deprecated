@@ -46,7 +46,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		if ( myAssetOTL == null )
 			return;
 		
-		int asset_id					= myAssetOTL.prAssetId;
+		int node_id						= myAssetOTL.prNodeId;
 		HAPI_HandleInfo[] handleInfos 	= myAssetOTL.prHandleInfos;
 		
 		if ( handleInfos == null )
@@ -238,7 +238,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
+						HAPI_Host.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
 						myAsset.savePreset();
 					} // if changed
@@ -278,7 +278,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
+						HAPI_Host.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
 						myAsset.savePreset();
 					} // if changed
@@ -301,7 +301,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
 						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HAPI_Host.setParmFloatValues( asset_id, temp_float_values, parm_info.floatValuesIndex, 
+						HAPI_Host.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
 						myAsset.savePreset();
 					} // if changed
