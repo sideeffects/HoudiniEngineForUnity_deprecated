@@ -367,8 +367,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	public void addAssetAsGeoInput( HAPI_Asset asset, int object_index, int index )
 	{
 		prUpStreamGeoAssets[ index ] = asset;
-		
-		// TODO: It's hard coded to be the 0th group - fix this!
+
 		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 
@@ -1524,7 +1523,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	protected virtual void processDependentAssets( bool serialization_recovery_only, bool force_reconnect, 
 												   bool use_delay_for_progress_bar )
 	{
-		bool has_built_something_upstream = false;
+		bool need_rebuild_after_reconnect = false;
 		
 		if ( !serialization_recovery_only && !force_reconnect )
 		{
@@ -1573,9 +1572,9 @@ public abstract class HAPI_Asset : HAPI_Control
 							prEnableCooking = false;
 							asset.OnEnable();
 							prEnableCooking = true;
-							has_built_something_upstream = true;
 						}
 						addAssetAsTransformInput( asset, i );
+						need_rebuild_after_reconnect = true;
 					}
 				}
 			}
@@ -1606,17 +1605,18 @@ public abstract class HAPI_Asset : HAPI_Control
 							prEnableCooking = false;
 							asset.OnEnable();
 							prEnableCooking = true;
-							has_built_something_upstream = true;
 						}
 						addAssetAsGeoInput( asset, object_index, i );
 					}
 					else
 						addGeoAsGeoInput( new_obj, i );
+
+					need_rebuild_after_reconnect = true;
 				}
 			}
 
 			// Need to rebuild because now we're connected to other assets.
-			if ( has_built_something_upstream )
+			if ( need_rebuild_after_reconnect )
 				build(	false, // reload_asset
 						false, // unload_asset_first
 						false, // serialization_recovery_only
