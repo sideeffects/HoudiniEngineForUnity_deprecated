@@ -55,9 +55,9 @@ public class HAPI_AssetUtility
 
 	public static Vector3 getScale( Matrix4x4 m )
 	{
-		var x = Mathf.Sqrt( m.m00 * m.m00 + m.m01 * m.m01 + m.m02 * m.m02 );
-		var y = Mathf.Sqrt( m.m10 * m.m10 + m.m11 * m.m11 + m.m12 * m.m12 );
-		var z = Mathf.Sqrt( m.m20 * m.m20 + m.m21 * m.m21 + m.m22 * m.m22 );
+		var x = Mathf.Sqrt( m.m00 * m.m00 + m.m10 * m.m10 + m.m20 * m.m20 );
+		var y = Mathf.Sqrt( m.m01 * m.m01 + m.m11 * m.m11 + m.m21 * m.m21 );
+		var z = Mathf.Sqrt( m.m02 * m.m02 + m.m12 * m.m12 + m.m22 * m.m22 );
 
 		return new Vector3( x, y, z );
 	}
