@@ -35,7 +35,13 @@ public class HAPI_Menu : MonoBehaviour
 		HAPI_GUIUtility.instantiateAsset( asset_file_path );
 	}
 	
-	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel, false, 1 ) ]
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLaunchOrboltPage, false, 1 ) ]
+	static private void launchOrboltPage() 
+	{
+		Application.OpenURL("http://www.orbolt.com");
+	}
+	
+	//[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel, false, 1 ) ]
 	static private void loadHipFile() 
 	{
 		string hip_file_path = HAPI_GUIUtility.promptForHIPPath();
