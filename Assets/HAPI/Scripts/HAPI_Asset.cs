@@ -641,6 +641,20 @@ public abstract class HAPI_Asset : HAPI_Control
 				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) );
 	}
 
+	public bool isDuplicatingAsset()
+	{
+		foreach ( HAPI_Asset asset in FindObjectsOfType< HAPI_Asset >() )
+		{
+			if ( asset.prAssetId == prAssetId &&
+			     asset.GetInstanceID() != GetInstanceID() )
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public virtual void OnEnable()
 	{
 #if UNITY_4_3		
@@ -676,6 +690,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				buildClientSide();
 			}
 			else if ( !isInstantiatingPrefab() &&
+			          !isDuplicatingAsset() &&
 				 	  HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
 			{
 				// Reloading asset after mode change or script-reload.
@@ -690,7 +705,8 @@ public abstract class HAPI_Asset : HAPI_Control
 			else
 			{
 				// Loading Scene (no Houdini scene exists yet) or 
-				// instantiating a prefab
+				// instantiating a prefab or duplicating an existing
+				// asset
 				prAssetId = -1;
 				build(	true,	// reload_asset
 						true,	// unload_asset_first
@@ -1130,6 +1146,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		// Update prefab instance after parameter change on prefab if needed
 		if ( isPrefabInstance() && prUpdatePrefabInstanceParmName != String.Empty )
 		{
+			HAPI_Asset prefab_asset = getParentPrefabAsset();
 			int parm_id = prParms.findParm( prUpdatePrefabInstanceParmName );
 			
 			if( parm_id >= 0 )
@@ -1162,19 +1179,23 @@ public abstract class HAPI_Asset : HAPI_Control
 					// automatically by the prefab value as it is done
 					// with float and int parameters
 					HAPI_ParmInfo parm_info = prParms.findParm( parm_id );
-					if ( parm_info.isString() )
+					if ( parm_info.isString() && prefab_asset )
 					{
-						HAPI_Asset prefab_asset = getParentPrefabAsset();
-						if ( prefab_asset )
-						{
-							int prefab_parm_id = prefab_asset.prParms.findParm( prUpdatePrefabInstanceParmName );
-							string[] values = prefab_asset.prParms.getParmStrings( prefab_asset.prParms.findParm( prefab_parm_id ) );
-							prParms.setParmStrings( parm_info, values );
-						}
+						int prefab_parm_id = prefab_asset.prParms.findParm( prUpdatePrefabInstanceParmName );
+						string[] values = prefab_asset.prParms.getParmStrings( prefab_asset.prParms.findParm( prefab_parm_id ) );
+						prParms.setParmStrings( parm_info, values );
 					}
 				}
 			}
 			prUpdatePrefabInstanceParmName = "";
+
+			// Need to set prUpdatePrefabInstanceParmName back to empty on prefab if
+			// it hasn't been already. We do not set prefab to be dirty so that other
+			// prefab instances that still need this value will not be affected.
+			if ( prefab_asset && prefab_asset.prUpdatePrefabInstanceParmName != String.Empty )
+			{
+				prefab_asset.prUpdatePrefabInstanceParmName = "";
+			}
 		}
 		
 		prParms.setChangedParametersIntoHost();
