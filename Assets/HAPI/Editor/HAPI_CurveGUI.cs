@@ -777,8 +777,8 @@ public class HAPI_CurveGUI : Editor
 		string title_text = HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Curve";
 		string add_hotkey_string = HAPI_Host.prAddingPointsModeHotKey.ToString();
 		string edit_hotkey_string = HAPI_Host.prEditingPointsModeHotKey.ToString();
-		string help_text = "<b>" + add_hotkey_string + "</b>: add points | <b>" + 
-						   edit_hotkey_string + "</b>: edit points";
+		string help_text = "" + add_hotkey_string + ": add points | " + 
+						   edit_hotkey_string + ": edit points";
 
 		int skin = EditorPrefs.GetInt( "UserSkin" );
 		Color box_color = ( skin == 0 ? mySceneUILightColour : mySceneUIDarkColour );
@@ -790,17 +790,17 @@ public class HAPI_CurveGUI : Editor
 		}
 		if ( myCurve.prIsAddingPoints )
 		{
-			help_text = "<b>Click</b> in space: add next point | <b>Click</b> a line segment: add midpoint | <b>Backspace</b>: delete last point | <b>ESC</b> or <b>Enter</b>: exit mode";
+			help_text = "Click in space: add next point | Click a line segment: add midpoint | Backspace: delete last point | ESC or Enter: exit mode";
 			box_color = HAPI_Host.prAddingPointsModeColour;
 		}
 		else if ( myCurve.prIsEditingPoints )
 		{
-			help_text = "<b>Click</b> or <b>drag</b>: select points | <b>Delete</b>: delete selected | Hold <b>Control</b>: toggle-based selection | <b>ESC</b> or <b>Enter</b>: exit mode";
+			help_text = "Click or drag: select points | Delete: delete selected | Hold Control: toggle-based selection | ESC or Enter: exit mode";
 			box_color = HAPI_Host.prEditingPointsModeColour;
 		}
 
 		if ( !mySceneWindowHasFocus && myCurve.prEditable )
-			help_text = "Scene window doesn't have focus. <b>Hotkeys may not work</b>. Right click anywhere in the scene to focus.";
+			help_text = "Scene window doesn't have focus. Hotkeys may not work. Right click anywhere in the scene to focus.";
 
 		Color original_color		= GUI.color;
 		
