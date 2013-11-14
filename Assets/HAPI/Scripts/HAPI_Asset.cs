@@ -645,7 +645,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public bool isDuplicatingAsset()
 	{
-		foreach ( HAPI_Asset asset in FindObjectsOfType< HAPI_Asset >() )
+		foreach ( HAPI_Asset asset in FindObjectsOfType( typeof( HAPI_Asset ) ) as HAPI_Asset[] )
 		{
 			if ( asset.prAssetId == prAssetId &&
 			     asset.GetInstanceID() != GetInstanceID() )
