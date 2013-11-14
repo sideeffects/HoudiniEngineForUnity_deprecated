@@ -690,8 +690,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				buildClientSide();
 			}
 			else if ( !isInstantiatingPrefab() &&
-			          !isDuplicatingAsset() &&
-				 	  HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
+				 	  HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) &&
+			          !isDuplicatingAsset() )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
@@ -1147,10 +1147,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( isPrefabInstance() && prUpdatePrefabInstanceParmName != String.Empty )
 		{
 			HAPI_Asset prefab_asset = getParentPrefabAsset();
-			int parm_id = prParms.findParm( prUpdatePrefabInstanceParmName );
-			
-			if( parm_id >= 0 )
+
+			try
 			{
+				HAPI_ParmInfo parm_info = prParms.findParm( prUpdatePrefabInstanceParmName );
+			
 				// Do not apply changes from prefab in the following cases: 
 				// Case 1: Parameter on prefab that has been changed is a
 				// transform parameter
@@ -1161,7 +1162,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				if( prUpdatePrefabInstanceParmName == "r" || 
 					prUpdatePrefabInstanceParmName == "s" ||
 					prUpdatePrefabInstanceParmName == "t" ||
-					prParms.isParmOverridden( parm_id ) )
+					prParms.isParmOverridden( parm_info.id ) )
 				{
 					// re-acquire parameters
 					prParms.getParameterValues();
@@ -1170,7 +1171,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				// instance and build.
 				else
 				{
-					prParms.prLastChangedParmId = parm_id;
+					prParms.prLastChangedParmId = parm_info.id;
 					
 					// if the parameter is a string we need to manually
 					// get the string value from the prefab because the
@@ -1178,15 +1179,17 @@ public abstract class HAPI_Asset : HAPI_Control
 					// is not serialized so the value isn't overridden 
 					// automatically by the prefab value as it is done
 					// with float and int parameters
-					HAPI_ParmInfo parm_info = prParms.findParm( parm_id );
 					if ( parm_info.isString() && prefab_asset )
 					{
-						int prefab_parm_id = prefab_asset.prParms.findParm( prUpdatePrefabInstanceParmName );
-						string[] values = prefab_asset.prParms.getParmStrings( prefab_asset.prParms.findParm( prefab_parm_id ) );
+						HAPI_ParmInfo prefab_parm_info = prefab_asset.prParms.findParm( prUpdatePrefabInstanceParmName );
+						string[] values = prefab_asset.prParms.getParmStrings( prefab_parm_info );
+
 						prParms.setParmStrings( parm_info, values );
 					}
 				}
 			}
+			catch {}
+
 			prUpdatePrefabInstanceParmName = "";
 
 			// Need to set prUpdatePrefabInstanceParmName back to empty on prefab if
@@ -1438,32 +1441,26 @@ public abstract class HAPI_Asset : HAPI_Control
 		HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
 		HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );
 
-		int parm = -1;
 		float [] parm_data = new float[ 3 ];
 
-		parm = prParms.findParm( "t" );
-		if ( parm > 0 )
+		try
 		{
-			HAPI_Host.getParmFloatValues( prNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
+			HAPI_ParmInfo parm_info = prParms.findParm( "t" );
+			HAPI_Host.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
-		}
+				prParms.prParmFloatValues[ parm_info.floatValuesIndex + i ] = parm_data[ i ];
 
-		parm = prParms.findParm( "r" );
-		if ( parm > 0 )
-		{
-			HAPI_Host.getParmFloatValues( prNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
+			parm_info = prParms.findParm( "r" );
+			HAPI_Host.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
-		}
+				prParms.prParmFloatValues[ parm_info.floatValuesIndex + i ] = parm_data[ i ];
 
-		parm = prParms.findParm( "s" );
-		if ( parm > 0 )
-		{
-			HAPI_Host.getParmFloatValues( prNodeId, parm_data, prParms.findParm( parm ).floatValuesIndex, 3 );
+			parm_info = prParms.findParm( "s" );
+			HAPI_Host.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
-				prParms.prParmFloatValues[ prParms.findParm( parm ).floatValuesIndex + i ] = parm_data[ i ];
+				prParms.prParmFloatValues[ parm_info.floatValuesIndex + i ] = parm_data[ i ];
 		}
+		catch {}
 	}
 	
 	protected void initAssetConnections()

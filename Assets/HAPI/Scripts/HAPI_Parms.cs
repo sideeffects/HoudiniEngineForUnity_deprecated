@@ -189,16 +189,18 @@ public class HAPI_Parms : MonoBehaviour
 		return myParmMap[ id ];
 	}
 
-	public virtual int findParm( string name )
+	public virtual HAPI_ParmInfo findParm( string name )
 	{
 		if ( prParms == null )
-			return -1;
+		{
+			throw new HAPI_ErrorNotFound( "Parameters have not been initialized!" );
+		}
 
 		for ( int i = 0; i < prParms.Length; ++i )
 			if ( prParms[ i ].name == name )
-				return prParms[ i ].id;
+				return prParms[ i ];
 
-		return -1;
+		throw new HAPI_ErrorNotFound( "Parameter with the name " + name + " does not exist!" );
 	}
 	
 	public bool isParmOverridden( int parm_id )
@@ -223,6 +225,115 @@ public class HAPI_Parms : MonoBehaviour
 						HAPI_Host.getString( prParmStringValues[ parm.stringValuesIndex + p ] );
 			}
 		}
+	}
+
+	public int getParmIntValue( string name, int index )
+	{
+		try
+		{
+			HAPI_ParmInfo parm_info = findParm( name );
+
+			if ( parm_info.isInt() )
+				return prParmIntValues[ parm_info.intValuesIndex + index ];
+		}
+		catch {}
+
+		throw new HAPI_ErrorInvalidArgument( name + " is not an int!" );
+	}
+
+	public float getParmFloatValue( string name, int index )
+	{
+		try
+		{
+			HAPI_ParmInfo parm_info = findParm( name );
+			
+			if ( parm_info.isFloat() )
+				return prParmFloatValues[ parm_info.floatValuesIndex + index ];
+		}
+		catch {}
+
+		throw new HAPI_ErrorInvalidArgument( name + " is not a float!" );
+	}
+
+	public string getParmStringValue( string name, int index )
+	{
+		try
+		{
+			HAPI_ParmInfo parm_info = findParm( name );
+			
+			if ( parm_info.isString() )
+				return myParmStrings[ parm_info.id ][ index ];
+		}
+		catch {}
+
+		throw new HAPI_ErrorInvalidArgument( name + " is not a string!" );
+	}
+
+	public void setParmIntValue( string name, int index, int value )
+	{
+		try
+		{
+			HAPI_ParmInfo parm_info = findParm( name );
+
+			if ( !parm_info.isInt() )
+				throw new HAPI_ErrorInvalidArgument( name + " is not an int!" );
+
+			int values_index = parm_info.intValuesIndex + index;
+			int[] int_value = { value };
+			
+			HAPI_Host.setParmIntValues( prControl.prNodeId, int_value, values_index, 1 );
+
+			prControl.prAsset.buildClientSide();
+		}
+		catch {}
+	}
+
+	public void setParmFloatValue( string name, int index, float value )
+	{
+		try
+		{
+			HAPI_ParmInfo parm_info = findParm( name );
+		
+			if ( !parm_info.isFloat() )
+				throw new HAPI_ErrorInvalidArgument( name + " is not a float!" );
+
+			int values_index = parm_info.floatValuesIndex + index;
+			float[] float_value = { value };
+			
+			HAPI_Host.setParmFloatValues( prControl.prNodeId, float_value, values_index, 1 );
+
+			prControl.prAsset.buildClientSide();
+		}
+		catch {}
+	}
+
+	public void setParmStringValue( string name, int index, string value )
+	{
+		try
+		{
+			HAPI_ParmInfo parm_info = findParm( name );
+
+			if ( !parm_info.isString() )
+				throw new HAPI_ErrorInvalidArgument( name + " is not a string!" );
+
+			HAPI_Host.setParmStringValue( prControl.prNodeId, value, parm_info.id, index );
+
+			prControl.prAsset.buildClientSide();
+		}
+		catch {}
+	}
+
+
+	public string[] getParameterNames()
+	{
+		string[] names = new string[ prParms.Length ];
+
+		for ( int i = 0; i < prParms.Length; i++ )
+		{
+			names[ i ] = prParms[ i ].name;
+		}
+
+		return names;
 	}
 
 	public void getParameterValues()

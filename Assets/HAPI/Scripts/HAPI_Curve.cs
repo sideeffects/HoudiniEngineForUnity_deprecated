@@ -167,38 +167,40 @@ public class HAPI_Curve : MonoBehaviour
 
 	public void syncPointsWithParm()
 	{
-		// Find the parm.
-		int coords_parm_id = prParms.findParm( "coords" );
-		if ( coords_parm_id < 0 )
-			return;
-
-		string point_list = 
-			HAPI_Host.getString( prParms.prParmStringValues[ prParms.findParm( coords_parm_id ).stringValuesIndex ] );
-
-		if ( point_list == null )
-			return;
-
-		// Clear all existing points.
-		prPoints.Clear();
-
-		// Parse parm value for the points.
-		string [] point_split = point_list.Split( new char [] { ' ' } );
-		for ( int i = 0; i < point_split.Length; ++i )
+		try
 		{
-			string vec_str = point_split[ i ];
-			string [] vec_split = vec_str.Split( new char [] { ',' } );
+			// Find the parm.
+			HAPI_ParmInfo coords_parm_info = prParms.findParm( "coords" );
 
-			if ( vec_split.Length == 3 )
+			string point_list = 
+				HAPI_Host.getString( prParms.prParmStringValues[ coords_parm_info.stringValuesIndex ] );
+
+			if ( point_list == null )
+				return;
+
+			// Clear all existing points.
+			prPoints.Clear();
+
+			// Parse parm value for the points.
+			string [] point_split = point_list.Split( new char [] { ' ' } );
+			for ( int i = 0; i < point_split.Length; ++i )
 			{
-				Vector3 vec = new Vector3();
+				string vec_str = point_split[ i ];
+				string [] vec_split = vec_str.Split( new char [] { ',' } );
 
-				vec.x = (float) -System.Convert.ToDouble( vec_split[ 0 ] );
-				vec.y = (float)  System.Convert.ToDouble( vec_split[ 1 ] );
-				vec.z = (float)  System.Convert.ToDouble( vec_split[ 2 ] );
+				if ( vec_split.Length == 3 )
+				{
+					Vector3 vec = new Vector3();
 
-				prPoints.Add( vec );
+					vec.x = (float) -System.Convert.ToDouble( vec_split[ 0 ] );
+					vec.y = (float)  System.Convert.ToDouble( vec_split[ 1 ] );
+					vec.z = (float)  System.Convert.ToDouble( vec_split[ 2 ] );
+
+					prPoints.Add( vec );
+				}
 			}
 		}
+		catch {}
 	}
 
 	public void reset()
@@ -316,26 +318,29 @@ public class HAPI_Curve : MonoBehaviour
 		// TODO: Make the defaults editable.
 		// TODO: Make generic update parm value functions.
 
-		int primitive_type_parm				= prParms.findParm( "type" );
-		int method_parm						= prParms.findParm( "method" );
-		int primitive_type_parm_default		= HAPI_Host.prCurvePrimitiveTypeDefault;
-		int method_parm_default				= HAPI_Host.prCurveMethodDefault;
+		try
+		{
+			HAPI_ParmInfo primitive_type_parm	= prParms.findParm( "type" );
+			HAPI_ParmInfo method_parm			= prParms.findParm( "method" );
+			int primitive_type_parm_default		= HAPI_Host.prCurvePrimitiveTypeDefault;
+			int method_parm_default				= HAPI_Host.prCurveMethodDefault;
+			int primitive_type_parm_int_values	= primitive_type_parm.intValuesIndex;
+			int method_parm_int_values			= method_parm.intValuesIndex;
 
-		int primitive_type_parm_int_values	= prParms.findParm( primitive_type_parm ).intValuesIndex;
-		int method_parm_int_values			= prParms.findParm( method_parm ).intValuesIndex;
+			prParms.prParmIntValues[ primitive_type_parm_int_values ]	= primitive_type_parm_default;
+			prParms.prParmIntValues[ method_parm_int_values ]			= method_parm_default;
 
-		prParms.prParmIntValues[ primitive_type_parm_int_values ]	= primitive_type_parm_default;
-		prParms.prParmIntValues[ method_parm_int_values ]			= method_parm_default;
+			int[] temp_int_values = new int[ 1 ];
 
-		int[] temp_int_values = new int[ 1 ];
+			temp_int_values[ 0 ] = primitive_type_parm_default;
+			HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, primitive_type_parm.intValuesIndex, 1 );
 
-		temp_int_values[ 0 ] = primitive_type_parm_default;
-		HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, prParms.findParm( primitive_type_parm ).intValuesIndex, 1 );
-		
-		temp_int_values[ 0 ] = method_parm_default;
-		HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, prParms.findParm( method_parm ).intValuesIndex, 1 );
-		
-		HAPI_Host.cookAsset( prControl.prAsset.prAssetId );
+			temp_int_values[ 0 ] = method_parm_default;
+			HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, method_parm.intValuesIndex, 1 );
+			
+			HAPI_Host.cookAsset( prControl.prAsset.prAssetId );
+		}
+		catch {}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

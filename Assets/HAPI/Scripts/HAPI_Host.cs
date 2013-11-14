@@ -744,6 +744,11 @@ namespace HAPI
 				}
 			}
 		}
+
+		public static HAPI_Asset[] getAssets()
+		{
+			return UnityEngine.Object.FindObjectsOfType( typeof( HAPI_Asset ) ) as HAPI_Asset[];
+		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Private
