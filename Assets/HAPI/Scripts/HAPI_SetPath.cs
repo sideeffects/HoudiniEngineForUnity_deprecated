@@ -76,10 +76,10 @@ namespace HAPI
 			
 			try
 			{
+#if UNITY_STANDALONE_WIN
 				string houdini_app_path = getHoudiniPath();
 				string houdini_bin_path = houdini_app_path + "/bin";
 
-#if UNITY_STANDALONE_WIN
 				string path = System.Environment.GetEnvironmentVariable( "PATH", 
 																		 System.EnvironmentVariableTarget.Machine );
 			
@@ -109,11 +109,10 @@ namespace HAPI
 		{
 			string app_path = "";
 			
-#if UNITY_4_3			
+#if UNITY_4_3
 			if ( BuildPipeline.isBuildingPlayer )
 				return app_path;
-#endif
-			
+#endif // UNITY_4_3
 
 #if UNITY_STANDALONE_WIN
 			// For Windows, we look at the registry entries made by the Houdini installer. We look for the 

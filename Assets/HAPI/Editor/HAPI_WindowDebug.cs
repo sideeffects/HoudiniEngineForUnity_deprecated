@@ -24,6 +24,11 @@ using HAPI;
 
 public class HAPI_WindowDebug : EditorWindow 
 {
+#if !UNITY_STANDALONE_WIN
+	#pragma warning disable 0414
+	#pragma warning disable 0649
+#endif // !UNITY_STANDALONE_WIN
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 
@@ -47,7 +52,13 @@ public class HAPI_WindowDebug : EditorWindow
 	
 	public void OnGUI() 
 	{
-		
+		bool gui_enable = GUI.enabled;
+
+#if !UNITY_STANDALONE_WIN
+		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+		GUI.enabled = false;
+#endif // !UNITY_STANDALONE_WIN
+
 		if ( GUILayout.Button( HAPI_GUIUtility.mySaveHoudiniSceneLabel ) )
 		{
 			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
@@ -89,7 +100,6 @@ public class HAPI_WindowDebug : EditorWindow
 		
 		
 		string path = Application.dataPath;
-		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 		
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
 
@@ -111,6 +121,9 @@ public class HAPI_WindowDebug : EditorWindow
 				Debug.LogError( "Directory navigation failed: " + e.ToString() );
 			}
 		}
+
+#if UNITY_STANDALONE_WIN
+		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 
 		try
 		{
@@ -159,8 +172,11 @@ public class HAPI_WindowDebug : EditorWindow
 		{
 			Debug.LogError( "Directory navigation failed: " + e.ToString() );
 		}
+#endif // UNITY_STANDALONE_WIN
 
 		GUILayout.EndScrollView();
+
+		GUI.enabled = gui_enable;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,11 +200,16 @@ public class HAPI_WindowDebug : EditorWindow
 	{
 		HAPI_GUIUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
 	}
-	
+
 	private static List< OTLDirectory >	myOTLDirectories  	= new List< OTLDirectory >();
 	
 	private static float 			myLineHeight 			= 16;
 	private static GUILayoutOption 	myLineHeightGUI 		= GUILayout.Height( myLineHeight );
 	private static Vector2 			myScrollPosition;
 	private static float			myTime;
+
+#if !UNITY_STANDALONE_WIN
+	#pragma warning restore 0414
+	#pragma warning restore 0649
+#endif // !UNITY_STANDALONE_WIN
 }

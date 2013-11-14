@@ -76,11 +76,20 @@ public class HAPI_ParmsGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Draw Asset Controls
 
-			if ( !myParms.prEditable )
+			bool is_editable = myParms.prEditable;
+
+			// We can only build or do anything if we can link to our dll which
+			// can only happen on the Windows x86 platform.
+#if !UNITY_STANDALONE_WIN
+			is_editable = false;
+			HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+#else
+			if ( !is_editable )
 				HAPI_GUI.help( "The parameters on this node are readonly.", MessageType.Info );
+#endif // !UNITY_STANDALONE_WIN
 
 			bool gui_enable = GUI.enabled;
-			GUI.enabled = myParms.prEditable;
+			GUI.enabled = is_editable;
 
 			myParmChanges |= generateAssetControls();
 

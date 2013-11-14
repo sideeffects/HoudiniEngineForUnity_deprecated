@@ -23,6 +23,10 @@ using HAPI;
 
 public class HAPI_WindowSettings : EditorWindow 
 {
+#if !UNITY_STANDALONE_WIN
+	#pragma warning disable 0414
+#endif // !UNITY_STANDALONE_WIN
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
@@ -47,9 +51,9 @@ public class HAPI_WindowSettings : EditorWindow
 	
 	public void OnGUI() 
 	{
+#if UNITY_STANDALONE_WIN
 		if ( !myEnableDraw )
 			return;
-				
 		try
 		{
 			if ( !HAPI.HAPI_SetPath.prIsPathSet )
@@ -67,7 +71,15 @@ public class HAPI_WindowSettings : EditorWindow
 		{
 			Debug.LogError( error.ToString() );
 		}
-		
+#endif // UNITY_STANDALONE_WIN
+
+		bool gui_enable = GUI.enabled;
+
+#if !UNITY_STANDALONE_WIN
+		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+		GUI.enabled = false;
+#endif // !UNITY_STANDALONE_WIN
+
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
 
 		if ( GUILayout.Button( HAPI_GUIUtility.myRevertAllSettingsLabel ) )
@@ -102,6 +114,8 @@ public class HAPI_WindowSettings : EditorWindow
 		}
 
 		GUILayout.EndScrollView();
+
+		GUI.enabled = gui_enable;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -585,5 +599,8 @@ public class HAPI_WindowSettings : EditorWindow
 	private static bool			myEnableDraw			= true;
 	private static int			mySettingsTabSelection	= 0;
 	private static Vector2 		myScrollPosition;
-	
+
+#if !UNITY_STANDALONE_WIN
+	#pragma warning restore 0414
+#endif // !UNITY_STANDALONE_WIN
 }

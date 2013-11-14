@@ -652,6 +652,9 @@ namespace HAPI
 
 		public static bool initialize()
 		{
+#if !UNITY_STANDALONE_WIN
+			return false;
+#else
 			if ( !prHoudiniSceneExists )
 			{
 				HAPI_Result status_code;
@@ -710,6 +713,7 @@ namespace HAPI
 			}
 
 			return true;
+#endif // !UNITY_STANDALONE_WIN
 		}
 
 		public static void throwRuntimeError()

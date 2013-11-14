@@ -34,11 +34,21 @@ public class HAPI_Menu : MonoBehaviour
 		string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
 		HAPI_GUIUtility.instantiateAsset( asset_file_path );
 	}
-	
+
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadAssetLabel, true, 0 ) ]
+	static private bool validateCreateHAPIObject() 
+	{
+#if UNITY_STANDALONE_WIN
+		return true;
+#else
+		return false;
+#endif // UNITY_STANDALONE_WIN
+	}
+
 	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLaunchOrboltPage, false, 1 ) ]
 	static private void launchOrboltPage() 
 	{
-		Application.OpenURL("http://www.orbolt.com");
+		Application.OpenURL( "http://www.orbolt.com" );
 	}
 	
 	//[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel, false, 1 ) ]
@@ -92,5 +102,15 @@ public class HAPI_Menu : MonoBehaviour
 		GameObject[] selection 	= new GameObject[ 1 ];
 		selection[ 0 ] 			= game_object;
 		Selection.objects 		= selection;
+	}
+
+	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myCreateCurveLabel, true, 100 ) ]
+	static private bool validateCreateCurve()
+	{
+#if UNITY_STANDALONE_WIN
+		return true;
+#else
+		return false;
+#endif // UNITY_STANDALONE_WIN
 	}
 }

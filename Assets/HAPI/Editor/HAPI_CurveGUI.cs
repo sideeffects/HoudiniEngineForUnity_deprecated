@@ -14,7 +14,6 @@
  * 
  */
 
-
 using UnityEngine;
 using UnityEditor;
 using System.Reflection;
@@ -26,6 +25,10 @@ using HAPI;
 [ CustomEditor( typeof( HAPI_Curve ) ) ]
 public class HAPI_CurveGUI : Editor 
 {
+#if !UNITY_STANDALONE_WIN
+	#pragma warning disable 0414
+#endif // !UNITY_STANDALONE_WIN
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
@@ -85,11 +88,20 @@ public class HAPI_CurveGUI : Editor
 		if ( myCurve == null )
 			return;
 
-		if ( !myCurve.prEditable )
+		bool is_editable = myCurve.prEditable;
+
+		// We can only build or do anything if we can link to our dll which
+		// can only happen on the Windows x86 platform.
+#if !UNITY_STANDALONE_WIN
+		is_editable = false;
+		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+#else
+		if ( !is_editable )
 			HAPI_GUI.help( "This curve is not editable.", MessageType.Info );
+#endif // !UNITY_STANDALONE_WIN
 
 		bool gui_enable = GUI.enabled;
-		GUI.enabled = myCurve.prEditable;
+		GUI.enabled = is_editable;
 
 		Object target = (Object) myTarget;
 		if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
@@ -100,6 +112,13 @@ public class HAPI_CurveGUI : Editor
 	
 	public void OnSceneGUI() 
 	{
+		// We can only build or do anything if we can link to our dll which
+		// can only happen on the Windows x86 platform.
+#if !UNITY_STANDALONE_WIN
+		return;
+		#pragma warning disable 0162
+#endif // !UNITY_STANDALONE_WIN
+
 		if ( myCurve == null )
 			return;
 
@@ -445,6 +464,12 @@ public class HAPI_CurveGUI : Editor
 				Graphics.DrawMeshNow( mySelectionMesh, myCurve.transform.localToWorldMatrix );
 			}
 		}
+
+		// We can only build or do anything if we can link to our dll which
+		// can only happen on the Windows x86 platform.
+#if !UNITY_STANDALONE_WIN
+		#pragma warning restore 0162
+#endif // !UNITY_STANDALONE_WIN
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -944,7 +969,7 @@ public class HAPI_CurveGUI : Editor
 			field.SetValue( null, value );
 		}
 	}
-	
+
 	private HAPI_Curve			myCurve;
 
 	private bool				myForceInspectorRedraw;
@@ -993,4 +1018,8 @@ public class HAPI_CurveGUI : Editor
 	private Material			myConnectionMaterial;
 
 	private HAPI_Curve.Mode myLastMode;
+
+#if !UNITY_STANDALONE_WIN
+	#pragma warning restore 0414
+#endif // !UNITY_STANDALONE_WIN
 }

@@ -470,7 +470,9 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	private void marshalCurvesFromClip( int node_id, AnimationClip clip )
 	{
+		#pragma warning disable 0618
 		AnimationClipCurveData[] curve_datas = AnimationUtility.GetAllCurves( clip );
+		#pragma warning restore 0618
 		foreach ( AnimationClipCurveData curve_data in curve_datas )
 		{
 			if( curve_data.propertyName == "m_LocalPosition.x" )
@@ -578,9 +580,9 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 
 		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() 
-#if UNITY_4_3					
+#if UNITY_4_3
 			&& !BuildPipeline.isBuildingPlayer
-#endif			
+#endif // UNITY_4_3
 			)
 
 		{
@@ -886,6 +888,13 @@ public abstract class HAPI_Asset : HAPI_Control
 							   bool cook_downstream_assets,
 							   bool use_delay_for_progress_bar )
 	{
+		// We can only build or do anything if we can link to our dll which
+		// can only happen on the Windows x86 platform.
+#if !UNITY_STANDALONE_WIN
+		return false;
+		#pragma warning disable 0162
+#endif // !UNITY_STANDALONE_WIN
+
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
 		{
 			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
@@ -1137,6 +1146,12 @@ public abstract class HAPI_Asset : HAPI_Control
 
 			myProgressBarJustUsed = false;
 		}
+
+		// We can only build or do anything if we can link to our dll which
+		// can only happen on the Windows x86 platform.
+#if !UNITY_STANDALONE_WIN
+		#pragma warning restore 0162
+#endif // !UNITY_STANDALONE_WIN
 		
 		return true;
 	}

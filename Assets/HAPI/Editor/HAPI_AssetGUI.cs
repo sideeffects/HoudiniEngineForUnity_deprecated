@@ -97,11 +97,19 @@ public class HAPI_AssetGUI : Editor
 
 	public override void OnInspectorGUI() 
 	{
+		// We can only build or do anything if we can link to our dll which
+		// can only happen on the Windows x86 platform.
+#if !UNITY_STANDALONE_WIN
+		bool gui_enable = GUI.enabled;
+		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+		GUI.enabled = false;
+#endif // !UNITY_STANDALONE_WIN
+
 		try
 		{
 			myDelayBuild	= false;
 			myParmChanges	= false;
-		
+
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
 
@@ -258,6 +266,10 @@ public class HAPI_AssetGUI : Editor
 		{
 			Debug.LogError( e.ToString() );
 		}
+		
+#if !UNITY_STANDALONE_WIN
+		GUI.enabled = gui_enable;
+#endif // !UNITY_STANDALONE_WIN
 	}
 
 	public virtual void OnSceneGUI()
