@@ -27,6 +27,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 
+#if !UNITY_4_3
+#warning Houdini for Unity relies on some Unity 4.3-only features. It is recommended you upgrade to Unity 4.3 as soon as possible.
+#endif // UNITY_4_3
+
 namespace HAPI 
 {
 	public delegate void RepaintDelegate();
