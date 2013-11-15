@@ -48,7 +48,7 @@ public class HAPI_Menu : MonoBehaviour
 	[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLaunchOrboltPage, false, 1 ) ]
 	static private void launchOrboltPage() 
 	{
-		Application.OpenURL( "http://www.orbolt.com" );
+		Application.OpenURL( "http://www.orbolt.com/unity" );
 	}
 	
 	//[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel, false, 1 ) ]
