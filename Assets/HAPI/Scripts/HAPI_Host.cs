@@ -142,6 +142,7 @@ namespace HAPI
 		public const bool myDefaultPlaymodePerFrameCooking					= false;
 		public const bool myDefaultPushUnityTransformToHoudini				= true;
 		public const bool myDefaultTransformChangeTriggersCooks				= false;
+		public const bool myDefaultImportTemplatedGeos						= false;
 
 		private const KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
@@ -207,6 +208,8 @@ namespace HAPI
 			setBool(	"HAPI_PlaymodePerFrameCooking", myDefaultPlaymodePerFrameCooking, true );
 			setBool(	"HAPI_PushUnityTransformToHoudini", myDefaultPushUnityTransformToHoudini, true );
 			setBool(	"HAPI_TransformChangeTriggersCooks", myDefaultTransformChangeTriggersCooks, true );
+			setBool(	"HAPI_ImportTemplatedGeos", myDefaultImportTemplatedGeos, true );
+
 
 			setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 			setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
@@ -312,6 +315,10 @@ namespace HAPI
 		public static bool prTransformChangeTriggersCooks {
 												get { return getBool( "HAPI_TransformChangeTriggersCooks" ); }
 												set { setBool( "HAPI_TransformChangeTriggersCooks", value ); } }
+
+		public static bool prImportTemplatedGeos {
+												get { return getBool( "HAPI_ImportTemplatedGeos" ); }
+												set { setBool( "HAPI_ImportTemplatedGeos", value ); } }
 
 		public static KeyCode prAddingPointsModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_AddingPointsModeHotKey" );
@@ -440,6 +447,9 @@ namespace HAPI
 		public static bool isTransformChangeTriggersCooksDefault()
 												{ return	prTransformChangeTriggersCooks == 
 															myDefaultTransformChangeTriggersCooks; }
+		public static bool isImportTemplatedGeosDefault()
+												{ return	prImportTemplatedGeos == 
+															myDefaultImportTemplatedGeos; }
 
 		public static bool isAddingPointsModeHotKeyDefault()
 												{ return	prAddingPointsModeHotKey == 
@@ -518,6 +528,7 @@ namespace HAPI
 			prPlaymodePerFrameCooking				= myDefaultPlaymodePerFrameCooking;
 			prPushUnityTransformToHoudini			= myDefaultPushUnityTransformToHoudini;
 			prTransformChangeTriggersCooks			= myDefaultTransformChangeTriggersCooks;
+			prImportTemplatedGeos					= myDefaultImportTemplatedGeos;
 
 			prAddingPointsModeHotKey				= myDefaultAddingPointsModeHotKey;
 			prAddingPointsModeColour				= myDefaultAddingPointsModeColour;

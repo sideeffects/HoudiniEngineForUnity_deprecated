@@ -454,6 +454,30 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			if ( changed )
 				myAsset.prTransformChangeTriggersCooks = value;
 		}
+
+		// Import Templated Geos Toggle
+		{
+			bool value		= myAsset.prImportTemplatedGeos;
+			bool is_bold 	= prefab_asset && prefab_asset.prImportTemplatedGeos != value;
+			string name		= "import_templated_geos";
+			string label	= "Import Templated Geos";
+			
+			bool global_overwrite = ( HAPI_Host.prImportTemplatedGeos != 
+			                         HAPI_Host.myDefaultImportTemplatedGeos );
+			bool local_overwrite  = ( myAsset.prEnableCooking == false );
+			
+			GUI.enabled = ( !global_overwrite && !local_overwrite );
+			if ( !GUI.enabled ) 
+				if ( global_overwrite )
+					label += " (overwritted by global setting)";
+			else // local_overwrite
+				label += " (all cooking is disabled)";
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
+			GUI.enabled = true;
+			
+			if ( changed )
+				myAsset.prImportTemplatedGeos = value;
+		}
 	}
 
 	private void generateAssetSettings()

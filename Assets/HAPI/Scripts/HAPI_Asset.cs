@@ -197,6 +197,12 @@ public abstract class HAPI_Asset : HAPI_Control
 																!HAPI_Host.isTransformChangeTriggersCooksDefault() ); } 
 												set { myTransformChangeTriggersCooks = value; } }
 
+	public bool	prImportTemplatedGeos{ get { return (			myImportTemplatedGeos && 
+			                                                    HAPI_Host.isImportTemplatedGeosDefault() )
+														  || (	HAPI_Host.prImportTemplatedGeos &&
+				    											!HAPI_Host.isImportTemplatedGeosDefault() ); } 
+												set { myImportTemplatedGeos = value; } }
+
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
 																	set { myEnableLogging = value; } }
 
@@ -800,6 +806,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prPlaymodePerFrameCooking		= false;
 		prPushUnityTransformToHoudini	= HAPI_Host.myDefaultPushUnityTransformToHoudini;
 		prTransformChangeTriggersCooks	= HAPI_Host.myDefaultTransformChangeTriggersCooks;
+		prImportTemplatedGeos 			= HAPI_Host.myDefaultImportTemplatedGeos;
 
 		prEnableLogging					= false;
 
@@ -1743,6 +1750,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myPlaymodePerFrameCooking;
 	[SerializeField] private bool					myPushUnityTransformToHoudini;
 	[SerializeField] private bool					myTransformChangeTriggersCooks;
+	[SerializeField] private bool					myImportTemplatedGeos;
 	
 	[SerializeField] private bool					myEnableLogging;
 

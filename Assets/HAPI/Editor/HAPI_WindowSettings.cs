@@ -393,6 +393,21 @@ public class HAPI_WindowSettings : EditorWindow
 					HAPI_Host.myRepaintDelegate();
 			}
 		}
+
+		// Import Templated Geos
+		{
+			bool value = HAPI_Host.prImportTemplatedGeos;
+			bool changed = HAPI_GUI.toggle( "import_templated_geos", 
+			                               "Import Templated Geos", ref value );
+			if ( changed )
+			{
+				HAPI_Host.prImportTemplatedGeos = value;
+				if ( HAPI_Host.myRepaintDelegate != null )
+					HAPI_Host.myRepaintDelegate();
+			}
+		}
+
+
 	}
 
 	private static void generateGeometrySettings()
