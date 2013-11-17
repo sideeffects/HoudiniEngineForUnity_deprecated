@@ -600,7 +600,7 @@ public class HAPI_Instancer : MonoBehaviour
 			return false;
 		}
 	}
-	
+			
 	public void instanceObjects( HAPI_ProgressBar progress_bar )
 	{
 		try
@@ -749,7 +749,14 @@ public class HAPI_Instancer : MonoBehaviour
 					
 					Matrix4x4 local_mat = new Matrix4x4();
 					local_mat.SetTRS( pos, Quaternion.Euler( euler ), scale );
-					Matrix4x4 global_mat = transform.localToWorldMatrix * local_mat;
+
+					// TODO: Now this *should* be the transform.localToWorldMatrix
+					// but for some reason, after a scene load, we pick up compensating
+					// factors in the local transform that cancel out the transform on the
+					// asset.  For now just use the asset's transform as the parent matrix.
+					Matrix4x4 parent_mat = prAsset.transform.localToWorldMatrix;
+					Matrix4x4 global_mat = parent_mat * local_mat;
+
 					
 					euler = HAPI_AssetUtility.getQuaternion( global_mat ).eulerAngles;
 					pos = HAPI_AssetUtility.getPosition( global_mat );
