@@ -925,12 +925,15 @@ namespace HAPI
 
 		public bool isValid() 
 		{
-			return minX < int.MaxValue && minY < int.MaxValue && minZ < int.MaxValue;
+			return isValid;
 		}
 
 		public int minX;
 		public int minY;
 		public int minZ;
+
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool isValid;
 	};
 #endif // UNITY_EDITOR
 }
