@@ -48,10 +48,12 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 					// this is the asset the prefab is being created/changed from
 					if ( asset.prAssetId == prefab_asset.prAssetId )
 					{
-						// if prefab's backup id refers to a valid asset then delete this asset
-						// since we are re-creating the prefab
-						if ( HAPI_Host.isAssetValid( prefab_asset.prBackupAssetId, 
-													 prefab_asset.prBackupAssetValidationId ) )
+						// If the prefab's backup id refers to a valid asset then this signifies the
+						// prefab is being changed due to an "Apply" from a prefab instance. We need
+						// to delete the prefab asset since we are re-creating the prefab. 
+						bool is_applying_changes = HAPI_Host.isAssetValid( prefab_asset.prBackupAssetId, 
+						                                                   prefab_asset.prBackupAssetValidationId );
+						if ( is_applying_changes )
 						{
 							try
 							{
@@ -71,26 +73,32 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						GameObject new_prefab = PrefabUtility.ReplacePrefab( asset.gameObject, 
 																			 prPrefabToReplace, 
 																			 ReplacePrefabOptions.ConnectToPrefab ) as GameObject;
+						HAPI_Asset new_prefab_asset = new_prefab.GetComponent< HAPI_Asset >();
+
+						// If applying changes to prefab from prefab instance we also need to retrieve 
+						// all the overriden parameters on the prefab instance so that we can apply 
+						// these changes properly to all the other instances. This must be done after
+						// prefab has been replaced.
+						if ( is_applying_changes )
+						{
+							foreach ( HAPI_ParmInfo parm_info in asset.prParms.prParms )
+							{
+								if ( asset.prParms.isParmOverridden( parm_info.id ) )
+								{
+									new_prefab_asset.prUpdatePrefabInstanceParmNames.Add( parm_info.name );
+								}
+							}
+						}
 						
 						// Set asset id of prefab to -1 since it has not been built yet.
 						// Call SetDirty so changes to prefab will be saved to disk and
 						// OnEnable will be called on original asset so that it can be
 						// rebuilt in order to re-create its game objects.
-						HAPI_Asset new_prefab_asset = new_prefab.GetComponent< HAPI_Asset >();
 						new_prefab_asset.prAssetId = -1;
 						new_prefab_asset.prAssetValidationId = -1;
 						EditorUtility.SetDirty( new_prefab_asset );
-					}
-					// this is not the prefab instance this prefab is being created from 
-					// so apply changes being made to prefab to this prefab instance 
-					// NOTE: if this gets called before the prefab is replaced it is okay 
-					// because the preset on the original prefab will be the same as the 
-					// one it is replaced with
-					else
-					{
-						asset.prPreset = prefab_asset.prPreset;
-						asset.loadPreset();
-						asset.buildClientSide();
+						
+						break;
 					}
 				}
 			}

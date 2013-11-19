@@ -218,14 +218,14 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	// Prefabs ------------------------------------------------------------------------------------------------------
 	
-	public int prBackupAssetId {					get { return myBackupAssetId; }
-													set { myBackupAssetId = value; } }
-	public int prBackupAssetValidationId {			get { return myBackupAssetValidationId; }
-													set { myBackupAssetValidationId = value; } }
-	public bool prReloadPrefabOnPlaymodeChange {	get { return myReloadPrefabOnPlaymodeChange; }
-													set { myReloadPrefabOnPlaymodeChange = value; } }
-	public string prUpdatePrefabInstanceParmName {	get { return myUpdatePrefabInstanceParmName; }
-													set { myUpdatePrefabInstanceParmName = value; } }
+	public int prBackupAssetId {							get { return myBackupAssetId; }
+															set { myBackupAssetId = value; } }
+	public int prBackupAssetValidationId {					get { return myBackupAssetValidationId; }
+															set { myBackupAssetValidationId = value; } }
+	public bool prReloadPrefabOnPlaymodeChange {			get { return myReloadPrefabOnPlaymodeChange; }
+															set { myReloadPrefabOnPlaymodeChange = value; } }
+	public List< string > prUpdatePrefabInstanceParmNames {	get { return myUpdatePrefabInstanceParmNames; }
+															set { myUpdatePrefabInstanceParmNames = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -669,6 +669,15 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( BuildPipeline.isBuildingPlayer )
 			return;
 #endif
+		// If this is being called because changes are being applied
+		// to the prefab of this instance do nothing
+		if ( isPrefabInstance() )
+		{
+			HAPI_Asset prefab_asset = getParentPrefabAsset();
+			if ( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
+				return;
+		}
+
 		// If this asset is a prefab instance that is being reverted 
 		// reload the asset in order to restore it's asset id and 
 		// asset validation id from the backup and to load the preset
@@ -682,20 +691,26 @@ public abstract class HAPI_Asset : HAPI_Control
 			   	   false,	// cook_downstream_assets
 			   	   false	// use_delay_for_progress_bar
 				);
-			
-			// This tells unity that values have been overridden for this 
-			// prefab instance. Need this because values such as the asset
-			// id and validation id are changed in the build.
+
+			// This tells Unity that values have been overridden for this 
+			// prefab instance (in this case values such as the asset id, 
+			// validation id, node id, etc).
 			PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 		}
 		else if ( prAssetId >= 0 || isInstantiatingPrefab() )
-		{	
+		{
 			if ( isPrefabInstance() &&
 				 !isInstantiatingPrefab() &&
-				 prUpdatePrefabInstanceParmName != String.Empty )
+				 prUpdatePrefabInstanceParmNames.Count > 0 )
 			{
 				// Updating prefab instance after parameter change on prefab
+				// and save changes to preset
 				buildClientSide();
+				savePreset();
+
+				// This tells Unity that values have been overridden for this 
+				// prefab instance (in this case the preset and parameter values).
+				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 			}
 			else if ( !isInstantiatingPrefab() &&
 				 	  HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) &&
@@ -823,7 +838,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prBackupAssetValidationId		= -1;
 		prReloadPrefabOnPlaymodeChange 	= false;
 		myCleanUpPrefabOTL 				= false;
-		prUpdatePrefabInstanceParmName	= "";
+		prUpdatePrefabInstanceParmNames	= new List< string >();
 	}
 	
 	public override void onParmChange( bool reload_asset )
@@ -833,7 +848,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( isPrefab() )
 		{
 			HAPI_ParmInfo parm_info = prParms.findParm( prParms.prLastChangedParmId );
-			prUpdatePrefabInstanceParmName = parm_info.name;
+			prUpdatePrefabInstanceParmNames.Add( parm_info.name );
 			
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			try 
@@ -1166,63 +1181,58 @@ public abstract class HAPI_Asset : HAPI_Control
 	public void updateParameters( HAPI_ProgressBar progress_bar )
 	{
 		// Update prefab instance after parameter change on prefab if needed
-		if ( isPrefabInstance() && prUpdatePrefabInstanceParmName != String.Empty )
+		if ( isPrefabInstance() && prUpdatePrefabInstanceParmNames.Count > 0 )
 		{
 			HAPI_Asset prefab_asset = getParentPrefabAsset();
 
-			try
+			foreach ( string parm_name in prUpdatePrefabInstanceParmNames )
 			{
-				HAPI_ParmInfo parm_info = prParms.findParm( prUpdatePrefabInstanceParmName );
-			
-				// Do not apply changes from prefab in the following cases: 
-				// Case 1: Parameter on prefab that has been changed is a
-				// transform parameter
-				// Case 2: Parameter on prefab that has been changed has been
-				// overridden on this asset
-				// In these cases parameter values must be re-acquired from
-				// Houdini
-				if( prUpdatePrefabInstanceParmName == "r" || 
-					prUpdatePrefabInstanceParmName == "s" ||
-					prUpdatePrefabInstanceParmName == "t" ||
-					prParms.isParmOverridden( parm_info.id ) )
+				try
 				{
-					// re-acquire parameters
-					prParms.getParameterValues();
-				}
-				// Otherwise set the parameter change for this prefab 
-				// instance and build.
-				else
-				{
-					prParms.prLastChangedParmId = parm_info.id;
-					
-					// if the parameter is a string we need to manually
-					// get the string value from the prefab because the
-					// parameter strings are stored in a dictionary which
-					// is not serialized so the value isn't overridden 
-					// automatically by the prefab value as it is done
-					// with float and int parameters
-					if ( parm_info.isString() && prefab_asset )
-					{
-						HAPI_ParmInfo prefab_parm_info = prefab_asset.prParms.findParm( prUpdatePrefabInstanceParmName );
-						string[] values = prefab_asset.prParms.getParmStrings( prefab_parm_info );
+					HAPI_ParmInfo parm_info = prParms.findParm( parm_name );
+				
+					// Do not apply changes from prefab in the following cases: 
+					// Case 1: Parameter on prefab that has been changed is a
+					// transform parameter
+					// Case 2: Parameter on prefab that has been changed has been
+					// overridden on this asset
+					// Otherwise set the parameter change for this prefab
+					if( parm_name != "r" && 
+					    parm_name != "s" &&
+					    parm_name != "t" &&
+						!prParms.isParmOverridden( parm_info.id ) )
+					{	
+						// if the parameter is a string we need to manually
+						// get the string value from the prefab because the
+						// parameter strings are stored in a dictionary which
+						// is not serialized so the value isn't overridden 
+						// automatically by the prefab value as it is done
+						// with float and int parameters
+						if ( parm_info.isString() && prefab_asset )
+						{
+							HAPI_ParmInfo prefab_parm_info = prefab_asset.prParms.findParm( parm_name );
+							string[] values = prefab_asset.prParms.getParmStrings( prefab_parm_info );
 
-						prParms.setParmStrings( parm_info, values );
+							prParms.setParmStrings( parm_info, values );
+						}
+
+						prParms.setChangedParameterIntoHost( parm_info.id );
 					}
 				}
+				catch {}
 			}
-			catch {}
 
-			prUpdatePrefabInstanceParmName = "";
+			prUpdatePrefabInstanceParmNames.Clear();
 
 			// Need to set prUpdatePrefabInstanceParmName back to empty on prefab if
 			// it hasn't been already. We do not set prefab to be dirty so that other
 			// prefab instances that still need this value will not be affected.
-			if ( prefab_asset && prefab_asset.prUpdatePrefabInstanceParmName != String.Empty )
+			if ( prefab_asset && prefab_asset.prUpdatePrefabInstanceParmNames.Count > 0 )
 			{
-				prefab_asset.prUpdatePrefabInstanceParmName = "";
+				prefab_asset.prUpdatePrefabInstanceParmNames.Clear();
 			}
 		}
-		
+
 		prParms.setChangedParametersIntoHost();
 
 		HAPI_Host.cookAsset( prAssetId );
@@ -1771,6 +1781,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	private int myBackupAssetValidationId;
 	private bool myReloadPrefabOnPlaymodeChange;
 	private bool myCleanUpPrefabOTL;
-	[SerializeField] private string myUpdatePrefabInstanceParmName;
+	[SerializeField] private List< string > myUpdatePrefabInstanceParmNames;
 #endif // UNITY_EDITOR
 }

@@ -227,115 +227,6 @@ public class HAPI_Parms : MonoBehaviour
 		}
 	}
 
-	public int getParmIntValue( string name, int index )
-	{
-		try
-		{
-			HAPI_ParmInfo parm_info = findParm( name );
-
-			if ( parm_info.isInt() )
-				return prParmIntValues[ parm_info.intValuesIndex + index ];
-		}
-		catch {}
-
-		throw new HAPI_ErrorInvalidArgument( name + " is not an int!" );
-	}
-
-	public float getParmFloatValue( string name, int index )
-	{
-		try
-		{
-			HAPI_ParmInfo parm_info = findParm( name );
-			
-			if ( parm_info.isFloat() )
-				return prParmFloatValues[ parm_info.floatValuesIndex + index ];
-		}
-		catch {}
-
-		throw new HAPI_ErrorInvalidArgument( name + " is not a float!" );
-	}
-
-	public string getParmStringValue( string name, int index )
-	{
-		try
-		{
-			HAPI_ParmInfo parm_info = findParm( name );
-			
-			if ( parm_info.isString() )
-				return myParmStrings[ parm_info.id ][ index ];
-		}
-		catch {}
-
-		throw new HAPI_ErrorInvalidArgument( name + " is not a string!" );
-	}
-
-	public void setParmIntValue( string name, int index, int value )
-	{
-		try
-		{
-			HAPI_ParmInfo parm_info = findParm( name );
-
-			if ( !parm_info.isInt() )
-				throw new HAPI_ErrorInvalidArgument( name + " is not an int!" );
-
-			int values_index = parm_info.intValuesIndex + index;
-			int[] int_value = { value };
-			
-			HAPI_Host.setParmIntValues( prControl.prNodeId, int_value, values_index, 1 );
-
-			prControl.prAsset.buildClientSide();
-		}
-		catch {}
-	}
-
-	public void setParmFloatValue( string name, int index, float value )
-	{
-		try
-		{
-			HAPI_ParmInfo parm_info = findParm( name );
-		
-			if ( !parm_info.isFloat() )
-				throw new HAPI_ErrorInvalidArgument( name + " is not a float!" );
-
-			int values_index = parm_info.floatValuesIndex + index;
-			float[] float_value = { value };
-			
-			HAPI_Host.setParmFloatValues( prControl.prNodeId, float_value, values_index, 1 );
-
-			prControl.prAsset.buildClientSide();
-		}
-		catch {}
-	}
-
-	public void setParmStringValue( string name, int index, string value )
-	{
-		try
-		{
-			HAPI_ParmInfo parm_info = findParm( name );
-
-			if ( !parm_info.isString() )
-				throw new HAPI_ErrorInvalidArgument( name + " is not a string!" );
-
-			HAPI_Host.setParmStringValue( prControl.prNodeId, value, parm_info.id, index );
-
-			prControl.prAsset.buildClientSide();
-		}
-		catch {}
-	}
-
-
-	public string[] getParameterNames()
-	{
-		string[] names = new string[ prParms.Length ];
-
-		for ( int i = 0; i < prParms.Length; i++ )
-		{
-			names[ i ] = prParms[ i ].name;
-		}
-
-		return names;
-	}
-
 	public void getParameterValues()
 	{
 		if ( prControl == null )
@@ -406,8 +297,21 @@ public class HAPI_Parms : MonoBehaviour
 						 		 	  );
 					EditorUtility.SetDirty( prefab_asset );
 				}
+				// if prefab has not been reloaded after play mode change yet then 
+				// reload it to get its parameters back
+				else if ( prefab_asset.prReloadPrefabOnPlaymodeChange )
+				{
+					prefab_asset.prReloadPrefabOnPlaymodeChange = false;
+					prefab_asset.build(	false,	// reload_asset
+					              		false,	// unload_asset_first
+					              		true,	// serializatin_recovery_only
+					              		false,	// force_reconnect
+					              		false,	// cook_downstream_assets
+					              		false	// use_delay_for_progress_bar
+					              	  );
+				}
 				
-				if ( prefab_asset.prParms.prParms != null )
+				if ( prefab_asset.prParms.prParms != null && !prefab_asset.isApplyingChangesToPrefab() )
 				{
 					// loop through parameter values and determine which ones have been
 					// overridden (ie. changed from corresponding parameter value on prefab)

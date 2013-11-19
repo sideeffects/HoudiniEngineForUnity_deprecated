@@ -143,7 +143,10 @@ public class HAPI_ParmsGUI : Editor
 		float[] parm_float_values	= myParms.prParmFloatValues;
 
 		HAPI_GUIParm gui_parm 		= new HAPI_GUIParm( parm );
-		gui_parm.isBold				= myParms.isParmOverridden( parm.id );
+
+		// overridden parameters should not be bold in play mode
+		gui_parm.isBold				= myParms.isParmOverridden( parm.id ) && 
+									  !EditorApplication.isPlayingOrWillChangePlaymode;
 
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter
