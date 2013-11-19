@@ -12,6 +12,7 @@ using System;
 using System.Collections;
 using HAPI;
 
+[Serializable]
 public class HAPI_AssetAccessor
 {
 	public enum ParmType
