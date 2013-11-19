@@ -278,7 +278,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 				// Clear previous volume tiles.
 				destroyChildren( part_node.transform );
 				
-				while ( tile.isValid() )
+				while ( tile.isValid )
 				{
 					for ( int i = 0; i < values.Length; ++i )
 						values[ i ] = 0;

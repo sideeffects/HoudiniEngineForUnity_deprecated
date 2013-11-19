@@ -922,12 +922,6 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_VolumeTileInfo
 	{
-
-		public bool isValid() 
-		{
-			return isValid;
-		}
-
 		public int minX;
 		public int minY;
 		public int minZ;
