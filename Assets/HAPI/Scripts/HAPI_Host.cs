@@ -144,6 +144,8 @@ namespace HAPI
 		public const bool myDefaultTransformChangeTriggersCooks				= false;
 		public const bool myDefaultImportTemplatedGeos						= false;
 
+		private const string myDefaultUnityTagAttribName					= "unity_tag";
+
 		private const KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
 
@@ -210,6 +212,7 @@ namespace HAPI
 			setBool(	"HAPI_TransformChangeTriggersCooks", myDefaultTransformChangeTriggersCooks, true );
 			setBool(	"HAPI_ImportTemplatedGeos", myDefaultImportTemplatedGeos, true );
 
+			setString(	"HAPI_UnityTagAttribName", myDefaultUnityTagAttribName, true );
 
 			setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 			setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
@@ -319,6 +322,10 @@ namespace HAPI
 		public static bool prImportTemplatedGeos {
 												get { return getBool( "HAPI_ImportTemplatedGeos" ); }
 												set { setBool( "HAPI_ImportTemplatedGeos", value ); } }
+
+		public static string prUnityTagAttribName {
+												get { return getString( "HAPI_UnityTagAttribName" ); }
+												set { setString( "HAPI_UnityTagAttribName", value ); } } 
 
 		public static KeyCode prAddingPointsModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_AddingPointsModeHotKey" );
@@ -450,7 +457,9 @@ namespace HAPI
 		public static bool isImportTemplatedGeosDefault()
 												{ return	prImportTemplatedGeos == 
 															myDefaultImportTemplatedGeos; }
-
+		public static bool isUnityTagAttribNameDefault()
+												{ return	prUnityTagAttribName ==
+															myDefaultUnityTagAttribName; }
 		public static bool isAddingPointsModeHotKeyDefault()
 												{ return	prAddingPointsModeHotKey == 
 															myDefaultAddingPointsModeHotKey; }
@@ -529,6 +538,8 @@ namespace HAPI
 			prPushUnityTransformToHoudini			= myDefaultPushUnityTransformToHoudini;
 			prTransformChangeTriggersCooks			= myDefaultTransformChangeTriggersCooks;
 			prImportTemplatedGeos					= myDefaultImportTemplatedGeos;
+
+			prUnityTagAttribName					= myDefaultUnityTagAttribName;
 
 			prAddingPointsModeHotKey				= myDefaultAddingPointsModeHotKey;
 			prAddingPointsModeColour				= myDefaultAddingPointsModeColour;

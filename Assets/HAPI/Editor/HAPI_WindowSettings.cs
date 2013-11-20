@@ -412,6 +412,17 @@ public class HAPI_WindowSettings : EditorWindow
 
 	private static void generateGeometrySettings()
 	{
+		// Unity Tag Attrib Name
+		{
+			string value = HAPI_Host.prUnityTagAttribName;
+			bool changed = HAPI_GUI.stringField( "unity_tag_attrib_name", 
+			                                    "Unity Tag Attrib.", ref value );
+			if ( changed )
+				HAPI_Host.prUnityTagAttribName = value;
+		}
+
+		HAPI_GUI.separator();
+
 		// Adding Points Mode Hot Key
 		{
 			int value = (int) HAPI_Host.prAddingPointsModeHotKey;

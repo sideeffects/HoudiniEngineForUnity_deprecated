@@ -310,6 +310,9 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 		// Assign materials.
 		HAPI_AssetUtility.assignMaterial( this, prAsset, ( reload_asset || has_material_changed ) );
+
+		// Assign unity tag.
+		assignUnityTag();
 	}
 
 	public virtual void Update()
@@ -425,6 +428,30 @@ public class HAPI_PartControl : HAPI_GeoControl
 		renderer.material = createSoftCircle( new Color( Random.Range( 0.5f, 1.0f ),
 														 Random.Range( 0.5f, 1.0f ),
 														 Random.Range( 0.5f, 1.0f ) ) );
+	}
+
+	private void assignUnityTag()
+	{
+		HAPI_AttributeInfo tag_attr_info = new HAPI_AttributeInfo( HAPI_Host.prUnityTagAttribName );
+		int[] tag_attr = new int[ 0 ];
+		HAPI_AssetUtility.getAttribute( prAssetId, prObjectId, prGeoId, prPartId, HAPI_Host.prUnityTagAttribName, 
+		             					ref tag_attr_info, ref tag_attr, HAPI_Host.getAttributeStrData );
+
+		if ( tag_attr_info.exists )
+		{
+			string tag = HAPI_Host.getString( tag_attr[ 0 ] );
+			if ( tag != string.Empty )
+			{
+				try
+				{
+					gameObject.tag = tag;
+				}
+				catch
+				{
+					Debug.LogWarning( "Unity Tag " + tag + " is not defined!" );
+				}
+			}
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
