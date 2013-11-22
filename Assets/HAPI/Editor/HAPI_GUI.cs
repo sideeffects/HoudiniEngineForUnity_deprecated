@@ -267,6 +267,9 @@ public class HAPI_GUI : Editor
 			}
 			
 			// Draw popup.
+			GUI.SetNextControlName( parm.name +
+			                        " " + parm.instanceNum +
+			                        " dropdown_field" );
 			int new_mapped_value = 0;
 			if ( parm.width >= 0 )
 				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values,

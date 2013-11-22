@@ -510,17 +510,15 @@ public class HAPI_ParmsGUI : Editor
 				current_index++;
 			}
 		}
-		
-		/*
-		TODO: This is broken right now. It is triggered on mouse hover most of the time.
+
 		if ( myLastFocusedControl != GUI.GetNameOfFocusedControl() )
 		{
-			Debug.Log( "Changed focus from " + myLastFocusedControl + " to " + GUI.GetNameOfFocusedControl() );
+			//Debug.Log( "Changed focus from " + myLastFocusedControl + " to " + GUI.GetNameOfFocusedControl() );
 			// We changed focus. Signal a build
 			myLastFocusedControl = GUI.GetNameOfFocusedControl();
 			myFocusChanged = true;
 			myDelayBuild = false;
-		}*/
+		}
 
 		return changed;
 	}
