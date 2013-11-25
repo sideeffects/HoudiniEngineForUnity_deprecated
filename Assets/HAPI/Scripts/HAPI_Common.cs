@@ -47,6 +47,7 @@ namespace HAPI
 		public const string HAPI_PRODUCT_SHORT_NAME			= "Houdini";
 
 		public static string HAPI_TEXTURES_PATH				= Application.dataPath + "/Textures";
+		public static string HAPI_BAKED_ASSETS_PATH			= Application.dataPath + "/Baked Assets";
 
 		public const int HAPI_MAX_PAGE_SIZE					= 32768;
 		public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 3;
