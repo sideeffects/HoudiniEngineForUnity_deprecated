@@ -81,6 +81,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					PrefabUtility.DisconnectPrefabInstance( myAssetOTL.gameObject );
 				}
 			}
+
+			if ( !myAssetOTL.isPrefab() && GUILayout.Button( "Bake" ) )
+				myAssetOTL.bakeAsset();
 		} // if
 
 		// Draw Help Pane

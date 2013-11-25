@@ -22,6 +22,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using HAPI;
 using Utility = HAPI_AssetUtility;
 
@@ -1279,7 +1280,141 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			Debug.LogError( err.ToString() );
 		}
-	}		
+	}
+
+	public void bakeAsset()
+	{
+		// get/create directory for the asset being baked
+		string baked_asset_path = HAPI_Constants.HAPI_BAKED_ASSETS_PATH + "/" + prAssetName;
+		string rel_baked_asset_path = baked_asset_path.Replace( Application.dataPath, "Assets" );
+		DirectoryInfo baked_asset_dir = new DirectoryInfo( baked_asset_path );
+		if ( !baked_asset_dir.Exists )
+			baked_asset_dir.Create();
+
+		// get/create directory for textures of the asset being baked
+		string textures_path = baked_asset_path + "/Textures";
+		string rel_textures_path = rel_baked_asset_path + "/Textures";
+		DirectoryInfo textures_dir = new DirectoryInfo( textures_path );
+		if ( !textures_dir.Exists )
+			textures_dir.Create();
+
+		// get/create directory for meshes of the asset being baked
+		string meshes_path = baked_asset_path + "/Meshes";
+		string rel_meshes_path = rel_baked_asset_path + "/Meshes";
+		DirectoryInfo meshes_dir = new DirectoryInfo( meshes_path );
+		if ( !meshes_dir.Exists )
+			meshes_dir.Create();
+
+		// get/create directory for materials of the asset being baked
+		string materials_path = baked_asset_path + "/Materials";
+		string rel_materials_path = rel_baked_asset_path + "/Materials";
+		DirectoryInfo materials_dir = new DirectoryInfo( materials_path );
+		if ( !materials_dir.Exists )
+			materials_dir.Create();
+
+		// get/create directory for shaders of the asset being baked
+		string shaders_path = baked_asset_path + "/Shaders";
+		string rel_shaders_path = rel_baked_asset_path + "/Shaders";
+		DirectoryInfo shaders_dir = new DirectoryInfo( shaders_path );
+		if ( !shaders_dir.Exists )
+			shaders_dir.Create();
+				
+		// Create new game object that is a copy of this asset except with all the HAPI components 
+		// removed. This new game object will be used to create a prefab.
+		GameObject new_object = Instantiate( gameObject ) as GameObject;
+
+		// bake all meshes and materials created by HAPI_PartControls
+		foreach ( HAPI_PartControl part_control in new_object.GetComponentsInChildren< HAPI_PartControl >() )
+		{
+			// bake meshes
+			MeshFilter mesh_filter = part_control.GetComponent< MeshFilter >();
+			if ( mesh_filter )
+			{
+				string mesh_name = part_control.prGeoControl.prObjectControl.name + "_" +
+								   part_control.prGeoControl.name + "_" +
+								   part_control.name + "_" +
+								   "mesh";
+				string mesh_path = rel_meshes_path + "/" + mesh_name + ".asset";
+				AssetDatabase.CreateAsset( mesh_filter.sharedMesh, mesh_path );
+				AssetDatabase.SaveAssets();
+			}
+
+			// bake materials
+			MeshRenderer mesh_renderer = part_control.GetComponent< MeshRenderer >();
+			if ( mesh_renderer )
+			{
+				foreach ( Material material in mesh_renderer.sharedMaterials )
+				{
+					// bake shader needed by material
+					if ( material.shader )
+					{
+						string shader_name = material.shader.name.Replace( "HAPI/", null );
+						string shader_path = rel_shaders_path + "/" + shader_name + ".asset";
+
+						Shader shader = AssetDatabase.LoadAssetAtPath( shader_path, typeof(Shader) ) as Shader;
+						if ( !shader )
+						{
+							shader = Instantiate( material.shader ) as Shader;
+							AssetDatabase.CreateAsset( shader, shader_path );
+							AssetDatabase.SaveAssets();
+						}
+
+						material.shader = shader;
+					}
+
+					// bake texture needed by material
+					if ( material.mainTexture )
+					{
+						string texture_name = Path.GetFileName( AssetDatabase.GetAssetPath( material.mainTexture ) ); 
+						string texture_path = rel_textures_path + "/" + texture_name;
+
+						Texture2D texture = AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+						if( !texture )
+						{
+							AssetDatabase.CopyAsset( AssetDatabase.GetAssetPath( material.mainTexture ), texture_path );
+							AssetDatabase.ImportAsset( texture_path, ImportAssetOptions.Default );
+
+							texture = AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+						}
+
+						material.mainTexture = texture;
+					}
+
+					string material_name = part_control.prGeoControl.prObjectControl.name + "_" +
+										   part_control.prGeoControl.name + "_" +
+										   part_control.name + "_" +
+										   "mat";
+					string mat_path = rel_materials_path + "/" + material_name + ".asset"; 
+					AssetDatabase.CreateAsset( material, mat_path );
+					AssetDatabase.SaveAssets();
+				}
+			}
+		}
+
+		// delete all HAPI components from prefab
+		foreach ( HAPI_Parms hapi_parms in new_object.GetComponentsInChildren< HAPI_Parms >() )
+		{
+			DestroyImmediate( hapi_parms );
+		}
+
+		foreach ( HAPI_Control hapi_control in new_object.GetComponentsInChildren< HAPI_Control >() )
+		{
+			DestroyImmediate( hapi_control );
+		}
+
+		foreach ( HAPI_MeshToPrefab hapi_mesh_to_prefab in new_object.GetComponentsInChildren< HAPI_MeshToPrefab >() )
+		{
+			DestroyImmediate( hapi_mesh_to_prefab );
+		}
+
+		// create prefab
+		string prefab_path = rel_baked_asset_path + "/" + gameObject.name + ".prefab";
+		PrefabUtility.CreatePrefab( prefab_path, new_object );
+		AssetDatabase.SaveAssets();
+
+		// destroy object we created because we don't need it anymore
+		DestroyImmediate( new_object );
+	}
 	
 	public void bakeAnimations( float start_time, 
 								float end_time, 
