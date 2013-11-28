@@ -1310,7 +1310,72 @@ public class HAPI_AssetUtility
 		if ( generate_tangents && !tangent_attr_info.exists )
 			calculateMeshTangents( mesh );
 	}
-	
+
+	private static void setMeshPointAttribute( int asset_id,
+	                                           int object_id,
+	                                           int geo_id,
+	                                           string attr, 
+	                                           int tuple_size,
+	                                           Vector3 [] input_data,
+	                                           bool setting_raw_mesh,
+	                                           bool adjust_for_coordinate_system,
+	                                           HAPI_PartInfo part_info,
+	                                           HAPI_PartControl part_control )
+	{
+		HAPI_AttributeInfo attr_info = new HAPI_AttributeInfo( attr );
+		attr_info.exists 		= true;
+		attr_info.owner 		= HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+		attr_info.storage 		= HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+		attr_info.count 		= part_info.pointCount;
+		attr_info.tupleSize 	= tuple_size;
+		HAPI_Host.addAttribute( asset_id, object_id, geo_id, 
+		                        attr, ref attr_info );
+		
+		float[] attr_values = new float[ part_info.pointCount * tuple_size ];
+
+		bool data_ok = true;
+		if ( setting_raw_mesh )
+		{
+			for ( int i = 0; i < part_info.pointCount; ++i )
+				for ( int j = 0; j < tuple_size; ++j )
+			{
+				if( adjust_for_coordinate_system )
+				{
+					if ( j != 0 )
+						attr_values[ i * tuple_size + j ] = input_data[ i ][ j ];
+					else
+						attr_values[ i * tuple_size + j ] = -input_data[ i ][ j ];
+				}
+				else
+				{
+					attr_values[ i * tuple_size + j ] = input_data[ i ][ j ];
+				}
+			}
+		}
+		else if ( attr == HAPI_Constants.HAPI_ATTRIB_POSITION )
+		{
+			for ( int ii = 0; ii < part_control.prVertexList.Length; ii++ )
+			{
+				int point_index = part_control.prVertexList[ ii ] * 3;
+				
+				attr_values[ point_index ] = -input_data[ ii ][ 0 ];
+				attr_values[ point_index + 1 ] = input_data[ ii ][ 1 ];
+				attr_values[ point_index + 2 ] = input_data[ ii ][ 2 ];
+			}
+		}
+		else
+		{
+			data_ok = false;
+			Debug.LogWarning( "Marshalling of " + attr + " for editing not supported at this time." );
+		}
+
+		if ( data_ok )
+		{
+			setAttribute( asset_id, object_id, geo_id, attr, 
+			             ref attr_info, ref attr_values, HAPI_Host.setAttributeFloatData );
+		}
+	}
+
 	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh, 
 								HAPI_PartControl part_control )
 	{
@@ -1318,8 +1383,8 @@ public class HAPI_AssetUtility
 
 		Vector3[] vertices 				= mesh.vertices;
 		int[] triangles 				= mesh.triangles;
-		//Vector2[] uvs 				= mesh.uv;
-		//Vector3[] normals 			= mesh.normals;
+		Vector2[] uvs 					= mesh.uv;
+		Vector3[] normals 				= mesh.normals;
 		
 		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
 		geo_info.id 					= geo_id;
@@ -1353,12 +1418,12 @@ public class HAPI_AssetUtility
 		part_info.faceAttributeCount 	= 0;
 		part_info.detailAttributeCount 	= 0;
 		
-		/* Not yet supported.
+		 
 		if ( uvs != null )
-			part_info.vertexAttributeCount++;
+			part_info.pointAttributeCount++;
 		if ( normals != null )
-			part_info.vertexAttributeCount++;
-		*/
+			part_info.pointAttributeCount++;
+
 		
 		HAPI_Host.setGeoInfo( asset_id, object_id, geo_id, ref geo_info );
 		HAPI_Host.setPartInfo( asset_id, object_id, geo_id, ref part_info );
@@ -1380,42 +1445,28 @@ public class HAPI_AssetUtility
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
 		
 		// Set position attributes.
-		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
-		pos_attr_info.exists 		= true;
-		pos_attr_info.owner 		= HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
-		pos_attr_info.storage 		= HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
-		pos_attr_info.count 		= part_info.pointCount;
-		pos_attr_info.tupleSize 	= 3;
-		HAPI_Host.addAttribute( asset_id, object_id, geo_id, 
-								HAPI_Constants.HAPI_ATTRIB_POSITION, ref pos_attr_info );
-		
-		float[] pos_attr = new float[ part_info.pointCount * 3 ];
-		
-		if ( setting_raw_mesh )
-		{
-			for ( int i = 0; i < part_info.pointCount; ++i )
-				for ( int j = 0; j < 3; ++j )
-				{
-					if ( j != 0 )
-						pos_attr[ i * 3 + j ] = vertices[ i ][ j ];
-					else
-						pos_attr[ i * 3 + j ] = -vertices[ i ][ j ];
-				}
-		}
-		else
-		{
-			for ( int ii = 0; ii < part_control.prVertexList.Length; ii++ )
-			{
-				int point_index = part_control.prVertexList[ ii ] * 3;
+		setMeshPointAttribute( asset_id, object_id, geo_id, 
+		                       HAPI_Constants.HAPI_ATTRIB_POSITION, 3, vertices,
+		                       setting_raw_mesh, true, part_info, part_control );
 
-				pos_attr[ point_index ] = -vertices[ ii ][ 0 ];
-				pos_attr[ point_index + 1 ] = vertices[ ii ][ 1 ];
-				pos_attr[ point_index + 2 ] = vertices[ ii ][ 2 ];
-			}
+
+		setMeshPointAttribute( asset_id, object_id, geo_id, 
+		                       HAPI_Constants.HAPI_ATTRIB_NORMAL, 3, normals,
+		                       setting_raw_mesh, true, part_info, part_control );
+
+		Vector3[] uvs3 = new Vector3[ uvs.Length ];
+		for ( int ii = 0; ii < uvs.Length; ii++ )
+		{
+			uvs3[ ii ][0] = uvs[ ii ][0];
+			uvs3[ ii ][1] = uvs[ ii ][1];
+			uvs3[ ii ][2] = 0;
 		}
-		
-		setAttribute( asset_id, object_id, geo_id, HAPI_Constants.HAPI_ATTRIB_POSITION, 
-					  ref pos_attr_info, ref pos_attr, HAPI_Host.setAttributeFloatData );
+
+		setMeshPointAttribute( asset_id, object_id, geo_id, 
+		                      HAPI_Constants.HAPI_ATTRIB_UV, 2, uvs3,
+		                      setting_raw_mesh, false, part_info, part_control );
+
+
 		
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
 	}
