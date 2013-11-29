@@ -449,7 +449,7 @@ public class HAPI_Instancer : MonoBehaviour
 		{
 																			
 			HAPI_Transform[] instance_transforms = new HAPI_Transform[ myNumInstances ];
-			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.HAPI_SRT, 
+			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, HAPI_RSTOrder.HAPI_SRT, 
 								 HAPI_Host.getInstanceTransforms, instance_transforms, myNumInstances );
 											
 						
@@ -618,7 +618,7 @@ public class HAPI_Instancer : MonoBehaviour
 			cacheNumInstances();
 											
 			HAPI_Transform[] instance_transforms = new HAPI_Transform[ myNumInstances ];
-			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, (int) HAPI_RSTOrder.HAPI_SRT, 
+			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, HAPI_RSTOrder.HAPI_SRT, 
 								 HAPI_Host.getInstanceTransforms, instance_transforms, myNumInstances );
 			
 			// Get scale point attributes.

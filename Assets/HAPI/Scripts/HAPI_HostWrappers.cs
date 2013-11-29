@@ -916,8 +916,7 @@ namespace HAPI
 		///			The geometry id.
 		///	</param>
 		/// <param name="rstOrder">
-		///			The order of application of translation, rotation and scale:
-		///			TRS = 0, TSR = 1, RTS = 2, RST = 3, STR = 4, SRT = 5
+		///			The order of application of translation, rotation and scale.
 		/// </param>
 		/// <param="transforms">
 		///			Array of HAPI_Transform at least the size of
@@ -933,11 +932,11 @@ namespace HAPI
 		/// </param>
 		public static void getInstanceTransforms(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-			int rstOrder, [Out] HAPI_Transform[] transforms,
+			HAPI_RSTOrder rst_order, [Out] HAPI_Transform[] transforms,
 			int start, int length )
 		{
 			HAPI_Result status_code = HAPI_GetInstanceTransforms(
-				asset_id, object_id, geo_id, rstOrder, transforms, start, length );
+				asset_id, object_id, geo_id, rst_order, transforms, start, length );
 			processStatusCode( status_code );
 		}
 
