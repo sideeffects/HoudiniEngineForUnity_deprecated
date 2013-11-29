@@ -375,7 +375,7 @@ namespace HAPI
 		private static extern HAPI_Result
 		HAPI_GetInstanceTransforms(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-			int rstOrder,
+			HAPI_RSTOrder rst_order,
 			[Out] HAPI_Transform[] transforms,
 			int start, int length );
 
