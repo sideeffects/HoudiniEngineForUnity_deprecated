@@ -700,7 +700,7 @@ namespace HAPI
 					
 					Debug.Log(  "Running Houdini Engine Unity Plugin Version: " +
 								HAPI_Version.HOUDINI_ENGINE_MAJOR + "." + 
-								HAPI_Version.HOUDINI_ENGINE_MINOR + "." +
+								HAPI_Version.HOUDINI_ENGINE_MINOR +
 								", API: " + HAPI_Version.HOUDINI_ENGINE_API );
 					
 					Debug.Log(  "Linking Against Houdini Engine Version: " + 
