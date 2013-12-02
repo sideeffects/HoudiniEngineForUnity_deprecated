@@ -174,9 +174,9 @@ public class HAPI_CurveGUI : Editor
 				ray.origin					= myTempCamera.transform.position;
 				Vector3 intersection		= new Vector3();
 
-				if ( myTarget != null && myTarget.GetComponent< MeshCollider >() )
+				if ( myTarget != null && myTarget.GetComponent< Collider >() )
 				{
-					MeshCollider collider = myTarget.GetComponent< MeshCollider >();
+					Collider collider = myTarget.GetComponent< Collider >();
 					RaycastHit hit_info;
 					collider.Raycast( ray, out hit_info, myIntersectionRayLength );
 					intersection = hit_info.point;
@@ -184,7 +184,7 @@ public class HAPI_CurveGUI : Editor
 				else
 				{
 					Plane plane = new Plane();
-					plane.SetNormalAndPosition( Vector3.up, myCurve.transform.position );
+					plane.SetNormalAndPosition( Vector3.up, Vector3.zero );
 					float enter = 0.0f;
 					plane.Raycast( ray, out enter );
  					intersection = ray.origin + ray.direction * enter;
@@ -197,19 +197,21 @@ public class HAPI_CurveGUI : Editor
 				// Draw guide line.
 				if ( myCurve.prPoints.Count > 0 )
 				{
-					Vector3 anchor1				= myCurve.prPoints[ myCurve.prPoints.Count - 1 ];
-					Vector3 anchor2				= Vector3.zero;
-					insert_index				= myCurve.prPoints.Count;
+					Vector3 anchor1 = myCurve.transform.TransformPoint(
+						myCurve.prPoints[ myCurve.prPoints.Count - 1 ] );
+					Vector3 anchor2 = Vector3.zero;
+					insert_index = myCurve.prPoints.Count;
 
 					// See if we're close to another segment.
 					for ( int i = 1; i < myCurve.prPoints.Count; ++i )
 					{
-						Vector3 p0 = myCurve.prPoints[ i - 1 ];
-						Vector3 p1 = myCurve.prPoints[ i ];
-						
+						Vector3 p0 = myCurve.transform.TransformPoint( myCurve.prPoints[ i - 1 ] );
+						Vector3 p1 = myCurve.transform.TransformPoint( myCurve.prPoints[ i ] );
+
 						Vector3 closest_point = new Vector3();
 						float distance = HAPI_GUIUtility.closestDistanceBetweenLineAndLineSegment(
-											p0, p1, ray, out closest_point );
+							p0, p1,
+							ray, out closest_point );
 						
 						if ( distance < 
 								HandleUtility.GetHandleSize( closest_point ) / 
@@ -255,7 +257,7 @@ public class HAPI_CurveGUI : Editor
 					myGuideLinesMaterial.SetPass( 0 );
 					myGuideLinesMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
 					myGuideLinesMaterial.SetTextureScale( "_MainTex", new Vector2( 1.0f, 1.0f ) );
-					Graphics.DrawMeshNow( myGuideLinesMesh, myCurve.transform.localToWorldMatrix );
+					Graphics.DrawMeshNow( myGuideLinesMesh, Matrix4x4.identity );
 				}
 
 				// Add points on click.
@@ -264,6 +266,11 @@ public class HAPI_CurveGUI : Editor
 					// Once we add a point we are no longer bound to the user holding down the add points key.
 					// Add points mode is now fully activated.
 					myCurve.prModeChangeWait = false;
+
+					// Need to inverse transform the new point because it is in world space
+					// and we want it to stay in the same location as it is in world space
+					// when it is parented to the curve's transform.
+					new_point_location = myCurve.transform.InverseTransformPoint( new_point_location );
 
 					if ( is_mid_point )
 						myCurve.insertPoint( insert_index, new_point_location );
