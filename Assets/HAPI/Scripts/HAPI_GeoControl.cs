@@ -224,6 +224,15 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 				HAPI_PresetMap map = prAsset.prPresetsMap;
 				byte[] preset = map.get( getFullControlNameAndPath() );
 				HAPI_Host.setPreset( prNodeId, preset );
+
+				// Unfortunately, we need to build everything again because we just changed
+				// the parameters on our geo node.
+				if ( prAsset )
+					prAsset.buildClientSide();
+
+				// The asset build will get the new parameter values of the asset, not our 
+				// geo node parameter values. We must get them ourselves.
+				prParms.getParameterValues();
 			}
 		}
 
