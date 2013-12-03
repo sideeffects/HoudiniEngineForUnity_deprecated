@@ -81,6 +81,8 @@ public class HAPI_Parms : MonoBehaviour
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
 
+	public HAPI_ParmsUndoInfo 		prParmsUndoInfo {				get { return myParmsUndoInfo; }
+																	private set { } }				
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
 	/// 	A 1:1 mapping with myFolderListSelectionIds.
@@ -169,6 +171,8 @@ public class HAPI_Parms : MonoBehaviour
 
 		prLastChangedParmId 			= -1;
 
+		myParmsUndoInfo					= null;
+
 		prFolderListSelections 			= new List< int >();
 		prFolderListSelectionIds 		= new List< int >();
 		prFolderListSelections.Add( 0 );
@@ -214,6 +218,8 @@ public class HAPI_Parms : MonoBehaviour
 
 	public void cacheStringsFromHost()
 	{
+		myParmsUndoInfo.parmStringValues = new string[ prParmStringValueCount ];
+
 		// For each string parameter, cache the string from the host
 		foreach ( HAPI_ParmInfo parm in prParms )
 		{
@@ -221,8 +227,13 @@ public class HAPI_Parms : MonoBehaviour
 			{
 				myParmStrings[ parm.id ] = new string[ parm.size ];
 				for ( int p = 0; p < parm.size; ++p )
-					myParmStrings[ parm.id ][ p ] =
-						HAPI_Host.getString( prParmStringValues[ parm.stringValuesIndex + p ] );
+				{
+					int values_index = parm.stringValuesIndex + p;
+					string string_value = HAPI_Host.getString( prParmStringValues[ values_index ] );
+
+					myParmStrings[ parm.id ][ p ] = string_value;
+					myParmsUndoInfo.parmStringValues[ values_index ] = string_value;
+				}
 			}
 		}
 	}
@@ -235,6 +246,10 @@ public class HAPI_Parms : MonoBehaviour
 			return;
 		if ( prControl.prAssetId < 0 )
 			return;
+
+		// Create undo info if it hasn't been created already
+		if ( myParmsUndoInfo == null )
+			myParmsUndoInfo = ScriptableObject.CreateInstance< HAPI_ParmsUndoInfo >();
 
 		// Get the node info again
 		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prControl.prNodeId );
@@ -257,10 +272,16 @@ public class HAPI_Parms : MonoBehaviour
 		Utility.getArray1Id( 
 			prControl.prNodeId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
 
+		myParmsUndoInfo.parmIntValues = new int[ prParmIntValueCount ];
+		Array.Copy( prParmIntValues, myParmsUndoInfo.parmIntValues, prParmIntValueCount );
+
 		// Get parameter float values.
 		prParmFloatValues = new float[ prParmFloatValueCount ];
 		Utility.getArray1Id( 
 			prControl.prNodeId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+
+		myParmsUndoInfo.parmFloatValues = new float[ prParmFloatValueCount ];
+		Array.Copy( prParmFloatValues, myParmsUndoInfo.parmFloatValues, prParmFloatValueCount );
 
 		// Get parameter string (handle) values.
 		prParmStringValues = new int[ prParmStringValueCount ];
@@ -532,7 +553,9 @@ public class HAPI_Parms : MonoBehaviour
 	private bool 									myToRemoveInstance = false;
 
 	[SerializeField] private int					myLastChangedParmId;
-	
+
+	[SerializeField] private HAPI_ParmsUndoInfo		myParmsUndoInfo;
+
 	/// <summary>
 	/// 	Indices of the currently selected folders in the Inspector.
 	/// 	A 1:1 mapping with myFolderListSelectionIds.
