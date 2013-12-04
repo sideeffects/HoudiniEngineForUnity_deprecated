@@ -321,7 +321,5 @@ public class HAPI_AssetGUI : Editor
 	protected bool 			myFocusChanged;
 	protected bool			myReloadAsset;
 
-	private string 			myLastFocusedControl;
-
 	private const int		myInputFormatDropdownWidth = 62;
 }

@@ -530,7 +530,6 @@ public class HAPI_ParmsGUI : Editor
 	private bool myParmChanges;
 	private bool myUnbuiltChanges;
 	private bool myFocusChanged;
-	private bool myReloadAsset;
 
 	private string myLastFocusedControl;
 }
