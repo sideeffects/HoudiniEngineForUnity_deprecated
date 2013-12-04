@@ -298,6 +298,28 @@ public class HAPI_Parms : MonoBehaviour
 			myParmMap[ prParms[ i ].id ] = prParms[ i ];
 
 		cacheStringsFromHost();
+
+		// Go through parameters and set index map and multiparm map for undo info
+		myParmsUndoInfo.parmNames.Clear();
+		myParmsUndoInfo.parmIndices.Clear();
+
+		foreach ( HAPI_ParmInfo parm in prParms )
+		{
+			// Need to check the index values are greater or equal to 0
+			// for now because there is a bug where some parameters are
+			// being set to have an integer parameter type, a size of 
+			// zero, and an index value of -1
+			if ( parm.isInt() && parm.intValuesIndex >= 0 )
+				myParmsUndoInfo.parmIndices.Add( parm.intValuesIndex );
+			else if ( parm.isFloat() && parm.floatValuesIndex >= 0 )
+				myParmsUndoInfo.parmIndices.Add( parm.floatValuesIndex );
+			else if ( parm.isString() && parm.stringValuesIndex >= 0 )
+				myParmsUndoInfo.parmIndices.Add( parm.stringValuesIndex );
+			else
+				continue;
+
+			myParmsUndoInfo.parmNames.Add( parm.name );
+		}
 		
 		// Set which parameter values have been overridden (only needed for a prefab instance)
 		if ( prControl && prControl.isPrefabInstance() && gameObject.GetComponent< HAPI_Asset >() != null )

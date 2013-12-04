@@ -17,6 +17,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using HAPI;
@@ -74,42 +75,78 @@ public class HAPI_ParmsGUI : Editor
 				commitChanges = true;
 			else if ( curr_event.commandName == "UndoRedoPerformed" )
 			{
-				HAPI_ParmsUndoInfo undo_info = myParms.prParmsUndoInfo;
-				
-				// Loop through int values and set ones that have changed
-				for ( int i = 0; i < myParms.prParmIntValueCount; i++ )
-				{
-					if ( undo_info.parmIntValues[ i ] != myParms.prParmIntValues[ i ] )
-					{
-						int[] values = new int[ 1 ];
-						values[ 0 ] = undo_info.parmIntValues[ i ];
-						HAPI_Host.setParmIntValues( myParms.prControl.prNodeId, values, i, 1 );
-					}
-				}
-				
-				// Loop through float values and set ones that have changed
-				for ( int i = 0; i < myParms.prParmFloatValueCount; i++ )
-				{
-					if ( undo_info.parmFloatValues[ i ] != myParms.prParmFloatValues[ i ] )
-					{
-						float[] values = new float[ 1 ];
-						values[ 0 ] = undo_info.parmFloatValues[ i ];
-						HAPI_Host.setParmFloatValues( myParms.prControl.prNodeId, values, i, 1 );
-					}
-				}
-				
-				// Loop through parameters and set string values that have changed
+				HAPI_ParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HAPI_ParmsUndoInfo;
+
+				// First find all multiparms and add/remove instances as necessary
 				foreach ( HAPI_ParmInfo parm in myParms.prParms )
 				{
-					if ( parm.isString() )
+					if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST &&
+					     undo_info.parmNames.Contains( parm.name ) )
+					{
+						// get value of multiparm from undo info
+						int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+						int new_value = undo_info.parmIntValues[ new_value_index ];
+
+						// get current value of multiparm
+						int current_value = myParms.prParmIntValues[ parm.intValuesIndex ];
+
+						// add/remove number of instances from current parameters to match number
+						// of parameters from undo info
+						int difference = new_value - current_value;
+						if ( difference > 0 )
+							myParms.appendMultiparmInstances( parm, difference );
+						else if ( difference < 0 )
+							myParms.removeMultiparmInstances( parm, -difference );
+
+						myParms.getParameterValues();
+					}
+				}
+				
+				// Next loop through all parameters and copy changed values over from undo info
+				foreach ( HAPI_ParmInfo parm in myParms.prParms )
+				{
+					if ( !undo_info.parmNames.Contains( parm.name ) )
+						continue;
+
+					if ( parm.isInt() )
+					{
+						int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+						int new_int_value = undo_info.parmIntValues[ new_value_index ];
+						int current_int_value = myParms.prParmIntValues[ parm.intValuesIndex ];
+
+						if ( new_int_value != current_int_value &&
+						    parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+						{
+							int[] values = new int[ parm.size ];
+							Array.Copy( undo_info.parmIntValues, new_value_index, values, 0, parm.size );
+							HAPI_Host.setParmIntValues( myParms.prControl.prNodeId, values, 
+							                            parm.intValuesIndex, parm.size );
+						}
+					}
+					else if ( parm.isFloat() )
+					{
+						int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+						float new_float_value = undo_info.parmFloatValues[ new_value_index ];
+						float current_float_value = myParms.prParmFloatValues[ parm.floatValuesIndex ];
+
+						if ( new_float_value != current_float_value )
+						{
+							float[] values = new float[ parm.size ];
+							Array.Copy( undo_info.parmFloatValues, new_value_index, values, 0, parm.size );
+							HAPI_Host.setParmFloatValues( myParms.prControl.prNodeId, values, 
+							                              parm.floatValuesIndex, parm.size );
+						}
+					}
+					else if ( parm.isString() )
 					{
 						string[] current_string_values = new string[ parm.size ];
 						current_string_values = myParms.getParmStrings( parm );
 						
 						for ( int i = 0; i < parm.size; i++ )
 						{
+							int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+							string new_string_value = undo_info.parmStringValues[ new_value_index + i ];
 							string current_string_value = current_string_values[ i ];
-							string new_string_value = undo_info.parmStringValues[ parm.stringValuesIndex + i ];
 							
 							if ( string.Compare( current_string_value, new_string_value ) != 0 )
 								HAPI_Host.setParmStringValue( myParms.prControl.prNodeId, 
@@ -156,7 +193,7 @@ public class HAPI_ParmsGUI : Editor
 				if ( myParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
 					changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
 
-				//Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
+				Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
 
 				myParms.prControl.onParmChange( false ); // We never need to reload the asset here.
 	
