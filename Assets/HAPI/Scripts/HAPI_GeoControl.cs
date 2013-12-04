@@ -134,8 +134,13 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 			geo_node.name = prGeoName + "_geo" + prGeoId;
 		}
 
-		if ( !myObjectControl.prAsset.prImportTemplatedGeos && geo_info.isTemplated && !geo_info.isDisplayGeo )
+		if ( !geo_info.isDisplayGeo && 
+				(	geo_info.type != HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE && 
+					!myObjectControl.prAsset.prImportTemplatedGeos && 
+					geo_info.isTemplated ) )
+		{
 			return;
+		}
 
 		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
