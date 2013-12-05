@@ -76,6 +76,7 @@ public class HAPI_ParmsGUI : Editor
 			else if ( curr_event.commandName == "UndoRedoPerformed" )
 			{
 				HAPI_ParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HAPI_ParmsUndoInfo;
+				bool changed = false;
 
 				// First find all multiparms and add/remove instances as necessary
 				foreach ( HAPI_ParmInfo parm in myParms.prParms )
@@ -97,8 +98,11 @@ public class HAPI_ParmsGUI : Editor
 							myParms.appendMultiparmInstances( parm, difference );
 						else if ( difference < 0 )
 							myParms.removeMultiparmInstances( parm, -difference );
+						else
+							continue;
 
 						myParms.getParameterValues();
+						changed = true;
 					}
 				}
 				
@@ -117,6 +121,8 @@ public class HAPI_ParmsGUI : Editor
 						if ( new_int_value != current_int_value &&
 						    parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 						{
+							changed = true;
+
 							int[] values = new int[ parm.size ];
 							Array.Copy( undo_info.parmIntValues, new_value_index, values, 0, parm.size );
 							HAPI_Host.setParmIntValues( myParms.prControl.prNodeId, values, 
@@ -131,6 +137,8 @@ public class HAPI_ParmsGUI : Editor
 
 						if ( new_float_value != current_float_value )
 						{
+							changed = true;
+
 							float[] values = new float[ parm.size ];
 							Array.Copy( undo_info.parmFloatValues, new_value_index, values, 0, parm.size );
 							HAPI_Host.setParmFloatValues( myParms.prControl.prNodeId, values, 
@@ -149,15 +157,19 @@ public class HAPI_ParmsGUI : Editor
 							string current_string_value = current_string_values[ i ];
 							
 							if ( string.Compare( current_string_value, new_string_value ) != 0 )
+							{
+								changed = true;
+
 								HAPI_Host.setParmStringValue( myParms.prControl.prNodeId, 
 								                             new_string_value, parm.id, i );
+							}
 						}
 					}
 				}
-				
-				if ( myParms.prControl.prAsset )
+
+				if ( changed )
 				{
-					myParms.prControl.prAsset.buildClientSide();
+					myAsset.buildClientSide();
 				}
 			}
 

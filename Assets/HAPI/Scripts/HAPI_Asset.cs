@@ -388,6 +388,13 @@ public abstract class HAPI_Asset : HAPI_Control
 					 && control.gameObject.GetComponent< MeshRenderer >() != null )
 					control.gameObject.GetComponent< MeshRenderer >().enabled = false;
 			}
+
+			// update undo info if needed
+			if ( asset.GetType() == typeof( HAPI_AssetOTL ) )
+			{
+				HAPI_AssetOTL asset_otl = asset as HAPI_AssetOTL;
+				asset_otl.prAssetOTLUndoInfo.isGeoVisible = false;
+			}
 		}
 	}
 	
