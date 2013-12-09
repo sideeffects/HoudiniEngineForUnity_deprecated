@@ -207,7 +207,7 @@ public class HAPI_ParmsGUI : Editor
 
 				Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
 
-				myParms.prControl.onParmChange( false ); // We never need to reload the asset here.
+				myParms.prControl.onParmChange();
 	
 				myUnbuiltChanges	= false;
 				myParmChanges		= false;

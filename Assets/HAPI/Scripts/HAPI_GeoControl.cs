@@ -188,9 +188,9 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		}
 	}
 
-	public override void onParmChange( bool reload_asset )
+	public override void onParmChange()
 	{
-		base.onParmChange( reload_asset );
+		base.onParmChange();
 
 		if ( prGeoType == HAPI_GeoType.HAPI_GEOTYPE_CURVE && prIsEditable )
 		{
@@ -198,8 +198,8 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 			if ( prAsset )
 				prAsset.build(
-					reload_asset,	// reload_asset
-					true,			// unload_asset_first
+					false,			// reload_asset
+					false,			// unload_asset_first
 					false,			// serializatin_recovery_only
 					false,			// force_reconnect
 					prAsset.prCookingTriggersDownCooks,

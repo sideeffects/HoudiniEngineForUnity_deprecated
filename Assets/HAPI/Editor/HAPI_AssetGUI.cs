@@ -33,7 +33,6 @@ public class HAPI_AssetGUI : Editor
 		
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
-		myReloadAsset		= false;
 		myFocusChanged 		= true;
 
 		HAPI_Host.myRepaintDelegate += this.refresh;
@@ -319,7 +318,6 @@ public class HAPI_AssetGUI : Editor
 	protected bool			myParmChanges;
 	protected bool			myUnbuiltChanges;
 	protected bool 			myFocusChanged;
-	protected bool			myReloadAsset;
 
 	private const int		myInputFormatDropdownWidth = 62;
 }

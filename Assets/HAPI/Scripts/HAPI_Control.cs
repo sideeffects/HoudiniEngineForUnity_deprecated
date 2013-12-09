@@ -102,7 +102,7 @@ public class HAPI_Control : MonoBehaviour
 		return "CONTROL";
 	}
 
-	public virtual void onParmChange( bool reload_asset ) {}
+	public virtual void onParmChange() {}
 
 	public T getOrCreateComponent< T >() where T : Component {
 		T component = gameObject.GetComponent< T >();
