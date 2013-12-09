@@ -842,9 +842,9 @@ public abstract class HAPI_Asset : HAPI_Control
 		prUpdatePrefabInstanceParmNames	= new List< string >();
 	}
 	
-	public override void onParmChange( bool reload_asset )
+	public override void onParmChange()
 	{
-		base.onParmChange( reload_asset );
+		base.onParmChange();
 
 		if ( isPrefab() )
 		{
@@ -868,8 +868,8 @@ public abstract class HAPI_Asset : HAPI_Control
 		else
 		{
 			build(	
-				reload_asset,	// reload_asset
-				true,			// unload_asset_first
+				false,			// reload_asset
+				false,			// unload_asset_first
 				false,			// serializatin_recovery_only
 				false,			// force_reconnect
 				prCookingTriggersDownCooks,

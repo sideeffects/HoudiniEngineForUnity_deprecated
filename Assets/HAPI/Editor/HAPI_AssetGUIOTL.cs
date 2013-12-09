@@ -36,15 +36,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	public override void OnInspectorGUI() 
 	{
-		myParmChanges = false;
-		myDelayBuild = false;
-		myFocusChanged = false;
-
-		Event curr_event = Event.current;
-		bool commitChanges = false;
-		if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
-			commitChanges = true;
-
 		base.OnInspectorGUI();
 
 		///////////////////////////////////////////////////////////////////////
@@ -62,24 +53,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 				if ( GUILayout.Button( "Recook" ) )
 					myAssetOTL.buildClientSide();
-			}
-			
-			string path = myAssetOTL.prAssetPath;
-			bool gui_enabled = GUI.enabled;
-			GUI.enabled = gui_enabled && !myAssetOTL.isPrefab();
-			bool file_path_changed = HAPI_GUI.fileField( "otl_path", "OTL Path", ref myDelayBuild, ref path );
-			GUI.enabled = gui_enabled;
-			if ( file_path_changed )
-			{
-				myParmChanges			|= file_path_changed;
-				myAssetOTL.prAssetPath	 = path;
-				myReloadAsset			 = true;
-				
-				// if asset is a prefab instance than break connection to prefab
-				if ( myAssetOTL.isPrefabInstance() )
-				{
-					PrefabUtility.DisconnectPrefabInstance( myAssetOTL.gameObject );
-				}
 			}
 
 			if ( !myAssetOTL.isPrefab() && GUILayout.Button( "Bake" ) )
@@ -120,22 +93,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			if ( myAssetOTL.prShowBakeOptions )
 				generateAssetBakeControls();
 		}
-
-		///////////////////////////////////////////////////////////////////////
-		// Apply Changes
-
-		if ( ( ( myParmChanges && !myDelayBuild ) || 
-				( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
-		{
-			myAssetOTL.onParmChange( myReloadAsset );
-	
-			myUnbuiltChanges	= false;
-			myParmChanges		= false;
-			myReloadAsset		= false;
-		}
-		else if ( myParmChanges )
-			myUnbuiltChanges = true;
-
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -162,7 +162,7 @@ public class HAPI_Curve : MonoBehaviour
 		prControl.prAsset.buildClientSide();
 		prControl.prAsset.savePreset();
 		prParms.getParameterValues();
-		prControl.onParmChange( false );
+		prControl.onParmChange();
 	}
 
 	public void syncPointsWithParm()

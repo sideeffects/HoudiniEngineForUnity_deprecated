@@ -101,7 +101,7 @@ public class HAPI_ParmsGUI : Editor
 			if ( ( ( myParmChanges && !myDelayBuild ) || 
 				 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
 			{
-				myParms.prControl.onParmChange( false ); // We never need to reload the asset here.
+				myParms.prControl.onParmChange();
 	
 				myUnbuiltChanges	= false;
 				myParmChanges		= false;
