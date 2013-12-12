@@ -72,6 +72,57 @@ public class HAPI_ParmsGUI : Editor
 			bool commitChanges = false;
 			if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
 				commitChanges = true;
+			else if ( curr_event.commandName == "UndoRedoPerformed" )
+			{
+				HAPI_ParmsUndoInfo undo_info = myParms.prParmsUndoInfo;
+				
+				// Loop through int values and set ones that have changed
+				for ( int i = 0; i < myParms.prParmIntValueCount; i++ )
+				{
+					if ( undo_info.parmIntValues[ i ] != myParms.prParmIntValues[ i ] )
+					{
+						int[] values = new int[ 1 ];
+						values[ 0 ] = undo_info.parmIntValues[ i ];
+						HAPI_Host.setParmIntValues( myParms.prControl.prNodeId, values, i, 1 );
+					}
+				}
+				
+				// Loop through float values and set ones that have changed
+				for ( int i = 0; i < myParms.prParmFloatValueCount; i++ )
+				{
+					if ( undo_info.parmFloatValues[ i ] != myParms.prParmFloatValues[ i ] )
+					{
+						float[] values = new float[ 1 ];
+						values[ 0 ] = undo_info.parmFloatValues[ i ];
+						HAPI_Host.setParmFloatValues( myParms.prControl.prNodeId, values, i, 1 );
+					}
+				}
+				
+				// Loop through parameters and set string values that have changed
+				foreach ( HAPI_ParmInfo parm in myParms.prParms )
+				{
+					if ( parm.isString() )
+					{
+						string[] current_string_values = new string[ parm.size ];
+						current_string_values = myParms.getParmStrings( parm );
+						
+						for ( int i = 0; i < parm.size; i++ )
+						{
+							string current_string_value = current_string_values[ i ];
+							string new_string_value = undo_info.parmStringValues[ parm.stringValuesIndex + i ];
+							
+							if ( string.Compare( current_string_value, new_string_value ) != 0 )
+								HAPI_Host.setParmStringValue( myParms.prControl.prNodeId, 
+								                             new_string_value, parm.id, i );
+						}
+					}
+				}
+				
+				if ( myParms.prControl.prAsset )
+				{
+					myParms.prControl.prAsset.buildClientSide();
+				}
+			}
 
 			///////////////////////////////////////////////////////////////////////
 			// Draw Asset Controls
@@ -101,6 +152,12 @@ public class HAPI_ParmsGUI : Editor
 			if ( ( ( myParmChanges && !myDelayBuild ) || 
 				 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
 			{
+				string changed_parm_name = "Parameter Change";
+				if ( myParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
+					changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
+
+				//Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
+
 				myParms.prControl.onParmChange();
 	
 				myUnbuiltChanges	= false;
