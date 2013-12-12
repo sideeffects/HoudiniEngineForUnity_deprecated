@@ -36,6 +36,50 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	public override void OnInspectorGUI() 
 	{
+		Event curr_event = Event.current;
+		if ( curr_event.commandName == "UndoRedoPerformed" )
+		{
+			HAPI_AssetOTLUndoInfo undo_info = ScriptableObject.Instantiate( myAssetOTL.prAssetOTLUndoInfo ) as HAPI_AssetOTLUndoInfo;
+
+			myAsset.prShowPinnedInstances 			= undo_info.showPinnedInstances;
+			myAsset.prAutoSelectAssetRootNode 		= undo_info.autoSelectAssetRootNode;
+			myAsset.prHideGeometryOnLinking 		= undo_info.hideGeometryOnLinking;
+			myAsset.prRenderResolution 				= undo_info.renderResolution;
+			myAsset.prEnableCooking 				= undo_info.enableCooking;
+			myAsset.prCookingTriggersDownCooks 		= undo_info.cookingTriggersDownCooks;
+			myAsset.prPlaymodePerFrameCooking 		= undo_info.playmodePerFrameCooking;
+			myAsset.prPushUnityTransformToHoudini 	= undo_info.pushUnityTransformToHoudini;
+			myAsset.prTransformChangeTriggersCooks 	= undo_info.transformChangeTriggersCooks;
+			myAsset.prImportTemplatedGeos 			= undo_info.importTemplatedGeos;
+
+			if ( undo_info.isGeoVisible != myAsset.prIsGeoVisible )
+			{
+				myAsset.prIsGeoVisible = undo_info.isGeoVisible;
+
+				HAPI_PartControl[] controls = 
+					myAsset.GetComponentsInChildren< HAPI_PartControl >();
+				foreach ( HAPI_PartControl control in controls )
+				{
+					if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
+					    && control.gameObject.GetComponent< MeshRenderer >() != null )
+						control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
+				}
+			}
+			if ( undo_info.materialShaderType != myAsset.prMaterialShaderType || 
+			     undo_info.showOnlyVertexColours != myAsset.prShowOnlyVertexColours )
+			{
+				myAsset.prMaterialShaderType = undo_info.materialShaderType;
+				myAsset.prShowOnlyVertexColours = undo_info.showOnlyVertexColours;
+
+				HAPI_AssetUtility.reApplyMaterials( myAsset );
+			}
+			if ( undo_info.generateTangents != myAsset.prGenerateTangents )
+			{
+				myAsset.prGenerateTangents = undo_info.generateTangents;
+				myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true );
+			}
+		}
+
 		base.OnInspectorGUI();
 
 		///////////////////////////////////////////////////////////////////////
@@ -160,7 +204,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		{
 			bool value = myAsset.prIsGeoVisible;
 			bool is_bold = prefab_asset && prefab_asset.prIsGeoVisible != value;
-			bool changed = HAPI_GUI.toggle( "show_geometries", "Show Geometries", is_bold, ref value );
+			string label = "Show Geometries";
+			bool changed = HAPI_GUI.toggle( "show_geometries", label, is_bold, ref value );
 			if ( changed )
 			{
 				myAsset.prIsGeoVisible = value;
@@ -172,6 +217,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							&& control.gameObject.GetComponent< MeshRenderer >() != null )
 						control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
 				}
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.isGeoVisible = value;
 			}
 		}
 		
@@ -179,10 +228,15 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		{
 			bool value = myAsset.prShowPinnedInstances;
 			bool is_bold = prefab_asset && prefab_asset.prShowPinnedInstances != value;
-			bool changed = HAPI_GUI.toggle( "show_pinned_instances", "Show Pinned Instances", is_bold, ref value );
+			string label = "Show Pinned Instances";
+			bool changed = HAPI_GUI.toggle( "show_pinned_instances", label, is_bold, ref value );
 			if ( changed )
 			{
 				myAsset.prShowPinnedInstances = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.showPinnedInstances = value;
 			}
 		}
 
@@ -200,7 +254,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 
 			if ( changed )
+			{
 				myAsset.prAutoSelectAssetRootNode = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.autoSelectAssetRootNode = value;
+			}
 		}
 		
 		// Hide When Fed to Other Asset
@@ -217,7 +277,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 
 			if ( changed )
+			{
 				myAsset.prHideGeometryOnLinking = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.hideGeometryOnLinking = value;
+			}
 		}
 	}
 	
@@ -236,14 +302,19 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		{
 			int value = (int) myAsset.prMaterialShaderType;
 			bool is_bold = prefab_asset && (int) prefab_asset.prMaterialShaderType != value;
+			string label = "Material Renderer";
 			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
 			int[] values = { 0, 1 };
-			bool changed = HAPI_GUI.dropdown( "material_renderer", "Material Renderer", 
+			bool changed = HAPI_GUI.dropdown( "material_renderer", label, 
 											  ref value, labels, is_bold, values );
 			if ( changed )
 			{
 				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
 				HAPI_AssetUtility.reApplyMaterials( myAsset );
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.materialShaderType = (HAPI_ShaderType) value;
 			}
 		}
 
@@ -253,7 +324,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			int[] values = new int[ 2 ];
 			values[ 0 ] = (int) myAsset.prRenderResolution[ 0 ];
 			values[ 1 ] = (int) myAsset.prRenderResolution[ 1 ];
-			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "render_resolution", "Render Resolution", 2 );
+			string label = "Render Resolution";
+			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "render_resolution", label, 2 );
 			gui_parm.isBold = prefab_asset && 
 							  (int) prefab_asset.prRenderResolution[ 0 ] != values[ 0 ] &&
 							  (int) prefab_asset.prRenderResolution[ 1 ] != values[ 1 ];
@@ -262,6 +334,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			{
 				Vector2 new_resolution = new Vector2( (float) values[ 0 ], (float) values[ 1 ] );
 				myAsset.prRenderResolution = new_resolution;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.renderResolution = new_resolution;
 			}
 		}
 
@@ -269,11 +345,16 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		{
 			bool value = myAsset.prShowOnlyVertexColours;
 			bool is_bold = prefab_asset && prefab_asset.prShowOnlyVertexColours != value;
-			bool changed = HAPI_GUI.toggle( "show_only_vertex_colours", "Show Only Vertex Colors", is_bold, ref value );
+			string label = "Show Only Vertex Colors";
+			bool changed = HAPI_GUI.toggle( "show_only_vertex_colours", label, is_bold, ref value );
 			if ( changed )
 			{
 				myAsset.prShowOnlyVertexColours = value;
 				HAPI_AssetUtility.reApplyMaterials( myAsset );
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.showOnlyVertexColours = value;
 			}
 		}
 
@@ -294,6 +375,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			{
 				myAsset.prGenerateTangents = value;
 				myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true );
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.generateTangents = value;
 			}
 		}
 	}
@@ -318,7 +403,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 
 			if ( changed )
+			{
 				myAsset.prEnableCooking = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.enableCooking = value;
+			}
 		}
 
 		HAPI_GUI.separator();
@@ -344,7 +435,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 
 			if ( changed )
+			{
 				myAsset.prCookingTriggersDownCooks = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.cookingTriggersDownCooks = value;
+			}
 		}
 
 		// Playmode Per-Frame Cooking Toggle
@@ -368,7 +465,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 
 			if ( changed )
+			{
 				myAsset.prPlaymodePerFrameCooking = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.playmodePerFrameCooking = value;
+			}
 		}
 
 		HAPI_GUI.separator();
@@ -388,7 +491,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 
 			if ( changed )
+			{
 				myAsset.prPushUnityTransformToHoudini = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.pushUnityTransformToHoudini = value;
+			}
 		}
 
 		// Transform Change Triggers Cooks Toggle
@@ -412,7 +521,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 
 			if ( changed )
+			{
 				myAsset.prTransformChangeTriggersCooks = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.transformChangeTriggersCooks = value;
+			}
 		}
 
 		// Import Templated Geos Toggle
@@ -436,7 +551,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			GUI.enabled = true;
 			
 			if ( changed )
+			{
 				myAsset.prImportTemplatedGeos = value;
+
+				// record undo info
+				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+				myAssetOTL.prAssetOTLUndoInfo.importTemplatedGeos = value;
+			}
 		}
 	}
 
