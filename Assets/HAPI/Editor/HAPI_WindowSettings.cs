@@ -33,8 +33,10 @@ public class HAPI_WindowSettings : EditorWindow
 	public static void ShowWindow() 
 	{
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow< HAPI_WindowSettings >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + 
-													   " " + HAPI_GUIUtility.mySettingsLabel );
+		EditorWindow window = EditorWindow.GetWindow< HAPI_WindowSettings >( false, 
+			HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " " + HAPI_GUIUtility.mySettingsLabel );
+
+		window.autoRepaintOnSceneChange = true;
 
 		if ( !HAPI.HAPI_SetPath.prIsPathSet )
 		{
@@ -145,7 +147,9 @@ public class HAPI_WindowSettings : EditorWindow
 		// Pin Size
 		{
 			float value = HAPI_Host.prPinSize;
-			bool changed = HAPI_GUI.floatField( "pin_size", "Pin Size", ref value );
+			bool changed = HAPI_GUI.floatField( "pin_size", "Pin Size", ref value, 
+			                                    HAPI_Host.prHostUndoInfo, 
+			                                    ref HAPI_Host.prHostUndoInfo.pinSize );
 			if ( changed )
 			{
 				HAPI_Host.prPinSize = value;
@@ -559,7 +563,9 @@ public class HAPI_WindowSettings : EditorWindow
 		{
 			float value = HAPI_Host.prGuidePointSize;
 			bool changed = HAPI_GUI.floatField( "guide_point_size", "Guide Point Size", 
-												ref value, 4.0f, 40.0f );
+												ref value, 4.0f, 40.0f,
+			                                    HAPI_Host.prHostUndoInfo,
+			                                    ref HAPI_Host.prHostUndoInfo.guidePointSize );
 			if ( changed )
 			{
 				HAPI_Host.prGuidePointSize = value;
@@ -573,7 +579,9 @@ public class HAPI_WindowSettings : EditorWindow
 			float value = HAPI_Host.prMinDistanceForPointSelection;
 			bool changed = HAPI_GUI.floatField( "min_distance_for_point_selection", 
 												"Min. Distance For Point Selection", 
-												ref value, 1.0f, 20.0f );
+			                                    ref value, 1.0f, 20.0f,
+			                                    HAPI_Host.prHostUndoInfo,
+			                                    ref HAPI_Host.prHostUndoInfo.minDistanceForPointSelection );
 			if ( changed )
 			{
 				HAPI_Host.prMinDistanceForPointSelection = value;
@@ -587,7 +595,9 @@ public class HAPI_WindowSettings : EditorWindow
 			float value = HAPI_Host.prGuideMinDistanceForMidPointInsertion;
 			bool changed = HAPI_GUI.floatField( "guide_min_distance_for_mid_point_insertion", 
 												"Guide Min. Distance For Mid Point Insertion", 
-												ref value, 1.0f, 20.0f );
+			                                   	ref value, 1.0f, 20.0f,
+			                                   	HAPI_Host.prHostUndoInfo,
+			                                   	ref HAPI_Host.prHostUndoInfo.guideMinDistanceForMidPointInsertion );
 			if ( changed )
 			{
 				HAPI_Host.prGuideMinDistanceForMidPointInsertion = value;

@@ -182,13 +182,13 @@ public class HAPI_GUI : Editor
 									  string[] dropdown_labels,
 									  T[] dropdown_values )
 	{
-		return dropdown( name, label, ref value, dropdown_labels, false, dropdown_values );
+		return dropdown( name, label, ref value, false, dropdown_labels, dropdown_values );
 	}
 	
 	public static bool dropdown< T >( string name, string label, 
 									  ref T value,
-									  string[] dropdown_labels,
-									  bool is_bold,
+	                                  bool is_bold,
+	                                  string[] dropdown_labels,
 									  T[] dropdown_values )
 	{
 		HAPI_GUIParm parm = new HAPI_GUIParm( name, label, 1 );
@@ -446,17 +446,21 @@ public class HAPI_GUI : Editor
 		return new_value != old_value;
 	}
 
-	public static bool floatField( string name, string label, ref float value )
+	public static bool floatField( string name, string label, ref float value, Object undo_info, ref float undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		float[] values = new float[ 1 ];
 		values[ 0 ] = value;
+		float[] undo_values = new float[ 1 ];
+		undo_values[ 0 ] = undo_value;
 		bool delay_build = false;
-		bool changed = floatField( ref gui_parm, ref delay_build, ref values );
+		bool changed = floatField( ref gui_parm, ref delay_build, ref values, undo_info, ref undo_values );
 		value = values[ 0 ];
+		undo_value = undo_values[ 0 ];
 		return changed;
 	}
-	public static bool floatField( string name, string label, ref float value, float ui_min, float ui_max )
+	public static bool floatField( string name, string label, ref float value, float ui_min, 
+	                               float ui_max, Object undo_info, ref float undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		gui_parm.hasUIMin = true;
@@ -465,26 +469,37 @@ public class HAPI_GUI : Editor
 		gui_parm.UIMax = ui_max;
 		float[] values = new float[ 1 ];
 		values[ 0 ] = value;
+		float[] undo_values = new float[ 1 ];
+		undo_values[ 0 ] = undo_value;
 		bool delay_build = false;
-		bool changed = floatField( ref gui_parm, ref delay_build, ref values );
+		bool changed = floatField( ref gui_parm, ref delay_build, ref values, undo_info, ref undo_values );
 		value = values[ 0 ];
+		undo_value = undo_values[ 0 ];
 		return changed;
 	}
 	public static bool floatField( ref HAPI_GUIParm parm,
-								   ref bool delay_build,
-								   ref float[] values )
+	                               ref bool delay_build,
+	                               ref float[] values,
+	                               Object undo_info, 
+	                               ref float[] undo_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return floatField( ref parm, ref delay_build, ref values, ref join_last, ref no_label_toggle_last );
+		return floatField( ref parm, ref delay_build, ref values, ref join_last, 
+		                   ref no_label_toggle_last, undo_info, ref undo_values );
 	}
 	public static bool floatField( ref HAPI_GUIParm parm,
 								   ref bool delay_build,
 								   ref float[] values,
-								   ref bool join_last, ref bool no_label_toggle_last )
+								   ref bool join_last, 
+	                               ref bool no_label_toggle_last,
+	                               Object undo_info,
+	                               ref float[] undo_values )
 	{
 		initializeConstants();
 		
 		bool changed = false;
+		bool is_undo_event = Event.current.type == EventType.ValidateCommand && 
+							 Event.current.commandName == "UndoRedoPerformed";
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
@@ -503,6 +518,17 @@ public class HAPI_GUI : Editor
 				EditorGUILayout.LabelField( "", myToggleWidthGUI );
 				EditorGUILayout.LabelField( "", getLabelWidth( parm ) );
 				per_line = 0;
+			}
+
+			// Check if value is being changed from an undo/redo event
+			if ( is_undo_event && undo_info != null )
+			{ 
+				float undo_value = undo_values[ parm.valuesIndex + p ];
+				if ( values[ parm.valuesIndex + p ] != undo_value )
+				{
+					values[ parm.valuesIndex + p ] = undo_value;
+					changed |= true;
+				}
 			}
 			
 			// Get old value.
@@ -548,6 +574,14 @@ public class HAPI_GUI : Editor
 			if ( new_value != old_value )
 			{
 				values[ parm.valuesIndex + p ] = new_value;
+
+				// record undo info
+				if ( undo_info != null )
+				{
+					Undo.RecordObject( undo_info, parm.label );
+					undo_values[ parm.valuesIndex + p ] = new_value;
+				}
+				
 				changed |= true;
 			} // if
 		} // for

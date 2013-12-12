@@ -297,8 +297,9 @@ public class HAPI_ParmsGUI : Editor
 		// Float Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
+			float[] undo_values = null;
 			changed = HAPI_GUI.floatField( ref gui_parm, ref myDelayBuild, ref parm_float_values, 
-										   ref join_last, ref no_label_toggle_last );
+										   ref join_last, ref no_label_toggle_last, null, ref undo_values );
 		} // if parm.type is FLOAT
 		///////////////////////////////////////////////////////////////////////
 		// String Parameter

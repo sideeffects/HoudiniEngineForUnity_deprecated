@@ -32,48 +32,13 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	{
 		base.OnEnable();
 		myAssetOTL = myAsset as HAPI_AssetOTL;
+		myUndoInfo = myAssetOTL.prAssetOTLUndoInfo;
 		myParentPrefabAsset = myAsset.getParentPrefabAsset();
 		myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 	}
 	
 	public override void OnInspectorGUI() 
 	{
-		Event curr_event = Event.current;
-		if ( curr_event.commandName == "UndoRedoPerformed" )
-		{
-			HAPI_AssetOTLUndoInfo undo_info = ScriptableObject.Instantiate( myAssetOTL.prAssetOTLUndoInfo ) as HAPI_AssetOTLUndoInfo;
-
-			myAsset.prShowPinnedInstances 			= undo_info.showPinnedInstances;
-			myAsset.prAutoSelectAssetRootNode 		= undo_info.autoSelectAssetRootNode;
-			myAsset.prHideGeometryOnLinking 		= undo_info.hideGeometryOnLinking;
-			myAsset.prRenderResolution 				= undo_info.renderResolution;
-			myAsset.prEnableCooking 				= undo_info.enableCooking;
-			myAsset.prCookingTriggersDownCooks 		= undo_info.cookingTriggersDownCooks;
-			myAsset.prPlaymodePerFrameCooking 		= undo_info.playmodePerFrameCooking;
-			myAsset.prPushUnityTransformToHoudini 	= undo_info.pushUnityTransformToHoudini;
-			myAsset.prTransformChangeTriggersCooks 	= undo_info.transformChangeTriggersCooks;
-			myAsset.prImportTemplatedGeos 			= undo_info.importTemplatedGeos;
-
-			if ( undo_info.isGeoVisible != myAsset.prIsGeoVisible )
-			{
-				myAsset.prIsGeoVisible = undo_info.isGeoVisible;
-				myAsset.applyGeoVisibilityToParts();
-			}
-			if ( undo_info.materialShaderType != myAsset.prMaterialShaderType || 
-			     undo_info.showOnlyVertexColours != myAsset.prShowOnlyVertexColours )
-			{
-				myAsset.prMaterialShaderType = undo_info.materialShaderType;
-				myAsset.prShowOnlyVertexColours = undo_info.showOnlyVertexColours;
-
-				HAPI_AssetUtility.reApplyMaterials( myAsset );
-			}
-			if ( undo_info.generateTangents != myAsset.prGenerateTangents )
-			{
-				myAsset.prGenerateTangents = undo_info.generateTangents;
-				myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true );
-			}
-		}
-
 		base.OnInspectorGUI();
 
 		///////////////////////////////////////////////////////////////////////
@@ -141,7 +106,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Start Time
 		{
 			float value = myAsset.prBakeStartTime;
-			bool changed = HAPI_GUI.floatField( "bake_start_time", "Start Time", ref value );
+			bool changed = HAPI_GUI.floatField( "bake_start_time", "Start Time", ref value, 
+			                                    myUndoInfo, ref myUndoInfo.bakeStartTime );
 			if ( changed )
 				myAsset.prBakeStartTime = value;
 		}
@@ -149,7 +115,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// End Time
 		{
 			float value = myAsset.prBakeEndTime;
-			bool changed = HAPI_GUI.floatField( "bake_end_time", "End Time", ref value );
+			bool changed = HAPI_GUI.floatField( "bake_end_time", "End Time", ref value, 
+			                                    myUndoInfo, ref myUndoInfo.bakeEndTime );
 			if ( changed )
 				myAsset.prBakeEndTime = value;
 		}
@@ -191,25 +158,25 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	private void generateViewSettings()
 	{	
 		// Show Geometries
-		bool changed = createToggleForProperty( "show_geometries", "Show Geometries", "prIsGeoVisible", 
-		                                        ref myAssetOTL.prAssetOTLUndoInfo.isGeoVisible );
-		if ( changed )
-			myAsset.applyGeoVisibilityToParts();
+		createToggleForProperty( "show_geometries", "Show Geometries", "prIsGeoVisible", 
+		                         ref myAssetOTL.prAssetOTLUndoInfo.isGeoVisible, 
+		                         () => myAsset.applyGeoVisibilityToParts() );
 		
 		// Show Pinned Instances
 		createToggleForProperty( "show_pinned_instances", "Show Pinned Instances", "prShowPinnedInstances", 
-	                        	 ref myAssetOTL.prAssetOTLUndoInfo.showPinnedInstances );
+	                        	 ref myAssetOTL.prAssetOTLUndoInfo.showPinnedInstances, null );
 
 		// Auto Select Asset Root Node Toggle
 		createToggleForProperty( "auto_select_asset_root_node", 
 		                         "Auto Select Asset Root Node", 
 			                     "prAutoSelectAssetRootNode", 
 		                         ref myAssetOTL.prAssetOTLUndoInfo.autoSelectAssetRootNode,
+		                         null,
 		                         !HAPI_Host.isAutoSelectAssetRootNodeDefault() );
 		
 		// Hide When Fed to Other Asset
 		createToggleForProperty( "hide_geometry_on_linking", "Hide Geometry On Linking", "prHideGeometryOnLinking",
-		                         ref myAssetOTL.prAssetOTLUndoInfo.hideGeometryOnLinking,
+		                         ref myAssetOTL.prAssetOTLUndoInfo.hideGeometryOnLinking, null,
 		                         !HAPI_Host.isHideGeometryOnLinkingDefault() );
 	}
 	
@@ -227,8 +194,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			string label = "Material Renderer";
 			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
 			int[] values = { 0, 1 };
-			bool changed = HAPI_GUI.dropdown( "material_renderer", label, 
-											  ref value, labels, is_bold, values );
+			bool changed = HAPI_GUI.dropdown( "material_renderer", label, ref value, 
+			                                  is_bold, labels, values );
 			if ( changed )
 			{
 				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
@@ -264,30 +231,24 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		}
 
 		// Show Vertex Colours
-		{
-			bool changed = createToggleForProperty( "show_only_vertex_colours", 
-			                                        "Show Only Vertex Colors", 
-			                                        "prShowOnlyVertexColours",
-			                                        ref myAssetOTL.prAssetOTLUndoInfo.showOnlyVertexColours );
-			if ( changed )
-				HAPI_AssetUtility.reApplyMaterials( myAsset );
-		}
+		createToggleForProperty( "show_only_vertex_colours", 
+                                 "Show Only Vertex Colors", 
+                                 "prShowOnlyVertexColours",
+                                 ref myAssetOTL.prAssetOTLUndoInfo.showOnlyVertexColours,
+                                 () => HAPI_AssetUtility.reApplyMaterials( myAsset ) );
 
 		// Generate Tangents
-		{
-			bool changed = createToggleForProperty( "generate_tangents", "Generate Tangents", "prGenerateTangents",
-			                                        ref myAssetOTL.prAssetOTLUndoInfo.generateTangents, 
-			                                        !HAPI_Host.isGenerateTangentsDefault() );
-			if ( changed )
-				myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true );
-		}
+		createToggleForProperty( "generate_tangents", "Generate Tangents", "prGenerateTangents",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.generateTangents,
+		                         () => myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true ),
+		                         !HAPI_Host.isGenerateTangentsDefault() );
 	}
 
 	private void generateCookingSettings()
 	{	
 		// Enable Cooking Toggle
 		createToggleForProperty( "enable_cooking", "Enable Cooking", "prEnableCooking",
-		                         ref myAssetOTL.prAssetOTLUndoInfo.enableCooking,
+		                         ref myAssetOTL.prAssetOTLUndoInfo.enableCooking, null,
 		                         !HAPI_Host.isEnableCookingDefault() );
 
 		HAPI_GUI.separator();
@@ -297,6 +258,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		                         "Cooking Triggers Downstream Cooks", 
 		                         "prCookingTriggersDownCooks",
 		                         ref myAssetOTL.prAssetOTLUndoInfo.cookingTriggersDownCooks,
+		                         null,
 		                         !HAPI_Host.isCookingTriggersDownCooksDefault(),
 		                         !myAsset.prEnableCooking,
 		                         " (all cooking is disabled)" );
@@ -306,6 +268,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		                         "Playmode Per-Frame Cooking", 
 		                         "prPlaymodePerFrameCooking",
 		                         ref myAssetOTL.prAssetOTLUndoInfo.playmodePerFrameCooking,
+		                         null,
 		                         !HAPI_Host.isPlaymodePerFrameCookingDefault(),
 		                         !myAsset.prEnableCooking,
 		                         " (all cooking is disabled)" );
@@ -317,6 +280,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		                         "Push Unity Transform To Houdini Engine", 
 		                         "prPushUnityTransformToHoudini",
 		                         ref myAssetOTL.prAssetOTLUndoInfo.pushUnityTransformToHoudini,
+		                         null,
 		                         !HAPI_Host.isPushUnityTransformToHoudiniDefault() );
 
 		// Transform Change Triggers Cooks Toggle
@@ -324,13 +288,14 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		                         "Transform Change Triggers Cooks", 
 		                         "prTransformChangeTriggersCooks",
 		                         ref myAssetOTL.prAssetOTLUndoInfo.transformChangeTriggersCooks,
+		                         null,
 		                         !HAPI_Host.isTransformChangeTriggersCooksDefault(),
 		                         !myAsset.prEnableCooking,
 		                         " (all cooking is disabled)" );
 
 		// Import Templated Geos Toggle
 		createToggleForProperty( "import_templated_geos", "Import Templated Geos", "prImportTemplatedGeos",
-		                         ref myAssetOTL.prAssetOTLUndoInfo.importTemplatedGeos,
+		                         ref myAssetOTL.prAssetOTLUndoInfo.importTemplatedGeos, null,
 		                         !HAPI_Host.isImportTemplatedGeosDefault(),
 		                         !myAsset.prEnableCooking,
 		                         " (all cooking is disabled)" );
@@ -353,58 +318,87 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		}
 	}
 
-	private bool createToggleForProperty( string name, string label, string property_name, ref bool undo_info_value )
+	private delegate void valueChangedFunc();
+
+	private void createToggleForProperty( string name, string label, string property_name, 
+	                                      ref bool undo_info_value, valueChangedFunc func )
 	{
-		return createToggleForProperty( name, label, property_name, ref undo_info_value, false );
+		createToggleForProperty( name, label, property_name, ref undo_info_value, func, false );
 	}
 	
-	private bool createToggleForProperty( string name, string label, string property_name, 
-	                                      ref bool undo_info_value, bool global_overwrite )
+	private void createToggleForProperty( string name, string label, string property_name, 
+	                                      ref bool undo_info_value, valueChangedFunc func,
+	                                      bool global_overwrite )
 	{
-		return createToggleForProperty( name, label, property_name, ref undo_info_value, global_overwrite, false, "" );
+		createToggleForProperty( name, label, property_name, ref undo_info_value, 
+		                         func, global_overwrite, false, "" );
 	}
 
-	private bool createToggleForProperty( string name, string label, string property_name, 
-	                                      ref bool undo_info_value, bool global_overwrite, 
-	                                      bool local_overwrite, string local_overwrite_message )
+	private void createToggleForProperty( string name, string label, string property_name, 
+	                                      ref bool undo_info_value, valueChangedFunc func,
+	                                      bool global_overwrite, bool local_overwrite, 
+	                                      string local_overwrite_message )
 	{
-		PropertyInfo property = typeof( HAPI_Asset ).GetProperty( property_name );
-		if ( property == null )
+		try
 		{
-			throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
+			PropertyInfo property = typeof( HAPI_Asset ).GetProperty( property_name );
+			if ( property == null )
+			{
+				throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
+			}
+			if ( property.PropertyType != typeof( bool ) )
+			{
+				throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
+			}
+
+			GUI.enabled = !global_overwrite && !local_overwrite;
+			if ( !GUI.enabled )
+			{
+				if ( global_overwrite )
+					label += " (overwritted by global setting)";
+				else
+					label += local_overwrite_message;
+			}
+			
+			bool value = ( bool ) property.GetValue( myAsset, null );
+
+			bool undo_redo_performed = false;
+			if ( Event.current.type == EventType.ValidateCommand && 
+			    Event.current.commandName == "UndoRedoPerformed" &&
+			    value != undo_info_value )
+			{
+				value = undo_info_value;
+				undo_redo_performed = true;
+			}
+
+			bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) == value;
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
+			GUI.enabled = true;
+
+			if ( changed || undo_redo_performed )
+			{
+				property.SetValue( myAsset, value, null );
+
+				if ( changed )
+				{
+					// record undo info
+					Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+					undo_info_value = value;
+				}
+
+				if ( func != null )
+					func();
+			}
 		}
-		if ( property.PropertyType != typeof( bool ) )
+		catch ( System.Exception error )
 		{
-			throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
+			Debug.LogError( "Failed to create toggle for: " + label + "\n" +
+			                error.ToString() + "\nSource: " + error.Source );
 		}
-
-		GUI.enabled = !global_overwrite && !local_overwrite;
-		if ( !GUI.enabled )
-		{
-			if ( global_overwrite )
-				label += " (overwritted by global setting)";
-			else
-				label += local_overwrite_message;
-		}
-		
-		bool value = ( bool ) property.GetValue( myAsset, null );
-		bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) == value;
-		bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-		GUI.enabled = true;
-
-		if ( changed )
-		{
-			property.SetValue( myAsset, value, null );
-
-			// record undo info
-			Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-			undo_info_value = value;
-		}
-
-		return changed;
 	}
 	
 	private HAPI_AssetOTL myAssetOTL;
+	private HAPI_AssetOTLUndoInfo myUndoInfo;
 	private HAPI_Asset myParentPrefabAsset;
 	private Vector2 myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 }
