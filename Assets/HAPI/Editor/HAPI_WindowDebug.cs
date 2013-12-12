@@ -74,7 +74,8 @@ public class HAPI_WindowDebug : EditorWindow
 			HAPI_GUIUtility.instantiateAsset( asset_file_path );
 		}
 
-		if ( HAPI_GUI.floatField( "global_time", "Global Time", ref myTime ) )
+		float undo_value = myTime;
+		if ( HAPI_GUI.floatField( "global_time", "Global Time", ref myTime, null, ref undo_value ) )
 		{
 			try
 			{

@@ -167,6 +167,10 @@ namespace HAPI
 
 		private const bool myDefaultEnablePointsAsParticles 				= true;
 
+		// Global Settings Undo Info --------------------------------------------------------------------------------
+
+		private static HAPI_HostUndoInfo myHostUndoInfo;
+
 		// Global Settings Initializations --------------------------------------------------------------------------
 
 		static HAPI_Host()
@@ -394,6 +398,19 @@ namespace HAPI
 												get { return getBool( "HAPI_EnablePointsAsParticles" ); }
 												set { setBool( "HAPI_EnablePointsAsParticles", value ); } }
 
+		// Global Settings Undo Info --------------------------------------------------------------------------------
+
+		public static HAPI_HostUndoInfo prHostUndoInfo 
+		{
+			get 
+			{ 
+				if ( myHostUndoInfo == null )
+					myHostUndoInfo = ScriptableObject.CreateInstance< HAPI_HostUndoInfo >();
+				return myHostUndoInfo; 
+			}
+			set { myHostUndoInfo = value; } 
+		}
+	
 		// Global Settings Default Checks ---------------------------------------------------------------------------
 
 		public static bool isCollisionGroupNameDefault()
@@ -569,6 +586,9 @@ namespace HAPI
 			prCurveMethodDefault					= myDefaultCurveMethodDefault;
 
 			prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
+
+			// reset undo info so values match with above settings
+			prHostUndoInfo.initialize();
 		}
 
 		public static RepaintDelegate			myRepaintDelegate;
@@ -799,6 +819,10 @@ namespace HAPI
 
 		private static void update()
 		{
+			//EditorWindow window = EditorWindow.GetWindow< EditorWindow >( false, null );
+			//window.Repaint();
+
+
 			// We need to catch any exceptions here because if we let any out they will stall
 			// the entire callback chain bound to EditorApplication.update which
 			// causes other bound functions in this callback list to never be called.

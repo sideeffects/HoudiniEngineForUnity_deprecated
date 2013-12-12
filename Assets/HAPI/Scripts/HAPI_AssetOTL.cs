@@ -92,6 +92,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 		myAssetOTLUndoInfo.pushUnityTransformToHoudini	= prPushUnityTransformToHoudini;
 		myAssetOTLUndoInfo.transformChangeTriggersCooks = prTransformChangeTriggersCooks;
 		myAssetOTLUndoInfo.importTemplatedGeos 			= prImportTemplatedGeos;
+		myAssetOTLUndoInfo.bakeStartTime				= prBakeStartTime;
+		myAssetOTLUndoInfo.bakeEndTime					= prBakeEndTime;
+		myAssetOTLUndoInfo.bakeSamplesPerSecond			= prBakeSamplesPerSecond;
 	}
 	
 	public override void Update()
