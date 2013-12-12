@@ -171,6 +171,14 @@ namespace HAPI
 
 		static HAPI_Host()
 		{
+#if UNITY_STANDALONE_WIN
+			// During the batch creation of our .unitypackage file we don't want to actually
+			// initialize HAPI. We use this environment variable to inhibit initialization.
+			string no_init = System.Environment.GetEnvironmentVariable( "HAPI_UNITY_NO_INIT" );
+			if ( no_init != null )
+				return;
+#endif
+
 			EditorApplication.update				+= update;
 			EditorApplication.playmodeStateChanged	+= playmodeStateChanged;
 
@@ -681,6 +689,12 @@ namespace HAPI
 #if !UNITY_STANDALONE_WIN
 			return false;
 #else
+			// During the batch creation of our .unitypackage file we don't want to actually
+			// initialize HAPI. We use this environment variable to inhibit initialization.
+			string no_init = System.Environment.GetEnvironmentVariable( "HAPI_UNITY_NO_INIT" );
+			if ( no_init != null )
+				return false;
+
 			if ( !prHoudiniSceneExists )
 			{
 				HAPI_Result status_code;
