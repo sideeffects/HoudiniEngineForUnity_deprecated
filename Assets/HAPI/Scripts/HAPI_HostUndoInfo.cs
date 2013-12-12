@@ -56,16 +56,10 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public HAPI_HostUndoInfo()
 	{
 		initialize();
-		Debug.Log( "Create Host Undo Info " + GetInstanceID() );
 	}
 
-	public void OnEnable()
-	{
-		Debug.Log( "OnEnable" );
-	}
-	
 	public void initialize()
-	{   
+	{
 		// set general settings
 		collisionGroupName 				= HAPI_Host.prCollisionGroupName;
 		renderedCollisionGroupName 		= HAPI_Host.prRenderedCollisionGroupName;
