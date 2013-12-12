@@ -19,6 +19,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using HAPI;
 
 [ CustomEditor( typeof( HAPI_AssetOTL ) ) ]
@@ -31,6 +32,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	{
 		base.OnEnable();
 		myAssetOTL = myAsset as HAPI_AssetOTL;
+		myParentPrefabAsset = myAsset.getParentPrefabAsset();
 		myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 	}
 	
@@ -55,15 +57,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			if ( undo_info.isGeoVisible != myAsset.prIsGeoVisible )
 			{
 				myAsset.prIsGeoVisible = undo_info.isGeoVisible;
-
-				HAPI_PartControl[] controls = 
-					myAsset.GetComponentsInChildren< HAPI_PartControl >();
-				foreach ( HAPI_PartControl control in controls )
-				{
-					if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
-					    && control.gameObject.GetComponent< MeshRenderer >() != null )
-						control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
-				}
+				myAsset.applyGeoVisibilityToParts();
 			}
 			if ( undo_info.materialShaderType != myAsset.prMaterialShaderType || 
 			     undo_info.showOnlyVertexColours != myAsset.prShowOnlyVertexColours )
@@ -195,104 +189,32 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	}
 
 	private void generateViewSettings()
-	{
-		// If the asset is a prefab instance then get the prefab parent in order to determine
-		// what view settings need to be bold
-		HAPI_Asset prefab_asset = myAsset.getParentPrefabAsset();
-		
+	{	
 		// Show Geometries
-		{
-			bool value = myAsset.prIsGeoVisible;
-			bool is_bold = prefab_asset && prefab_asset.prIsGeoVisible != value;
-			string label = "Show Geometries";
-			bool changed = HAPI_GUI.toggle( "show_geometries", label, is_bold, ref value );
-			if ( changed )
-			{
-				myAsset.prIsGeoVisible = value;
-				HAPI_PartControl[] controls = 
-					myAsset.GetComponentsInChildren< HAPI_PartControl >();
-				foreach ( HAPI_PartControl control in controls )
-				{
-					if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
-							&& control.gameObject.GetComponent< MeshRenderer >() != null )
-						control.gameObject.GetComponent< MeshRenderer >().enabled = myAsset.prIsGeoVisible;
-				}
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.isGeoVisible = value;
-			}
-		}
+		bool changed = createToggleForProperty( "show_geometries", "Show Geometries", "prIsGeoVisible", 
+		                                        ref myAssetOTL.prAssetOTLUndoInfo.isGeoVisible );
+		if ( changed )
+			myAsset.applyGeoVisibilityToParts();
 		
 		// Show Pinned Instances
-		{
-			bool value = myAsset.prShowPinnedInstances;
-			bool is_bold = prefab_asset && prefab_asset.prShowPinnedInstances != value;
-			string label = "Show Pinned Instances";
-			bool changed = HAPI_GUI.toggle( "show_pinned_instances", label, is_bold, ref value );
-			if ( changed )
-			{
-				myAsset.prShowPinnedInstances = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.showPinnedInstances = value;
-			}
-		}
+		createToggleForProperty( "show_pinned_instances", "Show Pinned Instances", "prShowPinnedInstances", 
+	                        	 ref myAssetOTL.prAssetOTLUndoInfo.showPinnedInstances );
 
 		// Auto Select Asset Root Node Toggle
-		{
-			bool value		= myAsset.prAutoSelectAssetRootNode;
-			bool is_bold 	= prefab_asset && prefab_asset.prAutoSelectAssetRootNode != value;
-			string name		= "auto_select_asset_root_node";
-			string label	= "Auto Select Asset Root Node";
-
-			GUI.enabled = ( HAPI_Host.prAutoSelectAssetRootNode == HAPI_Host.myDefaultAutoSelectAssetRootNode );
-			if ( !GUI.enabled ) 
-				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				myAsset.prAutoSelectAssetRootNode = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.autoSelectAssetRootNode = value;
-			}
-		}
+		createToggleForProperty( "auto_select_asset_root_node", 
+		                         "Auto Select Asset Root Node", 
+			                     "prAutoSelectAssetRootNode", 
+		                         ref myAssetOTL.prAssetOTLUndoInfo.autoSelectAssetRootNode,
+		                         !HAPI_Host.isAutoSelectAssetRootNodeDefault() );
 		
 		// Hide When Fed to Other Asset
-		{
-			bool value		= myAsset.prHideGeometryOnLinking;
-			bool is_bold 	= prefab_asset && prefab_asset.prHideGeometryOnLinking != value;
-			string name		= "hide_geometry_on_linking";
-			string label	= "Hide Geometry On Linking";
-
-			GUI.enabled = ( HAPI_Host.prHideGeometryOnLinking == HAPI_Host.myDefaultHideGeometryOnLinking );
-			if ( !GUI.enabled ) 
-				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				myAsset.prHideGeometryOnLinking = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.hideGeometryOnLinking = value;
-			}
-		}
+		createToggleForProperty( "hide_geometry_on_linking", "Hide Geometry On Linking", "prHideGeometryOnLinking",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.hideGeometryOnLinking,
+		                         !HAPI_Host.isHideGeometryOnLinkingDefault() );
 	}
 	
 	private void generateMaterialSettings()
-	{
-		// If the asset is a prefab instance then get the prefab parent in order to determine
-		// what material settings need to be bold
-		HAPI_Asset prefab_asset = myAsset.getParentPrefabAsset();
-		
+	{	
 		if ( GUILayout.Button( "Re-Render" ) ) 
 		{
 			HAPI_AssetUtility.reApplyMaterials( myAsset );
@@ -301,7 +223,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Material Shader Type
 		{
 			int value = (int) myAsset.prMaterialShaderType;
-			bool is_bold = prefab_asset && (int) prefab_asset.prMaterialShaderType != value;
+			bool is_bold = myParentPrefabAsset && (int) myParentPrefabAsset.prMaterialShaderType != value;
 			string label = "Material Renderer";
 			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
 			int[] values = { 0, 1 };
@@ -326,9 +248,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			values[ 1 ] = (int) myAsset.prRenderResolution[ 1 ];
 			string label = "Render Resolution";
 			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "render_resolution", label, 2 );
-			gui_parm.isBold = prefab_asset && 
-							  (int) prefab_asset.prRenderResolution[ 0 ] != values[ 0 ] &&
-							  (int) prefab_asset.prRenderResolution[ 1 ] != values[ 1 ];
+			gui_parm.isBold = myParentPrefabAsset && 
+							  (int) myParentPrefabAsset.prRenderResolution[ 0 ] != values[ 0 ] &&
+							  (int) myParentPrefabAsset.prRenderResolution[ 1 ] != values[ 1 ];
 			bool changed = HAPI_GUI.intField( ref gui_parm, ref delay_build, ref values );
 			if ( changed )
 			{
@@ -343,222 +265,75 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 		// Show Vertex Colours
 		{
-			bool value = myAsset.prShowOnlyVertexColours;
-			bool is_bold = prefab_asset && prefab_asset.prShowOnlyVertexColours != value;
-			string label = "Show Only Vertex Colors";
-			bool changed = HAPI_GUI.toggle( "show_only_vertex_colours", label, is_bold, ref value );
+			bool changed = createToggleForProperty( "show_only_vertex_colours", 
+			                                        "Show Only Vertex Colors", 
+			                                        "prShowOnlyVertexColours",
+			                                        ref myAssetOTL.prAssetOTLUndoInfo.showOnlyVertexColours );
 			if ( changed )
-			{
-				myAsset.prShowOnlyVertexColours = value;
 				HAPI_AssetUtility.reApplyMaterials( myAsset );
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.showOnlyVertexColours = value;
-			}
 		}
 
 		// Generate Tangents
 		{
-			bool value		= myAsset.prGenerateTangents;
-			bool is_bold 	= prefab_asset && prefab_asset.prGenerateTangents != value;
-			string name		= "generate_tangents";
-			string label	= "Generate Tangents";
-
-			GUI.enabled = HAPI_Host.isGenerateTangentsDefault();
-			if ( !GUI.enabled ) 
-				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
+			bool changed = createToggleForProperty( "generate_tangents", "Generate Tangents", "prGenerateTangents",
+			                                        ref myAssetOTL.prAssetOTLUndoInfo.generateTangents, 
+			                                        !HAPI_Host.isGenerateTangentsDefault() );
 			if ( changed )
-			{
-				myAsset.prGenerateTangents = value;
 				myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true );
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.generateTangents = value;
-			}
 		}
 	}
 
 	private void generateCookingSettings()
-	{
-		// If the asset is a prefab instance then get the prefab parent in order to determine
-		// what material settings need to be bold
-		HAPI_Asset prefab_asset = myAsset.getParentPrefabAsset();
-		
+	{	
 		// Enable Cooking Toggle
-		{
-			bool value		= myAsset.prEnableCooking;
-			bool is_bold 	= prefab_asset && prefab_asset.prEnableCooking != value;
-			string name		= "enable_cooking";
-			string label	= "Enable Cooking";
-
-			GUI.enabled = ( HAPI_Host.prEnableCooking == HAPI_Host.myDefaultEnableCooking );
-			if ( !GUI.enabled ) 
-				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				myAsset.prEnableCooking = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.enableCooking = value;
-			}
-		}
+		createToggleForProperty( "enable_cooking", "Enable Cooking", "prEnableCooking",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.enableCooking,
+		                         !HAPI_Host.isEnableCookingDefault() );
 
 		HAPI_GUI.separator();
 
 		// Cooking Triggers Downstream Cooks Toggle
-		{
-			bool value		= myAsset.prCookingTriggersDownCooks;
-			bool is_bold 	= prefab_asset && prefab_asset.prCookingTriggersDownCooks != value;
-			string name		= "cooking_triggers_downstream_cooks";
-			string label	= "Cooking Triggers Downstream Cooks";
-
-			bool global_overwrite = ( HAPI_Host.prCookingTriggersDownCooks != 
-									  HAPI_Host.myDefaultCookingTriggersDownCooks );
-			bool local_overwrite  = ( myAsset.prEnableCooking == false );
-
-			GUI.enabled = ( !global_overwrite && !local_overwrite );
-			if ( !GUI.enabled ) 
-				if ( global_overwrite )
-					label += " (overwritted by global setting)";
-				else // local_overwrite
-					label += " (all cooking is disabled)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				myAsset.prCookingTriggersDownCooks = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.cookingTriggersDownCooks = value;
-			}
-		}
+		createToggleForProperty( "cooking_triggers_downstream_cooks", 
+		                         "Cooking Triggers Downstream Cooks", 
+		                         "prCookingTriggersDownCooks",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.cookingTriggersDownCooks,
+		                         !HAPI_Host.isCookingTriggersDownCooksDefault(),
+		                         !myAsset.prEnableCooking,
+		                         " (all cooking is disabled)" );
 
 		// Playmode Per-Frame Cooking Toggle
-		{
-			bool value		= myAsset.prPlaymodePerFrameCooking;
-			bool is_bold 	= prefab_asset && prefab_asset.prPlaymodePerFrameCooking != value;
-			string name		= "playmode_per_frame_cooking";
-			string label	= "Playmode Per-Frame Cooking";
-
-			bool global_overwrite = ( HAPI_Host.prPlaymodePerFrameCooking != 
-									  HAPI_Host.myDefaultPlaymodePerFrameCooking );
-			bool local_overwrite  = ( myAsset.prEnableCooking == false );
-
-			GUI.enabled = ( !global_overwrite && !local_overwrite );
-			if ( !GUI.enabled ) 
-				if ( global_overwrite )
-					label += " (overwritted by global setting)";
-				else // local_overwrite
-					label += " (all cooking is disabled)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				myAsset.prPlaymodePerFrameCooking = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.playmodePerFrameCooking = value;
-			}
-		}
+		createToggleForProperty( "playmode_per_frame_cooking", 
+		                         "Playmode Per-Frame Cooking", 
+		                         "prPlaymodePerFrameCooking",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.playmodePerFrameCooking,
+		                         !HAPI_Host.isPlaymodePerFrameCookingDefault(),
+		                         !myAsset.prEnableCooking,
+		                         " (all cooking is disabled)" );
 
 		HAPI_GUI.separator();
 
 		// Push Unity Transform To Houdini Engine Toggle
-		{
-			bool value		= myAsset.prPushUnityTransformToHoudini;
-			bool is_bold 	= prefab_asset && prefab_asset.prPushUnityTransformToHoudini != value;
-			string name		= "push_unity_transform_to_houdini_engine";
-			string label	= "Push Unity Transform To Houdini Engine";
-
-			GUI.enabled = ( HAPI_Host.prPushUnityTransformToHoudini == 
-							HAPI_Host.myDefaultPushUnityTransformToHoudini );
-			if ( !GUI.enabled ) 
-				label += " (overwritted by global setting)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				myAsset.prPushUnityTransformToHoudini = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.pushUnityTransformToHoudini = value;
-			}
-		}
+		createToggleForProperty( "push_unity_transform_to_houdini_engine", 
+		                         "Push Unity Transform To Houdini Engine", 
+		                         "prPushUnityTransformToHoudini",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.pushUnityTransformToHoudini,
+		                         !HAPI_Host.isPushUnityTransformToHoudiniDefault() );
 
 		// Transform Change Triggers Cooks Toggle
-		{
-			bool value		= myAsset.prTransformChangeTriggersCooks;
-			bool is_bold 	= prefab_asset && prefab_asset.prTransformChangeTriggersCooks != value;
-			string name		= "transform_change_triggers_cooks";
-			string label	= "Transform Change Triggers Cooks";
-
-			bool global_overwrite = ( HAPI_Host.prTransformChangeTriggersCooks != 
-									  HAPI_Host.myDefaultTransformChangeTriggersCooks );
-			bool local_overwrite  = ( myAsset.prEnableCooking == false );
-
-			GUI.enabled = ( !global_overwrite && !local_overwrite );
-			if ( !GUI.enabled ) 
-				if ( global_overwrite )
-					label += " (overwritted by global setting)";
-				else // local_overwrite
-					label += " (all cooking is disabled)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				myAsset.prTransformChangeTriggersCooks = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.transformChangeTriggersCooks = value;
-			}
-		}
+		createToggleForProperty( "transform_change_triggers_cooks", 
+		                         "Transform Change Triggers Cooks", 
+		                         "prTransformChangeTriggersCooks",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.transformChangeTriggersCooks,
+		                         !HAPI_Host.isTransformChangeTriggersCooksDefault(),
+		                         !myAsset.prEnableCooking,
+		                         " (all cooking is disabled)" );
 
 		// Import Templated Geos Toggle
-		{
-			bool value		= myAsset.prImportTemplatedGeos;
-			bool is_bold 	= prefab_asset && prefab_asset.prImportTemplatedGeos != value;
-			string name		= "import_templated_geos";
-			string label	= "Import Templated Geos";
-			
-			bool global_overwrite = ( HAPI_Host.prImportTemplatedGeos != 
-			                         HAPI_Host.myDefaultImportTemplatedGeos );
-			bool local_overwrite  = ( myAsset.prEnableCooking == false );
-			
-			GUI.enabled = ( !global_overwrite && !local_overwrite );
-			if ( !GUI.enabled ) 
-				if ( global_overwrite )
-					label += " (overwritted by global setting)";
-			else // local_overwrite
-				label += " (all cooking is disabled)";
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
-			GUI.enabled = true;
-			
-			if ( changed )
-			{
-				myAsset.prImportTemplatedGeos = value;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.importTemplatedGeos = value;
-			}
-		}
+		createToggleForProperty( "import_templated_geos", "Import Templated Geos", "prImportTemplatedGeos",
+		                         ref myAssetOTL.prAssetOTLUndoInfo.importTemplatedGeos,
+		                         !HAPI_Host.isImportTemplatedGeosDefault(),
+		                         !myAsset.prEnableCooking,
+		                         " (all cooking is disabled)" );
 	}
 
 	private void generateAssetSettings()
@@ -577,7 +352,59 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			default: Debug.LogError( "Invalid Asset Settings Tab." ); break;
 		}
 	}
+
+	private bool createToggleForProperty( string name, string label, string property_name, ref bool undo_info_value )
+	{
+		return createToggleForProperty( name, label, property_name, ref undo_info_value, false );
+	}
+	
+	private bool createToggleForProperty( string name, string label, string property_name, 
+	                                      ref bool undo_info_value, bool global_overwrite )
+	{
+		return createToggleForProperty( name, label, property_name, ref undo_info_value, global_overwrite, false, "" );
+	}
+
+	private bool createToggleForProperty( string name, string label, string property_name, 
+	                                      ref bool undo_info_value, bool global_overwrite, 
+	                                      bool local_overwrite, string local_overwrite_message )
+	{
+		PropertyInfo property = typeof( HAPI_Asset ).GetProperty( property_name );
+		if ( property == null )
+		{
+			throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
+		}
+		if ( property.PropertyType != typeof( bool ) )
+		{
+			throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
+		}
+
+		GUI.enabled = !global_overwrite && !local_overwrite;
+		if ( !GUI.enabled )
+		{
+			if ( global_overwrite )
+				label += " (overwritted by global setting)";
+			else
+				label += local_overwrite_message;
+		}
+		
+		bool value = ( bool ) property.GetValue( myAsset, null );
+		bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) == value;
+		bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
+		GUI.enabled = true;
+
+		if ( changed )
+		{
+			property.SetValue( myAsset, value, null );
+
+			// record undo info
+			Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
+			undo_info_value = value;
+		}
+
+		return changed;
+	}
 	
 	private HAPI_AssetOTL myAssetOTL;
+	private HAPI_Asset myParentPrefabAsset;
 	private Vector2 myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 }

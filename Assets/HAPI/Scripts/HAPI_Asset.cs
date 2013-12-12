@@ -1293,10 +1293,22 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		// get/create directory for the asset being baked
 		string baked_asset_path = HAPI_Constants.HAPI_BAKED_ASSETS_PATH + "/" + prAssetName;
-		string rel_baked_asset_path = baked_asset_path.Replace( Application.dataPath, "Assets" );
+
 		DirectoryInfo baked_asset_dir = new DirectoryInfo( baked_asset_path );
-		if ( !baked_asset_dir.Exists )
-			baked_asset_dir.Create();
+		int i = 0;
+		while ( baked_asset_dir.Exists )
+		{
+			i++;
+			if ( i > 1 )
+				baked_asset_path = baked_asset_path.Substring( 0, baked_asset_path.Length - 1 ) + i;
+			else
+				baked_asset_path = baked_asset_path + "_" + i;
+
+			baked_asset_dir = new DirectoryInfo( baked_asset_path ); 
+		}
+		baked_asset_dir.Create();
+
+		string rel_baked_asset_path = baked_asset_path.Replace( Application.dataPath, "Assets" );
 
 		// get/create directory for textures of the asset being baked
 		string textures_path = baked_asset_path + "/Textures";
@@ -1589,6 +1601,17 @@ public abstract class HAPI_Asset : HAPI_Control
 			return prefab.GetComponent< HAPI_Asset >();
 		}
 		return null;
+	}
+
+	public void applyGeoVisibilityToParts()
+	{
+		HAPI_PartControl[] controls = GetComponentsInChildren< HAPI_PartControl >();
+		foreach ( HAPI_PartControl control in controls )
+		{
+			if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
+			    && control.gameObject.GetComponent< MeshRenderer >() != null )
+				control.gameObject.GetComponent< MeshRenderer >().enabled = prIsGeoVisible;
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
