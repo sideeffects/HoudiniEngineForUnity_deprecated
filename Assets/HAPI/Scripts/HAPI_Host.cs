@@ -754,7 +754,7 @@ namespace HAPI
 					}
 					
 					// Initialize.
-					status_code = (HAPI_Result) HAPI_Initialize( otls_path, dsos_path, true, -1 );
+					status_code = HAPI_Initialize( otls_path, dsos_path, true, -1 );
 					if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 						processStatusCode( status_code );
 				}
