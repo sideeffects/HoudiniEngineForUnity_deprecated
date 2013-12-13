@@ -56,7 +56,8 @@ public class HAPI_InstancerGUI : Editor
 		
 		{
 			bool value = myInstancer.prOverrideInstances;
-			changed |= HAPI_GUI.toggle( "override_instance_object", "Override Instance Object", ref value );
+			changed |= HAPI_GUI.toggle( "override_instance_object", "Override Instance Object", ref value,
+			                            null, ref value );
 			myInstancer.prOverrideInstances = value;
 		}
 		

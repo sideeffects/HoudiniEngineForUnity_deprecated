@@ -161,7 +161,8 @@ public class HAPI_PartControlGUI : Editor
 	{
 		{
 			bool value = myPartControl.prShowPointNumbers;
-			bool changed = HAPI_GUI.toggle( "show_point_numbers", "Show Point Numbers", ref value );
+			bool changed = HAPI_GUI.toggle( "show_point_numbers", "Show Point Numbers", ref value,
+			                                null, ref value );
 			myPartControl.prShowPointNumbers = value;
 			if ( changed )
 				EditorUtility.SetDirty( myPartControl );
