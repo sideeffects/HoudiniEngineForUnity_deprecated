@@ -285,21 +285,23 @@ public class HAPI_ParmsGUI : Editor
 				
 				changed = HAPI_GUI.dropdown( ref gui_parm, ref parm_int_values,
 											 labels.ToArray(), values.ToArray(),
-											 ref join_last, ref no_label_toggle_last );
+											 ref join_last, ref no_label_toggle_last,
+				                             null, ref parm_int_values );
 			}
 			else
 			{
 				changed = HAPI_GUI.intField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
-											 ref join_last, ref no_label_toggle_last );
+											 ref join_last, ref no_label_toggle_last, null, 
+				                             ref parm_int_values );
 			} // if parm.choiceCount
 		} // if parm.type is INT
 		///////////////////////////////////////////////////////////////////////
 		// Float Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
-			float[] undo_values = null;
 			changed = HAPI_GUI.floatField( ref gui_parm, ref myDelayBuild, ref parm_float_values, 
-										   ref join_last, ref no_label_toggle_last, null, ref undo_values );
+			                               ref join_last, ref no_label_toggle_last, null, 
+			                               ref parm_float_values );
 		} // if parm.type is FLOAT
 		///////////////////////////////////////////////////////////////////////
 		// String Parameter
@@ -330,7 +332,8 @@ public class HAPI_ParmsGUI : Editor
 
 				changed = HAPI_GUI.dropdown( ref gui_parm, ref values_temp,
 											 labels.ToArray(), values.ToArray(),
-											 ref join_last, ref no_label_toggle_last );
+											 ref join_last, ref no_label_toggle_last,
+				                             null, ref values_temp );
 
 				if ( changed ) 
 					myParms.setParmStrings( parm, values_temp );
@@ -343,7 +346,8 @@ public class HAPI_ParmsGUI : Editor
 				gui_parm.valuesIndex = 0;
 			
 				changed = HAPI_GUI.stringField( ref gui_parm, ref myDelayBuild, ref values,
-												ref join_last, ref no_label_toggle_last );
+												ref join_last, ref no_label_toggle_last, null,
+				                                ref values );
 			
 				// Set the to be changed strings into the cache
 				if ( changed )
@@ -367,14 +371,16 @@ public class HAPI_ParmsGUI : Editor
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
 			changed = HAPI_GUI.toggle( ref gui_parm, ref parm_int_values,
-									   ref join_last, ref no_label_toggle_last );
+									   ref join_last, ref no_label_toggle_last,
+			                           null, ref parm_int_values );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Color Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_COLOUR )
 		{
 			changed = HAPI_GUI.colourField( ref gui_parm, ref myDelayBuild, ref parm_float_values,
-											ref join_last, ref no_label_toggle_last );
+											ref join_last, ref no_label_toggle_last, null,
+			                                ref parm_float_values );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Button Parameter
@@ -402,7 +408,8 @@ public class HAPI_ParmsGUI : Editor
 				
 				changed = HAPI_GUI.dropdown( ref gui_parm, ref parm_int_values,
 											 labels.ToArray(), values.ToArray(),
-											 ref join_last, ref no_label_toggle_last );
+											 ref join_last, ref no_label_toggle_last,
+				                             null, ref parm_int_values );
 			}
 			else
 			{

@@ -28,5 +28,5 @@ public class HAPI_AssetOTLUndoInfo : ScriptableObject
 	// bake settings
 	public float bakeStartTime;
 	public float bakeEndTime;
-	public float bakeSamplesPerSecond;
+	public int bakeSamplesPerSecond;
 }

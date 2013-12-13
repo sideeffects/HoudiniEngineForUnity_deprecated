@@ -123,24 +123,12 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		
 		// Samples per second
 		{
-			HAPI_GUIParm gui_parm	= new HAPI_GUIParm( "bake_samples_per_second", "Samples Per Second" );
-			gui_parm.hasMin			= true;
-			gui_parm.hasMax			= true;
-			gui_parm.hasUIMin		= true;
-			gui_parm.hasUIMax		= true;
-			gui_parm.min			= 1;
-			gui_parm.max			= 120;
-			gui_parm.UIMin			= 1;
-			gui_parm.UIMax			= 120;
-			
-			bool delay_build		= false;
-			int[] values			= new int[1];
-			values[0]				= myAsset.prBakeSamplesPerSecond;
-			bool changed			= HAPI_GUI.intField( ref gui_parm, ref delay_build,
-														 ref values );
+			int value = myAsset.prBakeSamplesPerSecond;
+			bool changed = HAPI_GUI.intField( "bake_samples_per_second", "Samples Per Second", ref value,
+			                                  1, 120, myUndoInfo, ref myUndoInfo.bakeSamplesPerSecond );
 
 			if ( changed )
-				myAsset.prBakeSamplesPerSecond = values[ 0 ];
+				myAsset.prBakeSamplesPerSecond = value;
 		}
 		
 		if ( GUILayout.Button( "Bake" ) ) 
@@ -195,7 +183,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
 			int[] values = { 0, 1 };
 			bool changed = HAPI_GUI.dropdown( "material_renderer", label, ref value, 
-			                                  is_bold, labels, values );
+			                                  is_bold, labels, values, null, ref value );
 			if ( changed )
 			{
 				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
@@ -209,24 +197,24 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 		// Render Resolution
 		{
-			bool delay_build = false;
-			int[] values = new int[ 2 ];
-			values[ 0 ] = (int) myAsset.prRenderResolution[ 0 ];
-			values[ 1 ] = (int) myAsset.prRenderResolution[ 1 ];
-			string label = "Render Resolution";
-			HAPI_GUIParm gui_parm = new HAPI_GUIParm( "render_resolution", label, 2 );
-			gui_parm.isBold = myParentPrefabAsset && 
-							  (int) myParentPrefabAsset.prRenderResolution[ 0 ] != values[ 0 ] &&
-							  (int) myParentPrefabAsset.prRenderResolution[ 1 ] != values[ 1 ];
-			bool changed = HAPI_GUI.intField( ref gui_parm, ref delay_build, ref values );
+			bool delay_build 		= false;
+			int[] values 			= new int[ 2 ];
+			values[ 0 ] 			= (int) myAsset.prRenderResolution[ 0 ];
+			values[ 1 ] 			= (int) myAsset.prRenderResolution[ 1 ];
+			int[] undo_values 		= new int[ 2 ];
+			undo_values[ 0 ] 		= (int) myUndoInfo.renderResolution[ 0 ];
+			undo_values[ 1 ] 		= (int) myUndoInfo.renderResolution[ 1 ];
+			HAPI_GUIParm gui_parm 	= new HAPI_GUIParm( "render_resolution", "Render Resolution", 2 );
+			gui_parm.isBold 		= myParentPrefabAsset && 
+							  		  (int) myParentPrefabAsset.prRenderResolution[ 0 ] != values[ 0 ] &&
+							  		  (int) myParentPrefabAsset.prRenderResolution[ 1 ] != values[ 1 ];
+			bool changed = HAPI_GUI.intField( ref gui_parm, ref delay_build, ref values, 
+			                                  myUndoInfo, ref undo_values );
 			if ( changed )
 			{
 				Vector2 new_resolution = new Vector2( (float) values[ 0 ], (float) values[ 1 ] );
 				myAsset.prRenderResolution = new_resolution;
-
-				// record undo info
-				Undo.RecordObject( myAssetOTL.prAssetOTLUndoInfo, label );
-				myAssetOTL.prAssetOTLUndoInfo.renderResolution = new_resolution;
+				myUndoInfo.renderResolution = new_resolution;
 			}
 		}
 
@@ -372,7 +360,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			}
 
 			bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) == value;
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value );
+			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value, null, ref value );
 			GUI.enabled = true;
 
 			if ( changed || undo_redo_performed )

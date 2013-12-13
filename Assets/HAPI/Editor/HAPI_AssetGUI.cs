@@ -142,10 +142,10 @@ public class HAPI_AssetGUI : Editor
 						int[] input_format_dropdown_values		= new int[ 2 ] { 0, 1 };
 						string[] input_format_dropdown_labels	= new string[ 2 ] { "Object", "File" };
 						input_format_value[ 0 ]					= (int) myAsset.prGeoInputFormats[ input_index ];
-
+						
 						HAPI_GUI.dropdown( ref input_format_dropdown, ref input_format_value, 
 										   input_format_dropdown_labels, input_format_dropdown_values, 
-										   ref join_last, ref no_label_toggle_last );
+						                   ref join_last, ref no_label_toggle_last, null, ref input_format_value );
 
 						HAPI_GeoInputFormat value				= (HAPI_GeoInputFormat) input_format_value[ 0 ];
 						myAsset.prGeoInputFormats[ input_index ]= value;
