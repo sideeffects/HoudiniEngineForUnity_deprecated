@@ -855,8 +855,11 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		if ( isPrefab() )
 		{
-			HAPI_ParmInfo parm_info = prParms.findParm( prParms.prLastChangedParmId );
-			prUpdatePrefabInstanceParmNames.Add( parm_info.name );
+			if ( prParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
+			{
+				HAPI_ParmInfo parm_info = prParms.findParm( prParms.prLastChangedParmId );
+				prUpdatePrefabInstanceParmNames.Add( parm_info.name );
+			}
 			
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 			try 
@@ -1036,7 +1039,9 @@ public abstract class HAPI_Asset : HAPI_Control
 			// More imporantly, structs are not serialized and therefore putting them into their own
 			// variables is required in order to maintain state between serialization cycles.
 			prAssetId 					= prAssetInfo.id;
+			prBackupAssetId				= prAssetId;
 			prAssetValidationId			= prAssetInfo.validationId;
+			prBackupAssetValidationId 	= prAssetValidationId;
 			prNodeId					= prAssetInfo.nodeId;
 			prObjectCount 				= prAssetInfo.objectCount;
 			prHandleCount 				= prAssetInfo.handleCount;
@@ -1100,10 +1105,6 @@ public abstract class HAPI_Asset : HAPI_Control
 				
 			if ( reload_asset || serialization_recovery_only )
 			{
-				// Set back up asset id and asset validation id
-				prBackupAssetId				= prAssetId;
-				prBackupAssetValidationId 	= prAssetValidationId;
-				
 				// Need to re-acquire all the params for all the child controls that have parms exposed.
 				prParms.getParameterValues();
 				foreach ( HAPI_Parms parms in GetComponentsInChildren< HAPI_Parms >() )
