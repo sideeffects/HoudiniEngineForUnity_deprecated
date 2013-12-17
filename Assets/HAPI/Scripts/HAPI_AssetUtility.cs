@@ -900,13 +900,8 @@ public class HAPI_AssetUtility
 
 				// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
 				// understands paths relative to the project folder.
+				AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
 				Object tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-				if ( tex_obj == null || !AssetDatabase.Contains( tex_obj ) )
-				{
-					// Asset has not been imported yet so import and try again.
-					AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
-					tex_obj = AssetDatabase.LoadAssetAtPath( relative_file_path, typeof( Texture2D ) );
-				}
 
 				// Assign main texture.
 				result = (Texture2D) tex_obj;
@@ -992,9 +987,6 @@ public class HAPI_AssetUtility
 
 			material.SetColor( "_SpecColor", getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
 		}
-		
-		// Refresh all assets just in case.
-		AssetDatabase.Refresh();
 	}
 
 	public static bool assignUnityMaterial( HAPI_PartControl part_control, GameObject part_node,
