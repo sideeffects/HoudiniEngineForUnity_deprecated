@@ -562,6 +562,14 @@ namespace HAPI
 		private HAPI_StringHandle nameSH;
 		private HAPI_StringHandle labelSH;
 
+		// If this parameter is a multiparm instance than the templateNameSH
+		// will be the hash-templated parm name, containing #'s for the 
+		// parts of the name that use the instance number. Compared to the
+		// nameSH, the nameSH will be the templateNameSH but with the #'s
+		// replaced by the instance number. For regular parms, the templateNameSH
+		// is identical to the nameSH.
+		private HAPI_StringHandle templateNameSH;
+
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasMin;
 
@@ -620,6 +628,8 @@ namespace HAPI
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 		public string label
 		{ get { return HAPI_Host.getString( labelSH ); } private set {} }
+		public string templateName
+		{ get { return HAPI_Host.getString( templateNameSH ); } private set {} }
 	}
 	
 	[ StructLayout( LayoutKind.Sequential ) ]
