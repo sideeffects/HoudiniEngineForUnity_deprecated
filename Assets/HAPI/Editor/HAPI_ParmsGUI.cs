@@ -73,12 +73,13 @@ public class HAPI_ParmsGUI : Editor
 			bool commitChanges = false;
 			if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
 				commitChanges = true;
-			else if ( curr_event.commandName == "UndoRedoPerformed" )
+			else if ( curr_event.type == EventType.ValidateCommand && 
+			          curr_event.commandName == "UndoRedoPerformed" )
 			{
 				HAPI_ParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HAPI_ParmsUndoInfo;
-				bool changed = false;
-
-				// First find all multiparms and add/remove instances as necessary
+				bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HAPI_Asset >() != null;
+						
+						// First find all multiparms and add/remove instances as necessary
 				foreach ( HAPI_ParmInfo parm in myParms.prParms )
 				{
 					if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST &&
@@ -102,7 +103,12 @@ public class HAPI_ParmsGUI : Editor
 							continue;
 
 						myParms.getParameterValues();
-						changed = true;
+						myParmChanges = true;
+
+						if ( update_prefab_instance )
+						{
+							myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+						}
 					}
 				}
 				
@@ -121,12 +127,17 @@ public class HAPI_ParmsGUI : Editor
 						if ( new_int_value != current_int_value &&
 						    parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 						{
-							changed = true;
+							myParmChanges = true;
 
 							int[] values = new int[ parm.size ];
 							Array.Copy( undo_info.parmIntValues, new_value_index, values, 0, parm.size );
 							HAPI_Host.setParmIntValues( myParms.prControl.prNodeId, values, 
 							                            parm.intValuesIndex, parm.size );
+
+							if ( update_prefab_instance )
+							{
+								myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+							}
 						}
 					}
 					else if ( parm.isFloat() )
@@ -137,12 +148,17 @@ public class HAPI_ParmsGUI : Editor
 
 						if ( new_float_value != current_float_value )
 						{
-							changed = true;
+							myParmChanges = true;
 
 							float[] values = new float[ parm.size ];
 							Array.Copy( undo_info.parmFloatValues, new_value_index, values, 0, parm.size );
 							HAPI_Host.setParmFloatValues( myParms.prControl.prNodeId, values, 
 							                              parm.floatValuesIndex, parm.size );
+
+							if ( update_prefab_instance )
+							{
+								myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+							}
 						}
 					}
 					else if ( parm.isString() )
@@ -158,18 +174,18 @@ public class HAPI_ParmsGUI : Editor
 							
 							if ( string.Compare( current_string_value, new_string_value ) != 0 )
 							{
-								changed = true;
+								myParmChanges = true;
 
 								HAPI_Host.setParmStringValue( myParms.prControl.prNodeId, 
 								                             new_string_value, parm.id, i );
+
+								if ( update_prefab_instance )
+								{
+									myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+								}
 							}
 						}
 					}
-				}
-
-				if ( changed )
-				{
-					myAsset.buildClientSide();
 				}
 			}
 
@@ -201,11 +217,16 @@ public class HAPI_ParmsGUI : Editor
 			if ( ( ( myParmChanges && !myDelayBuild ) || 
 				 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
 			{
-				string changed_parm_name = "Parameter Change";
-				if ( myParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
-					changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
+				// Only record undo info object if parameters are not being changed
+				// due to an undo/redo event
+				if ( curr_event.commandName != "UndoRedoPerformed" )
+				{
+					string changed_parm_name = "Parameter Change";
+					if ( myParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
+						changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
 
-				Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
+					Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
+				}
 
 				myParms.prControl.onParmChange();
 	

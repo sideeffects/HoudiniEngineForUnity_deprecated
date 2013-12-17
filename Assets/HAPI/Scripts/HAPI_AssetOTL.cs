@@ -37,8 +37,20 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	public string prAssetPath {							get { return myAssetPath; } 
 														set { myAssetPath = value; } }
-	public HAPI_AssetOTLUndoInfo prAssetOTLUndoInfo {	get { return myAssetOTLUndoInfo; }
-														private set { } }
+	public HAPI_AssetOTLUndoInfo prAssetOTLUndoInfo 
+	{	
+		get 
+		{ 
+			if ( myAssetOTLUndoInfo == null )
+			{
+				myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HAPI_AssetOTLUndoInfo >();
+				myAssetOTLUndoInfo.initialize( this );
+			}
+			return myAssetOTLUndoInfo; 
+		}
+														
+		private set { } 
+	}
 	public HAPI_HandleInfo[] prHandleInfos { get; set; }
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
 	
@@ -73,28 +85,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 		// Need to restore the asset type here.
 		prAssetType = asset_type;
-
-		// Set undo info
-		if ( myAssetOTLUndoInfo == null )
-			myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HAPI_AssetOTLUndoInfo >();
-
-		myAssetOTLUndoInfo.isGeoVisible 				= prIsGeoVisible;
-		myAssetOTLUndoInfo.showPinnedInstances 			= prShowPinnedInstances;
-		myAssetOTLUndoInfo.autoSelectAssetRootNode 		= prAutoSelectAssetRootNode;
-		myAssetOTLUndoInfo.hideGeometryOnLinking 		= prHideGeometryOnLinking;
-		myAssetOTLUndoInfo.materialShaderType 			= prMaterialShaderType;
-		myAssetOTLUndoInfo.renderResolution 			= prRenderResolution;
-		myAssetOTLUndoInfo.showOnlyVertexColours 		= prShowOnlyVertexColours;
-		myAssetOTLUndoInfo.generateTangents 			= prGenerateTangents;
-		myAssetOTLUndoInfo.enableCooking 				= prEnableCooking;
-		myAssetOTLUndoInfo.cookingTriggersDownCooks 	= prCookingTriggersDownCooks;
-		myAssetOTLUndoInfo.playmodePerFrameCooking 		= prPlaymodePerFrameCooking;
-		myAssetOTLUndoInfo.pushUnityTransformToHoudini	= prPushUnityTransformToHoudini;
-		myAssetOTLUndoInfo.transformChangeTriggersCooks = prTransformChangeTriggersCooks;
-		myAssetOTLUndoInfo.importTemplatedGeos 			= prImportTemplatedGeos;
-		myAssetOTLUndoInfo.bakeStartTime				= prBakeStartTime;
-		myAssetOTLUndoInfo.bakeEndTime					= prBakeEndTime;
-		myAssetOTLUndoInfo.bakeSamplesPerSecond			= prBakeSamplesPerSecond;
 	}
 	
 	public override void Update()
