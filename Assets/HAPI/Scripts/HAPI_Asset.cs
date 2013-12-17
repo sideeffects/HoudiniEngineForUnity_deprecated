@@ -746,6 +746,9 @@ public abstract class HAPI_Asset : HAPI_Control
 						true,	// cook_downstream_assets
 						false	// use_delay_for_progress_bar
 					);
+
+				if ( isPrefabInstance() )
+					PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 			}
 		}
 	}
