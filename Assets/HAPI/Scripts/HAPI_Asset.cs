@@ -699,11 +699,6 @@ public abstract class HAPI_Asset : HAPI_Control
 			   	   false,	// cook_downstream_assets
 			   	   false	// use_delay_for_progress_bar
 				);
-
-			// This tells Unity that values have been overridden for this 
-			// prefab instance (in this case values such as the asset id, 
-			// validation id, node id, etc).
-			PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 		}
 		else if ( prAssetId >= 0 || isInstantiatingPrefab() )
 		{
@@ -715,10 +710,6 @@ public abstract class HAPI_Asset : HAPI_Control
 				// and save changes to preset
 				buildClientSide();
 				savePreset();
-
-				// This tells Unity that values have been overridden for this 
-				// prefab instance (in this case the preset and parameter values).
-				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 			}
 			else if ( !isInstantiatingPrefab() &&
 				 	  HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) &&
@@ -746,9 +737,6 @@ public abstract class HAPI_Asset : HAPI_Control
 						true,	// cook_downstream_assets
 						false	// use_delay_for_progress_bar
 					);
-
-				if ( isPrefabInstance() )
-					PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 			}
 		}
 	}
@@ -943,6 +931,9 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( isPrefab() )
 			myCleanUpPrefabOTL = true;
 
+		if ( isPrefabInstance() )
+			processParentPrefab();
+
 		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
 		progress_bar.prUseDelay			= use_delay_for_progress_bar;
 		progress_bar.prAsset			= this;
@@ -1063,6 +1054,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				if ( unload_asset_first || is_reverting_prefab_instance )
 				{
 					loadPreset();
+					progress_bar.statusCheckLoop();
 					
 					// Transform may not have been saved as part of the presets so we have to rely 
 					// on the serialized value.
@@ -1151,6 +1143,11 @@ public abstract class HAPI_Asset : HAPI_Control
 					processDependentAssets( serialization_recovery_only, force_reconnect, 
 											use_delay_for_progress_bar );
 			}
+
+			// This tells Unity that values have been overridden for this prefab instance 
+			// (eg. asset id, validation id, node id, etc). 
+			if ( isPrefabInstance() )
+				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 
 			// A bit of a hack (but not terrible). If we have presets for other child controls
 			// they set their presets by now so we need to rebuild with the new presets.
@@ -1588,6 +1585,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		try
 		{
 			myPreset = HAPI_Host.getPreset( prNodeId );
+
+			// This tells Unity that values have been overridden for this 
+			// prefab instance (in this case the preset).
+			if ( isPrefabInstance() )
+				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 		}
 		catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
 	}
@@ -1736,6 +1738,40 @@ public abstract class HAPI_Asset : HAPI_Control
 				geo_input_name = "Geometry Input #" + ( i + 1 );
 			prGeoInputNames.Add( geo_input_name );
 			prGeoInputFormats.Add( HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_DEFAULT );
+		}
+	}
+
+	protected void processParentPrefab()
+	{
+		HAPI_Asset prefab_asset = getParentPrefabAsset();
+		if ( prefab_asset )
+		{
+			// if prefab has not been built yet then build it
+			if ( !HAPI_Host.isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
+			{
+				prefab_asset.prAssetId = -1;
+				prefab_asset.build( true,	// reload_asset
+				                    true,	// unload_asset_first
+				                    true,	// serializatin_recovery_only
+				                    false,	// force_reconnect
+				                    false,	// cook_downstream_assets
+				                    false	// use_delay_for_progress_bar
+				                  );
+				EditorUtility.SetDirty( prefab_asset );
+			}
+			// if prefab has not been reloaded after play mode change yet then 
+			// reload it to get its parameters back
+			else if ( prefab_asset.prReloadPrefabOnPlaymodeChange )
+			{
+				prefab_asset.prReloadPrefabOnPlaymodeChange = false;
+				prefab_asset.build(	false,	// reload_asset
+				                    false,	// unload_asset_first
+				                    true,	// serializatin_recovery_only
+				                    false,	// force_reconnect
+				                    false,	// cook_downstream_assets
+				                    false	// use_delay_for_progress_bar
+				                  );
+			}
 		}
 	}
 
