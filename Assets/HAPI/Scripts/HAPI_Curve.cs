@@ -94,30 +94,45 @@ public class HAPI_Curve : MonoBehaviour
 
 	public void addPoint( Vector3 pos )
 	{
+		// record undo info
+		Undo.RecordObject( prParms.prParmsUndoInfo, "Add Point" );
+
 		prPoints.Add( pos );
 		updatePoints();
 	}
 
 	public void insertPoint( int index, Vector3 pos )
 	{
+		// record undo info
+		Undo.RecordObject( prParms.prParmsUndoInfo, "Insert Point" );
+
 		prPoints.Insert( index, pos );
 		updatePoints();
 	}
 
 	public void deletePoint( int index )
 	{
+		// record undo info
+		Undo.RecordObject( prParms.prParmsUndoInfo, "Delete Point" );
+
 		prPoints.RemoveAt( index );
 		updatePoints();
 	}
 
 	public void deleteLastPoint()
 	{
+		// record undo info
+		Undo.RecordObject( prParms.prParmsUndoInfo, "Delete Last Point" );
+
 		prPoints.RemoveAt( prPoints.Count - 1 );
 		updatePoints();
 	}
 
 	public void deletePoints( int[] indicies )
 	{
+		// record undo info
+		Undo.RecordObject( prParms.prParmsUndoInfo, "Delete Point(s)" );
+
 		List< Vector3 > new_points = new List< Vector3 >( prPoints.Count - indicies.Length );
 		List< bool > point_status = new List< bool >( prPoints.Count );
 		for ( int i = 0; i < prPoints.Count; ++i )
@@ -136,6 +151,9 @@ public class HAPI_Curve : MonoBehaviour
 	
 	public void updatePoint( int index, Vector3 pos )
 	{
+		// record undo info
+		Undo.RecordObject( prParms.prParmsUndoInfo, "Move Point" );
+
 		prPoints[ index ] = pos;
 		
 		updatePoints();
