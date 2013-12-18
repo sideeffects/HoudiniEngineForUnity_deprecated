@@ -325,45 +325,20 @@ public class HAPI_Parms : MonoBehaviour
 		if ( prControl && prControl.isPrefabInstance() && gameObject.GetComponent< HAPI_Asset >() != null )
 		{
 			HAPI_Asset prefab_asset = prControl.prAsset.getParentPrefabAsset();
-			if ( prefab_asset )
+			if ( prefab_asset && prefab_asset.prParms != null && 
+			     prefab_asset.prParms.prParms != null && 
+			     !prefab_asset.isApplyingChangesToPrefab() )
 			{
-				// if prefab has not been built yet then build it
-				if ( !HAPI_Host.isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
+				// loop through parameter values and determine which ones have been
+				// overridden (ie. changed from corresponding parameter value on prefab)
+				for ( int i = 0; i < prParms.Length; ++i )
 				{
-					prefab_asset.prAssetId = -1;
-					prefab_asset.build( true,	// reload_asset
-								   		true,	// unload_asset_first
-								   		true,	// serializatin_recovery_only
-								   		false,	// force_reconnect
-								   		false,	// cook_downstream_assets
-								   		false	// use_delay_for_progress_bar
-						 		 	  );
-					EditorUtility.SetDirty( prefab_asset );
-				}
-				// if prefab has not been reloaded after play mode change yet then 
-				// reload it to get its parameters back
-				else if ( prefab_asset.prReloadPrefabOnPlaymodeChange )
-				{
-					prefab_asset.prReloadPrefabOnPlaymodeChange = false;
-					prefab_asset.build(	false,	// reload_asset
-					              		false,	// unload_asset_first
-					              		true,	// serializatin_recovery_only
-					              		false,	// force_reconnect
-					              		false,	// cook_downstream_assets
-					              		false	// use_delay_for_progress_bar
-					              	  );
-				}
-				
-				if ( prefab_asset.prParms.prParms != null && !prefab_asset.isApplyingChangesToPrefab() )
-				{
-					// loop through parameter values and determine which ones have been
-					// overridden (ie. changed from corresponding parameter value on prefab)
-					for ( int i = 0; i < prParms.Length; ++i )
-					{
-						myOverriddenParmsMap[ prParms[ i ].id ] = !isParmSameInPrefab( prParms[ i ].id, prefab_asset.prParms );
-					}
+					myOverriddenParmsMap[ prParms[ i ].id ] = !isParmSameInPrefab( prParms[ i ].id, prefab_asset.prParms );
 				}
 			}
+
+			// This tells Unity that parameter values have been overridden for this prefab instance
+			PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 		}
 	}
 	

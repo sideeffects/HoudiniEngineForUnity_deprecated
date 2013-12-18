@@ -797,6 +797,13 @@ public class HAPI_AssetUtility
 	
 							setRenderResolution( asset.prRenderResolution );
 	
+							// Before assigning material, make sure that if the asset is a prefab instance, all 
+							// modifications are saved before assignHoudiniMaterial is called because ImportAsset may 
+							// be called within this function which will cause OnEnable to be called on all prefab 
+							// instances if the prefab is dirty
+							if ( asset.isPrefabInstance() )
+								PrefabUtility.RecordPrefabInstancePropertyModifications( asset );
+
 							Material material = mesh_renderer.sharedMaterial;
 							string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
 												 part_control.prAsset.prAssetName;
