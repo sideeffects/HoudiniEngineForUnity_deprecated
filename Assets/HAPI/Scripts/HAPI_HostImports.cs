@@ -683,6 +683,43 @@ namespace HAPI
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			ref HAPI_VolumeTileInfo tile,
 			[Out] int[] values );
+
+		// CURVES ---------------------------------------------------------------------------------------------------
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetCurveInfo(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			ref HAPI_CurveInfo curve_info );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetCurveVertices(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			[Out] float[] vertices,
+			int start, int length );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetCurveCounts(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			[Out] int[] counts,
+			int start, int length );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetCurveOrders(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			[Out] int[] orders,
+			int start, int length );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetCurveKnots(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			[Out] float[] knots,
+			int start, int length );
+
 #endif // UNITY_EDITOR
 	}
 
