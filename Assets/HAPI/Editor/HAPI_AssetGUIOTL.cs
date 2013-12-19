@@ -98,6 +98,15 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			if ( myAssetOTL.prShowBakeOptions )
 				generateAssetBakeControls();
 		}
+
+		HAPI_Instancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HAPI_Instancer >();
+		if( !myAssetOTL.isPrefab() && instancers.Length > 0 )
+		{
+			myAssetOTL.prShowInstanceControls = HAPI_GUI.foldout( "Instancing Controls", 
+			                                                      myAssetOTL.prShowInstanceControls, true );
+			if ( myAssetOTL.prShowInstanceControls )
+				generateAssetInstanceControls();
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +151,48 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 									myAsset.gameObject,
 									progress_bar );
 			progress_bar.clearProgressBar();
+		}
+	}
+
+	private void generateAssetInstanceControls()
+	{
+		HAPI_Instancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HAPI_Instancer >();
+
+		foreach( HAPI_Instancer instancer in instancers )
+		{
+			bool changed = false;
+			
+			{
+				Object obj = (Object) instancer.prObjToInstantiate;
+				changed |= HAPI_GUI.objectField( "object_to_instantiate", "Override " + instancer.name, 
+				                                ref obj, typeof( GameObject ) );
+				instancer.prObjToInstantiate = (GameObject) obj;
+			}
+
+			{
+				bool value = instancer.prOverrideInstances;
+				changed |= HAPI_GUI.toggle( "override_instance_object", "Override Instance Object", ref value );
+				instancer.prOverrideInstances = value;
+			}
+			
+			
+			if ( instancer.hasOverriddenInstances() )
+			{
+				if ( GUILayout.Button( "UnPin All Instances" ) ) 
+				{
+					instancer.unPinAllInstances();
+					changed = true;
+				}
+			}
+			
+			if ( changed )
+			{
+				HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+				instancer.instanceObjects( progress_bar );
+				progress_bar.clearProgressBar();
+			}
+
+			EditorGUILayout.Separator();
 		}
 	}
 
@@ -190,7 +241,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 		// Render Resolution
 		{
-			bool delay_build 		= false;
+			bool delay_build = false;
 			int[] values 			= new int[ 2 ];
 			values[ 0 ] 			= (int) myAsset.prRenderResolution[ 0 ];
 			values[ 1 ] 			= (int) myAsset.prRenderResolution[ 1 ];
@@ -303,22 +354,22 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		try
 		{
 			PropertyInfo property = typeof( HAPI_Asset ).GetProperty( property_name );
-			if ( property == null )
-			{
-				throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
-			}
-			if ( property.PropertyType != typeof( bool ) )
-			{
-				throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
-			}
+		if ( property == null )
+		{
+			throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
+		}
+		if ( property.PropertyType != typeof( bool ) )
+		{
+			throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
+		}
 
-			GUI.enabled = !global_overwrite && !local_overwrite;
-			if ( !GUI.enabled )
-			{
-				if ( global_overwrite )
-					label += " (overwritted by global setting)";
-				else
-					label += local_overwrite_message;
+		GUI.enabled = !global_overwrite && !local_overwrite;
+		if ( !GUI.enabled )
+		{
+			if ( global_overwrite )
+				label += " (overwritted by global setting)";
+			else
+				label += local_overwrite_message;
 			}
 			
 			bool value = ( bool ) property.GetValue( myAsset, null );
