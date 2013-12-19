@@ -171,7 +171,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 
 			{
 				bool value = instancer.prOverrideInstances;
-				changed |= HAPI_GUI.toggle( "override_instance_object", "Override Instance Object", ref value );
+				changed |= HAPI_GUI.toggle(
+					"override_instance_object", "Override Instance Object", ref value, null, ref value );
 				instancer.prOverrideInstances = value;
 			}
 			
