@@ -43,43 +43,5 @@ public class HAPI_InstancerGUI : Editor
 		
 	}
 	
-	public override void OnInspectorGUI() 
-	{
-		bool changed = false;
-		
-		{
-			Object obj = (Object) myInstancer.prObjToInstantiate;
-			changed |= HAPI_GUI.objectField( "object_to_instantiate", "Object To Instantiate", 
-											 ref obj, typeof( GameObject ) );
-			myInstancer.prObjToInstantiate = (GameObject) obj;
-		}
-		
-		{
-			bool value = myInstancer.prOverrideInstances;
-			changed |= HAPI_GUI.toggle( "override_instance_object", "Override Instance Object", ref value,
-			                            null, ref value );
-			myInstancer.prOverrideInstances = value;
-		}
-		
-		
-		if ( myInstancer.hasOverriddenInstances() )
-		{
-			if ( GUILayout.Button( "UnPin All Instances" ) ) 
-			{
-				myInstancer.unPinAllInstances();
-				changed = true;
-			}
-		}
-		
-		if ( changed )
-		{
-			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
-			myInstancer.instanceObjects( progress_bar );
-			progress_bar.clearProgressBar();
-		}
-		
-		
-	}
-	
 	private HAPI_Instancer	 	myInstancer;
 }
