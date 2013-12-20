@@ -248,22 +248,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset destroyed - Instance Id:" + GetInstanceID() );
-		
-		// This is the only place to unload OTL when prefab is being deleted. 
-		// Do not delete prefab if this is being called due to entering play mode.
-		if ( myCleanUpPrefabOTL &&
-			 !prReloadPrefabOnPlaymodeChange &&
-			 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) )
-		{
-			try
-			{
-				HAPI_Host.destroyAsset( prAssetId );
-			}
-			catch ( HAPI_Error error )
-			{
-				Debug.LogError( "Asset failed to unload: " + error.ToString() );
-			}
-		}
 	}
 	
 	public virtual void Awake()
@@ -840,7 +824,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		prBackupAssetId					= -1;
 		prBackupAssetValidationId		= -1;
 		prReloadPrefabOnPlaymodeChange 	= false;
-		myCleanUpPrefabOTL 				= false;
 		prUpdatePrefabInstanceParmNames	= new List< string >();
 	}
 	
@@ -931,9 +914,6 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		if ( !prEnableCooking )
 			return false;
-		
-		if ( isPrefab() )
-			myCleanUpPrefabOTL = true;
 
 		if ( isPrefabInstance() )
 			processParentPrefab();
@@ -1051,6 +1031,12 @@ public abstract class HAPI_Asset : HAPI_Control
 			prMaxTransInputCount		= prAssetInfo.maxTransInputCount;
 			prMinGeoInputCount 			= prAssetInfo.minGeoInputCount;
 			prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
+
+			if ( isPrefab() )
+			{
+				string prefab_path = AssetDatabase.GetAssetPath( GetInstanceID() );
+				HAPI_Host.myCleanUpPrefabAssets[ prefab_path ] = prAssetId;
+			}
 			
 			if ( reload_asset )
 			{		
@@ -1990,7 +1976,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	private int myBackupAssetId;
 	private int myBackupAssetValidationId;
 	private bool myReloadPrefabOnPlaymodeChange;
-	private bool myCleanUpPrefabOTL;
 	[SerializeField] private List< string > myUpdatePrefabInstanceParmNames;
 #endif // UNITY_EDITOR
 }
