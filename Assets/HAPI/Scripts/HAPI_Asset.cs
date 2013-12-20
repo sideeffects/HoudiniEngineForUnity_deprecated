@@ -1037,42 +1037,42 @@ public abstract class HAPI_Asset : HAPI_Control
 				string prefab_path = AssetDatabase.GetAssetPath( GetInstanceID() );
 				HAPI_Host.myCleanUpPrefabAssets[ prefab_path ] = prAssetId;
 			}
-			
-			if ( reload_asset )
-			{		
-				// Try to load presets.
-				if ( unload_asset_first || is_reverting_prefab_instance )
+				
+			// Try to load presets.
+			if ( ( reload_asset && ( unload_asset_first || is_reverting_prefab_instance ) ) || serialization_recovery_only )
+			{
+				loadPreset();
+				progress_bar.statusCheckLoop();
+				
+				// Transform may not have been saved as part of the presets so we have to rely 
+				// on the serialized value.
+				if ( myLastLocalToWorld != Matrix4x4.zero && !isPrefab() )
 				{
-					loadPreset();
-					progress_bar.statusCheckLoop();
-					
-					// Transform may not have been saved as part of the presets so we have to rely 
-					// on the serialized value.
-					if ( myLastLocalToWorld != Matrix4x4.zero && !isPrefab() )
+					// If this is a prefab instance being reverted we don't want to use the 
+					// serialized value so don't change transform. 
+					if ( !is_reverting_prefab_instance )
 					{
-						// If this is a prefab instance being reverted we don't want to use the 
-						// serialized value so don't change transform. 
-						if ( !is_reverting_prefab_instance )
+						transform.localPosition = Utility.getPosition( myLastLocalToWorld );
+						transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
+
+						Vector3 scale = Utility.getScale( myLastLocalToWorld );
+						if ( !( Mathf.Approximately( 0.0f, scale.x )
+							&& Mathf.Approximately( 0.0f, scale.y )
+							&& Mathf.Approximately( 0.0f, scale.z ) ) )
 						{
-							transform.localPosition = Utility.getPosition( myLastLocalToWorld );
-							transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
-	
-							Vector3 scale = Utility.getScale( myLastLocalToWorld );
-							if ( !( Mathf.Approximately( 0.0f, scale.x )
-								&& Mathf.Approximately( 0.0f, scale.y )
-								&& Mathf.Approximately( 0.0f, scale.z ) ) )
-							{
-								transform.localScale = Utility.getScale( myLastLocalToWorld );
-							}
-						}
-						
-						if ( prPushUnityTransformToHoudini )
-						{
-							pushAssetTransformToHoudini();
+							transform.localScale = Utility.getScale( myLastLocalToWorld );
 						}
 					}
+					
+					if ( prPushUnityTransformToHoudini )
+					{
+						pushAssetTransformToHoudini();
+					}
 				}
-				
+			}
+
+			if ( reload_asset )
+			{
 				progress_bar.prCurrentValue			= 0;
 				progress_bar.prTotal				= prObjectCount + prHandleCount;
 				
