@@ -12,6 +12,16 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						 				 String[] movedAssets,
 										 String[] movedFromAssetPaths ) 
 	{
+		foreach ( string asset_path in deletedAssets )
+		{
+			if ( HAPI_Host.myCleanUpPrefabAssets.ContainsKey( asset_path ) )
+			{
+				int asset_id = HAPI_Host.myCleanUpPrefabAssets[ asset_path ];
+				HAPI_Host.destroyAsset( asset_id );
+				HAPI_Host.myCleanUpPrefabAssets.Remove( asset_path );
+			}
+		}
+
 		foreach ( string asset_path in importedAssets )
 		{
 			if ( asset_path.EndsWith( ".prefab" ) )

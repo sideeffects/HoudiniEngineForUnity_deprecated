@@ -250,6 +250,8 @@ namespace HAPI
 			myRepaintDelegate			= null;
 			myDeselectionDelegate		= null;
 			mySelectionTarget			= null;
+
+			myCleanUpPrefabAssets		= new Dictionary< string, int >();
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -595,6 +597,9 @@ namespace HAPI
 		public static DeselectionDelegate		myDeselectionDelegate;
 
 		public static GameObject				mySelectionTarget;
+
+		// maps prefab path to asset id
+		public static Dictionary< string, int >	myCleanUpPrefabAssets;
 
 		public static bool hasScene() 
 		{
