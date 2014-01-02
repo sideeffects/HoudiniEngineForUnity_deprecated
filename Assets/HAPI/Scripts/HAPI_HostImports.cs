@@ -52,6 +52,7 @@ namespace HAPI
 		HAPI_Initialize(
 			string otl_search_path,
 			string dso_search_path,
+			HAPI_CookOptions cook_options,
 			[ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
 			int cooking_thread_stack_size );
 
@@ -176,7 +177,6 @@ namespace HAPI
 		HAPI_InstantiateAsset(
 			string asset_name,
 			[ MarshalAs( UnmanagedType.U1 ) ] bool cook_on_load,
-			int min_vertices_per_primitive, int max_vertices_per_primitive,
 			out HAPI_AssetId asset_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -193,7 +193,12 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_CookAsset( HAPI_AssetId asset_id );
+		HAPI_CookAsset(
+			HAPI_AssetId asset_id, HAPI_CookOptions cook_options );
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_CookAsset(
+			HAPI_AssetId asset_id, System.IntPtr cook_options );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
@@ -223,10 +228,7 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_LoadHIPFile(
-			string file_name,
-			int min_vertices_per_primitive,
-			int max_vertices_per_primitive );
+		HAPI_LoadHIPFile( string file_name, [ MarshalAs( UnmanagedType.U1 ) ] bool cook_on_load );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
