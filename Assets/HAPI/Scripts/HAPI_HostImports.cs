@@ -277,6 +277,7 @@ namespace HAPI
 		private static extern HAPI_Result
 		HAPI_GetParmStringValues(
 			HAPI_NodeId node_id,
+			[ MarshalAs( UnmanagedType.U1 ) ] bool evaluate,
 			[Out] HAPI_StringHandle[] values,
 			int start, int length );
 		

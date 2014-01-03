@@ -589,7 +589,10 @@ namespace HAPI
 			HAPI_NodeId node_id, [Out] HAPI_StringHandle[] values,
 			int start, int length )
 		{
-			HAPI_Result status_code = HAPI_GetParmStringValues( node_id, values, start, length );
+			// Can't turn this off yet. More testing is needed, especially for file paths.
+			const bool evaluate = true;
+
+			HAPI_Result status_code = HAPI_GetParmStringValues( node_id, evaluate, values, start, length );
 			processStatusCode( status_code );
 		}
 
