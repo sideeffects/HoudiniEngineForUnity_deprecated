@@ -618,7 +618,13 @@ namespace HAPI
 
 			int library_id = -1;
 
+			// This can be used to test in-memory OTL loading.
+#if false
+			byte[] file = File.ReadAllBytes( path );
+			HAPI_Result status_code = HAPI_LoadAssetLibraryFromMemory( file, file.Length, out library_id );
+#else
 			HAPI_Result status_code = HAPI_LoadAssetLibraryFromFile( path, out library_id );
+#endif
 			processStatusCode( status_code );
 
 			int asset_count = 0;

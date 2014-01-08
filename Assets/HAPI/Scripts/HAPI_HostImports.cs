@@ -161,6 +161,12 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result 
+		HAPI_LoadAssetLibraryFromMemory(
+			byte[] library_buffer, int library_buffer_size,
+			out HAPI_AssetLibraryId library_id );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result 
 		HAPI_GetAvailableAssetCount(
 			HAPI_AssetLibraryId library_id,
 			out int asset_count );
