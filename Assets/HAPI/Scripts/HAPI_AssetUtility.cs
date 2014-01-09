@@ -1521,7 +1521,7 @@ public class HAPI_AssetUtility
 			}
 		}
 
-		GameObject.DestroyImmediate( obj );
+		GameObject.DestroyImmediate( obj, true );
 	}
 
 	public static void attachScript( GameObject obj, string attach_script )
