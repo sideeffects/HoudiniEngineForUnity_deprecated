@@ -37,7 +37,10 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 					else if ( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
 					{
 						prPrefabToReplace = prefab;
-						EditorApplication.delayCall += ReplacePrefab;
+
+						// TODO: Used to be (why?):
+						// EditorApplication.delayCall += ReplacePrefab;
+						ReplacePrefab();
 					}
 				}
 			}
@@ -80,11 +83,6 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						
 						// replace prefab with original asset with all children game objects removed
 						asset.destroyChildren( asset.transform );
-						if ( asset.transform.childCount > 0 )
-						{
-							asset.destroyChildren( asset.transform );
-							Debug.LogError( "Something went wrong deleting children." );
-						}
 						GameObject new_prefab = PrefabUtility.ReplacePrefab( asset.gameObject, 
 																			 prPrefabToReplace, 
 																			 ReplacePrefabOptions.ConnectToPrefab ) as GameObject;
