@@ -31,7 +31,6 @@ public class HAPI_GeoInputControlGUI : Editor
 		myGeo					= target as HAPI_GeoInputControl;
 
 		myForceInspectorRedraw	= false;
-		myTarget				= null;
 
 		myIsMouseDown			= false;
 		myCurrentlyPressedKey	= KeyCode.None;
@@ -62,7 +61,8 @@ public class HAPI_GeoInputControlGUI : Editor
 		HAPI_Host.myDeselectionDelegate -= this.deselect;
 		HAPI_Host.mySelectionTarget = null;
 		
-		paintModeChangeCallback( false );
+		if ( myGeo != null )
+			paintModeChangeCallback( false );
 	}
 
 	public void refresh()
@@ -95,9 +95,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
 
-		Object target = (Object) myTarget;
-		if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
-			myTarget = (GameObject) target;
+		// STUFF
 
 		GUI.enabled = gui_enable;
 	}
@@ -127,20 +125,6 @@ public class HAPI_GeoInputControlGUI : Editor
 		Event current_event 		= Event.current;
 		Vector3 mouse_position		= getMousePosition( ref current_event );
 
-		// Set appropriate handles matrix.
-		// TODO: Fix.
-		/*
-		Vector3 handle_pos = HAPI_AssetUtility.getPosition( myGeo.transform.localToWorldMatrix );
-		Quaternion handle_rot = HAPI_AssetUtility.getQuaternion( myGeo.transform.localToWorldMatrix );
-		Matrix4x4 handle_matrix = Matrix4x4.identity;
-		handle_matrix.SetTRS( handle_pos, handle_rot, new Vector3( 1.0f, 1.0f, 1.0f ) );
-		//Debug.Log( handle_pos );
-		//Debug.Log( handle_rot );
-		//Debug.Log( handle_matrix );
-		Handles.matrix = handle_matrix;
-		 */
-		Handles.matrix = myGeo.transform.localToWorldMatrix;
-
 		// Determine key state.
 		getKeyState( current_event );
 
@@ -153,8 +137,43 @@ public class HAPI_GeoInputControlGUI : Editor
 
 		if ( !current_event.alt )
 		{
-			if ( myGeo.prIsEditingPoints )
+			if ( myGeo.prIsPaintingPoints )
 			{
+				Vector3 position	= Vector3.zero;
+				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
+				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+				bool button_press 	= Handles.Button( 	position, 
+														rotation,
+														handle_size,
+														handle_size,
+														Handles.RectangleCap );
+
+				Ray ray						= myTempCamera.ScreenPointToRay( mouse_position );
+				ray.origin					= myTempCamera.transform.position;
+
+				MeshCollider mesh_collider  = myGeo.getOrCreateComponent< MeshCollider >();
+				RaycastHit hit_info;
+				mesh_collider.Raycast( ray, out hit_info, myIntersectionRayLength );
+				Vector3 intersection = hit_info.point;
+
+				// Draw pain brush.
+				Handles.DrawLine( intersection, intersection + hit_info.normal );
+
+				// Paint attributes on click.
+				if ( button_press )
+				{
+					// Once we add a point we are no longer bound to the user holding down the add points key.
+					// Add points mode is now fully activated.
+					myGeo.prModeChangeWait = false;
+
+					// Paint.
+					myGeo.paint( hit_info );
+				}
+			}
+			else if ( myGeo.prIsEditingPoints )
+			{
+				Handles.matrix = myGeo.transform.localToWorldMatrix;
+
 				// Track mouse dragging.
 				if ( current_event.type == EventType.MouseDown && current_event.button == 0 && !myIsMouseDown )
 				{
@@ -801,9 +820,6 @@ public class HAPI_GeoInputControlGUI : Editor
 	private const float			myActiveBorderWidth = 5.0f;
 	private const float			myInactiveBorderWidth = 2.0f;
 	private Camera				myTempCamera;
-
-	[SerializeField] 
-	private GameObject			myTarget;
 
 	private bool				myIsMouseDown;
 	private KeyCode				myCurrentlyPressedKey;
