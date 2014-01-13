@@ -107,7 +107,52 @@ public class HAPI_GeoInputControl : HAPI_Control
 		}
 	}
 
+	public void paint( RaycastHit hit_info )
+	{
+		MeshFilter mesh_filter = gameObject.GetComponent< MeshFilter >();
+		if ( !mesh_filter )
+			return;
+
+		touch();
+
+		Color[] colours = mesh_filter.sharedMesh.colors;
+		int[] triangles = mesh_filter.sharedMesh.triangles;
+
+		int vertex_index0 = triangles[ hit_info.triangleIndex * 3 + 0 ];
+		int vertex_index1 = triangles[ hit_info.triangleIndex * 3 + 1 ];
+		int vertex_index2 = triangles[ hit_info.triangleIndex * 3 + 2 ];
+		
+		colours[ vertex_index0 ].g -= 0.1f;
+		colours[ vertex_index1 ].g -= 0.1f;
+		colours[ vertex_index2 ].g -= 0.1f;
+		colours[ vertex_index0 ].b -= 0.1f;
+		colours[ vertex_index1 ].b -= 0.1f;
+		colours[ vertex_index2 ].b -= 0.1f;
+
+		mesh_filter.sharedMesh.colors = colours;
+	}
+
 	public void updatePoint( int index, Vector3 position )
+	{
+		MeshFilter mesh_filter = gameObject.GetComponent< MeshFilter >();
+		if ( !mesh_filter )
+			return;
+
+		touch();
+
+		Vector3[] verts = mesh_filter.sharedMesh.vertices;
+		verts[ index ] = position;
+		mesh_filter.sharedMesh.vertices = verts;
+
+		// Refresh MeshCollider's geometry.
+		if ( gameObject.GetComponent< MeshCollider >() )
+		{
+			gameObject.GetComponent< MeshCollider >().enabled = false;
+			gameObject.GetComponent< MeshCollider >().enabled = true;
+		}
+	}
+
+	private void touch()
 	{
 		MeshFilter mesh_filter = gameObject.GetComponent< MeshFilter >();
 		if ( !mesh_filter )
@@ -123,7 +168,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 				
 				Color[] colours = new Color[ mesh_copy.vertexCount ];
 				for ( int i = 0; i < mesh_copy.vertexCount; ++i )
-					colours[ i ] = new Color( 1.0f, 0.0f, 0.0f );
+					colours[ i ] = new Color( 1.0f, 1.0f, 1.0f );
 
 				mesh_copy.colors = colours;
 				mesh_filter.sharedMesh = mesh_copy;
@@ -131,10 +176,6 @@ public class HAPI_GeoInputControl : HAPI_Control
 
 			myTouched = true;
 		}
-
-		Vector3[] verts = mesh_filter.sharedMesh.vertices;
-		verts[ index ] = position;
-		mesh_filter.sharedMesh.vertices = verts;
 	}
 
 	[SerializeField] private bool			mySyncAssetTransform;
