@@ -116,8 +116,6 @@ public class HAPI_Instancer : MonoBehaviour
 
 	public HAPI_Asset 	prAsset { get { return myAsset; } set { myAsset = value; } }
 	public int 			prObjectId { get { return myObjectId; } set { myObjectId = value; } }
-	public List< GameObject >   prObjsToInstantiate { get { return myObjsToInstantiate; } } 	
-	public List< string > prUniqueInstantiatedNames { get { return myUniqueInstantiatedNames; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -128,8 +126,6 @@ public class HAPI_Instancer : MonoBehaviour
 		prObjectId = -1;
 		myNumInstances = 0;
 		myCurvesCollection = null;
-		myObjsToInstantiate = new List< GameObject >();
-		myUniqueInstantiatedNames = new List< string >();
 	}
 	
 	
@@ -169,11 +165,16 @@ public class HAPI_Instancer : MonoBehaviour
 
 	public GameObject getUserObjToInstantiateFromName( string name )
 	{
-		for( int ii = 0; ii < prUniqueInstantiatedNames.Count; ii++ )
+		HAPI_InstancerManager instancer_manager = prAsset.GetComponent< HAPI_InstancerManager >();
+		HAPI_InstancerPersistentData instancer_data = instancer_manager.getInstancerPersistentData( this.name );
+
+		List< string > unique_names = instancer_data.uniqueNames;
+		List< GameObject > objs_to_instantiate = instancer_data.objsToInstantiate;
+		for( int ii = 0; ii < unique_names.Count; ii++ )
 		{
-			if( prUniqueInstantiatedNames[ ii ] == name )
+			if( unique_names[ ii ] == name )
 			{
-				return prObjsToInstantiate[ ii ];
+				return objs_to_instantiate[ ii ];
 			}
 		}
 		return null;
@@ -618,16 +619,23 @@ public class HAPI_Instancer : MonoBehaviour
 	{
 		List < GameObject > objs_to_instantiate = new List< GameObject >();
 
+		HAPI_InstancerManager instancer_manager = prAsset.GetComponent< HAPI_InstancerManager >();
+		HAPI_InstancerPersistentData instancer_data = instancer_manager.getInstancerPersistentData( this.name );
+		
+		List< string > existing_unique_names = instancer_data.uniqueNames;
+		List< GameObject > existing_objs_to_instantiate = instancer_data.objsToInstantiate;
+
+
 		for( int ii = 0; ii < unique_instantiated_names.Count; ii++ )
 		{
 			string unique_name = unique_instantiated_names[ ii ];
 			GameObject obj = null;
-			for( int jj = 0; jj < prUniqueInstantiatedNames.Count; jj++ )
+			for( int jj = 0; jj < existing_unique_names.Count; jj++ )
 			{
-				string existing_unique_name = prUniqueInstantiatedNames[ jj ];
+				string existing_unique_name = existing_unique_names[ jj ];
 				if( existing_unique_name == unique_name )
 				{
-					obj = prObjsToInstantiate[ jj ];
+					obj = existing_objs_to_instantiate[ jj ];
 					break;
 				}
 			}
@@ -635,8 +643,9 @@ public class HAPI_Instancer : MonoBehaviour
 			objs_to_instantiate.Add( obj );
 		}
 
-		myUniqueInstantiatedNames = unique_instantiated_names;
-		myObjsToInstantiate = objs_to_instantiate;
+
+		instancer_data.uniqueNames = unique_instantiated_names;
+		instancer_data.objsToInstantiate = objs_to_instantiate;
 
 	}
 			
@@ -869,8 +878,6 @@ public class HAPI_Instancer : MonoBehaviour
 	[SerializeField] private HAPI_Asset myAsset;
 	[SerializeField] private int myObjectId;
 	[SerializeField] private int myNumInstances;
-	[SerializeField] private List< GameObject > myObjsToInstantiate;
-	[SerializeField] private List< string > myUniqueInstantiatedNames;
 
 	
 	private HAPI_CurvesCollection[] myCurvesCollection;

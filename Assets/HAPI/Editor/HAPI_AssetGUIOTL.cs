@@ -99,14 +99,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				generateAssetBakeControls();
 		}
 
-		HAPI_Instancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HAPI_Instancer >();
-		if( !myAssetOTL.isPrefab() && instancers.Length > 0 )
-		{
-			myAssetOTL.prShowInstanceControls = HAPI_GUI.foldout( "Instancing Controls", 
-			                                                      myAssetOTL.prShowInstanceControls, true );
-			if ( myAssetOTL.prShowInstanceControls )
-				generateAssetInstanceControls();
-		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,53 +143,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 									myAsset.gameObject,
 									progress_bar );
 			progress_bar.clearProgressBar();
-		}
-	}
-
-	private void generateAssetInstanceControls()
-	{
-		HAPI_Instancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HAPI_Instancer >();
-
-		foreach( HAPI_Instancer instancer in instancers )
-		{
-			bool changed = false;
-			
-			{
-				List< string > unique_names = instancer.prUniqueInstantiatedNames;
-				
-				for( int ii = 0; ii < unique_names.Count; ii++ )
-				{
-					string instanced_name = unique_names[ ii ];
-					
-					Object obj = (Object) instancer.getUserObjToInstantiateFromName( instanced_name );
-					changed |= HAPI_GUI.objectField( "object_to_instantiate", "Replace " + instanced_name, 
-					                                ref obj, typeof( GameObject ) );
-					if( changed )
-					{
-						instancer.prObjsToInstantiate[ ii ] = (GameObject) obj;
-					}
-				}
-
-			}
-			
-			
-			if ( instancer.hasOverriddenInstances() )
-			{
-				if ( GUILayout.Button( "UnPin All Instances" ) ) 
-				{
-					instancer.unPinAllInstances();
-					changed = true;
-				}
-			}
-			
-			if ( changed )
-			{
-				HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
-				instancer.instanceObjects( progress_bar );
-				progress_bar.clearProgressBar();
-			}
-
-			EditorGUILayout.Separator();
 		}
 	}
 
