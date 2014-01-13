@@ -54,6 +54,8 @@ namespace HAPI
 		public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 		public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
 
+		public const float HAPI_CURVE_LOD					= 8.0f;
+
 		// Shared Constants -------------------------------------------------
 		//
 		// IMPORTANT: Changes to these constants will not change the behavior of the
@@ -470,8 +472,7 @@ namespace HAPI
 		// Use the node id to get the asset's parameters.
 		public HAPI_NodeId nodeId;
 
-		[ MarshalAs( UnmanagedType.U1 ) ]
-		public bool hasEverCooked;
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasEverCooked;
 
 		private HAPI_StringHandle nameSH; // Instance name (the label + a number).
 		private HAPI_StringHandle labelSH;
@@ -490,9 +491,6 @@ namespace HAPI
 		public int minGeoInputCount;
 		public int maxGeoInputCount;
 		
-		public int minVerticesPerPrimitive;
-		public int maxVerticesPerPrimitive;
-		
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
@@ -509,7 +507,20 @@ namespace HAPI
 		public string helpText
 		{ get { return HAPI_Host.getString( helpTextSH ); } private set {} }
 	}
-	
+
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_CookOptions
+	{
+		// Meshes
+		public int maxVerticesPerPrimitive; // This is enforced by convexing the mesh.
+											// Use -1 to avoid convexing at all and get
+											// some performance boost.
+
+		// Curves
+		[ MarshalAs( UnmanagedType.U1 ) ] public bool refineCurveToLinear;
+		public float curveRefineLOD;
+	}
+
 	// NODES --------------------------------------------------------------------------------------------------------
 
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -980,7 +991,7 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isRational;
 
-		public int order; // Order of 1 is invalid, order of 0 means there is a varying order.
+		public int order; // Order of 1 is invalid. 0 means there is a varying order.
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasKnots;

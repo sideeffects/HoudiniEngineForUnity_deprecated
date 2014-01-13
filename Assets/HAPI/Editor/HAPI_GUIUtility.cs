@@ -85,10 +85,7 @@ public class HAPI_GUIUtility : Editor
 			HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
 			progressBar.statusCheckLoop();
 			
-			int num_assets = HAPI_Host.getAssetCountFromLoadHip();
-			
-			int [] asset_ids = new int[ num_assets ];
-			HAPI_Host.getAssetIdsFromLoadHIPFile( asset_ids );
+			int[] asset_ids = HAPI_Host.getAssetIdsFromLoadHIPFile();
 			
 			foreach ( int asset_id in asset_ids )
 			{

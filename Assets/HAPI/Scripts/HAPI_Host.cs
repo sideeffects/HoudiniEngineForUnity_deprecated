@@ -644,11 +644,8 @@ namespace HAPI
 
 			int asset_id = -1;
 			string first_asset_name = asset_names[ 0 ];
-			status_code = HAPI_InstantiateAsset(
-				first_asset_name, true,
-				HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
-				HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE,
-				out asset_id );
+			bool cook_on_load = true;
+			status_code = HAPI_InstantiateAsset( first_asset_name, cook_on_load, out asset_id );
 			processStatusCode( status_code );
 
 			return asset_id;
@@ -659,31 +656,21 @@ namespace HAPI
 			if ( !initialize() )
 				throw new HAPI_Error( "DLL Not Found." );
 
-			HAPI_Result status_code = HAPI_LoadHIPFile(
-				path,
-				HAPI_Constants.HAPI_MIN_VERTICES_PER_FACE,
-				HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE );
+			HAPI_Result status_code = HAPI_LoadHIPFile( path, true );
+			processStatusCode( status_code );
+		}
+		
+		public static int[] getAssetIdsFromLoadHIPFile()
+		{
+			int asset_count = 0;
+			HAPI_Result status_code = HAPI_GetAssetCountFromLoadHIPFile( ref asset_count );
+			processStatusCode( status_code );
 
+			int[] asset_ids = new int[ asset_count ];
+			status_code = HAPI_GetAssetIdsFromLoadHIPFile( asset_ids );
 			processStatusCode( status_code );
-		}
-		
-		public static int getAssetCountFromLoadHip() 
-		{
-			int num_assets = 0;
-			
-			HAPI_Result status_code = (HAPI_Result) HAPI_GetAssetCountFromLoadHIPFile( ref num_assets );
-			
-			processStatusCode( status_code );
-			
-			return num_assets;
-		}
-		
-		public static void getAssetIdsFromLoadHIPFile( int [] assetIds )
-		{
-			HAPI_Result status_code = (HAPI_Result) HAPI_GetAssetIdsFromLoadHIPFile( assetIds );
-			
-			processStatusCode( status_code );
-			
+
+			return asset_ids;
 		}
 		
 		public static int createCurve()
@@ -763,9 +750,14 @@ namespace HAPI
 					{
 						throw new HAPI_Error( "Cannot link to Houdini Engine because of version mismatch." );
 					}
-					
+
+					HAPI_CookOptions cook_options = new HAPI_CookOptions();
+					cook_options.maxVerticesPerPrimitive = HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
+					cook_options.refineCurveToLinear = true;
+					cook_options.curveRefineLOD = HAPI_Constants.HAPI_CURVE_LOD;
+
 					// Initialize.
-					status_code = HAPI_Initialize( otls_path, dsos_path, true, -1 );
+					status_code = HAPI_Initialize( otls_path, dsos_path, cook_options, true, -1 );
 					if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 						processStatusCode( status_code );
 				}

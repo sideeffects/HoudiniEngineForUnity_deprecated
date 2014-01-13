@@ -379,7 +379,7 @@ namespace HAPI
 		/// </param>
 		public static void cookAsset( HAPI_AssetId asset_id )
 		{
-			HAPI_Result status_code = HAPI_CookAsset( asset_id );
+			HAPI_Result status_code = HAPI_CookAsset( asset_id, System.IntPtr.Zero );
 			processStatusCode( status_code );
 		}
 
@@ -2037,12 +2037,12 @@ namespace HAPI
 				asset_id, object_id, geo_id, part_id, raw_values, start, length );
 			processStatusCode( status_code );
 
-			Vector3[] values = new Vector3[ length / HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			Vector3[] values = new Vector3[ length / HAPI_Constants.HAPI_CV_VECTOR_SIZE ];
 			for ( int i = 0; i < values.Length; ++i )
 			{
-				values[ i ].x = raw_values[ i * HAPI_Constants.HAPI_POSITION_VECTOR_SIZE + 0 ];
-				values[ i ].y = raw_values[ i * HAPI_Constants.HAPI_POSITION_VECTOR_SIZE + 1 ];
-				values[ i ].z = raw_values[ i * HAPI_Constants.HAPI_POSITION_VECTOR_SIZE + 2 ];
+				values[ i ].x = raw_values[ i * HAPI_Constants.HAPI_CV_VECTOR_SIZE + 0 ];
+				values[ i ].y = raw_values[ i * HAPI_Constants.HAPI_CV_VECTOR_SIZE + 1 ];
+				values[ i ].z = raw_values[ i * HAPI_Constants.HAPI_CV_VECTOR_SIZE + 2 ];
 			}
 
 			return values;
