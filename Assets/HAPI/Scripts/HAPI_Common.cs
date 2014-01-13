@@ -977,6 +977,9 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isPeriodic;
 
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool isRational;
+
 		public int order; // Order of 1 is invalid, order of 0 means there is a varying order.
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
