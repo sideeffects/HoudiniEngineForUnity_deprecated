@@ -2015,6 +2015,72 @@ namespace HAPI
 			HAPI_Result status_code = HAPI_GetVolumeTileFloatData( asset_id, object_id, geo_id, part_id, ref tile, values );
 			processStatusCode( status_code );
 		}
+
+		// CURVES ---------------------------------------------------------------------------------------------------
+
+		public static HAPI_CurveInfo getCurveInfo(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			ref HAPI_VolumeInfo volume_info )
+		{
+			HAPI_CurveInfo curve_info = new HAPI_CurveInfo();
+			HAPI_Result status_code = HAPI_GetCurveInfo( asset_id, object_id, geo_id, part_id, ref curve_info );
+			processStatusCode( status_code );
+			return curve_info;
+		}
+
+		public static Vector3[] getCurveVertices(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			int start, int length )
+		{
+			float[] raw_values = new float[ length ];
+			HAPI_Result status_code = HAPI_GetCurveVertices(
+				asset_id, object_id, geo_id, part_id, raw_values, start, length );
+			processStatusCode( status_code );
+
+			Vector3[] values = new Vector3[ length / HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
+			for ( int i = 0; i < values.Length; ++i )
+			{
+				values[ i ].x = raw_values[ i * HAPI_Constants.HAPI_POSITION_VECTOR_SIZE + 0 ];
+				values[ i ].y = raw_values[ i * HAPI_Constants.HAPI_POSITION_VECTOR_SIZE + 1 ];
+				values[ i ].z = raw_values[ i * HAPI_Constants.HAPI_POSITION_VECTOR_SIZE + 2 ];
+			}
+
+			return values;
+		}
+
+		public static int[] getCurveCounts(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			int start, int length )
+		{
+			int[] counts = new int[ length ];
+			HAPI_Result status_code = HAPI_GetCurveCounts(
+				asset_id, object_id, geo_id, part_id, counts, start, length );
+			processStatusCode( status_code );
+			return counts;
+		}
+
+		public static int[] getCurveOrders(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			int start, int length )
+		{
+			int[] orders = new int[ length ];
+			HAPI_Result status_code = HAPI_GetCurveOrders(
+				asset_id, object_id, geo_id, part_id, orders, start, length );
+			processStatusCode( status_code );
+			return orders;
+		}
+
+		public static float[] getCurveKnots(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			int start, int length )
+		{
+			float[] knots = new float[ length ];
+			HAPI_Result status_code = HAPI_GetCurveKnots(
+				asset_id, object_id, geo_id, part_id, knots, start, length );
+			processStatusCode( status_code );
+			return knots;
+		}
+
 #endif // UNITY_EDITOR
 	}
 }

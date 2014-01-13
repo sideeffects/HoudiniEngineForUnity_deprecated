@@ -68,6 +68,7 @@ namespace HAPI
 		public const int HAPI_EULER_VECTOR_SIZE				= 3;
 		public const int HAPI_UV_VECTOR_SIZE				= 2;
 		public const int HAPI_COLOR_VECTOR_SIZE				= 4;
+		public const int HAPI_CV_VECTOR_SIZE				= 4;
 
 		public const int HAPI_PRIM_MIN_VERTEX_COUNT			= 1;
 		public const int HAPI_PRIM_MAX_VERTEX_COUNT			= 16;
@@ -213,12 +214,21 @@ namespace HAPI
 	{
 		HAPI_ATTROWNER_INVALID = -1,
 		HAPI_ATTROWNER_VERTEX,
-	    HAPI_ATTROWNER_POINT,
-	    HAPI_ATTROWNER_PRIM,
+		HAPI_ATTROWNER_POINT,
+		HAPI_ATTROWNER_PRIM,
 		HAPI_ATTROWNER_DETAIL,
-	    HAPI_ATTROWNER_MAX
+		HAPI_ATTROWNER_MAX
 	}
 	
+	public enum HAPI_CurveType
+	{
+		HAPI_CURVETYPE_INVALID = -1,
+		HAPI_CURVETYPE_LINEAR,
+		HAPI_CURVETYPE_BEZIER,
+		HAPI_CURVETYPE_NURBS,
+		HAPI_CURVETYPE_MAX
+	}
+
 	public enum HAPI_StorageType
 	{
 		HAPI_STORAGETYPE_INVALID = -1,
@@ -245,7 +255,16 @@ namespace HAPI
 		HAPI_INPUT_GEOMETRY,
 		HAPI_INPUT_MAX
 	};
-	
+
+	public enum HAPI_CurveOrders
+	{
+		HAPI_CURVE_ORDER_VARYING = 0,
+		HAPI_CURVE_ORDER_INVALID = 1,
+		HAPI_CURVE_ORDER_LINEAR = 2,
+		HAPI_CURVE_ORDER_QUADRATIC = 3,
+		HAPI_CURVE_ORDER_CUBIC = 4,
+	}
+
 	public enum HAPI_TransformComponentType
 	{
 		HAPI_TRANSFORM_TX = 0,
@@ -776,6 +795,9 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasVolume;
 
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool isCurve;
+
 		// Accessors
 		public string name
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
@@ -941,5 +963,25 @@ namespace HAPI
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool isValid;
 	};
+
+	// CURVES -------------------------------------------------------------------------------------------------------
+
+	[ StructLayout( LayoutKind.Sequential ) ]
+	public struct HAPI_CurveInfo
+	{
+		public HAPI_CurveType curveType;
+		public int curveCount;
+		public int vertexCount;
+		public int knotCount;
+
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool isPeriodic;
+
+		public int order; // Order of 1 is invalid, order of 0 means there is a varying order.
+
+		[ MarshalAs( UnmanagedType.U1 ) ]
+		public bool hasKnots;
+	};
+
 #endif // UNITY_EDITOR
 }
