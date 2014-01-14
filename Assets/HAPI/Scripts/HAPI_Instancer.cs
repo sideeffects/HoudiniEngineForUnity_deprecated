@@ -113,12 +113,11 @@ public class HAPI_Instancer : MonoBehaviour
 #if UNITY_EDITOR	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
-	
-	public GameObject 	prObjToInstantiate { get { return myObjToInstantiate; }  set { myObjToInstantiate = value; } }
-	public bool 		prOverrideInstances { get { return myOverrideInstances; } set { myOverrideInstances = value; } }
+
 	public HAPI_Asset 	prAsset { get { return myAsset; } set { myAsset = value; } }
 	public int 			prObjectId { get { return myObjectId; } set { myObjectId = value; } }
-		
+	public List< GameObject >   prObjsToInstantiate { get { return myObjsToInstantiate; } } 	
+	public List< string > prUniqueInstantiatedNames { get { return myUniqueInstantiatedNames; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -126,11 +125,11 @@ public class HAPI_Instancer : MonoBehaviour
 	public HAPI_Instancer () 
 	{
 		prAsset = null;
-		prOverrideInstances = false;
 		prObjectId = -1;
-		prObjToInstantiate = null;
 		myNumInstances = 0;
 		myCurvesCollection = null;
+		myObjsToInstantiate = new List< GameObject >();
+		myUniqueInstantiatedNames = new List< string >();
 	}
 	
 	
@@ -167,6 +166,19 @@ public class HAPI_Instancer : MonoBehaviour
 		}
 	}
 	
+
+	public GameObject getUserObjToInstantiateFromName( string name )
+	{
+		for( int ii = 0; ii < prUniqueInstantiatedNames.Count; ii++ )
+		{
+			if( prUniqueInstantiatedNames[ ii ] == name )
+			{
+				return prObjsToInstantiate[ ii ];
+			}
+		}
+		return null;
+	}
+
 	private void instanceObject( GameObject objToInstantiate, 
 								 Vector3 pos,
 								 Vector3 euler,
@@ -183,8 +195,9 @@ public class HAPI_Instancer : MonoBehaviour
 		}
 		
 		GameObject obj;
-		
-		if ( !prOverrideInstances )
+
+		GameObject user_instance = getUserObjToInstantiateFromName( objToInstantiate.name );
+		if ( user_instance == null )
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
 			
@@ -223,14 +236,14 @@ public class HAPI_Instancer : MonoBehaviour
 		}
 		else
 		{
-			obj = PrefabUtility.InstantiatePrefab( prObjToInstantiate ) as GameObject;
+			obj = PrefabUtility.InstantiatePrefab( user_instance ) as GameObject;
 			if( obj == null )
 			{
 				bool liveTransformPropagationSetting	= false;
 				bool syncAssetTransformSetting			= false;
 				bool enableCooking						= true;
 				
-				HAPI_Asset hapi_asset = prObjToInstantiate.GetComponent< HAPI_Asset >();
+				HAPI_Asset hapi_asset = user_instance.GetComponent< HAPI_Asset >();
 				if( hapi_asset != null )
 				{
 					liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
@@ -241,7 +254,7 @@ public class HAPI_Instancer : MonoBehaviour
 					hapi_asset.prEnableCooking				= false;
 				}
 				
-				obj = Instantiate( prObjToInstantiate, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
+				obj = Instantiate( user_instance, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
 				
 				if( hapi_asset != null )
 				{
@@ -600,6 +613,32 @@ public class HAPI_Instancer : MonoBehaviour
 			return false;
 		}
 	}
+
+	private void updateUniqueInstantiatedNames( List < string > unique_instantiated_names )
+	{
+		List < GameObject > objs_to_instantiate = new List< GameObject >();
+
+		for( int ii = 0; ii < unique_instantiated_names.Count; ii++ )
+		{
+			string unique_name = unique_instantiated_names[ ii ];
+			GameObject obj = null;
+			for( int jj = 0; jj < prUniqueInstantiatedNames.Count; jj++ )
+			{
+				string existing_unique_name = prUniqueInstantiatedNames[ jj ];
+				if( existing_unique_name == unique_name )
+				{
+					obj = prObjsToInstantiate[ jj ];
+					break;
+				}
+			}
+
+			objs_to_instantiate.Add( obj );
+		}
+
+		myUniqueInstantiatedNames = unique_instantiated_names;
+		myObjsToInstantiate = objs_to_instantiate;
+
+	}
 			
 	public void instanceObjects( HAPI_ProgressBar progress_bar )
 	{
@@ -656,7 +695,9 @@ public class HAPI_Instancer : MonoBehaviour
 			
 			List <int> exclusion_list = new List<int>();
 			instanceOverriddenObjects( myNumInstances, exclusion_list );
-			
+
+			List < string > unique_instantiated_names = new List< string >();
+
 			bool liveTransformPropagationSetting	= false;
 			bool syncAssetTransformSetting			= false;
 			bool enableCooking						= true;
@@ -683,6 +724,11 @@ public class HAPI_Instancer : MonoBehaviour
 						{
 							objToInstantiate = prAsset.findPartByName( obj_name, true );
 						}
+
+						if( objToInstantiate == null )
+						{
+							objToInstantiate = GameObject.Find( obj_name );
+						}
 					}
 					else 
 					{
@@ -707,6 +753,11 @@ public class HAPI_Instancer : MonoBehaviour
 						hapi_asset.prPushUnityTransformToHoudini			= false;
 						hapi_asset.prEnableCooking				= false;
 					}
+				}
+
+				if( !unique_instantiated_names.Contains( objToInstantiate.name ) )
+				{
+					unique_instantiated_names.Add( objToInstantiate.name );
 				}
 
 				// Set progress bar information.
@@ -777,18 +828,21 @@ public class HAPI_Instancer : MonoBehaviour
 									script_attr_info.exists,
 									script_to_attach );
 						
-					if ( !prOverrideInstances )
+
+					HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
+					if ( hapi_asset != null )
 					{
-						HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
-						if ( hapi_asset != null )
-						{
-							hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
-							hapi_asset.prPushUnityTransformToHoudini			= syncAssetTransformSetting;
-							hapi_asset.prEnableCooking				= enableCooking;
-						}
+						hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
+						hapi_asset.prPushUnityTransformToHoudini			= syncAssetTransformSetting;
+						hapi_asset.prEnableCooking				= enableCooking;
 					}
+
 				}
 			}
+
+			updateUniqueInstantiatedNames( unique_instantiated_names );
+
+
 		}
 		catch ( HAPI_Error error )
 		{
@@ -813,10 +867,11 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	
 	[SerializeField] private HAPI_Asset myAsset;
-	[SerializeField] private GameObject myObjToInstantiate;
-	[SerializeField] private bool myOverrideInstances;
 	[SerializeField] private int myObjectId;
 	[SerializeField] private int myNumInstances;
+	[SerializeField] private List< GameObject > myObjsToInstantiate;
+	[SerializeField] private List< string > myUniqueInstantiatedNames;
+
 	
 	private HAPI_CurvesCollection[] myCurvesCollection;
 #endif // UNITY_EDITOR

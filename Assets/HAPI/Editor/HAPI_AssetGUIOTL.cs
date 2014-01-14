@@ -163,17 +163,21 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			bool changed = false;
 			
 			{
-				Object obj = (Object) instancer.prObjToInstantiate;
-				changed |= HAPI_GUI.objectField( "object_to_instantiate", "Override " + instancer.name, 
-				                                ref obj, typeof( GameObject ) );
-				instancer.prObjToInstantiate = (GameObject) obj;
-			}
+				List< string > unique_names = instancer.prUniqueInstantiatedNames;
+				
+				for( int ii = 0; ii < unique_names.Count; ii++ )
+				{
+					string instanced_name = unique_names[ ii ];
+					
+					Object obj = (Object) instancer.getUserObjToInstantiateFromName( instanced_name );
+					changed |= HAPI_GUI.objectField( "object_to_instantiate", "Replace " + instanced_name, 
+					                                ref obj, typeof( GameObject ) );
+					if( changed )
+					{
+						instancer.prObjsToInstantiate[ ii ] = (GameObject) obj;
+					}
+				}
 
-			{
-				bool value = instancer.prOverrideInstances;
-				changed |= HAPI_GUI.toggle(
-					"override_instance_object", "Override Instance Object", ref value, null, ref value );
-				instancer.prOverrideInstances = value;
 			}
 			
 			
