@@ -185,7 +185,8 @@ public class HAPI_AssetOTL : HAPI_Asset
 				Debug.LogWarning( error.ToString() );
 			}
 		}
-			
+
+		bool found_instancer = false;
 		// Processing instancers.
 		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 		{
@@ -194,6 +195,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 			{
 				try
 				{
+					found_instancer = true;
 					if ( object_info.objectToInstanceId >= 0 && 
 							prGameObjects[ object_info.objectToInstanceId ] == null )
 						createObject( object_info.objectToInstanceId, reload_asset );
@@ -206,6 +208,15 @@ public class HAPI_AssetOTL : HAPI_Asset
 					Debug.LogWarning( error.ToString() );
 				}
 			}
+		}
+
+		if( found_instancer )
+		{
+			if( gameObject.GetComponent< HAPI_InstancerManager >() == null )
+				gameObject.AddComponent( "HAPI_InstancerManager" );
+
+			HAPI_InstancerManager instancer_manager = gameObject.GetComponent< HAPI_InstancerManager >();
+			instancer_manager.updateInstancerData();
 		}
 	}
 
