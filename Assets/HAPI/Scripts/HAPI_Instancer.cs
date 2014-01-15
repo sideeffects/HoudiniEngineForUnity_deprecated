@@ -623,6 +623,8 @@ public class HAPI_Instancer : MonoBehaviour
 		List < GameObject > objs_to_instantiate = new List< GameObject >();
 
 		HAPI_InstancerManager instancer_manager = prAsset.GetComponent< HAPI_InstancerManager >();
+		if( instancer_manager == null )
+			return;
 		HAPI_InstancerPersistentData instancer_data = instancer_manager.getInstancerPersistentData( this.name );
 		
 		List< string > existing_unique_names = instancer_data.uniqueNames;
