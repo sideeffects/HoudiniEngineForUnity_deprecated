@@ -497,23 +497,17 @@ public class HAPI_CurveGUI : Editor
 		// So, for some odd reason, it is possible (and highly likely) to get a the
 		// EventType.KeyDown event triggerd but with a keyCode of KeyCode.None. Lovely.
 		if ( current_event.type == EventType.KeyDown && current_event.keyCode != KeyCode.None )
-		{
 			myCurrentlyPressedKey = current_event.keyCode;
-		}
+		else if ( current_event.control )
+			myCurrentlyPressedKey = KeyCode.LeftControl;
 		else if ( current_event.shift )
-		{
 			myCurrentlyPressedKey = KeyCode.LeftShift;
-		}
-		// I have to also interpret the Ignore event as the mouse up event because that's all I
-		// get if the use lets go of the mouse button while over a different Unity window...
 		else if ( current_event.type == EventType.KeyUp || current_event.type == EventType.Ignore )
-		{
+			// I have to also interpret the Ignore event as the mouse up event because that's all I
+			// get if the use lets go of the mouse button while over a different Unity window...
 			myCurrentlyPressedKey = KeyCode.None;
-		}
 		else if ( myCurrentlyPressedKey == KeyCode.LeftShift && !current_event.shift )
-		{
 			myCurrentlyPressedKey = KeyCode.None;
-		}
 	}
 
 	private void clearSelection()
@@ -689,6 +683,23 @@ public class HAPI_CurveGUI : Editor
 		}
 	}
 
+	// Undistinguishes left and right shift and control.
+	private bool areKeysTheSame( KeyCode key1, KeyCode key2 )
+	{
+		if ( key1 == key2 )
+			return true;
+		
+		if ( ( key1 == KeyCode.LeftShift || key1 == KeyCode.RightShift )
+			&& ( key2 == KeyCode.LeftShift || key2 == KeyCode.RightShift ) )
+			return true;
+
+		if ( ( key1 == KeyCode.LeftControl || key1 == KeyCode.RightControl )
+			&& ( key2 == KeyCode.LeftControl || key2 == KeyCode.RightControl ) )
+			return true;
+
+		return false;
+	}
+
 	private void decideModes( ref Event current_event )
 	{
 		if ( !myCurve.prEditable )
@@ -701,8 +712,8 @@ public class HAPI_CurveGUI : Editor
 			return;
 		}
 
-		bool add_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prAddingPointsModeHotKey;
-		bool edit_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prEditingPointsModeHotKey;
+		bool add_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prAddingPointsModeHotKey );
+		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prEditingPointsModeHotKey );
 
 		bool add_points_mode		= myCurve.prIsAddingPoints;
 		bool edit_points_mode		= myCurve.prIsEditingPoints;
