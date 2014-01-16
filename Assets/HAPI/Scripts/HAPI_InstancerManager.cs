@@ -59,28 +59,24 @@ public class HAPI_InstancerManager : MonoBehaviour
 	}
 
 
-	public void updateInstancerData()
+	public void updateInstancerData( HAPI_Instancer instancer )
 	{
-		HAPI_Instancer[] instancers = gameObject.GetComponentsInChildren< HAPI_Instancer >();
-		foreach( HAPI_Instancer instancer in instancers )
+		bool foundInstancer = false;
+		foreach( HAPI_InstancerPersistentData persistent_data in myInstancersPersistentData )
 		{
-			bool foundInstancer = false;
-			foreach( HAPI_InstancerPersistentData persistent_data in myInstancersPersistentData )
+			if( persistent_data.instancerName == instancer.name )
 			{
-				if( persistent_data.instancerName == instancer.name )
-				{
-					foundInstancer = true;
-					break;
-				}
+				foundInstancer = true;
+				break;
 			}
+		}
 
-			if( !foundInstancer )
-			{
-				HAPI_InstancerPersistentData instancer_data 
-					= ScriptableObject.CreateInstance< HAPI_InstancerPersistentData>();
-				instancer_data.instancerName = instancer.name;
-				myInstancersPersistentData.Add( instancer_data );
-			}
+		if( !foundInstancer )
+		{
+			HAPI_InstancerPersistentData instancer_data 
+				= ScriptableObject.CreateInstance< HAPI_InstancerPersistentData>();
+			instancer_data.instancerName = instancer.name;
+			myInstancersPersistentData.Add( instancer_data );
 		}
 	}
 	

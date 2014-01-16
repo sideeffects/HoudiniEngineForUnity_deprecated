@@ -186,7 +186,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 			}
 		}
 
-		bool found_instancer = false;
 		// Processing instancers.
 		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 		{
@@ -195,12 +194,12 @@ public class HAPI_AssetOTL : HAPI_Asset
 			{
 				try
 				{
-					found_instancer = true;
 					if ( object_info.objectToInstanceId >= 0 && 
 							prGameObjects[ object_info.objectToInstanceId ] == null )
 						createObject( object_info.objectToInstanceId, reload_asset );
 						
-					instanceObjects( object_index, progress_bar );
+					if( reload_asset || object_info.haveGeosChanged )
+						instanceObjects( object_index, progress_bar );
 				}
 				catch ( HAPI_Error error )
 				{
@@ -210,14 +209,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 			}
 		}
 
-		if( found_instancer )
-		{
-			if( gameObject.GetComponent< HAPI_InstancerManager >() == null )
-				gameObject.AddComponent( "HAPI_InstancerManager" );
-
-			HAPI_InstancerManager instancer_manager = gameObject.GetComponent< HAPI_InstancerManager >();
-			instancer_manager.updateInstancerData();
-		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,12 +226,19 @@ public class HAPI_AssetOTL : HAPI_Asset
 		}
 		else
 		{
+
+			if( gameObject.GetComponent< HAPI_InstancerManager >() == null )
+				gameObject.AddComponent( "HAPI_InstancerManager" );
+
 			GameObject main_object = new GameObject( object_info.name );
 			main_object.transform.parent = transform;
 
 			main_object.AddComponent( "HAPI_Instancer" );
 			prGameObjects[ object_id ] = main_object;
 			instancer = main_object.GetComponent< HAPI_Instancer >();
+
+			HAPI_InstancerManager instancer_manager = gameObject.GetComponent< HAPI_InstancerManager >();
+			instancer_manager.updateInstancerData( instancer );
 		}
 		
 		instancer.prAsset		= this;
