@@ -204,17 +204,13 @@ public class HAPI_Instancer : MonoBehaviour
 		if ( user_instance == null )
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
+
+			HAPI_Instance instance = (HAPI_Instance) obj.AddComponent( "HAPI_Instance" );
+
 			
-			HAPI_PartControl child_part_control = obj.GetComponentInChildren< HAPI_PartControl >();
-			
-			if ( child_part_control == null )
-			{
-				Debug.LogError( "No child_part_control on instantiated object (name: " + obj.name + ")" );
-				return;
-			}
-			
-			child_part_control.prInstancePointNumber = point_index;
-			child_part_control.prObjectToInstantiate = objToInstantiate;
+			instance.prInstancePointNumber = point_index;
+			instance.prObjectToInstantiate = objToInstantiate;
+			instance.prInstancer = this;
 			
 			if ( scale_exists )
 			{
@@ -259,7 +255,12 @@ public class HAPI_Instancer : MonoBehaviour
 				}
 				
 				obj = Instantiate( user_instance, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
-				
+				HAPI_Asset hapi_asset_on_clone =  obj.GetComponent< HAPI_Asset >();
+				if( hapi_asset_on_clone != null )
+				{
+					Destroy( hapi_asset_on_clone );
+				}
+
 				if( hapi_asset != null )
 				{
 					hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
@@ -267,7 +268,12 @@ public class HAPI_Instancer : MonoBehaviour
 					hapi_asset.prEnableCooking				= enableCooking;
 				}									
 			}
-			
+
+			HAPI_Instance instance = (HAPI_Instance) obj.AddComponent( "HAPI_Instance" );
+			instance.prInstancePointNumber = point_index;
+			instance.prObjectToInstantiate = user_instance;
+			instance.prInstancer = this;
+
 			obj.transform.localPosition = pos;
 			obj.transform.localRotation = Quaternion.Euler( euler );
 			if( scale_exists )
@@ -297,6 +303,57 @@ public class HAPI_Instancer : MonoBehaviour
 		}
 		
 		return false;
+	}
+
+	public void pinObject( GameObject pin_object, bool pin )
+	{		
+		HAPI_Instance instance = pin_object.GetComponent< HAPI_Instance >();
+		if ( instance == null )
+		{
+			//The user might be moving the part instead of the object, so we should
+			//try to pin that in this case.
+			Transform parent = pin_object.transform.parent;
+			while ( parent != null )
+			{
+				instance = parent.gameObject.GetComponent< HAPI_Instance >();
+				if( instance != null )
+					break;
+				parent = parent.parent;
+			}
+			
+			if( instance == null )
+				return;
+		}
+		
+		if ( !pin )
+			unPinInstance( instance.prInstancePointNumber );
+		else
+		{
+			Transform game_object_xform = pin_object.transform;
+			
+			HAPI_InstancerOverrideInfo override_info =
+				ScriptableObject.CreateInstance< HAPI_InstancerOverrideInfo >();
+			
+			override_info.translate = game_object_xform.position;
+			override_info.rotate = game_object_xform.rotation.eulerAngles;
+			
+			Vector3 scale = game_object_xform.localScale;
+			
+			Transform parent = game_object_xform.parent;
+			while ( parent != null )
+			{
+				scale.x *= parent.localScale.x;
+				scale.y *= parent.localScale.y;
+				scale.z *= parent.localScale.z;
+				parent = parent.parent;
+			}
+			
+			override_info.scale = scale;
+			override_info.objectToInstantiatePath = findFullPath( instance.prObjectToInstantiate );
+			override_info.instancePointNumber = instance.prInstancePointNumber;
+			
+			pinInstance( override_info );
+		}
 	}
 	
 	public bool pinInstance( HAPI_InstancerOverrideInfo info )
@@ -877,6 +934,18 @@ public class HAPI_Instancer : MonoBehaviour
 		
 		foreach ( GameObject child in children )
 			DestroyImmediate( child );
+	}
+
+	private string findFullPath( GameObject game_obj )
+	{
+		GameObject obj = game_obj;
+		string path = "/" + obj.name;
+		while ( obj.transform.parent != null )
+		{
+			obj = obj.transform.parent.gameObject;
+			path = "/" + obj.name + path;
+		}
+		return path;
 	}
 	
 	

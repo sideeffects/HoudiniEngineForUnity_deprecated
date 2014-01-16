@@ -140,9 +140,7 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myShowAssetSettings = value; } }
 	public bool 					prShowBakeOptions {				get { return myShowBakeOptions; } 
 																	set { myShowBakeOptions = value; } }
-
-	public bool						prShowInstanceControls {		get { return myShowInstanceControls; }
-																	set { myShowInstanceControls = value; } }
+	
 	public bool						prShowInputControls {			get { return myShowInputControls; } 
 																	set { myShowInputControls = value; } }
 	public int						prAssetSettingsCategory {		get { return myAssetOptionsCategory; }
@@ -789,7 +787,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		prShowHelp						= false;
 		prShowAssetSettings				= true;
 		prShowBakeOptions				= false;
-		prShowInstanceControls			= false;
 		prShowInputControls 			= true;
 		prAssetSettingsCategory			= 0;
 
@@ -1937,7 +1934,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private bool					myShowHelp;
 	[SerializeField] private bool 					myShowAssetSettings;
 	[SerializeField] private bool 					myShowBakeOptions;
-	[SerializeField] private bool 					myShowInstanceControls;
 	[SerializeField] private bool					myShowInputControls;
 	[SerializeField] private int					myAssetOptionsCategory;
 
