@@ -15,10 +15,10 @@ public class HAPI_GeoInputControlGUI : Editor
 	public Mesh prGeoMesh {
 		get
 		{ 
-			if ( !myGeo.gameObject.GetComponent< MeshFilter >() )
-				return null;
+			if ( myGeo && myGeo.prEditableMesh )
+				return myGeo.prEditableMesh;
 			else
-				return myGeo.gameObject.GetComponent< MeshFilter >().sharedMesh;
+				return null;
 		}
 		private set {}
 	}
@@ -48,10 +48,6 @@ public class HAPI_GeoInputControlGUI : Editor
 		HAPI_Host.myRepaintDelegate += this.refresh;
 		HAPI_Host.myDeselectionDelegate += this.deselect;
 		HAPI_Host.mySelectionTarget = myGeo.gameObject;
-
-		myBackupShader = null;
-
-		paintModeChangeCallback( myGeo.prCurrentMode == HAPI_GeoInputControl.Mode.PAINT );
 	}
 
 	public void OnDisable()
@@ -60,9 +56,6 @@ public class HAPI_GeoInputControlGUI : Editor
 		HAPI_Host.myRepaintDelegate -= this.refresh;
 		HAPI_Host.myDeselectionDelegate -= this.deselect;
 		HAPI_Host.mySelectionTarget = null;
-		
-		if ( myGeo != null )
-			paintModeChangeCallback( false );
 	}
 
 	public void refresh()
@@ -353,23 +346,17 @@ public class HAPI_GeoInputControlGUI : Editor
 		// So, for some odd reason, it is possible (and highly likely) to get a the
 		// EventType.KeyDown event triggerd but with a keyCode of KeyCode.None. Lovely.
 		if ( current_event.type == EventType.KeyDown && current_event.keyCode != KeyCode.None )
-		{
 			myCurrentlyPressedKey = current_event.keyCode;
-		}
+		else if ( current_event.control )
+			myCurrentlyPressedKey = KeyCode.LeftControl;
 		else if ( current_event.shift )
-		{
 			myCurrentlyPressedKey = KeyCode.LeftShift;
-		}
-		// I have to also interpret the Ignore event as the mouse up event because that's all I
-		// get if the use lets go of the mouse button while over a different Unity window...
 		else if ( current_event.type == EventType.KeyUp || current_event.type == EventType.Ignore )
-		{
+			// I have to also interpret the Ignore event as the mouse up event because that's all I
+			// get if the use lets go of the mouse button while over a different Unity window...
 			myCurrentlyPressedKey = KeyCode.None;
-		}
 		else if ( myCurrentlyPressedKey == KeyCode.LeftShift && !current_event.shift )
-		{
 			myCurrentlyPressedKey = KeyCode.None;
-		}
 	}
 
 	private void clearSelection()
@@ -498,6 +485,23 @@ public class HAPI_GeoInputControlGUI : Editor
 		}
 	}
 
+	// Undistinguishes left and right shift and control.
+	private bool areKeysTheSame( KeyCode key1, KeyCode key2 )
+	{
+		if ( key1 == key2 )
+			return true;
+		
+		if ( ( key1 == KeyCode.LeftShift || key1 == KeyCode.RightShift )
+			&& ( key2 == KeyCode.LeftShift || key2 == KeyCode.RightShift ) )
+			return true;
+
+		if ( ( key1 == KeyCode.LeftControl || key1 == KeyCode.RightControl )
+			&& ( key2 == KeyCode.LeftControl || key2 == KeyCode.RightControl ) )
+			return true;
+
+		return false;
+	}
+
 	private void decideModes( ref Event current_event )
 	{
 		if ( !myGeo.prEditable )
@@ -510,8 +514,8 @@ public class HAPI_GeoInputControlGUI : Editor
 			return;
 		}
 
-		bool paint_mode_key			= myCurrentlyPressedKey == HAPI_Host.prAddingPointsModeHotKey;
-		bool edit_points_mode_key	= myCurrentlyPressedKey == HAPI_Host.prEditingPointsModeHotKey;
+		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prAddingPointsModeHotKey );
+		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prEditingPointsModeHotKey );
 
 		bool paint_mode				= myGeo.prIsPaintingPoints;
 		bool edit_points_mode		= myGeo.prIsEditingPoints;
@@ -573,10 +577,6 @@ public class HAPI_GeoInputControlGUI : Editor
 			myForceInspectorRedraw	= true;
 		}
 
-		// Change material shader for painting.
-		if ( paint_mode != myGeo.prIsPaintingPoints )
-			paintModeChangeCallback( paint_mode );
-
 		// Change the colours of the points if the edit points mode has changed.
 		if ( edit_points_mode != myGeo.prIsEditingPoints )
 		{
@@ -588,8 +588,8 @@ public class HAPI_GeoInputControlGUI : Editor
 		}
 
 		myGeo.prIsPaintingPoints	= paint_mode;
-		myGeo.prIsEditingPoints	= edit_points_mode;
-		myGeo.prModeChangeWait	= mode_change_wait;
+		myGeo.prIsEditingPoints		= edit_points_mode;
+		myGeo.prModeChangeWait		= mode_change_wait;
 	}
 
 	private void drawSceneUI()
@@ -719,14 +719,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			HAPI_GeoInputControl.Mode last_mode = myGeo.prCurrentMode;
 			myGeo.prCurrentMode = (HAPI_GeoInputControl.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
 			if ( last_mode != myGeo.prCurrentMode )
-			{
 				clearSelection();
-				if ( last_mode == HAPI_GeoInputControl.Mode.PAINT ||
-					myGeo.prCurrentMode == HAPI_GeoInputControl.Mode.PAINT )
-				{
-					paintModeChangeCallback( myGeo.prCurrentMode == HAPI_GeoInputControl.Mode.PAINT );
-				}
-			}
 			GUI.enabled = true;
 
 			// Draw selection rectangle.
@@ -773,22 +766,6 @@ public class HAPI_GeoInputControlGUI : Editor
 	
 		// Restore GUI colour.
 		GUI.color = original_color;
-	}
-
-	private void paintModeChangeCallback( bool paint_mode )
-	{
-		if ( myGeo.gameObject.GetComponent< MeshRenderer >() )
-			if ( paint_mode )
-			{
-				MeshRenderer mesh_renderer = myGeo.gameObject.GetComponent< MeshRenderer >();
-				myBackupShader = mesh_renderer.sharedMaterial.shader;
-				mesh_renderer.sharedMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
-			}
-			else if ( !paint_mode && myBackupShader )
-			{
-				MeshRenderer mesh_renderer = myGeo.gameObject.GetComponent< MeshRenderer >();
-				mesh_renderer.sharedMaterial.shader = myBackupShader;
-			}
 	}
 
 	public static bool mySceneWindowHasFocus {
@@ -851,7 +828,4 @@ public class HAPI_GeoInputControlGUI : Editor
 	private List< bool >		mySelectedPointsMask;
 
 	private HAPI_GeoInputControl.Mode myLastMode;
-
-	[SerializeField]
-	private Shader				myBackupShader;
 }
