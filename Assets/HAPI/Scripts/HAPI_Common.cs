@@ -476,7 +476,6 @@ namespace HAPI
 
 		private HAPI_StringHandle nameSH; // Instance name (the label + a number).
 		private HAPI_StringHandle labelSH;
-		private HAPI_StringHandle instancePathSH; // Instance path inside Houdini scene.
 		private HAPI_StringHandle filePathSH; // Path to the .otl file for this asset.
 
 		private HAPI_StringHandle versionSH; // User-defined asset version.
@@ -496,8 +495,6 @@ namespace HAPI
 		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 		public string label
 		{ get { return HAPI_Host.getString( labelSH ); } private set {} }
-		public string instancePath
-		{ get { return HAPI_Host.getString( instancePathSH ); } private set {} }
 		public string filePath
 		{ get { return HAPI_Host.getString( filePathSH ); } private set {} }
 		public string version
@@ -528,12 +525,18 @@ namespace HAPI
 	{
 		public HAPI_NodeId id;
 		public HAPI_AssetId assetId;
-		
+
+		public int uniqueHoudiniNodeId;
+		private HAPI_StringHandle internalNodePathSH;
+
 		public int parmCount;
 		public int parmIntValueCount;
 		public int parmFloatValueCount;
 		public int parmStringValueCount;
 		public int parmChoiceCount;
+
+		public string internalNodePath
+		{ get { return HAPI_Host.getString( internalNodePathSH ); } private set {} }
 	}
 
 	[ StructLayout( LayoutKind.Sequential ) ]
@@ -728,7 +731,6 @@ namespace HAPI
 		public int geoCount;
 
 		// Use the node id to get the node's parameters.
-		// Only valid if this is an Instancer object.
 		public HAPI_NodeId nodeId;
 
 		public HAPI_ObjectId objectToInstanceId;
@@ -750,7 +752,6 @@ namespace HAPI
 		private HAPI_StringHandle nameSH;
 
 		// Use the node id to get the node's parameters.
-		// Only valid if this geo is exposed (is editable or is a curve).
 		public HAPI_NodeId nodeId;
 
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool isEditable;
