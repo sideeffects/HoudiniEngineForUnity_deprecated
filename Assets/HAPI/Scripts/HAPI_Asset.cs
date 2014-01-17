@@ -970,13 +970,15 @@ public abstract class HAPI_Asset : HAPI_Control
 					progress_bar.statusCheckLoop();
 
 					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
+					HAPI_NodeInfo node_info = HAPI_Host.getNodeInfo( prAssetInfo.nodeId );
 					
 					if ( reload_asset )
 						Debug.Log( 
-							"Asset Loaded - Path: " + prAssetInfo.instancePath + "\n" +
-							"ID: " + prAssetInfo.id + "\n" +
+							"Asset Loaded - ID: " + prAssetInfo.id + "\n" +
+							"Full Name: " + prAssetInfo.fullOpName + "\n" +
 							"Version: " + prAssetInfo.version + "\n" + 
-							"Full Name: " + prAssetInfo.fullOpName );
+							"Unique Node Id: " + node_info.uniqueHoudiniNodeId + "\n" +
+							"Internal Node Path: " + node_info.internalNodePath + "\n" );
 				}
 				catch ( HAPI_Error error )
 				{
