@@ -116,6 +116,22 @@ public class HAPI_Instancer : MonoBehaviour
 
 	public HAPI_Asset 	prAsset { get { return myAsset; } set { myAsset = value; } }
 	public int 			prObjectId { get { return myObjectId; } set { myObjectId = value; } }
+
+	public HAPI_InstancerPersistentData prPersistentData
+	{
+		get
+		{
+			HAPI_InstancerManager instancer_manager = prAsset.GetComponent< HAPI_InstancerManager >();
+			if( instancer_manager == null )
+				return null;
+
+			HAPI_InstancerPersistentData data = instancer_manager.getInstancerPersistentData( this.name );
+			if( data == null )
+				Debug.LogError("Unable to retrieve persistent data for instancer " + this.name );
+
+			return data;
+		}
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -132,7 +148,9 @@ public class HAPI_Instancer : MonoBehaviour
 	private void instanceOverriddenObjects( int total_points, List< int > exclusion_list )
 	{		
 		int current_max_point_index = total_points - 1;
-		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
+
+		HAPI_InstancerPersistentData data = prPersistentData;
+		foreach ( HAPI_InstancerOverrideInfo override_info in data.overriddenInstances )
 		{
 			
 			Vector3 pos = override_info.translate;
@@ -165,11 +183,8 @@ public class HAPI_Instancer : MonoBehaviour
 
 	public GameObject getUserObjToInstantiateFromName( string name )
 	{
-		HAPI_InstancerManager instancer_manager = prAsset.GetComponent< HAPI_InstancerManager >();
-		if( instancer_manager == null )
-			return null;
-		
-		HAPI_InstancerPersistentData instancer_data = instancer_manager.getInstancerPersistentData( this.name );
+				
+		HAPI_InstancerPersistentData instancer_data = prPersistentData;
 
 		List< string > unique_names = instancer_data.uniqueNames;
 		List< GameObject > objs_to_instantiate = instancer_data.objsToInstantiate;
@@ -291,12 +306,14 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	public bool hasOverriddenInstances()
 	{
-		return prAsset.prOverriddenInstances.Count > 0;
+		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		return persistent_data.overriddenInstances.Count > 0;
 	}
 	
 	public bool isPointOverridden( int point_index )
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
+		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		foreach ( HAPI_InstancerOverrideInfo override_info in persistent_data.overriddenInstances )
 		{
 			if( override_info.instancePointNumber == point_index )
 				return true;
@@ -358,33 +375,36 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	public bool pinInstance( HAPI_InstancerOverrideInfo info )
 	{
+		HAPI_InstancerPersistentData persistent_data = prPersistentData;
 		int ii = 0;
-		for( ii = 0; ii < prAsset.prOverriddenInstances.Count; ii++ )
+		for( ii = 0; ii < persistent_data.overriddenInstances.Count; ii++ )
 		{
-			HAPI_InstancerOverrideInfo override_info = prAsset.prOverriddenInstances[ ii ];
+			HAPI_InstancerOverrideInfo override_info = persistent_data.overriddenInstances[ ii ];
 			if( override_info.instancePointNumber == info.instancePointNumber )
 			{
-				prAsset.prOverriddenInstances.RemoveAt( ii );
+				persistent_data.overriddenInstances.RemoveAt( ii );
 				break;
 			}
 		}
 		
-		prAsset.prOverriddenInstances.Add( info );
+		persistent_data.overriddenInstances.Add( info );
 		return true;
 		
 	}
 	
 	public void unPinAllInstances()
 	{
-		prAsset.prOverriddenInstances.Clear();		
+		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		persistent_data.overriddenInstances.Clear();		
 	}
 	
 	public void unPinInstance( int point_index )
 	{
+		HAPI_InstancerPersistentData persistent_data = prPersistentData;
 		int index_to_remove = -1;
-		for( int ii = 0 ; ii < prAsset.prOverriddenInstances.Count ; ii++ )
+		for( int ii = 0 ; ii < persistent_data.overriddenInstances.Count ; ii++ )
 		{
-			HAPI_InstancerOverrideInfo override_info = prAsset.prOverriddenInstances[ ii ];
+			HAPI_InstancerOverrideInfo override_info = persistent_data.overriddenInstances[ ii ];
 			if( override_info.instancePointNumber == point_index )
 			{
 				index_to_remove = ii;
@@ -394,13 +414,14 @@ public class HAPI_Instancer : MonoBehaviour
 		
 		if( index_to_remove >= 0 )
 		{
-			prAsset.prOverriddenInstances.RemoveAt( index_to_remove );
+			persistent_data.overriddenInstances.RemoveAt( index_to_remove );
 		}
 	}
 	
 	public void drawAllPins()
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
+		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		foreach ( HAPI_InstancerOverrideInfo override_info in persistent_data.overriddenInstances )
 		{
 			drawPin( override_info );
 						
@@ -409,7 +430,8 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	public void drawPin( int point_index )
 	{
-		foreach ( HAPI_InstancerOverrideInfo override_info in prAsset.prOverriddenInstances )
+		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		foreach ( HAPI_InstancerOverrideInfo override_info in persistent_data.overriddenInstances )
 		{
 			if( override_info.instancePointNumber == point_index )
 				drawPin( override_info );
@@ -679,10 +701,8 @@ public class HAPI_Instancer : MonoBehaviour
 	{
 		List < GameObject > objs_to_instantiate = new List< GameObject >();
 
-		HAPI_InstancerManager instancer_manager = prAsset.GetComponent< HAPI_InstancerManager >();
-		if( instancer_manager == null )
-			return;
-		HAPI_InstancerPersistentData instancer_data = instancer_manager.getInstancerPersistentData( this.name );
+
+		HAPI_InstancerPersistentData instancer_data = prPersistentData;
 		
 		List< string > existing_unique_names = instancer_data.uniqueNames;
 		List< GameObject > existing_objs_to_instantiate = instancer_data.objsToInstantiate;
