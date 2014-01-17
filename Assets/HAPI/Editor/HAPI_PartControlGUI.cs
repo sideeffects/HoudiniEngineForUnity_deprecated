@@ -54,15 +54,15 @@ public class HAPI_PartControlGUI : Editor
 				Handles.Label( position, new GUIContent("" + i ) );
 			}
 		}
-		
-		HAPI_Instancer instancer = instancerFromPartObject( control.gameObject );
-		if ( instancer == null )
+
+		HAPI_Instance instance = findInstanceControlInParent();
+		if ( instance == null )
 			return;
 		
-		bool is_overridden = instancer.isPointOverridden( control.prInstancePointNumber );
+		bool is_overridden = instance.prInstancer.isPointOverridden( instance.prInstancePointNumber );
 		
 		if ( is_overridden )
-			instancer.drawPin( control.prInstancePointNumber );
+			instance.prInstancer.drawPin( instance.prInstancePointNumber );
 
 		Event curr_event = Event.current;
 
@@ -76,85 +76,28 @@ public class HAPI_PartControlGUI : Editor
 			curr_event.isMouse && curr_event.type == EventType.MouseUp &&
 			HAPI_Host.prAutoPinInstances && control.prTransformChanged )
 		{
-			pinPartObject( control.gameObject, true );
+			instance.prInstancer.pinObject( control.gameObject, true );
 			control.prTransformChanged = false;
 			Repaint();
 		}
 	}
 
+	private HAPI_Instance findInstanceControlInParent()
+	{
+		Transform parent = myPartControl.gameObject.transform.parent;
+		while( parent != null )
+		{
+			HAPI_Instance instance = parent.gameObject.GetComponent< HAPI_Instance >();
+			if( instance != null )
+				return instance;
+			parent = parent.parent;
+		}
+		return null;
+	}
+
 	public virtual void OnEnable() 
 	{
 		myPartControl = target as HAPI_PartControl;
-	}
-
-	private HAPI_Instancer instancerFromPartObject( GameObject part_object )
-	{
-		GameObject instancer_game_object = null;
-
-		if ( part_object.transform.parent != null &&
-			part_object.transform.parent.parent != null &&
-			part_object.transform.parent.parent.parent != null )
-			instancer_game_object = part_object.transform.parent.parent.parent.gameObject;
-
-		HAPI_Instancer instancer = null;
-
-		if( instancer_game_object != null )
-			instancer = instancer_game_object.GetComponent< HAPI_Instancer >();
-
-		return instancer;
-	}
-
-	private string findFullPath( GameObject game_obj )
-	{
-		GameObject obj = game_obj;
-		string path = "/" + obj.name;
-		while ( obj.transform.parent != null )
-		{
-			obj = obj.transform.parent.gameObject;
-			path = "/" + obj.name + path;
-		}
-		return path;
-	}
-
-	private void pinPartObject( GameObject part_object, bool pin )
-	{
-		HAPI_Instancer instancer = instancerFromPartObject( part_object );
-		if ( instancer == null )
-			return;
-		
-		HAPI_PartControl part_control = part_object.GetComponent< HAPI_PartControl >();
-		if ( part_control == null )
-			return;
-
-		if ( !pin )
-			instancer.unPinInstance( part_control.prInstancePointNumber );
-		else
-		{
-			Transform game_object_xform = part_control.gameObject.transform;
-
-			HAPI_InstancerOverrideInfo override_info =
-				ScriptableObject.CreateInstance< HAPI_InstancerOverrideInfo >();
-
-			override_info.translate = game_object_xform.position;
-			override_info.rotate = game_object_xform.rotation.eulerAngles;
-
-			Vector3 scale = game_object_xform.localScale;
-
-			Transform parent = game_object_xform.parent;
-			while ( parent != null )
-			{
-				scale.x *= parent.localScale.x;
-				scale.y *= parent.localScale.y;
-				scale.z *= parent.localScale.z;
-				parent = parent.parent;
-			}
-
-			override_info.scale = scale;
-			override_info.objectToInstantiatePath = findFullPath( part_control.prObjectToInstantiate );
-			override_info.instancePointNumber = part_control.prInstancePointNumber;
-
-			instancer.pinInstance( override_info );
-		}
 	}
 
 	public override void OnInspectorGUI() 
@@ -192,29 +135,6 @@ public class HAPI_PartControlGUI : Editor
 				
 				myPartControl.prAsset.buildClientSide();
 			}
-		}
-
-		Object[] selection = Selection.objects;
-		HAPI_Instancer instancer = instancerFromPartObject( myPartControl.gameObject );
-		if ( selection.Length > 0 )
-		{
-			if ( !HAPI_Host.prAutoPinInstances && GUILayout.Button( "Pin Selection" ) )
-				foreach( Object obj in selection )
-					if ( obj.GetType() == typeof( GameObject ) )
-						pinPartObject( (GameObject) obj, true );
-			
-			if ( GUILayout.Button( "UnPin Selection" ) ) 
-				foreach( Object obj in selection )
-					if ( obj.GetType() == typeof( GameObject ) )
-						pinPartObject( (GameObject) obj, false );
-		}
-		else if ( instancer )
-		{
-			bool is_overridden = instancer.isPointOverridden( myPartControl.prInstancePointNumber );
-			if ( is_overridden && GUILayout.Button( "UnPin Instance" ) )
-				pinPartObject( myPartControl.gameObject, false );
-			else if ( !HAPI_Host.prAutoPinInstances && GUILayout.Button( "Pin Instance" ) )
-				pinPartObject( myPartControl.gameObject, true );
 		}
 
 		HAPI_GUI.help( "Values here are for debugging only and should not be modified directly.", MessageType.Info );
