@@ -292,7 +292,12 @@ public class HAPI_Instancer : MonoBehaviour
 			obj.transform.localPosition = pos;
 			obj.transform.localRotation = Quaternion.Euler( euler );
 			if( scale_exists )
-				obj.transform.localScale = scale;
+			{
+				obj.transform.localScale = new Vector3( obj.transform.localScale.x * scale.x,
+				                                        obj.transform.localScale.y * scale.y,
+				                                        obj.transform.localScale.z * scale.z
+				                                       );
+			}
 		}
 					
 		obj.transform.parent = transform;
