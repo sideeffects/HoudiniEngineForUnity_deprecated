@@ -214,9 +214,7 @@ public abstract class HAPI_Asset : HAPI_Control
 																	set { myGeoInputNames = value; } }
 	public List< HAPI_GeoInputFormat >	prGeoInputFormats {			get { return myGeoInputFormats; }
 																	set { myGeoInputFormats = value; } }
-	
-	public List< HAPI_InstancerOverrideInfo > prOverriddenInstances { get { return myOverriddenInstances; }
-																	  set {	myOverriddenInstances = value; } }
+
 	
 	// Prefabs ------------------------------------------------------------------------------------------------------
 	
@@ -812,7 +810,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		prTransInputNames				= new List< string >();
 		prGeoInputNames					= new List< string >();
 		prGeoInputFormats				= new List< HAPI_GeoInputFormat >();
-		prOverriddenInstances 			= new List< HAPI_InstancerOverrideInfo >();
 		
 		myProgressBarJustUsed 			= false;
 		
@@ -1960,9 +1957,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private List< string >			myGeoInputNames;
 	[SerializeField] 
 	private List< HAPI_GeoInputFormat >				myGeoInputFormats;
-	
-	
-	[SerializeField] private List< HAPI_InstancerOverrideInfo >	myOverriddenInstances;
+
 	
 	// Private Temporary Data
 	[SerializeField] private Matrix4x4				myLastLocalToWorld;
