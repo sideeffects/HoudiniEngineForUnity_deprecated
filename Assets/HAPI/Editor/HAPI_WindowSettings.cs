@@ -92,7 +92,7 @@ public class HAPI_WindowSettings : EditorWindow
 												"Yes", "No" ) )
 			{
 				HAPI_Host.revertAllSettingsToDefaults();
-				HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -155,8 +155,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prPinSize = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -168,8 +167,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prPinColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -182,8 +180,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prAutoPinInstances = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -224,8 +221,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prAutoSelectAssetRootNode = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -239,8 +235,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prHideGeometryOnLinking = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -306,8 +301,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prGenerateTangents = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 
 				EditorUtility.DisplayDialog(	"Rebuilds Required",
 												"You will need to rebuild existing assets for tangents " +
@@ -327,8 +321,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prDontCreateTextureFiles = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 
 				EditorUtility.DisplayDialog(	"Rebuilds Required",
 												"This change will take affect for new instantiations or rebuilds.\n" +
@@ -348,8 +341,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prExtractTexturesInRawFormat = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 			GUI.enabled = was_gui_enabled;
 		}
@@ -365,8 +357,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prEnableCooking = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -382,8 +373,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prCookingTriggersDownCooks = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -397,8 +387,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prPlaymodePerFrameCooking = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -414,8 +403,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prPushUnityTransformToHoudini = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -429,8 +417,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prTransformChangeTriggersCooks = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -444,8 +431,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prImportTemplatedGeos = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -466,6 +452,41 @@ public class HAPI_WindowSettings : EditorWindow
 
 		HAPI_GUI.separator();
 
+		// Painting Mode Hot Key
+		{
+			KeyCode value = HAPI_Host.prPaintingModeHotKey;
+			string[] labels = System.Enum.GetValues(typeof(KeyCode))
+								.Cast< KeyCode >()
+								.Select(v => v.ToString())
+								.ToArray();
+			KeyCode[] values = System.Enum.GetValues(typeof(KeyCode))
+								.Cast< KeyCode >()
+								.ToArray();
+			bool changed = HAPI_GUI.dropdown( "painting_mode_hot_key", "Painting Key", 
+											  ref value, labels, values, myUndoInfo,
+			                                  ref myUndoInfo.paintingModeHotKey );
+			if ( changed )
+			{
+				HAPI_Host.prPaintingModeHotKey = (KeyCode) value;
+				HAPI_Host.repaint();
+			}
+		}
+
+		// Painting Mode Colour
+		{
+			Color value = HAPI_Host.prPaintingModeColour;
+			bool changed = HAPI_GUI.colourField( "painting_mode_colour", "Painting Mode", 
+			                                     ref value, myUndoInfo, 
+			                                     ref myUndoInfo.paintingModeColour );
+			if ( changed )
+			{
+				HAPI_Host.prPaintingModeColour = value;
+				HAPI_Host.repaint();
+			}
+		}
+
+		HAPI_GUI.separator();
+
 		// Adding Points Mode Hot Key
 		{
 			KeyCode value = HAPI_Host.prAddingPointsModeHotKey;
@@ -482,8 +503,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prAddingPointsModeHotKey = (KeyCode) value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -496,8 +516,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prAddingPointsModeColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -519,8 +538,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prEditingPointsModeHotKey = (KeyCode) value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -533,8 +551,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prEditingPointsModeColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -548,8 +565,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prWireframeColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -562,8 +578,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prGuideWireframeColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -577,8 +592,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prUnselectableGuideWireframeColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -592,8 +606,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prUnselectedGuideWireframeColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -607,8 +620,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prSelectedGuideWireframeColour = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -624,8 +636,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prGuidePointSize = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -640,8 +651,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prMinDistanceForPointSelection = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 
@@ -656,8 +666,7 @@ public class HAPI_WindowSettings : EditorWindow
 			if ( changed )
 			{
 				HAPI_Host.prGuideMinDistanceForMidPointInsertion = value;
-				if ( HAPI_Host.myRepaintDelegate != null )
-					HAPI_Host.myRepaintDelegate();
+				HAPI_Host.repaint();
 			}
 		}
 	}

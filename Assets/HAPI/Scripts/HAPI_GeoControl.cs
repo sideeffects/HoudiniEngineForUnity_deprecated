@@ -255,8 +255,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		{
 			curve.syncPointsWithParm();
 			curve.createObject( object_id, geo_id );
-			if ( HAPI_Host.myRepaintDelegate != null )
-				HAPI_Host.myRepaintDelegate();
+			HAPI_Host.repaint();
 		}
 		catch ( HAPI_Error )
 		{

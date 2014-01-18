@@ -50,6 +50,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 																			: myCurrentMode ) ) ); } }
 	public bool			prModeChangeWait {				get { return myModeChangeWait; } 
 														set { myModeChangeWait = value; } }
+	public float		prBrushSize {					get { return myBrushSize; }
+														set { myBrushSize = value; } }
 
 	public Mesh			prEditableMesh {				get { return myEditableMesh; }
 														set { myEditableMesh = value; } }
@@ -81,6 +83,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 		myCurrentMode = Mode.NONE;
 
 		prModeChangeWait = false;
+		prBrushSize = 0.5f;
 
 		prEditableMesh = null;
 		prEditableMaterial = null;
@@ -245,6 +248,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 
 	[SerializeField] private Mode			myCurrentMode;
 	[SerializeField] private bool			myModeChangeWait;
+	[SerializeField] private float			myBrushSize;
 
 	[SerializeField] private Mesh			myEditableMesh;
 	[SerializeField] private Material		myEditableMaterial;
