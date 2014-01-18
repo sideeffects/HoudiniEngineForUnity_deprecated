@@ -1,4 +1,4 @@
-Shader "HAPI/Point" {
+﻿Shader "HAPI/MeshPoint" {
 	
 	Properties
 	{
@@ -8,7 +8,8 @@ Shader "HAPI/Point" {
 
 	SubShader {
 
-		ZTest Always
+		ZTest Less
+		ZWrite Off
 
 		Pass {
 			CGPROGRAM
