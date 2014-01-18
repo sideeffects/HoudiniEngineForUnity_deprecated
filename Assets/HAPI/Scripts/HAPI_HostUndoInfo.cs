@@ -5,7 +5,7 @@ using HAPI;
 
 public class HAPI_HostUndoInfo : ScriptableObject
 {
-	// general settings
+	// General Settings
 	public string collisionGroupName;
 	public string renderedCollisionGroupName;
 	public float pinSize;
@@ -17,7 +17,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public bool hideGeometryOnLinking;
 	public bool enablePointsAsParticles;
 
-	// material settings
+	// Material Settings
 	public string unityMaterialAttribName;
 	public string unitySubMaterialNameAttribName;
 	public string unitySubMaterialIndexAttribName;
@@ -25,7 +25,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public bool dontCreateTextureFiles;
 	public bool extractTexturesInRawFormat;
 	
-	// cooking settings
+	// Cooking Settings
 	public bool enableCooking;
 	public bool cookingTriggersDownCooks;
 	public bool playmodePerFrameCooking;
@@ -33,8 +33,10 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public bool transformChangeTriggersCooks;
 	public bool importTemplatedGeos;
 	
-	// geometry settings
+	// Geometry Settings
 	public string unityTagAttribName;
+	public KeyCode paintingModeHotKey;
+	public Color paintingModeColour;
 	public KeyCode addingPointsModeHotKey;
 	public Color addingPointsModeColour;
 	public KeyCode editingPointsModeHotKey;
@@ -48,7 +50,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public float minDistanceForPointSelection;
 	public float guideMinDistanceForMidPointInsertion;
 	
-	// curve settings
+	// Curve Settings
 	public int curvePrimitiveTypeDefault;
 	public int curveMethodDefault;
 
@@ -60,7 +62,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 
 	public void initialize()
 	{
-		// set general settings
+		// Set general settings.
 		collisionGroupName 				= HAPI_Host.prCollisionGroupName;
 		renderedCollisionGroupName 		= HAPI_Host.prRenderedCollisionGroupName;
 		pinSize 						= HAPI_Host.prPinSize;
@@ -72,7 +74,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		hideGeometryOnLinking 			= HAPI_Host.prHideGeometryOnLinking;
 		enablePointsAsParticles 		= HAPI_Host.prEnablePointsAsParticles;
 		
-		// set material settings
+		// Set material settings.
 		unityMaterialAttribName 		= HAPI_Host.prUnityMaterialAttribName;
 		unitySubMaterialNameAttribName 	= HAPI_Host.prUnitySubMaterialNameAttribName;
 		unitySubMaterialIndexAttribName = HAPI_Host.prUnitySubMaterialIndexAttribName;
@@ -80,7 +82,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		dontCreateTextureFiles 			= HAPI_Host.prDontCreateTextureFiles;
 		extractTexturesInRawFormat 		= HAPI_Host.prExtractTexturesInRawFormat;
 		
-		// set cooking settings
+		// Set cooking settings.
 		enableCooking 					= HAPI_Host.prEnableCooking;
 		cookingTriggersDownCooks 		= HAPI_Host.prCookingTriggersDownCooks;
 		playmodePerFrameCooking 		= HAPI_Host.prPlaymodePerFrameCooking;
@@ -88,8 +90,10 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		transformChangeTriggersCooks 	= HAPI_Host.prTransformChangeTriggersCooks;
 		importTemplatedGeos 			= HAPI_Host.prImportTemplatedGeos;
 		
-		// set geometry settings
+		// Set geometry settings.
 		unityTagAttribName 				= HAPI_Host.prUnityTagAttribName;
+		paintingModeHotKey 				= HAPI_Host.prPaintingModeHotKey;
+		paintingModeColour 				= HAPI_Host.prPaintingModeColour;
 		addingPointsModeHotKey 			= HAPI_Host.prAddingPointsModeHotKey;
 		addingPointsModeColour 			= HAPI_Host.prAddingPointsModeColour;
 		editingPointsModeHotKey 		= HAPI_Host.prEditingPointsModeHotKey;
@@ -103,7 +107,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		minDistanceForPointSelection 	= HAPI_Host.prMinDistanceForPointSelection;
 		guideMinDistanceForMidPointInsertion = HAPI_Host.prGuideMinDistanceForMidPointInsertion;
 		
-		// set curve settings
+		// Set curve settings.
 		curvePrimitiveTypeDefault		= HAPI_Host.prCurvePrimitiveTypeDefault;
 		curveMethodDefault				= HAPI_Host.prCurveMethodDefault;
 	}

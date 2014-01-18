@@ -141,26 +141,39 @@ public class HAPI_GeoInputControlGUI : Editor
 														handle_size,
 														Handles.RectangleCap );
 
-				Ray ray						= myTempCamera.ScreenPointToRay( mouse_position );
-				ray.origin					= myTempCamera.transform.position;
+				Ray ray = myTempCamera.ScreenPointToRay( mouse_position );
+				ray.origin = myTempCamera.transform.position;
 
 				MeshCollider mesh_collider  = myGeo.getOrCreateComponent< MeshCollider >();
 				RaycastHit hit_info;
 				mesh_collider.Raycast( ray, out hit_info, myIntersectionRayLength );
-				Vector3 intersection = hit_info.point;
 
-				// Draw pain brush.
-				Handles.DrawLine( intersection, intersection + hit_info.normal );
-
-				// Paint attributes on click.
-				if ( button_press )
+				if ( hit_info.collider )
 				{
-					// Once we add a point we are no longer bound to the user holding down the add points key.
-					// Add points mode is now fully activated.
-					myGeo.prModeChangeWait = false;
+					// Consume scroll-wheel event.
+					if ( current_event.type == EventType.ScrollWheel
+						&& areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey ) )
+					{
+						myGeo.prBrushSize += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
+						current_event.Use();
+					}
 
-					// Paint.
-					myGeo.paint( hit_info );
+					// Draw paint brush.
+					Handles.DrawLine( hit_info.point, hit_info.point + hit_info.normal );
+					Handles.CircleCap(
+						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
+						myGeo.prBrushSize );
+
+					// Paint attributes on click.
+					if ( button_press )
+					{
+						// Once we add a point we are no longer bound to the user holding down the add points key.
+						// Add points mode is now fully activated.
+						myGeo.prModeChangeWait = false;
+
+						// Paint.
+						myGeo.paint( hit_info );
+					}
 				}
 			}
 			else if ( myGeo.prIsEditingPoints )
@@ -514,7 +527,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			return;
 		}
 
-		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prAddingPointsModeHotKey );
+		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey );
 		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prEditingPointsModeHotKey );
 
 		bool paint_mode				= myGeo.prIsPaintingPoints;
@@ -595,9 +608,9 @@ public class HAPI_GeoInputControlGUI : Editor
 	private void drawSceneUI()
 	{
 		string title_text = HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Input Geo";
-		string add_hotkey_string = HAPI_Host.prAddingPointsModeHotKey.ToString();
+		string paint_hotkey_string = HAPI_Host.prPaintingModeHotKey.ToString();
 		string edit_hotkey_string = HAPI_Host.prEditingPointsModeHotKey.ToString();
-		string help_text = "" + add_hotkey_string + ": paint | " + 
+		string help_text = "" + paint_hotkey_string + ": paint | " + 
 						   edit_hotkey_string + ": edit points";
 
 		int skin = EditorPrefs.GetInt( "UserSkin" );
@@ -606,12 +619,12 @@ public class HAPI_GeoInputControlGUI : Editor
 
 		if ( !myGeo.prEditable )
 		{
-			help_text = "This curve is not editable.";
+			help_text = "This mesh is not editable.";
 		}
 		if ( myGeo.prIsPaintingPoints )
 		{
-			help_text = "Click on mesh: paint attribute | Click a line segment: add midpoint | Backspace: delete last point | ESC or Enter: exit mode";
-			box_color = HAPI_Host.prAddingPointsModeColour;
+			help_text = "Click on mesh: paint attribute | Mouse Scroll: change brush size | ESC or Enter: exit mode";
+			box_color = HAPI_Host.prPaintingModeColour;
 		}
 		else if ( myGeo.prIsEditingPoints )
 		{
@@ -714,7 +727,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			// Note: We want to disable the toolbar if a mode key is being held down because
 			// if a button is pressed the current mode will imidiatly switch back to the mode
 			// whos key is being held down...
-			GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
+			GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prPaintingModeHotKey ) &&
 									  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
 			HAPI_GeoInputControl.Mode last_mode = myGeo.prCurrentMode;
 			myGeo.prCurrentMode = (HAPI_GeoInputControl.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
@@ -812,6 +825,7 @@ public class HAPI_GeoInputControlGUI : Editor
 	private const float			mySceneUIBrightningFactor			= 0.2f;
 
 	private Vector3				myFirstMousePosition;
+	private const float			myMouseWheelBrushSizeMultiplier		= 0.01f;
 	private const float			myBigButtonHandleSizeMultiplier		= 1000000.0f;
 	private const float			myIntersectionRayLength				= 5000.0f;
 

@@ -146,6 +146,9 @@ namespace HAPI
 
 		private const string myDefaultUnityTagAttribName					= "unity_tag";
 
+		private const KeyCode myDefaultPaintingModeHotKey					= KeyCode.LeftShift;
+		private static Color myDefaultPaintingModeColour					= Color.green;
+
 		private const KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
 
@@ -225,6 +228,9 @@ namespace HAPI
 			setBool(	"HAPI_ImportTemplatedGeos", myDefaultImportTemplatedGeos, true );
 
 			setString(	"HAPI_UnityTagAttribName", myDefaultUnityTagAttribName, true );
+
+			setKeyCode( "HAPI_PaintingHotKey", myDefaultPaintingModeHotKey, true );
+			setColour(	"HAPI_PaintingModeColour", myDefaultPaintingModeColour, true );
 
 			setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 			setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
@@ -340,6 +346,17 @@ namespace HAPI
 		public static string prUnityTagAttribName {
 												get { return getString( "HAPI_UnityTagAttribName" ); }
 												set { setString( "HAPI_UnityTagAttribName", value ); } } 
+
+		public static KeyCode prPaintingModeHotKey {
+												get { KeyCode key = getKeyCode( "HAPI_PaintingModeHotKey" );
+													  if ( key == KeyCode.None ) {
+														  key = myDefaultPaintingModeHotKey;
+														  setKeyCode( "HAPI_PaintingModeHotKey", key ); }
+													  return key; }
+												set { setKeyCode( "HAPI_PaintingModeHotKey", value ); } }
+		public static Color prPaintingModeColour {
+												get { return getColour( "HAPI_PaintingModeColour" ); }
+												set { setColour( "HAPI_PaintingModeColour", value ); } }
 
 		public static KeyCode prAddingPointsModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_AddingPointsModeHotKey" );
@@ -487,6 +504,14 @@ namespace HAPI
 		public static bool isUnityTagAttribNameDefault()
 												{ return	prUnityTagAttribName ==
 															myDefaultUnityTagAttribName; }
+
+		public static bool isPaintingModeHotKeyDefault()
+												{ return	prPaintingModeHotKey == 
+															myDefaultPaintingModeHotKey; }
+		public static bool isPaintingModeColourDefault()
+												{ return	prPaintingModeColour == 
+															myDefaultPaintingModeColour; }
+
 		public static bool isAddingPointsModeHotKeyDefault()
 												{ return	prAddingPointsModeHotKey == 
 															myDefaultAddingPointsModeHotKey; }
@@ -567,6 +592,9 @@ namespace HAPI
 			prImportTemplatedGeos					= myDefaultImportTemplatedGeos;
 
 			prUnityTagAttribName					= myDefaultUnityTagAttribName;
+
+			prPaintingModeHotKey					= myDefaultPaintingModeHotKey;
+			prPaintingModeColour					= myDefaultPaintingModeColour;
 
 			prAddingPointsModeHotKey				= myDefaultAddingPointsModeHotKey;
 			prAddingPointsModeColour				= myDefaultAddingPointsModeColour;
@@ -810,6 +838,12 @@ namespace HAPI
 					return false;
 				}
 			}
+		}
+
+		public static void repaint()
+		{
+			if ( myRepaintDelegate != null )
+				myRepaintDelegate();
 		}
 
 		public static HAPI_Asset[] getAssets()
