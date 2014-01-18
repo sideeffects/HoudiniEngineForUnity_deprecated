@@ -234,6 +234,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 		Vector3[] verts = prEditableMesh.vertices;
 		verts[ index ] = position;
 		prEditableMesh.vertices = verts;
+		prEditableMesh.RecalculateBounds();
+		prEditableMesh.RecalculateNormals();
 
 		// Refresh MeshCollider's geometry.
 		getOrCreateComponent< MeshCollider >().enabled = false;

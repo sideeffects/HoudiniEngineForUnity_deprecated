@@ -583,7 +583,7 @@ public class HAPI_CurveGUI : Editor
 
 		if ( mySelectionMaterial == null )
 		{
-			mySelectionMaterial						= new Material( Shader.Find( "HAPI/Point" ) );
+			mySelectionMaterial						= new Material( Shader.Find( "HAPI/CurvePoint" ) );
 			mySelectionMaterial.hideFlags			= HideFlags.HideAndDontSave;
 			mySelectionMaterial.shader.hideFlags	= HideFlags.HideAndDontSave;
 		}
