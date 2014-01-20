@@ -33,6 +33,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		myForceInspectorRedraw	= false;
 
 		myIsMouseDown			= false;
+		myMouseKey				= 0;
 		myCurrentlyPressedKey	= KeyCode.None;
 		myFirstMousePosition	= new Vector3();
 
@@ -132,14 +133,23 @@ public class HAPI_GeoInputControlGUI : Editor
 		{
 			if ( myGeo.prIsPaintingPoints )
 			{
+				// The right mouse button has special interpretation in the Unity viewport.
+				// So much so, that simply Use()'ing the event is not enough. We need to actually
+				// change the event's mouse button to the left mouse button (0) as soon as
+				// we detect the right mouse button is pressed (in the Layout event). Of
+				// course, WE need to know when the right mouse button is pressed so we 
+				// first remember it and then change the current event. Hacks!
+				if ( current_event.type == EventType.Layout && myMouseKey != current_event.button )
+					myMouseKey = current_event.button;
+				Event.current.button = 0;
+
+				// Capture the mouse down here because the Handles.Button will use it after this.
+				bool mouseDown = current_event.type == EventType.MouseDown;
+
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
-				bool button_press 	= Handles.Button( 	position, 
-														rotation,
-														handle_size,
-														handle_size,
-														Handles.RectangleCap );
+				Handles.Button( position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
 				Ray ray = myTempCamera.ScreenPointToRay( mouse_position );
 				ray.origin = myTempCamera.transform.position;
@@ -147,14 +157,14 @@ public class HAPI_GeoInputControlGUI : Editor
 				MeshCollider mesh_collider  = myGeo.getOrCreateComponent< MeshCollider >();
 				RaycastHit hit_info;
 				mesh_collider.Raycast( ray, out hit_info, myIntersectionRayLength );
-
+				 
 				if ( hit_info.collider )
 				{
 					// Consume scroll-wheel event.
 					if ( current_event.type == EventType.ScrollWheel
 						&& areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey ) )
 					{
-						myGeo.prBrushSize += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
+						myGeo.prBrushRadius += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
 						current_event.Use();
 					}
 
@@ -162,28 +172,21 @@ public class HAPI_GeoInputControlGUI : Editor
 					Handles.DrawLine( hit_info.point, hit_info.point + hit_info.normal );
 					Handles.CircleCap(
 						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
-						myGeo.prBrushSize );
+						myGeo.prBrushRadius * 2 // CircleCap() takes diameter.
+					);
 
 					// Paint attributes on left-click.
-					if ( button_press )
+					if ( current_event.type == EventType.MouseDrag || mouseDown )
 					{
 						// Once we add a point we are no longer bound to the user holding down the add points key.
 						// Add points mode is now fully activated.
 						myGeo.prModeChangeWait = false;
 
 						// Paint.
-						myGeo.paint( hit_info, myGeo.prPaintAmount );
-					}
-
-					// Unpaint attributes on right-click.
-					if ( current_event.isMouse && current_event.button == 1 )
-					{
-						// Once we add a point we are no longer bound to the user holding down the add points key.
-						// Add points mode is now fully activated.
-						myGeo.prModeChangeWait = false;
-
-						// Paint.
-						myGeo.paint( hit_info, -myGeo.prPaintAmount );
+						if ( myMouseKey == 0 )
+							myGeo.paint( hit_info, myGeo.prPaintAmount );
+						else
+							myGeo.paint( hit_info, -myGeo.prPaintAmount );
 					}
 				}
 			}
@@ -287,7 +290,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			mySelectionArea			= new Rect();
 
 		// Hide default transform handles.
-		myIsTransformHandleHidden = myGeo.prIsEditingPoints;
+		myIsTransformHandleHidden = myGeo.prIsPaintingPoints || myGeo.prIsEditingPoints;
 
 		// Update active control point.
 		if ( mySelectedPoints.Count > 0 ) 
@@ -823,6 +826,7 @@ public class HAPI_GeoInputControlGUI : Editor
 	private Camera				myTempCamera;
 
 	private bool				myIsMouseDown;
+	private int					myMouseKey;
 	private KeyCode				myCurrentlyPressedKey;
 
 	private static Color		mySceneUIDarkColour					= new Color( 0.5f, 0.5f, 0.5f, 1.0f );

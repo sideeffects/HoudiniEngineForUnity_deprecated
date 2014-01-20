@@ -452,6 +452,24 @@ public class HAPI_WindowSettings : EditorWindow
 
 		HAPI_GUI.separator();
 
+		// Paint Brush Rate
+		{
+			// Everything is opposite here because the higher the number the slower
+			// the paint rate and we want the user to think the higher the number
+			// the FASTER the rate - so we have to invert.
+			float max = 5.0f;
+			float value = max - HAPI_Host.prPaintBrushRate;
+			bool changed = HAPI_GUI.floatField( "paint_brush_rate", "Paint Brush Rate", 
+												ref value, 0.0f, max,
+												myUndoInfo,
+												ref myUndoInfo.paintBrushRate );
+			if ( changed )
+			{
+				HAPI_Host.prPaintBrushRate = max - value;
+				HAPI_Host.repaint();
+			}
+		}
+
 		// Painting Mode Hot Key
 		{
 			KeyCode value = HAPI_Host.prPaintingModeHotKey;
