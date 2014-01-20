@@ -50,7 +50,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 																			: myCurrentMode ) ) ); } }
 	public bool			prModeChangeWait {				get { return myModeChangeWait; } 
 														set { myModeChangeWait = value; } }
-	public float		prBrushSize {					get { return myBrushSize; }
+	public float		prBrushRadius {					get { return myBrushSize; }
 														set { myBrushSize = value; } }
 	public float		prPaintAmount {					get { return myPaintAmount; }
 														set { myPaintAmount = value; } }
@@ -85,7 +85,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 		myCurrentMode = Mode.NONE;
 
 		prModeChangeWait = false;
-		prBrushSize = 0.5f;
+		prBrushRadius = 0.5f;
 		prPaintAmount = 0.1f;
 
 		prEditableMesh = null;
@@ -212,19 +212,27 @@ public class HAPI_GeoInputControl : HAPI_Control
 		if ( !prEditableMesh )
 			return;
 
+		Vector3[] verts = prEditableMesh.vertices;
 		Color[] colours = prEditableMesh.colors;
-		int[] triangles = prEditableMesh.triangles;
 
-		int vertex_index0 = triangles[ hit_info.triangleIndex * 3 + 0 ];
-		int vertex_index1 = triangles[ hit_info.triangleIndex * 3 + 1 ];
-		int vertex_index2 = triangles[ hit_info.triangleIndex * 3 + 2 ];
-		
-		colours[ vertex_index0 ].g -= amount;
-		colours[ vertex_index1 ].g -= amount;
-		colours[ vertex_index2 ].g -= amount;
-		colours[ vertex_index0 ].b -= amount;
-		colours[ vertex_index1 ].b -= amount;
-		colours[ vertex_index2 ].b -= amount;
+		Vector3 hit_point = transform.InverseTransformPoint( hit_info.point );
+
+		double current_time = System.DateTime.Now.ToOADate();
+		double time_delta = current_time - myLastPaintTime;
+		myLastPaintTime = current_time;
+
+		double min_time_delta = (double) HAPI_Host.prPaintBrushRate * myPaintTimeMinDelta;
+		if ( time_delta < min_time_delta )
+			amount *= (float) ( time_delta / min_time_delta );
+
+		for ( int i = 0; i < prEditableMesh.vertexCount; ++i )
+		{
+			if ( Vector3.Distance( hit_point, verts[ i ] ) <= prBrushRadius )
+			{
+				colours[ i ].g -= amount;
+				colours[ i ].b -= amount;
+			}
+		}
 
 		prEditableMesh.colors = colours;
 	}
@@ -255,6 +263,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 	[SerializeField] private bool			myModeChangeWait;
 	[SerializeField] private float			myBrushSize;
 	[SerializeField] private float			myPaintAmount;
+	[SerializeField] private double			myLastPaintTime;
+	private const double					myPaintTimeMinDelta = 0.0000005;
 
 	[SerializeField] private Mesh			myEditableMesh;
 	[SerializeField] private Material		myEditableMaterial;

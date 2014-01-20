@@ -146,6 +146,7 @@ namespace HAPI
 
 		private const string myDefaultUnityTagAttribName					= "unity_tag";
 
+		private const float myDefaultPaintBrushRate							= 2.0f;
 		private const KeyCode myDefaultPaintingModeHotKey					= KeyCode.LeftShift;
 		private static Color myDefaultPaintingModeColour					= Color.green;
 
@@ -229,6 +230,7 @@ namespace HAPI
 
 			setString(	"HAPI_UnityTagAttribName", myDefaultUnityTagAttribName, true );
 
+			setFloat(	"HAPI_PaintBrushRate", myDefaultPaintBrushRate, true );
 			setKeyCode( "HAPI_PaintingHotKey", myDefaultPaintingModeHotKey, true );
 			setColour(	"HAPI_PaintingModeColour", myDefaultPaintingModeColour, true );
 
@@ -347,6 +349,9 @@ namespace HAPI
 												get { return getString( "HAPI_UnityTagAttribName" ); }
 												set { setString( "HAPI_UnityTagAttribName", value ); } } 
 
+		public static float prPaintBrushRate {
+												get { return getFloat( "HAPI_PaintBrushRate" ); }
+												set { setFloat( "HAPI_PaintBrushRate", value ); } }
 		public static KeyCode prPaintingModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_PaintingModeHotKey" );
 													  if ( key == KeyCode.None ) {
@@ -505,6 +510,9 @@ namespace HAPI
 												{ return	prUnityTagAttribName ==
 															myDefaultUnityTagAttribName; }
 
+		public static bool isPaintBrushRateDefault()
+												{ return	prPaintBrushRate ==
+															myDefaultPaintBrushRate; }
 		public static bool isPaintingModeHotKeyDefault()
 												{ return	prPaintingModeHotKey == 
 															myDefaultPaintingModeHotKey; }
@@ -593,6 +601,7 @@ namespace HAPI
 
 			prUnityTagAttribName					= myDefaultUnityTagAttribName;
 
+			prPaintBrushRate						= myDefaultPaintBrushRate;
 			prPaintingModeHotKey					= myDefaultPaintingModeHotKey;
 			prPaintingModeColour					= myDefaultPaintingModeColour;
 

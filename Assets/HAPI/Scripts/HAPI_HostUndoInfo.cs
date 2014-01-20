@@ -35,6 +35,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	
 	// Geometry Settings
 	public string unityTagAttribName;
+	public float paintBrushRate;
 	public KeyCode paintingModeHotKey;
 	public Color paintingModeColour;
 	public KeyCode addingPointsModeHotKey;
@@ -92,6 +93,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		
 		// Set geometry settings.
 		unityTagAttribName 				= HAPI_Host.prUnityTagAttribName;
+		paintBrushRate					= HAPI_Host.prPaintBrushRate;
 		paintingModeHotKey 				= HAPI_Host.prPaintingModeHotKey;
 		paintingModeColour 				= HAPI_Host.prPaintingModeColour;
 		addingPointsModeHotKey 			= HAPI_Host.prAddingPointsModeHotKey;
