@@ -52,6 +52,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 														set { myModeChangeWait = value; } }
 	public float		prBrushSize {					get { return myBrushSize; }
 														set { myBrushSize = value; } }
+	public float		prPaintAmount {					get { return myPaintAmount; }
+														set { myPaintAmount = value; } }
 
 	public Mesh			prEditableMesh {				get { return myEditableMesh; }
 														set { myEditableMesh = value; } }
@@ -84,6 +86,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 
 		prModeChangeWait = false;
 		prBrushSize = 0.5f;
+		prPaintAmount = 0.1f;
 
 		prEditableMesh = null;
 		prEditableMaterial = null;
@@ -204,7 +207,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 		}
 	}
 
-	public void paint( RaycastHit hit_info )
+	public void paint( RaycastHit hit_info, float amount )
 	{
 		if ( !prEditableMesh )
 			return;
@@ -216,12 +219,12 @@ public class HAPI_GeoInputControl : HAPI_Control
 		int vertex_index1 = triangles[ hit_info.triangleIndex * 3 + 1 ];
 		int vertex_index2 = triangles[ hit_info.triangleIndex * 3 + 2 ];
 		
-		colours[ vertex_index0 ].g -= 0.1f;
-		colours[ vertex_index1 ].g -= 0.1f;
-		colours[ vertex_index2 ].g -= 0.1f;
-		colours[ vertex_index0 ].b -= 0.1f;
-		colours[ vertex_index1 ].b -= 0.1f;
-		colours[ vertex_index2 ].b -= 0.1f;
+		colours[ vertex_index0 ].g -= amount;
+		colours[ vertex_index1 ].g -= amount;
+		colours[ vertex_index2 ].g -= amount;
+		colours[ vertex_index0 ].b -= amount;
+		colours[ vertex_index1 ].b -= amount;
+		colours[ vertex_index2 ].b -= amount;
 
 		prEditableMesh.colors = colours;
 	}
@@ -251,6 +254,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 	[SerializeField] private Mode			myCurrentMode;
 	[SerializeField] private bool			myModeChangeWait;
 	[SerializeField] private float			myBrushSize;
+	[SerializeField] private float			myPaintAmount;
 
 	[SerializeField] private Mesh			myEditableMesh;
 	[SerializeField] private Material		myEditableMaterial;
