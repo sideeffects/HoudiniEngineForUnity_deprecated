@@ -164,7 +164,7 @@ public class HAPI_GeoInputControlGUI : Editor
 						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
 						myGeo.prBrushSize );
 
-					// Paint attributes on click.
+					// Paint attributes on left-click.
 					if ( button_press )
 					{
 						// Once we add a point we are no longer bound to the user holding down the add points key.
@@ -172,7 +172,18 @@ public class HAPI_GeoInputControlGUI : Editor
 						myGeo.prModeChangeWait = false;
 
 						// Paint.
-						myGeo.paint( hit_info );
+						myGeo.paint( hit_info, myGeo.prPaintAmount );
+					}
+
+					// Unpaint attributes on right-click.
+					if ( current_event.isMouse && current_event.button == 1 )
+					{
+						// Once we add a point we are no longer bound to the user holding down the add points key.
+						// Add points mode is now fully activated.
+						myGeo.prModeChangeWait = false;
+
+						// Paint.
+						myGeo.paint( hit_info, -myGeo.prPaintAmount );
 					}
 				}
 			}
