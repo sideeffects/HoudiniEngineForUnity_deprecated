@@ -1,5 +1,22 @@
+/*
+ * PROPRIETARY INFORMATION.  This software is proprietary to
+ * Side Effects Software Inc., and is not to be reproduced,
+ * transmitted, or disclosed in any way without written permission.
+ *
+ * Produced by:
+ *      Side Effects Software Inc
+ *		123 Front Street West, Suite 1401
+ *		Toronto, Ontario
+ *		Canada   M5J 2M2
+ *		416-504-9876
+ *
+ * COMMENTS:
+ * 
+ */
+
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 using HAPI;
 
@@ -64,6 +81,9 @@ public class HAPI_GeoInputControl : HAPI_Control
 	public Material		prOriginalMaterial {			get { return myOriginalMaterial; }
 														set { myOriginalMaterial = value; } }
 
+	public List< HAPI_GeoAttribute > prAttributes {		get { return myAttributes; }
+														set { myAttributes = value; } }
+
 	public void Awake()
 	{
 		myLastLocalToWorld = transform.localToWorldMatrix;
@@ -92,6 +112,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 		prEditableMaterial = null;
 		prOriginalMesh = null;
 		prOriginalMaterial = null;
+
+		prAttributes = null;
 	}
 
 	// Update is called once per frame.
@@ -253,6 +275,40 @@ public class HAPI_GeoInputControl : HAPI_Control
 		getOrCreateComponent< MeshCollider >().enabled = true;
 	}
 
+	public HAPI_GeoAttribute createAttribute()
+	{
+		deleteAttribute( name );
+
+		HAPI_GeoAttribute new_attribute = ScriptableObject.CreateInstance< HAPI_GeoAttribute >();
+		myAttributes.Add( new_attribute );
+
+		return new_attribute;
+	}
+
+	public HAPI_GeoAttribute createAttribute( HAPI_GeoAttribute.Preset preset )
+	{
+		HAPI_GeoAttribute new_attribute = createAttribute();
+		new_attribute.init( myEditableMesh, preset );
+		return new_attribute;
+	}
+
+	public HAPI_GeoAttribute createAttribute( string name, HAPI_GeoAttribute.Type type, int tuple_size )
+	{
+		HAPI_GeoAttribute new_attribute = createAttribute();
+		new_attribute.init( myEditableMesh, name, type, tuple_size );
+		return new_attribute;
+	}
+
+	public void deleteAttribute( string name )
+	{
+		for ( int i = 0; i < myAttributes.Count; ++i )
+			if ( myAttributes[ i ].prName == name )
+			{
+				myAttributes.RemoveAt( i );
+				break;
+			}
+	}
+
 	[SerializeField] private bool			mySyncAssetTransform;
 	[SerializeField] private bool			myLiveTransformPropagation;
 	[SerializeField] private bool			myEnableCooking;
@@ -270,6 +326,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 	[SerializeField] private Material		myEditableMaterial;
 	[SerializeField] private Mesh			myOriginalMesh;
 	[SerializeField] private Material		myOriginalMaterial;
+
+	[SerializeField] private List< HAPI_GeoAttribute > myAttributes;
 
 #endif // UNITY_EDITOR
 }
