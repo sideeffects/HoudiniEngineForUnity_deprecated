@@ -179,24 +179,7 @@ public class HAPI_Instancer : MonoBehaviour
 				
 		}
 	}
-	
 
-	public GameObject getUserObjToInstantiateFromName( string name )
-	{
-				
-		HAPI_InstancerPersistentData instancer_data = prPersistentData;
-
-		List< string > unique_names = instancer_data.uniqueNames;
-		List< GameObject > objs_to_instantiate = instancer_data.objsToInstantiate;
-		for( int ii = 0; ii < unique_names.Count; ii++ )
-		{
-			if( unique_names[ ii ] == name )
-			{
-				return objs_to_instantiate[ ii ];
-			}
-		}
-		return null;
-	}
 
 	private void instanceObject( GameObject objToInstantiate, 
 								 Vector3 pos,
@@ -215,7 +198,7 @@ public class HAPI_Instancer : MonoBehaviour
 		
 		GameObject obj;
 
-		GameObject user_instance = getUserObjToInstantiateFromName( objToInstantiate.name );
+		GameObject user_instance = prPersistentData.getUserObjToInstantiateFromName( objToInstantiate.name );
 		if ( user_instance == null )
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
@@ -704,35 +687,38 @@ public class HAPI_Instancer : MonoBehaviour
 
 	private void updateUniqueInstantiatedNames( List < string > unique_instantiated_names )
 	{
-		List < GameObject > objs_to_instantiate = new List< GameObject >();
-
-
 		HAPI_InstancerPersistentData instancer_data = prPersistentData;
 		
 		List< string > existing_unique_names = instancer_data.uniqueNames;
-		List< GameObject > existing_objs_to_instantiate = instancer_data.objsToInstantiate;
-
+		List< string > names_to_add = new List< string >();
 
 		for( int ii = 0; ii < unique_instantiated_names.Count; ii++ )
 		{
 			string unique_name = unique_instantiated_names[ ii ];
-			GameObject obj = null;
+			bool found = false;
 			for( int jj = 0; jj < existing_unique_names.Count; jj++ )
 			{
 				string existing_unique_name = existing_unique_names[ jj ];
 				if( existing_unique_name == unique_name )
 				{
-					obj = existing_objs_to_instantiate[ jj ];
+					found = true;
 					break;
 				}
 			}
 
-			objs_to_instantiate.Add( obj );
+			if( !found )
+			{
+				names_to_add.Add( unique_name );
+			}
 		}
 
+		foreach( string name_to_add in names_to_add )
+		{
+			instancer_data.uniqueNames.Add( name_to_add );
+			instancer_data.numObjsToInstantiate.Add( 1 );
+			instancer_data.objsToInstantiate.Add( null );
+		}
 
-		instancer_data.uniqueNames = unique_instantiated_names;
-		instancer_data.objsToInstantiate = objs_to_instantiate;
 
 	}
 			
