@@ -90,14 +90,70 @@ public partial class HAPI_InstancerManagerGUI: Editor
 					
 					for( int ii = 0; ii < unique_names.Count; ii++ )
 					{
+
 						string instanced_name = unique_names[ ii ];
-						
-						Object obj = (Object) persistent_data.objsToInstantiate[ ii ];
-						changed |= HAPI_GUI.objectField( "object_to_instantiate", "Replace " + instanced_name, 
-						                                ref obj, typeof( GameObject ) );
-						if( changed )
+						int base_index = persistent_data.baseIndex( ii );
+
+						if( persistent_data.numObjsToInstantiate[ ii ] > 1 )
 						{
-							persistent_data.objsToInstantiate[ ii ] = (GameObject) obj;
+
+							HAPI_GUI.foldout( instanced_name, true, true );
+
+							for( int jj = 0; jj < persistent_data.numObjsToInstantiate[ ii ]; jj++ )
+							{
+								Object obj = (Object) persistent_data.objsToInstantiate[ base_index + jj ];
+
+								GUILayout.BeginHorizontal();
+								
+								if ( GUILayout.Button( "+" ) )
+								{
+									persistent_data.objsToInstantiate.Insert
+																	  ( base_index + jj, null );
+									persistent_data.numObjsToInstantiate[ ii ]++;
+									changed = true;
+									break;
+								}
+								
+								if ( GUILayout.Button( "-" ) )
+								{
+									persistent_data.objsToInstantiate.RemoveAt( base_index + jj );
+									persistent_data.numObjsToInstantiate[ ii ]--;
+									changed = true;
+									break;
+								}
+
+								changed |= HAPI_GUI.objectField( "object_to_instantiate", "variation " + jj, 
+								                                ref obj, typeof( GameObject ) );
+
+								GUILayout.EndHorizontal();
+								if( changed )
+								{
+									persistent_data.objsToInstantiate[ base_index + jj ] = (GameObject) obj;
+								}
+							}
+						}
+						else
+						{
+							Object obj = (Object) persistent_data.objsToInstantiate[ base_index ];
+							
+							GUILayout.BeginHorizontal();
+							
+							if ( GUILayout.Button( "+" ) )
+							{
+								persistent_data.objsToInstantiate.Add( null );
+								persistent_data.numObjsToInstantiate[ ii ] += 1;
+								changed = true;
+								break;
+							}
+							
+							changed |= HAPI_GUI.objectField( "object_to_instantiate", instanced_name, 
+							                                ref obj, typeof( GameObject ) );
+							
+							GUILayout.EndHorizontal();
+							if( changed )
+							{
+								persistent_data.objsToInstantiate[ base_index ] = (GameObject) obj;
+							}
 						}
 					}
 
