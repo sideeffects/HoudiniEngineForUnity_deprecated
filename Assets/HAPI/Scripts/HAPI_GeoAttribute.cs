@@ -44,7 +44,120 @@ public class HAPI_GeoAttribute : ScriptableObject
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
-	public string prName { get { return myName; } private set {} }
+	public string prName
+	{
+		get
+		{
+			return myName;
+		}
+		set
+		{
+			myName = value;
+		}
+	}
+	public Type prType
+	{
+		get
+		{
+			return myType;
+		}
+		set
+		{
+			if ( myType == Type.UNDEFINED )
+				return;
+
+			if ( myType == value || value <= Type.UNDEFINED || value >= Type.MAX )
+				return;
+
+			if ( myType == Type.BOOL || myType == Type.INT )
+			{
+				myFloatPaintValue = new float[ myIntPaintValue.Length ];
+				for ( int i = 0; i < myIntPaintValue.Length; ++i )
+					myFloatPaintValue[ i ] = (float) myIntPaintValue[ i ];
+				myIntPaintValue = null;
+
+				myFloatData = new float[ myIntData.Length ];
+				for ( int i = 0; i < myIntData.Length; ++i )
+					myFloatData[ i ] = (float) myIntData[ i ];
+				myIntData = null;
+			}
+			else if ( myType == Type.FLOAT )
+			{
+				myIntPaintValue = new int[ myFloatPaintValue.Length ];
+				for ( int i = 0; i < myFloatPaintValue.Length; ++i )
+					if ( value == Type.BOOL )
+						myIntPaintValue[ i ] = (int) myFloatPaintValue[ i ] > 0 ? 1 : 0;
+					else
+						myIntPaintValue[ i ] = (int) myFloatPaintValue[ i ];
+				myFloatPaintValue = null;
+
+				myIntData = new int[ myFloatData.Length ];
+				for ( int i = 0; i < myFloatData.Length; ++i )
+					if ( value == Type.BOOL )
+						myIntData[ i ] = (int) myFloatData[ i ] > 0 ? 1 : 0;
+					else
+						myIntData[ i ] = (int) myFloatData[ i ];
+				myFloatData = null;
+			}
+
+			myType = value;
+		}
+	}
+	public int prTupleSize
+	{
+		get
+		{
+			return myTupleSize;
+		}
+		set
+		{
+			if ( myType == Type.UNDEFINED )
+				return;
+
+			if ( myTupleSize == value || value < 1 || value > 5 )
+				return;
+
+			int new_tuple_size = value;
+
+			if ( myType == Type.BOOL || myType == Type.INT )
+			{
+				int[] new_paint_value = new int[ new_tuple_size ];
+				int[] new_data = new int[ myVertexCount * new_tuple_size ];
+
+				int min_tuple_size = Mathf.Min( myTupleSize, new_tuple_size );
+				for ( int i = 0; i < min_tuple_size; ++i )
+					new_paint_value[ i ] = myIntPaintValue[ i ];
+
+				for ( int i = 0; i < myVertexCount; ++i )
+					for ( int j = 0; j < min_tuple_size; ++j )
+						new_data[ i * new_tuple_size + j ] = myIntData[ i * myTupleSize + j ];
+
+				myIntPaintValue = new_paint_value;
+				myIntData = new_data;
+				myTupleSize = new_tuple_size;
+			}
+			else if ( myType == Type.FLOAT )
+			{
+				float[] new_paint_value = new float[ new_tuple_size ];
+				float[] new_data = new float[ myVertexCount * new_tuple_size ];
+
+				int min_tuple_size = Mathf.Min( myTupleSize, new_tuple_size );
+				for ( int i = 0; i < min_tuple_size; ++i )
+					new_paint_value[ i ] = myFloatPaintValue[ i ];
+
+				for ( int i = 0; i < myVertexCount; ++i )
+					for ( int j = 0; j < min_tuple_size; ++j )
+						new_data[ i * new_tuple_size + j ] = myFloatData[ i * myTupleSize + j ];
+
+				myFloatPaintValue = new_paint_value;
+				myFloatData = new_data;
+				myTupleSize = new_tuple_size;
+			}
+		}
+	}
+
+	public int[] prIntPaintValue { get { return myIntPaintValue; } set { myIntPaintValue = value; } }
+	public float[] prFloatPaintValue { get { return myFloatPaintValue; } set { myFloatPaintValue = value; } }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -115,6 +228,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 
 		reset();
 		myName = name;
+		myType = type;
 		myTupleSize = tuple_size;
 		myVertexCount = mesh.vertexCount;
 
@@ -131,7 +245,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 	}
 
 	// -----------------------------------------------------------------------
-	// Getters
+	// Representation
 
 	public Color[] getColorRepresentation()
 	{
@@ -162,90 +276,26 @@ public class HAPI_GeoAttribute : ScriptableObject
 	}
 
 	// -----------------------------------------------------------------------
-	// Set Paint Value
+	// Paint
 
-	public void setPaintValue( bool[] value )
+	public void paint( int vertex_index, float paint_factor )
 	{
-		if ( value.Length != myTupleSize )
-			return; // Throw error.
-
-		if ( myType != Type.BOOL )
-			return; // Throw error.
-
-		for ( int i = 0; i < myTupleSize; ++i )
-			myIntPaintValue[ i ] = value[ i ] ? 1 : 0;
-	}
-
-	public void setPaintValue( int[] value )
-	{
-		if ( value.Length != myTupleSize )
-			return; // Throw error.
-
-		if ( myType != Type.INT )
-			return; // Throw error.
-
-		for ( int i = 0; i < myTupleSize; ++i )
-			myIntPaintValue[ i ] = value[ i ];
-	}
-
-	public void setPaintValue( float[] value )
-	{
-		if ( value.Length != myTupleSize )
-			return; // Throw error.
-
-		if ( myType != Type.FLOAT )
-			return; // Throw error.
-
-		for ( int i = 0; i < myTupleSize; ++i )
-			myFloatPaintValue[ i ] = value[ i ];
-	}
-
-	// -----------------------------------------------------------------------
-	// Set Paint Value
-
-	public void paint( int vertex_index, bool[] amount )
-	{
-		if ( amount.Length != myTupleSize )
-			return; // Throw error.
-
-		if ( myType != Type.BOOL )
-			return; // Throw error.
-
 		if ( vertex_index <= 0 || vertex_index >= myVertexCount )
 			return; // Throw error.
 
 		for ( int i = 0; i < myTupleSize; ++i )
-			myIntData[ vertex_index * myTupleSize + i ] = amount[ i ] ? 1 : 0;
-	}
-
-	public void paint( int vertex_index, int[] amount )
-	{
-		if ( amount.Length != myTupleSize )
-			return; // Throw error.
-
-		if ( myType != Type.INT )
-			return; // Throw error.
-
-		if ( vertex_index <= 0 || vertex_index >= myVertexCount )
-			return; // Throw error.
-
-		for ( int i = 0; i < myTupleSize; ++i )
-			myIntData[ vertex_index * myTupleSize + i ] = amount[ i ];
-	}
-
-	public void paint( int vertex_index, float[] amount )
-	{
-		if ( amount.Length != myTupleSize )
-			return; // Throw error.
-
-		if ( myType != Type.FLOAT )
-			return; // Throw error.
-
-		if ( vertex_index <= 0 || vertex_index >= myVertexCount )
-			return; // Throw error.
-
-		for ( int i = 0; i < myTupleSize; ++i )
-			myFloatData[ vertex_index * myTupleSize + i ] = amount[ i ];
+			if ( myType == Type.BOOL )
+				myIntData[ vertex_index * myTupleSize + i ] += (int) Mathf.Sign( paint_factor ) * myIntPaintValue[ i ];
+			else if ( myType == Type.INT )
+			{
+				myIntData[ vertex_index * myTupleSize + i ] += (int) ( paint_factor * (float) myIntPaintValue[ i ] );
+				myIntData[ vertex_index * myTupleSize + i ] = Mathf.Clamp( myIntData[ vertex_index * myTupleSize + i ], 0, 1 );
+			}
+			else if ( myType == Type.FLOAT )
+			{
+				myFloatData[ vertex_index * myTupleSize + i ] += paint_factor * myFloatPaintValue[ i ];
+				myFloatData[ vertex_index * myTupleSize + i ] = Mathf.Clamp( myFloatData[ vertex_index * myTupleSize + i ], 0.0f, 1.0f );
+			}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

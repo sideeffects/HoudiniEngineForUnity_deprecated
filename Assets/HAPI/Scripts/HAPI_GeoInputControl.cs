@@ -81,6 +81,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 	public Material		prOriginalMaterial {			get { return myOriginalMaterial; }
 														set { myOriginalMaterial = value; } }
 
+	public HAPI_GeoAttribute prActiveAttribute {		get { return myActiveAttribute; }
+														private set {} }
 	public List< HAPI_GeoAttribute > prAttributes {		get { return myAttributes; }
 														set { myAttributes = value; } }
 
@@ -113,7 +115,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 		prOriginalMesh = null;
 		prOriginalMaterial = null;
 
-		prAttributes = null;
+		myActiveAttribute = null;
+		prAttributes = new List<HAPI_GeoAttribute>();
 	}
 
 	// Update is called once per frame.
@@ -234,8 +237,10 @@ public class HAPI_GeoInputControl : HAPI_Control
 		if ( !prEditableMesh )
 			return;
 
+		if ( !prActiveAttribute || prActiveAttribute.prType == HAPI_GeoAttribute.Type.UNDEFINED )
+			return;
+
 		Vector3[] verts = prEditableMesh.vertices;
-		Color[] colours = prEditableMesh.colors;
 
 		Vector3 hit_point = transform.InverseTransformPoint( hit_info.point );
 
@@ -243,20 +248,16 @@ public class HAPI_GeoInputControl : HAPI_Control
 		double time_delta = current_time - myLastPaintTime;
 		myLastPaintTime = current_time;
 
+		float paint_factor = Mathf.Sign( amount );
 		double min_time_delta = (double) HAPI_Host.prPaintBrushRate * myPaintTimeMinDelta;
 		if ( time_delta < min_time_delta )
-			amount *= (float) ( time_delta / min_time_delta );
+			paint_factor *= (float) ( time_delta / min_time_delta );
 
 		for ( int i = 0; i < prEditableMesh.vertexCount; ++i )
-		{
 			if ( Vector3.Distance( hit_point, verts[ i ] ) <= prBrushRadius )
-			{
-				colours[ i ].g -= amount;
-				colours[ i ].b -= amount;
-			}
-		}
+				prActiveAttribute.paint( i, paint_factor );
 
-		prEditableMesh.colors = colours;
+		prEditableMesh.colors = prActiveAttribute.getColorRepresentation();
 	}
 
 	public void updatePoint( int index, Vector3 position )
@@ -275,27 +276,43 @@ public class HAPI_GeoInputControl : HAPI_Control
 		getOrCreateComponent< MeshCollider >().enabled = true;
 	}
 
+	public void setActiveAttribute( string name )
+	{
+		if ( myActiveAttribute && myActiveAttribute.prName == name )
+			return;
+
+		for ( int i = 0; i < myAttributes.Count; ++i )
+			if ( myAttributes[ i ].prName == name )
+			{
+				myActiveAttribute = myAttributes[ i ];
+				prEditableMesh.colors = prActiveAttribute.getColorRepresentation();
+				break;
+			}
+	}
+
 	public HAPI_GeoAttribute createAttribute()
 	{
-		deleteAttribute( name );
+		int temp_name_count = 0;
+		string temp_name = "";
+		while ( temp_name == "" )
+		{
+			temp_name = "new_attribute_" + temp_name_count;
+			for ( int i = 0; i < myAttributes.Count; ++i )
+				if ( myAttributes[ i ].prName == temp_name )
+				{
+					temp_name_count++;
+					temp_name = "";
+					break;
+				}
+		}
 
 		HAPI_GeoAttribute new_attribute = ScriptableObject.CreateInstance< HAPI_GeoAttribute >();
+		new_attribute.init( myEditableMesh, temp_name, HAPI_GeoAttribute.Type.FLOAT, 3 );
 		myAttributes.Add( new_attribute );
 
-		return new_attribute;
-	}
+		if ( myActiveAttribute == null )
+			myActiveAttribute = new_attribute;
 
-	public HAPI_GeoAttribute createAttribute( HAPI_GeoAttribute.Preset preset )
-	{
-		HAPI_GeoAttribute new_attribute = createAttribute();
-		new_attribute.init( myEditableMesh, preset );
-		return new_attribute;
-	}
-
-	public HAPI_GeoAttribute createAttribute( string name, HAPI_GeoAttribute.Type type, int tuple_size )
-	{
-		HAPI_GeoAttribute new_attribute = createAttribute();
-		new_attribute.init( myEditableMesh, name, type, tuple_size );
 		return new_attribute;
 	}
 
@@ -307,6 +324,12 @@ public class HAPI_GeoInputControl : HAPI_Control
 				myAttributes.RemoveAt( i );
 				break;
 			}
+
+		if ( myActiveAttribute && myActiveAttribute.prName == name )
+			if ( myAttributes.Count > 0 )
+				myActiveAttribute = myAttributes[ 0 ];
+			else
+				myActiveAttribute = null;
 	}
 
 	[SerializeField] private bool			mySyncAssetTransform;
@@ -327,6 +350,7 @@ public class HAPI_GeoInputControl : HAPI_Control
 	[SerializeField] private Mesh			myOriginalMesh;
 	[SerializeField] private Material		myOriginalMaterial;
 
+	[SerializeField] private HAPI_GeoAttribute myActiveAttribute;
 	[SerializeField] private List< HAPI_GeoAttribute > myAttributes;
 
 #endif // UNITY_EDITOR

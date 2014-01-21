@@ -83,13 +83,114 @@ public class HAPI_GeoInputControlGUI : Editor
 		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
 #else
 		if ( !is_editable )
-			HAPI_GUI.help( "This curve is not editable.", MessageType.Info );
+			HAPI_GUI.help( "This mesh is not editable.", MessageType.Info );
 #endif // !UNITY_STANDALONE_WIN
 
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
 
-		// STUFF
+		if ( GUILayout.Button( "Create Attribute" ) )
+			myGeo.createAttribute();
+
+		HAPI_GUI.separator();
+
+		string[] type_labels = new string[] { "bool", "int", "float" };
+		int[] type_values = new int[] { 0, 1, 2 };
+
+		string[] tuple_labels = new string[] { "1", "2", "3", "4", "5" };
+		int[] tuple_values = new int[] { 1, 2, 3, 4, 5 };
+
+		// Draw table header.
+		{
+			EditorGUILayout.BeginHorizontal();
+
+			GUIStyle label_style = new GUIStyle( EditorStyles.label );
+			label_style.padding.right = -5;
+			label_style.margin.left = -5;
+			label_style.border.right = -10;
+
+			EditorGUILayout.LabelField( "", GUILayout.Width( 18 ) );
+			EditorGUILayout.LabelField( "Name", GUILayout.Width( 100 ) );
+			EditorGUILayout.LabelField( "Type", GUILayout.Width( 40 ) );
+			EditorGUILayout.LabelField( "Tuple", GUILayout.Width( 42 ) );
+			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
+			EditorGUILayout.LabelField( "Paint Value", label_style, GUILayout.MinWidth( 20 ) );
+
+			EditorGUILayout.EndHorizontal();
+		}
+
+		for ( int i = 0; i < myGeo.prAttributes.Count; ++i )
+		{
+			HAPI_GeoAttribute attrib = myGeo.prAttributes[ i ];
+
+			EditorGUILayout.BeginHorizontal();
+
+			// Draw toggle to control the active attribute.
+			if ( EditorGUILayout.Toggle( 
+				"", myGeo.prActiveAttribute && myGeo.prActiveAttribute.prName == attrib.prName,
+				GUILayout.Width( 20 ) ) )
+			{
+				myGeo.setActiveAttribute( attrib.prName );
+			}
+
+			// Attribute Name
+			string new_name = EditorGUILayout.TextField( attrib.prName, GUILayout.Width( 100 ) );
+			attrib.prName = new_name;
+
+			// Attribute Type
+			attrib.prType = (HAPI_GeoAttribute.Type) EditorGUILayout.IntPopup(
+				(int) attrib.prType, type_labels, type_values, GUILayout.Width( 40 ) );
+
+			// Attribute Tuple Size
+			attrib.prTupleSize = EditorGUILayout.IntPopup(
+				attrib.prTupleSize, tuple_labels, tuple_values, GUILayout.Width( 40 ) );
+
+			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
+
+			for ( int j = 0; j < attrib.prTupleSize; ++j )
+			{
+				if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
+					attrib.prIntPaintValue[ j ] = EditorGUILayout.IntField(
+						"", attrib.prIntPaintValue[ j ], GUILayout.MinWidth( 20 ) );
+				else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
+					attrib.prFloatPaintValue[ j ] = EditorGUILayout.FloatField(
+						"", attrib.prFloatPaintValue[ j ], GUILayout.MinWidth( 20 ) );
+			}
+
+			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
+
+			GUIStyle label_style = new GUIStyle( EditorStyles.label );
+			label_style.fontStyle = FontStyle.Bold;
+			if ( GUILayout.Button( "X", label_style, GUILayout.Width( 15 ), GUILayout.Height( 15 ) ) )
+				myGeo.deleteAttribute( attrib.prName );
+
+			EditorGUILayout.EndHorizontal();
+		}
+
+		{
+			EditorGUILayout.BeginHorizontal();
+			GUIStyle label_style = new GUIStyle( EditorStyles.label );
+			label_style.fontStyle = FontStyle.Bold;
+			EditorGUILayout.LabelField( "↳", label_style, GUILayout.Width( 10 ) );
+			EditorGUILayout.LabelField( "Active Attribute to be Painted", GUILayout.MinWidth( 40 ) );
+
+			label_style.fontStyle = FontStyle.Normal;
+			label_style.alignment = TextAnchor.MiddleRight;
+			label_style.padding.left = 0;
+			label_style.margin.left = 0;
+			label_style.padding.right = 0;
+			label_style.margin.right = 0;
+			EditorGUILayout.LabelField( "Delete Attribute", label_style, GUILayout.MinWidth( 40 ) );
+
+			label_style.fontStyle = FontStyle.Bold;
+			label_style.padding.left = 0;
+			label_style.margin.left = 6;
+			label_style.padding.right = 5;
+			label_style.margin.right = 5;
+			EditorGUILayout.LabelField( "↲", label_style, GUILayout.Width( 10 ) );
+
+			EditorGUILayout.EndHorizontal();
+		}
 
 		GUI.enabled = gui_enable;
 	}
@@ -172,8 +273,7 @@ public class HAPI_GeoInputControlGUI : Editor
 					Handles.DrawLine( hit_info.point, hit_info.point + hit_info.normal );
 					Handles.CircleCap(
 						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
-						myGeo.prBrushRadius * 2 // CircleCap() takes diameter.
-					);
+						myGeo.prBrushRadius );
 
 					// Paint attributes on left-click.
 					if ( current_event.type == EventType.MouseDrag || mouseDown )
@@ -262,7 +362,7 @@ public class HAPI_GeoInputControlGUI : Editor
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
-				// Prevent the delete key from deleting the curve in this mode.
+				// Prevent the delete key from deleting the mesh in this mode.
 				if ( current_event.isKey && current_event.keyCode == KeyCode.Delete )
 				{
 					Event.current.Use();
@@ -676,7 +776,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		float title_box_width		= bold_text_style.CalcSize( new GUIContent( title_text ) ).x;
 		title_box_width				+= double_line_padding;
 
-		// The mode box should be nothing if the curve is static since there are no options for static curves.
+		// The mode box should be nothing if the mesh is static since there are no options for static meshes.
 		float mode_box_width		= myGeo.prEditable ? mySceneUIModeIndicatorWidth : 0.0f;
 		float help_box_width		= scene_width - title_box_width - mode_box_width - 
 									  ( 2.0f * border_total ) - ( 2.0f * border_padding );
@@ -715,7 +815,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( help_box_rect, box_texture, ScaleMode.StretchToFill );
 
-		// Draw the labels for the curve and the help.
+		// Draw the labels for the mesh and the help.
 		GUI.color = text_color;
 		GUI.Label( title_text_rect, title_text, bold_text_style );
  		GUI.Label( help_text_rect, help_text, normal_text_style );
