@@ -114,7 +114,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			EditorGUILayout.LabelField( "Type", GUILayout.Width( 40 ) );
 			EditorGUILayout.LabelField( "Tuple", GUILayout.Width( 42 ) );
 			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
-			EditorGUILayout.LabelField( "Paint Value", label_style, GUILayout.MinWidth( 20 ) );
+			EditorGUILayout.LabelField( "Range", label_style, GUILayout.MinWidth( 20 ) );
 
 			EditorGUILayout.EndHorizontal();
 		}
@@ -147,16 +147,40 @@ public class HAPI_GeoInputControlGUI : Editor
 
 			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
 
-			for ( int j = 0; j < attrib.prTupleSize; ++j )
 			{
-				if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
-					attrib.prIntPaintValue[ j ] = EditorGUILayout.IntField(
-						"", attrib.prIntPaintValue[ j ],
-						GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
-				else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
-					attrib.prFloatPaintValue[ j ] = EditorGUILayout.FloatField(
-						"", attrib.prFloatPaintValue[ j ],
-						GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+				EditorGUILayout.BeginVertical();
+
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.LabelField( "Min", GUILayout.Width( 26 ) );
+				for ( int j = 0; j < attrib.prTupleSize; ++j )
+				{
+					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
+						attrib.prIntMins[ j ] = EditorGUILayout.IntField(
+							"", attrib.prIntMins[ j ],
+							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
+						attrib.prFloatMins[ j ] = EditorGUILayout.FloatField(
+							"", attrib.prFloatMins[ j ],
+							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+				}
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.LabelField( "Max", GUILayout.Width( 26 ) );
+				for ( int j = 0; j < attrib.prTupleSize; ++j )
+				{
+					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
+						attrib.prIntMaxes[ j ] = EditorGUILayout.IntField(
+							"", attrib.prIntMaxes[ j ],
+							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
+						attrib.prFloatMaxes[ j ] = EditorGUILayout.FloatField(
+							"", attrib.prFloatMaxes[ j ],
+							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+				}
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.EndVertical();
 			}
 
 			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
@@ -167,6 +191,8 @@ public class HAPI_GeoInputControlGUI : Editor
 				myGeo.deleteAttribute( attrib.prName );
 
 			EditorGUILayout.EndHorizontal();
+
+			HAPI_GUI.separator();
 		}
 
 		{
