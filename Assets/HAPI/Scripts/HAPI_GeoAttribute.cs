@@ -41,6 +41,12 @@ public class HAPI_GeoAttribute : ScriptableObject
 		MAX
 	}
 
+	public enum SpecialPaintMode
+	{
+		COLOUR,
+		MAX
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -135,6 +141,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				myIntPaintValue = new_paint_value;
 				myIntData = new_data;
 				myTupleSize = new_tuple_size;
+				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size );
 			}
 			else if ( myType == Type.FLOAT )
 			{
@@ -152,7 +159,20 @@ public class HAPI_GeoAttribute : ScriptableObject
 				myFloatPaintValue = new_paint_value;
 				myFloatData = new_data;
 				myTupleSize = new_tuple_size;
+				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size );
 			}
+		}
+	}
+
+	public int prPaintMode
+	{
+		get
+		{
+			return myPaintMode;
+		}
+		set
+		{
+			myPaintMode = Mathf.Min( value, (int) SpecialPaintMode.MAX + myTupleSize );
 		}
 	}
 
@@ -174,6 +194,8 @@ public class HAPI_GeoAttribute : ScriptableObject
 		myType = Type.UNDEFINED;
 		myTupleSize = 1;
 		myVertexCount = 0;
+
+		myPaintMode = (int) SpecialPaintMode.COLOUR;
 
 		myIntPaintValue = null;
 		myIntData = null;
@@ -254,22 +276,47 @@ public class HAPI_GeoAttribute : ScriptableObject
 
 		Color[] colors = new Color[ myVertexCount ];
 
-		for ( int i = 0; i < myVertexCount; ++i )
+		if ( myPaintMode == (int) SpecialPaintMode.COLOUR )
 		{
-			colors[ i ].r = 1.0f;
-			colors[ i ].g = 1.0f;
-			colors[ i ].b = 1.0f;
-			colors[ i ].a = 1.0f;
+			for ( int i = 0; i < myVertexCount; ++i )
+			{
+				colors[ i ].r = 1.0f;
+				colors[ i ].g = 1.0f;
+				colors[ i ].b = 1.0f;
+				colors[ i ].a = 1.0f;
 
-			if ( myType == Type.BOOL )
-				for ( int j = 0; j < myTupleSize; ++j )
-					colors[ i ][ j ] = (float) myIntData[ i * myTupleSize + j ];
-			else if ( myType == Type.INT )
-				for ( int j = 0; j < myTupleSize; ++j )
-					colors[ i ][ j ] = (float) myIntData[ i * myTupleSize + j ];
-			else if ( myType == Type.FLOAT )
-				for ( int j = 0; j < myTupleSize; ++j )
-					colors[ i ][ j ] = myFloatData[ i * myTupleSize + j ];
+				if ( myType == Type.BOOL )
+					for ( int j = 0; j < myTupleSize; ++j )
+						colors[ i ][ j ] = (float) myIntData[ i * myTupleSize + j ];
+				else if ( myType == Type.INT )
+					for ( int j = 0; j < myTupleSize; ++j )
+						colors[ i ][ j ] = (float) myIntData[ i * myTupleSize + j ];
+				else if ( myType == Type.FLOAT )
+					for ( int j = 0; j < myTupleSize; ++j )
+						colors[ i ][ j ] = myFloatData[ i * myTupleSize + j ];
+			}
+		}
+		else
+		{
+			int component_index = myPaintMode - (int) SpecialPaintMode.MAX;
+
+			for ( int i = 0; i < myVertexCount; ++i )
+			{
+				colors[ i ].r = 1.0f;
+				colors[ i ].g = 1.0f;
+				colors[ i ].b = 1.0f;
+				colors[ i ].a = 1.0f;
+
+				if ( myType == Type.BOOL )
+					for ( int j = 0; j < 3; ++j )
+						colors[ i ][ j ] = (float) myIntData[ i * myTupleSize + component_index ];
+				else if ( myType == Type.INT )
+					for ( int j = 0; j < 3; ++j )
+						colors[ i ][ j ] = (float) myIntData[ i * myTupleSize + component_index ];
+				else if ( myType == Type.FLOAT )
+					for ( int j = 0; j < 3; ++j )
+						colors[ i ][ j ] = myFloatData[ i * myTupleSize + component_index ];
+			}
 		}
 
 		return colors;
@@ -283,7 +330,17 @@ public class HAPI_GeoAttribute : ScriptableObject
 		if ( vertex_index <= 0 || vertex_index >= myVertexCount )
 			return; // Throw error.
 
-		for ( int i = 0; i < myTupleSize; ++i )
+		int start_comp_index = 0;
+		int end_comp_index = myTupleSize;
+
+		if ( myPaintMode >= (int) SpecialPaintMode.MAX )
+		{
+			int component_index = myPaintMode - (int) SpecialPaintMode.MAX;
+			start_comp_index = component_index;
+			end_comp_index = component_index + 1;
+		}
+
+		for ( int i = start_comp_index; i < end_comp_index; ++i )
 			if ( myType == Type.BOOL )
 				myIntData[ vertex_index * myTupleSize + i ] += (int) Mathf.Sign( paint_factor ) * myIntPaintValue[ i ];
 			else if ( myType == Type.INT )
@@ -306,6 +363,8 @@ public class HAPI_GeoAttribute : ScriptableObject
 	[SerializeField] private Type myType;
 	[SerializeField] private int myTupleSize;
 	[SerializeField] private int myVertexCount;
+
+	[SerializeField] private int myPaintMode;
 
 	[SerializeField] private int[] myIntPaintValue;
 	[SerializeField] private int[] myIntData;

@@ -148,7 +148,7 @@ namespace HAPI
 
 		private const float myDefaultPaintBrushRate							= 2.0f;
 		private const KeyCode myDefaultPaintingModeHotKey					= KeyCode.LeftShift;
-		private static Color myDefaultPaintingModeColour					= Color.green;
+		private static Color myDefaultPaintingModeColour					= new Color( 0.7f, 0.9f, 0.7f, 1.0f );
 
 		private const KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 		private static Color myDefaultAddingPointsModeColour				= Color.yellow;
