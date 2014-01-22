@@ -151,10 +151,12 @@ public class HAPI_GeoInputControlGUI : Editor
 			{
 				if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
 					attrib.prIntPaintValue[ j ] = EditorGUILayout.IntField(
-						"", attrib.prIntPaintValue[ j ], GUILayout.MinWidth( 20 ) );
+						"", attrib.prIntPaintValue[ j ],
+						GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
 				else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
 					attrib.prFloatPaintValue[ j ] = EditorGUILayout.FloatField(
-						"", attrib.prFloatPaintValue[ j ], GUILayout.MinWidth( 20 ) );
+						"", attrib.prFloatPaintValue[ j ],
+						GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
 			}
 
 			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
@@ -719,7 +721,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		myGeo.prModeChangeWait		= mode_change_wait;
 	}
 
-	private void drawSceneUI()
+	private void drawToolSceneUI()
 	{
 		string title_text = HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Input Geo";
 		string paint_hotkey_string = HAPI_Host.prPaintingModeHotKey.ToString();
@@ -793,7 +795,7 @@ public class HAPI_GeoInputControlGUI : Editor
 											   box_color.b - mySceneUIDarkeningFactor, 0.5f ) );
 		box_texture.Apply();
 
-		// Set up rectangles for the boxes and the labels.
+		// Set up rectangles for the tool boxes and the labels.
 		Rect title_box_rect  = new Rect( title_box_right, box_top, title_box_width, box_height );
 		Rect mode_box_rect	 = new Rect( mode_box_right, box_top, mode_box_width, box_height );
 		Rect help_box_rect	 = new Rect( help_box_right, box_top, help_box_width, box_height );
@@ -893,6 +895,218 @@ public class HAPI_GeoInputControlGUI : Editor
 	
 		// Restore GUI colour.
 		GUI.color = original_color;
+	}
+
+	private void drawPaintingSceneUI()
+	{
+		string title_text = "Painting";
+		string attribute_text = "Attribute:";
+		string mode_text = "Mode:";
+		string value_text = "Value:";
+
+		Color box_color = HAPI_Host.prPaintingModeColour;
+		Color text_color = Color.white;
+
+		Color original_color		= GUI.color;
+		
+		float scene_width			= myTempCamera.pixelWidth;
+		float border_width			= myActiveBorderWidth;
+		float border_padding		= mySceneUIBorderPadding;
+		float border_total			= border_width + border_padding;
+		float line_height			= mySceneUILineHeight;
+		float line_padding			= mySceneUILinePadding;
+		float double_line_padding	= 2.0f * line_padding;
+		float dropdown_width		= 100.0f;
+
+		GUIStyle normal_text_style	= new GUIStyle( GUI.skin.label );
+		normal_text_style.alignment	= TextAnchor.MiddleLeft;
+		normal_text_style.fontStyle	= FontStyle.Normal;
+		normal_text_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
+
+		GUIStyle bold_text_style	= new GUIStyle( GUI.skin.label );
+		bold_text_style.alignment	= TextAnchor.MiddleLeft;
+		bold_text_style.fontStyle	= FontStyle.Bold;
+		bold_text_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
+		
+		float box_height			= line_height;
+		float box_top				= border_total;
+
+		// Get text widths.
+		float title_text_width		= bold_text_style.CalcSize( new GUIContent( title_text ) ).x
+									  + double_line_padding;
+		float attribute_text_width	= normal_text_style.CalcSize( new GUIContent( attribute_text ) ).x
+									  + double_line_padding;
+		float mode_text_width		= normal_text_style.CalcSize( new GUIContent( mode_text ) ).x
+									  + double_line_padding;
+		float value_text_width		= normal_text_style.CalcSize( new GUIContent( value_text ) ).x
+									  + double_line_padding;
+
+		float title_box_width		= title_text_width;
+		float attribute_box_width	= attribute_text_width + dropdown_width + line_padding;
+		float mode_box_width		= mode_text_width + dropdown_width + line_padding;
+		float value_box_width		= scene_width - title_box_width - border_padding - attribute_box_width
+									  - border_padding - mode_box_width - border_padding
+									  - border_total - border_total;
+		float value_fields_width	= value_box_width - value_text_width;
+		
+		float title_box_right		= border_total;
+		float attribute_box_right	= border_total + title_box_width + border_padding;
+		float attribute_dropdown_right = attribute_box_right + attribute_text_width;
+		float mode_box_right		= attribute_box_right + attribute_box_width + border_padding;
+		float mode_dropdown_right		= mode_box_right + mode_text_width;
+		float value_box_right		= mode_box_right + mode_box_width + border_padding;
+		float value_fields_right	= value_box_right + value_text_width;
+
+		// Create background boxes texture.
+		Texture2D box_texture		= new Texture2D( 1, 1 );
+		box_texture.wrapMode		= TextureWrapMode.Repeat;
+		box_texture.SetPixel( 0, 0, new Color( box_color.r - mySceneUIDarkeningFactor, 
+											   box_color.g - mySceneUIDarkeningFactor, 
+											   box_color.b - mySceneUIDarkeningFactor, 0.5f ) );
+		box_texture.Apply();
+
+		// Set up rectangles for the boxes.
+		Rect title_box_rect				= new Rect( title_box_right, box_top, title_box_width, box_height );
+		Rect attribute_box_rect			= new Rect( attribute_box_right, box_top, attribute_box_width, box_height );
+		Rect attribute_dropdown_rect	= new Rect( attribute_dropdown_right, box_top, dropdown_width, box_height );
+		Rect mode_box_rect				= new Rect( mode_box_right, box_top, mode_box_width, box_height );
+		Rect mode_dropdown_rect			= new Rect( mode_dropdown_right, box_top, dropdown_width, box_height );
+		Rect value_box_rect				= new Rect( value_box_right, box_top, value_box_width, box_height );
+		Rect value_fields_rect			= new Rect( value_fields_right, box_top, value_fields_width, box_height );
+
+		// Label boxes.
+		Rect title_text_rect = new Rect( title_box_right + line_padding, box_top, 
+										 title_text_width - double_line_padding, box_height - double_line_padding );
+		Rect attribute_text_rect = new Rect( attribute_box_right + line_padding, box_top, 
+											 attribute_text_width - double_line_padding,
+											 box_height - double_line_padding );
+		Rect mode_text_rect  = new Rect( mode_box_right + line_padding, box_top, 
+										 mode_text_width - double_line_padding, box_height - double_line_padding );
+		Rect value_text_rect = new Rect( value_box_right + line_padding, box_top, 
+										 value_text_width - double_line_padding, box_height - double_line_padding );
+
+		// Start Drawing --------------------------------------------------------------------------------------------
+		Handles.BeginGUI();
+		GUILayout.BeginArea( new Rect( 0, 0, Screen.width, Screen.height ) );
+
+		// Draw the background boxes for the Scene UI.
+		GUI.color = box_color;
+		GUI.DrawTexture( title_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( attribute_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( value_box_rect, box_texture, ScaleMode.StretchToFill );
+
+		// Draw the labels for the mesh and the help.
+		GUI.color = text_color;
+		GUI.Label( title_text_rect, title_text, bold_text_style );
+		GUI.Label( attribute_text_rect, attribute_text, normal_text_style );
+		GUI.Label( mode_text_rect, mode_text, normal_text_style );
+		GUI.Label( value_text_rect, value_text, normal_text_style );
+
+		// Set controls colours.
+		Color control_color		= box_color;
+		control_color.r			+= mySceneUIBrightningFactor;
+		control_color.g			+= mySceneUIBrightningFactor;
+		control_color.b			+= mySceneUIBrightningFactor;
+		GUI.color				= control_color;
+
+		// Draw attribute dropdown.
+		{
+			if ( myGeo.prActiveAttribute == null )
+			{
+				GUI.Label( attribute_dropdown_rect, "No attributes.", normal_text_style );
+			}
+			else
+			{
+				int[] attribute_indicies = new int[ myGeo.prAttributes.Count ];
+				for ( int i = 0; i < myGeo.prAttributes.Count; ++i )
+					attribute_indicies[ i ] = i;
+
+				string[] attribute_names = new string[ myGeo.prAttributes.Count ];
+				int selected_attribute_index = 0;
+				for ( int i = 0; i < myGeo.prAttributes.Count; ++i )
+				{
+					if ( myGeo.prAttributes[ i ].prName == myGeo.prActiveAttribute.prName )
+						selected_attribute_index = i;
+					attribute_names[ i ] = myGeo.prAttributes[ i ].prName;
+				}
+
+				selected_attribute_index = EditorGUI.IntPopup(
+					attribute_dropdown_rect, "", selected_attribute_index, attribute_names, attribute_indicies );
+
+				string selected_attribute_name = attribute_names[ selected_attribute_index ];
+				myGeo.setActiveAttribute( selected_attribute_name );
+			}
+		}
+
+		// Draw mode dropdown.
+		{
+			if ( myGeo.prActiveAttribute == null )
+			{
+				GUI.Label( mode_dropdown_rect, "N/A", normal_text_style );
+			}
+			else
+			{
+				int mode_count = myGeo.prActiveAttribute.prTupleSize + 1; // +1 for Colour Mode.
+				int[] mode_values = new int[ mode_count ];
+				for ( int i = 0; i < mode_count; ++i )
+					mode_values[ i ] = i;
+
+				string[] mode_labels = new string[ mode_count ];
+				mode_labels[ 0 ] = "Color (First 3 Components)";
+				for ( int i = 1; i < mode_count; ++i )
+					mode_labels[ i ] = "Component " + i + " Only (Grayscale)";
+
+				int new_paint_mode = EditorGUI.IntPopup(
+					mode_dropdown_rect, "", myGeo.prActiveAttribute.prPaintMode, mode_labels, mode_values );
+				if ( new_paint_mode != myGeo.prActiveAttribute.prPaintMode )
+				{
+					myGeo.prActiveAttribute.prPaintMode = new_paint_mode;
+					myGeo.refreshMeshColours();
+				}
+			}
+		}
+
+		// Draw paint value fields.
+		{
+			if ( myGeo.prActiveAttribute == null )
+			{
+				GUI.Label( value_fields_rect, "N/A", normal_text_style );
+			}
+			else
+			{
+				GUILayout.BeginArea( value_fields_rect );
+				GUILayout.BeginHorizontal();
+				for ( int i = 0; i < myGeo.prActiveAttribute.prTupleSize; ++i )
+				{
+					if ( myGeo.prActiveAttribute.prType == HAPI_GeoAttribute.Type.BOOL
+						|| myGeo.prActiveAttribute.prType == HAPI_GeoAttribute.Type.INT )
+						myGeo.prActiveAttribute.prIntPaintValue[ i ] = EditorGUILayout.IntField(
+							"", myGeo.prActiveAttribute.prIntPaintValue[ i ],
+							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+					else if ( myGeo.prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT )
+						myGeo.prActiveAttribute.prFloatPaintValue[ i ] = EditorGUILayout.FloatField(
+							"", myGeo.prActiveAttribute.prFloatPaintValue[ i ],
+							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+				}
+				GUILayout.EndHorizontal();
+				GUILayout.EndArea();
+			}
+		}
+
+		GUILayout.EndArea();
+		Handles.EndGUI();
+		// Stop Drawing ---------------------------------------------------------------------------------------------
+	
+		// Restore GUI colour.
+		GUI.color = original_color;
+	}
+
+	private void drawSceneUI()
+	{
+		drawToolSceneUI();
+		if ( myGeo.prEditable && myGeo.prIsPaintingPoints )
+			drawPaintingSceneUI();
 	}
 
 	public static bool mySceneWindowHasFocus {

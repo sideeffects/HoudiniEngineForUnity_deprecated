@@ -232,6 +232,14 @@ public class HAPI_GeoInputControl : HAPI_Control
 		}
 	}
 
+	public void refreshMeshColours()
+	{
+		if ( prActiveAttribute )
+			prEditableMesh.colors = prActiveAttribute.getColorRepresentation();
+		else
+			prEditableMesh.colors = new Color[ prEditableMesh.vertexCount ];
+	}
+
 	public void paint( RaycastHit hit_info, float amount )
 	{
 		if ( !prEditableMesh )
@@ -313,6 +321,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 		if ( myActiveAttribute == null )
 			myActiveAttribute = new_attribute;
 
+		refreshMeshColours();
+
 		return new_attribute;
 	}
 
@@ -330,6 +340,8 @@ public class HAPI_GeoInputControl : HAPI_Control
 				myActiveAttribute = myAttributes[ 0 ];
 			else
 				myActiveAttribute = null;
+
+		refreshMeshColours();
 	}
 
 	[SerializeField] private bool			mySyncAssetTransform;
