@@ -150,8 +150,9 @@ public class HAPI_Instancer : MonoBehaviour
 		int current_max_point_index = total_points - 1;
 
 		HAPI_InstancerPersistentData data = prPersistentData;
-		foreach ( HAPI_InstancerOverrideInfo override_info in data.overriddenInstances )
+		for ( int ii = 0; ii < data.overriddenInstances.Count; ii++ )
 		{
+			HAPI_InstancerOverrideInfo override_info = data.overriddenInstances[ ii ];
 			
 			Vector3 pos = override_info.translate;
 			
@@ -159,10 +160,13 @@ public class HAPI_Instancer : MonoBehaviour
 			
 			Vector3 scale = override_info.scale;
 			
-			GameObject object_to_instantiate = GameObject.Find( override_info.objectToInstantiatePath );
-			
-			//FIXME: we need to cache the scripts currently attached as well as the other info 
-			// for now this is not preserved.
+			GameObject object_to_instantiate = override_info.objectToInstantiate;
+			if( object_to_instantiate == null )
+			{
+				data.overriddenInstances.RemoveAt( ii );
+				continue;
+			}
+
 			instanceObject( object_to_instantiate, 
 							pos, euler, override_info.instancePointNumber, true, scale, false, "" );
 			
@@ -360,7 +364,7 @@ public class HAPI_Instancer : MonoBehaviour
 			}
 			
 			override_info.scale = scale;
-			override_info.objectToInstantiatePath = findFullPath( instance.prObjectToInstantiate );
+			override_info.objectToInstantiate = instance.prObjectToInstantiate;
 			override_info.instancePointNumber = instance.prInstancePointNumber;
 			
 			pinInstance( override_info );
@@ -953,18 +957,6 @@ public class HAPI_Instancer : MonoBehaviour
 			DestroyImmediate( child );
 	}
 
-	private string findFullPath( GameObject game_obj )
-	{
-		GameObject obj = game_obj;
-		string path = "/" + obj.name;
-		while ( obj.transform.parent != null )
-		{
-			obj = obj.transform.parent.gameObject;
-			path = "/" + obj.name + path;
-		}
-		return path;
-	}
-	
 	
 	[SerializeField] private HAPI_Asset myAsset;
 	[SerializeField] private int myObjectId;
