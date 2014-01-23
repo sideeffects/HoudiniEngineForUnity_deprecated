@@ -191,6 +191,10 @@ namespace HAPI
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
+		HAPI_CreateInputAsset( out HAPI_AssetId asset_id, string name );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
 		HAPI_DestroyAsset( HAPI_AssetId asset_id );
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
