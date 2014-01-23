@@ -1,0 +1,174 @@
+﻿/*
+ * PROPRIETARY INFORMATION.  This software is proprietary to
+ * Side Effects Software Inc., and is not to be reproduced,
+ * transmitted, or disclosed in any way without written permission.
+ *
+ * Produced by:
+ *      Side Effects Software Inc
+ *		123 Front Street West, Suite 1401
+ *		Toronto, Ontario
+ *		Canada   M5J 2M2
+ *		416-504-9876
+ *
+ * COMMENTS:
+ * 
+ */
+
+using UnityEngine;
+using System.Runtime.InteropServices;
+using System.Collections;
+using System.Collections.Generic;
+using HAPI;
+using Utility = HAPI_AssetUtility;
+
+[ ExecuteInEditMode ]
+[ RequireComponent( typeof( MeshFilter ) ) ]
+public class HAPI_AssetInput : HAPI_Asset
+{
+#if UNITY_EDITOR
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public Properties
+
+	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
+
+	public Mesh			prEditableMesh {				get { return myEditableMesh; }
+														set { myEditableMesh = value; } }
+	public Mesh			prOriginalMesh {				get { return myOriginalMesh; }
+														set { myOriginalMesh = value; } }
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public Methods
+	
+	public HAPI_AssetInput() 
+	{
+		if ( prEnableLogging )
+			Debug.Log( "HAPI_Asset created!" );
+
+		reset();
+	}
+	
+	~HAPI_AssetInput()
+	{}
+
+	public override void reset()
+	{
+		base.reset();
+
+		prEditableMesh = null;
+		prOriginalMesh = null;
+		
+		// Overwrite some settings that should be different by default for input assets than other asset types.
+		prAutoSelectAssetRootNode	= false;
+		prHideGeometryOnLinking		= false;
+		prAssetType					= AssetType.TYPE_INPUT;
+	}
+
+	public override void OnEnable()
+	{
+		/* TODO
+		
+		// If this curve asset is a duplicate then it will have the same mesh
+		// filter and mesh renderer as the curve it was duplicated from. Since
+		// we want it to have its own, delete the existing ones here and new
+		// ones will be created in the build.
+		if ( isDuplicatingAsset() )
+		{
+			MeshFilter mesh_filter = gameObject.GetComponent< MeshFilter >();
+			if ( mesh_filter != null )
+				DestroyImmediate( mesh_filter );
+
+			MeshRenderer mesh_renderer = gameObject.GetComponent< MeshRenderer >();
+			if ( mesh_renderer != null )
+				DestroyImmediate( mesh_renderer );
+		}
+		*/
+		base.OnEnable();
+
+		if ( prAssetId < 0 )
+			buildAll();
+	}
+	
+	public override bool build( bool reload_asset, bool unload_asset_first,
+								bool serialization_recovery_only,
+								bool force_reconnect,
+								bool cook_downstream_assets,
+								bool use_delay_for_progress_bar ) 
+	{
+		unload_asset_first = unload_asset_first && ( !serialization_recovery_only || isPrefab() );
+
+		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
+									  force_reconnect, cook_downstream_assets, use_delay_for_progress_bar );
+		if ( !base_built )
+			return false;
+		
+		return true;
+	}
+
+	public void resetFull()
+	{
+		// Safe to assume these exist because of [RequiredComponent] attributes.
+		MeshFilter mesh_filter = gameObject.GetComponent< MeshFilter >();
+		if ( prOriginalMesh )
+			mesh_filter.sharedMesh = prOriginalMesh;
+
+		HAPI_Host.destroyAsset( prAssetId );
+
+		reset();
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Protected Methods
+
+	protected override int buildCreateAsset()
+	{
+		return HAPI_Host.createInputAsset( transform.name );
+	}
+
+	protected override void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar )
+	{
+		cloneMesh();
+	}
+
+	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
+	{
+		try
+		{
+			HAPI_AssetUtility.setMesh( prAssetId, 0, 0, ref myEditableMesh, null );
+			HAPI_Host.repaint();
+		}
+		catch ( HAPI_Error )
+		{
+			// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
+			//Debug.LogWarning( error.ToString() );
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private void cloneMesh()
+	{
+		// Safe to assume these exist because of [RequiredComponent] attributes.
+		MeshFilter mesh_filter = gameObject.GetComponent< MeshFilter >();
+
+		// Create the editable mesh from the original mesh. We don't want to
+		// modify the original mesh because it is likely shared by many
+		// instances.
+		if ( prEditableMesh == null )
+		{
+			prOriginalMesh = mesh_filter.sharedMesh;
+			prEditableMesh = Mesh.Instantiate( prOriginalMesh ) as Mesh;
+			prEditableMesh.name = prOriginalMesh.name + " (Editable Copy)";
+
+			Color[] colours = new Color[ prEditableMesh.vertexCount ];
+			for ( int i = 0; i < prEditableMesh.vertexCount; ++i )
+				colours[ i ] = new Color( 1.0f, 1.0f, 1.0f );
+			prEditableMesh.colors = colours;
+		}
+	}
+
+	[SerializeField] private Mesh			myEditableMesh;
+	[SerializeField] private Mesh			myOriginalMesh;
+
+#endif // UNITY_EDITOR
+}

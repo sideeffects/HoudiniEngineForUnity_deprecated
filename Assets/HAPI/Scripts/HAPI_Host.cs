@@ -721,6 +721,18 @@ namespace HAPI
 
 			return asset_id;
 		}
+
+		public static int createInputAsset( string name )
+		{
+			if ( !initialize() )
+				throw new HAPI_Error( "DLL Not Found." );
+
+			int asset_id = -1;
+			HAPI_Result status_code = HAPI_CreateInputAsset( out asset_id, name );
+			processStatusCode( status_code );
+
+			return asset_id;
+		}
 		
 		public static bool destroyAsset( int asset_id ) 
 		{

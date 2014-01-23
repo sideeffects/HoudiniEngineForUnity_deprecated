@@ -35,6 +35,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		TYPE_OTL = 0,
 		TYPE_HIP,
 		TYPE_CURVE,
+		TYPE_INPUT,
 		TYPE_INVALID
 	}
 
