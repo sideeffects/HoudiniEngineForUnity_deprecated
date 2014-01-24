@@ -131,7 +131,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 				geo_info.isEditable, geo_info.isDisplayGeo );
 
 			// Set node name.
-			geo_node.name = prGeoName + "_geo" + prGeoId;
+			geo_node.name = prGeoName;
 		}
 
 		if ( !geo_info.isDisplayGeo && 
