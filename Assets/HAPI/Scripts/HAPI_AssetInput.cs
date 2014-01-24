@@ -61,6 +61,8 @@ public class HAPI_AssetInput : HAPI_Asset
 		prAutoSelectAssetRootNode	= false;
 		prHideGeometryOnLinking		= false;
 		prAssetType					= AssetType.TYPE_INPUT;
+
+		myGeoAttributeManager		= null;
 	}
 
 	public override void OnEnable()
@@ -127,6 +129,12 @@ public class HAPI_AssetInput : HAPI_Asset
 	protected override void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar )
 	{
 		cloneMesh();
+
+		MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
+		MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
+
+		myGeoAttributeManager = ScriptableObject.CreateInstance< HAPI_GeoAttributeManager >();
+		myGeoAttributeManager.init( prEditableMesh, mesh_renderer, mesh_collider, transform );
 	}
 
 	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
@@ -169,6 +177,8 @@ public class HAPI_AssetInput : HAPI_Asset
 
 	[SerializeField] private Mesh			myEditableMesh;
 	[SerializeField] private Mesh			myOriginalMesh;
+
+	[SerializeField] private HAPI_GeoAttributeManager myGeoAttributeManager;
 
 #endif // UNITY_EDITOR
 }
