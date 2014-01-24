@@ -255,7 +255,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		// Create main underling.
 		if ( prGameObjects[ object_id ] == null )
 		{
-			prGameObjects[ object_id ] = new GameObject( object_info.name + "_obj" + object_id );
+			prGameObjects[ object_id ] = new GameObject( object_info.name );
 			prGameObjects[ object_id ].transform.parent = transform;
 
 			object_control = prGameObjects[ object_id ].AddComponent< HAPI_ObjectControl >();

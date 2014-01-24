@@ -133,7 +133,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 			init( -1, part_info.id, part_info.name, part_info.materialId );
 
 			// Overwrite name.
-			part_node.name = part_info.name + "_part" + prPartId;
+			part_node.name = part_info.name;
 
 			if ( is_mesh ) // Valid mesh.
 			{
