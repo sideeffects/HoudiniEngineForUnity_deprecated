@@ -202,7 +202,8 @@ public class HAPI_Instancer : MonoBehaviour
 		
 		GameObject obj;
 
-		GameObject user_instance = prPersistentData.getUserObjToInstantiateFromName( objToInstantiate.name );
+		GameObject user_instance = prPersistentData.getUserObjToInstantiateFromName( objToInstantiate.name, 
+		                                                                             point_index );
 		if ( user_instance == null )
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
@@ -727,6 +728,7 @@ public class HAPI_Instancer : MonoBehaviour
 			instancer_data.uniqueNames.Add( name_to_add );
 			instancer_data.numObjsToInstantiate.Add( 1 );
 			instancer_data.objsToInstantiate.Add( null );
+			instancer_data.recalculateVariations.Add( true );
 		}
 
 
@@ -789,6 +791,26 @@ public class HAPI_Instancer : MonoBehaviour
 			instanceOverriddenObjects( myNumInstances, exclusion_list );
 
 			List < string > unique_instantiated_names = new List< string >();
+			HAPI_InstancerPersistentData persistent_data = prPersistentData;
+			if( persistent_data.variationChoice.Count != myNumInstances )
+			{
+				if( myNumInstances > persistent_data.variationChoice.Count )
+				{
+					int difference = myNumInstances - persistent_data.variationChoice.Count;
+					for( int ii = 0; ii < difference; ii++ )
+					{
+						persistent_data.variationChoice.Add( -1 );
+					}
+				}
+				else
+				{
+					int difference = persistent_data.variationChoice.Count - myNumInstances;
+					persistent_data.variationChoice.RemoveRange( persistent_data.variationChoice.Count - difference, 
+					                                             difference );
+					
+				}
+			}
+
 
 			bool liveTransformPropagationSetting	= false;
 			bool syncAssetTransformSetting			= false;

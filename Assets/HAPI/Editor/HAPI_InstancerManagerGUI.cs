@@ -121,6 +121,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 								persistent_data.objsToInstantiate.Insert
 									( base_index + jj, null );
 								persistent_data.numObjsToInstantiate[ ii ]++;
+								persistent_data.recalculateVariations[ ii ] = true;
 								changed = true;
 								break;
 							}
@@ -136,6 +137,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 									persistent_data.objsToInstantiate.RemoveAt( base_index + jj );
 									persistent_data.numObjsToInstantiate[ ii ]--;
 								}
+								persistent_data.recalculateVariations[ ii ] = true;
 								changed = true;
 								break;
 							}
@@ -144,6 +146,15 @@ public partial class HAPI_InstancerManagerGUI: Editor
 
 						}
 
+					}
+
+					if ( GUILayout.Button( "Recalculate Variations" ) )
+					{
+						for( int ii = 0; ii < unique_names.Count; ii++ )
+						{
+							persistent_data.recalculateVariations[ ii ] = true;
+						}
+						changed = true;
 					}
 
 				}
@@ -163,6 +174,12 @@ public partial class HAPI_InstancerManagerGUI: Editor
 					HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
 					instancer.instanceObjects( progress_bar );
 					progress_bar.clearProgressBar();
+
+					for( int ii = 0; ii < persistent_data.recalculateVariations.Count; ii++ )
+					{
+						persistent_data.recalculateVariations[ ii ] = false;
+					}
+
 				}
 			}
 
