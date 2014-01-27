@@ -160,14 +160,14 @@ public class HAPI_AssetInput : HAPI_Asset
 			Animation anim_component = GetComponent< Animation >();
 			if ( anim_component )
 				if ( anim_component.clip != null )
-					marshalCurvesFromClip( prNodeId, anim_component.clip );
+					marshalCurvesFromClip( prObjectNodeId, anim_component.clip );
 				else
 					foreach ( AnimationState anim_state in anim_component )
 					{
 						AnimationClip clip = anim_component.GetClip( anim_state.name );
 						if ( clip != null )
 						{
-							marshalCurvesFromClip( prNodeId, clip );
+							marshalCurvesFromClip( prObjectNodeId, clip );
 							break;
 						}
 					}

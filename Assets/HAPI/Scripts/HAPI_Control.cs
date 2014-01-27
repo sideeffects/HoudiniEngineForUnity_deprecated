@@ -38,6 +38,7 @@ public class HAPI_Control : MonoBehaviour
 
 	public HAPI_AssetId prAssetId { get { return myAssetId; } set { myAssetId = value; } }
 	public HAPI_NodeId prNodeId { get { return myNodeId; } set { myNodeId = value; } }
+	public HAPI_NodeId prObjectNodeId { get { return myObjectNodeId; } set { myObjectNodeId = value; } }
 	public HAPI_Asset prAsset { get { return myAsset; } set { myAsset = value; } }
 	public bool prParmsNeedInit
 	{
@@ -87,6 +88,7 @@ public class HAPI_Control : MonoBehaviour
 		
 		prAssetId = -1;
 		prNodeId = -1;
+		prObjectNodeId = -1;
 		prAsset = null;
 	}
 
@@ -94,6 +96,7 @@ public class HAPI_Control : MonoBehaviour
 	{
 		prAssetId	= control.prAssetId;
 		prNodeId	= control.prNodeId;
+		prObjectNodeId = control.prObjectNodeId;
 		prAsset		= control.prAsset;
 	}
 
@@ -127,6 +130,7 @@ public class HAPI_Control : MonoBehaviour
 
 	[SerializeField] private HAPI_AssetId myAssetId;
 	[SerializeField] private HAPI_NodeId myNodeId;
+	[SerializeField] private HAPI_NodeId myObjectNodeId;
 	[SerializeField] private HAPI_Asset myAsset;
 #endif // UNITY_EDITOR
 }
