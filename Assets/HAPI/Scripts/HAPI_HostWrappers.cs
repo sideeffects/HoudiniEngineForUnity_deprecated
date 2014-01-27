@@ -1968,7 +1968,7 @@ namespace HAPI
 		}
 
 		public static void setTransformAnimCurve(
-			HAPI_NodeId node_id, int transform_component,
+			HAPI_NodeId node_id, HAPI_TransformComponent transform_component,
 			HAPI_Keyframe[] curve_keyframes,
 			int keyframe_count )
 		{

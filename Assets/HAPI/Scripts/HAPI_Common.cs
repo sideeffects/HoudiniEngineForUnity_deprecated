@@ -269,7 +269,7 @@ namespace HAPI
 		HAPI_CURVE_ORDER_CUBIC = 4,
 	}
 
-	public enum HAPI_TransformComponentType
+	public enum HAPI_TransformComponent
 	{
 		HAPI_TRANSFORM_TX = 0,
 		HAPI_TRANSFORM_TY,
@@ -473,6 +473,15 @@ namespace HAPI
 
 		// Use the node id to get the asset's parameters.
 		public HAPI_NodeId nodeId;
+
+		// The objectNodeId differs from the regular nodeId in that for
+		// geometry based assets (SOPs) it will be the node id of the dummy
+		// object (OBJ) node instead of the asset node. For object based assets
+		// the objectNodeId will equal the nodeId. The reason the distinction
+		// exists is because transforms are always stored on the object node
+		// but the asset parameters may not be on the asset node if the asset
+		// is a geometry asset so we need both.
+		public HAPI_NodeId objectNodeId;
 
 		[ MarshalAs( UnmanagedType.U1 ) ] public bool hasEverCooked;
 

@@ -390,10 +390,10 @@ public abstract class HAPI_Asset : HAPI_Control
 		HAPI_Host.setFileInput( prAssetId, index, path );
 	}
 	
-	protected void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponentType transform_component )
+	protected void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponent transform_component )
 	{
 		HAPI_Keyframe[] keys = new HAPI_Keyframe[ curve.length ];
-		for( int ii = 0; ii < curve.length; ii++ )
+		for ( int ii = 0; ii < curve.length; ii++ )
 		{
 			Keyframe unity_key = curve.keys[ ii ];
 			keys[ ii ].time = unity_key.time;
@@ -401,21 +401,19 @@ public abstract class HAPI_Asset : HAPI_Control
 			keys[ ii ].inTangent = unity_key.inTangent;
 			keys[ ii ].outTangent = unity_key.outTangent;
 			
-			if( transform_component == HAPI_TransformComponentType.HAPI_TRANSFORM_TX )
+			if ( transform_component == HAPI_TransformComponent.HAPI_TRANSFORM_TX )
 			{
 				keys[ ii ].value *= -1;
 			}
 			
-			if( transform_component == HAPI_TransformComponentType.HAPI_TRANSFORM_RY ||
-				transform_component == HAPI_TransformComponentType.HAPI_TRANSFORM_RZ )
+			if ( transform_component == HAPI_TransformComponent.HAPI_TRANSFORM_RY ||
+				transform_component == HAPI_TransformComponent.HAPI_TRANSFORM_RZ )
 			{
 				keys[ ii ].value *= -1;
 			}
-			
 		}
 		
-		HAPI_Host.setTransformAnimCurve( node_id, (int)transform_component, keys, curve.length );
-		
+		HAPI_Host.setTransformAnimCurve( node_id, transform_component, keys, curve.length );
 	}
 	
 	protected void marshalRotation( int node_id, AnimationClipCurveData[] curve_datas )
@@ -459,9 +457,9 @@ public abstract class HAPI_Asset : HAPI_Control
 								
 			}
 			
-			marshalAnimCurve( node_id, rx, HAPI_TransformComponentType.HAPI_TRANSFORM_RX );
-			marshalAnimCurve( node_id, ry, HAPI_TransformComponentType.HAPI_TRANSFORM_RY );
-			marshalAnimCurve( node_id, rz, HAPI_TransformComponentType.HAPI_TRANSFORM_RZ );
+			marshalAnimCurve( node_id, rx, HAPI_TransformComponent.HAPI_TRANSFORM_RX );
+			marshalAnimCurve( node_id, ry, HAPI_TransformComponent.HAPI_TRANSFORM_RY );
+			marshalAnimCurve( node_id, rz, HAPI_TransformComponent.HAPI_TRANSFORM_RZ );
 			
 		}
 	}
@@ -474,17 +472,17 @@ public abstract class HAPI_Asset : HAPI_Control
 		foreach ( AnimationClipCurveData curve_data in curve_datas )
 		{
 			if( curve_data.propertyName == "m_LocalPosition.x" )
-				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_TX );
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_TX );
 			else if( curve_data.propertyName == "m_LocalPosition.y" )
-				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_TY );
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_TY );
 			else if( curve_data.propertyName == "m_LocalPosition.z" )
-				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_TZ );
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_TZ );
 			else if( curve_data.propertyName == "m_LocalScale.x" )
-				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_SX );
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_SX );
 			else if( curve_data.propertyName == "m_LocalScale.y" )
-				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_SY );
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_SY );
 			else if( curve_data.propertyName == "m_LocalScale.z" )
-				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponentType.HAPI_TRANSFORM_SZ );
+				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_SZ );
 						
 		}
 		
@@ -972,6 +970,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			prAssetValidationId			= prAssetInfo.validationId;
 			prBackupAssetValidationId 	= prAssetValidationId;
 			prNodeId					= prAssetInfo.nodeId;
+			prObjectNodeId				= prAssetInfo.objectNodeId;
 			prObjectCount 				= prAssetInfo.objectCount;
 			prHandleCount 				= prAssetInfo.handleCount;
 
