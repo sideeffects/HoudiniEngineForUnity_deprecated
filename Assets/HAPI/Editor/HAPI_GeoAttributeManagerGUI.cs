@@ -5,9 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using HAPI;
 
-[ ExecuteInEditMode ]
-[ CustomEditor( typeof( HAPI_GeoInputControl ) ) ]
-public class HAPI_GeoInputControlGUI : Editor
+public class HAPI_GeoAttributeManagerGUI
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -15,8 +13,8 @@ public class HAPI_GeoInputControlGUI : Editor
 	public Mesh prGeoMesh {
 		get
 		{ 
-			if ( myGeo && myGeo.prEditableMesh )
-				return myGeo.prEditableMesh;
+			if ( myManager && myManager.prEditableMesh )
+				return myManager.prEditableMesh;
 			else
 				return null;
 		}
@@ -26,9 +24,9 @@ public class HAPI_GeoInputControlGUI : Editor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
-	public void OnEnable() 
+	public HAPI_GeoAttributeManagerGUI( HAPI_GeoAttributeManager manager ) 
 	{
-		myGeo					= target as HAPI_GeoInputControl;
+		myManager				= manager;
 
 		myForceInspectorRedraw	= false;
 
@@ -44,14 +42,14 @@ public class HAPI_GeoInputControlGUI : Editor
 		mySelectedPoints		= new List< int >();
 		mySelectedPointsMask	= new List< bool >();
 
-		myLastMode				= HAPI_GeoInputControl.Mode.NONE;
+		myLastMode				= HAPI_GeoAttributeManager.Mode.NONE;
 
 		HAPI_Host.myRepaintDelegate += this.refresh;
 		HAPI_Host.myDeselectionDelegate += this.deselect;
-		HAPI_Host.mySelectionTarget = myGeo.gameObject;
+		HAPI_Host.mySelectionTarget = myManager.prTransform.gameObject;
 	}
 
-	public void OnDisable()
+	~HAPI_GeoAttributeManagerGUI()
 	{
 		// This is called after OnSceneGUI sometimes for some reason.
 		HAPI_Host.myRepaintDelegate -= this.refresh;
@@ -70,158 +68,9 @@ public class HAPI_GeoInputControlGUI : Editor
 		myIsTransformHandleHidden = false;
 	}
 
-	public override void OnInspectorGUI()
+	public void OnInspectorGUI()
 	{
-		if ( myGeo == null )
-			return;
-
-		bool is_editable = myGeo.prEditable;
-
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
-		is_editable = false;
-		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
-#else
-		if ( !is_editable )
-			HAPI_GUI.help( "This mesh is not editable.", MessageType.Info );
-#endif // !UNITY_STANDALONE_WIN
-
-		bool gui_enable = GUI.enabled;
-		GUI.enabled = is_editable;
-
-		if ( GUILayout.Button( "Create Attribute" ) )
-			myGeo.createAttribute();
-
-		HAPI_GUI.separator();
-
-		string[] type_labels = new string[] { "bool", "int", "float" };
-		int[] type_values = new int[] { 0, 1, 2 };
-
-		string[] tuple_labels = new string[] { "1", "2", "3", "4", "5" };
-		int[] tuple_values = new int[] { 1, 2, 3, 4, 5 };
-
-		// Draw table header.
-		{
-			EditorGUILayout.BeginHorizontal();
-
-			GUIStyle label_style = new GUIStyle( EditorStyles.label );
-			label_style.padding.right = -5;
-			label_style.margin.left = -5;
-			label_style.border.right = -10;
-
-			EditorGUILayout.LabelField( "", GUILayout.Width( 18 ) );
-			EditorGUILayout.LabelField( "Name", GUILayout.Width( 100 ) );
-			EditorGUILayout.LabelField( "Type", GUILayout.Width( 40 ) );
-			EditorGUILayout.LabelField( "Tuple", GUILayout.Width( 42 ) );
-			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
-			EditorGUILayout.LabelField( "Range", label_style, GUILayout.MinWidth( 20 ) );
-
-			EditorGUILayout.EndHorizontal();
-		}
-
-		for ( int i = 0; i < myGeo.prAttributes.Count; ++i )
-		{
-			HAPI_GeoAttribute attrib = myGeo.prAttributes[ i ];
-
-			EditorGUILayout.BeginHorizontal();
-
-			// Draw toggle to control the active attribute.
-			if ( EditorGUILayout.Toggle( 
-				"", myGeo.prActiveAttribute && myGeo.prActiveAttribute.prName == attrib.prName,
-				GUILayout.Width( 20 ) ) )
-			{
-				myGeo.setActiveAttribute( attrib.prName );
-			}
-
-			// Attribute Name
-			string new_name = EditorGUILayout.TextField( attrib.prName, GUILayout.Width( 100 ) );
-			attrib.prName = new_name;
-
-			// Attribute Type
-			attrib.prType = (HAPI_GeoAttribute.Type) EditorGUILayout.IntPopup(
-				(int) attrib.prType, type_labels, type_values, GUILayout.Width( 40 ) );
-
-			// Attribute Tuple Size
-			attrib.prTupleSize = EditorGUILayout.IntPopup(
-				attrib.prTupleSize, tuple_labels, tuple_values, GUILayout.Width( 40 ) );
-
-			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
-
-			{
-				EditorGUILayout.BeginVertical();
-
-				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField( "Min", GUILayout.Width( 26 ) );
-				for ( int j = 0; j < attrib.prTupleSize; ++j )
-				{
-					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
-						attrib.prIntMins[ j ] = EditorGUILayout.IntField(
-							"", attrib.prIntMins[ j ],
-							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
-					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
-						attrib.prFloatMins[ j ] = EditorGUILayout.FloatField(
-							"", attrib.prFloatMins[ j ],
-							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
-				}
-				EditorGUILayout.EndHorizontal();
-
-				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField( "Max", GUILayout.Width( 26 ) );
-				for ( int j = 0; j < attrib.prTupleSize; ++j )
-				{
-					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
-						attrib.prIntMaxes[ j ] = EditorGUILayout.IntField(
-							"", attrib.prIntMaxes[ j ],
-							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
-					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
-						attrib.prFloatMaxes[ j ] = EditorGUILayout.FloatField(
-							"", attrib.prFloatMaxes[ j ],
-							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
-				}
-				EditorGUILayout.EndHorizontal();
-
-				EditorGUILayout.EndVertical();
-			}
-
-			EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
-
-			GUIStyle label_style = new GUIStyle( EditorStyles.label );
-			label_style.fontStyle = FontStyle.Bold;
-			if ( GUILayout.Button( "X", label_style, GUILayout.Width( 15 ), GUILayout.Height( 15 ) ) )
-				myGeo.deleteAttribute( attrib.prName );
-
-			EditorGUILayout.EndHorizontal();
-
-			HAPI_GUI.separator();
-		}
-
-		{
-			EditorGUILayout.BeginHorizontal();
-			GUIStyle label_style = new GUIStyle( EditorStyles.label );
-			label_style.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField( "↳", label_style, GUILayout.Width( 10 ) );
-			EditorGUILayout.LabelField( "Active Attribute to be Painted", GUILayout.MinWidth( 40 ) );
-
-			label_style.fontStyle = FontStyle.Normal;
-			label_style.alignment = TextAnchor.MiddleRight;
-			label_style.padding.left = 0;
-			label_style.margin.left = 0;
-			label_style.padding.right = 0;
-			label_style.margin.right = 0;
-			EditorGUILayout.LabelField( "Delete Attribute", label_style, GUILayout.MinWidth( 40 ) );
-
-			label_style.fontStyle = FontStyle.Bold;
-			label_style.padding.left = 0;
-			label_style.margin.left = 6;
-			label_style.padding.right = 5;
-			label_style.margin.right = 5;
-			EditorGUILayout.LabelField( "↲", label_style, GUILayout.Width( 10 ) );
-
-			EditorGUILayout.EndHorizontal();
-		}
-
-		GUI.enabled = gui_enable;
+		
 	}
 	
 	public void OnSceneGUI() 
@@ -233,7 +82,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		#pragma warning disable 0162
 #endif // !UNITY_STANDALONE_WIN
 
-		if ( myGeo == null )
+		if ( myManager == null )
 			return;
 
 		if ( prGeoMesh == null )
@@ -261,7 +110,7 @@ public class HAPI_GeoInputControlGUI : Editor
 
 		if ( !current_event.alt )
 		{
-			if ( myGeo.prIsPaintingPoints )
+			if ( myManager.prIsPaintingPoints )
 			{
 				// The right mouse button has special interpretation in the Unity viewport.
 				// So much so, that simply Use()'ing the event is not enough. We need to actually
@@ -284,7 +133,7 @@ public class HAPI_GeoInputControlGUI : Editor
 				Ray ray = myTempCamera.ScreenPointToRay( mouse_position );
 				ray.origin = myTempCamera.transform.position;
 
-				MeshCollider mesh_collider  = myGeo.getOrCreateComponent< MeshCollider >();
+				MeshCollider mesh_collider  = myManager.prMeshCollider;
 				RaycastHit hit_info;
 				mesh_collider.Raycast( ray, out hit_info, myIntersectionRayLength );
 				 
@@ -294,7 +143,7 @@ public class HAPI_GeoInputControlGUI : Editor
 					if ( current_event.type == EventType.ScrollWheel
 						&& areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey ) )
 					{
-						myGeo.prBrushRadius += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
+						myManager.prBrushRadius += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
 						current_event.Use();
 					}
 
@@ -302,26 +151,26 @@ public class HAPI_GeoInputControlGUI : Editor
 					Handles.DrawLine( hit_info.point, hit_info.point + hit_info.normal );
 					Handles.CircleCap(
 						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
-						myGeo.prBrushRadius );
+						myManager.prBrushRadius );
 
 					// Paint attributes on left-click.
 					if ( current_event.type == EventType.MouseDrag || mouseDown )
 					{
 						// Once we add a point we are no longer bound to the user holding down the add points key.
 						// Add points mode is now fully activated.
-						myGeo.prModeChangeWait = false;
+						myManager.prModeChangeWait = false;
 
 						// Paint.
 						if ( myMouseKey == 0 )
-							myGeo.paint( hit_info, myGeo.prPaintAmount );
+							myManager.paint( hit_info, myManager.prPaintAmount );
 						else
-							myGeo.paint( hit_info, -myGeo.prPaintAmount );
+							myManager.paint( hit_info, -myManager.prPaintAmount );
 					}
 				}
 			}
-			else if ( myGeo.prIsEditingPoints )
+			else if ( myManager.prIsEditingPoints )
 			{
-				Handles.matrix = myGeo.transform.localToWorldMatrix;
+				Handles.matrix = myManager.prTransform.localToWorldMatrix;
 
 				// Track mouse dragging.
 				if ( current_event.type == EventType.MouseDown && current_event.button == 0 && !myIsMouseDown )
@@ -356,7 +205,7 @@ public class HAPI_GeoInputControlGUI : Editor
 					Vector3[] points = prGeoMesh.vertices;
 					for ( int i = 0; points != null && i < points.Length; ++i )
 					{
-						Vector3 transformed_point = myGeo.transform.TransformPoint( points[ i ] );
+						Vector3 transformed_point = myManager.prTransform.TransformPoint( points[ i ] );
 						Vector3 proj_pos = myTempCamera.WorldToScreenPoint( transformed_point );
 						proj_pos.z = 0.0f;
 
@@ -367,7 +216,7 @@ public class HAPI_GeoInputControlGUI : Editor
 							{
 								// Once we modify a point we are no longer bound to the user holding down 
 								// the point edit key. Edit point mode is now fully activated.
-								myGeo.prModeChangeWait = false;
+								myManager.prModeChangeWait = false;
 								togglePointSelection( i );
 							}
 						} // drag
@@ -378,7 +227,7 @@ public class HAPI_GeoInputControlGUI : Editor
 							{
 								// Once we modify a point we are no longer bound to the user holding down 
 								// the point edit key. Edit point mode is now fully activated.
-								myGeo.prModeChangeWait = false;
+								myManager.prModeChangeWait = false;
 								togglePointSelection( i );
 							} // if point hit
 						} // single click
@@ -402,12 +251,12 @@ public class HAPI_GeoInputControlGUI : Editor
 		
 		if ( myForceInspectorRedraw )
 		{
-			Repaint();
+			//Repaint();
 			myForceInspectorRedraw = false;
 		}
 
 		// Create selection area.
-		if ( myGeo.prIsEditingPoints && myIsMouseDown )
+		if ( myManager.prIsEditingPoints && myIsMouseDown )
 		{
 			float sel_left			= Mathf.Min( myFirstMousePosition.x, mouse_position.x );
 			float sel_top			= myTempCamera.pixelHeight - Mathf.Max( myFirstMousePosition.y, mouse_position.y );
@@ -419,7 +268,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			mySelectionArea			= new Rect();
 
 		// Hide default transform handles.
-		myIsTransformHandleHidden = myGeo.prIsPaintingPoints || myGeo.prIsEditingPoints;
+		myIsTransformHandleHidden = myManager.prIsPaintingPoints || myManager.prIsEditingPoints;
 
 		// Update active control point.
 		if ( mySelectedPoints.Count > 0 ) 
@@ -451,7 +300,7 @@ public class HAPI_GeoInputControlGUI : Editor
 					int point_index = mySelectedPoints[ i ];
 					Vector3 old_pos = prGeoMesh.vertices[ point_index ];
 					Vector3 new_pos = old_pos + delta;
-					myGeo.updatePoint( point_index, new_pos );
+					myManager.updatePoint( point_index, new_pos );
 				}
 
 				// Remake and Draw Guide Geometry
@@ -466,14 +315,14 @@ public class HAPI_GeoInputControlGUI : Editor
 			mySelectionMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
 			if ( mySelectionMaterial.SetPass( 0 ) )
 			{
-				Graphics.DrawMeshNow( mySelectionMesh, myGeo.transform.localToWorldMatrix );
+				Graphics.DrawMeshNow( mySelectionMesh, myManager.prTransform.localToWorldMatrix );
 			}
 
 			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize - myGuideBorderSize );
 			mySelectionMaterial.SetColor( "_Color", Color.white );
 			if ( mySelectionMaterial.SetPass( 1 ) )
 			{
-				Graphics.DrawMeshNow( mySelectionMesh, myGeo.transform.localToWorldMatrix );
+				Graphics.DrawMeshNow( mySelectionMesh, myManager.prTransform.localToWorldMatrix );
 			}
 		}
 
@@ -523,7 +372,7 @@ public class HAPI_GeoInputControlGUI : Editor
 
 		if ( mySelectionMeshColours != null )
 			for ( int i = 0; i < mySelectionMeshColours.Length; ++i )
-				if ( myGeo.prIsEditingPoints )
+				if ( myManager.prIsEditingPoints )
 					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
 				else
 					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
@@ -602,7 +451,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			mySelectionMeshColours = new Color[ selection_vertices.Length ];
 			for ( int i = 0; i < selection_vertices.Length; ++i )
 			{
-				if ( !myGeo.prIsEditingPoints )
+				if ( !myManager.prIsEditingPoints )
 					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
 				else
 					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
@@ -614,23 +463,23 @@ public class HAPI_GeoInputControlGUI : Editor
 		mySelectionMesh.SetIndices( selection_indices, MeshTopology.Points, 0 );
 	}
 
-	private void changeModes( ref bool paint_mode, ref bool edit_points_mode, HAPI_GeoInputControl.Mode mode )
+	private void changeModes( ref bool paint_mode, ref bool edit_points_mode, HAPI_GeoAttributeManager.Mode mode )
 	{
 		switch ( mode )
 		{
-			case HAPI_GeoInputControl.Mode.NONE: 
+			case HAPI_GeoAttributeManager.Mode.NONE: 
 				{
 					paint_mode = false;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_GeoInputControl.Mode.PAINT:
+			case HAPI_GeoAttributeManager.Mode.PAINT:
 				{
 					paint_mode = true;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_GeoInputControl.Mode.EDIT:
+			case HAPI_GeoAttributeManager.Mode.EDIT:
 				{
 					paint_mode = false;
 					edit_points_mode = true;
@@ -660,28 +509,28 @@ public class HAPI_GeoInputControlGUI : Editor
 
 	private void decideModes( ref Event current_event )
 	{
-		if ( !myGeo.prEditable )
+		if ( !myManager.prEditable )
 		{
-			myLastMode				= HAPI_GeoInputControl.Mode.NONE;
-			myGeo.prCurrentMode		= HAPI_GeoInputControl.Mode.NONE;
-			myGeo.prIsPaintingPoints	= false;
-			myGeo.prIsEditingPoints	= false;
-			myGeo.prModeChangeWait	= false;
+			myLastMode = HAPI_GeoAttributeManager.Mode.NONE;
+			myManager.prCurrentMode = HAPI_GeoAttributeManager.Mode.NONE;
+			myManager.prIsPaintingPoints = false;
+			myManager.prIsEditingPoints = false;
+			myManager.prModeChangeWait = false;
 			return;
 		}
 
 		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey );
 		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prEditingPointsModeHotKey );
 
-		bool paint_mode				= myGeo.prIsPaintingPoints;
-		bool edit_points_mode		= myGeo.prIsEditingPoints;
-		bool mode_change_wait		= myGeo.prModeChangeWait;
+		bool paint_mode				= myManager.prIsPaintingPoints;
+		bool edit_points_mode		= myManager.prIsEditingPoints;
+		bool mode_change_wait		= myManager.prModeChangeWait;
 
 		if ( paint_mode )
 		{
 			if ( !mode_change_wait && edit_points_mode_key )
 			{
-				myLastMode			= HAPI_GeoInputControl.Mode.PAINT;
+				myLastMode			= HAPI_GeoAttributeManager.Mode.PAINT;
 
 				paint_mode			= false;
 				edit_points_mode	= true;
@@ -697,7 +546,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		{
 			if ( !mode_change_wait && paint_mode_key )
 			{
-				myLastMode			= HAPI_GeoInputControl.Mode.EDIT;
+				myLastMode			= HAPI_GeoAttributeManager.Mode.EDIT;
 
 				paint_mode			= true;
 				edit_points_mode	= false;
@@ -715,13 +564,13 @@ public class HAPI_GeoInputControlGUI : Editor
 			{
 				paint_mode			= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_GeoInputControl.Mode.NONE;
+				myLastMode			= HAPI_GeoAttributeManager.Mode.NONE;
 			}
 			else if ( edit_points_mode_key )
 			{
 				edit_points_mode	= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_GeoInputControl.Mode.NONE;
+				myLastMode			= HAPI_GeoAttributeManager.Mode.NONE;
 			}
 		}
 
@@ -734,18 +583,18 @@ public class HAPI_GeoInputControlGUI : Editor
 		}
 
 		// Change the colours of the points if the edit points mode has changed.
-		if ( edit_points_mode != myGeo.prIsEditingPoints )
+		if ( edit_points_mode != myManager.prIsEditingPoints )
 		{
 			// Must assign this earlier than normal because clearSelection() will
 			// use the value to determine the colour of the control points.
 			// (between unselected and unselectable)
-			myGeo.prIsEditingPoints = edit_points_mode;
+			myManager.prIsEditingPoints = edit_points_mode;
 			clearSelection();
 		}
 
-		myGeo.prIsPaintingPoints	= paint_mode;
-		myGeo.prIsEditingPoints		= edit_points_mode;
-		myGeo.prModeChangeWait		= mode_change_wait;
+		myManager.prIsPaintingPoints	= paint_mode;
+		myManager.prIsEditingPoints		= edit_points_mode;
+		myManager.prModeChangeWait		= mode_change_wait;
 	}
 
 	private void drawToolSceneUI()
@@ -760,22 +609,22 @@ public class HAPI_GeoInputControlGUI : Editor
 		Color box_color = ( skin == 0 ? mySceneUILightColour : mySceneUIDarkColour );
 		Color text_color = Color.white;
 
-		if ( !myGeo.prEditable )
+		if ( !myManager.prEditable )
 		{
 			help_text = "This mesh is not editable.";
 		}
-		if ( myGeo.prIsPaintingPoints )
+		if ( myManager.prIsPaintingPoints )
 		{
 			help_text = "Click on mesh: paint attribute | Mouse Scroll: change brush size | ESC or Enter: exit mode";
 			box_color = HAPI_Host.prPaintingModeColour;
 		}
-		else if ( myGeo.prIsEditingPoints )
+		else if ( myManager.prIsEditingPoints )
 		{
 			help_text = "Click or drag: select points | Hold Control: toggle-based selection | ESC or Enter: exit mode";
 			box_color = HAPI_Host.prEditingPointsModeColour;
 		}
 
-		if ( !mySceneWindowHasFocus && myGeo.prEditable )
+		if ( !mySceneWindowHasFocus && myManager.prEditable )
 			help_text = "Scene window doesn't have focus. Hotkeys may not work. Right click anywhere in the scene to focus.";
 
 		Color original_color		= GUI.color;
@@ -806,7 +655,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		title_box_width				+= double_line_padding;
 
 		// The mode box should be nothing if the mesh is static since there are no options for static meshes.
-		float mode_box_width		= myGeo.prEditable ? mySceneUIModeIndicatorWidth : 0.0f;
+		float mode_box_width		= myManager.prEditable ? mySceneUIModeIndicatorWidth : 0.0f;
 		float help_box_width		= scene_width - title_box_width - mode_box_width - 
 									  ( 2.0f * border_total ) - ( 2.0f * border_padding );
 		
@@ -840,7 +689,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		// Draw the background boxes for the Scene UI.
 		GUI.color = box_color;
 		GUI.DrawTexture( title_box_rect, box_texture, ScaleMode.StretchToFill );
-		if ( myGeo.prEditable )
+		if ( myManager.prEditable )
 			GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( help_box_rect, box_texture, ScaleMode.StretchToFill );
 
@@ -849,7 +698,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		GUI.Label( title_text_rect, title_text, bold_text_style );
  		GUI.Label( help_text_rect, help_text, normal_text_style );
 
-		if ( myGeo.prEditable )
+		if ( myManager.prEditable )
 		{
 			// Set up mode selection toolbar.
 			GUIStyle button_style	= new GUIStyle( GUI.skin.button );
@@ -872,14 +721,14 @@ public class HAPI_GeoInputControlGUI : Editor
 			// whos key is being held down...
 			GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prPaintingModeHotKey ) &&
 									  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
-			HAPI_GeoInputControl.Mode last_mode = myGeo.prCurrentMode;
-			myGeo.prCurrentMode = (HAPI_GeoInputControl.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
-			if ( last_mode != myGeo.prCurrentMode )
+			HAPI_GeoAttributeManager.Mode last_mode = myManager.prCurrentMode;
+			myManager.prCurrentMode = (HAPI_GeoAttributeManager.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
+			if ( last_mode != myManager.prCurrentMode )
 				clearSelection();
 			GUI.enabled = true;
 
 			// Draw selection rectangle.
-			if ( myGeo.prIsEditingPoints )
+			if ( myManager.prIsEditingPoints )
 			{
 				GUI.color = Color.white;
 				GUI.Box( mySelectionArea, "" );
@@ -898,7 +747,7 @@ public class HAPI_GeoInputControlGUI : Editor
 			float width					= myTempCamera.pixelWidth;
 			float height				= myTempCamera.pixelHeight;
 
-			if ( myGeo.prCurrentMode == HAPI_GeoInputControl.Mode.NONE )
+			if ( myManager.prCurrentMode == HAPI_GeoAttributeManager.Mode.NONE )
 			{
 				border_texture.SetPixel( 0, 0, new Color( text_color.r, text_color.g, text_color.b, 0.6f ) );
 				border_texture.Apply();
@@ -1039,42 +888,42 @@ public class HAPI_GeoInputControlGUI : Editor
 
 		// Draw attribute dropdown.
 		{
-			if ( myGeo.prActiveAttribute == null )
+			if ( myManager.prActiveAttribute == null )
 			{
 				GUI.Label( attribute_dropdown_rect, "No attributes.", normal_text_style );
 			}
 			else
 			{
-				int[] attribute_indicies = new int[ myGeo.prAttributes.Count ];
-				for ( int i = 0; i < myGeo.prAttributes.Count; ++i )
+				int[] attribute_indicies = new int[ myManager.prAttributes.Count ];
+				for ( int i = 0; i < myManager.prAttributes.Count; ++i )
 					attribute_indicies[ i ] = i;
 
-				string[] attribute_names = new string[ myGeo.prAttributes.Count ];
+				string[] attribute_names = new string[ myManager.prAttributes.Count ];
 				int selected_attribute_index = 0;
-				for ( int i = 0; i < myGeo.prAttributes.Count; ++i )
+				for ( int i = 0; i < myManager.prAttributes.Count; ++i )
 				{
-					if ( myGeo.prAttributes[ i ].prName == myGeo.prActiveAttribute.prName )
+					if ( myManager.prAttributes[ i ].prName == myManager.prActiveAttribute.prName )
 						selected_attribute_index = i;
-					attribute_names[ i ] = myGeo.prAttributes[ i ].prName;
+					attribute_names[ i ] = myManager.prAttributes[ i ].prName;
 				}
 
 				selected_attribute_index = EditorGUI.IntPopup(
 					attribute_dropdown_rect, "", selected_attribute_index, attribute_names, attribute_indicies );
 
 				string selected_attribute_name = attribute_names[ selected_attribute_index ];
-				myGeo.setActiveAttribute( selected_attribute_name );
+				myManager.setActiveAttribute( selected_attribute_name );
 			}
 		}
 
 		// Draw mode dropdown.
 		{
-			if ( myGeo.prActiveAttribute == null )
+			if ( myManager.prActiveAttribute == null )
 			{
 				GUI.Label( mode_dropdown_rect, "N/A", normal_text_style );
 			}
 			else
 			{
-				int mode_count = myGeo.prActiveAttribute.prTupleSize + 1; // +1 for Colour Mode.
+				int mode_count = myManager.prActiveAttribute.prTupleSize + 1; // +1 for Colour Mode.
 				int[] mode_values = new int[ mode_count ];
 				for ( int i = 0; i < mode_count; ++i )
 					mode_values[ i ] = i;
@@ -1085,18 +934,18 @@ public class HAPI_GeoInputControlGUI : Editor
 					mode_labels[ i ] = "Component " + i + " Only (Grayscale)";
 
 				int new_paint_mode = EditorGUI.IntPopup(
-					mode_dropdown_rect, "", myGeo.prActiveAttribute.prPaintMode, mode_labels, mode_values );
-				if ( new_paint_mode != myGeo.prActiveAttribute.prPaintMode )
+					mode_dropdown_rect, "", myManager.prActiveAttribute.prPaintMode, mode_labels, mode_values );
+				if ( new_paint_mode != myManager.prActiveAttribute.prPaintMode )
 				{
-					myGeo.prActiveAttribute.prPaintMode = new_paint_mode;
-					myGeo.refreshMeshColours();
+					myManager.prActiveAttribute.prPaintMode = new_paint_mode;
+					myManager.refreshMeshColours();
 				}
 			}
 		}
 
 		// Draw paint value fields.
 		{
-			if ( myGeo.prActiveAttribute == null )
+			if ( myManager.prActiveAttribute == null )
 			{
 				GUI.Label( value_fields_rect, "N/A", normal_text_style );
 			}
@@ -1104,16 +953,16 @@ public class HAPI_GeoInputControlGUI : Editor
 			{
 				GUILayout.BeginArea( value_fields_rect );
 				GUILayout.BeginHorizontal();
-				for ( int i = 0; i < myGeo.prActiveAttribute.prTupleSize; ++i )
+				for ( int i = 0; i < myManager.prActiveAttribute.prTupleSize; ++i )
 				{
-					if ( myGeo.prActiveAttribute.prType == HAPI_GeoAttribute.Type.BOOL
-						|| myGeo.prActiveAttribute.prType == HAPI_GeoAttribute.Type.INT )
-						myGeo.prActiveAttribute.prIntPaintValue[ i ] = EditorGUILayout.IntField(
-							"", myGeo.prActiveAttribute.prIntPaintValue[ i ],
+					if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.BOOL
+						|| myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.INT )
+						myManager.prActiveAttribute.prIntPaintValue[ i ] = EditorGUILayout.IntField(
+							"", myManager.prActiveAttribute.prIntPaintValue[ i ],
 							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
-					else if ( myGeo.prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT )
-						myGeo.prActiveAttribute.prFloatPaintValue[ i ] = EditorGUILayout.FloatField(
-							"", myGeo.prActiveAttribute.prFloatPaintValue[ i ],
+					else if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT )
+						myManager.prActiveAttribute.prFloatPaintValue[ i ] = EditorGUILayout.FloatField(
+							"", myManager.prActiveAttribute.prFloatPaintValue[ i ],
 							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
 				}
 				GUILayout.EndHorizontal();
@@ -1132,7 +981,7 @@ public class HAPI_GeoInputControlGUI : Editor
 	private void drawSceneUI()
 	{
 		drawToolSceneUI();
-		if ( myGeo.prEditable && myGeo.prIsPaintingPoints )
+		if ( myManager.prEditable && myManager.prIsPaintingPoints )
 			drawPaintingSceneUI();
 	}
 
@@ -1158,7 +1007,7 @@ public class HAPI_GeoInputControlGUI : Editor
 		}
 	}
 
-	private HAPI_GeoInputControl myGeo;
+	private HAPI_GeoAttributeManager myManager;
 
 	private bool				myForceInspectorRedraw;
 
@@ -1197,5 +1046,5 @@ public class HAPI_GeoInputControlGUI : Editor
 	[SerializeField] 
 	private List< bool >		mySelectedPointsMask;
 
-	private HAPI_GeoInputControl.Mode myLastMode;
+	private HAPI_GeoAttributeManager.Mode myLastMode;
 }

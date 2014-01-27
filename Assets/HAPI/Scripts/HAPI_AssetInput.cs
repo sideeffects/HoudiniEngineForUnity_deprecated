@@ -35,6 +35,8 @@ public class HAPI_AssetInput : HAPI_Asset
 														set { myEditableMesh = value; } }
 	public Mesh			prOriginalMesh {				get { return myOriginalMesh; }
 														set { myOriginalMesh = value; } }
+	public HAPI_GeoAttributeManager prGeoAttributeManager { get { return myGeoAttributeManager; }
+															private set {} }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -130,11 +132,14 @@ public class HAPI_AssetInput : HAPI_Asset
 	{
 		cloneMesh();
 
-		MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
-		MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
+		if ( myGeoAttributeManager == null )
+		{
+			MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
+			MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 
-		myGeoAttributeManager = ScriptableObject.CreateInstance< HAPI_GeoAttributeManager >();
-		myGeoAttributeManager.init( prEditableMesh, mesh_renderer, mesh_collider, transform );
+			myGeoAttributeManager = ScriptableObject.CreateInstance< HAPI_GeoAttributeManager >();
+			myGeoAttributeManager.init( prEditableMesh, mesh_renderer, mesh_collider, transform );
+		}
 	}
 
 	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
@@ -172,6 +177,8 @@ public class HAPI_AssetInput : HAPI_Asset
 			for ( int i = 0; i < prEditableMesh.vertexCount; ++i )
 				colours[ i ] = new Color( 1.0f, 1.0f, 1.0f );
 			prEditableMesh.colors = colours;
+
+			mesh_filter.sharedMesh = prEditableMesh;
 		}
 	}
 

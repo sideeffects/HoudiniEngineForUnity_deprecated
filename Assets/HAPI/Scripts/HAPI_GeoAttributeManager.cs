@@ -36,6 +36,13 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	public bool			prEditable {					get { return true; }
 														private set {} }
 
+	public Mesh			prEditableMesh {				get { return myMesh; }
+														private set {} }
+	public MeshCollider prMeshCollider {				get { return myMeshCollider; }
+														private set {} }
+	public Transform	prTransform {					get { return myTransform; }
+														private set {} }
+
 	public Mode			prCurrentMode {					get { return myCurrentMode; }
 														set { changeMode( value ); } }
 	public bool			prIsPaintingPoints {			get { return ( myCurrentMode == Mode.PAINT ); } 
@@ -164,7 +171,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 
 	public void paint( RaycastHit hit_info, float amount )
 	{
-		if ( !myMesh || myMeshCollider || !myTransform )
+		if ( !myMesh || !myMeshCollider || !myTransform )
 			return;
 
 		if ( !prActiveAttribute || prActiveAttribute.prType == HAPI_GeoAttribute.Type.UNDEFINED )
