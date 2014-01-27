@@ -70,6 +70,7 @@ public class HAPI_CurveGUI : Editor
 		HAPI_Host.myRepaintDelegate -= this.refresh;
 		HAPI_Host.myDeselectionDelegate -= this.deselect;
 		HAPI_Host.mySelectionTarget = null;
+		myIsTransformHandleHidden = false;
 	}
 
 	public void refresh()
