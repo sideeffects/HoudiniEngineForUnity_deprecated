@@ -161,15 +161,6 @@ public class HAPI_AssetGUI : Editor
 					
 							if ( myParmChanges )
 							{
-								if ( myAsset.prUpStreamGeoObjects[ input_index ] != null )
-								{
-									HAPI_GeoInputControl control = 
-										myAsset.prUpStreamGeoObjects[ input_index ].GetComponent< HAPI_GeoInputControl>();
-									
-									if( control != null )
-										DestroyImmediate( control );
-								}
-								
 								if ( !obj )
 								{
 									myAsset.removeGeoInput( input_index );
@@ -182,46 +173,39 @@ public class HAPI_AssetGUI : Editor
 								else
 								{
 									myAsset.prFileInputs[ input_index ] = "";
-									
+
 									GameObject new_obj = (GameObject) obj;
-							
 									myAsset.prUpStreamGeoObjects[ input_index ] = new_obj;
-							
-									HAPI_Asset asset = null;
-									HAPI_PartControl part_control = new_obj.GetComponent< HAPI_PartControl >();
-							
+
+									// Select the asset component (if it exists).
+									HAPI_Asset asset = new_obj.GetComponent< HAPI_Asset >();
+
+									// If we're selecting a specific object to input than try and
+									// get the object id. Note that by getting the HAPI_ObjectControl
+									// component we also cover the geo and part controls because
+									// they all inherit from HAPI_ObjectControl. The user can therefore
+									// drag any gameObject under the asset into another asset's
+									// input and have it all work.
 									int object_index = 0;
-									if ( part_control )
+									HAPI_ObjectControl obj_control = new_obj.GetComponent< HAPI_ObjectControl >();
+									if ( obj_control )
 									{
-										object_index = part_control.prObjectId;
-										asset = part_control.prAsset;
+										object_index = obj_control.prObjectId;
+										asset = obj_control.prAsset;
 									}
-									else
-										asset = new_obj.GetComponent< HAPI_Asset >();
+
+									// If we are connecting a non-HAPI game object than we need to 
+									// assetize it first by converting it to an Input Asset.
+									if ( asset == null )
+										asset = new_obj.AddComponent< HAPI_AssetInput >();
 									
-									if( asset == null )
+									if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
 									{
-										new_obj.AddComponent< HAPI_GeoInputControl >();
-										HAPI_GeoInputControl control = new_obj.GetComponent< HAPI_GeoInputControl >();
-										control.prAsset = myAsset;
-										control.prAssetId = myAsset.prAssetId;
-									}
-									
-									if ( asset == null || myAsset.prUpStreamGeoAssets[ input_index ] != asset )
-									{
-										if ( asset )
-										{
-											if ( myAsset == asset )
-												Debug.LogError( "Can't connect an asset to itself!" );
-											else
-											{
-												myAsset.addAssetAsGeoInput( asset, object_index, input_index );
-												myAsset.buildClientSide();
-											}
-										}
+										if ( myAsset == asset )
+											Debug.LogError( "Can't connect an asset to itself!" );
 										else
 										{
-											myAsset.addGeoAsGeoInput( new_obj, input_index );
+											myAsset.addAssetAsGeoInput( asset, object_index, input_index );
 											myAsset.buildClientSide();
 										}
 									}
