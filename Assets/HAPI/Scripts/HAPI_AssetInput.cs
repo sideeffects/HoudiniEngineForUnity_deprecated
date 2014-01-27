@@ -146,7 +146,32 @@ public class HAPI_AssetInput : HAPI_Asset
 	{
 		try
 		{
-			HAPI_AssetUtility.setMesh( prAssetId, 0, 0, ref myEditableMesh, null );
+			const int object_id = 0;
+			const int geo_id = 0;
+
+			// Write marshalled geo to Input Asset.
+			HAPI_AssetUtility.setMesh( prAssetId, object_id, geo_id, ref myEditableMesh, null );
+
+			// Apply the input asset transform to the marshaled object in the Houdini scene.
+			HAPI_TransformEuler trans = Utility.getHapiTransform( transform.localToWorldMatrix );
+			HAPI_Host.setObjectTransform( prAssetId, object_id, trans );
+
+			// Marshall in the animation.
+			Animation anim_component = GetComponent< Animation >();
+			if ( anim_component )
+				if ( anim_component.clip != null )
+					marshalCurvesFromClip( prNodeId, anim_component.clip );
+				else
+					foreach ( AnimationState anim_state in anim_component )
+					{
+						AnimationClip clip = anim_component.GetClip( anim_state.name );
+						if ( clip != null )
+						{
+							marshalCurvesFromClip( prNodeId, clip );
+							break;
+						}
+					}
+
 			HAPI_Host.repaint();
 		}
 		catch ( HAPI_Error )

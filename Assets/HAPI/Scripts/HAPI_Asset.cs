@@ -390,7 +390,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		HAPI_Host.setFileInput( prAssetId, index, path );
 	}
 	
-	private void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponentType transform_component )
+	protected void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponentType transform_component )
 	{
 		HAPI_Keyframe[] keys = new HAPI_Keyframe[ curve.length ];
 		for( int ii = 0; ii < curve.length; ii++ )
@@ -418,7 +418,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 	}
 	
-	private void marshalRotation( int node_id, AnimationClipCurveData[] curve_datas )
+	protected void marshalRotation( int node_id, AnimationClipCurveData[] curve_datas )
 	{
 		AnimationCurve qx = null, qy = null, qz = null, qw = null;
 		
@@ -466,7 +466,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 	}
 	
-	private void marshalCurvesFromClip( int node_id, AnimationClip clip )
+	protected void marshalCurvesFromClip( int node_id, AnimationClip clip )
 	{
 		#pragma warning disable 0618
 		AnimationClipCurveData[] curve_datas = AnimationUtility.GetAllCurves( clip );
@@ -489,52 +489,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		
 		marshalRotation( node_id, curve_datas );
-	}
-
-	public void addGeoAsGeoInput( GameObject asset, int index )
-	{
-		prUpStreamGeoAssets[ index ] = null;
-		prUpStreamGeoAdded[ index ] = true;
-
-		int object_id;
-		int geo_id;
-		int node_id;
-		HAPI_Host.createGeoInput( prAssetId, index, out object_id, out geo_id, out node_id );
-
-		HAPI_GeoInputControl input_control = asset.GetComponent< HAPI_GeoInputControl >();
-		input_control.prInputObjectId = object_id;
-
-		MeshFilter asset_mesh_filter 	= asset.GetComponent< MeshFilter >();
-		Mesh mesh 						= asset_mesh_filter.sharedMesh;
-		HAPI_PartControl child_control  = asset.GetComponent< HAPI_PartControl >();
-
-		// Write marshlled geo to External Input Asset ( having assetId '0' )
-		Utility.setMesh( 0, object_id, geo_id, ref mesh, child_control );
-
-		// Apply the input asset transform to the marshaled object in the Houdini scene.
-		HAPI_TransformEuler trans = Utility.getHapiTransform( asset.transform.localToWorldMatrix );
-		HAPI_Host.setObjectTransform( 0, object_id, trans );
-
-		Animation anim_component = asset.GetComponent< Animation >();
-		if ( anim_component == null )
-			return;
-
-		if ( anim_component.clip != null )
-		{
-			marshalCurvesFromClip( node_id, anim_component.clip );
-		}
-		else 
-		{
-			foreach ( AnimationState anim_state in anim_component )
-			{
-				AnimationClip clip = anim_component.GetClip( anim_state.name );
-				if ( clip != null )
-				{
-					marshalCurvesFromClip( node_id, clip );
-					break;
-				}
-			}
-		}
 	}
 
 	public void removeGeoInput( int index )
@@ -1838,20 +1792,20 @@ public abstract class HAPI_Asset : HAPI_Control
 					}
 					else
 						asset = new_obj.GetComponent< HAPI_Asset >();
-							
-					if ( asset )
+
+					// If we are connecting a non-HAPI game object than we need to 
+					// assetize it first by converting it to an Input Asset.
+					if ( !asset )
+						asset = new_obj.AddComponent< HAPI_AssetInput >();
+
+					if ( !asset.isAssetValid() )
 					{
-						if ( !asset.isAssetValid() )
-						{
-							// No need to cache because since we're in here it means prEnableCooking == true.
-							prEnableCooking = false;
-							asset.OnEnable();
-							prEnableCooking = true;
-						}
-						addAssetAsGeoInput( asset, object_index, i );
+						// No need to cache because since we're in here it means prEnableCooking == true.
+						prEnableCooking = false;
+						asset.OnEnable();
+						prEnableCooking = true;
 					}
-					else
-						addGeoAsGeoInput( new_obj, i );
+					addAssetAsGeoInput( asset, object_index, i );
 
 					need_rebuild_after_reconnect = true;
 				}
