@@ -82,7 +82,7 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						}
 						
 						// replace prefab with original asset with all children game objects removed
-						asset.destroyChildren( asset.transform );
+						HAPI_Control.destroyChildren( asset.transform );
 						GameObject new_prefab = PrefabUtility.ReplacePrefab( asset.gameObject, 
 																			 prPrefabToReplace, 
 																			 ReplacePrefabOptions.ConnectToPrefab ) as GameObject;

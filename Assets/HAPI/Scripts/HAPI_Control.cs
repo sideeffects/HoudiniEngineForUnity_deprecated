@@ -107,14 +107,33 @@ public class HAPI_Control : MonoBehaviour
 
 	public virtual void onParmChange() {}
 
-	public T getOrCreateComponent< T >() where T : Component {
-		T component = gameObject.GetComponent< T >();
+	public T getOrCreateComponent< T >() where T : Component
+	{
+		return getOrCreateComponent< T >( gameObject );
+	}
+	static public T getOrCreateComponent< T >( GameObject game_object ) where T : Component
+	{
+		T component = game_object.GetComponent< T >();
 		if ( component == null )
-			component = gameObject.AddComponent< T >();
+			component = game_object.AddComponent< T >();
 		return component;
 	}
+
+	public void removeComponentsFromChildren< T >() where T : Component
+	{
+		removeComponentsFromChildren< T >( gameObject );
+	}
+	static public void removeComponentsFromChildren< T >( GameObject game_object ) where T : Component
+	{
+		foreach ( T comp in game_object.GetComponentsInChildren< T >() )
+			DestroyImmediate( comp );
+	}
 	
-	public void destroyChildren( Transform trans ) 
+	public void destroyChildren()
+	{
+		destroyChildren( gameObject.transform );
+	}
+	static public void destroyChildren( Transform trans ) 
 	{
 		List< GameObject > children = new List< GameObject >();
 		
