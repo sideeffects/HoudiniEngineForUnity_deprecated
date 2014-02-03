@@ -536,6 +536,7 @@ namespace HAPI
 	{
 		public HAPI_NodeId id;
 		public HAPI_AssetId assetId;
+		public HAPI_StringHandle nameSH;
 
 		public int uniqueHoudiniNodeId;
 		private HAPI_StringHandle internalNodePathSH;
@@ -546,6 +547,8 @@ namespace HAPI
 		public int parmStringValueCount;
 		public int parmChoiceCount;
 
+		public string name
+		{ get { return HAPI_Host.getString( nameSH ); } private set {} }
 		public string internalNodePath
 		{ get { return HAPI_Host.getString( internalNodePathSH ); } private set {} }
 	}
