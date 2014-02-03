@@ -279,8 +279,11 @@ public class HAPI_Instancer : MonoBehaviour
 
 			obj.transform.localPosition = pos;
 
+			//due to the difference between Houdini's coordinate system and that of Unity,
+			//most assets from unity won't look right until a 90 degree rotation in X is 
+			//introduced.  
 			Quaternion quat = Quaternion.Euler( 
-			                  new Vector3( user_instance.transform.localRotation.eulerAngles.x + euler.x,
+			                  new Vector3( 90 + user_instance.transform.localRotation.eulerAngles.x + euler.x,
 			            				   user_instance.transform.localRotation.eulerAngles.y + euler.y,
 			            				   user_instance.transform.localRotation.eulerAngles.z + euler.z ) );
 
