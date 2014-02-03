@@ -249,10 +249,16 @@ public class HAPI_PartControl : HAPI_GeoControl
 														   pos_attr[ i * 3 + 1 ], 
 														   pos_attr[ i * 3 + 2 ] );
 					if ( colour_attr_info.exists )
-						particles[ i ].color = new Color( colour_attr[ i * 4 + 0 ], 
-														  colour_attr[ i * 4 + 1 ], 
-														  colour_attr[ i * 4 + 2 ], 
-														  colour_attr[ i * 4 + 3 ] );
+					{
+						float alpha =
+							colour_attr_info.tupleSize == 4
+								? colour_attr[ i * colour_attr_info.tupleSize + 3 ]
+								: 1.0f;
+						particles[ i ].color = new Color( colour_attr[ i * colour_attr_info.tupleSize + 0 ], 
+														  colour_attr[ i * colour_attr_info.tupleSize + 1 ], 
+														  colour_attr[ i * colour_attr_info.tupleSize + 2 ], 
+														  alpha );
+					}
 				}
 
 				particle_emitter.particles = particles;
