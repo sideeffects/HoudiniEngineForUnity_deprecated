@@ -165,7 +165,7 @@ namespace HAPI
 		
 		// Helpers
 		
-		HAPI_PRMTYPE_MAX, // Total number of supported parameter types.
+		HAPI_PARMTYPE_MAX, // Total number of supported parameter types.
 		
 		HAPI_PARMTYPE_INT_START			= HAPI_PARMTYPE_INT,
 		HAPI_PARMTYPE_INT_END			= HAPI_PARMTYPE_BUTTON,
