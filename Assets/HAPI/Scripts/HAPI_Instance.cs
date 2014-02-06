@@ -25,7 +25,7 @@ using HAPI;
 [ ExecuteInEditMode ]
 public class HAPI_Instance: MonoBehaviour
 {	
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
@@ -84,5 +84,5 @@ public class HAPI_Instance: MonoBehaviour
 	[SerializeField] private bool			myTransformChanged;
 	[SerializeField] private HAPI_Instancer myInstancer;
 	
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

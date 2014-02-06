@@ -25,7 +25,7 @@ using HAPI;
 [ExecuteInEditMode]
 public class ExampleScript : MonoBehaviour 
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	public int parmIndex;
 	public string[] parmNames;
 
@@ -36,42 +36,47 @@ public class ExampleScript : MonoBehaviour
 	[SerializeField] private int[] parmIntValue;
 	[SerializeField] private float[] parmFloatValue;
 	[SerializeField] private string[] parmStringValue;
+	[SerializeField] private float seed;
 	
 	ExampleScript()
 	{
-		Debug.Log( "ExampleScript: CONSTRUCTOR" );
+		//Debug.Log( "ExampleScript: CONSTRUCTOR" );
+#if UNITY_EDITOR
 		EditorApplication.playmodeStateChanged += playmodeStateChanged;
+#endif // UNITY_EDITOR
 	}
 	
 	~ExampleScript()
 	{
-		Debug.Log( "ExampleScript: DESTRUCTOR" );
+		//Debug.Log( "ExampleScript: DESTRUCTOR" );
+#if UNITY_EDITOR
 		EditorApplication.playmodeStateChanged -= playmodeStateChanged;
+#endif // UNITY_EDITOR
 	}
 	
 	public void playmodeStateChanged()
 	{
-		Debug.Log( "ExampleScript: playmodeStateChanged - " + EditorApplication.isPlayingOrWillChangePlaymode );
+		//Debug.Log( "ExampleScript: playmodeStateChanged - " + EditorApplication.isPlayingOrWillChangePlaymode );
 	}
 
 	public void OnApplicationQuit()
 	{
-		Debug.Log( "ExampleScript: OnApplicationQuit" );
+		//Debug.Log( "ExampleScript: OnApplicationQuit" );
 	}
 
 	public void Reset()
 	{
-		Debug.Log( "ExampleScript: Reset" );
+		//Debug.Log( "ExampleScript: Reset" );
 	}
 
 	public void Awake()
 	{
-		Debug.Log( "ExampleScript: Awake" );
+		//Debug.Log( "ExampleScript: Awake" );
 	}
 	
 	public void Start() 
 	{
-		Debug.Log( "ExampleScript: Start" );
+		//Debug.Log( "ExampleScript: Start" );
 
 		parmIndex = 0;
 		parmNames = null;
@@ -98,16 +103,35 @@ public class ExampleScript : MonoBehaviour
 	public void Update() 
 	{
 		//Debug.Log( "ExampleScript: Update" );
+
+		// Example that works with the Sidefx Spaceship and will change the
+		// random seed that randomizes the spaceship parameters by using
+		// the up and down arrow keys.
+		try
+		{
+			if ( Input.GetKey( "up" ) )
+			{
+				seed += 0.01f;
+				asset.setParmFloatValue( "seed", 0, seed );
+			}
+
+			if ( Input.GetKey( "down" ) )
+			{
+				seed -= 0.01f;
+				asset.setParmFloatValue( "seed", 0, seed );
+			}
+		}
+		catch {}
 	}
 	
 	public void OnEnable()
 	{
-		Debug.Log( "ExampleScript: OnEnable" );
+		//Debug.Log( "ExampleScript: OnEnable" );
 	}
 	
 	public void OnDisable()
 	{
-		Debug.Log( "ExampleScript: OnDisable" );
+		//Debug.Log( "ExampleScript: OnDisable" );
 	}
 	
 	public void OnScene()
@@ -190,6 +214,9 @@ public class ExampleScript : MonoBehaviour
 	// Set up the UI for the currently selected parameter
 	public void GetParameterGUI()
 	{
+		// TODO: Move this to the companion Editor class!
+
+#if UNITY_EDITOR
 		try
 		{
 			for ( int i = 0; i < parmSize; i++ )
@@ -206,6 +233,7 @@ public class ExampleScript : MonoBehaviour
 		{
 			Debug.LogError( err.ToString() );
 		}
-	}
 #endif // UNITY_EDITOR
+	}
+#endif // UNITY_STANDALONE_WIN
 }

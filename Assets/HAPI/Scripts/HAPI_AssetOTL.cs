@@ -29,7 +29,7 @@ using Utility = HAPI_AssetUtility;
 [ ExecuteInEditMode ]
 public class HAPI_AssetOTL : HAPI_Asset 
 {	
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -91,7 +91,11 @@ public class HAPI_AssetOTL : HAPI_Asset
 	{
 		base.Update();
 
-		if ( EditorApplication.isPlaying && prPlaymodePerFrameCooking )
+		if (
+#if UNITY_EDITOR
+			EditorApplication.isPlaying &&
+#endif // UNITY_EDITOR
+			prPlaymodePerFrameCooking )
 		{
 			HAPI_Host.setTime( Time.time );
 			buildClientSide();
@@ -152,15 +156,17 @@ public class HAPI_AssetOTL : HAPI_Asset
 		{
 			progress_bar.incrementProgressBar();
 			HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
-					
+
+#if UNITY_EDITOR
 			if ( handle_info.typeName != "xform" && HAPI_Host.prEnableSupportWarnings )
 				Debug.LogWarning( "Handle " + handle_info.name + " of type " 
 								   	+ handle_info.typeName + " is unsupported at this time." );
-					
+#endif // UNITY_EDITOR
+
 			HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
 			Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
 								 	binding_infos, handle_info.bindingsCount );
-					
+
 			prHandleBindingInfos.Add( binding_infos );
 		}
 	}
@@ -294,6 +300,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	[SerializeField] private string					myAssetPath;
 	[SerializeField] private HAPI_AssetOTLUndoInfo	myAssetOTLUndoInfo;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 	
 }

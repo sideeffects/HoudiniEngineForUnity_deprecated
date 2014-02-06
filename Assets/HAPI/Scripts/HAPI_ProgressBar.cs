@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using HAPI;
 
 public class HAPI_ProgressBar  {
-#if UNITY_EDITOR	
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -51,6 +51,7 @@ public class HAPI_ProgressBar  {
 	
 	public void statusCheckLoop()
 	{
+#if UNITY_EDITOR
 		HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 		prCurrentValue = 0;
 		prTotal = 100;
@@ -99,6 +100,7 @@ public class HAPI_ProgressBar  {
 			state = HAPI_State.HAPI_STATE_READY;
 			HAPI_Host.throwRuntimeError();
 		}
+#endif // UNITY_EDITOR
 	}
 	
 	public void displayProgressBar()
@@ -120,11 +122,14 @@ public class HAPI_ProgressBar  {
 	public void clearProgressBar()
 	{		
 		prCurrentValue = 0;
+#if UNITY_EDITOR
 		EditorUtility.ClearProgressBar();
+#endif // UNITY_EDITOR
 	}
 
 	protected void displayProgressBar( int value )
 	{
+#if UNITY_EDITOR
 		System.DateTime current = System.DateTime.Now;
 		System.TimeSpan delta = current - prStartTime;
 		
@@ -179,10 +184,11 @@ public class HAPI_ProgressBar  {
 			myLastMsg = prMessage;
 			prCurrentDuration = delta;
 		}
+#endif // UNITY_EDITOR
 	}
 	
 	// Used to reduce the update frequency of the progress bar so it doesn't flicker.
 	private int					myLastValue;
 	private string				myLastMsg;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

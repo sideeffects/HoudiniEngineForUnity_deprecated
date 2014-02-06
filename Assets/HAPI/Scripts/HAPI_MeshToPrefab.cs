@@ -8,12 +8,12 @@ using System.Collections.Generic;
 using HAPI;
 
 public class HAPI_MeshToPrefab : MonoBehaviour {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	public GameObject prGameObject { get; set; }	
+	public GameObject prGameObject { get; set; }
 	public string prMeshName { get; set; }
 	public string prPathToPrefab { get; set; }
 		
@@ -25,11 +25,10 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 		prGameObject = null;
 		prPathToPrefab = "Assets/";
 	}
-		
-	// TODO: why doesn't the context menu show up???
-	[ ContextMenu ( "Save To Prefab" ) ]
+
 	public void SaveToPrefab() 
 	{
+#if UNITY_EDITOR
 		if( prPathToPrefab == "" )
 		{
 			Debug.LogError("Please specify a valid path to the prefab");
@@ -110,6 +109,7 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	    // get rid of the temporary object (otherwise it stays over in scene)
 	    Object.DestroyImmediate(template);
 	    */
+#endif // UNITY_EDITOR
 	}
 	
 	
@@ -124,5 +124,5 @@ public class HAPI_MeshToPrefab : MonoBehaviour {
 	// Private Members
 	
 	
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

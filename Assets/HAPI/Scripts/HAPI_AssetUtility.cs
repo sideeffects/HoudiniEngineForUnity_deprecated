@@ -26,7 +26,7 @@ using HAPI;
 
 public class HAPI_AssetUtility
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	// TRANSFORMS ------------------------------------------------------------------------------------------------------
 
 	public static Quaternion getQuaternion( Matrix4x4 m )
@@ -757,8 +757,12 @@ public class HAPI_AssetUtility
 							   part_control.prPartId, out part_info );
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
-		if ( ( !part_control.prPartName.Contains( HAPI_Host.prCollisionGroupName ) || 
-			part_control.prPartName.Contains( HAPI_Host.prRenderedCollisionGroupName ) ) && is_mesh )
+		if ( is_mesh
+#if UNITY_EDITOR
+			&& ( !part_control.prPartName.Contains( HAPI_Host.prCollisionGroupName ) || 
+			part_control.prPartName.Contains( HAPI_Host.prRenderedCollisionGroupName ) )
+#endif // UNITY_EDITOR
+			)
 		{
 			part_control.prMaterialId = part_info.materialId;
 		
@@ -801,8 +805,10 @@ public class HAPI_AssetUtility
 							// modifications are saved before assignHoudiniMaterial is called because ImportAsset may 
 							// be called within this function which will cause OnEnable to be called on all prefab 
 							// instances if the prefab is dirty
+#if UNITY_EDITOR
 							if ( asset.isPrefabInstance() )
 								PrefabUtility.RecordPrefabInstancePropertyModifications( asset );
+#endif // UNITY_EDITOR
 
 							Material material = mesh_renderer.sharedMaterial;
 							string folder_path = HAPI_Constants.HAPI_TEXTURES_PATH + "/" + 
@@ -822,7 +828,9 @@ public class HAPI_AssetUtility
 		Texture2D result = null;
 		try
 		{
+#if UNITY_EDITOR
 			if ( HAPI_Host.prDontCreateTextureFiles )
+#endif // UNITY_EDITOR
 			{
 				if ( HAPI_Host.prExtractTexturesInRawFormat )
 				{
@@ -880,6 +888,7 @@ public class HAPI_AssetUtility
 					result = tex;
 				}
 			}
+#if UNITY_EDITOR
 			else // Figure out the source file path and name.
 			{
 				// Navigate to the Assets/Textures directory and create it if it doesn't exist.
@@ -913,6 +922,7 @@ public class HAPI_AssetUtility
 				// Assign main texture.
 				result = (Texture2D) tex_obj;
 			}
+#endif // UNITY_EDITOR
 		}
 		catch ( HAPI_Error )
 		{
@@ -1027,16 +1037,18 @@ public class HAPI_AssetUtility
 		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Host.prUnitySubMaterialIndexAttribName, 
 					  ref sub_material_index_attr_info, ref sub_material_index_attr, HAPI_Host.getAttributeIntData );
 
-		bool has_sub_material_name		= sub_material_name_attr_info.exists && 
-										  HAPI_Host.getString( sub_material_name_attr[ 0 ] ) != "";
-		bool has_sub_material_index		= sub_material_index_attr_info.exists;
-
 		if ( material_attr_info.exists )
 		{
+			Material material			= (Material) Resources.Load( material_path, typeof( Material ) );
+
+#if UNITY_EDITOR
+			bool has_sub_material_name		= sub_material_name_attr_info.exists && 
+											  HAPI_Host.getString( sub_material_name_attr[ 0 ] ) != "";
+			bool has_sub_material_index		= sub_material_index_attr_info.exists;
+
 			string sub_material_name	= has_sub_material_name ? HAPI_Host.getString( sub_material_name_attr[ 0 ] ) 
 																: "";
 			int sub_material_index		= has_sub_material_index ? sub_material_index_attr[ 0 ] : 0;
-			Material material			= (Material) Resources.Load( material_path, typeof( Material ) );
 
 			if ( material == null )
 			{
@@ -1044,7 +1056,7 @@ public class HAPI_AssetUtility
 				AssetDatabase.ImportAsset( material_path, ImportAssetOptions.Default );
 				material = (Material) AssetDatabase.LoadAssetAtPath( material_path, typeof( Material ) );
 			}
-			
+
 			if ( material != null && ( has_sub_material_name || has_sub_material_index ) )
 			{
 				// Try Substance materials.
@@ -1073,6 +1085,7 @@ public class HAPI_AssetUtility
 					Debug.LogWarning( "sub_material_index (" + sub_material_index + ") out of range for " +
 									  "material: " + abs_path );
 			}
+#endif // UNITY_EDITOR
 
 			mesh_renderer.sharedMaterial = material;
 
@@ -1638,5 +1651,5 @@ public class HAPI_AssetUtility
 						
 		}
 	}
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

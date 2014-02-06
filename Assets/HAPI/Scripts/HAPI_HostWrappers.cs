@@ -41,7 +41,7 @@ namespace HAPI
 	/// </summary>
 	public static partial class HAPI_Host
 	{
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 		// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 
 		/// <summary>
@@ -2081,6 +2081,6 @@ namespace HAPI
 			return knots;
 		}
 
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 	}
 }

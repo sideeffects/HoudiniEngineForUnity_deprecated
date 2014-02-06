@@ -22,7 +22,7 @@ using HAPI;
 [Serializable]
 public class HAPI_AssetAccessor
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	public enum ParmType
 	{
 		INVALID = -1,
@@ -196,6 +196,6 @@ public class HAPI_AssetAccessor
 
 	[SerializeField] private HAPI_Asset myAsset;
 	[SerializeField] private HAPI_Parms myAssetParms;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }
 

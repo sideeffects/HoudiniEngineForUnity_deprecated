@@ -32,7 +32,7 @@ using HAPI_NodeId = System.Int32;
 [ RequireComponent( typeof( HAPI_Parms ) ) ]
 public class HAPI_Curve : MonoBehaviour
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
 	
@@ -83,19 +83,25 @@ public class HAPI_Curve : MonoBehaviour
 	
 	public HAPI_Curve() 
 	{
+#if UNITY_EDITOR
 		EditorApplication.playmodeStateChanged += playmodeStateChanged;
+#endif // UNITY_EDITOR
 		reset();
 	}
 	
 	~HAPI_Curve()
 	{
+#if UNITY_EDITOR
 		EditorApplication.playmodeStateChanged -= playmodeStateChanged;
+#endif // UNITY_EDITOR
 	}
 
 	public void addPoint( Vector3 pos )
 	{
+#if UNITY_EDITOR
 		// record undo info
 		Undo.RecordObject( prParms.prParmsUndoInfo, "Add Point" );
+#endif // UNITY_EDITOR
 
 		prPoints.Add( pos );
 		updatePoints();
@@ -103,8 +109,10 @@ public class HAPI_Curve : MonoBehaviour
 
 	public void insertPoint( int index, Vector3 pos )
 	{
+#if UNITY_EDITOR
 		// record undo info
 		Undo.RecordObject( prParms.prParmsUndoInfo, "Insert Point" );
+#endif // UNITY_EDITOR
 
 		prPoints.Insert( index, pos );
 		updatePoints();
@@ -112,8 +120,10 @@ public class HAPI_Curve : MonoBehaviour
 
 	public void deletePoint( int index )
 	{
+#if UNITY_EDITOR
 		// record undo info
 		Undo.RecordObject( prParms.prParmsUndoInfo, "Delete Point" );
+#endif // UNITY_EDITOR
 
 		prPoints.RemoveAt( index );
 		updatePoints();
@@ -121,8 +131,10 @@ public class HAPI_Curve : MonoBehaviour
 
 	public void deleteLastPoint()
 	{
+#if UNITY_EDITOR
 		// record undo info
 		Undo.RecordObject( prParms.prParmsUndoInfo, "Delete Last Point" );
+#endif // UNITY_EDITOR
 
 		prPoints.RemoveAt( prPoints.Count - 1 );
 		updatePoints();
@@ -130,8 +142,10 @@ public class HAPI_Curve : MonoBehaviour
 
 	public void deletePoints( int[] indicies )
 	{
+#if UNITY_EDITOR
 		// record undo info
 		Undo.RecordObject( prParms.prParmsUndoInfo, "Delete Point(s)" );
+#endif // UNITY_EDITOR
 
 		List< Vector3 > new_points = new List< Vector3 >( prPoints.Count - indicies.Length );
 		List< bool > point_status = new List< bool >( prPoints.Count );
@@ -151,8 +165,10 @@ public class HAPI_Curve : MonoBehaviour
 	
 	public void updatePoint( int index, Vector3 pos )
 	{
+#if UNITY_EDITOR
 		// record undo info
 		Undo.RecordObject( prParms.prParmsUndoInfo, "Move Point" );
+#endif // UNITY_EDITOR
 
 		prPoints[ index ] = pos;
 		
@@ -320,7 +336,9 @@ public class HAPI_Curve : MonoBehaviour
 			// Create guide and selection meshes.
 			buildDummyMesh();
 
+#if UNITY_EDITOR
 			AssetDatabase.Refresh();
+#endif // UNITY_EDITOR
 		}
 		catch ( HAPI_Error error )
 		{
@@ -397,6 +415,7 @@ public class HAPI_Curve : MonoBehaviour
 		// causes other bound functions in this callback list to never be called, leading to
 		// bug: #56253.
 		
+#if UNITY_EDITOR
 		try
 		{	
 			if ( gameObject != null )
@@ -418,6 +437,7 @@ public class HAPI_Curve : MonoBehaviour
 		{
 			Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 		}
+#endif // UNITY_EDITOR
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -433,6 +453,6 @@ public class HAPI_Curve : MonoBehaviour
 
 	[SerializeField] private Mode				myCurrentMode;
 	[SerializeField] private bool				myModeChangeWait;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 
 }

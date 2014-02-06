@@ -19,7 +19,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class HAPI_GeoAttributeManager : ScriptableObject {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
 	
@@ -294,5 +294,5 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	[SerializeField] private HAPI_GeoAttribute myActiveAttribute;
 	[SerializeField] private List< HAPI_GeoAttribute > myAttributes;
 
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

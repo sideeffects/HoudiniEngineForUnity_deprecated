@@ -22,7 +22,7 @@ using HAPI;
 
 public class HAPI_ObjectControl : HAPI_Control 
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -254,5 +254,5 @@ public class HAPI_ObjectControl : HAPI_Control
 	[SerializeField] private List< GameObject > myGeos;
 	
 	private HAPI_CurvesCollection myCurveCollection = null;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

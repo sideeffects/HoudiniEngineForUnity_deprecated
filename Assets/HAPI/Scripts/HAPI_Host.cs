@@ -113,7 +113,7 @@ namespace HAPI
 #endif // UNITY_EDITOR
 	public static partial class HAPI_Host
 	{
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 		// Global Settings Defaults ---------------------------------------------------------------------------------
 
 		private const string myDefaultCollisionGroupName					= "collision_geo";
@@ -187,8 +187,10 @@ namespace HAPI
 				return;
 #endif
 
+#if UNITY_EDITOR
 			EditorApplication.update				+= update;
 			EditorApplication.playmodeStateChanged	+= playmodeStateChanged;
+#endif // UNITY_EDITOR
 
 			if ( !isRuntimeInitialized() )
 			{
@@ -199,7 +201,7 @@ namespace HAPI
 			}
 
 			// Preferences
-			
+
 			setString(	"HAPI_CollisionGroupName", myDefaultCollisionGroupName, true );
 			setString(	"HAPI_RenderedCollisionGroupName", myDefaultRenderedCollisionGroupName, true );
 
@@ -748,7 +750,11 @@ namespace HAPI
 
 		public static bool isRealDestroy()
 		{
+#if UNITY_EDITOR
 			return !EditorApplication.isPlayingOrWillChangePlaymode && !prMidPlaymodeStateChange;
+#else
+			return true;
+#endif // UNITY_EDITOR
 		}
 
 		public static bool initialize()
@@ -877,9 +883,9 @@ namespace HAPI
 
 		private static void update()
 		{
+#if UNITY_EDITOR
 			//EditorWindow window = EditorWindow.GetWindow< EditorWindow >( false, null );
 			//window.Repaint();
-
 
 			// We need to catch any exceptions here because if we let any out they will stall
 			// the entire callback chain bound to EditorApplication.update which
@@ -897,10 +903,12 @@ namespace HAPI
 			{
 				Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 			}
+#endif // UNITY_EDITOR
 		}
 
 		private static void playmodeStateChanged()
 		{
+#if UNITY_EDITOR
 			// We need to catch any exceptions here because if we let any out they will stall
 			// the entire callback chain bound to EditorApplication.playmodeStateChanged which
 			// causes other bound functions in this callback list to never be called.
@@ -914,7 +922,7 @@ namespace HAPI
 				// serialization recovery will occur for the parameters
 				if ( prMidPlaymodeStateChange )
 				{
-					foreach( string asset_path in AssetDatabase.GetAllAssetPaths() )
+					foreach ( string asset_path in AssetDatabase.GetAllAssetPaths() )
 					{
 						if ( asset_path.EndsWith( ".prefab" ) )
 						{
@@ -939,6 +947,7 @@ namespace HAPI
 			{
 				Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 			}
+#endif // UNITY_EDITOR
 		}
 
 		private static string getAllFoldersInPath( string path )
@@ -969,7 +978,11 @@ namespace HAPI
 
 		private static int getInt( string name )
 		{
+#if UNITY_EDITOR
 			return EditorPrefs.GetInt( name );
+#else
+			return PlayerPrefs.GetInt( name );
+#endif // UNITY_EDITOR
 		}
 		private static void setInt( string name, int value )
 		{
@@ -977,13 +990,25 @@ namespace HAPI
 		}
 		private static void setInt( string name, int value, bool only_if_new )
 		{
+#if UNITY_EDITOR
 			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
+			{
 				EditorPrefs.SetInt( name, value );
+				PlayerPrefs.SetInt( name, value );
+			}
+#else
+			if ( !only_if_new || !PlayerPrefs.HasKey( name ) )
+				PlayerPrefs.SetInt( name, value );
+#endif // UNITY_EDITOR
 		}
 
 		private static bool getBool( string name )
 		{
+#if UNITY_EDITOR
 			return EditorPrefs.GetInt( name ) == 0 ? false : true;
+#else
+			return PlayerPrefs.GetInt( name ) == 0 ? false : true;
+#endif // UNITY_EDITOR
 		}
 		private static void setBool( string name, bool value )
 		{
@@ -991,13 +1016,25 @@ namespace HAPI
 		}
 		private static void setBool( string name, bool value, bool only_if_new )
 		{
+#if UNITY_EDITOR
 			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
+			{
 				EditorPrefs.SetInt( name, value ? 1 : 0 );
+				PlayerPrefs.SetInt( name, value ? 1 : 0 );
+			}
+#else
+			if ( !only_if_new || !PlayerPrefs.HasKey( name ) )
+				PlayerPrefs.SetInt( name, value ? 1 : 0 );
+#endif // UNITY_EDITOR
 		}
 
 		private static float getFloat( string name )
 		{
+#if UNITY_EDITOR
 			return EditorPrefs.GetFloat( name );
+#else
+			return PlayerPrefs.GetFloat( name );
+#endif // UNITY_EDITOR
 		}
 		private static void setFloat( string name, float value )
 		{
@@ -1005,13 +1042,25 @@ namespace HAPI
 		}
 		private static void setFloat( string name, float value, bool only_if_new )
 		{
+#if UNITY_EDITOR
 			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
+			{
 				EditorPrefs.SetFloat( name, value );
+				PlayerPrefs.SetFloat( name, value );
+			}
+#else
+			if ( !only_if_new || !PlayerPrefs.HasKey( name ) )
+				PlayerPrefs.SetFloat( name, value );
+#endif // UNITY_EDITOR
 		}
 
 		private static string getString( string name )
 		{
+#if UNITY_EDITOR
 			return EditorPrefs.GetString( name );
+#else
+			return PlayerPrefs.GetString( name );
+#endif // UNITY_EDITOR
 		}
 		private static void setString( string name, string value )
 		{
@@ -1019,13 +1068,21 @@ namespace HAPI
 		}
 		private static void setString( string name, string value, bool only_if_new )
 		{
+#if UNITY_EDITOR
 			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
+			{
 				EditorPrefs.SetString( name, value );
+				PlayerPrefs.SetString( name, value );
+			}
+#else
+			if ( !only_if_new || !PlayerPrefs.HasKey( name ) )
+				PlayerPrefs.SetString( name, value );
+#endif // UNITY_EDITOR
 		}
 
 		private static KeyCode getKeyCode( string name )
 		{
-			return (KeyCode) EditorPrefs.GetInt( name );
+			return (KeyCode) getInt( name );
 		}
 		private static void setKeyCode( string name, KeyCode value )
 		{
@@ -1033,8 +1090,7 @@ namespace HAPI
 		}
 		private static void setKeyCode( string name, KeyCode value, bool only_if_new )
 		{
-			if ( !only_if_new || !EditorPrefs.HasKey( name ) )
-				EditorPrefs.SetInt( name, (int) value );
+			setInt( name, (int) value, only_if_new );
 		}
 
 		private static Color getColour( string name )
@@ -1048,17 +1104,13 @@ namespace HAPI
 		}
 		private static void setColour( string name, Color value, bool only_if_new )
 		{
-			if ( !only_if_new || 
-					!( EditorPrefs.HasKey( name + "_r" ) || EditorPrefs.HasKey( name + "_g" ) ||
-					   EditorPrefs.HasKey( name + "_b" ) || EditorPrefs.HasKey( name + "_a" ) ) )
-			{
-				setFloat( name + "_r", value.r );
-				setFloat( name + "_g", value.g );
-				setFloat( name + "_b", value.b );
-				setFloat( name + "_a", value.a );
-			}
+			setFloat( name + "_r", value.r, only_if_new );
+			setFloat( name + "_g", value.g, only_if_new );
+			setFloat( name + "_b", value.b, only_if_new );
+			setFloat( name + "_a", value.a, only_if_new );
 		}
-#endif // UNITY_EDITOR
+
+#endif // UNITY_STANDALONE_WIN
 	}
 
 } // namespace HAPI

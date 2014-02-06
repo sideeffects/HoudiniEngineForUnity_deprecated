@@ -28,7 +28,7 @@ using HAPI_NodeId = System.Int32;
 [ ExecuteInEditMode ]
 public class HAPI_PartControl : HAPI_GeoControl 
 {	
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
@@ -75,12 +75,14 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 	public void selectParent()
 	{
+#if UNITY_EDITOR
 		if ( prAsset != null && prAsset.prAutoSelectAssetRootNode && HAPI_Host.prAutoSelectAssetRootNode )
 		{
 			GameObject[] selection 	= new GameObject[ 1 ];
 			selection[ 0 ] 			= prAsset.gameObject;
 			Selection.objects 		= selection;
 		}
+#endif // UNITY_EDITOR
 	}
 
 	public void init( HAPI_PartControl part_control )
@@ -469,5 +471,5 @@ public class HAPI_PartControl : HAPI_GeoControl
 	[SerializeField] private bool			myShowPointNumbers;
 
 	[SerializeField] private HAPI_GeoControl myGeoControl;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

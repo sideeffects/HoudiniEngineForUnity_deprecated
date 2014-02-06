@@ -392,7 +392,7 @@ namespace HAPI
 	// Main API Structs
 	
 	// GENERICS -----------------------------------------------------------------------------------------------------
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_Transform 
 	{
@@ -1012,5 +1012,5 @@ namespace HAPI
 		public bool hasKnots;
 	};
 
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

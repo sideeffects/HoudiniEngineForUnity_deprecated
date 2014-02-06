@@ -29,7 +29,7 @@ using Utility = HAPI_AssetUtility;
 [ ExecuteInEditMode ]
 public abstract class HAPI_Asset : HAPI_Control
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	public enum AssetType
 	{
 		TYPE_OTL = 0,
@@ -294,7 +294,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	}
 
 	// Transform related connection methods -------------------------------------------------------
-	
+
 	public void addAssetAsTransformInput( HAPI_Asset asset, int index )
 	{
 		if ( prUpStreamTransformAssets[ index ] == asset )
@@ -389,7 +389,8 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		HAPI_Host.setFileInput( prAssetId, index, path );
 	}
-	
+
+#if UNITY_EDITOR
 	protected void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponent transform_component )
 	{
 		HAPI_Keyframe[] keys = new HAPI_Keyframe[ curve.length ];
@@ -415,7 +416,6 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		HAPI_Host.setTransformAnimCurve( node_id, transform_component, keys, curve.length );
 	}
-	
 	protected void marshalRotation( int node_id, AnimationClipCurveData[] curve_datas )
 	{
 		AnimationCurve qx = null, qy = null, qz = null, qw = null;
@@ -463,9 +463,11 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 		}
 	}
-	
+#endif // UNITY_EDITOR
+
 	protected void marshalCurvesFromClip( int node_id, AnimationClip clip )
 	{
+#if UNITY_EDITOR
 		#pragma warning disable 0618
 		AnimationClipCurveData[] curve_datas = AnimationUtility.GetAllCurves( clip );
 		#pragma warning restore 0618
@@ -487,6 +489,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		
 		marshalRotation( node_id, curve_datas );
+#endif // UNITY_EDITOR
 	}
 
 	public void removeGeoInput( int index )
@@ -525,12 +528,12 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		prDownStreamGeoAssets.Add( asset );
 	}
-	
+
 	public virtual void OnDestroy()
 	{
 
 		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() 
-#if UNITY_4_3
+#if UNITY_EDITOR && UNITY_4_3
 			&& !BuildPipeline.isBuildingPlayer
 #endif // UNITY_4_3
 			)
@@ -575,6 +578,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public bool isInstantiatingPrefab()
 	{
+#if UNITY_EDITOR
 		if ( isPrefabInstance() && prBackupAssetId < 0 )
 		{
 			HAPI_Asset prefab_asset = getParentPrefabAsset();
@@ -583,14 +587,19 @@ public abstract class HAPI_Asset : HAPI_Control
 				return prAssetId == prefab_asset.prAssetId;
 			}
 		}
-		return false;		 
+#endif // UNITY_EDITOR
+		return false;
 	}
 	
 	public bool isApplyingChangesToPrefab()
 	{
+#if UNITY_EDITOR
 		return ( isPrefab() && 
 			     prAssetId != prBackupAssetId && 
 				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) );
+#else
+		return false;
+#endif // UNITY_EDITOR
 	}
 
 	public bool isDuplicatingAsset()
@@ -609,18 +618,21 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void OnEnable()
 	{
-#if UNITY_4_3		
+#if UNITY_EDITOR && UNITY_4_3
 		if ( BuildPipeline.isBuildingPlayer )
 			return;
-#endif
+#endif // UNITY_EDITOR && UNITY_4_3
+
 		// If this is being called because changes are being applied
 		// to the prefab of this instance do nothing
+#if UNITY_EDITOR
 		if ( isPrefabInstance() )
 		{
 			HAPI_Asset prefab_asset = getParentPrefabAsset();
 			if ( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
 				return;
 		}
+#endif // UNITY_EDITOR
 
 		// If this asset is a prefab instance that is being reverted 
 		// reload the asset in order to restore it's asset id and 
@@ -797,8 +809,10 @@ public abstract class HAPI_Asset : HAPI_Control
 			{
 				progress_bar.clearProgressBar();
 			}
-			
+
+#if UNITY_EDITOR
 			EditorUtility.SetDirty( this );
+#endif // UNITY_EDITOR
 		}
 		else
 		{
@@ -814,8 +828,10 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		// To keep things consistent with Unity workflow, we should not save parameter changes
 		// while in Play mode.
+#if UNITY_EDITOR
 		if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
 			savePreset();
+#endif // UNITY_EDITOR
 	}
 
 	public virtual bool buildAll()
@@ -952,8 +968,12 @@ public abstract class HAPI_Asset : HAPI_Control
 					reset();
 
 					// If in play mode, disable live cooks.
+#if UNITY_EDITOR
 					if ( EditorApplication.isPlaying )
+#endif // UNITY_EDITOR
+					{
 						prPlaymodePerFrameCooking = false;
+					}
 					
 					return false; // false for failed :(
 				}
@@ -982,12 +1002,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			prMinGeoInputCount 			= prAssetInfo.minGeoInputCount;
 			prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
 
+#if UNITY_EDITOR
 			if ( isPrefab() )
 			{
 				string prefab_path = AssetDatabase.GetAssetPath( GetInstanceID() );
 				HAPI_Host.myCleanUpPrefabAssets[ prefab_path ] = prAssetId;
 			}
-				
+#endif // UNITY_EDITOR
+
 			// Try to load presets.
 			if ( ( reload_asset && ( unload_asset_first || is_reverting_prefab_instance ) ) || serialization_recovery_only )
 			{
@@ -1086,8 +1108,10 @@ public abstract class HAPI_Asset : HAPI_Control
 
 			// This tells Unity that values have been overridden for this prefab instance 
 			// (eg. asset id, validation id, node id, etc). 
+#if UNITY_EDITOR
 			if ( isPrefabInstance() )
 				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
+#endif // UNITY_EDITOR
 
 			// A bit of a hack (but not terrible). If we have presets for other child controls
 			// they set their presets by now so we need to rebuild with the new presets.
@@ -1098,8 +1122,12 @@ public abstract class HAPI_Asset : HAPI_Control
 		catch ( HAPI_ErrorProgressCancelled error )
 		{
 			// If in play mode, disable live cooks.
+#if UNITY_EDITOR
 			if ( EditorApplication.isPlaying )
+#endif // UNITY_EDITOR
+			{
 				prPlaymodePerFrameCooking = false;
+			}
 
 			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
@@ -1130,6 +1158,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	public void updateParameters( HAPI_ProgressBar progress_bar )
 	{
 		// Update prefab instance after parameter change on prefab if needed
+#if UNITY_EDITOR
 		if ( isPrefabInstance() && prUpdatePrefabInstanceParmNames.Count > 0 )
 		{
 			HAPI_Asset prefab_asset = getParentPrefabAsset();
@@ -1181,6 +1210,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				prefab_asset.prUpdatePrefabInstanceParmNames.Clear();
 			}
 		}
+#endif // UNITY_EDITOR
 
 		prParms.setChangedParametersIntoHost();
 
@@ -1196,7 +1226,11 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void Update()
 	{
-		if ( !prPushUnityTransformToHoudini || prAssetId < 0 || EditorApplication.isPlayingOrWillChangePlaymode )
+		if ( !prPushUnityTransformToHoudini || prAssetId < 0
+#if UNITY_EDITOR
+			|| EditorApplication.isPlayingOrWillChangePlaymode
+#endif // UNITY_EDITOR
+			)
 			return;
 
 		try
@@ -1232,6 +1266,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public void bakeAsset()
 	{
+#if UNITY_EDITOR
 		// Get/Create directory for the asset being baked.
 		string baked_asset_path = HAPI_Constants.HAPI_BAKED_ASSETS_PATH + "/" + prAssetName;
 
@@ -1383,6 +1418,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		// Destroy object we created because we don't need it anymore.
 		DestroyImmediate( new_object );
+#endif // UNITY_EDITOR
 	}
 	
 	public void bakeAnimations( float start_time, 
@@ -1391,6 +1427,7 @@ public abstract class HAPI_Asset : HAPI_Control
 								GameObject parent_object,
 								HAPI_ProgressBar progress_bar )
 	{
+#if UNITY_EDITOR
 		try
 		{
 			//This build is needed in case the user changed a geometry input to the asset.  
@@ -1506,7 +1543,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			Debug.LogWarning( error.ToString() );
 		}
-		
+#endif // UNITY_EDITOR
 	}
 
 	public void loadPreset()
@@ -1531,6 +1568,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public void savePreset()
 	{
+#if UNITY_EDITOR
 		try
 		{
 			myPreset = HAPI_Host.getPreset( prNodeId );
@@ -1541,13 +1579,15 @@ public abstract class HAPI_Asset : HAPI_Control
 				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 		}
 		catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
+#endif // UNITY_EDITOR
 	}
 
 	public bool isAssetValid()
 	{
 		return HAPI_Host.isAssetValid( prAssetId, prAssetInfo.validationId );
 	}
-	
+
+#if UNITY_EDITOR
 	public HAPI_Asset getParentPrefabAsset()
 	{
 		GameObject prefab = PrefabUtility.GetPrefabParent( gameObject ) as GameObject;
@@ -1557,6 +1597,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		return null;
 	}
+#endif // UNITY_EDITOR
 
 	public void applyGeoVisibilityToParts()
 	{
@@ -1692,6 +1733,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	protected void processParentPrefab()
 	{
+#if UNITY_EDITOR
 		HAPI_Asset prefab_asset = getParentPrefabAsset();
 		if ( prefab_asset )
 		{
@@ -1722,6 +1764,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				                  );
 			}
 		}
+#endif // UNITY_EDITOR
 	}
 
 	protected virtual void processDependentAssets( bool serialization_recovery_only, bool force_reconnect, 
@@ -1933,5 +1976,5 @@ public abstract class HAPI_Asset : HAPI_Control
 	private int myBackupAssetValidationId;
 	private bool myReloadPrefabOnPlaymodeChange;
 	[SerializeField] private List< string > myUpdatePrefabInstanceParmNames;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

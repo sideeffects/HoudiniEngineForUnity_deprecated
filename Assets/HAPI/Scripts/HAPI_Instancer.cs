@@ -110,7 +110,7 @@ public class HAPI_CurvesCollection
 
 public class HAPI_Instancer : MonoBehaviour 
 {
-#if UNITY_EDITOR	
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -200,11 +200,73 @@ public class HAPI_Instancer : MonoBehaviour
 			return;
 		}
 		
-		GameObject obj;
+		GameObject obj = null;
 
-		GameObject user_instance = prPersistentData.getUserObjToInstantiateFromName( objToInstantiate.name, 
-		                                                                             point_index );
-		if ( user_instance == null )
+#if UNITY_EDITOR
+		GameObject user_instance =
+			prPersistentData.getUserObjToInstantiateFromName( objToInstantiate.name, point_index );
+
+		if ( user_instance != null )
+		{
+			obj = PrefabUtility.InstantiatePrefab( user_instance ) as GameObject;
+			if ( obj == null )
+			{
+				bool liveTransformPropagationSetting	= false;
+				bool syncAssetTransformSetting			= false;
+				bool enableCooking						= true;
+				
+				HAPI_Asset hapi_asset = user_instance.GetComponent< HAPI_Asset >();
+				if ( hapi_asset != null )
+				{
+					liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
+					syncAssetTransformSetting				= hapi_asset.prPushUnityTransformToHoudini;
+					enableCooking							= hapi_asset.prEnableCooking;
+					hapi_asset.prTransformChangeTriggersCooks	= false;
+					hapi_asset.prPushUnityTransformToHoudini	= false;
+					hapi_asset.prEnableCooking					= false;
+				}
+				
+				obj = Instantiate( user_instance, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
+				HAPI_Asset hapi_asset_on_clone =  obj.GetComponent< HAPI_Asset >();
+				if ( hapi_asset_on_clone != null )
+				{
+					Destroy( hapi_asset_on_clone );
+				}
+
+				if ( hapi_asset != null )
+				{
+					hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
+					hapi_asset.prPushUnityTransformToHoudini	= syncAssetTransformSetting;
+					hapi_asset.prEnableCooking					= enableCooking;
+				}
+			}
+
+			HAPI_Instance instance = (HAPI_Instance) obj.AddComponent( "HAPI_Instance" );
+			instance.prInstancePointNumber = point_index;
+			instance.prObjectToInstantiate = user_instance;
+			instance.prInstancer = this;
+
+			obj.transform.localPosition = pos;
+
+			// Due to the difference between Houdini's coordinate system and that of Unity,
+			// most assets from unity won't look right until a 90 degree rotation in X is 
+			// introduced.
+			Quaternion quat = Quaternion.Euler( new Vector3(
+				90 + user_instance.transform.localRotation.eulerAngles.x + euler.x,
+				user_instance.transform.localRotation.eulerAngles.y + euler.y,
+				user_instance.transform.localRotation.eulerAngles.z + euler.z ) );
+
+			obj.transform.localRotation = quat;
+			if ( scale_exists )
+			{
+				obj.transform.localScale = new Vector3(
+					user_instance.transform.localScale.x * scale.x,
+					user_instance.transform.localScale.y * scale.y,
+					user_instance.transform.localScale.z * scale.z );
+			}
+		}
+		else
+#endif // UNITY_EDITOR
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
 
@@ -237,73 +299,11 @@ public class HAPI_Instancer : MonoBehaviour
 			foreach ( MeshRenderer mesh_renderer in mesh_renderers )
 				mesh_renderer.enabled = true;
 		}
-		else
-		{
-			obj = PrefabUtility.InstantiatePrefab( user_instance ) as GameObject;
-			if( obj == null )
-			{
-				bool liveTransformPropagationSetting	= false;
-				bool syncAssetTransformSetting			= false;
-				bool enableCooking						= true;
-				
-				HAPI_Asset hapi_asset = user_instance.GetComponent< HAPI_Asset >();
-				if( hapi_asset != null )
-				{
-					liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
-					syncAssetTransformSetting				= hapi_asset.prPushUnityTransformToHoudini;
-					enableCooking							= hapi_asset.prEnableCooking;
-					hapi_asset.prTransformChangeTriggersCooks	= false;
-					hapi_asset.prPushUnityTransformToHoudini			= false;
-					hapi_asset.prEnableCooking				= false;
-				}
-				
-				obj = Instantiate( user_instance, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
-				HAPI_Asset hapi_asset_on_clone =  obj.GetComponent< HAPI_Asset >();
-				if( hapi_asset_on_clone != null )
-				{
-					Destroy( hapi_asset_on_clone );
-				}
 
-				if( hapi_asset != null )
-				{
-					hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
-					hapi_asset.prPushUnityTransformToHoudini			= syncAssetTransformSetting;
-					hapi_asset.prEnableCooking				= enableCooking;
-				}									
-			}
-
-			HAPI_Instance instance = (HAPI_Instance) obj.AddComponent( "HAPI_Instance" );
-			instance.prInstancePointNumber = point_index;
-			instance.prObjectToInstantiate = user_instance;
-			instance.prInstancer = this;
-
-			obj.transform.localPosition = pos;
-
-			//due to the difference between Houdini's coordinate system and that of Unity,
-			//most assets from unity won't look right until a 90 degree rotation in X is 
-			//introduced.  
-			Quaternion quat = Quaternion.Euler( 
-			                  new Vector3( 90 + user_instance.transform.localRotation.eulerAngles.x + euler.x,
-			            				   user_instance.transform.localRotation.eulerAngles.y + euler.y,
-			            				   user_instance.transform.localRotation.eulerAngles.z + euler.z ) );
-
-			obj.transform.localRotation = quat;
-			if( scale_exists )
-			{
-				obj.transform.localScale = new Vector3( user_instance.transform.localScale.x * scale.x,
-				                                       	user_instance.transform.localScale.y * scale.y,
-				                                       	user_instance.transform.localScale.z * scale.z
-				                                       );
-			}
-		}
-					
 		obj.transform.parent = transform;
 		
 		if ( attach_script_exists )
-		{
-			HAPI_AssetUtility.attachScript( obj, attach_script );			
-		}
-		
+			HAPI_AssetUtility.attachScript( obj, attach_script );
 	}
 	
 	public bool hasOverriddenInstances()
@@ -442,7 +442,9 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	public void drawPin( HAPI_InstancerOverrideInfo override_info )
 	{
-		
+		// TODO: This code should be on the companion Editor class, not here!
+
+#if UNITY_EDITOR
 		float handle_size 	= HandleUtility.GetHandleSize( override_info.translate );		
 		
 		Matrix4x4 old_handles_mat = Handles.matrix;
@@ -493,7 +495,7 @@ public class HAPI_Instancer : MonoBehaviour
 							 scale_factor*1.3f );
 		
 		Handles.matrix = old_handles_mat;
-		
+#endif // UNITY_EDITOR
 	}
 	
 	
@@ -989,6 +991,6 @@ public class HAPI_Instancer : MonoBehaviour
 
 	
 	private HAPI_CurvesCollection[] myCurvesCollection;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 	
 }

@@ -29,7 +29,7 @@ namespace HAPI
 	/// </summary>
 	public static partial class HAPI_Host
 	{
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Public
 		
@@ -53,7 +53,7 @@ namespace HAPI
 		// Private
 		
 		// TODO: We would like to cache some strings eventually.
-#endif // UNITY_EDITOR	
+#endif // UNITY_STANDALONE_WIN
 	}
 
 }

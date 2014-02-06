@@ -25,7 +25,7 @@ using Utility = HAPI_AssetUtility;
 [ RequireComponent( typeof( MeshFilter ) ) ]
 public class HAPI_AssetInput : HAPI_Asset
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -212,5 +212,5 @@ public class HAPI_AssetInput : HAPI_Asset
 
 	[SerializeField] private HAPI_GeoAttributeManager myGeoAttributeManager;
 
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

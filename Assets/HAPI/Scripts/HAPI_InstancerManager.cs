@@ -26,7 +26,7 @@ using HAPI;
 
 public class HAPI_InstancerManager : MonoBehaviour 
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -85,5 +85,5 @@ public class HAPI_InstancerManager : MonoBehaviour
 
 	[SerializeField] private List< HAPI_InstancerPersistentData > myInstancersPersistentData;
 	
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }
