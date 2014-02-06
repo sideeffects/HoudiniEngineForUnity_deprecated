@@ -5,7 +5,7 @@ using HAPI;
 
 public class HAPI_HostUndoInfo : ScriptableObject
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	// General Settings
 	public string collisionGroupName;
 	public string renderedCollisionGroupName;
@@ -114,6 +114,6 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		curvePrimitiveTypeDefault		= HAPI_Host.prCurvePrimitiveTypeDefault;
 		curveMethodDefault				= HAPI_Host.prCurveMethodDefault;
 	}
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }
 

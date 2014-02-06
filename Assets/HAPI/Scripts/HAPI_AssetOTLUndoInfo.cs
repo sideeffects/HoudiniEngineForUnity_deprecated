@@ -5,7 +5,7 @@ using HAPI;
 
 public class HAPI_AssetOTLUndoInfo : ScriptableObject
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	// view settings
 	public bool isGeoVisible;
 	public bool showPinnedInstances;
@@ -52,5 +52,5 @@ public class HAPI_AssetOTLUndoInfo : ScriptableObject
 		bakeEndTime						= asset_otl.prBakeEndTime;
 		bakeSamplesPerSecond			= asset_otl.prBakeSamplesPerSecond;
 	}
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

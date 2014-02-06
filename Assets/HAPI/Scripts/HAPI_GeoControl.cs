@@ -27,7 +27,7 @@ using HAPI_NodeId = System.Int32;
 
 public class HAPI_GeoControl : HAPI_ObjectControl 
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -208,10 +208,12 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
 
+#if UNITY_EDITOR
 			// To keep things consistent with Unity workflow, we should not save parameter changes
 			// while in Play mode.
 			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
 				prAsset.prPresetsMap.set( getFullControlNameAndPath(), HAPI_Host.getPreset( prNodeId ) );
+#endif // UNITY_EDITOR
 		}
 	}
 
@@ -293,5 +295,5 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	[SerializeField] private HAPI_ObjectControl myObjectControl;
 
 	[SerializeField] private List< GameObject > myParts;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

@@ -40,7 +40,7 @@ namespace HAPI
 	/// </summary>
 	public static partial class HAPI_Host
 	{
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 		// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------
 
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -733,7 +733,7 @@ namespace HAPI
 			[Out] float[] knots,
 			int start, int length );
 
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 	}
 
 }

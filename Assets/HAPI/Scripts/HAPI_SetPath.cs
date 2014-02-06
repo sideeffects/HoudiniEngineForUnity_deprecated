@@ -13,7 +13,7 @@ namespace HAPI
 	[ InitializeOnLoad ]
 #endif // UNITY_EDITOR
 	public class HAPI_SetPath {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 		static HAPI_SetPath()
 		{
 			setPath();
@@ -109,10 +109,10 @@ namespace HAPI
 		{
 			string app_path = "";
 			
-#if UNITY_4_3
+#if UNITY_EDITOR && UNITY_4_3
 			if ( BuildPipeline.isBuildingPlayer )
 				return app_path;
-#endif // UNITY_4_3
+#endif // UNITY_EDITOR && UNITY_4_3
 
 #if UNITY_STANDALONE_WIN
 			// For Windows, we look at the registry entries made by the Houdini installer. We look for the 
@@ -153,7 +153,7 @@ namespace HAPI
 		}
 
 		private static bool myIsPathSet = false;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 	}
 	
 } // namespace HAPI

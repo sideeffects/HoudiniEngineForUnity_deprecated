@@ -24,7 +24,7 @@ using Utility = HAPI_AssetUtility;
 [ ExecuteInEditMode ]
 public class HAPI_AssetCurve : HAPI_Asset
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -129,6 +129,6 @@ public class HAPI_AssetCurve : HAPI_Asset
 			//Debug.LogWarning( error.ToString() );
 		}
 	}
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 
 }

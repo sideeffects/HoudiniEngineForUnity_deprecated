@@ -32,7 +32,7 @@ using HAPI_NodeId = System.Int32;
 [ RequireComponent( typeof( HAPI_Control ) ) ]
 public class HAPI_Parms : MonoBehaviour
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 	public enum AssetType
 	{
 		TYPE_OTL = 0,
@@ -320,7 +320,8 @@ public class HAPI_Parms : MonoBehaviour
 
 			myParmsUndoInfo.parmNames.Add( parm.name );
 		}
-		
+
+#if UNITY_EDITOR
 		// Set which parameter values have been overridden (only needed for a prefab instance)
 		if ( prControl && prControl.isPrefabInstance() && gameObject.GetComponent< HAPI_Asset >() != null )
 		{
@@ -340,6 +341,7 @@ public class HAPI_Parms : MonoBehaviour
 			// This tells Unity that parameter values have been overridden for this prefab instance
 			PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 		}
+#endif // UNITY_EDITOR
 	}
 	
 	// Checks if the parameter with the given id parm_id represents the same parameter 
@@ -568,5 +570,5 @@ public class HAPI_Parms : MonoBehaviour
 	// Control ------------------------------------------------------------------------------------------------------
 
 	private bool myPostSerialization;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }

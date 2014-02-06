@@ -29,7 +29,7 @@ using HAPI_AssetId = System.Int32;
 
 public class HAPI_Control : MonoBehaviour 
 {
-#if UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -68,9 +68,14 @@ public class HAPI_Control : MonoBehaviour
 		}
 		private set {}
 	}
-	
+
+#if UNITY_EDITOR
 	public bool isPrefab() 			{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab; }
 	public bool isPrefabInstance()	{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance; }
+#else
+	public bool isPrefab()			{ return false; }
+	public bool isPrefabInstance()	{ return false; }
+#endif // UNITY_EDITOR
 
 	public HAPI_Control() 
 	{
@@ -151,5 +156,5 @@ public class HAPI_Control : MonoBehaviour
 	[SerializeField] private HAPI_NodeId myNodeId;
 	[SerializeField] private HAPI_NodeId myObjectNodeId;
 	[SerializeField] private HAPI_Asset myAsset;
-#endif // UNITY_EDITOR
+#endif // UNITY_STANDALONE_WIN
 }
