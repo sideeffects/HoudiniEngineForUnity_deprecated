@@ -148,7 +148,9 @@ public class HAPI_GeoAttributeManagerGUI
 					}
 
 					// Draw paint brush.
-					Handles.DrawLine( hit_info.point, hit_info.point + hit_info.normal );
+					Handles.DrawLine(
+						hit_info.point,
+						hit_info.point + ( Vector3.Normalize( hit_info.normal ) * myManager.prBrushRadius ) );
 					Handles.CircleCap(
 						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
 						myManager.prBrushRadius );
