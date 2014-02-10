@@ -102,7 +102,7 @@ public class HAPI_GeoAttributeManagerGUI
 		getKeyState( current_event );
 
 		// Decide modes.
-		if ( current_event.type == EventType.Layout )
+		if ( current_event.type == EventType.Layout && mySceneWindowHasFocus )
 			decideModes( ref current_event );
 
 		// Draw scene UI.
@@ -721,8 +721,10 @@ public class HAPI_GeoAttributeManagerGUI
 			// Note: We want to disable the toolbar if a mode key is being held down because
 			// if a button is pressed the current mode will imidiatly switch back to the mode
 			// whos key is being held down...
-			GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prPaintingModeHotKey ) &&
-									  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
+			GUI.enabled = 
+				!mySceneWindowHasFocus ||
+				( ( myCurrentlyPressedKey != HAPI_Host.prPaintingModeHotKey ) &&
+				  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey ) );
 			HAPI_GeoAttributeManager.Mode last_mode = myManager.prCurrentMode;
 			myManager.prCurrentMode = (HAPI_GeoAttributeManager.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
 			if ( last_mode != myManager.prCurrentMode )
