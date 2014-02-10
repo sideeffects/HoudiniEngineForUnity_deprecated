@@ -122,7 +122,8 @@ public class HAPI_PartControlGUI : Editor
 												myPartControl.prObjectId,
 												myPartControl.prGeoId,
 												ref shared_mesh,
-												part_control );
+												part_control,
+												null );
 				
 				myPartControl.prAsset.buildClientSide();
 			}

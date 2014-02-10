@@ -150,7 +150,8 @@ public class HAPI_AssetInput : HAPI_Asset
 			const int geo_id = 0;
 
 			// Write marshalled geo to Input Asset.
-			HAPI_AssetUtility.setMesh( prAssetId, object_id, geo_id, ref myEditableMesh, null );
+			HAPI_AssetUtility.setMesh(
+				prAssetId, object_id, geo_id, ref myEditableMesh, null, myGeoAttributeManager );
 
 			// Apply the input asset transform to the marshaled object in the Houdini scene.
 			HAPI_TransformEuler trans = Utility.getHapiTransform( transform.localToWorldMatrix );

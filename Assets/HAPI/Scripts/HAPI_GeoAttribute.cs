@@ -235,11 +235,39 @@ public class HAPI_GeoAttribute : ScriptableObject
 
 	public int[] prIntPaintValue { get { return myIntPaintValue; } set { myIntPaintValue = value; } }
 	public int[] prIntMins { get { return myIntMins; } set { myIntMins = value; } }
-	public int[] prIntMaxes { get { return myIntMaxes; } 
+	public int[] prIntMaxes {
+		get { return myIntMaxes; } 
 		set { if ( myType != Type.BOOL ) myIntMaxes = value; } }
+	public int[] prIntData { get { return myIntData; } private set {} }
 	public float[] prFloatPaintValue { get { return myFloatPaintValue; } set { myFloatPaintValue = value; } }
 	public float[] prFloatMins { get { return myFloatMins; } set { myFloatMins = value; } }
 	public float[] prFloatMaxes { get { return myFloatMaxes; } set { myFloatMaxes = value; } }
+	public float[] prFloatData { get { return myFloatData; } private set {} }
+
+	public HAPI.HAPI_AttributeInfo prAttributeInfo
+	{
+		get
+		{
+			if ( myType == Type.UNDEFINED )
+				throw new HAPI.HAPI_ErrorInvalidArgument( "Geo attribute not defined." );
+
+			HAPI.HAPI_AttributeInfo attr_info = new HAPI.HAPI_AttributeInfo( prName );
+			attr_info.exists = true;
+			attr_info.owner = HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+
+			if ( myType == Type.BOOL || myType == Type.INT )
+				attr_info.storage = HAPI.HAPI_StorageType.HAPI_STORAGETYPE_INT;
+			else if ( myType == Type.FLOAT )
+				attr_info.storage = HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+			else
+				throw new HAPI.HAPI_ErrorInvalidArgument( "Invalid geo attribute type." );
+
+			attr_info.count = myVertexCount;
+			attr_info.tupleSize = myTupleSize;
+			return attr_info;
+		}
+		private set {}
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
