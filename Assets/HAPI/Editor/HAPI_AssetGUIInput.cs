@@ -58,8 +58,58 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
 
-		if ( GUILayout.Button( "Build" ) )
-			myAssetInput.buildAll();
+		myAsset.prShowHoudiniControls 
+			= HAPI_GUI.foldout( "Houdini Controls", myAsset.prShowHoudiniControls, true );
+		if ( myAsset.prShowHoudiniControls ) 
+		{
+			if ( !myAsset.isPrefab() )
+			{
+				if ( GUILayout.Button( "Build" ) )
+					myAsset.buildAll();
+			}
+		}
+
+		// Draw Help Pane
+		myAsset.prShowHelp = HAPI_GUI.foldout( "Asset Help", myAsset.prShowHelp, true );
+		if ( myAsset.prShowHelp )
+			drawHelpBox( "No help yet. TODO!" );
+
+		///////////////////////////////////////////////////////////////////////
+		// Draw Asset Settings
+		// These don't affect the asset directly so they don't trigger rebuilds.
+
+		myAsset.prShowAssetSettings = HAPI_GUI.foldout( "Asset Settings", myAsset.prShowAssetSettings, true );
+		if ( myAsset.prShowAssetSettings )
+		{
+			// Enable Cooking Toggle
+			createToggleForProperty(
+				"enable_cooking", "Enable Cooking", "prEnableCooking",
+				ref myUndoInfo.enableCooking, null, !HAPI_Host.isEnableCookingDefault() );
+
+			HAPI_GUI.separator();
+
+			// Cooking Triggers Downstream Cooks Toggle
+			createToggleForProperty(
+				"cooking_triggers_downstream_cooks", "Cooking Triggers Downstream Cooks", 
+				"prCookingTriggersDownCooks", ref myUndoInfo.cookingTriggersDownCooks,
+				null, !HAPI_Host.isCookingTriggersDownCooksDefault(),
+				!myAsset.prEnableCooking, " (all cooking is disabled)" );
+
+			HAPI_GUI.separator();
+
+			// Push Unity Transform To Houdini Engine Toggle
+			createToggleForProperty(
+				"push_unity_transform_to_houdini_engine", "Push Unity Transform To Houdini Engine", 
+				"prPushUnityTransformToHoudini", ref myUndoInfo.pushUnityTransformToHoudini,
+				null, !HAPI_Host.isPushUnityTransformToHoudiniDefault() );
+
+			// Transform Change Triggers Cooks Toggle
+			createToggleForProperty(
+				"transform_change_triggers_cooks", "Transform Change Triggers Cooks", 
+				"prTransformChangeTriggersCooks", ref myUndoInfo.transformChangeTriggersCooks,
+				null, !HAPI_Host.isTransformChangeTriggersCooksDefault(),
+				!myAsset.prEnableCooking, " (all cooking is disabled)" );
+		}
 
 		HAPI_GUI.separator();
 

@@ -32,8 +32,6 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	{
 		base.OnEnable();
 		myAssetOTL = myAsset as HAPI_AssetOTL;
-		myUndoInfo = myAssetOTL.prAssetOTLUndoInfo;
-		myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 	}
 	
 	public override void OnInspectorGUI() 
@@ -47,55 +45,43 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Draw Game Object Controls
 		
 
-		myAssetOTL.prShowHoudiniControls 
-			= HAPI_GUI.foldout( "Houdini Controls", myAssetOTL.prShowHoudiniControls, true );
-		if ( myAssetOTL.prShowHoudiniControls ) 
+		myAsset.prShowHoudiniControls 
+			= HAPI_GUI.foldout( "Houdini Controls", myAsset.prShowHoudiniControls, true );
+		if ( myAsset.prShowHoudiniControls ) 
 		{
-			if ( !myAssetOTL.isPrefab() )
+			if ( !myAsset.isPrefab() )
 			{
 				if ( GUILayout.Button( "Rebuild" ) ) 
-					myAssetOTL.buildAll();
+					myAsset.buildAll();
 	
 				if ( GUILayout.Button( "Recook" ) )
-					myAssetOTL.buildClientSide();
+					myAsset.buildClientSide();
 
 				if ( GUILayout.Button( "Bake" ) )
-					myAssetOTL.bakeAsset();
+					myAsset.bakeAsset();
 			}
-		} // if
+		}
 
 		// Draw Help Pane
-		myAssetOTL.prShowHelp = HAPI_GUI.foldout( "Asset Help", myAssetOTL.prShowHelp, true );
-		if ( myAssetOTL.prShowHelp )
-		{
-			myHelpScrollPosition = EditorGUILayout.BeginScrollView(
-				myHelpScrollPosition, GUILayout.Height( 200 ) );
-			float height = GUI.skin.label.CalcHeight( 
-				new GUIContent( myAssetOTL.prAssetHelp ), (float) Screen.width );
-			GUIStyle sel_label = GUI.skin.label;
-			sel_label.stretchWidth = true;
-			sel_label.wordWrap = true;
-			EditorGUILayout.SelectableLabel( 
-				myAssetOTL.prAssetHelp, sel_label, GUILayout.Height( height ), 
-				GUILayout.Width( Screen.width - 40 ) );
-			EditorGUILayout.EndScrollView();
-		}
+		myAsset.prShowHelp = HAPI_GUI.foldout( "Asset Help", myAsset.prShowHelp, true );
+		if ( myAsset.prShowHelp )
+			drawHelpBox( myAsset.prAssetHelp );
 		
 		///////////////////////////////////////////////////////////////////////
 		// Draw Asset Settings
 		// These don't affect the asset directly so they don't trigger rebuilds.
 
-		myAssetOTL.prShowAssetSettings = HAPI_GUI.foldout( "Asset Settings", myAssetOTL.prShowAssetSettings, true );
-		if ( myAssetOTL.prShowAssetSettings )
+		myAsset.prShowAssetSettings = HAPI_GUI.foldout( "Asset Settings", myAsset.prShowAssetSettings, true );
+		if ( myAsset.prShowAssetSettings )
 			generateAssetSettings();
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Baking Controls
 		
-		if( !myAssetOTL.isPrefab() )
+		if( !myAsset.isPrefab() )
 		{
-			myAssetOTL.prShowBakeOptions = HAPI_GUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
-			if ( myAssetOTL.prShowBakeOptions )
+			myAsset.prShowBakeOptions = HAPI_GUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
+			if ( myAsset.prShowBakeOptions )
 				generateAssetBakeControls();
 		}
 
@@ -257,6 +243,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		                         null, !HAPI_Host.isTransformChangeTriggersCooksDefault(),
 		                         !myAsset.prEnableCooking, " (all cooking is disabled)" );
 
+		HAPI_GUI.separator();
+
 		// Import Templated Geos Toggle
 		createToggleForProperty( "import_templated_geos", "Import Templated Geos", "prImportTemplatedGeos",
 		                         ref myUndoInfo.importTemplatedGeos, null, !HAPI_Host.isImportTemplatedGeosDefault(),
@@ -280,70 +268,5 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		}
 	}
 
-	private delegate void valueChangedFunc();
-
-	private void createToggleForProperty( string name, string label, string property_name, 
-	                                      ref bool undo_info_value, valueChangedFunc func )
-	{
-		createToggleForProperty( name, label, property_name, ref undo_info_value, func, false );
-	}
-	
-	private void createToggleForProperty( string name, string label, string property_name, 
-	                                      ref bool undo_info_value, valueChangedFunc func,
-	                                      bool global_overwrite )
-	{
-		createToggleForProperty( name, label, property_name, ref undo_info_value, 
-		                         func, global_overwrite, false, "" );
-	}
-
-	private void createToggleForProperty( string name, string label, string property_name, 
-	                                      ref bool undo_info_value, valueChangedFunc func,
-	                                      bool global_overwrite, bool local_overwrite, 
-	                                      string local_overwrite_message )
-	{
-		try
-		{
-			PropertyInfo property = typeof( HAPI_Asset ).GetProperty( property_name );
-		if ( property == null )
-		{
-			throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
-		}
-		if ( property.PropertyType != typeof( bool ) )
-		{
-			throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
-		}
-
-		GUI.enabled = !global_overwrite && !local_overwrite;
-		if ( !GUI.enabled )
-		{
-			if ( global_overwrite )
-				label += " (overwritted by global setting)";
-			else
-				label += local_overwrite_message;
-			}
-			
-			bool value = ( bool ) property.GetValue( myAsset, null );
-			bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) != value;
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value, myUndoInfo, ref undo_info_value );
-			GUI.enabled = true;
-
-			if ( changed )
-			{
-				property.SetValue( myAsset, value, null );
-
-				if ( func != null )
-					func();
-			}
-		}
-		catch ( System.Exception error )
-		{
-			Debug.LogError( "Failed to create toggle for: " + label + "\n" +
-			                error.ToString() + "\nSource: " + error.Source );
-		}
-	}
-	
 	private HAPI_AssetOTL myAssetOTL;
-	private HAPI_AssetOTLUndoInfo myUndoInfo;
-	private HAPI_Asset myParentPrefabAsset;
-	private Vector2 myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 }

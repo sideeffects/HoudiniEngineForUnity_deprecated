@@ -63,6 +63,21 @@ public abstract class HAPI_Asset : HAPI_Control
 	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; } 
 																	set { myAssetSubType = value; } }
 
+	public HAPI_AssetUndoInfo prAssetUndoInfo 
+	{
+		get
+		{
+			if ( myAssetOTLUndoInfo == null )
+			{
+				myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HAPI_AssetUndoInfo >();
+				myAssetOTLUndoInfo.initialize( this );
+			}
+			return myAssetOTLUndoInfo;
+		}
+
+		private set {}
+	}
+
 	// Parameters ---------------------------------------------------------------------------------------------------
 
 	public HAPI_PresetMap prPresetsMap 
@@ -377,7 +392,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( asset.GetType() == typeof( HAPI_AssetOTL ) )
 			{
 				HAPI_AssetOTL asset_otl = asset as HAPI_AssetOTL;
-				asset_otl.prAssetOTLUndoInfo.isGeoVisible = false;
+				asset_otl.prAssetUndoInfo.isGeoVisible = false;
 			}
 		}
 	}
@@ -1976,5 +1991,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	private int myBackupAssetValidationId;
 	private bool myReloadPrefabOnPlaymodeChange;
 	[SerializeField] private List< string > myUpdatePrefabInstanceParmNames;
+	[SerializeField] private HAPI_AssetUndoInfo	myAssetOTLUndoInfo;
 #endif // UNITY_STANDALONE_WIN
 }

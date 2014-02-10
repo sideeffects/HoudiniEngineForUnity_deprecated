@@ -39,20 +39,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 	
 	public string prAssetPath {							get { return myAssetPath; } 
 														set { myAssetPath = value; } }
-	public HAPI_AssetOTLUndoInfo prAssetOTLUndoInfo 
-	{
-		get
-		{
-			if ( myAssetOTLUndoInfo == null )
-			{
-				myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HAPI_AssetOTLUndoInfo >();
-				myAssetOTLUndoInfo.initialize( this );
-			}
-			return myAssetOTLUndoInfo;
-		}
-
-		private set {}
-	}
 	public HAPI_HandleInfo[] prHandleInfos { get; set; }
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
 	
@@ -301,7 +287,6 @@ public class HAPI_AssetOTL : HAPI_Asset
 	// Serialized Data
 	
 	[SerializeField] private string					myAssetPath;
-	[SerializeField] private HAPI_AssetOTLUndoInfo	myAssetOTLUndoInfo;
 #endif // UNITY_STANDALONE_WIN
 	
 }
