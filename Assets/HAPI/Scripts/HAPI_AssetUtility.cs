@@ -1396,8 +1396,10 @@ public class HAPI_AssetUtility
 		}
 	}
 
-	public static void setMesh( int asset_id, int object_id, int geo_id, ref Mesh mesh, 
-								HAPI_PartControl part_control )
+	public static void setMesh(
+		int asset_id, int object_id, int geo_id, ref Mesh mesh, 
+		HAPI_PartControl part_control,
+		HAPI_GeoAttributeManager attribute_manager )
 	{
 		bool setting_raw_mesh = ( part_control == null );
 
@@ -1437,23 +1439,21 @@ public class HAPI_AssetUtility
 		part_info.vertexAttributeCount 	= 0;
 		part_info.faceAttributeCount 	= 0;
 		part_info.detailAttributeCount 	= 0;
-		
-		 
+
 		if ( uvs != null )
 			part_info.pointAttributeCount++;
 		if ( normals != null )
 			part_info.pointAttributeCount++;
 
-		
 		HAPI_Host.setGeoInfo( asset_id, object_id, geo_id, ref geo_info );
 		HAPI_Host.setPartInfo( asset_id, object_id, geo_id, ref part_info );
-		
+
 		// Set Face counts.
 		int[] face_counts = new int[ part_info.faceCount ];
 		for ( int i = 0; i < part_info.faceCount; ++i )
 			face_counts[ i ] = 3;
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setFaceCounts, face_counts, part_info.faceCount );
-		
+
 		// Set Vertex list.
 		int[] vertex_list = new int[ part_info.vertexCount ];
 		if ( setting_raw_mesh )
@@ -1463,12 +1463,11 @@ public class HAPI_AssetUtility
 		else
 			vertex_list = part_control.prVertexList;
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
-		
+
 		// Set position attributes.
 		setMeshPointAttribute( asset_id, object_id, geo_id, 
 		                       HAPI_Constants.HAPI_ATTRIB_POSITION, 3, vertices,
 		                       setting_raw_mesh, true, part_info, part_control );
-
 
 		setMeshPointAttribute( asset_id, object_id, geo_id, 
 		                       HAPI_Constants.HAPI_ATTRIB_NORMAL, 3, normals,
@@ -1477,17 +1476,42 @@ public class HAPI_AssetUtility
 		Vector3[] uvs3 = new Vector3[ uvs.Length ];
 		for ( int ii = 0; ii < uvs.Length; ii++ )
 		{
-			uvs3[ ii ][0] = uvs[ ii ][0];
-			uvs3[ ii ][1] = uvs[ ii ][1];
-			uvs3[ ii ][2] = 0;
+			uvs3[ ii ][ 0 ] = uvs[ ii ][ 0 ];
+			uvs3[ ii ][ 1 ] = uvs[ ii ][ 1 ];
+			uvs3[ ii ][ 2 ] = 0;
 		}
 
-		setMeshPointAttribute( asset_id, object_id, geo_id, 
-		                      HAPI_Constants.HAPI_ATTRIB_UV, 2, uvs3,
-		                      setting_raw_mesh, false, part_info, part_control );
+		setMeshPointAttribute( 
+			asset_id, object_id, geo_id, 
+			HAPI_Constants.HAPI_ATTRIB_UV, 2, uvs3,
+			setting_raw_mesh, false, part_info, part_control );
 
+		// Add and set additional attributes.
+		if ( attribute_manager )
+		{
+			foreach ( HAPI_GeoAttribute attribute in attribute_manager.prAttributes )
+			{
+				HAPI_AttributeInfo attr_info = attribute.prAttributeInfo;
+				HAPI_Host.addAttribute( asset_id, object_id, geo_id, attribute.prName, ref attr_info );
 
-		
+				if ( attribute.prType == HAPI_GeoAttribute.Type.BOOL ||
+					attribute.prType == HAPI_GeoAttribute.Type.INT )
+				{
+					int[] int_data = attribute.prIntData;
+					setAttribute(
+						asset_id, object_id, geo_id, attribute.prName, 
+						ref attr_info, ref int_data, HAPI_Host.setAttributeIntData );
+				}
+				else if ( attribute.prType == HAPI_GeoAttribute.Type.FLOAT )
+				{
+					float[] int_data = attribute.prFloatData;
+					setAttribute(
+						asset_id, object_id, geo_id, attribute.prName, 
+						ref attr_info, ref int_data, HAPI_Host.setAttributeFloatData );
+				}
+			}
+		}
+
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
 	}
 	

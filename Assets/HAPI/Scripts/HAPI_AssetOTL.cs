@@ -16,9 +16,11 @@
 #define ENABLE_PARTICLES
 
 using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
-#endif
+#endif // UNITY_EDITOR
+
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,18 +40,18 @@ public class HAPI_AssetOTL : HAPI_Asset
 	public string prAssetPath {							get { return myAssetPath; } 
 														set { myAssetPath = value; } }
 	public HAPI_AssetOTLUndoInfo prAssetOTLUndoInfo 
-	{	
-		get 
-		{ 
+	{
+		get
+		{
 			if ( myAssetOTLUndoInfo == null )
 			{
 				myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HAPI_AssetOTLUndoInfo >();
 				myAssetOTLUndoInfo.initialize( this );
 			}
-			return myAssetOTLUndoInfo; 
+			return myAssetOTLUndoInfo;
 		}
-														
-		private set { } 
+
+		private set {}
 	}
 	public HAPI_HandleInfo[] prHandleInfos { get; set; }
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
