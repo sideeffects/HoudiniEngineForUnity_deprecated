@@ -151,7 +151,7 @@ public class HAPI_CurveGUI : Editor
 		getKeyState( current_event );
 
 		// Decide modes.
-		if ( current_event.type == EventType.Layout )
+		if ( current_event.type == EventType.Layout && mySceneWindowHasFocus )
 			decideModes( ref current_event );
 
 		// Draw scene UI.
@@ -913,8 +913,10 @@ public class HAPI_CurveGUI : Editor
 			// Note: We want to disable the toolbar if a mode key is being held down because
 			// if a button is pressed the current mode will imidiatly switch back to the mode
 			// whos key is being held down...
-			GUI.enabled				= ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
-									  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey );
+			GUI.enabled =
+				!mySceneWindowHasFocus ||
+				( ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
+				  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey ) );
 			HAPI_Curve.Mode last_mode = myCurve.prCurrentMode;
 			myCurve.prCurrentMode = (HAPI_Curve.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
 			if ( last_mode != myCurve.prCurrentMode )
