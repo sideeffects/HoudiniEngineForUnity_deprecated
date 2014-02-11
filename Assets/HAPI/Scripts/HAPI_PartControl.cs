@@ -168,11 +168,17 @@ public class HAPI_PartControl : HAPI_GeoControl
 				// picks up the mesh automagically)
 				if ( part_info.name.Contains( HAPI_Host.prRenderedCollisionGroupName ) )
 				{
-					getOrCreateComponent< MeshCollider >();
+					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 					getOrCreateComponent< MeshRenderer >();
+					mesh_collider.enabled = false;
+					mesh_collider.enabled = true;
 				}
 				else if ( part_info.name.Contains( HAPI_Host.prCollisionGroupName ) )
-					getOrCreateComponent< MeshCollider >();
+				{
+					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
+					mesh_collider.enabled = false;
+					mesh_collider.enabled = true;
+				}
 				else
 					getOrCreateComponent< MeshRenderer >();
 
