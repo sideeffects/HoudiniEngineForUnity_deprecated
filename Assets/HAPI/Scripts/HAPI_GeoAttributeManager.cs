@@ -119,10 +119,14 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		if ( prEditableMaterial == null )
 		{
 			prOriginalMaterial = mesh_renderer.sharedMaterial;
-			prEditableMaterial = Material.Instantiate( prOriginalMaterial ) as Material;
-			prEditableMaterial.name = prOriginalMaterial.name + " (Editable Copy)";
-
-			prEditableMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+			if ( prOriginalMaterial )
+			{
+				prEditableMaterial = Material.Instantiate( prOriginalMaterial ) as Material;
+				prEditableMaterial.name = prOriginalMaterial.name + " (Editable Copy)";
+				prEditableMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+			}
+			else
+				prEditableMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
 		}
 	}
 

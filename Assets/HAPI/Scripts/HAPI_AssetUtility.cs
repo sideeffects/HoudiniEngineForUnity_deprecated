@@ -507,7 +507,24 @@ public class HAPI_AssetUtility
 										  ref HAPI_AttributeInfo info, T[] items, 
 										  setAttrArrayInputFunc< T > set_func, int count ) 
 	{
-		int max_array_size = HAPI_Constants.HAPI_MAX_PAGE_SIZE / ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
+		int max_array_size = 0;
+		if ( typeof( T ) == typeof( string ) )
+		{
+			int max_string_length = 1;
+			foreach ( T s in items )
+			{
+				string ss = (string)(object) s;
+				if ( ss.Length > max_string_length )
+					max_string_length = ss.Length;
+			}
+			max_array_size =
+				HAPI_Constants.HAPI_MAX_PAGE_SIZE
+				/ ( max_string_length * Marshal.SizeOf( typeof( char ) ) * info.tupleSize );
+		}
+		else
+			max_array_size =
+				HAPI_Constants.HAPI_MAX_PAGE_SIZE
+				/ ( Marshal.SizeOf( typeof( T ) ) * info.tupleSize );
 		
 		int local_count = count;
 		int current_index = 0;
@@ -1510,6 +1527,26 @@ public class HAPI_AssetUtility
 						ref attr_info, ref int_data, HAPI_Host.setAttributeFloatData );
 				}
 			}
+
+#if false
+			if ( attribute_manager.prAttributes.Count > 0 )
+			{
+				HAPI_AttributeInfo attr_info = attribute_manager.prAttributes[ 0 ].prAttributeInfo;
+				attr_info.exists = true;
+				attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_STR;
+
+				HAPI_Host.addAttribute( asset_id, object_id, geo_id, "test_string_attr", ref attr_info );
+
+				string[] blah = new string[ attr_info.count * attr_info.tupleSize ];
+				for ( int i = 0; i < attr_info.count * attr_info.tupleSize; ++i )
+					blah[ i ] = "Item " + i;
+
+				setAttribute(
+					asset_id, object_id, geo_id, "test_string_attr", 
+					ref attr_info, ref blah, HAPI_Host.setAttributeStringData );
+			}
+#endif
 		}
 
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
