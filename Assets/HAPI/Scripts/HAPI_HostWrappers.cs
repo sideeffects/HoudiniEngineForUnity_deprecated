@@ -1499,6 +1499,45 @@ namespace HAPI
 				asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 			processStatusCode( status_code );
 		}
+
+		/// <summary>
+		/// 	Set attribute string data.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="name">
+		/// 	Attribute name.
+		/// </param>
+		/// <param name="attr_info">
+		/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
+		/// 	like data type. Generally should be the same struct returned by 
+		/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
+		/// <param name="data">
+		/// 	A strings array at least the size of #length.
+		/// </param>
+		/// <param name="start">
+		/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
+		/// </param>
+		/// <param name="length">
+		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
+		/// </param>
+		public static void setAttributeStringData(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
+			ref HAPI_AttributeInfo attr_info,
+			string[] data,
+			int start, int length )
+		{
+			HAPI_Result status_code = HAPI_SetAttributeStringData(
+				asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
+			processStatusCode( status_code );
+		}
 		
 		/// <summary>
 		/// 	Commit the current input geometry to the cook engine. Nodes that use this geometry node will 

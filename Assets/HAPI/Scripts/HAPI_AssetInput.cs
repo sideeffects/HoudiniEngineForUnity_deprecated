@@ -193,9 +193,14 @@ public class HAPI_AssetInput : HAPI_Asset
 		// Create the editable mesh from the original mesh. We don't want to
 		// modify the original mesh because it is likely shared by many
 		// instances.
-		if ( prEditableMesh == null )
+		if ( !prEditableMesh )
 		{
 			prOriginalMesh = mesh_filter.sharedMesh;
+			if ( !prOriginalMesh )
+				prOriginalMesh = mesh_filter.mesh;
+			if ( !prOriginalMesh )
+				throw new HAPI_ErrorNotFound( "No mesh found on the Mesh Filter!" );
+
 			prEditableMesh = Mesh.Instantiate( prOriginalMesh ) as Mesh;
 			prEditableMesh.name = prOriginalMesh.name + " (Editable Copy)";
 

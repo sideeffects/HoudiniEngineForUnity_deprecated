@@ -511,7 +511,7 @@ namespace HAPI
 			ref HAPI_AttributeInfo attr_info,
 			int[] data,
 			int start, int length );
-		
+
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_SetAttributeFloatData(
@@ -520,7 +520,16 @@ namespace HAPI
 			ref HAPI_AttributeInfo attr_info,
 			float[] data,
 			int start, int length );
-		
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_SetAttributeStringData(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+			string name,
+			ref HAPI_AttributeInfo attr_info,
+			string[] data,
+			int start, int length );
+
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_CommitGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id );
