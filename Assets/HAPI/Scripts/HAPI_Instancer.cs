@@ -638,7 +638,7 @@ public class HAPI_Instancer : MonoBehaviour
 		
 		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );		
 		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "instance", 
-							  ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStrData );
+							  ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStringData );
 		
 		if ( !instance_attr_info.exists )
 			return;
@@ -653,7 +653,7 @@ public class HAPI_Instancer : MonoBehaviour
 		
 		HAPI_AttributeInfo name_attr_info = new HAPI_AttributeInfo( "name" );		
 		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "name", 
-							  ref name_attr_info, ref name_attr, HAPI_Host.getAttributeStrData );
+							  ref name_attr_info, ref name_attr, HAPI_Host.getAttributeStringData );
 					
 		
 		if ( name_attr_info.exists && name_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -777,7 +777,7 @@ public class HAPI_Instancer : MonoBehaviour
 			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
 			int[] script_attr = new int[ 0 ];
 			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "Unity_Script",
-								  ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
+								  ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStringData );
 			
 			if ( script_attr_info.exists && script_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 				throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as point attributes!" );

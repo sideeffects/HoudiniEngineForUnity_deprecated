@@ -461,7 +461,7 @@ namespace HAPI
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
-		HAPI_GetAttributeStrData(
+		HAPI_GetAttributeStringData(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			string name,
 			ref HAPI_AttributeInfo attr_info,

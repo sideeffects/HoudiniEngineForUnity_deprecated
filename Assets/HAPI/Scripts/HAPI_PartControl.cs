@@ -446,7 +446,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 		HAPI_AttributeInfo tag_attr_info = new HAPI_AttributeInfo( HAPI_Host.prUnityTagAttribName );
 		int[] tag_attr = new int[ 0 ];
 		HAPI_AssetUtility.getAttribute( prAssetId, prObjectId, prGeoId, prPartId, HAPI_Host.prUnityTagAttribName, 
-		             					ref tag_attr_info, ref tag_attr, HAPI_Host.getAttributeStrData );
+		             					ref tag_attr_info, ref tag_attr, HAPI_Host.getAttributeStringData );
 
 		if ( tag_attr_info.exists )
 		{

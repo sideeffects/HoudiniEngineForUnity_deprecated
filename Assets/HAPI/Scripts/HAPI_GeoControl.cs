@@ -174,7 +174,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 			
 				HAPI_AssetUtility.getAttribute( 
 					prAssetId, prObjectId, prGeoId, 0, "Unity_Script",
-					ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStrData );
+					ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStringData );
 			
 				if ( script_attr_info.exists && script_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL )
 					throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as detail attributes!" );
