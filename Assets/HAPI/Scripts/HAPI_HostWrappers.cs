@@ -1274,13 +1274,13 @@ namespace HAPI
 		/// <param name="length">
 		/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
 		/// </param>
-		public static void getAttributeStrData(
+		public static void getAttributeStringData(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
 			ref HAPI_AttributeInfo attr_info,
 			[Out] int[] data,
 			int start, int length )
 		{
-			HAPI_Result status_code = HAPI_GetAttributeStrData(
+			HAPI_Result status_code = HAPI_GetAttributeStringData(
 				asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
 			processStatusCode( status_code );
 		}

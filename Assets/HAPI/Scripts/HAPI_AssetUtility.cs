@@ -1035,7 +1035,7 @@ public class HAPI_AssetUtility
 		HAPI_AttributeInfo material_attr_info = new HAPI_AttributeInfo( HAPI_Host.prUnityMaterialAttribName );
 		int[] material_attr = new int[ 0 ];
 		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Host.prUnityMaterialAttribName, 
-					  ref material_attr_info, ref material_attr, HAPI_Host.getAttributeStrData );
+					  ref material_attr_info, ref material_attr, HAPI_Host.getAttributeStringData );
 
 		// Need to get the material path here because the next call to HAPI_Host.getAttributeStrData will
 		// overwrite the string ids in material_attr.
@@ -1046,7 +1046,7 @@ public class HAPI_AssetUtility
 																HAPI_Host.prUnitySubMaterialNameAttribName );
 		int[] sub_material_name_attr = new int[ 0 ];
 		getAttribute( asset_id, object_id, geo_id, part_id, HAPI_Host.prUnitySubMaterialNameAttribName, 
-					  ref sub_material_name_attr_info, ref sub_material_name_attr, HAPI_Host.getAttributeStrData );
+					  ref sub_material_name_attr_info, ref sub_material_name_attr, HAPI_Host.getAttributeStringData );
 
 		HAPI_AttributeInfo sub_material_index_attr_info = new HAPI_AttributeInfo( 
 																HAPI_Host.prUnitySubMaterialIndexAttribName );
