@@ -223,6 +223,7 @@ public class HAPI_ObjectControl : HAPI_Control
 	{
 		GameObject child = new GameObject( "uninitialized_geo" );
 		child.transform.parent = gameObject.transform;
+		child.isStatic = gameObject.isStatic;
 
 		// Need to reset position here because the assignment above will massage the child's
 		// position in order to be in the same place it was in the global namespace.

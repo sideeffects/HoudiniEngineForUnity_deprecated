@@ -251,6 +251,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 		{
 			prGameObjects[ object_id ] = new GameObject( object_info.name );
 			prGameObjects[ object_id ].transform.parent = transform;
+			prGameObjects[ object_id ].isStatic = gameObject.isStatic;
 
 			object_control = prGameObjects[ object_id ].AddComponent< HAPI_ObjectControl >();
 			object_control.init(
