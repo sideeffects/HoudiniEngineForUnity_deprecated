@@ -1787,7 +1787,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		bool need_rebuild_after_reconnect = false;
 		
-		if ( !serialization_recovery_only && !force_reconnect )
+		if ( !serialization_recovery_only )
 		{
 			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
 			{
@@ -1817,7 +1817,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				prEnableCooking = true;
 			}
 		}
-		else if ( force_reconnect )
+		
+		if ( force_reconnect )
 		{
 			for ( int i = 0; i < prUpStreamTransformObjects.Count; ++i )
 			{
