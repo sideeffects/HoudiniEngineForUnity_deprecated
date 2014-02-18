@@ -64,8 +64,11 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		{
 			if ( !myAsset.isPrefab() )
 			{
-				if ( GUILayout.Button( "Build" ) )
+				if ( GUILayout.Button( "Rebuild" ) ) 
 					myAsset.buildAll();
+	
+				if ( GUILayout.Button( "Recook" ) )
+					myAsset.buildClientSide();
 			}
 		}
 
