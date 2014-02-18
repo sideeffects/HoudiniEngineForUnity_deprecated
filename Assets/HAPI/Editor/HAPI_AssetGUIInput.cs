@@ -254,6 +254,11 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 	{
 		base.OnSceneGUI();
 		myGeoAttributeManagerGUI.OnSceneGUI();
+		if ( myAssetInput.prGeoAttributeManager.prHasChanged && myAssetInput.prGeoAttributeManager.prLiveUpdates )
+		{
+			myAssetInput.prGeoAttributeManager.prHasChanged = false;
+			myAssetInput.buildClientSide();
+		}
 	}
 
 	private HAPI_AssetInput myAssetInput;

@@ -35,6 +35,10 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 
 	public bool			prEditable {					get { return true; }
 														private set {} }
+	public bool			prHasChanged {					get { return myHasChanged; }
+														set { myHasChanged = value; } }
+	public bool			prLiveUpdates {					get { return myLiveUpdates; }
+														set { myLiveUpdates = value; } }
 
 	public Mesh			prEditableMesh {				get { return myMesh; }
 														private set {} }
@@ -77,6 +81,9 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	public void reset()
 	{
 		// Please keep these in the same order and grouping as their declarations at the top.
+
+		myHasChanged = true;
+		myLiveUpdates = true;
 
 		myMesh = null;
 		myMeshRenderer = null;
@@ -199,6 +206,8 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 				prActiveAttribute.paint( i, paint_factor );
 
 		myMesh.colors = prActiveAttribute.getColorRepresentation();
+
+		myHasChanged = true;
 	}
 
 	public void updatePoint( int index, Vector3 position )
@@ -215,6 +224,8 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		// Refresh MeshCollider's geometry.
 		myMeshCollider.enabled = false;
 		myMeshCollider.enabled = true;
+
+		myHasChanged = true;
 	}
 
 	public void setActiveAttribute( string name )
@@ -279,6 +290,9 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 
 		refreshMeshColours();
 	}
+
+	[SerializeField] private bool			myHasChanged;
+	[SerializeField] private bool			myLiveUpdates;
 
 	[SerializeField] private Mesh			myMesh;
 	[SerializeField] private MeshRenderer	myMeshRenderer;

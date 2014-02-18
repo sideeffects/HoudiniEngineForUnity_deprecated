@@ -783,6 +783,7 @@ public class HAPI_GeoAttributeManagerGUI
 		string attribute_text = "Attribute:";
 		string mode_text = "Mode:";
 		string value_text = "Value:";
+		string liveup_text = "Live Updates";
 
 		Color box_color = HAPI_Host.prPaintingModeColour;
 		Color text_color = Color.white;
@@ -797,6 +798,7 @@ public class HAPI_GeoAttributeManagerGUI
 		float line_padding			= mySceneUILinePadding;
 		float double_line_padding	= 2.0f * line_padding;
 		float dropdown_width		= 100.0f;
+		float toggle_width			= 14.0f;
 
 		GUIStyle normal_text_style	= new GUIStyle( GUI.skin.label );
 		normal_text_style.alignment	= TextAnchor.MiddleLeft;
@@ -820,12 +822,18 @@ public class HAPI_GeoAttributeManagerGUI
 									  + double_line_padding;
 		float value_text_width		= normal_text_style.CalcSize( new GUIContent( value_text ) ).x
 									  + double_line_padding;
+		float liveup_text_width		= normal_text_style.CalcSize( new GUIContent( liveup_text ) ).x
+									  + double_line_padding;
 
 		float title_box_width		= title_text_width;
 		float attribute_box_width	= attribute_text_width + dropdown_width + line_padding;
 		float mode_box_width		= mode_text_width + dropdown_width + line_padding;
-		float value_box_width		= scene_width - title_box_width - border_padding - attribute_box_width
-									  - border_padding - mode_box_width - border_padding
+		float liveup_box_width		= liveup_text_width + toggle_width + line_padding;
+		float value_box_width		= scene_width
+									  - title_box_width - border_padding
+									  - attribute_box_width - border_padding
+									  - liveup_box_width - border_padding
+									  - mode_box_width - border_padding
 									  - border_total - border_total;
 		float value_fields_width	= value_box_width - value_text_width;
 		
@@ -833,9 +841,11 @@ public class HAPI_GeoAttributeManagerGUI
 		float attribute_box_right	= border_total + title_box_width + border_padding;
 		float attribute_dropdown_right = attribute_box_right + attribute_text_width;
 		float mode_box_right		= attribute_box_right + attribute_box_width + border_padding;
-		float mode_dropdown_right		= mode_box_right + mode_text_width;
+		float mode_dropdown_right	= mode_box_right + mode_text_width;
 		float value_box_right		= mode_box_right + mode_box_width + border_padding;
 		float value_fields_right	= value_box_right + value_text_width;
+		float liveup_box_right		= value_box_right + value_box_width + border_padding;
+		float liveup_toggle_right	= liveup_box_right + line_padding;
 
 		// Create background boxes texture.
 		Texture2D box_texture		= new Texture2D( 1, 1 );
@@ -853,6 +863,8 @@ public class HAPI_GeoAttributeManagerGUI
 		Rect mode_dropdown_rect			= new Rect( mode_dropdown_right, box_top, dropdown_width, box_height );
 		Rect value_box_rect				= new Rect( value_box_right, box_top, value_box_width, box_height );
 		Rect value_fields_rect			= new Rect( value_fields_right, box_top, value_fields_width, box_height );
+		Rect liveup_box_rect			= new Rect( liveup_box_right, box_top, liveup_box_width, box_height );
+		Rect liveup_toggle_rect			= new Rect( liveup_toggle_right, box_top, liveup_text_width + toggle_width, box_height );
 
 		// Label boxes.
 		Rect title_text_rect = new Rect( title_box_right + line_padding, box_top, 
@@ -875,6 +887,7 @@ public class HAPI_GeoAttributeManagerGUI
 		GUI.DrawTexture( attribute_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( value_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( liveup_box_rect, box_texture, ScaleMode.StretchToFill );
 
 		// Draw the labels for the mesh and the help.
 		GUI.color = text_color;
@@ -889,6 +902,10 @@ public class HAPI_GeoAttributeManagerGUI
 		control_color.g			+= mySceneUIBrightningFactor;
 		control_color.b			+= mySceneUIBrightningFactor;
 		GUI.color				= control_color;
+
+		// Draw live updates toggle.
+		myManager.prLiveUpdates = EditorGUI.ToggleLeft(
+			liveup_toggle_rect, liveup_text, myManager.prLiveUpdates );
 
 		// Draw attribute dropdown.
 		{
