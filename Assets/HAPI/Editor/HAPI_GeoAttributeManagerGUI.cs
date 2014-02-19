@@ -985,6 +985,10 @@ public class HAPI_GeoAttributeManagerGUI
 						myManager.prActiveAttribute.prFloatPaintValue[ i ] = EditorGUILayout.FloatField(
 							"", myManager.prActiveAttribute.prFloatPaintValue[ i ],
 							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+					else if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.STRING )
+						myManager.prActiveAttribute.prStringPaintValue[ i ] = EditorGUILayout.TextField(
+							"", myManager.prActiveAttribute.prStringPaintValue[ i ],
+							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.EndArea();

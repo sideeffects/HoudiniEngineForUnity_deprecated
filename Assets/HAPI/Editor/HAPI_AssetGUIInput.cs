@@ -134,8 +134,8 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 
 			HAPI_GUI.separator();
 
-			string[] type_labels = new string[] { "bool", "int", "float" };
-			int[] type_values = new int[] { 0, 1, 2 };
+			string[] type_labels = new string[] { "bool", "int", "float", "string" };
+			int[] type_values = new int[] { 0, 1, 2, 3 };
 
 			string[] tuple_labels = new string[] { "1", "2", "3", "4", "5" };
 			int[] tuple_values = new int[] { 1, 2, 3, 4, 5 };
@@ -150,8 +150,8 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				label_style.border.right = -10;
 
 				EditorGUILayout.LabelField( "Name", GUILayout.Width( 100 ) );
-				EditorGUILayout.LabelField( "Type", GUILayout.Width( 40 ) );
-				EditorGUILayout.LabelField( "Tuple", GUILayout.Width( 40 ) );
+				EditorGUILayout.LabelField( "Type", GUILayout.Width( 50 ) );
+				EditorGUILayout.LabelField( "Tuple", GUILayout.Width( 50 ) );
 				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
 				EditorGUILayout.LabelField( "Range", label_style, GUILayout.MinWidth( 20 ) );
 
@@ -174,7 +174,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 
 				// Attribute Type
 				HAPI_GeoAttribute.Type new_attrib_type = (HAPI_GeoAttribute.Type) EditorGUILayout.IntPopup(
-					(int) attrib.prType, type_labels, type_values, GUILayout.Width( 40 ) );
+					(int) attrib.prType, type_labels, type_values, GUILayout.Width( 50 ) );
 				if ( new_attrib_type != attrib.prType )
 				{
 					attrib.prType = new_attrib_type;
@@ -183,7 +183,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 
 				// Attribute Tuple Size
 				int new_tuple_size = EditorGUILayout.IntPopup(
-					attrib.prTupleSize, tuple_labels, tuple_values, GUILayout.Width( 40 ) );
+					attrib.prTupleSize, tuple_labels, tuple_values, GUILayout.Width( 50 ) );
 				if ( new_tuple_size != attrib.prTupleSize )
 				{
 					attrib.prTupleSize = new_tuple_size;
@@ -192,6 +192,15 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 
 				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
 
+				if ( attrib.prType == HAPI_GeoAttribute.Type.STRING )
+				{
+					EditorGUILayout.BeginVertical();
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.LabelField( "N/A", GUILayout.Width( 26 ) );
+					EditorGUILayout.EndHorizontal();
+					EditorGUILayout.EndVertical();
+				}
+				else
 				{
 					EditorGUILayout.BeginVertical();
 
