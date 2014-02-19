@@ -31,6 +31,11 @@ public class HAPI_AssetInput : HAPI_Asset
 
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 
+	public bool			prShowAttributesTable {			get { return myShowAttributesTable; }
+														set { myShowAttributesTable = value; } }
+	public bool			prHasAttributeChanges {			get { return myHasAttributeChanges; }
+														set { myHasAttributeChanges = value; } }
+
 	public Mesh			prEditableMesh {				get { return myEditableMesh; }
 														set { myEditableMesh = value; } }
 	public Mesh			prOriginalMesh {				get { return myOriginalMesh; }
@@ -55,6 +60,9 @@ public class HAPI_AssetInput : HAPI_Asset
 	public override void reset()
 	{
 		base.reset();
+
+		myShowAttributesTable = true;
+		myHasAttributeChanges = false;
 
 		prEditableMesh = null;
 		prOriginalMesh = null;
@@ -104,7 +112,9 @@ public class HAPI_AssetInput : HAPI_Asset
 									  force_reconnect, cook_downstream_assets, use_delay_for_progress_bar );
 		if ( !base_built )
 			return false;
-		
+
+		myHasAttributeChanges = false;
+
 		return true;
 	}
 
@@ -212,6 +222,9 @@ public class HAPI_AssetInput : HAPI_Asset
 			mesh_filter.sharedMesh = prEditableMesh;
 		}
 	}
+
+	[SerializeField] private bool			myShowAttributesTable;
+	[SerializeField] private bool			myHasAttributeChanges;
 
 	[SerializeField] private Mesh			myEditableMesh;
 	[SerializeField] private Mesh			myOriginalMesh;
