@@ -247,7 +247,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 
 	public HAPI_GeoAttribute createAttribute()
 	{
-		return createAttribute( "new_attribute_" );
+		return createAttribute( "new_attribute" );
 	}
 	public HAPI_GeoAttribute createAttribute( string suggested_name )
 	{

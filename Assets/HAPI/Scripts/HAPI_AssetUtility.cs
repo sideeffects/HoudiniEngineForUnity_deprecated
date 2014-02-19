@@ -1526,27 +1526,14 @@ public class HAPI_AssetUtility
 						asset_id, object_id, geo_id, attribute.prName, 
 						ref attr_info, ref int_data, HAPI_Host.setAttributeFloatData );
 				}
+				else if ( attribute.prType == HAPI_GeoAttribute.Type.STRING )
+				{
+					string[] string_data = attribute.prStringData;
+					setAttribute(
+						asset_id, object_id, geo_id, attribute.prName, 
+						ref attr_info, ref string_data, HAPI_Host.setAttributeStringData );
+				}
 			}
-
-#if false
-			if ( attribute_manager.prAttributes.Count > 0 )
-			{
-				HAPI_AttributeInfo attr_info = attribute_manager.prAttributes[ 0 ].prAttributeInfo;
-				attr_info.exists = true;
-				attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
-				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_STR;
-
-				HAPI_Host.addAttribute( asset_id, object_id, geo_id, "test_string_attr", ref attr_info );
-
-				string[] blah = new string[ attr_info.count * attr_info.tupleSize ];
-				for ( int i = 0; i < attr_info.count * attr_info.tupleSize; ++i )
-					blah[ i ] = "Item " + i;
-
-				setAttribute(
-					asset_id, object_id, geo_id, "test_string_attr", 
-					ref attr_info, ref blah, HAPI_Host.setAttributeStringData );
-			}
-#endif
 		}
 
 		HAPI_Host.commitGeo( asset_id, object_id, geo_id );
