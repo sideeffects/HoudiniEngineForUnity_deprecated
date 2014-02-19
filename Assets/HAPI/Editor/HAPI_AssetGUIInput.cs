@@ -114,19 +114,21 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				!myAssetInput.prEnableCooking, " (all cooking is disabled)" );
 		}
 
-		myAssetInput.prShowAttributesTable = HAPI_GUI.foldout( "Custom Attributes", myAssetInput.prShowAttributesTable, true );
+		myAssetInput.prShowAttributesTable = HAPI_GUI.foldout( "Point Attributes", myAssetInput.prShowAttributesTable, true );
 		if ( myAssetInput.prShowAttributesTable )
 		{
-
-			if ( GUILayout.Button( "Create Attribute" ) )
+			if ( GUILayout.Button( "Create Custom Point Attribute" ) )
 			{
 				myGeoAttributeManager.createAttribute();
 				myAssetInput.prHasAttributeChanges = true;
 			}
 
 			// Draw recook notice.
+			string help_msg = "There are uncommitted attribute changes. Press 'Recook' when ready.";
+			if ( myAssetInput.prHasError )
+				help_msg += "\nError: " + myAssetInput.prErrorMsg;
 			if ( myAssetInput.prHasAttributeChanges )
-				HAPI_GUI.help( "There are uncommitted attribute changes. Press 'Recook' when ready.", MessageType.Info );
+				HAPI_GUI.help( help_msg, MessageType.Info );
 			else
 				HAPI_GUI.help( "Ready", MessageType.Info );
 

@@ -18,6 +18,7 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using HAPI;
 using Utility = HAPI_AssetUtility;
 
@@ -35,6 +36,11 @@ public class HAPI_AssetInput : HAPI_Asset
 														set { myShowAttributesTable = value; } }
 	public bool			prHasAttributeChanges {			get { return myHasAttributeChanges; }
 														set { myHasAttributeChanges = value; } }
+
+	public bool			prHasError {					get { return myErrorMsg != ""; }
+														private set {} }
+	public string		prErrorMsg {					get { return myErrorMsg; }
+														set { myErrorMsg = value; } }
 
 	public Mesh			prEditableMesh {				get { return myEditableMesh; }
 														set { myEditableMesh = value; } }
@@ -63,6 +69,8 @@ public class HAPI_AssetInput : HAPI_Asset
 
 		myShowAttributesTable = true;
 		myHasAttributeChanges = false;
+
+		myErrorMsg = "";
 
 		prEditableMesh = null;
 		prOriginalMesh = null;
@@ -106,6 +114,9 @@ public class HAPI_AssetInput : HAPI_Asset
 								bool cook_downstream_assets,
 								bool use_delay_for_progress_bar ) 
 	{
+		if ( !validateAttributes() )
+			return false;
+
 		unload_asset_first = unload_asset_first && ( !serialization_recovery_only || isPrefab() );
 
 		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
@@ -195,6 +206,56 @@ public class HAPI_AssetInput : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
+	private bool validateAttributes()
+	{
+		if ( !myGeoAttributeManager )
+			return true;
+
+		// Check for duplicates.
+		for ( int i = 0; i < myGeoAttributeManager.prAttributes.Count; ++i )
+			for ( int j = i + 1; j < myGeoAttributeManager.prAttributes.Count; ++j )
+				if ( myGeoAttributeManager.prAttributes[ i ].prName ==
+					myGeoAttributeManager.prAttributes[ j ].prName )
+				{
+					myErrorMsg = "Duplicate attribute name: " + myGeoAttributeManager.prAttributes[ i ].prName;
+					return false;
+				}
+
+		// Check for invalid attribute names.
+		Regex attribute_name_regex = new Regex( "^[a-zA-Z0-9-_]*$" );
+		foreach ( HAPI_GeoAttribute attribute in myGeoAttributeManager.prAttributes )
+		{
+			if ( attribute.prName == "" )
+			{
+				myErrorMsg = "You have an empty attribute name.";
+				return false;
+			}
+
+			if ( !attribute_name_regex.IsMatch( attribute.prName ) )
+			{
+				myErrorMsg = "Attribute names cannot contain special characters: " + attribute.prName;
+				return false;
+			}
+
+			int temp;
+			if ( int.TryParse( attribute.prName.Substring( 0, 1 ), out temp ) )
+			{
+				myErrorMsg = "Attribute cannot start with a number: " + attribute.prName;
+				return false;
+			}
+
+			if ( attribute.prName == "P" )
+			{
+				myErrorMsg = "Cannot have an attribute named 'P' as that attribute is reserved for positions.";
+				return false;
+			}
+		}
+
+		myErrorMsg = "";
+
+		return true;
+	}
+
 	private void cloneMesh()
 	{
 		// Safe to assume these exist because of [RequiredComponent] attributes.
@@ -225,6 +286,8 @@ public class HAPI_AssetInput : HAPI_Asset
 
 	[SerializeField] private bool			myShowAttributesTable;
 	[SerializeField] private bool			myHasAttributeChanges;
+
+	[SerializeField] private string			myErrorMsg;
 
 	[SerializeField] private Mesh			myEditableMesh;
 	[SerializeField] private Mesh			myOriginalMesh;
