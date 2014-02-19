@@ -247,11 +247,19 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 
 	public HAPI_GeoAttribute createAttribute()
 	{
+		return createAttribute( "new_attribute_" );
+	}
+	public HAPI_GeoAttribute createAttribute( string suggested_name )
+	{
 		int temp_name_count = 0;
 		string temp_name = "";
 		while ( temp_name == "" )
 		{
-			temp_name = "new_attribute_" + temp_name_count;
+			temp_name = suggested_name;
+
+			if ( temp_name_count > 0 )
+				temp_name += temp_name_count;
+
 			for ( int i = 0; i < myAttributes.Count; ++i )
 				if ( myAttributes[ i ].prName == temp_name )
 				{
