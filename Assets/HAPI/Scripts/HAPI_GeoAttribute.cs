@@ -82,17 +82,13 @@ public class HAPI_GeoAttribute : ScriptableObject
 				if ( new_type == Type.FLOAT )
 				{
 					myFloatPaintValue = new float[ myTupleSize ];
-					myFloatMins = new float[ myTupleSize ];
-					myFloatMaxes = new float[ myTupleSize ];
 					for ( int i = 0; i < myTupleSize; ++i )
 					{
 						myFloatPaintValue[ i ] = (float) myIntPaintValue[ i ];
-						myFloatMins[ i ] = (float) myIntMins[ i ];
-						myFloatMaxes[ i ] = (float) myIntMaxes[ i ];
+						myFloatMin = (float) myIntMin;
+						myFloatMax = (float) myIntMax;
 					}
 					myIntPaintValue = null;
-					myIntMins = null;
-					myIntMaxes = null;
 
 					myFloatData = new float[ myIntData.Length ];
 					for ( int i = 0; i < myIntData.Length; ++i )
@@ -116,24 +112,20 @@ public class HAPI_GeoAttribute : ScriptableObject
 				if ( new_type == Type.BOOL || new_type == Type.INT )
 				{
 					myIntPaintValue = new int[ myTupleSize ];
-					myIntMins = new int[ myTupleSize ];
-					myIntMaxes = new int[ myTupleSize ];
 					for ( int i = 0; i < myTupleSize; ++i )
 						if ( new_type == Type.BOOL )
 						{
 							myIntPaintValue[ i ] = (int) myFloatPaintValue[ i ] > 0 ? 1 : 0;
-							myIntMins[ i ] = 0;
-							myIntMaxes[ i ] = 1;
+							myIntMin = 0;
+							myIntMax = 1;
 						}
 						else
 						{
 							myIntPaintValue[ i ] = (int) myFloatPaintValue[ i ];
-							myIntMins[ i ] = (int) myFloatMins[ i ];
-							myIntMaxes[ i ] = (int) myFloatMaxes[ i ];
+							myIntMin = (int) myFloatMin;
+							myIntMax = (int) myFloatMax;
 						}
 					myFloatPaintValue = null;
-					myFloatMins = null;
-					myFloatMaxes = null;
 
 					myIntData = new int[ myFloatData.Length ];
 					for ( int i = 0; i < myFloatData.Length; ++i )
@@ -160,8 +152,8 @@ public class HAPI_GeoAttribute : ScriptableObject
 				if ( new_type == Type.BOOL || new_type == Type.INT )
 				{
 					myIntPaintValue = new int[ myTupleSize ];
-					myIntMins = new int[ myTupleSize ];
-					myIntMaxes = new int[ myTupleSize ];
+					myIntMin = myDefaultIntMin;
+					myIntMax = myDefaultIntMax;
 					for ( int i = 0; i < myTupleSize; ++i )
 					{
 						int new_value;
@@ -171,15 +163,11 @@ public class HAPI_GeoAttribute : ScriptableObject
 						if ( new_type == Type.BOOL )
 						{
 							myIntPaintValue[ i ] = new_value > 0 ? 1 : 0;
-							myIntMins[ i ] = 0;
-							myIntMaxes[ i ] = 1;
+							myIntMin = 0;
+							myIntMax = 1;
 						}
 						else
-						{
 							myIntPaintValue[ i ] = new_value;
-							myIntMins[ i ] = myDefaultIntMin;
-							myIntMaxes[ i ] = myDefaultIntMax;
-						}
 					}
 					myStringPaintValue = null;
 
@@ -200,8 +188,8 @@ public class HAPI_GeoAttribute : ScriptableObject
 				else if ( new_type == Type.FLOAT )
 				{
 					myFloatPaintValue = new float[ myTupleSize ];
-					myFloatMins = new float[ myTupleSize ];
-					myFloatMaxes = new float[ myTupleSize ];
+					myFloatMin = myDefaultFloatMin;
+					myFloatMax = myDefaultFloatMax;
 					for ( int i = 0; i < myTupleSize; ++i )
 					{
 						float new_value;
@@ -209,8 +197,6 @@ public class HAPI_GeoAttribute : ScriptableObject
 							new_value = myDefaultIntPaintValue;
 
 						myFloatPaintValue[ i ] = new_value;
-						myFloatMins[ i ] = myDefaultFloatMin;
-						myFloatMaxes[ i ] = myDefaultFloatMax;
 					}
 					myStringPaintValue = null;
 
@@ -250,40 +236,22 @@ public class HAPI_GeoAttribute : ScriptableObject
 			if ( myType == Type.BOOL || myType == Type.INT )
 			{
 				int[] new_paint_value = new int[ new_tuple_size ];
-				int[] new_mins = new int[ new_tuple_size ];
-				int[] new_maxes = new int[ new_tuple_size ];
 				int[] new_data = new int[ myVertexCount * new_tuple_size ];
 
 				int min_tuple_size = Mathf.Min( myTupleSize, new_tuple_size );
 				for ( int i = 0; i < min_tuple_size; ++i )
-				{
 					new_paint_value[ i ] = myIntPaintValue[ i ];
-					new_mins[ i ] = myIntMins[ i ];
-					new_maxes[ i ] = myIntMaxes[ i ];
-				}
 				for ( int i = min_tuple_size; i < new_tuple_size; ++i )
-				{
 					if ( myType == Type.BOOL )
-					{
 						new_paint_value[ i ] = 1;
-						new_mins[ i ] = 0;
-						new_maxes[ i ] = 1;
-					}
 					else if ( myType == Type.INT )
-					{
 						new_paint_value[ i ] = myDefaultIntPaintValue;
-						new_mins[ i ] = myDefaultIntMin;
-						new_maxes[ i ] = myDefaultIntMax;
-					}
-				}
 
 				for ( int i = 0; i < myVertexCount; ++i )
 					for ( int j = 0; j < min_tuple_size; ++j )
 						new_data[ i * new_tuple_size + j ] = myIntData[ i * myTupleSize + j ];
 
 				myIntPaintValue = new_paint_value;
-				myIntMins = new_mins;
-				myIntMaxes = new_maxes;
 				myIntData = new_data;
 				myTupleSize = new_tuple_size;
 				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size );
@@ -291,31 +259,19 @@ public class HAPI_GeoAttribute : ScriptableObject
 			else if ( myType == Type.FLOAT )
 			{
 				float[] new_paint_value = new float[ new_tuple_size ];
-				float[] new_mins = new float[ new_tuple_size ];
-				float[] new_maxes = new float[ new_tuple_size ];
 				float[] new_data = new float[ myVertexCount * new_tuple_size ];
 
 				int min_tuple_size = Mathf.Min( myTupleSize, new_tuple_size );
 				for ( int i = 0; i < min_tuple_size; ++i )
-				{
 					new_paint_value[ i ] = myFloatPaintValue[ i ];
-					new_mins[ i ] = myFloatMins[ i ];
-					new_maxes[ i ] = myFloatMaxes[ i ];
-				}
 				for ( int i = min_tuple_size; i < new_tuple_size; ++i )
-				{
 					new_paint_value[ i ] = myDefaultFloatPaintValue;
-					new_mins[ i ] = myDefaultFloatMin;
-					new_maxes[ i ] = myDefaultFloatMax;
-				}
 
 				for ( int i = 0; i < myVertexCount; ++i )
 					for ( int j = 0; j < min_tuple_size; ++j )
 						new_data[ i * new_tuple_size + j ] = myFloatData[ i * myTupleSize + j ];
 
 				myFloatPaintValue = new_paint_value;
-				myFloatMins = new_mins;
-				myFloatMaxes = new_maxes;
 				myFloatData = new_data;
 				myTupleSize = new_tuple_size;
 				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size );
@@ -356,14 +312,14 @@ public class HAPI_GeoAttribute : ScriptableObject
 	}
 
 	public int[] prIntPaintValue { get { return myIntPaintValue; } set { myIntPaintValue = value; } }
-	public int[] prIntMins { get { return myIntMins; } set { myIntMins = value; } }
-	public int[] prIntMaxes {
-		get { return myIntMaxes; } 
-		set { if ( myType != Type.BOOL ) myIntMaxes = value; } }
+	public int prIntMin { get { return myIntMin; } set { myIntMin = value; } }
+	public int prIntMax {
+		get { return myIntMax; } 
+		set { if ( myType != Type.BOOL ) myIntMax = value; } }
 	public int[] prIntData { get { return myIntData; } private set {} }
 	public float[] prFloatPaintValue { get { return myFloatPaintValue; } set { myFloatPaintValue = value; } }
-	public float[] prFloatMins { get { return myFloatMins; } set { myFloatMins = value; } }
-	public float[] prFloatMaxes { get { return myFloatMaxes; } set { myFloatMaxes = value; } }
+	public float prFloatMin { get { return myFloatMin; } set { myFloatMin = value; } }
+	public float prFloatMax { get { return myFloatMax; } set { myFloatMax = value; } }
 	public float[] prFloatData { get { return myFloatData; } private set {} }
 	public Vector2[] prFloatDataVec2 {
 		get
@@ -436,13 +392,13 @@ public class HAPI_GeoAttribute : ScriptableObject
 		myPaintMode = (int) SpecialPaintMode.COLOUR;
 
 		myIntPaintValue = null;
-		myIntMins = null;
-		myIntMaxes = null;
+		myIntMin = myDefaultIntMin;
+		myIntMax = myDefaultIntMax;
 		myIntData = null;
 
 		myFloatPaintValue = null;
-		myFloatMins = null;
-		myFloatMaxes = null;
+		myFloatMin = myDefaultFloatMin;
+		myFloatMax = myDefaultFloatMax;
 		myFloatData = null;
 
 		myStringPaintValue = null;
@@ -512,8 +468,8 @@ public class HAPI_GeoAttribute : ScriptableObject
 		if ( type == Type.BOOL || type == Type.INT )
 		{
 			myIntPaintValue = new int[ tuple_size ];
-			myIntMins = new int[ tuple_size ];
-			myIntMaxes = new int[ tuple_size ];
+			myIntMin = myDefaultIntMin;
+			myIntMax = myDefaultIntMax;
 			myIntData = new int[ mesh.vertexCount * tuple_size ];
 
 			for ( int i = 0; i < tuple_size; ++i )
@@ -521,29 +477,21 @@ public class HAPI_GeoAttribute : ScriptableObject
 				{
 					// These are hard coded because...well, BOOLs.
 					myIntPaintValue[ i ] = 1;
-					myIntMins[ i ] = 0;
-					myIntMaxes[ i ] = 1;
+					myIntMin = 0;
+					myIntMax = 1;
 				}
 				else if ( type == Type.INT )
-				{
 					myIntPaintValue[ i ] = myDefaultIntPaintValue;
-					myIntMins[ i ] = myDefaultIntMin;
-					myIntMaxes[ i ] = myDefaultIntMax;
-				}
 		}
 		else if ( type == Type.FLOAT )
 		{
 			myFloatPaintValue = new float[ tuple_size ];
-			myFloatMins = new float[ tuple_size ];
-			myFloatMaxes = new float[ tuple_size ];
+			myFloatMin = myDefaultFloatMin;
+			myFloatMax = myDefaultFloatMax;
 			myFloatData = new float[ mesh.vertexCount * tuple_size ];
 
 			for ( int i = 0; i < tuple_size; ++i )
-			{
 				myFloatPaintValue[ i ] = myDefaultFloatPaintValue;
-				myFloatMins[ i ] = myDefaultFloatMin;
-				myFloatMaxes[ i ] = myDefaultFloatMax;
-			}
 		}
 		else if ( type == Type.STRING )
 		{
@@ -578,12 +526,12 @@ public class HAPI_GeoAttribute : ScriptableObject
 					if ( myType == Type.BOOL || myType == Type.INT )
 						colors[ i ][ j ] =
 							Mathf.InverseLerp( 
-								myIntMins[ j ], myIntMaxes[ j ], 
+								myIntMin, myIntMax, 
 								myIntData[ i * myTupleSize + j ] );
 					else if ( myType == Type.FLOAT )
 						colors[ i ][ j ] =
 							Mathf.InverseLerp( 
-								myFloatMins[ j ], myFloatMaxes[ j ], 
+								myFloatMin, myFloatMax,
 								myFloatData[ i * myTupleSize + j ] );
 					else if ( myType == Type.STRING )
 						colors[ i ][ j ] =
@@ -607,14 +555,12 @@ public class HAPI_GeoAttribute : ScriptableObject
 					if ( myType == Type.BOOL || myType == Type.INT )
 						colors[ i ][ j ] =
 							Mathf.InverseLerp( 
-								myIntMins[ component_index ],
-								myIntMaxes[ component_index ], 
+								myIntMin, myIntMax,
 								myIntData[ i * myTupleSize + component_index ] );
 					else if ( myType == Type.FLOAT )
 						colors[ i ][ j ] =
 							Mathf.InverseLerp( 
-								myFloatMins[ component_index ],
-								myFloatMaxes[ component_index ], 
+								myFloatMin, myFloatMax,
 								myFloatData[ i * myTupleSize + component_index ] );
 					else if ( myType == Type.STRING )
 						colors[ i ][ j ] =
@@ -650,19 +596,52 @@ public class HAPI_GeoAttribute : ScriptableObject
 				myIntData[ vertex_index * myTupleSize + i ] += (int) Mathf.Sign( paint_factor ) * myIntPaintValue[ i ];
 			else if ( myType == Type.INT )
 			{
-				myIntData[ vertex_index * myTupleSize + i ] +=
-					(int) ( paint_factor * (float) myIntPaintValue[ i ] );
-				myIntData[ vertex_index * myTupleSize + i ] =
-					Mathf.Clamp( myIntData[ vertex_index * myTupleSize + i ], 
-					myIntMins[ i ], myIntMaxes[ i ] );
+				if ( myIntPaintValue[ i ] < myIntMin || myIntPaintValue[ i ] > myIntMax )
+					myIntData[ vertex_index * myTupleSize + i ] = myIntPaintValue[ i ];
+				else
+				{
+					int original_value = myIntData[ vertex_index * myTupleSize + i ];
+					int new_value = myIntPaintValue[ i ];
+					int distance = new_value - original_value;
+
+					int min_max_distance = myIntMax - myIntMin;
+					float max_paint_amount = (float) min_max_distance * HAPI.HAPI_Host.prPaintBrushRate;
+
+					if ( paint_factor < 0.0f )
+						distance = min_max_distance - Mathf.Abs( distance ) + (int) Mathf.Sign( distance );
+
+					float clamped_distance =
+						Mathf.Sign( distance ) * Mathf.Min( Mathf.Abs( distance ), Mathf.Abs( max_paint_amount ) );
+					float paint_amount = paint_factor * clamped_distance;
+
+					int paint_amount_int =
+						distance > 0 ? Mathf.CeilToInt( paint_amount ) : Mathf.FloorToInt( paint_amount );
+
+					myIntData[ vertex_index * myTupleSize + i ] += paint_amount_int;
+				}
 			}
 			else if ( myType == Type.FLOAT )
 			{
-				myFloatData[ vertex_index * myTupleSize + i ] +=
-					paint_factor * myFloatPaintValue[ i ];
-				myFloatData[ vertex_index * myTupleSize + i ] =
-					Mathf.Clamp( myFloatData[ vertex_index * myTupleSize + i ],
-					myFloatMins[ i ], myFloatMaxes[ i ] );
+				if ( myFloatPaintValue[ i ] < myFloatMin || myFloatPaintValue[ i ] > myFloatMax )
+					myFloatData[ vertex_index * myTupleSize + i ] = myFloatPaintValue[ i ];
+				else
+				{
+					float original_value = myFloatData[ vertex_index * myTupleSize + i ];
+					float new_value = myFloatPaintValue[ i ];
+					float distance = new_value - original_value;
+
+					float min_max_distance = myFloatMax - myFloatMin;
+					float max_paint_amount = min_max_distance * HAPI.HAPI_Host.prPaintBrushRate;
+
+					if ( paint_factor < 0.0f )
+						distance = min_max_distance - distance;
+
+					float clamped_distance =
+						Mathf.Sign( distance ) * Mathf.Min( Mathf.Abs( distance ), Mathf.Abs( max_paint_amount ) );
+					float paint_amount = paint_factor * clamped_distance;
+
+					myFloatData[ vertex_index * myTupleSize + i ] += paint_amount;
+				}
 			}
 			else if ( myType == Type.STRING )
 			{
@@ -683,13 +662,13 @@ public class HAPI_GeoAttribute : ScriptableObject
 	[SerializeField] private int myPaintMode;
 
 	[SerializeField] private int[] myIntPaintValue;
-	[SerializeField] private int[] myIntMins;
-	[SerializeField] private int[] myIntMaxes;
+	[SerializeField] private int myIntMin;
+	[SerializeField] private int myIntMax;
 	[SerializeField] private int[] myIntData;
 	
 	[SerializeField] private float[] myFloatPaintValue;
-	[SerializeField] private float[] myFloatMins;
-	[SerializeField] private float[] myFloatMaxes;
+	[SerializeField] private float myFloatMin;
+	[SerializeField] private float myFloatMax;
 	[SerializeField] private float[] myFloatData;
 
 	[SerializeField] private string[] myStringPaintValue;

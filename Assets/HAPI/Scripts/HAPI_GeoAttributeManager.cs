@@ -214,8 +214,8 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		double time_delta = current_time - myLastPaintTime;
 		myLastPaintTime = current_time;
 
-		float paint_factor = Mathf.Sign( amount );
-		double min_time_delta = (double) HAPI.HAPI_Host.prPaintBrushRate * myPaintTimeMinDelta;
+		float paint_factor = 1.0f * Mathf.Sign( amount );
+		double min_time_delta = myPaintTimeMinDelta;
 		if ( time_delta < min_time_delta )
 			paint_factor *= (float) ( time_delta / min_time_delta );
 
@@ -348,7 +348,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	[SerializeField] private float			myBrushSize;
 	[SerializeField] private float			myPaintAmount;
 	[SerializeField] private double			myLastPaintTime;
-	private const double					myPaintTimeMinDelta = 0.0000005;
+	private const double					myPaintTimeMinDelta = 0.000001;
 
 	[SerializeField] private Material		myEditableMaterial;
 	[SerializeField] private Material		myOriginalMaterial;

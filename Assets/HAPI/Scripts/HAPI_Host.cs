@@ -146,7 +146,7 @@ namespace HAPI
 
 		private const string myDefaultUnityTagAttribName					= "unity_tag";
 
-		private const float myDefaultPaintBrushRate							= 2.0f;
+		private const float myDefaultPaintBrushRate							= 0.2f; // Should be between zero and one.
 		private const KeyCode myDefaultPaintingModeHotKey					= KeyCode.LeftShift;
 		private static Color myDefaultPaintingModeColour					= new Color( 0.7f, 0.9f, 0.7f, 1.0f );
 
