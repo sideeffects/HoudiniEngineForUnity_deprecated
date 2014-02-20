@@ -65,8 +65,6 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 														set { myModeChangeWait = value; } }
 	public float		prBrushRadius {					get { return myBrushSize; }
 														set { myBrushSize = value; } }
-	public float		prPaintAmount {					get { return myPaintAmount; }
-														set { myPaintAmount = value; } }
 
 	public Material		prEditableMaterial {			get { return myEditableMaterial; }
 														set { myEditableMaterial = value; } }
@@ -96,7 +94,6 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 
 		prModeChangeWait = false;
 		prBrushRadius = 0.5f;
-		prPaintAmount = 0.1f;
 
 		prEditableMaterial = null;
 		prOriginalMaterial = null;
@@ -198,7 +195,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 			myMesh.colors = new Color[ myMesh.vertexCount ];
 	}
 
-	public void paint( RaycastHit hit_info, float amount )
+	public void paint( RaycastHit hit_info, bool inverse )
 	{
 		if ( !myMesh || !myMeshCollider || !myTransform )
 			return;
@@ -214,14 +211,14 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		double time_delta = current_time - myLastPaintTime;
 		myLastPaintTime = current_time;
 
-		float paint_factor = 1.0f * Mathf.Sign( amount );
+		float paint_factor = 1.0f;
 		double min_time_delta = myPaintTimeMinDelta;
 		if ( time_delta < min_time_delta )
 			paint_factor *= (float) ( time_delta / min_time_delta );
 
 		for ( int i = 0; i < myMesh.vertexCount; ++i )
 			if ( Vector3.Distance( hit_point, verts[ i ] ) <= prBrushRadius )
-				prActiveAttribute.paint( i, paint_factor );
+				prActiveAttribute.paint( i, paint_factor, inverse );
 
 		refreshMesh();
 
@@ -346,7 +343,6 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	[SerializeField] private Mode			myCurrentMode;
 	[SerializeField] private bool			myModeChangeWait;
 	[SerializeField] private float			myBrushSize;
-	[SerializeField] private float			myPaintAmount;
 	[SerializeField] private double			myLastPaintTime;
 	private const double					myPaintTimeMinDelta = 0.000001;
 

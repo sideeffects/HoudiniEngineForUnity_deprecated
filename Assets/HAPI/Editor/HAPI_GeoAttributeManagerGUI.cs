@@ -164,9 +164,9 @@ public class HAPI_GeoAttributeManagerGUI
 
 						// Paint.
 						if ( myMouseKey == 0 )
-							myManager.paint( hit_info, myManager.prPaintAmount );
+							myManager.paint( hit_info, false );
 						else
-							myManager.paint( hit_info, -myManager.prPaintAmount );
+							myManager.paint( hit_info, true );
 					}
 				}
 			}

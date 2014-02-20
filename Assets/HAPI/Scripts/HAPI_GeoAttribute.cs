@@ -576,7 +576,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 	// -----------------------------------------------------------------------
 	// Paint
 
-	public void paint( int vertex_index, float paint_factor )
+	public void paint( int vertex_index, float paint_factor, bool inverse )
 	{
 		if ( vertex_index <= 0 || vertex_index >= myVertexCount )
 			return; // TODO: Throw error.
@@ -600,24 +600,33 @@ public class HAPI_GeoAttribute : ScriptableObject
 					myIntData[ vertex_index * myTupleSize + i ] = myIntPaintValue[ i ];
 				else
 				{
+					int paint_value = myIntPaintValue[ i ];
+					if ( inverse )
+						paint_value = myIntMax - myIntPaintValue[ i ];
+
+					// First bring the current values back to the min/max range.
+					myIntData[ vertex_index * myTupleSize + i ] = Mathf.Clamp(
+						myIntData[ vertex_index * myTupleSize + i ], myIntMin, myIntMax );
+
 					int original_value = myIntData[ vertex_index * myTupleSize + i ];
-					int new_value = myIntPaintValue[ i ];
+					int new_value = paint_value;
 					int distance = new_value - original_value;
+					int abs_distance = Mathf.Abs( distance );
 
-					int min_max_distance = myIntMax - myIntMin;
-					float max_paint_amount = (float) min_max_distance * HAPI.HAPI_Host.prPaintBrushRate;
+					if ( distance != 0 )
+					{
+						int min_max_distance = myIntMax - myIntMin;
+						int max_paint_amount = Mathf.CeilToInt(
+							(float) min_max_distance * HAPI.HAPI_Host.prPaintBrushRate );
 
-					if ( paint_factor < 0.0f )
-						distance = min_max_distance - Mathf.Abs( distance ) + (int) Mathf.Sign( distance );
+						int clamped_distance = Mathf.Min( abs_distance, max_paint_amount );
+						float paint_amount = paint_factor * clamped_distance;
+						int paint_amount_int = Mathf.CeilToInt( paint_amount );
+						int paint_amount_clamped = Mathf.Min( abs_distance, paint_amount_int );
+						int paint_amount_signed = (int) Mathf.Sign( distance ) * paint_amount_clamped;
 
-					float clamped_distance =
-						Mathf.Sign( distance ) * Mathf.Min( Mathf.Abs( distance ), Mathf.Abs( max_paint_amount ) );
-					float paint_amount = paint_factor * clamped_distance;
-
-					int paint_amount_int =
-						distance > 0 ? Mathf.CeilToInt( paint_amount ) : Mathf.FloorToInt( paint_amount );
-
-					myIntData[ vertex_index * myTupleSize + i ] += paint_amount_int;
+						myIntData[ vertex_index * myTupleSize + i ] += paint_amount_signed;
+					}
 				}
 			}
 			else if ( myType == Type.FLOAT )
@@ -626,15 +635,20 @@ public class HAPI_GeoAttribute : ScriptableObject
 					myFloatData[ vertex_index * myTupleSize + i ] = myFloatPaintValue[ i ];
 				else
 				{
+					float paint_value = myFloatPaintValue[ i ];
+					if ( inverse )
+						paint_value = myFloatMax - myFloatPaintValue[ i ];
+
+					// First bring the current values back to the min/max range.
+					myFloatData[ vertex_index * myTupleSize + i ] = Mathf.Clamp(
+						myFloatData[ vertex_index * myTupleSize + i ], myFloatMin, myFloatMax );
+
 					float original_value = myFloatData[ vertex_index * myTupleSize + i ];
-					float new_value = myFloatPaintValue[ i ];
+					float new_value = paint_value;
 					float distance = new_value - original_value;
 
 					float min_max_distance = myFloatMax - myFloatMin;
 					float max_paint_amount = min_max_distance * HAPI.HAPI_Host.prPaintBrushRate;
-
-					if ( paint_factor < 0.0f )
-						distance = min_max_distance - distance;
 
 					float clamped_distance =
 						Mathf.Sign( distance ) * Mathf.Min( Mathf.Abs( distance ), Mathf.Abs( max_paint_amount ) );
