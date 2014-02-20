@@ -34,11 +34,9 @@ public class HAPI_GeoAttribute : ScriptableObject
 
 	public enum Preset
 	{
-		UNDEFINED = -1,
-		POSITION,
+		COLOR,
 		UV,
 		NORMAL,
-		COLOR,
 		MAX
 	}
 
@@ -367,6 +365,28 @@ public class HAPI_GeoAttribute : ScriptableObject
 	public float[] prFloatMins { get { return myFloatMins; } set { myFloatMins = value; } }
 	public float[] prFloatMaxes { get { return myFloatMaxes; } set { myFloatMaxes = value; } }
 	public float[] prFloatData { get { return myFloatData; } private set {} }
+	public Vector2[] prFloatDataVec2 {
+		get
+		{
+			Vector2[] vec2_data = new Vector2[ myVertexCount ];
+			for ( int i = 0; i < myVertexCount; ++i )
+				for ( int j = 0; j < Mathf.Min( 2, myTupleSize ); ++j )
+					vec2_data[ i ][ j ] = myFloatData[ i * myTupleSize + j ];
+			return vec2_data;
+		}
+		private set {}
+	}
+	public Vector3[] prFloatDataVec3 {
+		get
+		{
+			Vector3[] vec3_data = new Vector3[ myVertexCount ];
+			for ( int i = 0; i < myVertexCount; ++i )
+				for ( int j = 0; j < Mathf.Min( 3, myTupleSize ); ++j )
+					vec3_data[ i ][ j ] = myFloatData[ i * myTupleSize + j ];
+			return vec3_data;
+		}
+		private set {}
+	}
 	public string[] prStringPaintValue { get { return myStringPaintValue; } set { myStringPaintValue = value; } }
 	public string[] prStringData { get { return myStringData; } private set {} }
 
@@ -433,11 +453,21 @@ public class HAPI_GeoAttribute : ScriptableObject
 	{
 		switch ( preset )
 		{
-			case Preset.POSITION:
+			case Preset.COLOR:
 			{
 				init(
-					mesh, HAPI.HAPI_Constants.HAPI_ATTRIB_POSITION, Type.FLOAT,
-					HAPI.HAPI_Constants.HAPI_POSITION_VECTOR_SIZE );
+					mesh, HAPI.HAPI_Constants.HAPI_ATTRIB_COLOR, Type.FLOAT,
+					HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE );
+
+				// Set the alpha values to 1.
+				if ( HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE == 4 )
+				{
+					myFloatPaintValue[ HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ] = 1.0f;
+					for ( int i = 0; i < myVertexCount; ++i )
+						myFloatData[
+							( i * HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE ) + 
+							( HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ) ] = 1.0f;
+				}
 				break;
 			}
 			case Preset.UV:
@@ -452,16 +482,16 @@ public class HAPI_GeoAttribute : ScriptableObject
 				init(
 					mesh, HAPI.HAPI_Constants.HAPI_ATTRIB_NORMAL, Type.FLOAT,
 					HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE );
+
+				// Compute the normals as initial attribute values.
+				mesh.RecalculateNormals();
+				for ( int i = 0; i < myVertexCount; ++i )
+					for ( int j = 0; j < HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE; ++j )
+						myFloatData[ i * HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE + j ] =
+							mesh.normals[ i ][ j ];
 				break;
 			}
-			case Preset.COLOR:
-			{
-				init(
-					mesh, HAPI.HAPI_Constants.HAPI_ATTRIB_COLOR, Type.FLOAT,
-					HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE );
-				break;
-			}
-			default: return; // Throw error.
+			default: throw new HAPI.HAPI_ErrorInvalidArgument( "Invalid HAPI_GeoAttribute.Preset!" );
 		}
 	}
 

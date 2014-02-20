@@ -289,10 +289,8 @@ public class HAPI_GeoAttributeManagerGUI
 				min_bounds.z = Mathf.Min( min_bounds.z, current_pos.z );
 			}
 			Vector3 mid_pos = ( max_bounds + min_bounds ) / 2.0f;
+			Vector3 new_mid_pos = Handles.PositionHandle( mid_pos, Quaternion.identity );
 
-			Vector3 new_mid_pos = Handles.PositionHandle( mid_pos, 
-															Quaternion.identity );
-			
 			if ( new_mid_pos != mid_pos )
 			{
 				myIsMouseDown = false;
@@ -959,7 +957,7 @@ public class HAPI_GeoAttributeManagerGUI
 				if ( new_paint_mode != myManager.prActiveAttribute.prPaintMode )
 				{
 					myManager.prActiveAttribute.prPaintMode = new_paint_mode;
-					myManager.refreshMeshColours();
+					myManager.refreshMesh();
 				}
 			}
 		}
@@ -974,7 +972,34 @@ public class HAPI_GeoAttributeManagerGUI
 			{
 				GUILayout.BeginArea( value_fields_rect );
 				GUILayout.BeginHorizontal();
-				for ( int i = 0; i < myManager.prActiveAttribute.prTupleSize; ++i )
+
+				int drawn_field_start_index = 0;
+
+				if ( myManager.prActiveAttribute.prName.StartsWith( "Cd" ) &&
+					myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
+					myManager.prActiveAttribute.prTupleSize >= 3 )
+				{
+					Color old_colour = new Color( 
+						myManager.prActiveAttribute.prFloatPaintValue[ 0 ],
+						myManager.prActiveAttribute.prFloatPaintValue[ 1 ],
+						myManager.prActiveAttribute.prFloatPaintValue[ 2 ],
+						myManager.prActiveAttribute.prTupleSize > 3
+							? myManager.prActiveAttribute.prFloatPaintValue[ 3 ] : 1.0f );
+					Color new_colour = EditorGUILayout.ColorField(
+						old_colour, GUILayout.MinWidth( 120 ), GUILayout.MaxWidth( 240 ) );
+					if ( new_colour != old_colour )
+					{
+						myManager.prActiveAttribute.prFloatPaintValue[ 0 ] = new_colour[ 0 ];
+						myManager.prActiveAttribute.prFloatPaintValue[ 1 ] = new_colour[ 1 ];
+						myManager.prActiveAttribute.prFloatPaintValue[ 2 ] = new_colour[ 2 ];
+						if ( myManager.prActiveAttribute.prTupleSize > 3 )
+							myManager.prActiveAttribute.prFloatPaintValue[ 3 ] = new_colour[ 3 ];
+					}
+
+					drawn_field_start_index = Mathf.Min( 4, myManager.prActiveAttribute.prTupleSize );
+				}
+
+				for ( int i = drawn_field_start_index; i < myManager.prActiveAttribute.prTupleSize; ++i )
 				{
 					if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.BOOL
 						|| myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.INT )

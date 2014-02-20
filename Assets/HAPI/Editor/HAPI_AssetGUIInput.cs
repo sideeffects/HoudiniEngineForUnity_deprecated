@@ -114,13 +114,35 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				!myAssetInput.prEnableCooking, " (all cooking is disabled)" );
 		}
 
+		///////////////////////////////////////////////////////////////////////
+		// Draw Point Attributes
+
 		myAssetInput.prShowAttributesTable = HAPI_GUI.foldout( "Point Attributes", myAssetInput.prShowAttributesTable, true );
 		if ( myAssetInput.prShowAttributesTable )
 		{
-			if ( GUILayout.Button( "Create Custom Point Attribute" ) )
+			// Draw Create Point Attributes Action Bar
 			{
-				myGeoAttributeManager.createAttribute();
-				myAssetInput.prHasAttributeChanges = true;
+				string[] preset_labels = new string[] {
+					"Create Point Attribute:", "Custom", "Color", "UV", "Normal" };
+				int[] preset_values = new int[] { 0, 1, 2, 3, 4 };
+
+				GUIStyle style = new GUIStyle( EditorStyles.popup );
+				style.fixedHeight = 18;
+				style.margin.bottom = 6;
+				int preset_selected = EditorGUILayout.IntPopup(
+					0, preset_labels, preset_values, style );
+
+				if ( preset_selected == 1 )
+				{
+					myGeoAttributeManager.createAttribute();
+					myAssetInput.prHasAttributeChanges = true;
+				}
+				else if ( preset_selected > 1 )
+				{
+					HAPI_GeoAttribute.Preset preset = (HAPI_GeoAttribute.Preset) ( preset_selected - 2 );
+					myGeoAttributeManager.createAttribute( preset );
+					myAssetInput.prHasAttributeChanges = true;
+				}
 			}
 
 			// Draw recook notice.
@@ -160,6 +182,8 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 
 			for ( int i = 0; i < myGeoAttributeManager.prAttributes.Count; ++i )
 			{
+				HAPI_GUI.separator();
+
 				HAPI_GeoAttribute attrib = myGeoAttributeManager.prAttributes[ i ];
 
 				EditorGUILayout.BeginHorizontal();
@@ -248,8 +272,6 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				}
 
 				EditorGUILayout.EndHorizontal();
-
-				HAPI_GUI.separator();
 			}
 
 			{
