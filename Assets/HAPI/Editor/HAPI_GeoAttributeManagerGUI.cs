@@ -311,7 +311,7 @@ public class HAPI_GeoAttributeManagerGUI
 		}
 
 		// Selection Mesh Draws
-		if ( mySelectionMaterial != null && mySelectionMesh != null )
+		if ( mySelectionMaterial != null && mySelectionMesh != null && myManager.prIsEditingPoints )
 		{
 			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize );
 			mySelectionMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
