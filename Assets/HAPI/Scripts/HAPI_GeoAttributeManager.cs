@@ -172,10 +172,28 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		}
 	}
 
-	public void refreshMeshColours()
+	public void refreshMesh()
 	{
 		if ( prActiveAttribute )
+		{
 			myMesh.colors = prActiveAttribute.getColorRepresentation();
+			if ( prActiveAttribute.prName == "N" &&
+				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE )
+				myMesh.normals = prActiveAttribute.prFloatDataVec3;
+			else if ( prActiveAttribute.prName == "uv" &&
+				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				myMesh.uv = prActiveAttribute.prFloatDataVec2;
+			else if ( prActiveAttribute.prName == "uv1" &&
+				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				myMesh.uv1 = prActiveAttribute.prFloatDataVec2;
+			else if ( prActiveAttribute.prName == "uv2" &&
+				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				myMesh.uv2 = prActiveAttribute.prFloatDataVec2;
+		}
 		else
 			myMesh.colors = new Color[ myMesh.vertexCount ];
 	}
@@ -205,7 +223,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 			if ( Vector3.Distance( hit_point, verts[ i ] ) <= prBrushRadius )
 				prActiveAttribute.paint( i, paint_factor );
 
-		myMesh.colors = prActiveAttribute.getColorRepresentation();
+		refreshMesh();
 
 		myHasChanged = true;
 	}
@@ -251,33 +269,18 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	}
 	public HAPI_GeoAttribute createAttribute( string suggested_name )
 	{
-		int temp_name_count = 0;
-		string temp_name = "";
-		while ( temp_name == "" )
-		{
-			temp_name = suggested_name;
-
-			if ( temp_name_count > 0 )
-				temp_name += temp_name_count;
-
-			for ( int i = 0; i < myAttributes.Count; ++i )
-				if ( myAttributes[ i ].prName == temp_name )
-				{
-					temp_name_count++;
-					temp_name = "";
-					break;
-				}
-		}
-
+		string temp_name = getUniqueAttributeName( suggested_name );
 		HAPI_GeoAttribute new_attribute = ScriptableObject.CreateInstance< HAPI_GeoAttribute >();
 		new_attribute.init( myMesh, temp_name, HAPI_GeoAttribute.Type.FLOAT, 3 );
-		myAttributes.Add( new_attribute );
-
-		if ( myActiveAttribute == null )
-			myActiveAttribute = new_attribute;
-
-		refreshMeshColours();
-
+		addAttribute( new_attribute );
+		return new_attribute;
+	}
+	public HAPI_GeoAttribute createAttribute( HAPI_GeoAttribute.Preset preset )
+	{
+		HAPI_GeoAttribute new_attribute = ScriptableObject.CreateInstance< HAPI_GeoAttribute >();
+		new_attribute.init( myMesh, preset );
+		new_attribute.prName = getUniqueAttributeName( new_attribute.prName );
+		addAttribute( new_attribute );
 		return new_attribute;
 	}
 
@@ -296,7 +299,40 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 			else
 				myActiveAttribute = null;
 
-		refreshMeshColours();
+		refreshMesh();
+	}
+
+	private void addAttribute( HAPI_GeoAttribute new_attribute )
+	{
+		myAttributes.Add( new_attribute );
+
+		if ( myActiveAttribute == null )
+			myActiveAttribute = new_attribute;
+
+		refreshMesh();
+	}
+
+	private string getUniqueAttributeName( string given_name )
+	{
+		int temp_name_count = 0;
+		string temp_name = "";
+		while ( temp_name == "" )
+		{
+			temp_name = given_name;
+
+			if ( temp_name_count > 0 )
+				temp_name += temp_name_count;
+
+			for ( int i = 0; i < myAttributes.Count; ++i )
+				if ( myAttributes[ i ].prName == temp_name )
+				{
+					temp_name_count++;
+					temp_name = "";
+					break;
+				}
+		}
+
+		return temp_name;
 	}
 
 	[SerializeField] private bool			myHasChanged;
