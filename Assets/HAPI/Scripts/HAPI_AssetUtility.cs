@@ -1305,21 +1305,21 @@ public class HAPI_AssetUtility
 			{
 				// If the colours are per vertex just query directly into the normals array we filled above.
 				if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
-					for ( int j = 0; j < 3; ++j )
-						colours[ i ][ j ] = colour_attr[ i * 3 + j ];
+					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
+						colours[ i ][ j ] = colour_attr[ i * colour_attr_info.tupleSize + j ];
 				
 				// If the colours are per point use the vertex list array point indicies to query into
 				// the normal array we filled above.
 				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-					for ( int j = 0; j < 3; ++j )
-						colours[ i ][ j ] = colour_attr[ vertex_list[ i ] * 3 + j ];
+					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
+						colours[ i ][ j ] = colour_attr[ vertex_list[ i ] * colour_attr_info.tupleSize + j ];
 				
 				// If the colours are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
 				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
 				{
 					int face_index = i / HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
-					for ( int j = 0; j < 3; ++j )
+					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
 						colours[ i ][ j ] 
 							= colour_attr[ face_index * HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE + j ];
 				}
