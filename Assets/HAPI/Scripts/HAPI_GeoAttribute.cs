@@ -37,6 +37,10 @@ public class HAPI_GeoAttribute : ScriptableObject
 		COLOR,
 		UV,
 		NORMAL,
+		BOOL,
+		INT,
+		FLOAT,
+		STRING,
 		MAX
 	}
 
@@ -472,6 +476,26 @@ public class HAPI_GeoAttribute : ScriptableObject
 					for ( int j = 0; j < HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE; ++j )
 						myFloatData[ i * HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE + j ] =
 							mesh.normals[ i ][ j ];
+				break;
+			}
+			case Preset.BOOL:
+			{
+				init( mesh, "bool_attribute", Type.BOOL, 1 );
+				break;
+			}
+			case Preset.INT:
+			{
+				init( mesh, "int_attribute", Type.INT, 1 );
+				break;
+			}
+			case Preset.FLOAT:
+			{
+				init( mesh, "float_attribute", Type.FLOAT, 3 );
+				break;
+			}
+			case Preset.STRING:
+			{
+				init( mesh, "string_attribute", Type.STRING, 1 );
 				break;
 			}
 			default: throw new HAPI.HAPI_ErrorInvalidArgument( "Invalid HAPI_GeoAttribute.Preset!" );
