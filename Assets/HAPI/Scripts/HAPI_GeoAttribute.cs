@@ -573,6 +573,35 @@ public class HAPI_GeoAttribute : ScriptableObject
 		return colors;
 	}
 
+	public void fit()
+	{
+		if ( myVertexCount > 0 )
+			if ( myType == Type.INT )
+			{
+				int min = myIntData[ 0 ];
+				int max = myIntData[ 0 ];
+				for ( int i = 0; i < myIntData.Length; ++i )
+				{
+					if ( myIntData[ i ] < min )
+						min = myIntData[ i ];
+					if ( max < myIntData[ i ] )
+						max = myIntData[ i ];
+				}
+			}
+			else if ( myType == Type.FLOAT )
+			{
+				float min = myFloatData[ 0 ];
+				float max = myFloatData[ 0 ];
+				for ( int i = 0; i < myFloatData.Length; ++i )
+				{
+					if ( myFloatData[ i ] < min )
+						min = myFloatData[ i ];
+					if ( max < myFloatData[ i ] )
+						max = myFloatData[ i ];
+				}
+			}
+	}
+
 	// -----------------------------------------------------------------------
 	// Paint
 
@@ -664,6 +693,23 @@ public class HAPI_GeoAttribute : ScriptableObject
 			}
 	}
 
+	public void fill()
+	{
+		if ( myVertexCount > 0 )
+			if ( myType == Type.BOOL || myType == Type.INT )
+				for ( int i = 0; i < myVertexCount; ++i )
+					for ( int j = 0; j < myTupleSize; ++j )
+						myIntData[ i * myTupleSize + j ] = myIntPaintValue[ j ];
+			else if ( myType == Type.FLOAT )
+				for ( int i = 0; i < myVertexCount; ++i )
+					for ( int j = 0; j < myTupleSize; ++j )
+						myFloatData[ i * myTupleSize + j ] = myFloatPaintValue[ j ];
+			else if ( myType == Type.STRING )
+				for ( int i = 0; i < myVertexCount; ++i )
+					for ( int j = 0; j < myTupleSize; ++j )
+						myStringData[ i * myTupleSize + j ] = myStringPaintValue[ j ];
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
@@ -690,6 +736,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 
 	// -----------------------------------------------------------------------
 	// Constants
+
 	private const int myDefaultIntPaintValue = 1;
 	private const int myDefaultIntMin = 0;
 	private const int myDefaultIntMax = 10;
