@@ -164,7 +164,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 
 			string[] do_action_labels = new string[] {
 				"Do:",
-				"Fill (set all values to the minimum of the range)",
+				"Fill (set all values to the paint value)",
 				"Fit (recalculate the range to encompass all values)" };
 			int[] do_action_values = new int[] { 0, 1, 2 };
 
@@ -252,7 +252,17 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
 
 				// Do Actions
-				EditorGUILayout.IntPopup( 0, do_action_labels, do_action_values, GUILayout.Width( 50 ) );
+				{
+					int action = EditorGUILayout.IntPopup( 0, do_action_labels, do_action_values, GUILayout.Width( 50 ) );
+					if ( action > 0 )
+					{
+						if ( action == 1 )
+							attrib.fill();
+						else if ( action == 2 )
+							attrib.fit();
+						myAssetInput.prGeoAttributeManager.refreshMesh();
+					}
+				}
 
 				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
 
