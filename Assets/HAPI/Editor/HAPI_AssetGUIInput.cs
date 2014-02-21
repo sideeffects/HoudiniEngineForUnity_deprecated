@@ -123,8 +123,8 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 			// Draw Create Point Attributes Action Bar
 			{
 				string[] preset_labels = new string[] {
-					"Create Point Attribute:", "Custom", "Color", "UV", "Normal" };
-				int[] preset_values = new int[] { 0, 1, 2, 3, 4 };
+					"Create Point Attribute:", "Custom", "Color", "UV", "Normal", "Bool", "Int", "Float", "String" };
+				int[] preset_values = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
 				GUIStyle style = new GUIStyle( EditorStyles.popup );
 				style.fixedHeight = 18;
