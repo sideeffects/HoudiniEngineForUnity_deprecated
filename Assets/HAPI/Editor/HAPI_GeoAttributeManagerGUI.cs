@@ -1003,17 +1003,30 @@ public class HAPI_GeoAttributeManagerGUI
 				{
 					if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.BOOL
 						|| myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.INT )
-						myManager.prActiveAttribute.prIntPaintValue[ i ] = EditorGUILayout.IntField(
-							"", myManager.prActiveAttribute.prIntPaintValue[ i ],
-							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+						myManager.prActiveAttribute.prIntPaintValue[ i ] = Mathf.Clamp(
+							EditorGUILayout.IntField(
+								"", myManager.prActiveAttribute.prIntPaintValue[ i ],
+								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) ),
+							myManager.prActiveAttribute.prIntMin,
+							myManager.prActiveAttribute.prIntMax );
 					else if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT )
-						myManager.prActiveAttribute.prFloatPaintValue[ i ] = EditorGUILayout.FloatField(
-							"", myManager.prActiveAttribute.prFloatPaintValue[ i ],
-							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+						myManager.prActiveAttribute.prFloatPaintValue[ i ] = Mathf.Clamp(
+							EditorGUILayout.FloatField(
+								"", myManager.prActiveAttribute.prFloatPaintValue[ i ],
+								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) ),
+							myManager.prActiveAttribute.prFloatMin,
+							myManager.prActiveAttribute.prFloatMax );
 					else if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.STRING )
-						myManager.prActiveAttribute.prStringPaintValue[ i ] = EditorGUILayout.TextField(
+					{
+						string new_value = EditorGUILayout.TextField(
 							"", myManager.prActiveAttribute.prStringPaintValue[ i ],
 							GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+						if ( new_value != myManager.prActiveAttribute.prStringPaintValue[ i ] )
+						{
+							myManager.prActiveAttribute.prStringPaintValue[ i ] = new_value;
+							myManager.refreshMesh();
+						}
+					}
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.EndArea();
