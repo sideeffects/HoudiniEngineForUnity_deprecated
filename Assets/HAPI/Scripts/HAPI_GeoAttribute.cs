@@ -311,15 +311,42 @@ public class HAPI_GeoAttribute : ScriptableObject
 		}
 	}
 
-	public int[] prIntPaintValue { get { return myIntPaintValue; } set { myIntPaintValue = value; } }
-	public int prIntMin { get { return myIntMin; } set { myIntMin = value; } }
+	public int[] prIntPaintValue {
+		get { return myIntPaintValue; }
+		set
+		{
+			if ( value.Length == myTupleSize )
+				for ( int i = 0; i < myTupleSize; ++i )
+					myIntPaintValue[ i ] = Mathf.Clamp( value[ i ], myIntMin, myIntMax );
+			else
+				throw new HAPI.HAPI_ErrorInvalidArgument( "prIntPaintValue given wrong sized array." );
+		}
+	}
+	public int prIntMin {
+		get { return myIntMin; }
+		set { myIntMin = Mathf.Min( value, myIntMax ); } }
 	public int prIntMax {
 		get { return myIntMax; } 
-		set { if ( myType != Type.BOOL ) myIntMax = value; } }
+		set { if ( myType != Type.BOOL ) myIntMax = Mathf.Max( value, myIntMin ); } }
 	public int[] prIntData { get { return myIntData; } private set {} }
-	public float[] prFloatPaintValue { get { return myFloatPaintValue; } set { myFloatPaintValue = value; } }
-	public float prFloatMin { get { return myFloatMin; } set { myFloatMin = value; } }
-	public float prFloatMax { get { return myFloatMax; } set { myFloatMax = value; } }
+
+	public float[] prFloatPaintValue {
+		get { return myFloatPaintValue; }
+		set
+		{
+			if ( value.Length == myTupleSize )
+				for ( int i = 0; i < myTupleSize; ++i )
+					myFloatPaintValue[ i ] = Mathf.Clamp( value[ i ], myFloatMin, myFloatMax );
+			else
+				throw new HAPI.HAPI_ErrorInvalidArgument( "prFloatPaintValue given wrong sized array." );
+		}
+	}
+	public float prFloatMin {
+		get { return myFloatMin; }
+		set { myFloatMin = Mathf.Min( value, myFloatMax ); } }
+	public float prFloatMax {
+		get { return myFloatMax; }
+		set { myFloatMax = Mathf.Max( value, myFloatMin ); } }
 	public float[] prFloatData { get { return myFloatData; } private set {} }
 	public Vector2[] prFloatDataVec2 {
 		get
