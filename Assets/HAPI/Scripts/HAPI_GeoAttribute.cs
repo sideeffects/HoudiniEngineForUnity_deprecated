@@ -587,6 +587,8 @@ public class HAPI_GeoAttribute : ScriptableObject
 					if ( max < myIntData[ i ] )
 						max = myIntData[ i ];
 				}
+				myIntMin = min;
+				myIntMax = max;
 			}
 			else if ( myType == Type.FLOAT )
 			{
@@ -599,6 +601,8 @@ public class HAPI_GeoAttribute : ScriptableObject
 					if ( max < myFloatData[ i ] )
 						max = myFloatData[ i ];
 				}
+				myFloatMin = min;
+				myFloatMax = max;
 			}
 	}
 
