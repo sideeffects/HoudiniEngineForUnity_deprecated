@@ -33,8 +33,10 @@ public class HAPI_ProgressBar  {
 		prMessage			= "Doing stuff.";
 		prStartTime			= System.DateTime.Now;
 
+#if UNITY_EDITOR
 		myLastValue			= -1;
 		myLastMsg			= "";
+#endif // UNITY_EDITOR
 
 		prUseDelay			= true;
 
@@ -187,8 +189,10 @@ public class HAPI_ProgressBar  {
 #endif // UNITY_EDITOR
 	}
 	
+#if UNITY_EDITOR
 	// Used to reduce the update frequency of the progress bar so it doesn't flicker.
 	private int					myLastValue;
 	private string				myLastMsg;
+#endif // UNITY_EDITOR
 #endif // UNITY_STANDALONE_WIN
 }
