@@ -353,7 +353,9 @@ namespace HAPI
 
 		public static float prPaintBrushRate {
 												get { return getFloat( "HAPI_PaintBrushRate" ); }
-												set { setFloat( "HAPI_PaintBrushRate", value ); } }
+												set { setFloat(
+														"HAPI_PaintBrushRate",
+														Mathf.Clamp( value, 0.0f, 1.0f ) ); } }
 		public static KeyCode prPaintingModeHotKey {
 												get { KeyCode key = getKeyCode( "HAPI_PaintingModeHotKey" );
 													  if ( key == KeyCode.None ) {
