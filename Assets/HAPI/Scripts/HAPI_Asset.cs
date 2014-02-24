@@ -22,6 +22,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.IO;
 using HAPI;
 using Utility = HAPI_AssetUtility;
@@ -703,7 +704,17 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 		}
 	}
-	
+
+	public virtual void OnDisable()
+	{
+#if UNITY_EDITOR
+		// Not matter what, re-enable the transform gizmo on deletion/disable.
+		System.Type type = typeof( Tools );
+		FieldInfo field = type.GetField( "s_Hidden", BindingFlags.NonPublic | BindingFlags.Static );
+		field.SetValue( null, false );
+#endif // UNITY_EDITOR
+	}
+
 	public override void reset()
 	{
 		base.reset();
