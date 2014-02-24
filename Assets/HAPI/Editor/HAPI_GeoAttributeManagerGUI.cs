@@ -615,7 +615,7 @@ public class HAPI_GeoAttributeManagerGUI
 		}
 		if ( myManager.prIsPaintingPoints )
 		{
-			help_text = "Click on mesh: paint attribute | Mouse Scroll: change brush size | ESC or Enter: exit mode";
+			help_text = "Click on mesh: paint attribute | Mouse Scroll + " + paint_hotkey_string + ": change brush size | ESC or Enter: exit mode";
 			box_color = HAPI_Host.prPaintingModeColour;
 		}
 		else if ( myManager.prIsEditingPoints )
@@ -781,6 +781,7 @@ public class HAPI_GeoAttributeManagerGUI
 		string attribute_text = "Attribute:";
 		string mode_text = "Mode:";
 		string value_text = "Value:";
+		string rate_text = "Rate:";
 		string liveup_text = "Live Updates";
 
 		Color box_color = HAPI_Host.prPaintingModeColour;
@@ -796,6 +797,7 @@ public class HAPI_GeoAttributeManagerGUI
 		float line_padding			= mySceneUILinePadding;
 		float double_line_padding	= 2.0f * line_padding;
 		float dropdown_width		= 100.0f;
+		float field_width			= 50.0f;
 		float toggle_width			= 14.0f;
 
 		GUIStyle normal_text_style	= new GUIStyle( GUI.skin.label );
@@ -820,16 +822,20 @@ public class HAPI_GeoAttributeManagerGUI
 									  + double_line_padding;
 		float value_text_width		= normal_text_style.CalcSize( new GUIContent( value_text ) ).x
 									  + double_line_padding;
+		float rate_text_width		= normal_text_style.CalcSize( new GUIContent( rate_text ) ).x
+									  + double_line_padding;
 		float liveup_text_width		= normal_text_style.CalcSize( new GUIContent( liveup_text ) ).x
 									  + double_line_padding;
 
 		float title_box_width		= title_text_width;
 		float attribute_box_width	= attribute_text_width + dropdown_width + line_padding;
 		float mode_box_width		= mode_text_width + dropdown_width + line_padding;
+		float rate_box_width		= rate_text_width + field_width + line_padding;
 		float liveup_box_width		= liveup_text_width + toggle_width + line_padding;
 		float value_box_width		= scene_width
 									  - title_box_width - border_padding
 									  - attribute_box_width - border_padding
+									  - rate_box_width - border_padding
 									  - liveup_box_width - border_padding
 									  - mode_box_width - border_padding
 									  - border_total - border_total;
@@ -842,7 +848,9 @@ public class HAPI_GeoAttributeManagerGUI
 		float mode_dropdown_right	= mode_box_right + mode_text_width;
 		float value_box_right		= mode_box_right + mode_box_width + border_padding;
 		float value_fields_right	= value_box_right + value_text_width;
-		float liveup_box_right		= value_box_right + value_box_width + border_padding;
+		float rate_box_right		= value_box_right + value_box_width + border_padding;
+		float rate_field_right		= rate_box_right;
+		float liveup_box_right		= rate_box_right + rate_box_width + border_padding;
 		float liveup_toggle_right	= liveup_box_right + line_padding;
 
 		// Create background boxes texture.
@@ -861,6 +869,8 @@ public class HAPI_GeoAttributeManagerGUI
 		Rect mode_dropdown_rect			= new Rect( mode_dropdown_right, box_top, dropdown_width, box_height );
 		Rect value_box_rect				= new Rect( value_box_right, box_top, value_box_width, box_height );
 		Rect value_fields_rect			= new Rect( value_fields_right, box_top, value_fields_width, box_height );
+		Rect rate_box_rect				= new Rect( rate_box_right, box_top, rate_box_width, box_height );
+		Rect rate_field_rect			= new Rect( rate_field_right, box_top, rate_text_width + field_width, box_height );
 		Rect liveup_box_rect			= new Rect( liveup_box_right, box_top, liveup_box_width, box_height );
 		Rect liveup_toggle_rect			= new Rect( liveup_toggle_right, box_top, liveup_text_width + toggle_width, box_height );
 
@@ -874,6 +884,8 @@ public class HAPI_GeoAttributeManagerGUI
 										 mode_text_width - double_line_padding, box_height - double_line_padding );
 		Rect value_text_rect = new Rect( value_box_right + line_padding, box_top, 
 										 value_text_width - double_line_padding, box_height - double_line_padding );
+		Rect rate_text_rect = new Rect( rate_box_right + line_padding, box_top,
+										rate_text_width - double_line_padding, box_height - double_line_padding );
 
 		// Start Drawing --------------------------------------------------------------------------------------------
 		Handles.BeginGUI();
@@ -885,6 +897,7 @@ public class HAPI_GeoAttributeManagerGUI
 		GUI.DrawTexture( attribute_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( value_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( rate_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( liveup_box_rect, box_texture, ScaleMode.StretchToFill );
 
 		// Draw the labels for the mesh and the help.
@@ -900,6 +913,10 @@ public class HAPI_GeoAttributeManagerGUI
 		control_color.g			+= mySceneUIBrightningFactor;
 		control_color.b			+= mySceneUIBrightningFactor;
 		GUI.color				= control_color;
+
+		// Draw rate field.
+		EditorGUIUtility.LookLikeControls( rate_text_width, field_width );
+		HAPI_Host.prPaintBrushRate = EditorGUI.FloatField( rate_field_rect, rate_text, HAPI_Host.prPaintBrushRate );
 
 		// Draw live updates toggle.
 		myManager.prLiveUpdates = EditorGUI.ToggleLeft(
