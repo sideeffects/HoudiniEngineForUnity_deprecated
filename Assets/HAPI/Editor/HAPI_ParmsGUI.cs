@@ -397,7 +397,7 @@ public class HAPI_ParmsGUI : Editor
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Color Parameter
-		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_COLOUR )
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_COLOR )
 		{
 			changed = HAPI_GUI.colourField( ref gui_parm, ref myDelayBuild, ref parm_float_values,
 											ref join_last, ref no_label_toggle_last, null,
