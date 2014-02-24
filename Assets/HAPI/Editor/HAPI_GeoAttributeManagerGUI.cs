@@ -101,6 +101,13 @@ public class HAPI_GeoAttributeManagerGUI
 		// Determine key state.
 		getKeyState( current_event );
 
+		//if ( current_event.type != EventType.Layout && current_event.type != EventType.Repaint
+		//	&& current_event.type != EventType.mouseMove )
+			//Debug.Log( current_event.type );
+
+		//if ( GUI.GetNameOfFocusedControl() != "" )
+			//Debug.Log( GUI.GetNameOfFocusedControl() );
+
 		// Decide modes.
 		if ( current_event.type == EventType.Layout && mySceneWindowHasFocus )
 			decideModes( ref current_event );
@@ -575,7 +582,9 @@ public class HAPI_GeoAttributeManagerGUI
 		}
 
 		// Check if ENTER or ESC was pressed so we can exit the mode.
-		if ( myCurrentlyPressedKey == KeyCode.Escape || myCurrentlyPressedKey == KeyCode.Return )
+		if ( myCurrentlyPressedKey == KeyCode.Escape || 
+			( myCurrentlyPressedKey == KeyCode.Return &&
+				!GUI.GetNameOfFocusedControl().StartsWith( myPaintValuesFieldName ) ) )
 		{
 			paint_mode				= false;
 			edit_points_mode		= false;
@@ -884,8 +893,6 @@ public class HAPI_GeoAttributeManagerGUI
 										 mode_text_width - double_line_padding, box_height - double_line_padding );
 		Rect value_text_rect = new Rect( value_box_right + line_padding, box_top, 
 										 value_text_width - double_line_padding, box_height - double_line_padding );
-		Rect rate_text_rect = new Rect( rate_box_right + line_padding, box_top,
-										rate_text_width - double_line_padding, box_height - double_line_padding );
 
 		// Start Drawing --------------------------------------------------------------------------------------------
 		Handles.BeginGUI();
@@ -916,9 +923,11 @@ public class HAPI_GeoAttributeManagerGUI
 
 		// Draw rate field.
 		EditorGUIUtility.LookLikeControls( rate_text_width, field_width );
+		GUI.SetNextControlName( myPaintValuesFieldName + "RATE" );
 		HAPI_Host.prPaintBrushRate = EditorGUI.FloatField( rate_field_rect, rate_text, HAPI_Host.prPaintBrushRate );
 
 		// Draw live updates toggle.
+		GUI.SetNextControlName( myPaintValuesFieldName + "LIVE_UPDATES" );
 		myManager.prLiveUpdates = EditorGUI.ToggleLeft(
 			liveup_toggle_rect, liveup_text, myManager.prLiveUpdates );
 
@@ -943,6 +952,7 @@ public class HAPI_GeoAttributeManagerGUI
 					attribute_names[ i ] = myManager.prAttributes[ i ].prName;
 				}
 
+				GUI.SetNextControlName( myPaintValuesFieldName + "ATTRIBUTE" );
 				selected_attribute_index = EditorGUI.IntPopup(
 					attribute_dropdown_rect, "", selected_attribute_index, attribute_names, attribute_indicies );
 
@@ -969,6 +979,7 @@ public class HAPI_GeoAttributeManagerGUI
 				for ( int i = 1; i < mode_count; ++i )
 					mode_labels[ i ] = "Component " + i + " Only (Grayscale)";
 
+				GUI.SetNextControlName( myPaintValuesFieldName + "DRAW_MODE" );
 				int new_paint_mode = EditorGUI.IntPopup(
 					mode_dropdown_rect, "", myManager.prActiveAttribute.prPaintMode, mode_labels, mode_values );
 				if ( new_paint_mode != myManager.prActiveAttribute.prPaintMode )
@@ -1002,6 +1013,7 @@ public class HAPI_GeoAttributeManagerGUI
 						myManager.prActiveAttribute.prFloatPaintValue[ 2 ],
 						myManager.prActiveAttribute.prTupleSize > 3
 							? myManager.prActiveAttribute.prFloatPaintValue[ 3 ] : 1.0f );
+					GUI.SetNextControlName( myPaintValuesFieldName + "COLOR" );
 					Color new_colour = EditorGUILayout.ColorField(
 						old_colour, GUILayout.MinWidth( 120 ), GUILayout.MaxWidth( 240 ) );
 					if ( new_colour != old_colour )
@@ -1018,6 +1030,7 @@ public class HAPI_GeoAttributeManagerGUI
 
 				for ( int i = drawn_field_start_index; i < myManager.prActiveAttribute.prTupleSize; ++i )
 				{
+					GUI.SetNextControlName( myPaintValuesFieldName + i );
 					if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.BOOL
 						|| myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.INT )
 						myManager.prActiveAttribute.prIntPaintValue[ i ] = Mathf.Clamp(
@@ -1098,6 +1111,8 @@ public class HAPI_GeoAttributeManagerGUI
 	private bool				myIsMouseDown;
 	private int					myMouseKey;
 	private KeyCode				myCurrentlyPressedKey;
+
+	private const string		myPaintValuesFieldName				= "__HAPI_PaintBrushPaintValue";
 
 	private static Color		mySceneUIDarkColour					= new Color( 0.5f, 0.5f, 0.5f, 1.0f );
 	private static Color		mySceneUILightColour				= new Color( 0.9f, 0.9f, 0.9f, 1.0f );
