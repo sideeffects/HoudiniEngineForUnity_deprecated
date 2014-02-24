@@ -85,24 +85,11 @@ public class HAPI_AssetInput : HAPI_Asset
 
 	public override void OnEnable()
 	{
-		/* TODO
-		
-		// If this curve asset is a duplicate then it will have the same mesh
-		// filter and mesh renderer as the curve it was duplicated from. Since
-		// we want it to have its own, delete the existing ones here and new
-		// ones will be created in the build.
-		if ( isDuplicatingAsset() )
-		{
-			MeshFilter mesh_filter = gameObject.GetComponent< MeshFilter >();
-			if ( mesh_filter != null )
-				DestroyImmediate( mesh_filter );
-
-			MeshRenderer mesh_renderer = gameObject.GetComponent< MeshRenderer >();
-			if ( mesh_renderer != null )
-				DestroyImmediate( mesh_renderer );
-		}
-		*/
 		base.OnEnable();
+
+		// We want to preserve the transform of the original mesh as we
+		// assetize it.
+		myLastLocalToWorld = transform.localToWorldMatrix;
 
 		if ( prAssetId < 0 )
 			buildAll();
