@@ -1984,7 +1984,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	
 	// Private Temporary Data
-	[SerializeField] private Matrix4x4				myLastLocalToWorld;
+	[SerializeField] protected Matrix4x4			myLastLocalToWorld;
 	
 	// Prefabs ------------------------------------------------------------------------------------------------------
 	
