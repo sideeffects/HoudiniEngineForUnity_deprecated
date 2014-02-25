@@ -1095,8 +1095,12 @@ public class HAPI_GUI : Editor
 		if ( parm_size > 3 )
 			old_color.a = values[ parm.valuesIndex + 3 ];
 		
-		// Draw control.
-		Color new_color = EditorGUILayout.ColorField( old_color );
+		// Draw colour control.
+		// This control throws a "harmless" exception every time it is clicked so
+		// we have to consume that exception before it does real damage.
+		Color new_color = old_color;
+		try { new_color = EditorGUILayout.ColorField( old_color ); }
+		catch {}
 
 		// Determine if value changed and update parameter value.
 		if ( new_color != old_color )
