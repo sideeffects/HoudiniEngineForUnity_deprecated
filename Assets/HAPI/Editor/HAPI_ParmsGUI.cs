@@ -39,6 +39,7 @@ public class HAPI_ParmsGUI : Editor
 
 		HAPI_Host.myRepaintDelegate += this.refresh;
 		HAPI_Host.myDeselectionDelegate += this.deselect;
+		HAPI_Host.myPlaymodeStateChangeDelegate += this.playmodeStateChange;
 		HAPI_Host.mySelectionTarget = myParms.gameObject;
 	}
 
@@ -46,7 +47,11 @@ public class HAPI_ParmsGUI : Editor
 	{
 		HAPI_Host.myRepaintDelegate -= this.refresh;
 		HAPI_Host.myDeselectionDelegate -= this.deselect;
+		HAPI_Host.myPlaymodeStateChangeDelegate -= this.playmodeStateChange;
 		HAPI_Host.mySelectionTarget = null;
+
+		myParmChanges = false;
+		applyChanges( true, true );
 	}
 
 	public virtual void refresh()
@@ -60,6 +65,34 @@ public class HAPI_ParmsGUI : Editor
 		if ( HAPI_Host.mySelectionTarget == myParms.gameObject )
 			HAPI_Host.mySelectionTarget = null;
 	}
+
+	public void playmodeStateChange()
+	{
+		applyChanges( true, true );
+	}
+
+	public void applyChanges( bool commit_changes, bool record_undo )
+	{
+		if ( ( ( myParmChanges && !myDelayBuild ) || 
+				( myUnbuiltChanges && ( commit_changes || myFocusChanged ) ) ) )
+		{
+			if ( record_undo )
+			{
+				string changed_parm_name = "Parameter Change";
+				if ( myParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
+					changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
+
+				Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
+			}
+
+			myParms.prControl.onParmChange();
+	
+			myUnbuiltChanges	= false;
+			myParmChanges		= false;
+		}
+		else if ( myParmChanges )
+			myUnbuiltChanges = true;
+	}
 	
 	public override void OnInspectorGUI() 
 	{
@@ -69,12 +102,12 @@ public class HAPI_ParmsGUI : Editor
 			myParmChanges = false;
 			myFocusChanged = false;
 
-			Event curr_event = Event.current;
-			bool commitChanges = false;
-			if ( curr_event.isKey && curr_event.type == EventType.KeyUp && curr_event.keyCode == KeyCode.Return )
-				commitChanges = true;
-			else if ( curr_event.type == EventType.ValidateCommand && 
-			          curr_event.commandName == "UndoRedoPerformed" )
+			Event current_event = Event.current;
+			bool commit_changes = false;
+			if ( current_event.isKey && current_event.type == EventType.KeyUp && current_event.keyCode == KeyCode.Return )
+				commit_changes = true;
+			else if ( current_event.type == EventType.ValidateCommand && 
+			          current_event.commandName == "UndoRedoPerformed" )
 			{
 				HAPI_ParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HAPI_ParmsUndoInfo;
 				bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HAPI_Asset >() != null;
@@ -214,27 +247,10 @@ public class HAPI_ParmsGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Apply Changes
 
-			if ( ( ( myParmChanges && !myDelayBuild ) || 
-				 ( myUnbuiltChanges && ( commitChanges || myFocusChanged ) ) ) )
-			{
-				// Only record undo info object if parameters are not being changed
-				// due to an undo/redo event
-				if ( curr_event.commandName != "UndoRedoPerformed" )
-				{
-					string changed_parm_name = "Parameter Change";
-					if ( myParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
-						changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
-
-					Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
-				}
-
-				myParms.prControl.onParmChange();
-	
-				myUnbuiltChanges	= false;
-				myParmChanges		= false;
-			}
-			else if ( myParmChanges )
-				myUnbuiltChanges = true;
+			// Only record undo info object if parameters are not being changed
+			// due to an undo/redo event.
+			bool record_undo = current_event.commandName != "UndoRedoPerformed";
+			applyChanges( commit_changes, record_undo );
 		}
 		catch ( HAPI_ErrorIgnorable ) {}
 		catch ( HAPI_Error error )

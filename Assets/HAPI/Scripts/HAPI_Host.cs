@@ -35,6 +35,7 @@ namespace HAPI
 {
 	public delegate void RepaintDelegate();
 	public delegate void DeselectionDelegate();
+	public delegate void PlaymodeStateChangeDelegate();
 
 	public class HAPI_Error : System.Exception 
 	{
@@ -636,6 +637,7 @@ namespace HAPI
 
 		public static RepaintDelegate			myRepaintDelegate;
 		public static DeselectionDelegate		myDeselectionDelegate;
+		public static PlaymodeStateChangeDelegate myPlaymodeStateChangeDelegate;
 
 		public static GameObject				mySelectionTarget;
 
@@ -941,6 +943,9 @@ namespace HAPI
 							}
 						}
 					}
+
+					if ( myPlaymodeStateChangeDelegate != null )
+						myPlaymodeStateChangeDelegate();
 				}
 				
 				setTime( 0.0f );
