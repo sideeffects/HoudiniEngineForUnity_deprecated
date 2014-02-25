@@ -29,7 +29,12 @@ public class ExampleScript : MonoBehaviour
 	public int parmIndex;
 	public string[] parmNames;
 
-	[SerializeField] private HAPI_AssetAccessor asset;
+	public bool hasAsset()
+	{
+		return gameObject.GetComponent< HAPI_Asset >() != null;
+	}
+
+	[SerializeField] private HAPI_AssetAccessor myAsset;
 	[SerializeField] private string parmName;
 	[SerializeField] private int parmSize;
 	[SerializeField] private HAPI_AssetAccessor.ParmType parmType;
@@ -80,7 +85,7 @@ public class ExampleScript : MonoBehaviour
 
 		parmIndex = 0;
 		parmNames = null;
-		asset = null;
+		myAsset = null;
 		parmName = "";
 		parmSize = 0;
 		parmType = HAPI_AssetAccessor.ParmType.INVALID;
@@ -91,13 +96,13 @@ public class ExampleScript : MonoBehaviour
 		// If the game object has a HAPI_Asset component then get
 		// the parameters for this asset and set the selected
 		// parameter to be the asset's first parameter
-		asset = HAPI_AssetAccessor.getAssetAccessor( gameObject );
-		if ( asset != null )
+		myAsset = HAPI_AssetAccessor.getAssetAccessor( gameObject );
+		if ( myAsset != null )
 		{
-			Debug.Log( "Asset name: " + asset.prName );
-			parmNames = asset.getParameters();
+			Debug.Log( "Asset name: " + myAsset.prName );
+			parmNames = myAsset.getParameters();
+			setSelectedParameter();
 		}
-		SetSelectedParameter();
 	}
 	
 	public void Update() 
@@ -109,16 +114,19 @@ public class ExampleScript : MonoBehaviour
 		// the up and down arrow keys.
 		try
 		{
+			if ( !hasAsset() )
+				return;
+
 			if ( Input.GetKey( "up" ) )
 			{
 				seed += 0.01f;
-				asset.setParmFloatValue( "seed", 0, seed );
+				myAsset.setParmFloatValue( "seed", 0, seed );
 			}
 
 			if ( Input.GetKey( "down" ) )
 			{
 				seed -= 0.01f;
-				asset.setParmFloatValue( "seed", 0, seed );
+				myAsset.setParmFloatValue( "seed", 0, seed );
 			}
 		}
 		catch {}
@@ -145,13 +153,16 @@ public class ExampleScript : MonoBehaviour
 	}
 
 	// Set the currently selected parameter and retrieve its values
-	public void SetSelectedParameter()
+	public void setSelectedParameter()
 	{
 		try
 		{
+			if ( !hasAsset() )
+				return;
+
 			parmName = parmNames[ parmIndex ];
-			parmSize = asset.getParmSize( parmName );
-			parmType = asset.getParmType( parmName );
+			parmSize = myAsset.getParmSize( parmName );
+			parmType = myAsset.getParmType( parmName );
 			parmIntValue = null;
 			parmFloatValue = null;
 			parmStringValue = null;
@@ -162,7 +173,7 @@ public class ExampleScript : MonoBehaviour
 
 				for ( int i = 0; i < parmSize; i++ )
 				{
-					parmIntValue[ i ] = asset.getParmIntValue( parmName, i );
+					parmIntValue[ i ] = myAsset.getParmIntValue( parmName, i );
 				}
 			}
 			else if ( parmType == HAPI_AssetAccessor.ParmType.FLOAT )
@@ -171,7 +182,7 @@ public class ExampleScript : MonoBehaviour
 				
 				for ( int i = 0; i < parmSize; i++ )
 				{
-					parmFloatValue[ i ] = asset.getParmFloatValue( parmName, i );
+					parmFloatValue[ i ] = myAsset.getParmFloatValue( parmName, i );
 				}
 			}
 			else if ( parmType == HAPI_AssetAccessor.ParmType.STRING )
@@ -180,7 +191,7 @@ public class ExampleScript : MonoBehaviour
 				
 				for ( int i = 0; i < parmSize; i++ )
 				{
-					parmStringValue[ i ] = asset.getParmStringValue( parmName, i );
+					parmStringValue[ i ] = myAsset.getParmStringValue( parmName, i );
 				}
 			}
 		}
@@ -191,18 +202,21 @@ public class ExampleScript : MonoBehaviour
 	}
 
 	// Set the value of the currently selected parameter
-	public void SetParameterValue()
+	public void setParameterValue()
 	{
 		try
 		{
+			if ( !hasAsset() )
+				return;
+
 			for ( int i = 0; i < parmSize; i++ )
 			{
 				if ( parmType == HAPI_AssetAccessor.ParmType.INT )
-					asset.setParmIntValue( parmName, i, parmIntValue[ i ] );
+					myAsset.setParmIntValue( parmName, i, parmIntValue[ i ] );
 				else if ( parmType == HAPI_AssetAccessor.ParmType.FLOAT )
-					asset.setParmFloatValue( parmName, i, parmFloatValue[ i ] );
+					myAsset.setParmFloatValue( parmName, i, parmFloatValue[ i ] );
 				else if ( parmType == HAPI_AssetAccessor.ParmType.STRING )
-					asset.setParmStringValue( parmName, i, parmStringValue[ i ] );
+					myAsset.setParmStringValue( parmName, i, parmStringValue[ i ] );
 			}
 		}
 		catch ( HAPI_Error err )
@@ -212,13 +226,16 @@ public class ExampleScript : MonoBehaviour
 	}
 
 	// Set up the UI for the currently selected parameter
-	public void GetParameterGUI()
+	public void getParameterGUI()
 	{
 		// TODO: Move this to the companion Editor class!
 
 #if UNITY_EDITOR
 		try
 		{
+			if ( !hasAsset() )
+				return;
+
 			for ( int i = 0; i < parmSize; i++ )
 			{
 				if ( parmType == HAPI_AssetAccessor.ParmType.INT )
