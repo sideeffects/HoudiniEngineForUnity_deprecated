@@ -378,6 +378,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 
+		// We have to save the presets here because this connection might change a parm
+		// and we want to save it.
+		if ( !EditorApplication.isPlaying )
+			savePreset();
+
 		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideGeometryOnLinking )
 		{
 			asset.prIsGeoVisible = false;
@@ -842,7 +847,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		else
 		{
-			build(	
+			build(
 				false,			// reload_asset
 				false,			// unload_asset_first
 				false,			// serializatin_recovery_only
@@ -855,7 +860,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		// To keep things consistent with Unity workflow, we should not save parameter changes
 		// while in Play mode.
 #if UNITY_EDITOR
-		if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
+		if ( !EditorApplication.isPlaying )
 			savePreset();
 #endif // UNITY_EDITOR
 	}
