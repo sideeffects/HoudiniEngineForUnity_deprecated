@@ -119,6 +119,16 @@ public class HAPI_GeoAttributeManagerGUI
 		{
 			if ( myManager.prIsPaintingPoints )
 			{
+				if (
+					( myCurrentlyPressedKey != myMayaBrushResizeKey &&
+						myCurrentlyPressedKey != myHoudiniBrushResizeKey ) ||
+					( current_event.type == EventType.MouseDown ) &&
+						( myCurrentlyPressedKey == myMayaBrushResizeKey ||
+							myCurrentlyPressedKey == myMayaBrushResizeKey ) )
+				{
+					myFirstMousePosition = mouse_position;
+				}
+
 				// The right mouse button has special interpretation in the Unity viewport.
 				// So much so, that simply Use()'ing the event is not enough. We need to actually
 				// change the event's mouse button to the left mouse button (0) as soon as
@@ -137,7 +147,7 @@ public class HAPI_GeoAttributeManagerGUI
 				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				Handles.Button( position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
-				Ray ray = myTempCamera.ScreenPointToRay( mouse_position );
+				Ray ray = myTempCamera.ScreenPointToRay( myFirstMousePosition );
 				ray.origin = myTempCamera.transform.position;
 
 				MeshCollider mesh_collider  = myManager.prMeshCollider;
@@ -146,14 +156,6 @@ public class HAPI_GeoAttributeManagerGUI
 				 
 				if ( hit_info.collider )
 				{
-					// Consume scroll-wheel event.
-					if ( current_event.type == EventType.ScrollWheel
-						&& areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey ) )
-					{
-						myManager.prBrushRadius += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
-						current_event.Use();
-					}
-
 					// Draw paint brush.
 					Handles.DrawLine(
 						hit_info.point,
@@ -162,18 +164,43 @@ public class HAPI_GeoAttributeManagerGUI
 						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
 						myManager.prBrushRadius );
 
-					// Paint attributes on left-click.
-					if ( current_event.type == EventType.MouseDrag || mouseDown )
+					// Consume scroll-wheel event.
+					if ( current_event.type == EventType.ScrollWheel
+						&& areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey ) )
 					{
-						// Once we add a point we are no longer bound to the user holding down the add points key.
-						// Add points mode is now fully activated.
-						myManager.prModeChangeWait = false;
+						myManager.prBrushRadius += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
+						current_event.Use();
+					}
 
-						// Paint.
-						if ( myMouseKey == 0 )
-							myManager.paint( hit_info, false );
-						else
-							myManager.paint( hit_info, true );
+					// Change brush size via grow/shrink keys.
+					if ( current_event.type == EventType.KeyDown )
+						if ( current_event.keyCode == myPhotoshopBrushShrinkKey )
+							myManager.prBrushRadius -= myMouseWheelBrushSizeMultiplier;
+						else if ( current_event.keyCode == myPhotoshopBrushGrowKey )
+							myManager.prBrushRadius += myMouseWheelBrushSizeMultiplier;
+
+					if ( myCurrentlyPressedKey == myMayaBrushResizeKey || 
+						myCurrentlyPressedKey == myHoudiniBrushResizeKey )
+					{
+						EditorGUIUtility.AddCursorRect( myTempCamera.pixelRect, MouseCursor.ResizeHorizontal );
+						if ( current_event.type == EventType.MouseDrag )
+							myManager.prBrushRadius += current_event.delta.x * myMouseWheelBrushSizeMultiplier;
+					}
+					else
+					{
+						// Paint attributes on left-click.
+						if ( current_event.type == EventType.MouseDrag || mouseDown )
+						{
+							// Once we add a point we are no longer bound to the user holding down the add points key.
+							// Add points mode is now fully activated.
+							myManager.prModeChangeWait = false;
+
+							// Paint.
+							if ( myMouseKey == 0 )
+								myManager.paint( hit_info, false );
+							else
+								myManager.paint( hit_info, true );
+						}
 					}
 				}
 			}
@@ -624,7 +651,7 @@ public class HAPI_GeoAttributeManagerGUI
 		}
 		if ( myManager.prIsPaintingPoints )
 		{
-			help_text = "Click on mesh: paint attribute | Mouse Scroll + " + paint_hotkey_string + ": change brush size | ESC or Enter: exit mode";
+			help_text = "Click on mesh: paint attribute | " + paint_hotkey_string + " + Mouse Scroll: change brush size | ESC or Enter: exit mode";
 			box_color = HAPI_Host.prPaintingModeColour;
 		}
 		else if ( myManager.prIsEditingPoints )
@@ -1111,6 +1138,11 @@ public class HAPI_GeoAttributeManagerGUI
 	private bool				myIsMouseDown;
 	private int					myMouseKey;
 	private KeyCode				myCurrentlyPressedKey;
+
+	private const KeyCode		myMayaBrushResizeKey				= KeyCode.B;
+	private const KeyCode		myHoudiniBrushResizeKey				= KeyCode.LeftShift;
+	private const KeyCode		myPhotoshopBrushGrowKey				= KeyCode.RightBracket;
+	private const KeyCode		myPhotoshopBrushShrinkKey			= KeyCode.LeftBracket;
 
 	private const string		myPaintValuesFieldName				= "__HAPI_PaintBrushPaintValue";
 
