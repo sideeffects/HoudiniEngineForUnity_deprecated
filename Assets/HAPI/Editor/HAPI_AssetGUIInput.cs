@@ -75,7 +75,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		// Draw Help Pane
 		myAssetInput.prShowHelp = HAPI_GUI.foldout( "Asset Help", myAssetInput.prShowHelp, true );
 		if ( myAssetInput.prShowHelp )
-			drawHelpBox( "No help yet. TODO!" );
+			drawHelpBox( myHelpText );
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Asset Settings
@@ -322,4 +322,40 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 	private HAPI_AssetInput myAssetInput;
 	private HAPI_GeoAttributeManager myGeoAttributeManager;
 	private HAPI_GeoAttributeManagerGUI myGeoAttributeManagerGUI;
+
+	private const string myHelpText = 
+		"- Instantiation -\n" +
+		"\n" +
+		"As soon as this component is attached to a valid GameObject (one " +
+		"that has a MeshFilter with a valid mesh) a Houdini asset will be " +
+		"instantiated that will contain the full mesh and you'll be able to " +
+		"connect this asset as geometry or transfrom input to any other " +
+		"Houdini Engine asset loaded via OTL.\n" +
+		"\n" +
+		"- Attributes -\n" +
+		"\n" +
+		"Add Attribute:\n" +
+		"    1. Expand the 'Point Attributes' foldout.\n" +
+		"    2. Click on 'Create Point Attribute:'.\n" +
+		"    3. Choose a preset or choose 'Custom'.\n" +
+		"\n" +
+		"Modify Attributes:\n" +
+		"    1. Change either the name, type, tuple, min, or max.\n" +
+		"        - Note that you cannot have an attribute name P or two attributes with the same name.\n" +
+		"    2. Click on the 'Recook' button under 'Houdini Controls'.\n" +
+		"\n" +
+		"Delete Attribute:\n" +
+		"    1. Click on the little 'X' beside the attribute to delete.\n" +
+		"    2. Click on the 'Recook' button under 'Houdini Controls'.\n" +
+		"\n" +
+		"Paint Attributes:\n" +
+		"    1. In the Scene window, at the bottom, click the 'Paint' button.\n" +
+		"    2. At the top of the Scene window, select which attribute to paint.\n" +
+		"    3. Also at the top, you can choose between painting 3 components at once or just one component at a time.\n" +
+		"    4. Furthermore, at the top is also where you choose the value to paint. To fill paint the whole surface with this value click the 'Fill' button in the inspector beside the active attribute.\n" +
+		"    5. To the right of the value is the 'Rate' setting which is a percentage of the max-min that will be applied on each click/stroke until the paint value is reached.\n" +
+		"    6. Finally, at the top right corner is the 'Live Updates' toggle which controls whether to cook the asset on every brush stroke or not.\n" +
+		"    7. You can also resize the brush by holding down Shift and dragging the mouse horizontally.\n" +
+		"    8. Left-click drag on the mesh surface to paint the paint value.\n" +
+		"    9. Right-click drag on the mesh surface to paint the inverse paint value, resepctive to the min/max settings.\n";
 }

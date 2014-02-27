@@ -304,16 +304,22 @@ public class HAPI_AssetGUI : Editor
 
 	protected void drawHelpBox( string text )
 	{
+		float width = (float) Screen.width - 60;
+
 		myHelpScrollPosition = EditorGUILayout.BeginScrollView(
 			myHelpScrollPosition, GUILayout.Height( 200 ) );
-		float height = GUI.skin.label.CalcHeight( 
-			new GUIContent( text ), (float) Screen.width );
+
 		GUIStyle sel_label = new GUIStyle( GUI.skin.label );
 		sel_label.stretchWidth = true;
 		sel_label.wordWrap = true;
+
+		float height = sel_label.CalcHeight( 
+			new GUIContent( text ), width );
+
 		EditorGUILayout.SelectableLabel( 
-			text, sel_label, GUILayout.Height( height ), 
-			GUILayout.Width( Screen.width - 40 ) );
+			text, sel_label, GUILayout.Width( width ),
+			GUILayout.Height( height ) );
+
 		EditorGUILayout.EndScrollView();
 	}
 
