@@ -1149,7 +1149,7 @@ namespace HAPI
 		public static void getAttributeNames(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			HAPI_AttributeOwner owner,
-			[Out] int[] data,
+			[Out] HAPI_StringHandle[] data,
 			int count )
 		{
 			HAPI_Result status_code = HAPI_GetAttributeNames(

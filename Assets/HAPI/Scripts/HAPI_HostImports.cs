@@ -438,7 +438,7 @@ namespace HAPI
 		HAPI_GetAttributeNames(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			HAPI_AttributeOwner owner,
-			[Out] int[] data,
+			[Out] HAPI_StringHandle[] data,
 			int count );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
