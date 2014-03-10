@@ -493,8 +493,7 @@ namespace HAPI
 		/// 	Fill an array of HAPI_ParmInfo structs with parameter information from the asset instance node.
 		/// </summary>
 		/// <param name="node_id">
-		/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-		/// 	a <see cref="HAPI_MaterialInfo"/> struct.
+		/// 	The node id.
 		/// </param>
 		/// <param name="parm_infos">
 		/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of
@@ -512,6 +511,29 @@ namespace HAPI
 		{
 			HAPI_Result status_code = HAPI_GetParameters( node_id, parm_infos, start, length );
 			processStatusCode( status_code );
+		}
+
+		/// <summary>
+		/// 	All parameter APIs require a HAPI_ParmId but if you know the parameter you wish
+		/// 	to operate on by name than you can use this function to get its HAPI_ParmId.
+		/// 	If the parameter with the given name is not found the parameter id returned
+		/// 	will be -1.
+		/// </summary>
+		/// <param name="node_id">
+		/// 	The node id.
+		/// </param>
+		/// <param name="name">
+		/// 	The name of the parameter you wish to get the id for.
+		/// </param>
+		/// <returns>
+		///		The parameter id. -1 if parameter not found.
+		/// </returns>
+		public static HAPI_ParmId getParmIdFromName( HAPI_NodeId node_id, string name )
+		{
+			HAPI_ParmId parm_id = -1;
+			HAPI_Result status_code = HAPI_GetParmIdFromName( node_id, name, out parm_id );
+			processStatusCode( status_code );
+			return parm_id;
 		}
 
 		/// <summary>

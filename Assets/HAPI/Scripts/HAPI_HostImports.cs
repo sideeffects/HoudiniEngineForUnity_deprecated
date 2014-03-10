@@ -270,7 +270,14 @@ namespace HAPI
 			HAPI_NodeId node_id,
 			[Out] HAPI_ParmInfo[] parm_infos,
 			int start, int length );
-		
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetParmIdFromName(
+			HAPI_NodeId node_id,
+			string name,
+			out HAPI_ParmId parm_id );
+
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 		private static extern HAPI_Result
 		HAPI_GetParmIntValues(
