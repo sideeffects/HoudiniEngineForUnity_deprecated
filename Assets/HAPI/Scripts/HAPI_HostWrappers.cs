@@ -2024,8 +2024,8 @@ namespace HAPI
 			HAPI_Keyframe[] curve_keyframes,
 			int keyframe_count )
 		{
-			HAPI_Result status_code = HAPI_SetAnimCurve( node_id, parm_id, parm_index, 
-			                                             curve_keyframes, keyframe_count );
+			HAPI_Result status_code = HAPI_SetAnimCurve(
+				node_id, parm_id, parm_index, curve_keyframes, keyframe_count );
 			processStatusCode( status_code );
 		}
 
