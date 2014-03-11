@@ -2020,11 +2020,12 @@ namespace HAPI
 		// SIMULATION/ANIMATIONS ------------------------------------------------------------------------------------
 
 		public static void setAnimCurve(
-			HAPI_NodeId node_id, HAPI_ParmId parm_id,
+			HAPI_NodeId node_id, HAPI_ParmId parm_id, int parm_index,
 			HAPI_Keyframe[] curve_keyframes,
 			int keyframe_count )
 		{
-			HAPI_Result status_code = HAPI_SetAnimCurve( node_id, parm_id, curve_keyframes, keyframe_count );
+			HAPI_Result status_code = HAPI_SetAnimCurve( node_id, parm_id, parm_index, 
+			                                             curve_keyframes, keyframe_count );
 			processStatusCode( status_code );
 		}
 

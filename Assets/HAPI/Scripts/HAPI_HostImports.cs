@@ -665,6 +665,7 @@ namespace HAPI
 		private static extern HAPI_Result
 		HAPI_SetAnimCurve(
 			HAPI_NodeId node_id, HAPI_ParmId parm_id,
+			int parm_index,
 			HAPI_Keyframe[] curve_keyframes,
 			int keyframe_count );
 
