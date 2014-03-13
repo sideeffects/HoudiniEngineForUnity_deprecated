@@ -171,14 +171,13 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				label_style.margin.left = -5;
 				label_style.border.right = -10;
 
-				EditorGUILayout.LabelField( "Name", GUILayout.Width( 100 ) );
+				EditorGUILayout.LabelField( "Name", GUILayout.MinWidth( 100 ) );
 				EditorGUILayout.LabelField( "Type", GUILayout.Width( 50 ) );
 				EditorGUILayout.LabelField( "Tuple", GUILayout.Width( 50 ) );
 				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
-				EditorGUILayout.LabelField( "Min", GUILayout.MinWidth( 20 ) );
-				EditorGUILayout.LabelField( "Max", GUILayout.MinWidth( 20 ) );
-				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
-				EditorGUILayout.LabelField( "Fill Paint Val.", GUILayout.Width( 81 ) );
+				EditorGUILayout.LabelField( "Min", GUILayout.Width( 50 ) );
+				EditorGUILayout.LabelField( "Max", GUILayout.Width( 50 ) );
+				EditorGUILayout.LabelField( "", GUILayout.Width( 27 ) );
 
 				EditorGUILayout.EndHorizontal();
 			}
@@ -190,7 +189,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				EditorGUILayout.BeginHorizontal();
 
 				// Attribute Name
-				string new_name = EditorGUILayout.TextField( attrib.prName, GUILayout.Width( 100 ) );
+				string new_name = EditorGUILayout.TextField( attrib.prName, GUILayout.MinWidth( 100 ) );
 				if ( new_name != attrib.prName )
 				{
 					attrib.prName = new_name;
@@ -226,48 +225,17 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				{
 					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
 						attrib.prIntMin =
-							EditorGUILayout.IntField( "", attrib.prIntMin, GUILayout.MinWidth( 20 ) );
+							EditorGUILayout.IntField( "", attrib.prIntMin, GUILayout.Width( 50 ) );
 					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
 						attrib.prFloatMin =
-							EditorGUILayout.FloatField( "", attrib.prFloatMin, GUILayout.MinWidth( 20 ) );
+							EditorGUILayout.FloatField( "", attrib.prFloatMin, GUILayout.Width( 50 ) );
 
 					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
 						attrib.prIntMax =
-							EditorGUILayout.IntField( "", attrib.prIntMax, GUILayout.MinWidth( 20 ) );
+							EditorGUILayout.IntField( "", attrib.prIntMax, GUILayout.Width( 50 ) );
 					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
 						attrib.prFloatMax =
-							EditorGUILayout.FloatField( "", attrib.prFloatMax, GUILayout.MinWidth( 20 ) );
-				}
-
-				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
-
-				// Do Actions
-				{
-					if ( GUILayout.Button( "Fill", GUILayout.Width( 50 ), GUILayout.Height( 14 ) ) )
-					{
-						attrib.fill();
-						myAssetInput.prGeoAttributeManager.refreshMesh();
-						myAssetInput.buildClientSide();
-					}
-					
-					/* Action Menu
-					string[] do_action_labels = new string[] {
-						"Do:",
-						"Fill (set all values to the paint value)",
-						"Fit (recalculate the range to encompass all values)" };
-					int[] do_action_values = new int[] { 0, 1, 2 };
-					
-					int action = EditorGUILayout.IntPopup( 0, do_action_labels, do_action_values, GUILayout.Width( 50 ) );
-					if ( action > 0 )
-					{
-						if ( action == 1 )
-							attrib.fill();
-						else if ( action == 2 )
-							attrib.fit();
-						myAssetInput.prGeoAttributeManager.refreshMesh();
-						myAssetInput.buildClientSide();
-					}
-					*/
+							EditorGUILayout.FloatField( "", attrib.prFloatMax, GUILayout.Width( 50 ) );
 				}
 
 				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
@@ -352,10 +320,10 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		"    1. In the Scene window, at the bottom, click the 'Paint' button.\n" +
 		"    2. At the top of the Scene window, select which attribute to paint.\n" +
 		"    3. Also at the top, you can choose between painting 3 components at once or just one component at a time.\n" +
-		"    4. Furthermore, at the top is also where you choose the value to paint. To fill paint the whole surface with this value click the 'Fill' button in the inspector beside the active attribute.\n" +
+		"    4. Furthermore, at the top is also where you choose the value to paint. To fill paint the whole surface with this value click the 'Fill' button to the right of the paint value fields.\n" +
 		"    5. To the right of the value is the 'Rate' setting which is a percentage of the max-min that will be applied on each click/stroke until the paint value is reached.\n" +
 		"    6. Finally, at the top right corner is the 'Live Updates' toggle which controls whether to cook the asset on every brush stroke or not.\n" +
-		"    7. You can also resize the brush by holding down Shift and dragging the mouse horizontally.\n" +
+		"    7. You can also resize the brush by holding down Shift and dragging the mouse horizontally (the Maya and Houdini brush resize hotkeys also work).\n" +
 		"    8. Left-click drag on the mesh surface to paint the paint value.\n" +
-		"    9. Right-click drag on the mesh surface to paint the inverse paint value, resepctive to the min/max settings.\n";
+		"    9. Right-click drag on the mesh surface to paint the inverse paint value, respective to the min/max settings.\n";
 }
