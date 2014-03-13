@@ -336,7 +336,7 @@ namespace HAPI
 		/// 	using the host application's instances of the assets.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="asset_validation_id">
 		///		The asset validation id that's found in the <see cref="HAPI_AssetInfo"/> struct 
@@ -360,7 +360,7 @@ namespace HAPI
 		/// 	Get an asset_info struct.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		public static HAPI_AssetInfo getAssetInfo( HAPI_AssetId asset_id )
 		{
@@ -375,7 +375,7 @@ namespace HAPI
 		/// 	are connected.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		public static void cookAsset( HAPI_AssetId asset_id )
 		{
@@ -396,7 +396,7 @@ namespace HAPI
 		/// 	Get the transform of an asset to match the transform of the asset on the client side.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="rst_order">
 		/// 	The order of application of translation, rotation and scale.
@@ -419,7 +419,7 @@ namespace HAPI
 		/// 	Set the transform of an asset to match the transform of the asset on the client side.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="transform">
 		/// 	The actual transform struct.
@@ -435,7 +435,7 @@ namespace HAPI
 		/// 	Get the name of an asset's input.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="input_idx">
 		/// 	Input index of the asset.
@@ -775,7 +775,7 @@ namespace HAPI
 		/// 	user manipulation handle on the asset.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name ="handle_infos">
 		/// 	Array of <see cref="HAPI_HandleInfo"/> exactly the size of <paramref name="length"/>.
@@ -800,7 +800,7 @@ namespace HAPI
 		/// 	handle parameter maps to each asset parameter.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="handle_index">
 		/// 	The index of the handle, from 0 to handleCount - 1 from the call to <see cref="HAPI_Host.loadOTLFile"/>
@@ -874,7 +874,7 @@ namespace HAPI
 		/// 	flags to false after it returns the original flag values.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_infos">
 		/// 	Array of <see cref="HAPI_ObjectInfo"/> at least the size of <paramref name="length"/>.
@@ -901,7 +901,7 @@ namespace HAPI
 		/// 	flags to false after it returns the original flag values.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="rst_order">
 		/// 	The order of application of translation, rotation and scale.
@@ -972,7 +972,7 @@ namespace HAPI
 		/// 	likely fail, unless the transforms are exposed as editable via exposed parameters.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
 		/// 	The object id returned by <see cref="HAPI_Host.HAPI_GetObjects"/>.
@@ -996,10 +996,10 @@ namespace HAPI
 		/// 	flags to false after it returns the original flag values.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1019,10 +1019,10 @@ namespace HAPI
 		/// 	Get the part info struct (<see cref="HAPI_PartInfo"/>).
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1045,10 +1045,10 @@ namespace HAPI
 		/// 	the nth face has.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1078,10 +1078,10 @@ namespace HAPI
 		/// 	the point index the ith vertex associates with.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1110,10 +1110,10 @@ namespace HAPI
 		/// 	Get attribute information; fill a <see cref="HAPI_AttributeInfo"/>.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1141,14 +1141,13 @@ namespace HAPI
 		}
 
 		/// <summary>
-		/// 	Get list of attribute names by attribute owner. Note that the name string handles are only valid 
-		/// 	until the next time this function is called.
+		/// 	Get list of attribute names by attribute owner.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1159,34 +1158,39 @@ namespace HAPI
 		/// <param name="owner"/>
 		/// 	The <see cref="HAPI_AttributeOwner"/> enum value specifying the owner of the attribute.
 		/// </param>
-		/// <param name="data">
-		/// 	Array of ints (string handles) to house the attribute names.
-		/// 	Should be exactly the size of the appropriate attribute owner type count
-		/// 	in <see cref="HAPI_GeoInfo"/>.
-		/// </param>
-		/// <param name="count">
-		/// 	Sanity check count. Must be equal to the appropriate attribute owner type count
-		/// 	in <see cref="HAPI_GeoInfo"/>.
-		/// </param>
-		public static void getAttributeNames(
+		/// <returns>
+		/// 	List of attribute names.
+		/// </returns>
+		public static string[] getAttributeNames(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-			HAPI_AttributeOwner owner,
-			[Out] HAPI_StringHandle[] data,
-			int count )
+			HAPI_AttributeOwner owner )
 		{
-			HAPI_Result status_code = HAPI_GetAttributeNames(
-				asset_id, object_id, geo_id, part_id, owner, data, count );
+			HAPI_PartInfo part_info = new HAPI_PartInfo();
+			HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
 			processStatusCode( status_code );
+
+			int count = part_info.getAttributeCountByOwner( owner );
+
+			int[] names = new int[ count ];
+			status_code = HAPI_GetAttributeNames(
+				asset_id, object_id, geo_id, part_id, owner, names, count );
+			processStatusCode( status_code );
+
+			string[] name_strings = new string[ count ];
+			for ( int i = 0; i < count; ++i )
+				name_strings[ i ] = getString( names[ i ] );
+
+			return name_strings;
 		}
 
 		/// <summary>
 		/// 	Get attribute integer data.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1225,10 +1229,10 @@ namespace HAPI
 		/// 	Get attribute float data.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1268,10 +1272,10 @@ namespace HAPI
 		/// 	time this function is called.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1306,17 +1310,105 @@ namespace HAPI
 				asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
 			processStatusCode( status_code );
 		}
-		
+
+		/// <summary>
+		/// 	Get list of group names by group type.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="part_id">
+		/// 	The part id.
+		/// </param>
+		/// <param name="group_type">
+		/// 	The group type.
+		/// </param>
+		/// <returns>
+		/// 	List of group names.
+		/// </returns>
+		public static string[] getGroupNames(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			HAPI_GroupType group_type )
+		{
+			HAPI_PartInfo part_info = new HAPI_PartInfo();
+			HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+			processStatusCode( status_code );
+
+			int count = part_info.getGroupCountByType( group_type );
+
+			int[] names = new int[ count ];
+			status_code = HAPI_GetGroupNames(
+				asset_id, object_id, geo_id, part_id, group_type, names, count );
+			processStatusCode( status_code );
+
+			string[] name_strings = new string[ count ];
+			for ( int i = 0; i < count; ++i )
+				name_strings[ i ] = getString( names[ i ] );
+
+			return name_strings;
+		}
+
+		/// <summary>
+		/// 	Get attribute string data. Note that the string handles returned are only valid until the next 
+		/// 	time this function is called.
+		/// </summary>
+		/// <param name="asset_id">
+		/// 	The asset id.
+		/// </param>
+		/// <param name="object_id">
+		/// 	The object id.
+		/// </param>
+		/// <param name="geo_id">
+		/// 	The geometry id.
+		/// </param>
+		/// <param name="part_id">
+		/// 	The part id.
+		/// </param>
+		/// <param name="group_type">
+		/// 	The group type.
+		/// </param>
+		/// <returns>
+		/// 	List of group names.
+		/// </returns>
+		public static bool[] getGroupMembership(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			HAPI_GroupType group_type,
+			string group_name )
+		{
+			HAPI_PartInfo part_info = new HAPI_PartInfo();
+			HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+			processStatusCode( status_code );
+
+			int count = part_info.getElementCountByGroupType( group_type );
+
+			int[] membership = new int[ count ];
+			status_code = HAPI_GetGroupMembership(
+				asset_id, object_id, geo_id, part_id, group_type, group_name, membership, count );
+			processStatusCode( status_code );
+
+			bool[] membership_bools = new bool[ count ];
+			for ( int i = 0; i < count; ++i )
+				membership_bools[ i ] = membership[ i ] > 0;
+
+			return membership_bools;
+		}
+
 		// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 
 		/// <summary>
 		/// 	Set the main geometry info struct (<see cref="HAPI_GeoInfo"/>).
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1336,10 +1428,10 @@ namespace HAPI
 		/// 	Set the main part info struct (<see cref="HAPI_PartInfo"/>).
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1360,10 +1452,10 @@ namespace HAPI
 		/// 	the nth face has.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1391,10 +1483,10 @@ namespace HAPI
 		/// 	the point index the ith vertex associates with.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1421,10 +1513,10 @@ namespace HAPI
 		/// 	Add an attribute.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1448,10 +1540,10 @@ namespace HAPI
 		/// 	Set attribute integer data.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1487,10 +1579,10 @@ namespace HAPI
 		/// 	Set attribute float data.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1526,10 +1618,10 @@ namespace HAPI
 		/// 	Set attribute string data.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1566,10 +1658,10 @@ namespace HAPI
 		/// 	re-cook using the input geometry given through the geometry setter API calls.
 		/// </summary>
 		/// <param name="asset_id">
-		/// 	The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+		/// 	The asset id.
 		/// </param>
 		/// <param name="object_id">
-		/// 	The object id returned by <see cref="HAPI_Host.getObjects"/>.
+		/// 	The object id.
 		/// </param>
 		/// <param name="geo_id">
 		/// 	The geometry id.
@@ -1757,7 +1849,7 @@ namespace HAPI
 		/// 	used and stored in an asset.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
@@ -1776,7 +1868,7 @@ namespace HAPI
 		///		UV space, flattening the material into an image that can be later mapped back onto the object.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
@@ -1796,7 +1888,7 @@ namespace HAPI
 		///		texture files for use within the client application.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
@@ -1845,7 +1937,7 @@ namespace HAPI
 		/// 	format. This information will be used when extracting planes to an image.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
@@ -1866,7 +1958,7 @@ namespace HAPI
 		/// 	extracting planes to an image.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
@@ -1884,7 +1976,7 @@ namespace HAPI
 		/// 	Get the names of the image planes of the just rendered image.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
@@ -1916,7 +2008,7 @@ namespace HAPI
 		/// 	Extract a rendered image to a file.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.
@@ -1968,7 +2060,7 @@ namespace HAPI
 		/// 	Extract a rendered image to memory.
 		/// </summary>
 	    /// <param name="asset_id">
-	    ///		The asset id returned by <see cref="HAPI_Host.loadOTLFile"/>.
+	    ///		The asset id.
 		/// </param>
 		/// <param name="material_id">
 		///		The material id from a <see cref="HAPI_PartInfo"/> struct.

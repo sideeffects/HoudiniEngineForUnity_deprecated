@@ -584,27 +584,11 @@ public class HAPI_AssetUtility
 	{
 		setAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
 	}
-	
-	public static string[] getAttributeNames( int asset_id, int object_id, int geo_id, int part_id, 
-											  HAPI_PartInfo part_info, HAPI_AttributeOwner owner )
+
+	public static void printAttributeNames(
+		int asset_id, int object_id, int geo_id, int part_id, HAPI_AttributeOwner owner )
 	{
-		int attr_count = part_info.getOwnerCount( owner );
-			
-		string[] names = new string[ attr_count ];
-		
-		int[] attr_names = new int[ attr_count ]; // string handles (SH)
-		
-		HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, part_id, owner, attr_names, attr_count );
-		for ( int ii = 0; ii < attr_count; ++ii )
-			names[ ii ] = HAPI_Host.getString( attr_names[ ii ] );
-		
-		return names;
-	}
-	
-	public static void printAttributeNames( int asset_id, int object_id, int geo_id, int part_id, 
-											HAPI_PartInfo part_info, HAPI_AttributeOwner owner )
-	{
-		string[] names = getAttributeNames( asset_id, object_id, geo_id, part_id, part_info, owner );
+		string[] names = HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, part_id, owner );
 		
 		string msg = "A" + asset_id + "O" + object_id + " - ";
 		
@@ -632,11 +616,10 @@ public class HAPI_AssetUtility
 		Debug.Log( msg );
 	}
 	
-	public static void printAllAttributeNames( int asset_id, int object_id, int geo_id, int part_id, 
-											   HAPI_PartInfo part_info )
+	public static void printAllAttributeNames( int asset_id, int object_id, int geo_id, int part_id )
 	{
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
-			printAttributeNames( asset_id, object_id, geo_id, part_id, part_info, (HAPI_AttributeOwner) owner );
+			printAttributeNames( asset_id, object_id, geo_id, part_id, (HAPI_AttributeOwner) owner );
 	}
 
 	// PARAMETERS ---------------------------------------------------------------------------------------------------

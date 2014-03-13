@@ -214,7 +214,16 @@ namespace HAPI
 		HAPI_ASSETSUBTYPE_EXTERNALINPUT,
 		HAPI_ASSETSUBTYPE_MAX
 	}
-	
+
+	public enum HAPI_GroupType
+	{
+		HAPI_GROUPTYPE_INVALID = -1,
+		HAPI_GROUPTYPE_POINT,
+		HAPI_GROUPTYPE_PRIM,
+		HAPI_GROUPTYPE_DETAIL,
+		HAPI_GROUPTYPE_MAX
+	}
+
 	public enum HAPI_AttributeOwner
 	{
 		HAPI_ATTROWNER_INVALID = -1,
@@ -794,7 +803,30 @@ namespace HAPI
 	[ StructLayout( LayoutKind.Sequential ) ]
 	public struct HAPI_PartInfo
 	{
-		public int getOwnerCount( HAPI_AttributeOwner owner )
+		public int getElementCountByAttributeOwner( HAPI_AttributeOwner owner )
+		{
+			switch ( owner )
+			{
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX: return vertexCount;
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_POINT: return pointCount;
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM: return faceCount;
+				case HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL: return 1;
+				default: return 0;
+			}
+		}
+
+		public int getElementCountByGroupType( HAPI_GroupType type )
+		{
+			switch ( type )
+			{
+				case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointCount;
+				case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return faceCount;
+				case HAPI_GroupType.HAPI_GROUPTYPE_DETAIL: return 1;
+				default: return 0;
+			}
+		}
+
+		public int getAttributeCountByOwner( HAPI_AttributeOwner owner )
 		{
 			switch ( owner )
 			{
@@ -802,6 +834,17 @@ namespace HAPI
 				case HAPI_AttributeOwner.HAPI_ATTROWNER_POINT: return pointAttributeCount;
 				case HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM: return faceAttributeCount;
 				case HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL: return detailAttributeCount;
+				default: return 0;
+			}
+		}
+
+		public int getGroupCountByType( HAPI_GroupType type )
+		{
+			switch ( type )
+			{
+				case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointGroupCount;
+				case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return faceGroupCount;
+				case HAPI_GroupType.HAPI_GROUPTYPE_DETAIL: return detailGroupCount;
 				default: return 0;
 			}
 		}
@@ -814,10 +857,15 @@ namespace HAPI
 		public int faceCount;
 		public int vertexCount;
 		public int pointCount;
+
 		public int pointAttributeCount;
 		public int faceAttributeCount;
 		public int vertexAttributeCount;
 		public int detailAttributeCount;
+
+		public int pointGroupCount;
+		public int faceGroupCount;
+		public int detailGroupCount;
 
 		[ MarshalAs( UnmanagedType.U1 ) ]
 		public bool hasVolume;

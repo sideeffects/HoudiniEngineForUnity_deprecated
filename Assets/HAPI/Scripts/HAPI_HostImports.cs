@@ -445,7 +445,7 @@ namespace HAPI
 		HAPI_GetAttributeNames(
 			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 			HAPI_AttributeOwner owner,
-			[Out] HAPI_StringHandle[] data,
+			[Out] HAPI_StringHandle[] attribute_names,
 			int count );
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
@@ -474,7 +474,24 @@ namespace HAPI
 			ref HAPI_AttributeInfo attr_info,
 			[Out] int[] data,
 			int start, int length );
-		
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetGroupNames(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			HAPI_GroupType group_type,
+			[Out] HAPI_StringHandle[] group_names,
+			int group_count );
+
+		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+		private static extern HAPI_Result
+		HAPI_GetGroupMembership(
+			HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+			HAPI_GroupType group_type,
+			string group_name,
+			[Out] int[] membership,
+			int count );
+
 		// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 		
 		[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
