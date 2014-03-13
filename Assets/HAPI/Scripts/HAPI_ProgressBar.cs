@@ -5,10 +5,8 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-using HAPI;
-
-public class HAPI_ProgressBar  {
-#if UNITY_STANDALONE_WIN
+public class HAPI_ProgressBar
+{
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -194,5 +192,4 @@ public class HAPI_ProgressBar  {
 	private int					myLastValue;
 	private string				myLastMsg;
 #endif // UNITY_EDITOR
-#endif // UNITY_STANDALONE_WIN
 }

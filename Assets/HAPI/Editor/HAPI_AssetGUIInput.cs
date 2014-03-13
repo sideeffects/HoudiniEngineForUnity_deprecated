@@ -20,7 +20,6 @@ using UnityEditor;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 [ ExecuteInEditMode ]
 [ CustomEditor( typeof( HAPI_AssetInput ) ) ]
@@ -49,7 +48,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		// can only happen on the Windows x86 platform.
 #if !UNITY_STANDALONE_WIN
 		is_editable = false;
-		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 		if ( !is_editable )
 			HAPI_GUI.help( "This mesh is not editable.", MessageType.Info );

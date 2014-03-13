@@ -18,8 +18,6 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-using HAPI;
-
 [ CustomEditor( typeof( HAPI_Instance ) ) ]
 [ CanEditMultipleObjects ]
 public class HAPI_InstanceGUI : Editor 

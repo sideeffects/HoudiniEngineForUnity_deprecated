@@ -19,7 +19,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class HAPI_GeoAttributeManager : ScriptableObject {
-#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
 	
@@ -176,19 +175,19 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 			myMesh.colors = prActiveAttribute.getColorRepresentation();
 			if ( prActiveAttribute.prName == "N" &&
 				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE )
+				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE )
 				myMesh.normals = prActiveAttribute.prFloatDataVec3;
 			else if ( prActiveAttribute.prName == "uv" &&
 				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv = prActiveAttribute.prFloatDataVec2;
 			else if ( prActiveAttribute.prName == "uv1" &&
 				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv1 = prActiveAttribute.prFloatDataVec2;
 			else if ( prActiveAttribute.prName == "uv2" &&
 				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI.HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv2 = prActiveAttribute.prFloatDataVec2;
 		}
 		else
@@ -352,5 +351,4 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	[SerializeField] private HAPI_GeoAttribute myActiveAttribute;
 	[SerializeField] private List< HAPI_GeoAttribute > myAttributes;
 
-#endif // UNITY_STANDALONE_WIN
 }

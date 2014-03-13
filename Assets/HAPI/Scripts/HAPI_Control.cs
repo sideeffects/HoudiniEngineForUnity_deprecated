@@ -21,16 +21,12 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-using HAPI;
-
 // Typedefs
 using HAPI_NodeId = System.Int32;
 using HAPI_AssetId = System.Int32;
 
 public class HAPI_Control : MonoBehaviour 
 {
-#if UNITY_STANDALONE_WIN
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -156,5 +152,5 @@ public class HAPI_Control : MonoBehaviour
 	[SerializeField] private HAPI_NodeId myNodeId;
 	[SerializeField] private HAPI_NodeId myObjectNodeId;
 	[SerializeField] private HAPI_Asset myAsset;
-#endif // UNITY_STANDALONE_WIN
+
 }

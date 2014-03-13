@@ -22,11 +22,9 @@ using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using HAPI;
 
 public class HAPI_AssetUtility
 {
-#if UNITY_STANDALONE_WIN
 	// TRANSFORMS ------------------------------------------------------------------------------------------------------
 
 	public static Quaternion getQuaternion( Matrix4x4 m )
@@ -1344,8 +1342,8 @@ public class HAPI_AssetUtility
 	{
 		HAPI_AttributeInfo attr_info = new HAPI_AttributeInfo( attr );
 		attr_info.exists 		= true;
-		attr_info.owner 		= HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
-		attr_info.storage 		= HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+		attr_info.owner 		= HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+		attr_info.storage 		= HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
 		attr_info.count 		= part_info.pointCount;
 		attr_info.tupleSize 	= tuple_size;
 		HAPI_Host.addAttribute( asset_id, object_id, geo_id, 
@@ -1679,8 +1677,6 @@ public class HAPI_AssetUtility
 				Debug.LogError("Unable to set property " + arg_name_str );
 				return;
 			}
-						
 		}
 	}
-#endif // UNITY_STANDALONE_WIN
 }

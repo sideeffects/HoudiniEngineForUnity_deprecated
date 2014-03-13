@@ -21,39 +21,29 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HAPI 
-{	
-	/// <summary>
-	/// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
-	/// 	Houdini runtime.
-	/// </summary>
-	public static partial class HAPI_Host
+public static partial class HAPI_Host
+{
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public
+		
+	public static string getString( int string_handle )
 	{
-#if UNITY_STANDALONE_WIN
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Public
-		
-		public static string getString( int string_handle )
-		{
-			int length = 0;
-			getStringBufLength( string_handle, out length );
+		int length = 0;
+		getStringBufLength( string_handle, out length );
 			
-			if ( length <= 0 )
-				return "";
+		if ( length <= 0 )
+			return "";
 			
-			StringBuilder string_builder = new StringBuilder( length );
-			getString( string_handle, string_builder, length );
+		StringBuilder string_builder = new StringBuilder( length );
+		getString( string_handle, string_builder, length );
 			
-			string string_value = string_builder.ToString();
+		string string_value = string_builder.ToString();
 			
-			return string_value;
-		}
-		
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Private
-		
-		// TODO: We would like to cache some strings eventually.
-#endif // UNITY_STANDALONE_WIN
+		return string_value;
 	}
-
+		
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private
+		
+	// TODO: We would like to cache some strings eventually.
 }

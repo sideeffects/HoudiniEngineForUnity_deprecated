@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 using System;
-using HAPI;
 
 [InitializeOnLoad]
 class HAPI_AssetModificationProcessor : UnityEditor.AssetModificationProcessor 

@@ -20,7 +20,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using HAPI;
 
 [ CustomEditor( typeof( HAPI_Asset ) ) ]
 public class HAPI_AssetGUI : Editor 
@@ -105,7 +104,7 @@ public class HAPI_AssetGUI : Editor
 		// can only happen on the Windows x86 platform.
 #if !UNITY_STANDALONE_WIN
 		bool gui_enable = GUI.enabled;
-		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #endif // !UNITY_STANDALONE_WIN
 
@@ -348,31 +347,25 @@ public class HAPI_AssetGUI : Editor
 		bool global_overwrite, bool local_overwrite, 
 		string local_overwrite_message )
 	{
+		bool gui_enabled = GUI.enabled;
 		try
 		{
 			PropertyInfo property = typeof( HAPI_Asset ).GetProperty( property_name );
-		if ( property == null )
-		{
-			throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
-		}
-		if ( property.PropertyType != typeof( bool ) )
-		{
-			throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
-		}
+			if ( property == null )
+				throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
+			if ( property.PropertyType != typeof( bool ) )
+				throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
 
-		GUI.enabled = !global_overwrite && !local_overwrite;
-		if ( !GUI.enabled )
-		{
+			GUI.enabled = !global_overwrite && !local_overwrite && GUI.enabled;
+
 			if ( global_overwrite )
 				label += " (overwritted by global setting)";
-			else
+			else if ( local_overwrite )
 				label += local_overwrite_message;
-			}
-			
+
 			bool value = ( bool ) property.GetValue( myAsset, null );
 			bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) != value;
 			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value, myUndoInfo, ref undo_info_value );
-			GUI.enabled = true;
 
 			if ( changed )
 			{
@@ -388,6 +381,7 @@ public class HAPI_AssetGUI : Editor
 				"Failed to create toggle for: " + label + "\n" +
 				error.ToString() + "\nSource: " + error.Source );
 		}
+		GUI.enabled = gui_enabled;
 	}
 
 	protected HAPI_Asset 	myAsset;

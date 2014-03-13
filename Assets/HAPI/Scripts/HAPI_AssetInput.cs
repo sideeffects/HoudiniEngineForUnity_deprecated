@@ -19,14 +19,12 @@ using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using HAPI;
 using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
 [ RequireComponent( typeof( MeshFilter ) ) ]
 public class HAPI_AssetInput : HAPI_Asset
 {
-#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -280,6 +278,4 @@ public class HAPI_AssetInput : HAPI_Asset
 	[SerializeField] private Mesh			myOriginalMesh;
 
 	[SerializeField] private HAPI_GeoAttributeManager myGeoAttributeManager;
-
-#endif // UNITY_STANDALONE_WIN
 }

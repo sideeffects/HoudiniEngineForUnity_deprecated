@@ -20,7 +20,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using HAPI;
 
 [ CustomEditor( typeof( HAPI_AssetOTL ) ) ]
 public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI 

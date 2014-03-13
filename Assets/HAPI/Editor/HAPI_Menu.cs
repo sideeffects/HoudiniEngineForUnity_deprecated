@@ -18,7 +18,6 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
-using HAPI;
 
 /// <summary>
 /// 	Main HAPI menu which adds components to the main Unity menu bar.

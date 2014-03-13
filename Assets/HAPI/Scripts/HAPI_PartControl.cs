@@ -20,15 +20,13 @@ using UnityEditor;
 #endif // UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 // Typedefs
 using HAPI_NodeId = System.Int32;
 
 [ ExecuteInEditMode ]
 public class HAPI_PartControl : HAPI_GeoControl 
-{	
-#if UNITY_STANDALONE_WIN
+{
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
@@ -477,5 +475,4 @@ public class HAPI_PartControl : HAPI_GeoControl
 	[SerializeField] private bool			myShowPointNumbers;
 
 	[SerializeField] private HAPI_GeoControl myGeoControl;
-#endif // UNITY_STANDALONE_WIN
 }

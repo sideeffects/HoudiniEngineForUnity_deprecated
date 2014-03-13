@@ -18,8 +18,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-using HAPI;
-
 public class HAPI_ParmsUndoInfo : ScriptableObject
 {	
 	public List< string > parmNames = new List< string >();

@@ -7,9 +7,6 @@ using System.Collections.Generic;
 using Utility = HAPI_AssetUtility;
 using System;
 
-using HAPI;
-
-
 public class HAPI_CurvesCollection
 {
 	public AnimationCurve tx = new AnimationCurve();
@@ -110,7 +107,6 @@ public class HAPI_CurvesCollection
 
 public class HAPI_Instancer : MonoBehaviour 
 {
-#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
@@ -991,6 +987,4 @@ public class HAPI_Instancer : MonoBehaviour
 
 	
 	private HAPI_CurvesCollection[] myCurvesCollection;
-#endif // UNITY_STANDALONE_WIN
-	
 }

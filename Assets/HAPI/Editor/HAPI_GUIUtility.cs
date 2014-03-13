@@ -3,8 +3,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-using HAPI;
-
 [ InitializeOnLoad ]
 public class HAPI_GUIUtility : Editor 
 {
@@ -223,16 +221,6 @@ public class HAPI_GUIUtility : Editor
 	public const string myDefaultPrefabLabel 		= "Houdini Asset";
 	public const string myDebugLabel				= "Debug";
 	public const string mySettingsLabel 			= "Settings";
-
-	public const string myPlatformUnsupportedMessage = 
-		"Houdini Plugin for Unity currently only supports the Standalone Windows platform in Editor.\n" +
-		"\n" +
-		"To switch to the Standalone Windows platform go to File > Build Settings... and under 'Platform' " +
-		"choose 'PC, Mac & Linux Standalone' and click 'Switch Platform'. Afterwards, on the right hand side, " +
-		"under 'Target Platform' choose 'Windows'.\n" +
-		"\n" +
-		"When you switch back to the Standalone Windows platform you might need to Rebuild each asset to get back " +
-		"the controls. Just click on the 'Rebuild' button in the Houdini Asset's Inspector.";
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private

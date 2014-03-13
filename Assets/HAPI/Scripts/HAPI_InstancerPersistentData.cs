@@ -2,9 +2,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-using HAPI;
-
-
 public class HAPI_InstancerPersistentData : ScriptableObject
 {
 	public string instancerName;

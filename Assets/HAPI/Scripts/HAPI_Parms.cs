@@ -22,7 +22,6 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 using Utility = HAPI_AssetUtility;
 
 // Typedefs
@@ -32,7 +31,6 @@ using HAPI_NodeId = System.Int32;
 [ RequireComponent( typeof( HAPI_Control ) ) ]
 public class HAPI_Parms : MonoBehaviour
 {
-#if UNITY_STANDALONE_WIN
 	public enum AssetType
 	{
 		TYPE_OTL = 0,
@@ -570,5 +568,4 @@ public class HAPI_Parms : MonoBehaviour
 	// Control ------------------------------------------------------------------------------------------------------
 
 	private bool myPostSerialization;
-#endif // UNITY_STANDALONE_WIN
 }
