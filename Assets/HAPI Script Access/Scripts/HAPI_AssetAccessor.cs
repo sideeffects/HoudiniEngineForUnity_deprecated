@@ -17,12 +17,10 @@
 using UnityEngine;
 using System;
 using System.Collections;
-using HAPI;
 
 [Serializable]
 public class HAPI_AssetAccessor
 {
-#if UNITY_STANDALONE_WIN
 	public enum ParmType
 	{
 		INVALID = -1,
@@ -196,6 +194,6 @@ public class HAPI_AssetAccessor
 
 	[SerializeField] private HAPI_Asset myAsset;
 	[SerializeField] private HAPI_Parms myAssetParms;
-#endif // UNITY_STANDALONE_WIN
+
 }
 

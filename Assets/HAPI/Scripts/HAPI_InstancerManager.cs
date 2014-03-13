@@ -21,13 +21,8 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-using HAPI;
-
-
 public class HAPI_InstancerManager : MonoBehaviour 
 {
-#if UNITY_STANDALONE_WIN
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	public List< HAPI_InstancerPersistentData > prInstancerPersistentData 
@@ -84,6 +79,4 @@ public class HAPI_InstancerManager : MonoBehaviour
 	// Serialized Private Data
 
 	[SerializeField] private List< HAPI_InstancerPersistentData > myInstancersPersistentData;
-	
-#endif // UNITY_STANDALONE_WIN
 }

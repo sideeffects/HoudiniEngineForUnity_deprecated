@@ -19,7 +19,6 @@ using UnityEditor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI 
 {

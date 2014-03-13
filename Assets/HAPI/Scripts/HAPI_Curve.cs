@@ -21,7 +21,6 @@ using UnityEditor;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 using Utility = HAPI_AssetUtility;
 
 // Typedefs
@@ -32,7 +31,6 @@ using HAPI_NodeId = System.Int32;
 [ RequireComponent( typeof( HAPI_Parms ) ) ]
 public class HAPI_Curve : MonoBehaviour
 {
-#if UNITY_STANDALONE_WIN
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
 	
@@ -453,6 +451,5 @@ public class HAPI_Curve : MonoBehaviour
 
 	[SerializeField] private Mode				myCurrentMode;
 	[SerializeField] private bool				myModeChangeWait;
-#endif // UNITY_STANDALONE_WIN
 
 }

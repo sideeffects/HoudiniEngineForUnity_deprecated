@@ -24,14 +24,12 @@ using UnityEditor;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 using Utility = HAPI_AssetUtility;
 
 
 [ ExecuteInEditMode ]
 public class HAPI_AssetOTL : HAPI_Asset 
-{	
-#if UNITY_STANDALONE_WIN
+{
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -288,6 +286,4 @@ public class HAPI_AssetOTL : HAPI_Asset
 	// Serialized Data
 	
 	[SerializeField] private string					myAssetPath;
-#endif // UNITY_STANDALONE_WIN
-	
 }

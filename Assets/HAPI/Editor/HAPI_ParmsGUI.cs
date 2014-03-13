@@ -20,7 +20,6 @@ using UnityEditor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 [ CustomEditor( typeof( HAPI_Parms ) ) ]
 public class HAPI_ParmsGUI : Editor
@@ -231,7 +230,7 @@ public class HAPI_ParmsGUI : Editor
 			// can only happen on the Windows x86 platform.
 #if !UNITY_STANDALONE_WIN
 			is_editable = false;
-			HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+			HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 			if ( !is_editable )
 				HAPI_GUI.help( "The parameters on this node are readonly.", MessageType.Info );

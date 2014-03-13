@@ -24,13 +24,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
-using HAPI;
 using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
 public abstract class HAPI_Asset : HAPI_Control
 {
-#if UNITY_STANDALONE_WIN
 	public enum AssetType
 	{
 		TYPE_OTL = 0,
@@ -252,7 +250,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( prEnableLogging )
 			Debug.Log( "HAPI_Asset created - Instance Id: " + GetInstanceID() );
 		
-		HAPI.HAPI_SetPath.setPath();
+		HAPI_SetPath.setPath();
 
 		reset();
 	}
@@ -380,8 +378,10 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		// We have to save the presets here because this connection might change a parm
 		// and we want to save it.
+#if UNITY_EDITOR
 		if ( !EditorApplication.isPlaying )
 			savePreset();
+#endif // UNITY_EDITOR
 
 		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideGeometryOnLinking )
 		{
@@ -639,6 +639,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void OnEnable()
 	{
+#if UNITY_STANDALONE_WIN
 #if UNITY_EDITOR && UNITY_4_3
 		if ( BuildPipeline.isBuildingPlayer )
 			return;
@@ -708,6 +709,7 @@ public abstract class HAPI_Asset : HAPI_Control
 					);
 			}
 		}
+#endif // UNITY_STANDALONE_WIN
 	}
 
 	public virtual void OnDisable()
@@ -900,7 +902,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		#pragma warning disable 0162
 #endif // !UNITY_STANDALONE_WIN
 
-		if ( !HAPI.HAPI_SetPath.prIsPathSet )
+		if ( !HAPI_SetPath.prIsPathSet )
 		{
 			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 			return false;
@@ -2009,5 +2011,5 @@ public abstract class HAPI_Asset : HAPI_Control
 	private bool myReloadPrefabOnPlaymodeChange;
 	[SerializeField] private List< string > myUpdatePrefabInstanceParmNames;
 	[SerializeField] private HAPI_AssetUndoInfo	myAssetOTLUndoInfo;
-#endif // UNITY_STANDALONE_WIN
+
 }

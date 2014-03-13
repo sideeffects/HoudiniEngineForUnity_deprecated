@@ -1,11 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-using HAPI;
-
 public class HAPI_AssetUndoInfo : ScriptableObject
 {
-#if UNITY_STANDALONE_WIN
 	// View Settings
 	public bool isGeoVisible;
 	public bool showPinnedInstances;
@@ -52,5 +49,4 @@ public class HAPI_AssetUndoInfo : ScriptableObject
 		bakeEndTime						= asset.prBakeEndTime;
 		bakeSamplesPerSecond			= asset.prBakeSamplesPerSecond;
 	}
-#endif // UNITY_STANDALONE_WIN
 }

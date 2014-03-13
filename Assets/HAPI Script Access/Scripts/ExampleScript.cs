@@ -20,12 +20,10 @@ using UnityEditor;
 #endif // UNITY_EDITOR
 using System.Runtime.Serialization;
 using System.Collections;
-using HAPI;
 
 [ExecuteInEditMode]
 public class ExampleScript : MonoBehaviour 
 {
-#if UNITY_STANDALONE_WIN
 	public int parmIndex;
 	public string[] parmNames;
 
@@ -252,5 +250,4 @@ public class ExampleScript : MonoBehaviour
 		}
 #endif // UNITY_EDITOR
 	}
-#endif // UNITY_STANDALONE_WIN
 }

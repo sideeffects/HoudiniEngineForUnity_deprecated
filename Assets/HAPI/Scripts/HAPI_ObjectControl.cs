@@ -18,12 +18,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-using HAPI;
-
 public class HAPI_ObjectControl : HAPI_Control 
 {
-#if UNITY_STANDALONE_WIN
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -255,5 +251,4 @@ public class HAPI_ObjectControl : HAPI_Control
 	[SerializeField] private List< GameObject > myGeos;
 	
 	private HAPI_CurvesCollection myCurveCollection = null;
-#endif // UNITY_STANDALONE_WIN
 }

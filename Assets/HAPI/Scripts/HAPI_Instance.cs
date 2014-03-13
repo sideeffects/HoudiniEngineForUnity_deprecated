@@ -20,12 +20,10 @@ using UnityEditor;
 #endif // UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 [ ExecuteInEditMode ]
 public class HAPI_Instance: MonoBehaviour
-{	
-#if UNITY_STANDALONE_WIN
+{
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
@@ -83,6 +81,5 @@ public class HAPI_Instance: MonoBehaviour
 	[SerializeField] private Matrix4x4		myLastLocalToWorld;
 	[SerializeField] private bool			myTransformChanged;
 	[SerializeField] private HAPI_Instancer myInstancer;
-	
-#endif // UNITY_STANDALONE_WIN
+
 }

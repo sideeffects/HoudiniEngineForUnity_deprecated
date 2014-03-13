@@ -81,13 +81,13 @@ public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< K
 		if ( myKeys.Count != myValues.Count )
 		{
 			Debug.LogError( myName + " dictionary has unserializable values." );
-			throw new HAPI.HAPI_ErrorNotFound();
+			throw new HAPI_ErrorNotFound();
 		}
 		int index = myKeys.FindIndex( delegate( KEY k ) { return k.Equals( key ); } );
 		if ( index >= 0 )
 			return myValues[ index ];
 		else
-			throw new HAPI.HAPI_ErrorNotFound();
+			throw new HAPI_ErrorNotFound();
 	}
 
 	[SerializeField] protected string myName;

@@ -20,15 +20,12 @@ using UnityEditor;
 #endif // UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 // Typedefs
 using HAPI_NodeId = System.Int32;
 
 public class HAPI_GeoControl : HAPI_ObjectControl 
 {
-#if UNITY_STANDALONE_WIN
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
@@ -110,13 +107,13 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
 		HAPI_Host.getGeoInfo( prAssetId, prObjectId, prGeoId, out geo_info );
 
-		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_INPUT )
+		if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_INPUT )
 			return;
 
 		if ( !reload_asset && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
 			return;
 
-		if ( reload_asset || geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
+		if ( reload_asset || geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
 			for ( int i = 0; i < myParts.Count; ++i )
 				HAPI_AssetUtility.destroyGameObject( myParts[ i ] );
@@ -135,14 +132,14 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		}
 
 		if ( !geo_info.isDisplayGeo && 
-				(	geo_info.type != HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE && 
+				(	geo_info.type != HAPI_GeoType.HAPI_GEOTYPE_CURVE && 
 					!myObjectControl.prAsset.prImportTemplatedGeos && 
 					geo_info.isTemplated ) )
 		{
 			return;
 		}
 
-		if ( geo_info.type == HAPI.HAPI_GeoType.HAPI_GEOTYPE_CURVE )
+		if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
 			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
 		}
@@ -296,5 +293,4 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	[SerializeField] private HAPI_ObjectControl myObjectControl;
 
 	[SerializeField] private List< GameObject > myParts;
-#endif // UNITY_STANDALONE_WIN
 }

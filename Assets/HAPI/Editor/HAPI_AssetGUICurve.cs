@@ -20,7 +20,6 @@ using UnityEditor;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 [ ExecuteInEditMode ]
 [ CustomEditor( typeof( HAPI_AssetCurve ) ) ]

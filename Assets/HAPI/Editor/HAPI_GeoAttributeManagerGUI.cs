@@ -3,7 +3,11 @@ using UnityEditor;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
+
+#if !UNITY_STANDALONE_WIN
+#pragma warning disable 0162 // Unreachable Code
+#pragma warning disable 0414 // Initialized but unused Private Member Variable
+#endif // !UNITY_STANDALONE_WIN
 
 public class HAPI_GeoAttributeManagerGUI
 {
@@ -79,7 +83,6 @@ public class HAPI_GeoAttributeManagerGUI
 		// can only happen on the Windows x86 platform.
 #if !UNITY_STANDALONE_WIN
 		return;
-		#pragma warning disable 0162
 #endif // !UNITY_STANDALONE_WIN
 
 		if ( myManager == null )
@@ -1184,3 +1187,9 @@ public class HAPI_GeoAttributeManagerGUI
 
 	private HAPI_GeoAttributeManager.Mode myLastMode;
 }
+
+#if !UNITY_STANDALONE_WIN
+#pragma warning restore 0162 // Unreachable Code
+#pragma warning restore 0414 // Initialized but unused Private Member Variable
+#endif // !UNITY_STANDALONE_WIN
+

@@ -323,7 +323,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				for ( int i = 0; i < myTupleSize; ++i )
 					myIntPaintValue[ i ] = Mathf.Clamp( value[ i ], myIntMin, myIntMax );
 			else
-				throw new HAPI.HAPI_ErrorInvalidArgument( "prIntPaintValue given wrong sized array." );
+				throw new HAPI_ErrorInvalidArgument( "prIntPaintValue given wrong sized array." );
 		}
 	}
 	public int prIntMin {
@@ -342,7 +342,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				for ( int i = 0; i < myTupleSize; ++i )
 					myFloatPaintValue[ i ] = Mathf.Clamp( value[ i ], myFloatMin, myFloatMax );
 			else
-				throw new HAPI.HAPI_ErrorInvalidArgument( "prFloatPaintValue given wrong sized array." );
+				throw new HAPI_ErrorInvalidArgument( "prFloatPaintValue given wrong sized array." );
 		}
 	}
 	public float prFloatMin {
@@ -377,25 +377,25 @@ public class HAPI_GeoAttribute : ScriptableObject
 	public string[] prStringPaintValue { get { return myStringPaintValue; } set { myStringPaintValue = value; } }
 	public string[] prStringData { get { return myStringData; } private set {} }
 
-	public HAPI.HAPI_AttributeInfo prAttributeInfo
+	public HAPI_AttributeInfo prAttributeInfo
 	{
 		get
 		{
 			if ( myType == Type.UNDEFINED )
-				throw new HAPI.HAPI_ErrorInvalidArgument( "Geo attribute not defined." );
+				throw new HAPI_ErrorInvalidArgument( "Geo attribute not defined." );
 
-			HAPI.HAPI_AttributeInfo attr_info = new HAPI.HAPI_AttributeInfo( prName );
+			HAPI_AttributeInfo attr_info = new HAPI_AttributeInfo( prName );
 			attr_info.exists = true;
-			attr_info.owner = HAPI.HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+			attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 
 			if ( myType == Type.BOOL || myType == Type.INT )
-				attr_info.storage = HAPI.HAPI_StorageType.HAPI_STORAGETYPE_INT;
+				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_INT;
 			else if ( myType == Type.FLOAT )
-				attr_info.storage = HAPI.HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
 			else if ( myType == Type.STRING )
-				attr_info.storage = HAPI.HAPI_StorageType.HAPI_STORAGETYPE_STRING;
+				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_STRING;
 			else
-				throw new HAPI.HAPI_ErrorInvalidArgument( "Invalid geo attribute type." );
+				throw new HAPI_ErrorInvalidArgument( "Invalid geo attribute type." );
 
 			attr_info.count = myVertexCount;
 			attr_info.tupleSize = myTupleSize;
@@ -443,38 +443,38 @@ public class HAPI_GeoAttribute : ScriptableObject
 			case Preset.COLOR:
 			{
 				init(
-					mesh, HAPI.HAPI_Constants.HAPI_ATTRIB_COLOR, Type.FLOAT,
-					HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE );
+					mesh, HAPI_Constants.HAPI_ATTRIB_COLOR, Type.FLOAT,
+					HAPI_Constants.HAPI_COLOR_VECTOR_SIZE );
 
 				// Set the alpha values to 1.
-				if ( HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE == 4 )
+				if ( HAPI_Constants.HAPI_COLOR_VECTOR_SIZE == 4 )
 				{
-					myFloatPaintValue[ HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ] = 1.0f;
+					myFloatPaintValue[ HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ] = 1.0f;
 					for ( int i = 0; i < myVertexCount; ++i )
 						myFloatData[
-							( i * HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE ) + 
-							( HAPI.HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ) ] = 1.0f;
+							( i * HAPI_Constants.HAPI_COLOR_VECTOR_SIZE ) + 
+							( HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ) ] = 1.0f;
 				}
 				break;
 			}
 			case Preset.UV:
 			{
 				init(
-					mesh, HAPI.HAPI_Constants.HAPI_ATTRIB_UV, Type.FLOAT,
-					HAPI.HAPI_Constants.HAPI_UV_VECTOR_SIZE );
+					mesh, HAPI_Constants.HAPI_ATTRIB_UV, Type.FLOAT,
+					HAPI_Constants.HAPI_UV_VECTOR_SIZE );
 				break;
 			}
 			case Preset.NORMAL:
 			{
 				init(
-					mesh, HAPI.HAPI_Constants.HAPI_ATTRIB_NORMAL, Type.FLOAT,
-					HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE );
+					mesh, HAPI_Constants.HAPI_ATTRIB_NORMAL, Type.FLOAT,
+					HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE );
 
 				// Compute the normals as initial attribute values.
 				mesh.RecalculateNormals();
 				for ( int i = 0; i < myVertexCount; ++i )
-					for ( int j = 0; j < HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE; ++j )
-						myFloatData[ i * HAPI.HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE + j ] =
+					for ( int j = 0; j < HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE; ++j )
+						myFloatData[ i * HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE + j ] =
 							mesh.normals[ i ][ j ];
 				break;
 			}
@@ -498,7 +498,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				init( mesh, "string_attribute", Type.STRING, 1 );
 				break;
 			}
-			default: throw new HAPI.HAPI_ErrorInvalidArgument( "Invalid HAPI_GeoAttribute.Preset!" );
+			default: throw new HAPI_ErrorInvalidArgument( "Invalid HAPI_GeoAttribute.Preset!" );
 		}
 	}
 
@@ -701,7 +701,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 					{
 						int min_max_distance = myIntMax - myIntMin;
 						int max_paint_amount = Mathf.CeilToInt(
-							(float) min_max_distance * HAPI.HAPI_Host.prPaintBrushRate );
+							(float) min_max_distance * HAPI_Host.prPaintBrushRate );
 
 						int clamped_distance = Mathf.Min( abs_distance, max_paint_amount );
 						float paint_amount = paint_factor * clamped_distance;
@@ -732,7 +732,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 					float distance = new_value - original_value;
 
 					float min_max_distance = myFloatMax - myFloatMin;
-					float max_paint_amount = min_max_distance * HAPI.HAPI_Host.prPaintBrushRate;
+					float max_paint_amount = min_max_distance * HAPI_Host.prPaintBrushRate;
 
 					float clamped_distance =
 						Mathf.Sign( distance ) * Mathf.Min( Mathf.Abs( distance ), Mathf.Abs( max_paint_amount ) );

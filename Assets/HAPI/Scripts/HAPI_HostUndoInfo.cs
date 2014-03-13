@@ -1,11 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-using HAPI;
-
 public class HAPI_HostUndoInfo : ScriptableObject
 {
-#if UNITY_STANDALONE_WIN
 	// General Settings
 	public string collisionGroupName;
 	public string renderedCollisionGroupName;
@@ -114,6 +111,5 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		curvePrimitiveTypeDefault		= HAPI_Host.prCurvePrimitiveTypeDefault;
 		curveMethodDefault				= HAPI_Host.prCurveMethodDefault;
 	}
-#endif // UNITY_STANDALONE_WIN
 }
 

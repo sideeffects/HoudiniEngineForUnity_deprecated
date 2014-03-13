@@ -46,7 +46,7 @@ public struct HAPI_GUIParm
 		isBold 			= false;
 	}
 	
-	public HAPI_GUIParm( HAPI.HAPI_ParmInfo info )
+	public HAPI_GUIParm( HAPI_ParmInfo info )
 	{
 		size 			= info.size;
 		choiceCount 	= info.choiceCount;
@@ -70,7 +70,7 @@ public struct HAPI_GUIParm
 		labelNone 		= info.labelNone;
 
 		isChildOfMultiParm = info.isChildOfMultiParm;
-		isRamp = info.rampType != HAPI.HAPI_RampType.HAPI_RAMPTYPE_MAX;
+		isRamp = info.rampType != HAPI_RampType.HAPI_RAMPTYPE_MAX;
 
 		instanceNum 	= info.instanceNum;
 		instanceStartOffset = info.instanceStartOffset;

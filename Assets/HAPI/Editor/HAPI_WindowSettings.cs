@@ -19,7 +19,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HAPI;
 
 public class HAPI_WindowSettings : EditorWindow 
 {
@@ -38,10 +37,10 @@ public class HAPI_WindowSettings : EditorWindow
 
 		window.autoRepaintOnSceneChange = true;
 
-		if ( !HAPI.HAPI_SetPath.prIsPathSet )
+		if ( !HAPI_SetPath.prIsPathSet )
 		{
-			HAPI.HAPI_SetPath.setPath();
-			if ( !HAPI.HAPI_SetPath.prIsPathSet )
+			HAPI_SetPath.setPath();
+			if ( !HAPI_SetPath.prIsPathSet )
 			{
 				Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 				return;
@@ -58,10 +57,10 @@ public class HAPI_WindowSettings : EditorWindow
 			return;
 		try
 		{
-			if ( !HAPI.HAPI_SetPath.prIsPathSet )
+			if ( !HAPI_SetPath.prIsPathSet )
 			{
-				HAPI.HAPI_SetPath.setPath();
-				if ( !HAPI.HAPI_SetPath.prIsPathSet )
+				HAPI_SetPath.setPath();
+				if ( !HAPI_SetPath.prIsPathSet )
 				{
 					Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 					return;
@@ -78,7 +77,7 @@ public class HAPI_WindowSettings : EditorWindow
 		bool gui_enable = GUI.enabled;
 
 #if !UNITY_STANDALONE_WIN
-		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #endif // !UNITY_STANDALONE_WIN
 

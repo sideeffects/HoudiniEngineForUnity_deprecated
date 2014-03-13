@@ -20,7 +20,6 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
-using HAPI;
 
 /// <summary>
 /// 	GUI companion to <see cref="HAPI_MeshToPrefab"/>. Responsible for generating the custom Inspector for

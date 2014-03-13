@@ -20,7 +20,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using HAPI;
 
 public class HAPI_WindowDebug : EditorWindow 
 {
@@ -55,7 +54,7 @@ public class HAPI_WindowDebug : EditorWindow
 		bool gui_enable = GUI.enabled;
 
 #if !UNITY_STANDALONE_WIN
-		HAPI_GUI.help( HAPI_GUIUtility.myPlatformUnsupportedMessage, MessageType.Info );
+		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #endif // !UNITY_STANDALONE_WIN
 
@@ -78,10 +77,10 @@ public class HAPI_WindowDebug : EditorWindow
 		{
 			try
 			{
-				if ( !HAPI.HAPI_SetPath.prIsPathSet )
+				if ( !HAPI_SetPath.prIsPathSet )
 				{
-					HAPI.HAPI_SetPath.setPath();
-					if ( !HAPI.HAPI_SetPath.prIsPathSet )
+					HAPI_SetPath.setPath();
+					if ( !HAPI_SetPath.prIsPathSet )
 					{
 						Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 						return;
