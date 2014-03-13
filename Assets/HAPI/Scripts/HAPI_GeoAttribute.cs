@@ -258,7 +258,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				myIntPaintValue = new_paint_value;
 				myIntData = new_data;
 				myTupleSize = new_tuple_size;
-				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size );
+				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size - 1 );
 			}
 			else if ( myType == Type.FLOAT )
 			{
@@ -278,7 +278,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				myFloatPaintValue = new_paint_value;
 				myFloatData = new_data;
 				myTupleSize = new_tuple_size;
-				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size );
+				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size - 1 );
 			}
 			else if ( myType == Type.STRING )
 			{
@@ -298,7 +298,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				myStringPaintValue = new_paint_value;
 				myStringData = new_data;
 				myTupleSize = new_tuple_size;
-				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size );
+				myPaintMode = Mathf.Min( myPaintMode, (int) SpecialPaintMode.MAX + new_tuple_size - 1 );
 			}
 		}
 	}
@@ -311,7 +311,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 		}
 		set
 		{
-			myPaintMode = Mathf.Min( value, (int) SpecialPaintMode.MAX + myTupleSize );
+			myPaintMode = Mathf.Min( value, (int) SpecialPaintMode.MAX + myTupleSize - 1 );
 		}
 	}
 

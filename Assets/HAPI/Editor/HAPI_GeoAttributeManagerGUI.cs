@@ -1085,6 +1085,15 @@ public class HAPI_GeoAttributeManagerGUI
 						}
 					}
 				}
+
+				GUI.SetNextControlName( myPaintValuesFieldName + "FILL" );
+				if ( GUILayout.Button( "Fill", GUILayout.Width( 35 ), GUILayout.Height( 14 ) ) )
+				{
+					myManager.prActiveAttribute.fill();
+					myManager.refreshMesh();
+					myManager.prHasChanged = true;
+				}
+
 				GUILayout.EndHorizontal();
 				GUILayout.EndArea();
 			}
