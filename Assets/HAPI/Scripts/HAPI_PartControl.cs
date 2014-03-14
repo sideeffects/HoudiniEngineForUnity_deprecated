@@ -412,39 +412,39 @@ public class HAPI_PartControl : HAPI_GeoControl
 		Particle[] particles = particle_emitter.particles;
 		for ( int z = 0; z < volume.tileSize; ++z )
 			for ( int y = 0; y < volume.tileSize; ++y )
-				  for ( int x = 0; x < volume.tileSize; ++x )
-				  {
-					  int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
-					  if ( data[ index ] > particle_epsilon
-						   && part_index < particles.Length )
-					  {
-						  Vector3 pos = new Vector3( (float)x, (float)y, (float)z );
-						  pos = 2 * ( ( pos + tileMin ) - new Vector3( 0.5f, 0.5f, 0.5f ) );
+				for ( int x = 0; x < volume.tileSize; ++x )
+				{
+					int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
+					if ( data[ index ] > particle_epsilon
+						&& part_index < particles.Length )
+					{
+						Vector3 pos = new Vector3( (float)x, (float)y, (float)z );
+						pos = 2 * ( ( pos + tileMin ) - new Vector3( 0.5f, 0.5f, 0.5f ) );
 
-						  particles[ part_index ].position =
-							  node.transform.parent.TransformPoint( pos );
-						  particles[ part_index ].color    =
-							  new Color( data[ index ], data[ index ], data[ index ], data[ index ] );
-						  part_index++;
-					  }
-				  }
+						particles[ part_index ].position =
+							node.transform.parent.TransformPoint( pos );
+						particles[ part_index ].color =
+							new Color( data[ index ], data[ index ], data[ index ], data[ index ] );
+						part_index++;
+					}
+				}
 		particle_emitter.particles = particles;
 
 		ParticleRenderer renderer = node.GetComponent< ParticleRenderer >();
 		if ( renderer == null ) 
 			renderer = node.AddComponent< ParticleRenderer >();
 
-		renderer.material = createSoftCircle( new Color( Random.Range( 0.5f, 1.0f ),
-														 Random.Range( 0.5f, 1.0f ),
-														 Random.Range( 0.5f, 1.0f ) ) );
+		renderer.material = createSoftCircle(
+			new Color( Random.Range( 0.5f, 1.0f ), Random.Range( 0.5f, 1.0f ), Random.Range( 0.5f, 1.0f ) ) );
 	}
 
 	private void assignUnityTag()
 	{
 		HAPI_AttributeInfo tag_attr_info = new HAPI_AttributeInfo( HAPI_Host.prUnityTagAttribName );
 		int[] tag_attr = new int[ 0 ];
-		HAPI_AssetUtility.getAttribute( prAssetId, prObjectId, prGeoId, prPartId, HAPI_Host.prUnityTagAttribName, 
-		             					ref tag_attr_info, ref tag_attr, HAPI_Host.getAttributeStringData );
+		HAPI_AssetUtility.getAttribute(
+			prAssetId, prObjectId, prGeoId, prPartId, HAPI_Host.prUnityTagAttribName,
+			ref tag_attr_info, ref tag_attr, HAPI_Host.getAttributeStringData );
 
 		if ( tag_attr_info.exists )
 		{

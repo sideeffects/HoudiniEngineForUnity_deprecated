@@ -14,8 +14,6 @@
  * 
  */
 
-#define DEBUG // since Unity doesn't seem to define it itself
-
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -31,42 +29,35 @@ public class HAPI_MeshToPrefabGUI : Editor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
-	public void OnEnable() 
-	{		
+	public void OnEnable()
+	{
 		myMeshToPrefab = target as HAPI_MeshToPrefab;
-		
-		
 	}
-	
+
 	public override void OnInspectorGUI() 
 	{
-		
 		EditorGUILayout.LabelField( new GUIContent( "Prefab Path:" ) );
 		EditorGUILayout.BeginHorizontal(); 
 		{
 			string old_prefab_path = myMeshToPrefab.prPathToPrefab;
 			string new_prefab_path = "";
 			new_prefab_path = EditorGUILayout.TextField( old_prefab_path );
-	        
-	        if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
+
+			if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
 			{
 				string prompt_result_path = HAPI_GUIUtility.promptForPrefabPath( old_prefab_path );
 				if ( prompt_result_path.Length > 0 )
 					new_prefab_path = prompt_result_path;
-	        }
-			
+			}
+
 			myMeshToPrefab.prPathToPrefab = new_prefab_path;
-		} 
-		EditorGUILayout.EndHorizontal();
-		
-		
-		if ( GUILayout.Button( "Save To Prefab" ) ) 
-		{
-			myMeshToPrefab.SaveToPrefab();
 		}
-		
+		EditorGUILayout.EndHorizontal();
+
+		if ( GUILayout.Button( "Save To Prefab" ) ) 
+			myMeshToPrefab.SaveToPrefab();
 	}
-		
-	private HAPI_MeshToPrefab	 	myMeshToPrefab;
+
+	private HAPI_MeshToPrefab myMeshToPrefab;
 	private int myFileChooserButtonWidth = 50;
 }

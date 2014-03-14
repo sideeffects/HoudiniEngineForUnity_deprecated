@@ -63,8 +63,8 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						// If the prefab's backup id refers to a valid asset then this signifies the
 						// prefab is being changed due to an "Apply" from a prefab instance. We need
 						// to delete the prefab asset since we are re-creating the prefab. 
-						bool is_applying_changes = HAPI_Host.isAssetValid( prefab_asset.prBackupAssetId, 
-						                                                   prefab_asset.prBackupAssetValidationId );
+						bool is_applying_changes = HAPI_Host.isAssetValid(
+							prefab_asset.prBackupAssetId, prefab_asset.prBackupAssetValidationId );
 						if ( is_applying_changes )
 						{
 							try

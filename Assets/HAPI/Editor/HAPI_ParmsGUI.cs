@@ -105,8 +105,9 @@ public class HAPI_ParmsGUI : Editor
 			bool commit_changes = false;
 			if ( current_event.isKey && current_event.type == EventType.KeyUp && current_event.keyCode == KeyCode.Return )
 				commit_changes = true;
-			else if ( current_event.type == EventType.ValidateCommand && 
-			          current_event.commandName == "UndoRedoPerformed" )
+			else if (
+				current_event.type == EventType.ValidateCommand && 
+				current_event.commandName == "UndoRedoPerformed" )
 			{
 				HAPI_ParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HAPI_ParmsUndoInfo;
 				bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HAPI_Asset >() != null;
@@ -114,8 +115,9 @@ public class HAPI_ParmsGUI : Editor
 						// First find all multiparms and add/remove instances as necessary
 				foreach ( HAPI_ParmInfo parm in myParms.prParms )
 				{
-					if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST &&
-					     undo_info.parmNames.Contains( parm.name ) )
+					if (
+						parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST &&
+						undo_info.parmNames.Contains( parm.name ) )
 					{
 						// get value of multiparm from undo info
 						int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
@@ -156,15 +158,17 @@ public class HAPI_ParmsGUI : Editor
 						int new_int_value = undo_info.parmIntValues[ new_value_index ];
 						int current_int_value = myParms.prParmIntValues[ parm.intValuesIndex ];
 
-						if ( new_int_value != current_int_value &&
-						    parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+						if (
+							new_int_value != current_int_value &&
+							parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 						{
 							myParmChanges = true;
 
 							int[] values = new int[ parm.size ];
 							Array.Copy( undo_info.parmIntValues, new_value_index, values, 0, parm.size );
-							HAPI_Host.setParmIntValues( myParms.prControl.prNodeId, values, 
-							                            parm.intValuesIndex, parm.size );
+							HAPI_Host.setParmIntValues(
+								myParms.prControl.prNodeId, values, 
+								parm.intValuesIndex, parm.size );
 
 							if ( update_prefab_instance )
 							{
@@ -184,8 +188,9 @@ public class HAPI_ParmsGUI : Editor
 
 							float[] values = new float[ parm.size ];
 							Array.Copy( undo_info.parmFloatValues, new_value_index, values, 0, parm.size );
-							HAPI_Host.setParmFloatValues( myParms.prControl.prNodeId, values, 
-							                              parm.floatValuesIndex, parm.size );
+							HAPI_Host.setParmFloatValues(
+								myParms.prControl.prNodeId, values, 
+								parm.floatValuesIndex, parm.size );
 
 							if ( update_prefab_instance )
 							{
@@ -208,8 +213,9 @@ public class HAPI_ParmsGUI : Editor
 							{
 								myParmChanges = true;
 
-								HAPI_Host.setParmStringValue( myParms.prControl.prNodeId, 
-								                             new_string_value, parm.id, i );
+								HAPI_Host.setParmStringValue(
+									myParms.prControl.prNodeId, 
+									new_string_value, parm.id, i );
 
 								if ( update_prefab_instance )
 								{
@@ -319,25 +325,28 @@ public class HAPI_ParmsGUI : Editor
 					values.Add( i );
 				}
 				
-				changed = HAPI_GUI.dropdown( ref gui_parm, ref parm_int_values,
-											 labels.ToArray(), values.ToArray(),
-											 ref join_last, ref no_label_toggle_last,
-				                             null, ref parm_int_values );
+				changed = HAPI_GUI.dropdown(
+					ref gui_parm, ref parm_int_values,
+					labels.ToArray(), values.ToArray(),
+					ref join_last, ref no_label_toggle_last,
+					null, ref parm_int_values );
 			}
 			else
 			{
-				changed = HAPI_GUI.intField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
-											 ref join_last, ref no_label_toggle_last, null, 
-				                             ref parm_int_values );
+				changed = HAPI_GUI.intField(
+					ref gui_parm, ref myDelayBuild, ref parm_int_values,
+					ref join_last, ref no_label_toggle_last, null, 
+					ref parm_int_values );
 			} // if parm.choiceCount
 		} // if parm.type is INT
 		///////////////////////////////////////////////////////////////////////
 		// Float Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
-			changed = HAPI_GUI.floatField( ref gui_parm, ref myDelayBuild, ref parm_float_values, 
-			                               ref join_last, ref no_label_toggle_last, null, 
-			                               ref parm_float_values );
+			changed = HAPI_GUI.floatField(
+				ref gui_parm, ref myDelayBuild, ref parm_float_values, 
+				ref join_last, ref no_label_toggle_last, null, 
+				ref parm_float_values );
 		} // if parm.type is FLOAT
 		///////////////////////////////////////////////////////////////////////
 		// String Parameter
@@ -366,10 +375,11 @@ public class HAPI_ParmsGUI : Editor
 				string[] values_temp = myParms.getParmStrings( parm );
 				gui_parm.valuesIndex = 0; // Since we're piping a de-handled temp array.
 
-				changed = HAPI_GUI.dropdown( ref gui_parm, ref values_temp,
-											 labels.ToArray(), values.ToArray(),
-											 ref join_last, ref no_label_toggle_last,
-				                             null, ref values_temp );
+				changed = HAPI_GUI.dropdown(
+					ref gui_parm, ref values_temp,
+					labels.ToArray(), values.ToArray(),
+					ref join_last, ref no_label_toggle_last,
+					null, ref values_temp );
 
 				if ( changed ) 
 					myParms.setParmStrings( parm, values_temp );
@@ -381,9 +391,10 @@ public class HAPI_ParmsGUI : Editor
 				// The given string array is only for this parm so we need to set the values index to 0.
 				gui_parm.valuesIndex = 0;
 			
-				changed = HAPI_GUI.stringField( ref gui_parm, ref myDelayBuild, ref values,
-												ref join_last, ref no_label_toggle_last, null,
-				                                ref values );
+				changed = HAPI_GUI.stringField(
+					ref gui_parm, ref myDelayBuild, ref values,
+					ref join_last, ref no_label_toggle_last, null,
+					ref values );
 			
 				// Set the to be changed strings into the cache
 				if ( changed )
@@ -396,8 +407,9 @@ public class HAPI_ParmsGUI : Editor
 		{
 			string[] path = myParms.getParmStrings( parm );
 			
-			changed = HAPI_GUI.fileField( ref gui_parm, ref myDelayBuild, ref path[ 0 ],
-										  ref join_last, ref no_label_toggle_last );
+			changed = HAPI_GUI.fileField(
+				ref gui_parm, ref myDelayBuild, ref path[ 0 ],
+				ref join_last, ref no_label_toggle_last );
 			
 			if ( changed )
 				myParms.setParmStrings( parm, path );
@@ -406,17 +418,19 @@ public class HAPI_ParmsGUI : Editor
 		// Toggle Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
-			changed = HAPI_GUI.toggle( ref gui_parm, ref parm_int_values,
-									   ref join_last, ref no_label_toggle_last,
-			                           null, ref parm_int_values );
+			changed = HAPI_GUI.toggle(
+				ref gui_parm, ref parm_int_values,
+				ref join_last, ref no_label_toggle_last,
+				null, ref parm_int_values );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Color Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_COLOR )
 		{
-			changed = HAPI_GUI.colourField( ref gui_parm, ref myDelayBuild, ref parm_float_values,
-											ref join_last, ref no_label_toggle_last, null,
-			                                ref parm_float_values );
+			changed = HAPI_GUI.colourField(
+				ref gui_parm, ref myDelayBuild, ref parm_float_values,
+				ref join_last, ref no_label_toggle_last, null,
+				ref parm_float_values );
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Button Parameter
@@ -432,20 +446,22 @@ public class HAPI_ParmsGUI : Editor
 				for ( int i = 0; i < parm.choiceCount; ++i )
 				{
 					if ( myParms.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != parm.id )
-						Debug.LogError( "Parm choice parent parm id (" 
-										+ myParms.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
-										+ ") not matching current parm id (" + parm.id + ")!\n"
-										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
-										+ "Choice count: " + parm.choiceCount );
+						Debug.LogError(
+							"Parm choice parent parm id (" 
+							+ myParms.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
+							+ ") not matching current parm id (" + parm.id + ")!\n"
+							+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
+							+ "Choice count: " + parm.choiceCount );
 					
 					labels.Add( myParms.prParmChoiceLists[ parm.choiceIndex + i ].label );
 					values.Add( i );
 				}
 				
-				changed = HAPI_GUI.dropdown( ref gui_parm, ref parm_int_values,
-											 labels.ToArray(), values.ToArray(),
-											 ref join_last, ref no_label_toggle_last,
-				                             null, ref parm_int_values );
+				changed = HAPI_GUI.dropdown(
+					ref gui_parm, ref parm_int_values,
+					labels.ToArray(), values.ToArray(),
+					ref join_last, ref no_label_toggle_last,
+					null, ref parm_int_values );
 			}
 			else
 			{
@@ -489,7 +505,7 @@ public class HAPI_ParmsGUI : Editor
 		// parameters are still contained in the current folder.
 		Stack< int > parent_id_stack 		= new Stack< int >();
 		Stack< int > parent_count_stack 	= new Stack< int >();
-		int 	     instance_length = -1;
+		int instance_length = -1;
 		
 		// Loop through all the parameters.
 		while ( current_index < myParms.prParmCount )

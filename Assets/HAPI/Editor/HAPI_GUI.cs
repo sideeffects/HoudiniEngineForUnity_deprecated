@@ -177,24 +177,27 @@ public class HAPI_GUI : Editor
 										style );
 	}
 	
-	public static bool dropdown< T >( string name, string label, 
-									  ref T value,
-									  string[] dropdown_labels,
-									  T[] dropdown_values,
-	                                  Object undo_info, 
-	                                  ref T undo_value )
+	public static bool dropdown< T >(
+		string name, string label, 
+		ref T value,
+		string[] dropdown_labels,
+		T[] dropdown_values,
+	    Object undo_info, 
+	    ref T undo_value )
 	{
-		return dropdown( name, label, ref value, false, dropdown_labels, 
-		                 dropdown_values, undo_info, ref undo_value );
+		return dropdown(
+			name, label, ref value, false, dropdown_labels, 
+			dropdown_values, undo_info, ref undo_value );
 	}
 	
-	public static bool dropdown< T >( string name, string label, 
-									  ref T value,
-	                                  bool is_bold,
-	                                  string[] dropdown_labels,
-									  T[] dropdown_values,
-	                                  Object undo_info,
-	                                  ref T undo_value )
+	public static bool dropdown< T >(
+		string name, string label, 
+		ref T value,
+		bool is_bold,
+		string[] dropdown_labels,
+		T[] dropdown_values,
+		Object undo_info,
+		ref T undo_value )
 	{
 		HAPI_GUIParm parm = new HAPI_GUIParm( name, label, 1 );
 		parm.isBold = is_bold;
@@ -202,32 +205,36 @@ public class HAPI_GUI : Editor
 		values[ 0 ] = value;
 		T[] undo_values = new T[ 1 ];
 		undo_values[ 0 ] = undo_value;
-		bool changed = dropdown( ref parm, ref values, dropdown_labels, 
-		                         dropdown_values, undo_info, ref undo_values );
+		bool changed = dropdown(
+			ref parm, ref values, dropdown_labels, 
+			dropdown_values, undo_info, ref undo_values );
 		value = values[ 0 ];
 		undo_value = undo_values[ 0 ];
 		return changed;
 	}
-	public static bool dropdown< T >( ref HAPI_GUIParm parm,
-									  ref T[] values,
-									  string[] dropdown_labels,
-									  T[] dropdown_values,
-	                                  Object undo_info,
-	                                  ref T[] undo_values )
+	public static bool dropdown< T >(
+		ref HAPI_GUIParm parm,
+		ref T[] values,
+		string[] dropdown_labels,
+		T[] dropdown_values,
+		Object undo_info,
+		ref T[] undo_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return dropdown( ref parm, ref values, dropdown_labels, dropdown_values, 
-						 ref join_last, ref no_label_toggle_last, undo_info, 
-		                 ref undo_values );
+		return dropdown(
+			ref parm, ref values, dropdown_labels, dropdown_values, 
+			ref join_last, ref no_label_toggle_last, undo_info, 
+		    ref undo_values );
 	}
-	public static bool dropdown< T >( ref HAPI_GUIParm parm,
-									  ref T[] values,
-									  string[] dropdown_labels,
-									  T[] dropdown_values,
-									  ref bool join_last, 
-	                                  ref bool no_label_toggle_last,
-	                                  Object undo_info,
-	                                  ref T[] undo_values )
+	public static bool dropdown< T >(
+		ref HAPI_GUIParm parm,
+		ref T[] values,
+		string[] dropdown_labels,
+		T[] dropdown_values,
+		ref bool join_last, 
+		ref bool no_label_toggle_last,
+		Object undo_info,
+		ref T[] undo_values )
 	{
 		initializeConstants();
 		
@@ -300,10 +307,12 @@ public class HAPI_GUI : Editor
 			                        " dropdown_field" );
 			int new_mapped_value = 0;
 			if ( parm.width >= 0 )
-				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values,
-															 popup_style, GUILayout.Width( parm.width ) );
+				new_mapped_value = EditorGUILayout.IntPopup(
+					old_mapped_value, dropdown_labels, mapped_values,
+					popup_style, GUILayout.Width( parm.width ) );
 			else
-				new_mapped_value = EditorGUILayout.IntPopup( old_mapped_value, dropdown_labels, mapped_values, popup_style );
+				new_mapped_value = EditorGUILayout.IntPopup(
+					old_mapped_value, dropdown_labels, mapped_values, popup_style );
 
 			T new_value = dropdown_values[ new_mapped_value ];
 
@@ -332,8 +341,9 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
-	public static bool intField( string name, string label, ref int value,
-	                             Object undo_info, ref int undo_value )
+	public static bool intField(
+		string name, string label, ref int value,
+		Object undo_info, ref int undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		int[] values = new int[ 1 ];
@@ -347,8 +357,9 @@ public class HAPI_GUI : Editor
 		undo_value = undo_values[ 0 ];
 		return changed;
 	}
-	public static bool intField( string name, string label, ref int value, int ui_min, 
-	                             int ui_max, Object undo_info, ref int undo_value )
+	public static bool intField(
+		string name, string label, ref int value, int ui_min, 
+		int ui_max, Object undo_info, ref int undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		gui_parm.hasUIMin = true;
@@ -365,23 +376,26 @@ public class HAPI_GUI : Editor
 		undo_value = undo_values[ 0 ];
 		return changed;
 	}
-	public static bool intField( ref HAPI_GUIParm parm,
-								 ref bool delay_build,
-								 ref int[] values,
-	                             Object undo_info,
-	                             ref int[] undo_values )
+	public static bool intField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref int[] values,
+		Object undo_info,
+		ref int[] undo_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return intField( ref parm, ref delay_build, ref values, ref join_last, 
-		                 ref no_label_toggle_last, undo_info, ref undo_values );
+		return intField(
+			ref parm, ref delay_build, ref values, ref join_last, 
+			ref no_label_toggle_last, undo_info, ref undo_values );
 	}
-	public static bool intField( ref HAPI_GUIParm parm,
-								 ref bool delay_build,
-								 ref int[] values,
-								 ref bool join_last, 
-	                             ref bool no_label_toggle_last,
-	                             Object undo_info,
-	                             ref int[] undo_values )
+	public static bool intField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref int[] values,
+		ref bool join_last, 
+		ref bool no_label_toggle_last,
+		Object undo_info,
+		ref int[] undo_values )
 	{
 		initializeConstants();
 		
@@ -486,10 +500,11 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 
-	public static bool multiparmField( 	ref HAPI_GUIParm parm,
-										ref bool delay_build,
-										ref int[] values,
-										ref bool join_last, ref bool no_label_toggle_last )
+	public static bool multiparmField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref int[] values,
+		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
 		
@@ -531,7 +546,8 @@ public class HAPI_GUI : Editor
 		return new_value != old_value;
 	}
 
-	public static bool floatField( string name, string label, ref float value, Object undo_info, ref float undo_value )
+	public static bool floatField(
+		string name, string label, ref float value, Object undo_info, ref float undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		float[] values = new float[ 1 ];
@@ -544,8 +560,9 @@ public class HAPI_GUI : Editor
 		undo_value = undo_values[ 0 ];
 		return changed;
 	}
-	public static bool floatField( string name, string label, ref float value, float ui_min, 
-	                               float ui_max, Object undo_info, ref float undo_value )
+	public static bool floatField(
+		string name, string label, ref float value, float ui_min, 
+		float ui_max, Object undo_info, ref float undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		gui_parm.hasUIMin = true;
@@ -562,23 +579,26 @@ public class HAPI_GUI : Editor
 		undo_value = undo_values[ 0 ];
 		return changed;
 	}
-	public static bool floatField( ref HAPI_GUIParm parm,
-	                               ref bool delay_build,
-	                               ref float[] values,
-	                               Object undo_info, 
-	                               ref float[] undo_values )
+	public static bool floatField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref float[] values,
+		Object undo_info, 
+		ref float[] undo_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return floatField( ref parm, ref delay_build, ref values, ref join_last, 
-		                   ref no_label_toggle_last, undo_info, ref undo_values );
+		return floatField(
+			ref parm, ref delay_build, ref values, ref join_last, 
+			ref no_label_toggle_last, undo_info, ref undo_values );
 	}
-	public static bool floatField( ref HAPI_GUIParm parm,
-								   ref bool delay_build,
-								   ref float[] values,
-								   ref bool join_last, 
-	                               ref bool no_label_toggle_last,
-	                               Object undo_info,
-	                               ref float[] undo_values )
+	public static bool floatField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref float[] values,
+		ref bool join_last, 
+		ref bool no_label_toggle_last,
+		Object undo_info,
+		ref float[] undo_values )
 	{
 		initializeConstants();
 		
@@ -642,11 +662,13 @@ public class HAPI_GUI : Editor
 				Rect lastDoubleRect = getLastDoubleRect();
 				mySliderStyle.stretchWidth = false;
 				mySliderStyle.fixedWidth = lastDoubleRect.width;
-				GUI.SetNextControlName( parm.name +
-										" " + parm.instanceNum +
-										" " + p + " float_slider" );
-				new_value = GUI.HorizontalSlider( lastDoubleRect, new_value, ui_min, ui_max, 
-												  mySliderStyle, mySliderThumbStyle );
+				GUI.SetNextControlName(
+					parm.name +
+					" " + parm.instanceNum +
+					" " + p + " float_slider" );
+				new_value = GUI.HorizontalSlider(
+					lastDoubleRect, new_value, ui_min, ui_max, 
+					mySliderStyle, mySliderThumbStyle );
 			}
 			
 			// Enforce min/max bounds.
@@ -680,8 +702,9 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
-	public static bool stringField( string name, string label, ref string value,
-	                                Object undo_info, ref string undo_value )
+	public static bool stringField(
+		string name, string label, ref string value,
+		Object undo_info, ref string undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		string[] values = new string[ 1 ];
@@ -695,23 +718,26 @@ public class HAPI_GUI : Editor
 		undo_value = undo_values[ 0 ];
 		return changed;
 	}
-	public static bool stringField( ref HAPI_GUIParm parm,
-									ref bool delay_build,
-									ref string[] values,
-	                                Object undo_info,
-	                                ref string[] undo_values )
+	public static bool stringField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref string[] values,
+		Object undo_info,
+		ref string[] undo_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return stringField( ref parm, ref delay_build, ref values, ref join_last, 
-		                    ref no_label_toggle_last, undo_info, ref undo_values );
+		return stringField(
+			ref parm, ref delay_build, ref values, ref join_last, 
+			ref no_label_toggle_last, undo_info, ref undo_values );
 	}
-	public static bool stringField( ref HAPI_GUIParm parm,
-									ref bool delay_build,
-									ref string[] values,
-									ref bool join_last, 
-	                                ref bool no_label_toggle_last,
-	                                Object undo_info,
-	                                ref string[] undo_values )
+	public static bool stringField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref string[] values,
+		ref bool join_last, 
+		ref bool no_label_toggle_last,
+		Object undo_info,
+		ref string[] undo_values )
 	{
 		initializeConstants();
 		
@@ -760,9 +786,10 @@ public class HAPI_GUI : Editor
 			}
 			
 			// Draw field.
-			GUI.SetNextControlName( parm.name +
-									" " + parm.instanceNum +
-									" " + p + " string_field" );
+			GUI.SetNextControlName(
+				parm.name +
+				" " + parm.instanceNum +
+				" " + p + " string_field" );
 			string new_value = EditorGUILayout.TextField( old_value, text_field_style );
 			if ( new_value != old_value ) // Check if the field is being used instead of the slider.
 				delay_build = true;
@@ -792,20 +819,21 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
-	public static bool objectField( string name, string label, ref Object obj, System.Type type )
+	public static bool objectField(
+		string name, string label, ref Object obj, System.Type type )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		return objectField( ref gui_parm, ref obj, type );
 	}
-	public static bool objectField( ref HAPI_GUIParm parm,
-									ref Object obj, System.Type type )
+	public static bool objectField(
+		ref HAPI_GUIParm parm, ref Object obj, System.Type type )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
 		return objectField( ref parm, ref obj, type, ref join_last, ref no_label_toggle_last );
 	}
-	public static bool objectField( ref HAPI_GUIParm parm,
-									ref Object obj, System.Type type,
-									ref bool join_last, ref bool no_label_toggle_last )
+	public static bool objectField(
+		ref HAPI_GUIParm parm, ref Object obj, System.Type type,
+		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
 		
@@ -836,9 +864,10 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
-	public static bool fileField( string name, string label,
-								  ref bool delay_build,
-								  ref string path )
+	public static bool fileField(
+		string name, string label,
+		ref bool delay_build,
+		ref string path )
 	{
 		HAPI_GUIParm parm = new HAPI_GUIParm( name, label );
 		return fileField( ref parm, ref delay_build, ref path );
@@ -848,12 +877,14 @@ public class HAPI_GUI : Editor
 								  ref string path )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return fileField( ref parm, ref delay_build, ref path, ref join_last, ref no_label_toggle_last );
+		return fileField(
+			ref parm, ref delay_build, ref path, ref join_last, ref no_label_toggle_last );
 	}
-	public static bool fileField( ref HAPI_GUIParm parm,
-								  ref bool delay_build,
-								  ref string path,
-								  ref bool join_last, ref bool no_label_toggle_last )
+	public static bool fileField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref string path,
+		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
 		
@@ -903,14 +934,16 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
-	public static bool toggle( string name, string label, ref bool value,
-	                           Object undo_info, ref bool undo_value )
+	public static bool toggle(
+		string name, string label, ref bool value,
+		Object undo_info, ref bool undo_value )
 	{
 		return toggle( name, label, false, ref value, undo_info, ref undo_value );
 	}
 	
-	public static bool toggle( string name, string label, bool is_bold, ref bool value,
-	                           Object undo_info, ref bool undo_value )
+	public static bool toggle(
+		string name, string label, bool is_bold, ref bool value,
+		Object undo_info, ref bool undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		gui_parm.isBold = is_bold;
@@ -923,21 +956,23 @@ public class HAPI_GUI : Editor
 		undo_value = ( undo_values[ 0 ] == 1 ? true : false );
 		return result;
 	}
-	public static bool toggle( ref HAPI_GUIParm parm,
-							   ref int[] values,
-	                           Object undo_info,
-	                           ref int[] undo_values )
+	public static bool toggle(
+		ref HAPI_GUIParm parm,
+		ref int[] values,
+		Object undo_info,
+		ref int[] undo_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
 		return toggle( ref parm, ref values, ref join_last, ref no_label_toggle_last,
 		               undo_info, ref undo_values );
 	}
-	public static bool toggle( ref HAPI_GUIParm parm,
-							   ref int[] values,
-							   ref bool join_last, 
-	                           ref bool no_label_toggle_last,
-	                           Object undo_info,
-	                           ref int[] undo_values )
+	public static bool toggle(
+		ref HAPI_GUIParm parm,
+		ref int[] values,
+		ref bool join_last, 
+		ref bool no_label_toggle_last,
+		Object undo_info,
+		ref int[] undo_values )
 	{
 		initializeConstants();
 		
@@ -1011,8 +1046,9 @@ public class HAPI_GUI : Editor
 		return changed;
 	}
 	
-	public static bool colourField( string name, string label, ref Color value,
-	                                Object undo_info, ref Color undo_value )
+	public static bool colourField(
+		string name, string label, ref Color value,
+		Object undo_info, ref Color undo_value )
 	{
 		HAPI_GUIParm gui_parm = new HAPI_GUIParm( name, label );
 		gui_parm.size = 4;
@@ -1039,23 +1075,26 @@ public class HAPI_GUI : Editor
 		undo_value.a = undo_values[ 3 ];
 		return result;
 	}
-	public static bool colourField( ref HAPI_GUIParm parm,
-									ref bool delay_build,
-									ref float[] values,
-	                                Object undo_info,
-	                                ref float[] undo_values )
+	public static bool colourField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref float[] values,
+		Object undo_info,
+		ref float[] undo_values )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return colourField( ref parm, ref delay_build, ref values, ref join_last, 
-		                    ref no_label_toggle_last, undo_info, ref undo_values );
+		return colourField(
+			ref parm, ref delay_build, ref values, ref join_last, 
+			ref no_label_toggle_last, undo_info, ref undo_values );
 	}
-	public static bool colourField( ref HAPI_GUIParm parm,
-									ref bool delay_build,
-									ref float[] values,
-									ref bool join_last, 
-	                                ref bool no_label_toggle_last,
-	                                Object undo_info,
-	                                ref float[] undo_values )
+	public static bool colourField(
+		ref HAPI_GUIParm parm,
+		ref bool delay_build,
+		ref float[] values,
+		ref bool join_last, 
+		ref bool no_label_toggle_last,
+		Object undo_info,
+		ref float[] undo_values )
 	{
 		initializeConstants();
 		
@@ -1089,9 +1128,10 @@ public class HAPI_GUI : Editor
 			}
 		}
 		
-		Color old_color = new Color( values[ parm.valuesIndex + 0 ], 
-								 	 values[ parm.valuesIndex + 1 ], 
-								 	 values[ parm.valuesIndex + 2 ] );
+		Color old_color = new Color(
+			values[ parm.valuesIndex + 0 ], 
+			values[ parm.valuesIndex + 1 ], 
+			values[ parm.valuesIndex + 2 ] );
 		if ( parm_size > 3 )
 			old_color.a = values[ parm.valuesIndex + 3 ];
 		
@@ -1147,8 +1187,9 @@ public class HAPI_GUI : Editor
 		bool join_last = false; bool no_label_toggle_last = false;
 		return button( ref parm, ref join_last, ref no_label_toggle_last );
 	}
-	public static bool button( ref HAPI_GUIParm parm,
-							   ref bool join_last, ref bool no_label_toggle_last )
+	public static bool button(
+		ref HAPI_GUIParm parm,
+		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
 		
@@ -1250,13 +1291,15 @@ public class HAPI_GUI : Editor
 		return last_double_rect;
 	}
 	
-	private static void label( ref HAPI_GUIParm parm,
-							   ref bool join_last, ref bool no_label_toggle_last )
+	private static void label(
+		ref HAPI_GUIParm parm,
+		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		if ( !parm.labelNone )
 		{
 			float label_final_width =
-				(parm.isChildOfMultiParm ? myLabelWidthMulti : myLabelWidth) + (float) parm.labelExtraWidth;
+				( parm.isChildOfMultiParm ? myLabelWidthMulti : myLabelWidth ) +
+				(float) parm.labelExtraWidth;
 			
 			if ( parm.isBold )
 			{
@@ -1303,7 +1346,7 @@ public class HAPI_GUI : Editor
 			mySliderThumbStyle = new GUIStyle( GUI.skin.horizontalSliderThumb );
 	}
 	
-	private static GUIStyle			myLabelStyle;
-	private static GUIStyle			mySliderStyle;
-	private static GUIStyle			mySliderThumbStyle;
+	private static GUIStyle myLabelStyle;
+	private static GUIStyle mySliderStyle;
+	private static GUIStyle mySliderThumbStyle;
 }

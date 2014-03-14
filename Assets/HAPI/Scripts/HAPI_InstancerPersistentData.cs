@@ -27,9 +27,9 @@ public class HAPI_InstancerPersistentData : ScriptableObject
 	public int baseIndex( string name )
 	{
 		int index = 0;
-		for( int ii = 0; ii < uniqueNames.Count; ii++ )
+		for ( int ii = 0; ii < uniqueNames.Count; ii++ )
 		{
-			if( uniqueNames[ ii ] == name )
+			if ( uniqueNames[ ii ] == name )
 			{
 				return index;
 			}
@@ -40,35 +40,35 @@ public class HAPI_InstancerPersistentData : ScriptableObject
 
 	public int baseIndex( int logical_index )
 	{
-		if( logical_index >= uniqueNames.Count )
+		if ( logical_index >= uniqueNames.Count )
 			return -1;
 
 		int index = 0;
-		for( int ii = 0; ii < logical_index; ii++ )
+		for ( int ii = 0; ii < logical_index; ii++ )
 		{
 			index += numObjsToInstantiate[ ii ];
 		}
 		return index;
 	}
 
-
 	public GameObject getUserObjToInstantiateFromName( string name, int point_index )
 	{
-		for( int ii = 0; ii < uniqueNames.Count; ii++ )
+		for ( int ii = 0; ii < uniqueNames.Count; ii++ )
 		{
-			if( uniqueNames[ ii ] == name )
+			if ( uniqueNames[ ii ] == name )
 			{
 				int base_index = baseIndex( name );
-				if( point_index >= variationChoice.Count )
+				if ( point_index >= variationChoice.Count )
 				{
-					Debug.LogError( "point_index out of range in " +
-									"HAPI_InstancerPersistentData::getUserObjToInstantiateFromName" );
+					Debug.LogError(
+						"point_index out of range in " +
+						"HAPI_InstancerPersistentData::getUserObjToInstantiateFromName" );
 					return null;
 				}
 
-				if( recalculateVariations[ ii ] || 
-				   	variationChoice[ point_index ] < 0 || 				    				    
-				   variationChoice[ point_index ] >= numObjsToInstantiate[ ii ] )
+				if ( recalculateVariations[ ii ] || 
+					variationChoice[ point_index ] < 0 ||
+					variationChoice[ point_index ] >= numObjsToInstantiate[ ii ] )
 				{
 					int random_index = UnityEngine.Random.Range( 0, numObjsToInstantiate[ ii ] );
 					variationChoice[ point_index ] = random_index;
@@ -77,7 +77,6 @@ public class HAPI_InstancerPersistentData : ScriptableObject
 				int variation_choice = base_index + variationChoice[ point_index ];
 				return objsToInstantiate[ variation_choice ];
 			}
-
 		}
 		return null;
 	}
