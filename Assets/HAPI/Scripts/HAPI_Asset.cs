@@ -215,9 +215,9 @@ public abstract class HAPI_Asset : HAPI_Control
 												set { myTransformChangeTriggersCooks = value; } }
 
 	public bool	prImportTemplatedGeos{ get { return (			myImportTemplatedGeos && 
-			                                                    HAPI_Host.isImportTemplatedGeosDefault() )
+																HAPI_Host.isImportTemplatedGeosDefault() )
 														  || (	HAPI_Host.prImportTemplatedGeos &&
-				    											!HAPI_Host.isImportTemplatedGeosDefault() ); } 
+																!HAPI_Host.isImportTemplatedGeosDefault() ); } 
 												set { myImportTemplatedGeos = value; } }
 
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
@@ -402,7 +402,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 		}
 	}
-	
+
 	public void addFileAsGeoInput( string path, int index )
 	{
 		prUpStreamGeoAssets[ index ] = null;
@@ -437,10 +437,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		HAPI_Host.setTransformAnimCurve( node_id, transform_component, keys, curve.length );
 	}
+
 	protected void marshalRotation( int node_id, AnimationClipCurveData[] curve_datas )
 	{
 		AnimationCurve qx = null, qy = null, qz = null, qw = null;
-		
+
 		foreach ( AnimationClipCurveData curve_data in curve_datas )
 		{
 			if( curve_data.propertyName == "m_LocalRotation.x" )
@@ -452,36 +453,33 @@ public abstract class HAPI_Asset : HAPI_Control
 			else if( curve_data.propertyName == "m_LocalRotation.w" )
 				qw = curve_data.curve;
 
-			if( qx != null && qy != null && qz != null && qw != null )
+			if ( qx != null && qy != null && qz != null && qw != null )
 				break;
-						
 		}
 		
-		if( qx != null && qy != null && qz != null && qw != null )
+		if ( qx != null && qy != null && qz != null && qw != null )
 		{
 			AnimationCurve rx = new AnimationCurve();
 			AnimationCurve ry = new AnimationCurve();
 			AnimationCurve rz = new AnimationCurve();
-			for( int ii = 0; ii < qx.length; ii++ )
+			for ( int ii = 0; ii < qx.length; ii++ )
 			{
 				Keyframe key_qx = qx.keys[ ii ];
 				Keyframe key_qy = qy.keys[ ii ];
 				Keyframe key_qz = qz.keys[ ii ];
 				Keyframe key_qw = qw.keys[ ii ];
-				
+
 				Quaternion quat = new Quaternion( key_qx.value, key_qy.value, key_qz.value, key_qw.value );
 				Vector3 eulerAngle = quat.eulerAngles;
-				
+
 				HAPI_AssetUtility.addKeyToCurve( key_qx.time, eulerAngle.x, rx );
 				HAPI_AssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.y, ry );
 				HAPI_AssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.z, rz );
-								
 			}
 			
 			marshalAnimCurve( node_id, rx, HAPI_TransformComponent.HAPI_TRANSFORM_RX );
 			marshalAnimCurve( node_id, ry, HAPI_TransformComponent.HAPI_TRANSFORM_RY );
 			marshalAnimCurve( node_id, rz, HAPI_TransformComponent.HAPI_TRANSFORM_RZ );
-			
 		}
 	}
 #endif // UNITY_EDITOR
@@ -506,9 +504,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_SY );
 			else if( curve_data.propertyName == "m_LocalScale.z" )
 				marshalAnimCurve( node_id, curve_data.curve, HAPI_TransformComponent.HAPI_TRANSFORM_SZ );
-						
 		}
-		
+
 		marshalRotation( node_id, curve_datas );
 #endif // UNITY_EDITOR
 	}
@@ -542,7 +539,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	}
 	
 	public void addDownstreamGeoAsset( HAPI_Asset asset )
-	{		
+	{
 		foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
 			if ( downstream_asset == asset )
 				return;
@@ -552,7 +549,6 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void OnDestroy()
 	{
-
 		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() 
 #if UNITY_EDITOR && UNITY_4_3
 			&& !BuildPipeline.isBuildingPlayer
@@ -592,9 +588,10 @@ public abstract class HAPI_Asset : HAPI_Control
 	
 	public bool isRevertingPrefabInstance()
 	{
-		return ( isPrefabInstance() && 
-				 prAssetId != prBackupAssetId &&
-				 HAPI_Host.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) );
+		return (
+			isPrefabInstance() && 
+			prAssetId != prBackupAssetId &&
+			HAPI_Host.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) );
 	}
 	
 	public bool isInstantiatingPrefab()
@@ -615,9 +612,10 @@ public abstract class HAPI_Asset : HAPI_Control
 	public bool isApplyingChangesToPrefab()
 	{
 #if UNITY_EDITOR
-		return ( isPrefab() && 
-			     prAssetId != prBackupAssetId && 
-				 HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) );
+		return (
+			isPrefab() && 
+			prAssetId != prBackupAssetId && 
+			HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) );
 #else
 		return false;
 #endif // UNITY_EDITOR
@@ -628,7 +626,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		foreach ( HAPI_Asset asset in FindObjectsOfType( typeof( HAPI_Asset ) ) as HAPI_Asset[] )
 		{
 			if ( asset.prAssetId == prAssetId &&
-			     asset.GetInstanceID() != GetInstanceID() )
+				asset.GetInstanceID() != GetInstanceID() )
 			{
 				return true;
 			}
@@ -662,28 +660,31 @@ public abstract class HAPI_Asset : HAPI_Control
 		// from the prefab
 		if( isRevertingPrefabInstance() )
 		{
-			build( true,	// reload_asset
-			   	   false,	// unload_asset_first
-			   	   false,	// serializatin_recovery_only
-			   	   true,	// force_reconnect
-			   	   false,	// cook_downstream_assets
-			   	   false	// use_delay_for_progress_bar
-				);
+			build(
+				true,	// reload_asset
+				false,	// unload_asset_first
+				false,	// serializatin_recovery_only
+				true,	// force_reconnect
+				false,	// cook_downstream_assets
+				false	// use_delay_for_progress_bar
+			);
 		}
 		else if ( prAssetId >= 0 || isInstantiatingPrefab() )
 		{
-			if ( isPrefabInstance() &&
-				 !isInstantiatingPrefab() &&
-				 prUpdatePrefabInstanceParmNames.Count > 0 )
+			if (
+				isPrefabInstance() &&
+				!isInstantiatingPrefab() &&
+				prUpdatePrefabInstanceParmNames.Count > 0 )
 			{
 				// Updating prefab instance after parameter change on prefab
 				// and save changes to preset
 				buildClientSide();
 				savePreset();
 			}
-			else if ( !isInstantiatingPrefab() &&
-				 	  HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) &&
-			          !isDuplicatingAsset() )
+			else if (
+				!isInstantiatingPrefab() &&
+				HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) &&
+				!isDuplicatingAsset() )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
@@ -1208,11 +1209,11 @@ public abstract class HAPI_Asset : HAPI_Control
 					// Case 2: Parameter on prefab that has been changed has been
 					// overridden on this asset
 					// Otherwise set the parameter change for this prefab
-					if( parm_name != "r" && 
-					    parm_name != "s" &&
-					    parm_name != "t" &&
+					if ( parm_name != "r" && 
+						parm_name != "s" &&
+						parm_name != "t" &&
 						!prParms.isParmOverridden( parm_info.id ) )
-					{	
+					{
 						// if the parameter is a string we need to manually
 						// get the string value from the prefab because the
 						// parameter strings are stored in a dictionary which
@@ -1638,7 +1639,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		foreach ( HAPI_PartControl control in controls )
 		{
 			if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
-			    && control.gameObject.GetComponent< MeshRenderer >() != null )
+				&& control.gameObject.GetComponent< MeshRenderer >() != null )
 				control.gameObject.GetComponent< MeshRenderer >().enabled = prIsGeoVisible;
 		}
 	}
@@ -1774,13 +1775,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( !HAPI_Host.isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
 			{
 				prefab_asset.prAssetId = -1;
-				prefab_asset.build( true,	// reload_asset
-				                    true,	// unload_asset_first
-				                    true,	// serializatin_recovery_only
-				                    false,	// force_reconnect
-				                    false,	// cook_downstream_assets
-				                    false	// use_delay_for_progress_bar
-				                  );
+				prefab_asset.build(
+					true,	// reload_asset
+					true,	// unload_asset_first
+					true,	// serializatin_recovery_only
+					false,	// force_reconnect
+					false,	// cook_downstream_assets
+					false	// use_delay_for_progress_bar
+				);
 				EditorUtility.SetDirty( prefab_asset );
 			}
 			// if prefab has not been reloaded after play mode change yet then 
@@ -1788,13 +1790,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			else if ( prefab_asset.prReloadPrefabOnPlaymodeChange )
 			{
 				prefab_asset.prReloadPrefabOnPlaymodeChange = false;
-				prefab_asset.build(	false,	// reload_asset
-				                    false,	// unload_asset_first
-				                    true,	// serializatin_recovery_only
-				                    false,	// force_reconnect
-				                    false,	// cook_downstream_assets
-				                    false	// use_delay_for_progress_bar
-				                  );
+				prefab_asset.build(
+					false,	// reload_asset
+					false,	// unload_asset_first
+					true,	// serializatin_recovery_only
+					false,	// force_reconnect
+					false,	// cook_downstream_assets
+					false	// use_delay_for_progress_bar
+				);
 			}
 		}
 #endif // UNITY_EDITOR

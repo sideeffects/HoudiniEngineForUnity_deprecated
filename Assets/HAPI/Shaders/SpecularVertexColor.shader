@@ -16,7 +16,7 @@ Shader "HAPI/SpecularVertexColor" {
 			Material {
 				Shininess [_Shininess]
 				Specular [_SpecColor]
-				Emission [_Emission]    
+				Emission [_Emission]
 			}
 			ColorMaterial AmbientAndDiffuse
 			Lighting On
@@ -27,7 +27,7 @@ Shader "HAPI/SpecularVertexColor" {
 			SetTexture [_MainTex] {
 				constantColor [_Color]
 				Combine previous * constant DOUBLE, previous * constant
-			} 
+			}
 		}
 	}
 

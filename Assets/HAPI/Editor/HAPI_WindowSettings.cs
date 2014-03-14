@@ -86,9 +86,10 @@ public class HAPI_WindowSettings : EditorWindow
 
 		if ( GUILayout.Button( HAPI_GUIUtility.myRevertAllSettingsLabel ) )
 		{
-			if ( EditorUtility.DisplayDialog(	"Revert all settings?",
-												"Are you sure you want to revert ALL Houdini plugin settings?", 
-												"Yes", "No" ) )
+			if ( EditorUtility.DisplayDialog(
+				"Revert all settings?",
+				"Are you sure you want to revert ALL Houdini plugin settings?", 
+				"Yes", "No" ) )
 			{
 				HAPI_Host.revertAllSettingsToDefaults();
 				HAPI_Host.repaint();
@@ -128,8 +129,9 @@ public class HAPI_WindowSettings : EditorWindow
 		// Collision Group Name
 		{
 			string value = HAPI_Host.prCollisionGroupName;
-			bool changed = HAPI_GUI.stringField( "collision_group_name", "Colli. Grp.", ref value,
-			                                     myUndoInfo, ref myUndoInfo.collisionGroupName );
+			bool changed = HAPI_GUI.stringField(
+				"collision_group_name", "Colli. Grp.", ref value,
+				myUndoInfo, ref myUndoInfo.collisionGroupName );
 			if ( changed )
 				HAPI_Host.prCollisionGroupName = value;
 		}
@@ -137,9 +139,10 @@ public class HAPI_WindowSettings : EditorWindow
 		// Rendered Collision Group Name
 		{
 			string value = HAPI_Host.prRenderedCollisionGroupName;
-			bool changed = HAPI_GUI.stringField( "rendered_collision_group_name", 
-												 "Rendered Colli. Grp.", ref value, myUndoInfo, 
-			                                     ref myUndoInfo.renderedCollisionGroupName );
+			bool changed = HAPI_GUI.stringField(
+				"rendered_collision_group_name", 
+				"Rendered Colli. Grp.", ref value, myUndoInfo, 
+				ref myUndoInfo.renderedCollisionGroupName );
 			if ( changed )
 				HAPI_Host.prRenderedCollisionGroupName = value;
 		}
@@ -149,8 +152,9 @@ public class HAPI_WindowSettings : EditorWindow
 		// Pin Size
 		{
 			float value = HAPI_Host.prPinSize;
-			bool changed = HAPI_GUI.floatField( "pin_size", "Pin Size", ref value, 
-			                                    myUndoInfo, ref myUndoInfo.pinSize );
+			bool changed = HAPI_GUI.floatField(
+				"pin_size", "Pin Size", ref value, 
+				myUndoInfo, ref myUndoInfo.pinSize );
 			if ( changed )
 			{
 				HAPI_Host.prPinSize = value;
@@ -161,8 +165,9 @@ public class HAPI_WindowSettings : EditorWindow
 		// Pin Colour
 		{
 			Color value = HAPI_Host.prPinColour;
-			bool changed = HAPI_GUI.colourField( "pin_colour", "Pin Color", ref value,
-			                                     myUndoInfo, ref myUndoInfo.pinColour );
+			bool changed = HAPI_GUI.colourField(
+				"pin_colour", "Pin Color", ref value,
+				myUndoInfo, ref myUndoInfo.pinColour );
 			if ( changed )
 			{
 				HAPI_Host.prPinColour = value;
@@ -173,9 +178,10 @@ public class HAPI_WindowSettings : EditorWindow
 		// Auto pin
 		{
 			bool value = HAPI_Host.prAutoPinInstances;
-			bool changed = HAPI_GUI.toggle( "auto_pin_instances", "Auto Pin Instances", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.autoPinInstances );
+			bool changed = HAPI_GUI.toggle(
+				"auto_pin_instances", "Auto Pin Instances", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.autoPinInstances );
 			if ( changed )
 			{
 				HAPI_Host.prAutoPinInstances = value;
@@ -188,9 +194,10 @@ public class HAPI_WindowSettings : EditorWindow
 		// Enable Drag-and-Drop
 		{
 			bool value = HAPI_Host.prEnableDragAndDrop;
-			bool changed = HAPI_GUI.toggle( "enable_drag_and_drop", "Enable Drag-and-Drop", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.enableDragAndDrop );
+			bool changed = HAPI_GUI.toggle(
+				"enable_drag_and_drop", "Enable Drag-and-Drop", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.enableDragAndDrop );
 			if ( changed )
 			{
 				HAPI_Host.prEnableDragAndDrop = value;
@@ -201,9 +208,10 @@ public class HAPI_WindowSettings : EditorWindow
 		// Enable Support Warnings
 		{
 			bool value = HAPI_Host.prEnableSupportWarnings;
-			bool changed = HAPI_GUI.toggle( "enable_support_warnings", "Enable Support Warnings", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.enableSupportWarnings );
+			bool changed = HAPI_GUI.toggle(
+				"enable_support_warnings", "Enable Support Warnings", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.enableSupportWarnings );
 			if ( changed )
 				HAPI_Host.prEnableSupportWarnings = value;
 		}
@@ -213,10 +221,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Auto Select Asset Root Node
 		{
 			bool value = HAPI_Host.prAutoSelectAssetRootNode;
-			bool changed = HAPI_GUI.toggle( "auto_select_asset_root_node", 
-											"Auto Select Asset Root Node", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.autoSelectAssetRootNode );
+			bool changed = HAPI_GUI.toggle(
+				"auto_select_asset_root_node", 
+				"Auto Select Asset Root Node", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.autoSelectAssetRootNode );
 			if ( changed )
 			{
 				HAPI_Host.prAutoSelectAssetRootNode = value;
@@ -227,10 +236,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Hide Geometry On Linking
 		{
 			bool value = HAPI_Host.prHideGeometryOnLinking;
-			bool changed = HAPI_GUI.toggle( "hide_geometry_on_linking", 
-			                                "Hide Geometry On Linking", 
-			                                ref value, myUndoInfo, 
-			                                ref myUndoInfo.hideGeometryOnLinking );
+			bool changed = HAPI_GUI.toggle(
+				"hide_geometry_on_linking", 
+				"Hide Geometry On Linking", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.hideGeometryOnLinking );
 			if ( changed )
 			{
 				HAPI_Host.prHideGeometryOnLinking = value;
@@ -243,10 +253,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Enable particles
 		{
 			bool value = HAPI_Host.prEnablePointsAsParticles;
-			bool changed = HAPI_GUI.toggle( "enable_points_as_particles",
-											"Create Points as Particles", 
-											ref value, myUndoInfo,
-			                                ref myUndoInfo.enablePointsAsParticles );
+			bool changed = HAPI_GUI.toggle(
+				"enable_points_as_particles",
+				"Create Points as Particles", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.enablePointsAsParticles );
 			if ( changed )
 			{
 				HAPI_Host.prEnablePointsAsParticles = value;
@@ -259,10 +270,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Unity Material Attrib Name
 		{
 			string value = HAPI_Host.prUnityMaterialAttribName;
-			bool changed = HAPI_GUI.stringField( "unity_material_attrib_name", 
-												 "Unity Mat. Attrib.", 
-			                                     ref value, myUndoInfo, 
-			                                     ref myUndoInfo.unityMaterialAttribName );
+			bool changed = HAPI_GUI.stringField(
+				"unity_material_attrib_name", 
+				"Unity Mat. Attrib.", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.unityMaterialAttribName );
 			if ( changed )
 				HAPI_Host.prUnityMaterialAttribName = value;
 		}
@@ -270,10 +282,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Unity Sub Material Name Attrib Name
 		{
 			string value = HAPI_Host.prUnitySubMaterialNameAttribName;
-			bool changed = HAPI_GUI.stringField( "unity_sub_material_name_attrib_name", 
-												 "Unity SubMat. Name Attrib.", 
-			                                     ref value, myUndoInfo,
-			                                     ref myUndoInfo.unitySubMaterialNameAttribName );
+			bool changed = HAPI_GUI.stringField(
+				"unity_sub_material_name_attrib_name", 
+				"Unity SubMat. Name Attrib.", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.unitySubMaterialNameAttribName );
 			if ( changed )
 				HAPI_Host.prUnitySubMaterialNameAttribName = value;
 		}
@@ -281,10 +294,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Unity Sub Material Index Attrib Name
 		{
 			string value = HAPI_Host.prUnitySubMaterialIndexAttribName;
-			bool changed = HAPI_GUI.stringField( "unity_sub_material_index_attrib_name", 
-												 "Unity SubMat. Index Attrib.", 
-			                                     ref value, myUndoInfo,
-			                                     ref myUndoInfo.unitySubMaterialIndexAttribName );
+			bool changed = HAPI_GUI.stringField(
+				"unity_sub_material_index_attrib_name", 
+				"Unity SubMat. Index Attrib.", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.unitySubMaterialIndexAttribName );
 			if ( changed )
 				HAPI_Host.prUnitySubMaterialIndexAttribName = value;
 		}
@@ -294,18 +308,20 @@ public class HAPI_WindowSettings : EditorWindow
 		// Generate Tangents
 		{
 			bool value = HAPI_Host.prGenerateTangents;
-			bool changed = HAPI_GUI.toggle( "generate_tangents", "Generate Tangents", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.generateTangents );
+			bool changed = HAPI_GUI.toggle(
+				"generate_tangents", "Generate Tangents", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.generateTangents );
 			if ( changed )
 			{
 				HAPI_Host.prGenerateTangents = value;
 				HAPI_Host.repaint();
 
-				EditorUtility.DisplayDialog(	"Rebuilds Required",
-												"You will need to rebuild existing assets for tangents " +
-												"to be removed/generated.", 
-												"Ok" );
+				EditorUtility.DisplayDialog(
+					"Rebuilds Required",
+					"You will need to rebuild existing assets for tangents " +
+					"to be removed/generated.", 
+					"Ok" );
 			}
 		}
 
@@ -314,18 +330,20 @@ public class HAPI_WindowSettings : EditorWindow
 		// Don't Create Texture Files
 		{
 			bool value = HAPI_Host.prDontCreateTextureFiles;
-			bool changed = HAPI_GUI.toggle( "dont_create_texture_files", 
-			                                "Don't Create Texture Files (use in-memory textures)", 
-			                                ref value, myUndoInfo, ref myUndoInfo.dontCreateTextureFiles );
+			bool changed = HAPI_GUI.toggle(
+				"dont_create_texture_files", 
+				"Don't Create Texture Files (use in-memory textures)", 
+				ref value, myUndoInfo, ref myUndoInfo.dontCreateTextureFiles );
 			if ( changed )
 			{
 				HAPI_Host.prDontCreateTextureFiles = value;
 				HAPI_Host.repaint();
 
-				EditorUtility.DisplayDialog(	"Rebuilds Required",
-												"This change will take affect for new instantiations or rebuilds.\n" +
-												"A full Unity restart is recommended.", 
-												"Ok" );
+				EditorUtility.DisplayDialog(
+					"Rebuilds Required",
+					"This change will take affect for new instantiations or rebuilds.\n" +
+					"A full Unity restart is recommended.", 
+					"Ok" );
 			}
 		}
 
@@ -334,9 +352,10 @@ public class HAPI_WindowSettings : EditorWindow
 			bool value = HAPI_Host.prExtractTexturesInRawFormat;
 			bool was_gui_enabled = GUI.enabled;
 			GUI.enabled = HAPI_Host.prDontCreateTextureFiles;
-			bool changed = HAPI_GUI.toggle( "extract_textures_in_raw_format", 
-			                                "Extract Textures In Raw Format (only works for in-memory textures)", 
-			                                ref value, myUndoInfo, ref myUndoInfo.extractTexturesInRawFormat );
+			bool changed = HAPI_GUI.toggle(
+				"extract_textures_in_raw_format", 
+				"Extract Textures In Raw Format (only works for in-memory textures)", 
+				ref value, myUndoInfo, ref myUndoInfo.extractTexturesInRawFormat );
 			if ( changed )
 			{
 				HAPI_Host.prExtractTexturesInRawFormat = value;
@@ -351,8 +370,9 @@ public class HAPI_WindowSettings : EditorWindow
 		// Enable Cooking
 		{
 			bool value = HAPI_Host.prEnableCooking;
-			bool changed = HAPI_GUI.toggle( "enable_cooking", "Enable Cooking", ref value,
-			                                myUndoInfo, ref myUndoInfo.enableCooking );
+			bool changed = HAPI_GUI.toggle(
+				"enable_cooking", "Enable Cooking", ref value,
+				myUndoInfo, ref myUndoInfo.enableCooking );
 			if ( changed )
 			{
 				HAPI_Host.prEnableCooking = value;
@@ -365,10 +385,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Cooking Triggers Downstream Cooks
 		{
 			bool value = HAPI_Host.prCookingTriggersDownCooks;
-			bool changed = HAPI_GUI.toggle( "cooking_triggers_downstream_cooks", 
-											"Cooking Triggers Downstream Cooks", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.cookingTriggersDownCooks );
+			bool changed = HAPI_GUI.toggle(
+				"cooking_triggers_downstream_cooks", 
+				"Cooking Triggers Downstream Cooks", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.cookingTriggersDownCooks );
 			if ( changed )
 			{
 				HAPI_Host.prCookingTriggersDownCooks = value;
@@ -379,10 +400,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Playmode Per-Frame Cooking
 		{
 			bool value = HAPI_Host.prPlaymodePerFrameCooking;
-			bool changed = HAPI_GUI.toggle( "playmode_per_frame_cooking", 
-											"Playmode Per-Frame Cooking", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.playmodePerFrameCooking );
+			bool changed = HAPI_GUI.toggle(
+				"playmode_per_frame_cooking", 
+				"Playmode Per-Frame Cooking", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.playmodePerFrameCooking );
 			if ( changed )
 			{
 				HAPI_Host.prPlaymodePerFrameCooking = value;
@@ -395,10 +417,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Push Unity Transform To Houdini Engine
 		{
 			bool value = HAPI_Host.prPushUnityTransformToHoudini;
-			bool changed = HAPI_GUI.toggle( "push_unity_transform_to_houdini", 
-											"Push Unity Transform to Houdini Engine", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.pushUnityTransformToHoudini );
+			bool changed = HAPI_GUI.toggle(
+				"push_unity_transform_to_houdini", 
+				"Push Unity Transform to Houdini Engine", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.pushUnityTransformToHoudini );
 			if ( changed )
 			{
 				HAPI_Host.prPushUnityTransformToHoudini = value;
@@ -409,10 +432,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Transform Change Triggers Cooks
 		{
 			bool value = HAPI_Host.prTransformChangeTriggersCooks;
-			bool changed = HAPI_GUI.toggle( "transform_change_triggers_cooks", 
-											"Transform Change Triggers Cooks", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.transformChangeTriggersCooks );
+			bool changed = HAPI_GUI.toggle(
+				"transform_change_triggers_cooks", 
+				"Transform Change Triggers Cooks", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.transformChangeTriggersCooks );
 			if ( changed )
 			{
 				HAPI_Host.prTransformChangeTriggersCooks = value;
@@ -423,10 +447,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Import Templated Geos
 		{
 			bool value = HAPI_Host.prImportTemplatedGeos;
-			bool changed = HAPI_GUI.toggle( "import_templated_geos", 
-			                                "Import Templated Geos", 
-			                                ref value, myUndoInfo,
-			                                ref myUndoInfo.importTemplatedGeos );
+			bool changed = HAPI_GUI.toggle(
+				"import_templated_geos", 
+				"Import Templated Geos", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.importTemplatedGeos );
 			if ( changed )
 			{
 				HAPI_Host.prImportTemplatedGeos = value;
@@ -442,9 +467,10 @@ public class HAPI_WindowSettings : EditorWindow
 		// Unity Tag Attrib Name
 		{
 			string value = HAPI_Host.prUnityTagAttribName;
-			bool changed = HAPI_GUI.stringField( "unity_tag_attrib_name", "Unity Tag Attrib.", 
-			                                     ref value, myUndoInfo, 
-			                                     ref myUndoInfo.unityTagAttribName );
+			bool changed = HAPI_GUI.stringField(
+				"unity_tag_attrib_name", "Unity Tag Attrib.", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.unityTagAttribName );
 			if ( changed )
 				HAPI_Host.prUnityTagAttribName = value;
 		}
@@ -457,10 +483,11 @@ public class HAPI_WindowSettings : EditorWindow
 			// the paint rate and we want the user to think the higher the number
 			// the FASTER the rate - so we have to invert.
 			float value = HAPI_Host.prPaintBrushRate;
-			bool changed = HAPI_GUI.floatField( "paint_brush_rate", "Paint Brush Rate", 
-												ref value, 0.0f, 1.0f,
-												myUndoInfo,
-												ref myUndoInfo.paintBrushRate );
+			bool changed = HAPI_GUI.floatField(
+				"paint_brush_rate", "Paint Brush Rate", 
+				ref value, 0.0f, 1.0f,
+				myUndoInfo,
+				ref myUndoInfo.paintBrushRate );
 			if ( changed )
 			{
 				HAPI_Host.prPaintBrushRate = value;
@@ -471,16 +498,20 @@ public class HAPI_WindowSettings : EditorWindow
 		// Painting Mode Hot Key
 		{
 			KeyCode value = HAPI_Host.prPaintingModeHotKey;
-			string[] labels = System.Enum.GetValues(typeof(KeyCode))
-								.Cast< KeyCode >()
-								.Select(v => v.ToString())
-								.ToArray();
-			KeyCode[] values = System.Enum.GetValues(typeof(KeyCode))
-								.Cast< KeyCode >()
-								.ToArray();
-			bool changed = HAPI_GUI.dropdown( "painting_mode_hot_key", "Painting Key", 
-											  ref value, labels, values, myUndoInfo,
-			                                  ref myUndoInfo.paintingModeHotKey );
+			string[] labels = 
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.Select( v => v.ToString() )
+					.ToArray();
+			KeyCode[] values =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.ToArray();
+			bool changed = HAPI_GUI.dropdown(
+				"painting_mode_hot_key", "Painting Key",
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.paintingModeHotKey );
+
 			if ( changed )
 			{
 				HAPI_Host.prPaintingModeHotKey = (KeyCode) value;
@@ -491,9 +522,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Painting Mode Colour
 		{
 			Color value = HAPI_Host.prPaintingModeColour;
-			bool changed = HAPI_GUI.colourField( "painting_mode_colour", "Painting Mode", 
-			                                     ref value, myUndoInfo, 
-			                                     ref myUndoInfo.paintingModeColour );
+			bool changed = HAPI_GUI.colourField(
+				"painting_mode_colour", "Painting Mode", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.paintingModeColour );
+
 			if ( changed )
 			{
 				HAPI_Host.prPaintingModeColour = value;
@@ -506,16 +539,21 @@ public class HAPI_WindowSettings : EditorWindow
 		// Adding Points Mode Hot Key
 		{
 			KeyCode value = HAPI_Host.prAddingPointsModeHotKey;
-			string[] labels = System.Enum.GetValues(typeof(KeyCode))
-								.Cast< KeyCode >()
-								.Select(v => v.ToString())
-								.ToArray();
-			KeyCode[] values = System.Enum.GetValues(typeof(KeyCode))
-								.Cast< KeyCode >()
-								.ToArray();
-			bool changed = HAPI_GUI.dropdown( "adding_points_mode_hot_key", "Adding Points Key", 
-											  ref value, labels, values, myUndoInfo,
-			                                  ref myUndoInfo.addingPointsModeHotKey );
+			string[] labels =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.Select( v => v.ToString() )
+					.ToArray();
+			KeyCode[] values =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.ToArray();
+
+			bool changed = HAPI_GUI.dropdown(
+				"adding_points_mode_hot_key", "Adding Points Key",
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.addingPointsModeHotKey );
+
 			if ( changed )
 			{
 				HAPI_Host.prAddingPointsModeHotKey = (KeyCode) value;
@@ -526,9 +564,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Adding Points Mode Colour
 		{
 			Color value = HAPI_Host.prAddingPointsModeColour;
-			bool changed = HAPI_GUI.colourField( "adding_ponits_mode_colour", "Adding Points Mode", 
-			                                     ref value, myUndoInfo, 
-			                                     ref myUndoInfo.addingPointsModeColour );
+			bool changed = HAPI_GUI.colourField(
+				"adding_ponits_mode_colour", "Adding Points Mode", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.addingPointsModeColour );
+
 			if ( changed )
 			{
 				HAPI_Host.prAddingPointsModeColour = value;
@@ -541,16 +581,21 @@ public class HAPI_WindowSettings : EditorWindow
 		// Editing Points Mode Hot Key
 		{
 			KeyCode value = HAPI_Host.prEditingPointsModeHotKey;
-			string[] labels = System.Enum.GetValues(typeof(KeyCode))
-								.Cast< KeyCode >()
-								.Select(v => v.ToString())
-								.ToArray();
-			KeyCode[] values = System.Enum.GetValues(typeof(KeyCode))
-								.Cast< KeyCode >()
-								.ToArray();
-			bool changed = HAPI_GUI.dropdown( "editing_points_mode_hot_key", "Editing Points Key", 
-											  ref value, labels, values, myUndoInfo,
-			                                  ref myUndoInfo.editingPointsModeHotKey );
+			string[] labels =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.Select( v => v.ToString() )
+					.ToArray();
+			KeyCode[] values =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.ToArray();
+
+			bool changed = HAPI_GUI.dropdown(
+				"editing_points_mode_hot_key", "Editing Points Key", 
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.editingPointsModeHotKey );
+
 			if ( changed )
 			{
 				HAPI_Host.prEditingPointsModeHotKey = (KeyCode) value;
@@ -561,9 +606,10 @@ public class HAPI_WindowSettings : EditorWindow
 		// Editing Points Mode Colour
 		{
 			Color value = HAPI_Host.prEditingPointsModeColour;
-			bool changed = HAPI_GUI.colourField( "editing_ponits_mode_colour", "Editing Points Mode", 
-			                                     ref value, myUndoInfo, 
-			                                     ref myUndoInfo.editingPointsModeColour );
+			bool changed = HAPI_GUI.colourField(
+				"editing_ponits_mode_colour", "Editing Points Mode", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.editingPointsModeColour );
 			if ( changed )
 			{
 				HAPI_Host.prEditingPointsModeColour = value;
@@ -576,8 +622,9 @@ public class HAPI_WindowSettings : EditorWindow
 		// Wireframe Colour
 		{
 			Color value = HAPI_Host.prWireframeColour;
-			bool changed = HAPI_GUI.colourField( "wireframe_colour", "Wireframe", ref value,
-			                                     myUndoInfo, ref myUndoInfo.wireframeColour );
+			bool changed = HAPI_GUI.colourField(
+				"wireframe_colour", "Wireframe", ref value,
+				myUndoInfo, ref myUndoInfo.wireframeColour );
 			if ( changed )
 			{
 				HAPI_Host.prWireframeColour = value;
@@ -588,9 +635,10 @@ public class HAPI_WindowSettings : EditorWindow
 		// Guide Wireframe Colour
 		{
 			Color value = HAPI_Host.prGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField( "guide_wireframe_colour", "Guide Wireframe", 
-			                                     ref value, myUndoInfo,
-			                                     ref myUndoInfo.guideWireframeColour );
+			bool changed = HAPI_GUI.colourField(
+				"guide_wireframe_colour", "Guide Wireframe", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.guideWireframeColour );
 			if ( changed )
 			{
 				HAPI_Host.prGuideWireframeColour = value;
@@ -601,10 +649,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Unselectable Guide Wireframe Colour
 		{
 			Color value = HAPI_Host.prUnselectableGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField( "unselectable_guide_wireframe_colour", 
-			                                     "Unselectable Guide", 
-			                                     ref value, myUndoInfo, 
-			                                     ref myUndoInfo.unselectableGuideWireframeColour );
+			bool changed = HAPI_GUI.colourField(
+				"unselectable_guide_wireframe_colour",
+				"Unselectable Guide",
+				ref value, myUndoInfo,
+				ref myUndoInfo.unselectableGuideWireframeColour );
 			if ( changed )
 			{
 				HAPI_Host.prUnselectableGuideWireframeColour = value;
@@ -615,10 +664,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Unselected Guide Wireframe Colour
 		{
 			Color value = HAPI_Host.prUnselectedGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField( "unselected_guide_wireframe_colour", 
-			                                     "Unselected Guide", 
-			                                     ref value, myUndoInfo,
-			                                     ref myUndoInfo.unselectedGuideWireframeColour );
+			bool changed = HAPI_GUI.colourField(
+				"unselected_guide_wireframe_colour",
+				"Unselected Guide",
+				ref value, myUndoInfo,
+				ref myUndoInfo.unselectedGuideWireframeColour );
 			if ( changed )
 			{
 				HAPI_Host.prUnselectedGuideWireframeColour = value;
@@ -629,10 +679,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Selected Guide Wireframe Colour
 		{
 			Color value = HAPI_Host.prSelectedGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField( "selected_guide_wireframe_colour", 
-			                                     "Selected Guide", 
-			                                     ref value, myUndoInfo,
-			                                     ref myUndoInfo.selectedGuideWireframeColour );
+			bool changed = HAPI_GUI.colourField(
+				"selected_guide_wireframe_colour",
+				"Selected Guide",
+				ref value, myUndoInfo,
+				ref myUndoInfo.selectedGuideWireframeColour );
 			if ( changed )
 			{
 				HAPI_Host.prSelectedGuideWireframeColour = value;
@@ -645,10 +696,11 @@ public class HAPI_WindowSettings : EditorWindow
 		// Guide Point Size
 		{
 			float value = HAPI_Host.prGuidePointSize;
-			bool changed = HAPI_GUI.floatField( "guide_point_size", "Guide Point Size", 
-												ref value, 4.0f, 40.0f,
-			                                    myUndoInfo,
-			                                    ref myUndoInfo.guidePointSize );
+			bool changed = HAPI_GUI.floatField(
+				"guide_point_size", "Guide Point Size", 
+				ref value, 4.0f, 40.0f,
+				myUndoInfo,
+				ref myUndoInfo.guidePointSize );
 			if ( changed )
 			{
 				HAPI_Host.prGuidePointSize = value;
@@ -659,11 +711,12 @@ public class HAPI_WindowSettings : EditorWindow
 		// Min. Distance For Point Selection
 		{
 			float value = HAPI_Host.prMinDistanceForPointSelection;
-			bool changed = HAPI_GUI.floatField( "min_distance_for_point_selection", 
-												"Min. Distance For Point Selection", 
-			                                    ref value, 1.0f, 20.0f,
-			                                    myUndoInfo,
-			                                    ref myUndoInfo.minDistanceForPointSelection );
+			bool changed = HAPI_GUI.floatField(
+				"min_distance_for_point_selection", 
+				"Min. Distance For Point Selection", 
+				ref value, 1.0f, 20.0f,
+				myUndoInfo,
+				ref myUndoInfo.minDistanceForPointSelection );
 			if ( changed )
 			{
 				HAPI_Host.prMinDistanceForPointSelection = value;
@@ -674,11 +727,12 @@ public class HAPI_WindowSettings : EditorWindow
 		// Guide Min. Distance For Mid Point Insertion
 		{
 			float value = HAPI_Host.prGuideMinDistanceForMidPointInsertion;
-			bool changed = HAPI_GUI.floatField( "guide_min_distance_for_mid_point_insertion", 
-												"Guide Min. Distance For Mid Point Insertion", 
-			                                   	ref value, 1.0f, 20.0f,
-			                                   	myUndoInfo,
-			                                   	ref myUndoInfo.guideMinDistanceForMidPointInsertion );
+			bool changed = HAPI_GUI.floatField(
+				"guide_min_distance_for_mid_point_insertion", 
+				"Guide Min. Distance For Mid Point Insertion", 
+				ref value, 1.0f, 20.0f,
+				myUndoInfo,
+				ref myUndoInfo.guideMinDistanceForMidPointInsertion );
 			if ( changed )
 			{
 				HAPI_Host.prGuideMinDistanceForMidPointInsertion = value;
@@ -694,9 +748,10 @@ public class HAPI_WindowSettings : EditorWindow
 			int value = HAPI_Host.prCurvePrimitiveTypeDefault;
 			string[] labels = { "Polygon", "NURBS", "Bezier" };
 			int[] values = { 0, 1, 2 };
-			bool changed = HAPI_GUI.dropdown( "curve_primitive_type_default", "Initial Type", 
-											  ref value, labels, values, myUndoInfo,
-			                                  ref myUndoInfo.curvePrimitiveTypeDefault );
+			bool changed = HAPI_GUI.dropdown(
+				"curve_primitive_type_default", "Initial Type", 
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.curvePrimitiveTypeDefault );
 			if ( changed )
 				HAPI_Host.prCurvePrimitiveTypeDefault = value;
 		}
@@ -706,17 +761,18 @@ public class HAPI_WindowSettings : EditorWindow
 			int value = HAPI_Host.prCurveMethodDefault;
 			string[] labels = { "CVs", "Breakpoints", "Freehand" };
 			int[] values = { 0, 1, 2 };
-			bool changed = HAPI_GUI.dropdown( "curve_method_default", "Initial Method", 
-											  ref value, labels, values, myUndoInfo,
-			                                  ref myUndoInfo.curveMethodDefault );
+			bool changed = HAPI_GUI.dropdown(
+				"curve_method_default", "Initial Method", 
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.curveMethodDefault );
 			if ( changed )
 				HAPI_Host.prCurveMethodDefault = value;
 		}
 	}
 
-	private static bool			myEnableDraw			= true;
-	private static int			mySettingsTabSelection	= 0;
-	private static Vector2 		myScrollPosition;
+	private static bool myEnableDraw = true;
+	private static int mySettingsTabSelection = 0;
+	private static Vector2 myScrollPosition;
 	private static HAPI_HostUndoInfo myUndoInfo;
 
 #if !UNITY_STANDALONE_WIN

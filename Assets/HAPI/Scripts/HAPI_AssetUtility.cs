@@ -203,7 +203,7 @@ public class HAPI_AssetUtility
 			
 			float div = s1 * t2 - s2 * t1;
 			float r = div == 0.0f ? 0.0f : 1.0f / div;
-			//float r = 1.0f / (s1 * t2 - s2 * t1);      //Above code fixes div by zero.
+			//float r = 1.0f / (s1 * t2 - s2 * t1); // Above code fixes div by zero.
 	 
 			Vector3 sdir = new Vector3( ( t2 * x1 - t1 * x2 ) * r, 
 										( t2 * y1 - t1 * y2 ) * r, 
@@ -1329,16 +1329,17 @@ public class HAPI_AssetUtility
 			calculateMeshTangents( mesh );
 	}
 
-	private static void setMeshPointAttribute( int asset_id,
-	                                           int object_id,
-	                                           int geo_id,
-	                                           string attr, 
-	                                           int tuple_size,
-	                                           Vector3 [] input_data,
-	                                           bool setting_raw_mesh,
-	                                           bool adjust_for_coordinate_system,
-	                                           HAPI_PartInfo part_info,
-	                                           HAPI_PartControl part_control )
+	private static void setMeshPointAttribute(
+		int asset_id,
+		int object_id,
+		int geo_id,
+		string attr, 
+		int tuple_size,
+		Vector3 [] input_data,
+		bool setting_raw_mesh,
+		bool adjust_for_coordinate_system,
+		HAPI_PartInfo part_info,
+		HAPI_PartControl part_control )
 	{
 		HAPI_AttributeInfo attr_info = new HAPI_AttributeInfo( attr );
 		attr_info.exists 		= true;
@@ -1346,8 +1347,9 @@ public class HAPI_AssetUtility
 		attr_info.storage 		= HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
 		attr_info.count 		= part_info.pointCount;
 		attr_info.tupleSize 	= tuple_size;
-		HAPI_Host.addAttribute( asset_id, object_id, geo_id, 
-		                        attr, ref attr_info );
+		HAPI_Host.addAttribute(
+			asset_id, object_id, geo_id, 
+			attr, ref attr_info );
 		
 		float[] attr_values = new float[ part_info.pointCount * tuple_size ];
 
@@ -1389,8 +1391,9 @@ public class HAPI_AssetUtility
 
 		if ( data_ok )
 		{
-			setAttribute( asset_id, object_id, geo_id, attr, 
-			             ref attr_info, ref attr_values, HAPI_Host.setAttributeFloatData );
+			setAttribute(
+				asset_id, object_id, geo_id, attr,
+				ref attr_info, ref attr_values, HAPI_Host.setAttributeFloatData );
 		}
 	}
 
@@ -1463,13 +1466,15 @@ public class HAPI_AssetUtility
 		setArray3Id( asset_id, object_id, geo_id, HAPI_Host.setVertexList, vertex_list, part_info.vertexCount );
 
 		// Set position attributes.
-		setMeshPointAttribute( asset_id, object_id, geo_id, 
-		                       HAPI_Constants.HAPI_ATTRIB_POSITION, 3, vertices,
-		                       setting_raw_mesh, true, part_info, part_control );
+		setMeshPointAttribute(
+			asset_id, object_id, geo_id,
+			HAPI_Constants.HAPI_ATTRIB_POSITION, 3, vertices,
+			setting_raw_mesh, true, part_info, part_control );
 
-		setMeshPointAttribute( asset_id, object_id, geo_id, 
-		                       HAPI_Constants.HAPI_ATTRIB_NORMAL, 3, normals,
-		                       setting_raw_mesh, true, part_info, part_control );
+		setMeshPointAttribute(
+			asset_id, object_id, geo_id, 
+			HAPI_Constants.HAPI_ATTRIB_NORMAL, 3, normals,
+			setting_raw_mesh, true, part_info, part_control );
 
 		Vector3[] uvs3 = new Vector3[ uvs.Length ];
 		for ( int ii = 0; ii < uvs.Length; ii++ )

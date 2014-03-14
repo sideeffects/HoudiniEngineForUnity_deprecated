@@ -1,14 +1,14 @@
-﻿/*
+/*
  * PROPRIETARY INFORMATION.  This software is proprietary to
  * Side Effects Software Inc., and is not to be reproduced,
  * transmitted, or disclosed in any way without written permission.
  *
  * Produced by:
  *      Side Effects Software Inc
- *		123 Front Street West, Suite 1401
- *		Toronto, Ontario
- *		Canada   M5J 2M2
- *		416-504-9876
+ *      123 Front Street West, Suite 1401
+ *      Toronto, Ontario
+ *      Canada   M5J 2M2
+ *      416-504-9876
  *
  * COMMENTS:
  * 
@@ -325,8 +325,8 @@ public class HAPI_Parms : MonoBehaviour
 		{
 			HAPI_Asset prefab_asset = prControl.prAsset.getParentPrefabAsset();
 			if ( prefab_asset && prefab_asset.prParms != null && 
-			     prefab_asset.prParms.prParms != null && 
-			     !prefab_asset.isApplyingChangesToPrefab() )
+				prefab_asset.prParms.prParms != null && 
+				!prefab_asset.isApplyingChangesToPrefab() )
 			{
 				// loop through parameter values and determine which ones have been
 				// overridden (ie. changed from corresponding parameter value on prefab)
@@ -402,8 +402,8 @@ public class HAPI_Parms : MonoBehaviour
 				}
 			}
 		}
-		
-	    return true;
+
+		return true;
 	}
 
 	public void removeMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
@@ -541,7 +541,7 @@ public class HAPI_Parms : MonoBehaviour
 	/// 	A mapping from parm id to a boolean indicating whether the value 
 	/// 	of the parameter with that id has been changed from the value of 
 	/// 	the same parameter in the associated prefab. These values are only 
-	///     used if these parameters are the parameters of a prefab instance.
+	///		used if these parameters are the parameters of a prefab instance.
 	/// </summary>
 	private Dictionary< int, bool > 				myOverriddenParmsMap = new Dictionary< int, bool >();
 

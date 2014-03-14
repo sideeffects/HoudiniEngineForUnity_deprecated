@@ -94,8 +94,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Start Time
 		{
 			float value = myAsset.prBakeStartTime;
-			bool changed = HAPI_GUI.floatField( "bake_start_time", "Start Time", ref value, 
-			                                    myUndoInfo, ref myUndoInfo.bakeStartTime );
+			bool changed = HAPI_GUI.floatField(
+				"bake_start_time", "Start Time", ref value, 
+				myUndoInfo, ref myUndoInfo.bakeStartTime );
+
 			if ( changed )
 				myAsset.prBakeStartTime = value;
 		}
@@ -103,8 +105,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// End Time
 		{
 			float value = myAsset.prBakeEndTime;
-			bool changed = HAPI_GUI.floatField( "bake_end_time", "End Time", ref value, 
-			                                    myUndoInfo, ref myUndoInfo.bakeEndTime );
+			bool changed = HAPI_GUI.floatField(
+				"bake_end_time", "End Time", ref value, 
+				myUndoInfo, ref myUndoInfo.bakeEndTime );
 			if ( changed )
 				myAsset.prBakeEndTime = value;
 		}
@@ -112,8 +115,9 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		// Samples per second
 		{
 			int value = myAsset.prBakeSamplesPerSecond;
-			bool changed = HAPI_GUI.intField( "bake_samples_per_second", "Samples Per Second", ref value,
-			                                  1, 120, myUndoInfo, ref myUndoInfo.bakeSamplesPerSecond );
+			bool changed = HAPI_GUI.intField(
+				"bake_samples_per_second", "Samples Per Second", ref value,
+				1, 120, myUndoInfo, ref myUndoInfo.bakeSamplesPerSecond );
 
 			if ( changed )
 				myAsset.prBakeSamplesPerSecond = value;
@@ -122,11 +126,12 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		if ( GUILayout.Button( "Bake" ) ) 
 		{
 			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
-			myAsset.bakeAnimations( myAsset.prBakeStartTime, 
-									myAsset.prBakeEndTime, 
-									myAsset.prBakeSamplesPerSecond, 
-									myAsset.gameObject,
-									progress_bar );
+			myAsset.bakeAnimations(
+				myAsset.prBakeStartTime, 
+				myAsset.prBakeEndTime, 
+				myAsset.prBakeSamplesPerSecond, 
+				myAsset.gameObject,
+				progress_bar );
 			progress_bar.clearProgressBar();
 		}
 	}
@@ -134,21 +139,25 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	private void generateViewSettings()
 	{	
 		// Show Geometries
-		createToggleForProperty( "show_geometries", "Show Geometries", "prIsGeoVisible", 
-		                         ref myUndoInfo.isGeoVisible, () => myAsset.applyGeoVisibilityToParts() );
+		createToggleForProperty(
+			"show_geometries", "Show Geometries", "prIsGeoVisible", 
+			ref myUndoInfo.isGeoVisible, () => myAsset.applyGeoVisibilityToParts() );
 		
 		// Show Pinned Instances
-		createToggleForProperty( "show_pinned_instances", "Show Pinned Instances", "prShowPinnedInstances", 
-		                         ref myUndoInfo.showPinnedInstances, null );
+		createToggleForProperty(
+			"show_pinned_instances", "Show Pinned Instances", "prShowPinnedInstances", 
+			ref myUndoInfo.showPinnedInstances, null );
 
 		// Auto Select Asset Root Node Toggle
-		createToggleForProperty( "auto_select_asset_root_node", "Auto Select Asset Root Node", 
-			                     "prAutoSelectAssetRootNode", ref myUndoInfo.autoSelectAssetRootNode,
-		                         null, !HAPI_Host.isAutoSelectAssetRootNodeDefault() );
+		createToggleForProperty(
+			"auto_select_asset_root_node", "Auto Select Asset Root Node", 
+			"prAutoSelectAssetRootNode", ref myUndoInfo.autoSelectAssetRootNode,
+			null, !HAPI_Host.isAutoSelectAssetRootNodeDefault() );
 		
 		// Hide When Fed to Other Asset
-		createToggleForProperty( "hide_geometry_on_linking", "Hide Geometry On Linking", "prHideGeometryOnLinking",
-		                         ref myUndoInfo.hideGeometryOnLinking, null, !HAPI_Host.isHideGeometryOnLinkingDefault() );
+		createToggleForProperty(
+			"hide_geometry_on_linking", "Hide Geometry On Linking", "prHideGeometryOnLinking",
+			ref myUndoInfo.hideGeometryOnLinking, null, !HAPI_Host.isHideGeometryOnLinkingDefault() );
 	}
 	
 	private void generateMaterialSettings()
@@ -164,9 +173,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			bool is_bold = myParentPrefabAsset && myParentPrefabAsset.prMaterialShaderType != value;
 			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
 			HAPI_ShaderType[] values = { HAPI_ShaderType.HAPI_SHADER_OPENGL, HAPI_ShaderType.HAPI_SHADER_MANTRA };
-			bool changed = HAPI_GUI.dropdown( "material_renderer", "Material Renderer", ref value, 
-			                                  is_bold, labels, values, myUndoInfo, 
-			                                  ref myUndoInfo.materialShaderType );
+			bool changed = HAPI_GUI.dropdown(
+				"material_renderer", "Material Renderer", ref value, 
+				is_bold, labels, values, myUndoInfo, 
+				ref myUndoInfo.materialShaderType );
 			if ( changed )
 			{
 				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
@@ -184,11 +194,15 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 			undo_values[ 0 ] 		= (int) myUndoInfo.renderResolution[ 0 ];
 			undo_values[ 1 ] 		= (int) myUndoInfo.renderResolution[ 1 ];
 			HAPI_GUIParm gui_parm 	= new HAPI_GUIParm( "render_resolution", "Render Resolution", 2 );
-			gui_parm.isBold 		= myParentPrefabAsset && 
-							  		  (int) myParentPrefabAsset.prRenderResolution[ 0 ] != values[ 0 ] &&
-							  		  (int) myParentPrefabAsset.prRenderResolution[ 1 ] != values[ 1 ];
-			bool changed = HAPI_GUI.intField( ref gui_parm, ref delay_build, ref values, 
-			                                  myUndoInfo, ref undo_values );
+
+			gui_parm.isBold =
+				myParentPrefabAsset && 
+				(int) myParentPrefabAsset.prRenderResolution[ 0 ] != values[ 0 ] &&
+				(int) myParentPrefabAsset.prRenderResolution[ 1 ] != values[ 1 ];
+
+			bool changed = HAPI_GUI.intField(
+				ref gui_parm, ref delay_build, ref values, 
+				myUndoInfo, ref undo_values );
 			if ( changed )
 			{
 				Vector2 new_resolution = new Vector2( (float) values[ 0 ], (float) values[ 1 ] );
@@ -198,56 +212,64 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 		}
 
 		// Show Vertex Colours
-		createToggleForProperty( "show_only_vertex_colours", "Show Only Vertex Colors", 
-                                 "prShowOnlyVertexColours", ref myUndoInfo.showOnlyVertexColours,
-                                 () => HAPI_AssetUtility.reApplyMaterials( myAsset ) );
+		createToggleForProperty(
+			"show_only_vertex_colours", "Show Only Vertex Colors", 
+			"prShowOnlyVertexColours", ref myUndoInfo.showOnlyVertexColours,
+			() => HAPI_AssetUtility.reApplyMaterials( myAsset ) );
 
 		// Generate Tangents
-		createToggleForProperty( "generate_tangents", "Generate Tangents", "prGenerateTangents",
-		                         ref myUndoInfo.generateTangents,
-		                         () => myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true ),
-		                         !HAPI_Host.isGenerateTangentsDefault() );
+		createToggleForProperty(
+			"generate_tangents", "Generate Tangents", "prGenerateTangents",
+			ref myUndoInfo.generateTangents,
+			() => myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true ),
+			!HAPI_Host.isGenerateTangentsDefault() );
 	}
 
 	private void generateCookingSettings()
-	{	
+	{
 		// Enable Cooking Toggle
-		createToggleForProperty( "enable_cooking", "Enable Cooking", "prEnableCooking",
-		                         ref myUndoInfo.enableCooking, null, !HAPI_Host.isEnableCookingDefault() );
+		createToggleForProperty(
+			"enable_cooking", "Enable Cooking", "prEnableCooking",
+			ref myUndoInfo.enableCooking, null, !HAPI_Host.isEnableCookingDefault() );
 
 		HAPI_GUI.separator();
 
 		// Cooking Triggers Downstream Cooks Toggle
-		createToggleForProperty( "cooking_triggers_downstream_cooks", "Cooking Triggers Downstream Cooks", 
-		                         "prCookingTriggersDownCooks", ref myUndoInfo.cookingTriggersDownCooks,
-		                         null, !HAPI_Host.isCookingTriggersDownCooksDefault(),
-		                         !myAsset.prEnableCooking, " (all cooking is disabled)" );
+		createToggleForProperty(
+			"cooking_triggers_downstream_cooks", "Cooking Triggers Downstream Cooks", 
+			"prCookingTriggersDownCooks", ref myUndoInfo.cookingTriggersDownCooks,
+			null, !HAPI_Host.isCookingTriggersDownCooksDefault(),
+			!myAsset.prEnableCooking, " (all cooking is disabled)" );
 
 		// Playmode Per-Frame Cooking Toggle
-		createToggleForProperty( "playmode_per_frame_cooking", "Playmode Per-Frame Cooking", 
-		                         "prPlaymodePerFrameCooking", ref myUndoInfo.playmodePerFrameCooking,
-		                         null, !HAPI_Host.isPlaymodePerFrameCookingDefault(),
-		                         !myAsset.prEnableCooking, " (all cooking is disabled)" );
+		createToggleForProperty(
+			"playmode_per_frame_cooking", "Playmode Per-Frame Cooking", 
+			"prPlaymodePerFrameCooking", ref myUndoInfo.playmodePerFrameCooking,
+			null, !HAPI_Host.isPlaymodePerFrameCookingDefault(),
+			!myAsset.prEnableCooking, " (all cooking is disabled)" );
 
 		HAPI_GUI.separator();
 
 		// Push Unity Transform To Houdini Engine Toggle
-		createToggleForProperty( "push_unity_transform_to_houdini_engine", "Push Unity Transform To Houdini Engine", 
-		                         "prPushUnityTransformToHoudini", ref myUndoInfo.pushUnityTransformToHoudini,
-		                         null, !HAPI_Host.isPushUnityTransformToHoudiniDefault() );
+		createToggleForProperty(
+			"push_unity_transform_to_houdini_engine", "Push Unity Transform To Houdini Engine", 
+			"prPushUnityTransformToHoudini", ref myUndoInfo.pushUnityTransformToHoudini,
+			null, !HAPI_Host.isPushUnityTransformToHoudiniDefault() );
 
 		// Transform Change Triggers Cooks Toggle
-		createToggleForProperty( "transform_change_triggers_cooks", "Transform Change Triggers Cooks", 
-		                         "prTransformChangeTriggersCooks", ref myUndoInfo.transformChangeTriggersCooks,
-		                         null, !HAPI_Host.isTransformChangeTriggersCooksDefault(),
-		                         !myAsset.prEnableCooking, " (all cooking is disabled)" );
+		createToggleForProperty(
+			"transform_change_triggers_cooks", "Transform Change Triggers Cooks", 
+			"prTransformChangeTriggersCooks", ref myUndoInfo.transformChangeTriggersCooks,
+			null, !HAPI_Host.isTransformChangeTriggersCooksDefault(),
+			!myAsset.prEnableCooking, " (all cooking is disabled)" );
 
 		HAPI_GUI.separator();
 
 		// Import Templated Geos Toggle
-		createToggleForProperty( "import_templated_geos", "Import Templated Geos", "prImportTemplatedGeos",
-		                         ref myUndoInfo.importTemplatedGeos, null, !HAPI_Host.isImportTemplatedGeosDefault(),
-		                         !myAsset.prEnableCooking, " (all cooking is disabled)" );
+		createToggleForProperty(
+			"import_templated_geos", "Import Templated Geos", "prImportTemplatedGeos",
+			ref myUndoInfo.importTemplatedGeos, null, !HAPI_Host.isImportTemplatedGeosDefault(),
+			!myAsset.prEnableCooking, " (all cooking is disabled)" );
 	}
 
 	private void generateAssetSettings()

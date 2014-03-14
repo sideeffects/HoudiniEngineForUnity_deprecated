@@ -806,12 +806,10 @@ public class HAPI_Instancer : MonoBehaviour
 				else
 				{
 					int difference = persistent_data.variationChoice.Count - myNumInstances;
-					persistent_data.variationChoice.RemoveRange( persistent_data.variationChoice.Count - difference, 
-					                                             difference );
-					
+					persistent_data.variationChoice.RemoveRange(
+						persistent_data.variationChoice.Count - difference, difference );
 				}
 			}
-
 
 			bool liveTransformPropagationSetting	= false;
 			bool syncAssetTransformSetting			= false;

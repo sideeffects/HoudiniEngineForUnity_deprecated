@@ -200,8 +200,8 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 				else
 					position = new Vector3( tx, ty, tz );
 				
-				Quaternion rotation = Quaternion.Euler( xform.rotationEuler[ 0 ], xform.rotationEuler[ 1 ], 
-													    xform.rotationEuler[ 2 ] );
+				Quaternion rotation = Quaternion.Euler(
+					xform.rotationEuler[ 0 ], xform.rotationEuler[ 1 ], xform.rotationEuler[ 2 ] );
 				Vector3 scale = new Vector3( sx, sy, sz );
 				
 				if ( myManipMode == XformManipMode.Translate )

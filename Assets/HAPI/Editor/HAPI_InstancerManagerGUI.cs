@@ -78,8 +78,8 @@ public partial class HAPI_InstancerManagerGUI: Editor
 				continue;
 			}
 
-			persistent_data.showInstancerGUI = HAPI_GUI.foldout( persistent_data.instancerName, 
-			                                                    persistent_data.showInstancerGUI, true );
+			persistent_data.showInstancerGUI = HAPI_GUI.foldout(
+				persistent_data.instancerName, persistent_data.showInstancerGUI, true );
 			if ( persistent_data.showInstancerGUI )
 			{
 				bool changed = false;
@@ -87,7 +87,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 				{
 					List< string > unique_names = persistent_data.uniqueNames;
 					
-					for( int ii = 0; ii < unique_names.Count; ii++ )
+					for ( int ii = 0; ii < unique_names.Count; ii++ )
 					{
 
 						string instanced_name = unique_names[ ii ];
@@ -95,7 +95,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 
 
 
-						for( int jj = 0; jj < persistent_data.numObjsToInstantiate[ ii ]; jj++ )
+						for ( int jj = 0; jj < persistent_data.numObjsToInstantiate[ ii ]; jj++ )
 						{
 							Object obj = (Object) persistent_data.objsToInstantiate[ base_index + jj ];
 
@@ -104,13 +104,13 @@ public partial class HAPI_InstancerManagerGUI: Editor
 
 
 							string label = "";
-							if( jj == 0 )
+							if ( jj == 0 )
 								label = instanced_name;
 
-							changed |= HAPI_GUI.objectField( "object_to_instantiate", label, 
-							                                ref obj, typeof( GameObject ) );
+							changed |= HAPI_GUI.objectField(
+								"object_to_instantiate", label, ref obj, typeof( GameObject ) );
 
-							if( changed )
+							if ( changed )
 							{
 								persistent_data.objsToInstantiate[ base_index + jj ] = (GameObject) obj;
 							}
@@ -127,7 +127,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 							
 							if ( GUILayout.Button( "-" ) )
 							{
-								if( persistent_data.numObjsToInstantiate[ ii ] == 1 )
+								if ( persistent_data.numObjsToInstantiate[ ii ] == 1 )
 								{
 									persistent_data.objsToInstantiate[ base_index ] = null;
 								}
@@ -178,7 +178,6 @@ public partial class HAPI_InstancerManagerGUI: Editor
 					{
 						persistent_data.recalculateVariations[ ii ] = false;
 					}
-
 				}
 			}
 
