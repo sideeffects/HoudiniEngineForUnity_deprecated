@@ -620,6 +620,41 @@ public class HAPI_AssetUtility
 			printAttributeNames( asset_id, object_id, geo_id, part_id, (HAPI_AttributeOwner) owner );
 	}
 
+	public static void printGroupNames(
+		int asset_id, int object_id, int geo_id, int part_id, HAPI_GroupType type )
+	{
+		string[] names = HAPI_Host.getGroupNames( asset_id, object_id, geo_id, part_id, type );
+		
+		string msg = "A" + asset_id + "O" + object_id + " - ";
+		
+		switch ( type )
+		{
+			case HAPI_GroupType.HAPI_GROUPTYPE_POINT:	msg += "Point"; break;
+			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: 	msg += "Primitive"; break;
+			default: Debug.LogError( "Invalid HAPI_GroupType!" ); return;
+		}
+		
+		msg += " Groups:";
+		
+		bool comma = false;
+		foreach ( string name in names )
+		{
+			if ( comma )
+				msg += ",";
+			else
+				comma = true;
+			msg += " " + name;
+		}
+		
+		Debug.Log( msg );
+	}
+
+	public static void printAllGroupNames( int asset_id, int object_id, int geo_id, int part_id )
+	{
+		for ( int type = 0; type < (int) HAPI_GroupType.HAPI_GROUPTYPE_MAX; ++type )
+			printGroupNames( asset_id, object_id, geo_id, part_id, (HAPI_GroupType) type );
+	}
+
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
 	
 	public static int findParm( ref HAPI_ParmInfo[] parms, string name )
@@ -1123,7 +1158,9 @@ public class HAPI_AssetUtility
 		int[] vertex_list = new int[ part_info.vertexCount ];
 		getArray4Id( asset_id, object_id, geo_id, part_id, HAPI_Host.getVertexList, 
 					 vertex_list, part_info.vertexCount );
-		
+
+		printAllGroupNames( asset_id, object_id, geo_id, part_id );
+
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 		float[] pos_attr = new float[ 0 ];

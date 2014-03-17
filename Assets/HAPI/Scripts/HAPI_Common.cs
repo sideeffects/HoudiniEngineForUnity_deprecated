@@ -228,7 +228,6 @@ public enum HAPI_GroupType
 	HAPI_GROUPTYPE_INVALID = -1,
 	HAPI_GROUPTYPE_POINT,
 	HAPI_GROUPTYPE_PRIM,
-	HAPI_GROUPTYPE_DETAIL,
 	HAPI_GROUPTYPE_MAX
 }
 
@@ -829,7 +828,6 @@ public struct HAPI_PartInfo
 		{
 			case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointCount;
 			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return faceCount;
-			case HAPI_GroupType.HAPI_GROUPTYPE_DETAIL: return 1;
 			default: return 0;
 		}
 	}
@@ -852,7 +850,6 @@ public struct HAPI_PartInfo
 		{
 			case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointGroupCount;
 			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return faceGroupCount;
-			case HAPI_GroupType.HAPI_GROUPTYPE_DETAIL: return detailGroupCount;
 			default: return 0;
 		}
 	}
@@ -873,7 +870,6 @@ public struct HAPI_PartInfo
 
 	public int pointGroupCount;
 	public int faceGroupCount;
-	public int detailGroupCount;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool hasVolume;
