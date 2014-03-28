@@ -1527,31 +1527,35 @@ public static partial class HAPI_Host
 	/// <param name="part_id">
 	/// 	The part id.
 	/// </param>
-	/// <param name="group_type">
-	/// 	The group type.
+	/// <param name="owner">
+	/// 	The attribute owner type.
 	/// </param>
 	/// <returns>
 	/// 	List of group names.
 	/// </returns>
 	public static string[] getGroupNames(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		HAPI_GroupType group_type )
+		HAPI_AttributeOwner owner )
 	{
 #if UNITY_STANDALONE_WIN
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
-		int count = part_info.getGroupCountByType( group_type );
+		int count = part_info.getAttributeCountByOwner( owner );
 
 		int[] names = new int[ count ];
-		status_code = HAPI_GetGroupNames(
-			asset_id, object_id, geo_id, part_id, group_type, names, count );
+		status_code = HAPI_GetAttributeNames(
+			asset_id, object_id, geo_id, part_id, owner, names, count );
 		processStatusCode( status_code );
 
 		string[] name_strings = new string[ count ];
 		for ( int i = 0; i < count; ++i )
-			name_strings[ i ] = getString( names[ i ] );
+		{
+			string group_name = getString( names[ i ] );
+			if ( group_name.StartsWith( "__group_" ) )
+				name_strings[ i ] = group_name.Replace( "__group_", "" );
+		}
 
 		return name_strings;
 #else
@@ -1575,15 +1579,15 @@ public static partial class HAPI_Host
 	/// <param name="part_id">
 	/// 	The part id.
 	/// </param>
-	/// <param name="group_type">
-	/// 	The group type.
+	/// <param name="owner">
+	/// 	The attribute owner type.
 	/// </param>
 	/// <returns>
 	/// 	List of group names.
 	/// </returns>
 	public static bool[] getGroupMembership(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		HAPI_GroupType group_type,
+		HAPI_AttributeOwner owner,
 		string group_name )
 	{
 #if UNITY_STANDALONE_WIN
@@ -1591,10 +1595,10 @@ public static partial class HAPI_Host
 		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
-		int count = part_info.getElementCountByGroupType( group_type );
-
+		int count = part_info.getElementCountByAttributeOwner( owner );
+		/*
 		int[] membership = new int[ count ];
-		status_code = HAPI_GetGroupMembership(
+		status_code = HAPI_GetAttr(
 			asset_id, object_id, geo_id, part_id, group_type, group_name, membership, count );
 		processStatusCode( status_code );
 
@@ -1602,7 +1606,8 @@ public static partial class HAPI_Host
 		for ( int i = 0; i < count; ++i )
 			membership_bools[ i ] = membership[ i ] > 0;
 
-		return membership_bools;
+		return membership_bools;*/
+		return new bool[ count ];
 #else
 		throw new HAPI_ErrorUnsupportedPlatform();
 #endif

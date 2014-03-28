@@ -223,14 +223,6 @@ public enum HAPI_AssetSubType
 	HAPI_ASSETSUBTYPE_MAX
 }
 
-public enum HAPI_GroupType
-{
-	HAPI_GROUPTYPE_INVALID = -1,
-	HAPI_GROUPTYPE_POINT,
-	HAPI_GROUPTYPE_PRIM,
-	HAPI_GROUPTYPE_MAX
-}
-
 public enum HAPI_AttributeOwner
 {
 	HAPI_ATTROWNER_INVALID = -1,
@@ -822,16 +814,6 @@ public struct HAPI_PartInfo
 		}
 	}
 
-	public int getElementCountByGroupType( HAPI_GroupType type )
-	{
-		switch ( type )
-		{
-			case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointCount;
-			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return faceCount;
-			default: return 0;
-		}
-	}
-
 	public int getAttributeCountByOwner( HAPI_AttributeOwner owner )
 	{
 		switch ( owner )
@@ -840,16 +822,6 @@ public struct HAPI_PartInfo
 			case HAPI_AttributeOwner.HAPI_ATTROWNER_POINT: return pointAttributeCount;
 			case HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM: return faceAttributeCount;
 			case HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL: return detailAttributeCount;
-			default: return 0;
-		}
-	}
-
-	public int getGroupCountByType( HAPI_GroupType type )
-	{
-		switch ( type )
-		{
-			case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointGroupCount;
-			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return faceGroupCount;
 			default: return 0;
 		}
 	}
@@ -867,9 +839,6 @@ public struct HAPI_PartInfo
 	public int faceAttributeCount;
 	public int vertexAttributeCount;
 	public int detailAttributeCount;
-
-	public int pointGroupCount;
-	public int faceGroupCount;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool hasVolume;
