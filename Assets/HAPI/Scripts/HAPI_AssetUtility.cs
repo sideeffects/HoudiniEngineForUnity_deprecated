@@ -621,21 +621,21 @@ public class HAPI_AssetUtility
 	}
 
 	public static void printGroupNames(
-		int asset_id, int object_id, int geo_id, int part_id, HAPI_AttributeOwner owner )
+		int asset_id, int object_id, int geo_id, int part_id, HAPI_GroupType type )
 	{
+		string[] names = HAPI_Host.getGroupNames( asset_id, object_id, geo_id, part_id, type );
+		
 		string msg = "A" + asset_id + "O" + object_id + " - ";
-
-		switch ( owner )
+		
+		switch ( type )
 		{
-			case HAPI_AttributeOwner.HAPI_ATTROWNER_POINT:	msg += "Point"; break;
-			case HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM: 	msg += "Primitive"; break;
-			default: Debug.LogError( "Invalid Group Owner!" ); return;
+			case HAPI_GroupType.HAPI_GROUPTYPE_POINT:	msg += "Point"; break;
+			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: 	msg += "Primitive"; break;
+			default: Debug.LogError( "Invalid HAPI_GroupType!" ); return;
 		}
-
+		
 		msg += " Groups:";
-
-		string[] names = HAPI_Host.getGroupNames( asset_id, object_id, geo_id, part_id, owner );
-
+		
 		bool comma = false;
 		foreach ( string name in names )
 		{
@@ -645,14 +645,14 @@ public class HAPI_AssetUtility
 				comma = true;
 			msg += " " + name;
 		}
-
+		
 		Debug.Log( msg );
 	}
 
 	public static void printAllGroupNames( int asset_id, int object_id, int geo_id, int part_id )
 	{
-		printGroupNames( asset_id, object_id, geo_id, part_id, HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
-		printGroupNames( asset_id, object_id, geo_id, part_id, HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM );
+		for ( int type = 0; type < (int) HAPI_GroupType.HAPI_GROUPTYPE_MAX; ++type )
+			printGroupNames( asset_id, object_id, geo_id, part_id, (HAPI_GroupType) type );
 	}
 
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
@@ -1159,6 +1159,7 @@ public class HAPI_AssetUtility
 		getArray4Id( asset_id, object_id, geo_id, part_id, HAPI_Host.getVertexList, 
 					 vertex_list, part_info.vertexCount );
 
+		printAllGroupNames( asset_id, object_id, geo_id, part_id );
 
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
