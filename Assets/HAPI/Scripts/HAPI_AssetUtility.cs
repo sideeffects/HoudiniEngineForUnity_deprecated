@@ -1159,8 +1159,6 @@ public class HAPI_AssetUtility
 		getArray4Id( asset_id, object_id, geo_id, part_id, HAPI_Host.getVertexList, 
 					 vertex_list, part_info.vertexCount );
 
-		printAllGroupNames( asset_id, object_id, geo_id, part_id );
-
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
 		float[] pos_attr = new float[ 0 ];
