@@ -48,7 +48,8 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public float guidePointSize;
 	public float minDistanceForPointSelection;
 	public float guideMinDistanceForMidPointInsertion;
-	
+	public bool createGroupsFromBoolAttributes;
+
 	// Curve Settings
 	public int curvePrimitiveTypeDefault;
 	public int curveMethodDefault;

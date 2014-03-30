@@ -1560,8 +1560,7 @@ public static partial class HAPI_Host
 	}
 
 	/// <summary>
-	/// 	Get attribute string data. Note that the string handles returned are only valid until the next 
-	/// 	time this function is called.
+	/// 	Get group membership.
 	/// </summary>
 	/// <param name="asset_id">
 	/// 	The asset id.
@@ -1595,7 +1594,7 @@ public static partial class HAPI_Host
 
 		int[] membership = new int[ count ];
 		status_code = HAPI_GetGroupMembership(
-			asset_id, object_id, geo_id, part_id, group_type, group_name, membership, count );
+			asset_id, object_id, geo_id, part_id, group_type, group_name, membership, 0, count );
 		processStatusCode( status_code );
 
 		bool[] membership_bools = new bool[ count ];
@@ -1893,7 +1892,88 @@ public static partial class HAPI_Host
 		throw new HAPI_ErrorUnsupportedPlatform();
 #endif
 	}
-		
+
+	/// <summary>
+	/// 	Add a group.
+	/// </summary>
+	/// <param name="asset_id">
+	/// 	The asset id.
+	/// </param>
+	/// <param name="object_id">
+	/// 	The object id.
+	/// </param>
+	/// <param name="geo_id">
+	/// 	The geometry id.
+	/// </param>
+	/// <param name="group_type">
+	/// 	The group type.
+	/// </param>
+	/// <param name="group_name">
+	/// 	The group name.
+	/// </param>
+	public static void addGroup(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		HAPI_GroupType group_type, string group_name )
+	{
+#if UNITY_STANDALONE_WIN
+		HAPI_Result status_code = HAPI_AddGroup(
+			asset_id, object_id, geo_id, group_type, group_name );
+		processStatusCode( status_code );
+#else
+		throw new HAPI_ErrorUnsupportedPlatform();
+#endif
+	}
+
+	/// <summary>
+	/// 	Set group membership.
+	/// </summary>
+	/// <param name="asset_id">
+	/// 	The asset id.
+	/// </param>
+	/// <param name="object_id">
+	/// 	The object id.
+	/// </param>
+	/// <param name="geo_id">
+	/// 	The geometry id.
+	/// </param>
+	/// <param name="part_id">
+	/// 	The part id.
+	/// </param>
+	/// <param name="group_type">
+	/// 	The group type.
+	/// </param>
+	/// <param name="group_name">
+	/// 	The group name.
+	/// </param>
+	/// <param name="membership">
+	/// 	The group membership.
+	/// </param>
+	/// <param name="count">
+	/// 	The group owner element count.
+	/// </param>
+	public static void setGroupMembership(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		HAPI_GroupType group_type,
+		string group_name,
+		bool[] membership,
+		int count )
+	{
+#if UNITY_STANDALONE_WIN
+		if ( count != membership.Length )
+			throw new HAPI_ErrorInvalidArgument( "Membership array not same size as count argument!" );
+
+		int[] membership_int = new int[ count ];
+		for ( int i = 0; i < count; ++i )
+			membership_int[ i ] = membership[ i ] ? 1 : 0;
+
+		HAPI_Result status_code = HAPI_SetGroupMembership(
+			asset_id, object_id, geo_id, group_type, group_name, membership_int, 0, count );
+		processStatusCode( status_code );
+#else
+		throw new HAPI_ErrorUnsupportedPlatform();
+#endif
+	}
+
 	/// <summary>
 	/// 	Commit the current input geometry to the cook engine. Nodes that use this geometry node will 
 	/// 	re-cook using the input geometry given through the geometry setter API calls.

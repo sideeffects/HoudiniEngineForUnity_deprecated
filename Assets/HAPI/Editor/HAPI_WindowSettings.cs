@@ -739,6 +739,22 @@ public class HAPI_WindowSettings : EditorWindow
 				HAPI_Host.repaint();
 			}
 		}
+
+		HAPI_GUI.separator();
+
+		// Create Groups from Bool Attribute
+		{
+			bool value = HAPI_Host.prCreateGroupsFromBoolAttributes;
+			bool changed = HAPI_GUI.toggle(
+				"create_groups_from_bool_attributes", "Create Groups from Bool Attributes", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.createGroupsFromBoolAttributes );
+			if ( changed )
+			{
+				HAPI_Host.prCreateGroupsFromBoolAttributes = value;
+				HAPI_Host.repaint();
+			}
+		}
 	}
 
 	private static void generateCurveSettings()

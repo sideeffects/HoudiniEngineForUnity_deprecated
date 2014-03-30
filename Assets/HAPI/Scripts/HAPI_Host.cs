@@ -123,6 +123,8 @@ public static partial class HAPI_Host
 	public const bool myDefaultAutoSelectAssetRootNode					= true;
 	public const bool myDefaultHideGeometryOnLinking					= true;
 
+	private const bool myDefaultEnablePointsAsParticles 				= true;
+
 	public const bool myDefaultGenerateTangents							= true;
 
 	public const bool myDefaultEnableCooking							= true;
@@ -154,10 +156,10 @@ public static partial class HAPI_Host
 	private const float myDefaultMinDistanceForPointSelection			= 8.0f;
 	private const float myDefaultGuideMinDistanceForMidPointInsertion	= 5.0f;
 
+	private const bool myDefaultCreateGroupsFromBoolAttributes			= false;
+
 	private const int myDefaultCurvePrimitiveTypeDefault				= 1;
 	private const int myDefaultCurveMethodDefault						= 1;
-
-	private const bool myDefaultEnablePointsAsParticles 				= true;
 
 	// Global Settings Undo Info --------------------------------------------------------------------------------
 
@@ -209,6 +211,8 @@ public static partial class HAPI_Host
 		setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
 		setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
 
+		setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
+
 		setBool(	"HAPI_GenerateTangents", myDefaultGenerateTangents, true );
 
 		setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
@@ -240,10 +244,10 @@ public static partial class HAPI_Host
 		setFloat(	"HAPI_MinDistanceForPointSelection", myDefaultMinDistanceForPointSelection, true );
 		setFloat(	"HAPI_GuideMinDistanceForMidPointInsertion", myDefaultGuideMinDistanceForMidPointInsertion, true );
 
+		setBool(	"HAPI_CreateGroupsFromBoolAttributes", myDefaultCreateGroupsFromBoolAttributes, true );
+
 		setInt(		"HAPI_CurvePrimitiveTypeDefault", myDefaultCurvePrimitiveTypeDefault, true );
 		setInt(		"HAPI_CurveMethodDefault", myDefaultCurveMethodDefault, true );
-
-		setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
 
 		myRepaintDelegate			= null;
 		myDeselectionDelegate		= null;
@@ -310,6 +314,10 @@ public static partial class HAPI_Host
 	public static bool prHideGeometryOnLinking {
 											get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
 											set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
+
+	public static bool prEnablePointsAsParticles {
+											get { return getBool( "HAPI_EnablePointsAsParticles" ); }
+											set { setBool( "HAPI_EnablePointsAsParticles", value ); } }
 
 	public static bool prGenerateTangents {
 											get { return getBool( "HAPI_GenerateTangents" ); } 
@@ -403,16 +411,16 @@ public static partial class HAPI_Host
 											get { return getFloat( "HAPI_GuideMinDistanceForMidPointInsertion" ); }
 											set { setFloat( "HAPI_GuideMinDistanceForMidPointInsertion", value ); } }
 
+	public static bool prCreateGroupsFromBoolAttributes {
+											get { return getBool( "HAPI_CreateGroupsFromBoolAttributes" ); }
+											set { setBool( "HAPI_CreateGroupsFromBoolAttributes", value ); } }
+
 	public static int prCurvePrimitiveTypeDefault {
 											get { return getInt( "HAPI_CurvePrimitiveTypeDefault" ); }
 											set { setInt( "HAPI_CurvePrimitiveTypeDefault", value ); } }
 	public static int prCurveMethodDefault {
 											get { return getInt( "HAPI_CurveMethodDefault" ); }
 											set { setInt( "HAPI_CurveMethodDefault", value ); } }
-
-	public static bool prEnablePointsAsParticles {
-											get { return getBool( "HAPI_EnablePointsAsParticles" ); }
-											set { setBool( "HAPI_EnablePointsAsParticles", value ); } }
 
 	// Global Settings Undo Info --------------------------------------------------------------------------------
 
@@ -552,6 +560,10 @@ public static partial class HAPI_Host
 											{ return	prGuideMinDistanceForMidPointInsertion == 
 														myDefaultGuideMinDistanceForMidPointInsertion; }
 
+	public static bool isCreateGroupsFromBoolAttributes()
+											{ return	prCreateGroupsFromBoolAttributes ==
+														myDefaultCreateGroupsFromBoolAttributes; }
+
 	public static bool isCurvePrimitiveTypeDefaultDefault()
 											{ return	prCurvePrimitiveTypeDefault == 
 														myDefaultCurvePrimitiveTypeDefault; }
@@ -581,6 +593,8 @@ public static partial class HAPI_Host
 
 		prAutoSelectAssetRootNode				= myDefaultAutoSelectAssetRootNode;
 		prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
+
+		prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
 
 		prGenerateTangents						= myDefaultGenerateTangents;
 
@@ -613,10 +627,10 @@ public static partial class HAPI_Host
 		prMinDistanceForPointSelection			= myDefaultMinDistanceForPointSelection;
 		prGuideMinDistanceForMidPointInsertion	= myDefaultGuideMinDistanceForMidPointInsertion;
 
+		prCreateGroupsFromBoolAttributes		= myDefaultCreateGroupsFromBoolAttributes;
+
 		prCurvePrimitiveTypeDefault				= myDefaultCurvePrimitiveTypeDefault;
 		prCurveMethodDefault					= myDefaultCurveMethodDefault;
-
-		prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
 
 		// reset undo info so values match with above settings
 		prHostUndoInfo.initialize();
