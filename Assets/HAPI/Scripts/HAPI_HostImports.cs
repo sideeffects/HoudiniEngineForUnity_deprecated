@@ -488,7 +488,7 @@ public static partial class HAPI_Host
 		HAPI_GroupType group_type,
 		string group_name,
 		[Out] int[] membership,
-		int count );
+		int start, int length );
 
 	// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 		
@@ -550,6 +550,22 @@ public static partial class HAPI_Host
 		string name,
 		ref HAPI_AttributeInfo attr_info,
 		string[] data,
+		int start, int length );
+
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_AddGroup(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		HAPI_GroupType group_type,
+		string group_name );
+
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetGroupMembership(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		HAPI_GroupType group_type,
+		string group_name,
+		[Out] int[] membership,
 		int start, int length );
 
 	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]

@@ -324,5 +324,8 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		"    6. Finally, at the top right corner is the 'Live Updates' toggle which controls whether to cook the asset on every brush stroke or not.\n" +
 		"    7. You can also resize the brush by holding down Shift and dragging the mouse horizontally (the Maya and Houdini brush resize hotkeys also work).\n" +
 		"    8. Left-click drag on the mesh surface to paint the paint value.\n" +
-		"    9. Right-click drag on the mesh surface to paint the inverse paint value, respective to the min/max settings.\n";
+		"    9. Right-click drag on the mesh surface to paint the inverse paint value, respective to the min/max settings.\n" +
+		"\n" +
+		"Bool Attributes:\n" +
+		"    Bool attributes are special because they can also be used to create point groups. You need to enable this by checking 'Create Groups from Bool Attributes' in the Houdini Settings window, under Geometry (disabled by default). Only bool attributes with a tuple size of 1 will be used to create point groups. The group's name will be the same as the bool attribute's name.\n";
 }

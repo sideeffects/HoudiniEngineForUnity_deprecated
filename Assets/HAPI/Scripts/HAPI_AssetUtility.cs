@@ -1541,6 +1541,21 @@ public class HAPI_AssetUtility
 					setAttribute(
 						asset_id, object_id, geo_id, attribute.prName, 
 						ref attr_info, ref int_data, HAPI_Host.setAttributeIntData );
+
+					if ( HAPI_Host.prCreateGroupsFromBoolAttributes
+						&& attribute.prType == HAPI_GeoAttribute.Type.BOOL
+						&& attribute.prTupleSize == 1 )
+					{
+						HAPI_Host.addGroup(
+							asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
+							attribute.prName );
+						bool[] bool_data = new bool[ int_data.Length ];
+						for ( int i = 0; i < int_data.Length; ++i )
+							bool_data[ i ] = int_data[ i ] > 0;
+						HAPI_Host.setGroupMembership(
+							asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
+							attribute.prName, bool_data, bool_data.Length );
+					}
 				}
 				else if ( attribute.prType == HAPI_GeoAttribute.Type.FLOAT )
 				{
