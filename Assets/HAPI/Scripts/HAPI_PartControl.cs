@@ -300,7 +300,8 @@ public class HAPI_PartControl : HAPI_GeoControl
 														   ", " + tile.minZ + ")" );
 					tile_node.transform.parent = part_node.transform;
 
-					createFogVolume( tile_node, values, tile, volume );
+					//createFogVolume( tile_node, values, tile, volume );
+					createSurfaceVolume( tile_node, values, tile, volume );
 
 					HAPI_Host.getNextVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
 				}
@@ -386,6 +387,43 @@ public class HAPI_PartControl : HAPI_GeoControl
 		return mat;
 	}
 
+	private Material createSquare( Color color )
+	{
+		Material mat = new Material( Shader.Find( "HAPI/VolumeSurface" ) );
+		int width = 20;
+		int length = 20;
+		Texture2D tex = new Texture2D( width, length, TextureFormat.RGBA32, false );
+		for ( int x = 0; x < width; ++x ) 
+		{
+			for ( int y = 0; y < length; ++y ) 
+			{
+				color.a = 1.0f;
+				tex.SetPixel( x, y, color );
+			}
+		}
+		tex.Apply();
+		mat.mainTexture = tex;
+		mat.color = new Color( 1.0f, 1.0f, 1.0f );
+		return mat;
+	}
+
+	private float getVolumeData( float[] data, HAPI_VolumeInfo volume, int x, int y, int z )
+	{
+		if ( x < 0 || x >= volume.tileSize
+			|| y < 0 || y >= volume.tileSize
+			|| z < 0 || z >= volume.tileSize )
+			return 0.0f;
+
+		int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
+
+		if ( data[ index ] > 0.05f )
+			return 1.0f;
+		else if ( data[ index ] < -0.05f )
+			return -1.0f;
+		else
+			return 0.0f;
+	}
+
 	private void createFogVolume( GameObject node, float[] data, HAPI_VolumeTileInfo tile, HAPI_VolumeInfo volume )
 	{
 		// Create a particle with alpha = to the data format
@@ -436,6 +474,88 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 		renderer.material = createSoftCircle(
 			new Color( Random.Range( 0.5f, 1.0f ), Random.Range( 0.5f, 1.0f ), Random.Range( 0.5f, 1.0f ) ) );
+	}
+
+	private void createSurfaceVolume( GameObject node, float[] data, HAPI_VolumeTileInfo tile, HAPI_VolumeInfo volume )
+	{
+		// Create a particle with alpha = to the data format
+		const float particle_epsilon = 0.05f;
+		int nparticles = 0;
+		for ( int i = 0; i < data.Length; ++i )
+			if ( data[ i ] > -particle_epsilon && data[ i ] < particle_epsilon )
+				nparticles++;
+		if ( nparticles == 0 )
+		{
+			DestroyImmediate( node );
+			return;
+		}
+
+		ParticleEmitter particle_emitter = node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
+		particle_emitter.emit = false;
+		particle_emitter.maxSize = volume.transform.scale[0]*2;
+		particle_emitter.minSize = volume.transform.scale[1]*2;
+		particle_emitter.ClearParticles();
+		particle_emitter.Emit( nparticles );
+
+		Vector3 tileMin = new Vector3( tile.minX, tile.minY, tile.minZ );
+		int part_index = 0;
+		Particle[] particles = particle_emitter.particles;
+		for ( int z = 0; z < volume.tileSize; ++z )
+			for ( int y = 0; y < volume.tileSize; ++y )
+				for ( int x = 0; x < volume.tileSize; ++x )
+				{
+					int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
+					if ( data[ index ] > -particle_epsilon && data[ index ] < particle_epsilon
+						&& part_index < particles.Length )
+					{
+						Vector3 pos = new Vector3( (float)x, (float)y, (float)z );
+						pos = 1.2f * ( ( pos + tileMin ) - new Vector3( 0.5f, 0.5f, 0.5f ) );
+
+						particles[ part_index ].position =
+							node.transform.parent.TransformPoint( pos );
+
+						int amount = 1;
+						int sample_count = 0;
+						Vector3 normals = Vector3.zero;
+
+						for ( int xi = -1; xi <= 1; ++xi )
+							for ( int yi = -1; yi <= 1; ++yi )
+								for ( int zi = -1; zi <= 1; ++zi )
+								{
+									if ( xi == 0 && yi == 0 && zi == 0 )
+										continue;
+
+									float result = getVolumeData( data, volume, x + xi * amount, y + yi * amount, z + zi * amount );
+
+									Vector3 normal = Vector3.zero;
+									if ( result < -0.5f )
+										normal = new Vector3( -xi, -yi, -zi );
+									else if ( result > 0.5f )
+										normal = new Vector3( xi, yi, zi );
+									else
+										continue;
+
+									normals += normal;
+									sample_count++;
+								}
+						normals /= sample_count;
+						normals.Normalize();
+						normals.x += 1.0f; normals.y += 1.0f; normals.z += 1.0f;
+						normals /= 2.0f;
+
+						particles[ part_index ].color =
+							new Color( normals.x, normals.y, normals.z, 1 );
+
+						part_index++;
+					}
+				}
+		particle_emitter.particles = particles;
+
+		ParticleRenderer renderer = node.GetComponent< ParticleRenderer >();
+		if ( renderer == null ) 
+			renderer = node.AddComponent< ParticleRenderer >();
+
+		renderer.material = createSquare( Color.gray );
 	}
 
 	private void assignUnityTag()
