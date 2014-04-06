@@ -1,6 +1,8 @@
 Shader "HAPI/VolumeSurface" {
 
 	Properties {
+		_PointSize ("PointSize", Float) = 10.0
+		_Color ("Color", Color) = (1,1,1,1)
 	}
 
 	SubShader {
@@ -16,29 +18,36 @@ Shader "HAPI/VolumeSurface" {
 
 				#include "UnityCG.cginc"
 
+				float _PointSize;
+				float4 _Color;
+
 				struct a2v
 				{
 					float4 vertex : POSITION;
 					float4 color: COLOR;
+					float3 normal: NORMAL;
 				};
 
 				struct v2f
 				{
-					float4 pos : POSITION;
+					float4 pos : SV_POSITION;
 					float4 color : COLOR;
+					float size : PSIZE;
 				};
 
 				v2f vert (a2v v)
 				{
 					v2f o;
 
-					float3 normal = float3(
-						v.color.r * 2.0 - 1.0,
-						v.color.g * 2.0 - 1.0,
-						v.color.b * 2.0 - 1.0 );
-
 					o.pos = mul( UNITY_MATRIX_MVP, v.vertex );
-					o.color = float4( ShadeVertexLights( v.vertex, normal ) * 2.0, 1.0 );
+					o.color =
+						float4( ShadeVertexLights( v.vertex, v.normal ) * 2.0, 1.0 );
+						//* v.color
+						//* _Color;
+
+					float3 worldSpaceObjectPos = mul( v.vertex, _Object2World ).xyz;
+					float dist = distance( worldSpaceObjectPos.xyz, _WorldSpaceCameraPos.xyz );
+					o.size = _PointSize * ( 1 / dist );
 					return o;
 				}
 

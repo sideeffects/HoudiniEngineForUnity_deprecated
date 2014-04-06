@@ -480,44 +480,56 @@ public class HAPI_PartControl : HAPI_GeoControl
 	{
 		// Create a particle with alpha = to the data format
 		const float particle_epsilon = 0.05f;
-		int nparticles = 0;
+		int particle_count = 0;
 		for ( int i = 0; i < data.Length; ++i )
 			if ( data[ i ] > -particle_epsilon && data[ i ] < particle_epsilon )
-				nparticles++;
-		if ( nparticles == 0 )
-		{
-			DestroyImmediate( node );
-			return;
-		}
+				particle_count++;
 
-		ParticleEmitter particle_emitter = node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
-		particle_emitter.emit = false;
-		particle_emitter.maxSize = volume.transform.scale[0]*2;
-		particle_emitter.minSize = volume.transform.scale[1]*2;
-		particle_emitter.ClearParticles();
-		particle_emitter.Emit( nparticles );
+		MeshFilter mesh_filter = HAPI_Control.getOrCreateComponent< MeshFilter >( node );
+		MeshRenderer mesh_renderer = HAPI_Control.getOrCreateComponent< MeshRenderer >( node );
+
+		if ( !mesh_filter.sharedMesh )
+			mesh_filter.sharedMesh = new Mesh();
+		mesh_filter.sharedMesh.Clear();
+
+		if ( particle_count <= 0 )
+			return;
+
+		if ( !mesh_renderer.sharedMaterial )
+			mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/VolumeSurface" ) );
+		mesh_renderer.sharedMaterial.SetFloat( "_PointSize", 70.0f );
+		mesh_renderer.sharedMaterial.SetColor( "_Color", new Color( 1.0f, 0.9f, 0.9f ) );
+
+		Vector3[] vertices = new Vector3[ particle_count ];
+		Color[] colors = new Color[ particle_count ];
+		Vector3[] normals = new Vector3[ particle_count ];
+		Vector2[] uvs = new Vector2[ particle_count ];
+
+		// Create the selection indices.
+		int[] indices = new int[ vertices.Length ];
+		for ( int i = 0; i < vertices.Length; ++i )
+			indices[ i ] = i;
 
 		Vector3 tileMin = new Vector3( tile.minX, tile.minY, tile.minZ );
+		//float volume_scale = volume.transform.scale[ 0 ] * 2.0f;
 		int part_index = 0;
-		Particle[] particles = particle_emitter.particles;
 		for ( int z = 0; z < volume.tileSize; ++z )
 			for ( int y = 0; y < volume.tileSize; ++y )
 				for ( int x = 0; x < volume.tileSize; ++x )
 				{
 					int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
 					if ( data[ index ] > -particle_epsilon && data[ index ] < particle_epsilon
-						&& part_index < particles.Length )
+						&& part_index < particle_count )
 					{
-						Vector3 pos = new Vector3( (float)x, (float)y, (float)z );
+						// Get particle position.
+						Vector3 pos = new Vector3( (float) x, (float) y, (float) z );
 						pos = 1.2f * ( ( pos + tileMin ) - new Vector3( 0.5f, 0.5f, 0.5f ) );
+						vertices[ part_index ] = node.transform.parent.TransformPoint( pos );
 
-						particles[ part_index ].position =
-							node.transform.parent.TransformPoint( pos );
-
+						// Get particle normal.
 						int amount = 1;
 						int sample_count = 0;
-						Vector3 normals = Vector3.zero;
-
+						Vector3 average_normal = Vector3.zero;
 						for ( int xi = -1; xi <= 1; ++xi )
 							for ( int yi = -1; yi <= 1; ++yi )
 								for ( int zi = -1; zi <= 1; ++zi )
@@ -535,21 +547,27 @@ public class HAPI_PartControl : HAPI_GeoControl
 									else
 										continue;
 
-									normals += normal;
+									average_normal += normal;
 									sample_count++;
 								}
-						normals /= sample_count;
-						normals.Normalize();
-						normals.x += 1.0f; normals.y += 1.0f; normals.z += 1.0f;
-						normals /= 2.0f;
+						average_normal /= sample_count;
+						average_normal.Normalize();
+						normals[ part_index ] = average_normal;
 
-						particles[ part_index ].color =
-							new Color( normals.x, normals.y, normals.z, 1 );
+						// Get particle color.
+						average_normal.x += 1.0f; average_normal.y += 1.0f; average_normal.z += 1.0f;
+						average_normal /= 2.0f;
+						colors[ part_index ] = new Color( average_normal.x, average_normal.y, average_normal.z, 1 );
 
 						part_index++;
 					}
 				}
-		particle_emitter.particles = particles;
+
+		mesh_filter.sharedMesh.vertices = vertices;
+		mesh_filter.sharedMesh.colors = colors;
+		mesh_filter.sharedMesh.normals = normals;
+		mesh_filter.sharedMesh.uv = uvs;
+		mesh_filter.sharedMesh.SetIndices( indices, MeshTopology.Points, 0 );
 
 		ParticleRenderer renderer = node.GetComponent< ParticleRenderer >();
 		if ( renderer == null ) 
