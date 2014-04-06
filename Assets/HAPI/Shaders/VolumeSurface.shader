@@ -24,7 +24,6 @@ Shader "HAPI/VolumeSurface" {
 				struct a2v
 				{
 					float4 vertex : POSITION;
-					float4 color: COLOR;
 					float3 normal: NORMAL;
 				};
 
@@ -40,10 +39,7 @@ Shader "HAPI/VolumeSurface" {
 					v2f o;
 
 					o.pos = mul( UNITY_MATRIX_MVP, v.vertex );
-					o.color =
-						float4( ShadeVertexLights( v.vertex, v.normal ) * 2.0, 1.0 );
-						//* v.color
-						//* _Color;
+					o.color = float4( ShadeVertexLights( v.vertex, v.normal ) * 2.0, 1.0 ) * _Color;
 
 					float3 worldSpaceObjectPos = mul( v.vertex, _Object2World ).xyz;
 					float dist = distance( worldSpaceObjectPos.xyz, _WorldSpaceCameraPos.xyz );

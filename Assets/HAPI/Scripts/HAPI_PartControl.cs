@@ -272,21 +272,28 @@ public class HAPI_PartControl : HAPI_GeoControl
 			
 			if ( part_info.hasVolume )
 			{
+				const float particle_delta = 0.1f;
+
+				// Clear previous volume tiles.
+				destroyChildren( part_node.transform );
+
 				// If we have a volume, retrieve the volume info
 				HAPI_VolumeInfo volume = new HAPI_VolumeInfo();
 				HAPI_Host.getVolumeInfo( prAssetId, prObjectId, prGeoId, prPartId, ref volume );
 
+				// TODO: Find out what exactly this transform means.
+				//HAPI_AssetUtility.applyTransform( volume.transform, part_node.transform );
+
+				List< Vector3 > acc_vertices = new List< Vector3 >();
+				List< Vector3 > acc_normals = new List< Vector3 >();
+
+				float[] values = new float[ volume.tileSize * volume.tileSize * volume.tileSize ];
+				int tile_index = 0;
+				int current_container_particle_index = 0;
+
 				// Iterate through the voxels and print out the data, for now.
 				HAPI_VolumeTileInfo tile = new HAPI_VolumeTileInfo();
 				HAPI_Host.getFirstVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
-				float[] values = new float[ volume.tileSize * volume.tileSize * volume.tileSize ];
-				int tile_num = 0;
-				
-				HAPI_AssetUtility.applyTransform( volume.transform, part_node.transform );
-				
-				// Clear previous volume tiles.
-				destroyChildren( part_node.transform );
-				
 				while ( tile.isValid )
 				{
 					for ( int i = 0; i < values.Length; ++i )
@@ -294,18 +301,73 @@ public class HAPI_PartControl : HAPI_GeoControl
 					HAPI_Host.getVolumeTileFloatData( 
 						prAssetId, prObjectId, prGeoId, prPartId, ref tile, values );
 
-					tile_num += 1;
-					GameObject tile_node = new GameObject( "tile (" + tile.minX +
-														   ", " + tile.minY +
-														   ", " + tile.minZ + ")" );
-					tile_node.transform.parent = part_node.transform;
+					Vector3 tileMin = new Vector3( tile.minX, tile.minY, tile.minZ );
+					int part_index = 0;
+					for ( int z = 0; z < volume.tileSize; ++z )
+						for ( int y = 0; y < volume.tileSize; ++y )
+							for ( int x = 0; x < volume.tileSize; ++x )
+							{
+								int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
+								if ( values[ index ] > -particle_delta && values[ index ] < particle_delta )
+								{
+									// Make sure we have enough room in our arrays.
+									if ( current_container_particle_index > 64000 )
+									{
+										createVolumeTilesObject( part_node.transform, acc_vertices, acc_normals );
+										current_container_particle_index = 0;
+										acc_vertices.Clear();
+										acc_normals.Clear();
+									}
 
-					//createFogVolume( tile_node, values, tile, volume );
-					createSurfaceVolume( tile_node, values, tile, volume );
+									// Get particle position.
+									Vector3 pos = new Vector3( (float) x, (float) y, (float) z );
+									pos = 0.1f * ( ( pos + tileMin ) );
+									pos.x = -pos.x;
+									acc_vertices.Add( part_node.transform.TransformPoint( pos ) );
+
+									// Get particle normal.
+									int amount = 1;
+									int sample_count = 0;
+									Vector3 average_normal = Vector3.zero;
+									for ( int xi = -1; xi <= 1; ++xi )
+										for ( int yi = -1; yi <= 1; ++yi )
+											for ( int zi = -1; zi <= 1; ++zi )
+											{
+												if ( xi == 0 && yi == 0 && zi == 0 )
+													continue;
+
+												float result = getVolumeData(
+													values, volume, particle_delta, x + xi * amount, y + yi * amount, z + zi * amount );
+
+												Vector3 normal = Vector3.zero;
+												if ( result < -0.5f )
+													normal = new Vector3( -xi, -yi, -zi );
+												else if ( result > 0.5f )
+													normal = new Vector3( xi, yi, zi );
+												else
+													continue;
+
+												average_normal += normal;
+												sample_count++;
+											}
+									average_normal /= sample_count;
+									average_normal.Normalize();
+									acc_normals.Add( average_normal );
+
+									part_index++;
+									current_container_particle_index++;
+								}
+							}
 
 					HAPI_Host.getNextVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
-				}
-			}
+
+					tile_index += 1;
+				} // tile iteration
+
+				// If we have left-over particles in our arrays we need another container.
+				createVolumeTilesObject( part_node.transform, acc_vertices, acc_normals );
+
+			} // if has volume
 		}
 
 		// Refresh enabled flags.
@@ -324,7 +386,37 @@ public class HAPI_PartControl : HAPI_GeoControl
 		// Assign unity tag.
 		assignUnityTag();
 	}
-	
+
+	public void createVolumeTilesObject(
+		Transform parent, List< Vector3 > vertices, List< Vector3 > normals )
+	{
+		GameObject tiles_node = new GameObject( "VolumeTiles" );
+		tiles_node.transform.parent = parent;
+
+		MeshFilter mesh_filter = HAPI_Control.getOrCreateComponent< MeshFilter >( tiles_node );
+		MeshRenderer mesh_renderer = HAPI_Control.getOrCreateComponent< MeshRenderer >( tiles_node );
+
+		if ( !mesh_filter.sharedMesh )
+			mesh_filter.sharedMesh = new Mesh();
+		mesh_filter.sharedMesh.Clear();
+
+		if ( !mesh_renderer.sharedMaterial )
+			mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/VolumeSurface" ) );
+		mesh_renderer.sharedMaterial.SetFloat( "_PointSize", 80.0f );
+		mesh_renderer.sharedMaterial.SetColor( "_Color", new Color( 0.9f, 0.9f, 0.9f ) );
+
+		Vector3[] mesh_vertices = vertices.ToArray();
+		Vector3[] mesh_normals = normals.ToArray();
+		int[] indices = new int[ vertices.Count ];
+
+		for ( int i = 0; i < vertices.Count; ++i )
+			indices[ i ] = i;
+
+		mesh_filter.sharedMesh.vertices = mesh_vertices;
+		mesh_filter.sharedMesh.normals = mesh_normals;
+		mesh_filter.sharedMesh.SetIndices( indices, MeshTopology.Points, 0 );
+	}
+
 	public virtual void Update()
 	{
 		
@@ -332,7 +424,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 		
 		if ( local_to_world == myLastLocalToWorld )
 			return;
-						
+
 		myLastLocalToWorld = local_to_world;
 		myTransformChanged = true;
 	}
@@ -407,7 +499,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 		return mat;
 	}
 
-	private float getVolumeData( float[] data, HAPI_VolumeInfo volume, int x, int y, int z )
+	private float getVolumeData( float[] data, HAPI_VolumeInfo volume, float delta, int x, int y, int z )
 	{
 		if ( x < 0 || x >= volume.tileSize
 			|| y < 0 || y >= volume.tileSize
@@ -416,9 +508,9 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 		int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
 
-		if ( data[ index ] > 0.05f )
+		if ( data[ index ] > delta )
 			return 1.0f;
-		else if ( data[ index ] < -0.05f )
+		else if ( data[ index ] < -delta )
 			return -1.0f;
 		else
 			return 0.0f;
@@ -537,7 +629,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 									if ( xi == 0 && yi == 0 && zi == 0 )
 										continue;
 
-									float result = getVolumeData( data, volume, x + xi * amount, y + yi * amount, z + zi * amount );
+									float result = getVolumeData( data, volume, particle_epsilon, x + xi * amount, y + yi * amount, z + zi * amount );
 
 									Vector3 normal = Vector3.zero;
 									if ( result < -0.5f )
@@ -568,12 +660,6 @@ public class HAPI_PartControl : HAPI_GeoControl
 		mesh_filter.sharedMesh.normals = normals;
 		mesh_filter.sharedMesh.uv = uvs;
 		mesh_filter.sharedMesh.SetIndices( indices, MeshTopology.Points, 0 );
-
-		ParticleRenderer renderer = node.GetComponent< ParticleRenderer >();
-		if ( renderer == null ) 
-			renderer = node.AddComponent< ParticleRenderer >();
-
-		renderer.material = createSquare( Color.gray );
 	}
 
 	private void assignUnityTag()
