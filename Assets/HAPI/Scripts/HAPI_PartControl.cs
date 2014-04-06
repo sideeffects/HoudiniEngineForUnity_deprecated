@@ -374,6 +374,14 @@ public class HAPI_PartControl : HAPI_GeoControl
 				createVolumeTilesObject( point_size, part_node.transform, acc_vertices, acc_normals );
 
 			} // if has volume
+			else // Restore part node if previously used to store volume.
+			{
+				// Clear previous volume tiles.
+				destroyChildren( part_node.transform );
+				part_node.transform.localScale = Vector3.one;
+				part_node.transform.localPosition = Vector3.zero;
+				part_node.transform.localRotation = Quaternion.identity;
+			}
 		}
 
 		// Refresh enabled flags.
