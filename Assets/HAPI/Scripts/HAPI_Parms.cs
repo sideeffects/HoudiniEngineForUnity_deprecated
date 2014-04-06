@@ -80,23 +80,17 @@ public class HAPI_Parms : MonoBehaviour
 																	set { myLastChangedParmId = value; } }
 
 	public HAPI_ParmsUndoInfo 		prParmsUndoInfo {				get { return myParmsUndoInfo; }
-																	private set { } }				
-	/// <summary>
-	/// 	Indices of the currently selected folders in the Inspector.
-	/// 	A 1:1 mapping with myFolderListSelectionIds.
-	/// </summary>
+																	private set { } }
+
 	public List< int > 				prFolderListSelections {		get { return myFolderListSelections; } 
 																	set { myFolderListSelections = value; } }
-	
-	/// <summary>
-	/// 	Parameter ids of the currently selected folders in the Inspector. 
-	/// 	A 1:1 mapping with myFolderListSelections.
-	/// </summary>
 	public List< int > 				prFolderListSelectionIds {		get { return myFolderListSelectionIds; } 
 																	set { myFolderListSelectionIds = value; } }
 
 	public bool						prPostSerialization {			get { return myPostSerialization; }
 																	set { myPostSerialization = value; } }
+	public bool						prValuesEqualToHoudini {		get { return myValuesEqualToHoudini; }
+																	set { myValuesEqualToHoudini = value; } }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -139,9 +133,7 @@ public class HAPI_Parms : MonoBehaviour
 	}
 
 	public virtual void OnEnable()
-	{
-
-	}
+	{}
 	
 	public void reset()
 	{
@@ -178,7 +170,8 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Control -------------------------------------------------------------------------------------------------
 
-		myPostSerialization				= true;
+		myPostSerialization = true;
+		myValuesEqualToHoudini = false;
 	}
 
 	public virtual void Update()
@@ -236,6 +229,63 @@ public class HAPI_Parms : MonoBehaviour
 		}
 	}
 
+	public bool areValuesEqualToHoudini()
+	{
+		if ( prControl == null )
+			return false;
+		if ( prControl.prAsset == null )
+			return false;
+		if ( prControl.prAssetId < 0 )
+			return false;
+
+		// Get the node info again
+		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prControl.prNodeId );
+
+		if ( prParmCount != node_info.parmCount )
+			return false;
+		if ( prParmIntValueCount != node_info.parmIntValueCount )
+			return false;
+		if ( prParmFloatValueCount != node_info.parmFloatValueCount )
+			return false;
+		if ( prParmStringValueCount != node_info.parmStringValueCount )
+			return false;
+		if ( prParmChoiceCount != node_info.parmChoiceCount )
+			return false;
+
+		// Get parameter int values.
+		int[] houdini_int_values = new int[ prParmIntValueCount ];
+		Utility.getArray1Id( 
+			prControl.prNodeId, HAPI_Host.getParmIntValues, houdini_int_values, prParmIntValueCount );
+		if ( prParmIntValues.Length != houdini_int_values.Length )
+			return false;
+		for ( int i = 0; i < prParmIntValueCount; ++i )
+			if ( !prParmIntValues[ i ].Equals( houdini_int_values[ i ] ) )
+				return false;
+
+		// Get parameter float values.
+		float[] houdini_float_values = new float[ prParmFloatValueCount ];
+		Utility.getArray1Id( 
+			prControl.prNodeId, HAPI_Host.getParmFloatValues, houdini_float_values, prParmFloatValueCount );
+		if ( prParmFloatValues.Length != houdini_float_values.Length )
+			return false;
+		for ( int i = 0; i < prParmFloatValueCount; ++i )
+			if ( !prParmFloatValues[ i ].Equals( houdini_float_values[ i ] ) )
+				return false;
+
+		// Get parameter string (handle) values.
+		int[] houdini_string_values = new int[ prParmStringValueCount ];
+		Utility.getArray1Id( 
+			prControl.prNodeId, HAPI_Host.getParmStringValues, houdini_string_values, prParmStringValueCount );
+		if ( prParmStringValues.Length != houdini_string_values.Length )
+			return false;
+		for ( int i = 0; i < prParmStringValueCount; ++i )
+			if ( !HAPI_Host.getString( prParmStringValues[ i ] ).Equals(
+				HAPI_Host.getString( houdini_string_values[ i ] ) ) )
+				return false;
+
+		return true;
+	}
+
 	public void getParameterValues()
 	{
 		if ( prControl == null )
@@ -244,6 +294,11 @@ public class HAPI_Parms : MonoBehaviour
 			return;
 		if ( prControl.prAssetId < 0 )
 			return;
+
+		if ( myPostSerialization )
+			myValuesEqualToHoudini = areValuesEqualToHoudini();
+		else
+			myValuesEqualToHoudini = true;
 
 		// Create undo info if it hasn't been created already
 		if ( myParmsUndoInfo == null )
@@ -257,9 +312,6 @@ public class HAPI_Parms : MonoBehaviour
 		prParmFloatValueCount	= node_info.parmFloatValueCount;
 		prParmStringValueCount	= node_info.parmStringValueCount;
 		prParmChoiceCount		= node_info.parmChoiceCount;
-
-		// We need to get the parameter values again because they could have been
-		// changed by a script.
 
 		// Get all parameters.
 		prParms = new HAPI_ParmInfo[ prParmCount ];
@@ -536,13 +588,11 @@ public class HAPI_Parms : MonoBehaviour
 	// A mapping from parm id to the parm's string values
 	private Dictionary< int, string[] >  			myParmStrings = new Dictionary< int, string[] >();
 	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary< int, HAPI_ParmInfo >();
-	
-	/// <summary>
-	/// 	A mapping from parm id to a boolean indicating whether the value 
-	/// 	of the parameter with that id has been changed from the value of 
-	/// 	the same parameter in the associated prefab. These values are only 
-	///		used if these parameters are the parameters of a prefab instance.
-	/// </summary>
+
+	// A mapping from parm id to a boolean indicating whether the value 
+	// of the parameter with that id has been changed from the value of 
+	// the same parameter in the associated prefab. These values are only 
+	// used if these parameters are the parameters of a prefab instance.
 	private Dictionary< int, bool > 				myOverriddenParmsMap = new Dictionary< int, bool >();
 
 	private HAPI_ParmInfo 							myMultiparmInstancePos;
@@ -553,19 +603,26 @@ public class HAPI_Parms : MonoBehaviour
 
 	[SerializeField] private HAPI_ParmsUndoInfo		myParmsUndoInfo;
 
-	/// <summary>
-	/// 	Indices of the currently selected folders in the Inspector.
-	/// 	A 1:1 mapping with myFolderListSelectionIds.
-	/// </summary>
+	// Indices of the currently selected folders in the Inspector.
+	// A 1:1 mapping with myFolderListSelectionIds.
 	[SerializeField] private List< int > 			myFolderListSelections;
-	
-	/// <summary>
-	/// 	Parameter ids of the currently selected folders in the Inspector.
-	/// 	A 1:1 mapping with myFolderListSelections.
-	/// </summary>
+
+	// Parameter ids of the currently selected folders in the Inspector.
+	// A 1:1 mapping with myFolderListSelections.
 	[SerializeField] private List< int > 			myFolderListSelectionIds;
 
 	// Control ------------------------------------------------------------------------------------------------------
 
 	private bool myPostSerialization;
+
+	// This variable keeps track of whether the parameter values were the same
+	// as those in the Houdini instantiate when the parms were deserialized
+	// or if the values were different. The only time there will be a difference
+	// is when going out of playmode having made changes to parameters during
+	// playmode. This is because Unity restores the parameter values from
+	// before playmode by design (so what you do during playmode SHOULD be
+	// lost). In this case we need to do an extra cook when we go out 
+	// of playmode with the "old" parameter values. In all other cases this
+	// value is true.
+	private bool myValuesEqualToHoudini;
 }

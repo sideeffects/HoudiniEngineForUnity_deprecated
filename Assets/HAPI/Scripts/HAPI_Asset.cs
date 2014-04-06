@@ -1045,7 +1045,22 @@ public abstract class HAPI_Asset : HAPI_Control
 #endif // UNITY_EDITOR
 
 			// Try to load presets.
-			if ( ( reload_asset && ( unload_asset_first || is_reverting_prefab_instance ) ) || serialization_recovery_only )
+			if ( ( reload_asset && ( unload_asset_first || is_reverting_prefab_instance ) )
+#if UNITY_EDITOR
+				// Only load presets during serialization recovery if we really need to.
+				// The only such case is when we made changes DURING playmode and Unity
+				// restores the parameter values from before going into playmode.
+				// We only save presets while NOT in playmode which means to restore
+				// the Houdini state to before playmode state we need to loadPreset()
+				// with the last saved preset. In all other cases, like going INTO
+				// playmode, we should avoid this step because loadPreset() WILL
+				// cause a cook regardless if the parameters have changed or not which
+				// is terrible for large assets.
+				|| ( serialization_recovery_only && 
+					!EditorApplication.isPlayingOrWillChangePlaymode &&
+					!prParms.prValuesEqualToHoudini )
+#endif // UNITY_EDITOR
+				)
 			{
 				loadPreset();
 				progress_bar.statusCheckLoop();
