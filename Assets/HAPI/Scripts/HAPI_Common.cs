@@ -54,6 +54,11 @@ public struct HAPI_Constants
 
 	public const float HAPI_CURVE_LOD					= 8.0f;
 
+	public const float HAPI_VOLUME_POSITION_MULT		= 2.0f;
+	public const float HAPI_VOLUME_SURFACE_MAX_PT_PER_C = 64000; // Max points per container. 65000 is Unity max.
+	public const float HAPI_VOLUME_SURFACE_DELTA_MULT	= 1.2f;
+	public const float HAPI_VOLUME_SURFACE_PT_SIZE_MULT = 1800.0f;
+
 	// Shared Constants -------------------------------------------------
 	//
 	// IMPORTANT: Changes to these constants will not change the behavior of the

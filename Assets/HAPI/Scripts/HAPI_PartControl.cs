@@ -272,8 +272,6 @@ public class HAPI_PartControl : HAPI_GeoControl
 			
 			if ( part_info.hasVolume )
 			{
-				const float particle_delta = 0.1f;
-
 				// Clear previous volume tiles.
 				destroyChildren( part_node.transform );
 
@@ -281,8 +279,14 @@ public class HAPI_PartControl : HAPI_GeoControl
 				HAPI_VolumeInfo volume = new HAPI_VolumeInfo();
 				HAPI_Host.getVolumeInfo( prAssetId, prObjectId, prGeoId, prPartId, ref volume );
 
-				// TODO: Find out what exactly this transform means.
-				//HAPI_AssetUtility.applyTransform( volume.transform, part_node.transform );
+				// The volume.transform.scale is the voxel size. Both the particle
+				// delta and the point size are affected by the voxel size.
+				HAPI_AssetUtility.applyTransform( volume.transform, part_node.transform );
+				float particle_delta = HAPI_Constants.HAPI_VOLUME_SURFACE_DELTA_MULT * Mathf.Max( Mathf.Max( 
+					volume.transform.scale[ 0 ],
+					volume.transform.scale[ 1 ] ),
+					volume.transform.scale[ 2 ] );
+				float point_size = HAPI_Constants.HAPI_VOLUME_SURFACE_PT_SIZE_MULT * particle_delta;
 
 				List< Vector3 > acc_vertices = new List< Vector3 >();
 				List< Vector3 > acc_normals = new List< Vector3 >();
@@ -311,9 +315,11 @@ public class HAPI_PartControl : HAPI_GeoControl
 								if ( values[ index ] > -particle_delta && values[ index ] < particle_delta )
 								{
 									// Make sure we have enough room in our arrays.
-									if ( current_container_particle_index > 64000 )
+									if ( current_container_particle_index
+										> HAPI_Constants.HAPI_VOLUME_SURFACE_MAX_PT_PER_C )
 									{
-										createVolumeTilesObject( part_node.transform, acc_vertices, acc_normals );
+										createVolumeTilesObject(
+											point_size, part_node.transform, acc_vertices, acc_normals );
 										current_container_particle_index = 0;
 										acc_vertices.Clear();
 										acc_normals.Clear();
@@ -321,7 +327,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 									// Get particle position.
 									Vector3 pos = new Vector3( (float) x, (float) y, (float) z );
-									pos = 0.1f * ( ( pos + tileMin ) );
+									pos = HAPI_Constants.HAPI_VOLUME_POSITION_MULT * ( pos + tileMin );
 									pos.x = -pos.x;
 									acc_vertices.Add( part_node.transform.TransformPoint( pos ) );
 
@@ -361,11 +367,11 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 					HAPI_Host.getNextVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
 
-					tile_index += 1;
+					tile_index++;
 				} // tile iteration
 
 				// If we have left-over particles in our arrays we need another container.
-				createVolumeTilesObject( part_node.transform, acc_vertices, acc_normals );
+				createVolumeTilesObject( point_size, part_node.transform, acc_vertices, acc_normals );
 
 			} // if has volume
 		}
@@ -388,7 +394,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 	}
 
 	public void createVolumeTilesObject(
-		Transform parent, List< Vector3 > vertices, List< Vector3 > normals )
+		float point_size, Transform parent, List< Vector3 > vertices, List< Vector3 > normals )
 	{
 		GameObject tiles_node = new GameObject( "VolumeTiles" );
 		tiles_node.transform.parent = parent;
@@ -402,7 +408,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 		if ( !mesh_renderer.sharedMaterial )
 			mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/VolumeSurface" ) );
-		mesh_renderer.sharedMaterial.SetFloat( "_PointSize", 80.0f );
+		mesh_renderer.sharedMaterial.SetFloat( "_PointSize", point_size );
 		mesh_renderer.sharedMaterial.SetColor( "_Color", new Color( 0.9f, 0.9f, 0.9f ) );
 
 		Vector3[] mesh_vertices = vertices.ToArray();
