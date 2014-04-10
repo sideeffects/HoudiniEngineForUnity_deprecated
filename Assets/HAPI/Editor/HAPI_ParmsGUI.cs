@@ -300,8 +300,9 @@ public class HAPI_ParmsGUI : Editor
 		// Integer Parameter
 		if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
-			changed = HAPI_GUI.multiparmField( ref gui_parm, ref myDelayBuild, ref parm_int_values,
-											   ref join_last, ref no_label_toggle_last );
+			changed = HAPI_GUI.multiparmField(
+				ref gui_parm, ref myDelayBuild, ref parm_int_values,
+				ref join_last, ref no_label_toggle_last );
 		}
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_INT )
 		{
