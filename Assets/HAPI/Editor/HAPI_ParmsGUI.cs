@@ -363,11 +363,12 @@ public class HAPI_ParmsGUI : Editor
 				for ( int i = 0; i < parm.choiceCount; ++i )
 				{
 					if ( myParms.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId != parm.id )
-						Debug.LogError( "Parm choice parent parm id (" 
-										+ myParms.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId 
-										+ ") not matching current parm id (" + parm.id + ")!\n"
-										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
-										+ "Choice count: " + parm.choiceCount );
+						Debug.LogError(
+							"Parm choice parent parm id ("
+							+ myParms.prParmChoiceLists[ parm.choiceIndex + i ].parentParmId
+							+ ") not matching current parm id (" + parm.id + ")!\n"
+							+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
+							+ "Choice count: " + parm.choiceCount );
 					
 					labels.Add( myParms.prParmChoiceLists[ parm.choiceIndex + i ].label );
 					values.Add( myParms.prParmChoiceLists[ parm.choiceIndex + i ].value );
