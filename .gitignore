@@ -12,6 +12,7 @@
 *.png
 /*
 !/Assets
+!README.md
 /Assets/*
 !/Assets/HAPI
 !/Assets/HAPI Script Access
