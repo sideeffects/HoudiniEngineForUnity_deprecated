@@ -588,7 +588,7 @@ public class HAPI_AssetUtility
 	{
 		string[] names = HAPI_Host.getAttributeNames( asset_id, object_id, geo_id, part_id, owner );
 		
-		string msg = "A" + asset_id + "O" + object_id + " - ";
+		string msg = "A" + asset_id + "O" + object_id + "G" + geo_id + "P" + part_id + " - ";
 		
 		switch ( owner )
 		{
@@ -620,12 +620,12 @@ public class HAPI_AssetUtility
 			printAttributeNames( asset_id, object_id, geo_id, part_id, (HAPI_AttributeOwner) owner );
 	}
 
-	public static void printGroupNames(
+	public static void printGroups(
 		int asset_id, int object_id, int geo_id, int part_id, HAPI_GroupType type )
 	{
-		string[] names = HAPI_Host.getGroupNames( asset_id, object_id, geo_id, part_id, type );
+		string[] names = HAPI_Host.getGroupNames( asset_id, object_id, geo_id, type );
 		
-		string msg = "A" + asset_id + "O" + object_id + " - ";
+		string msg = "A" + asset_id + "O" + object_id + "G" + geo_id + "P" + part_id + " - ";
 		
 		switch ( type )
 		{
@@ -635,7 +635,9 @@ public class HAPI_AssetUtility
 		}
 		
 		msg += " Groups:";
-		
+
+		string membership_msg = "";
+
 		bool comma = false;
 		foreach ( string name in names )
 		{
@@ -644,15 +646,23 @@ public class HAPI_AssetUtility
 			else
 				comma = true;
 			msg += " " + name;
+
+			membership_msg += name + " > ";
+			bool[] membership = HAPI_Host.getGroupMembership(
+				asset_id, object_id, geo_id, part_id, type, name );
+			for ( int i = 0; i < membership.Length; ++i )
+				if ( membership[ i ] )
+					membership_msg += i.ToString() + " ";
+			membership_msg += "\n";
 		}
 		
-		Debug.Log( msg );
+		Debug.Log( msg + "\n" + membership_msg );
 	}
 
-	public static void printAllGroupNames( int asset_id, int object_id, int geo_id, int part_id )
+	public static void printAllGroups( int asset_id, int object_id, int geo_id, int part_id )
 	{
 		for ( int type = 0; type < (int) HAPI_GroupType.HAPI_GROUPTYPE_MAX; ++type )
-			printGroupNames( asset_id, object_id, geo_id, part_id, (HAPI_GroupType) type );
+			printGroups( asset_id, object_id, geo_id, part_id, (HAPI_GroupType) type );
 	}
 
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
@@ -1148,7 +1158,16 @@ public class HAPI_AssetUtility
 								  + ") above limit (" + ( 65000 * 3 ) + ")!" );
 		if ( part_info.vertexCount > 65000 )
 			throw new HAPI_Error( "Vertex count (" + part_info.vertexCount + ") above limit (" + 65000 + ")!" );
-		
+
+		// For Debugging.
+#if false
+		Debug.Log( "ATTRIBS" );
+			printAllAttributeNames( asset_id, object_id, geo_id, part_id );
+		Debug.Log( "GROUPS" );
+			printAllGroups( asset_id, object_id, geo_id, part_id );
+		Debug.Log( "DONE" );
+#endif
+
 		// Get Face counts.
 		int[] face_counts = new int[ part_info.faceCount ];
 		getArray4Id( asset_id, object_id, geo_id, part_id, HAPI_Host.getFaceCounts, 
