@@ -476,7 +476,7 @@ public static partial class HAPI_Host
 	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetGroupNames(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_GroupType group_type,
 		[Out] HAPI_StringHandle[] group_names,
 		int group_count );

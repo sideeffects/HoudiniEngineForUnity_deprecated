@@ -1524,9 +1524,6 @@ public static partial class HAPI_Host
 	/// <param name="geo_id">
 	/// 	The geometry id.
 	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
 	/// <param name="group_type">
 	/// 	The group type.
 	/// </param>
@@ -1534,19 +1531,19 @@ public static partial class HAPI_Host
 	/// 	List of group names.
 	/// </returns>
 	public static string[] getGroupNames(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_GroupType group_type )
 	{
 #if UNITY_STANDALONE_WIN
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HAPI_Result status_code = HAPI_GetGeoInfo( asset_id, object_id, geo_id, out geo_info );
 		processStatusCode( status_code );
 
-		int count = part_info.getGroupCountByType( group_type );
+		int count = geo_info.getGroupCountByType( group_type );
 
 		int[] names = new int[ count ];
 		status_code = HAPI_GetGroupNames(
-			asset_id, object_id, geo_id, part_id, group_type, names, count );
+			asset_id, object_id, geo_id, group_type, names, count );
 		processStatusCode( status_code );
 
 		string[] name_strings = new string[ count ];

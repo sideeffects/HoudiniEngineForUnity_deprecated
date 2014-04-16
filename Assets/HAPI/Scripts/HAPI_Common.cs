@@ -783,6 +783,16 @@ public struct HAPI_ObjectInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_GeoInfo
 {
+	public int getGroupCountByType( HAPI_GroupType type )
+	{
+		switch ( type )
+		{
+			case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointGroupCount;
+			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return primitiveGroupCount;
+			default: return 0;
+		}
+	}
+
 	public HAPI_GeoId id;
 	public HAPI_GeoType type;
 	private HAPI_StringHandle nameSH;
@@ -796,6 +806,9 @@ public struct HAPI_GeoInfo
 		
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool hasGeoChanged;
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool hasMaterialChanged;
+
+	public int pointGroupCount;
+	public int primitiveGroupCount;
 
 	public int partCount;
 
@@ -849,16 +862,6 @@ public struct HAPI_PartInfo
 		}
 	}
 
-	public int getGroupCountByType( HAPI_GroupType type )
-	{
-		switch ( type )
-		{
-			case HAPI_GroupType.HAPI_GROUPTYPE_POINT: return pointGroupCount;
-			case HAPI_GroupType.HAPI_GROUPTYPE_PRIM: return faceGroupCount;
-			default: return 0;
-		}
-	}
-
 	public HAPI_PartId id;
 	private HAPI_StringHandle nameSH;
 
@@ -872,9 +875,6 @@ public struct HAPI_PartInfo
 	public int faceAttributeCount;
 	public int vertexAttributeCount;
 	public int detailAttributeCount;
-
-	public int pointGroupCount;
-	public int faceGroupCount;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool hasVolume;
