@@ -52,6 +52,7 @@ public struct HAPI_Constants
 	public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 	public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
 
+	public const bool HAPI_CURVE_REFINE_TO_LINEAR		= true;
 	public const float HAPI_CURVE_LOD					= 8.0f;
 
 	public const float HAPI_VOLUME_POSITION_MULT		= 2.0f;
@@ -541,10 +542,24 @@ public struct HAPI_AssetInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_CookOptions
 {
-	// Meshes
-	public int maxVerticesPerPrimitive; // This is enforced by convexing the mesh.
-										// Use -1 to avoid convexing at all and get
-										// some performance boost.
+	/// Normally, geos are split into parts in two different ways. First it
+    /// is split by group and within each group it is split by primitive type.
+    ///
+    /// For example, if you have a geo with group1 covering half of the mesh
+    /// and volume1 and group2 covering the other half of the mesh, all of
+    /// curve1, and volume2 you will end up with 5 parts. First two parts
+    /// will be for the half-mesh of group1 and volume1, and the last three
+    /// will cover group2.
+    ///
+    /// This toggle lets you disable the splitting by group and just have
+    /// the geo be split by primitive type alone. By default, this is true
+    /// and therefore geos will be split by group and primitive type. If
+    /// set to false, geos will only be split by primtive type.
+    [ MarshalAs( UnmanagedType.U1 ) ] public bool splitGeosByGroup;
+
+	/// For meshes only, this is enforced by convexing the mesh. Use -1
+    /// to avoid convexing at all and get some performance boost.
+	public int maxVerticesPerPrimitive;
 
 	// Curves
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool refineCurveToLinear;

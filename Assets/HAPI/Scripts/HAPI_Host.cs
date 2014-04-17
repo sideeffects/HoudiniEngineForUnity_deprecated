@@ -133,6 +133,7 @@ public static partial class HAPI_Host
 	public const bool myDefaultPushUnityTransformToHoudini				= true;
 	public const bool myDefaultTransformChangeTriggersCooks				= false;
 	public const bool myDefaultImportTemplatedGeos						= false;
+	public const bool myDefaultSplitGeosByGroup							= true;
 
 	private const string myDefaultUnityTagAttribName					= "unity_tag";
 
@@ -221,6 +222,7 @@ public static partial class HAPI_Host
 		setBool(	"HAPI_PushUnityTransformToHoudini", myDefaultPushUnityTransformToHoudini, true );
 		setBool(	"HAPI_TransformChangeTriggersCooks", myDefaultTransformChangeTriggersCooks, true );
 		setBool(	"HAPI_ImportTemplatedGeos", myDefaultImportTemplatedGeos, true );
+		setBool(	"HAPI_SplitGeosByGroup", myDefaultSplitGeosByGroup, true );
 
 		setString(	"HAPI_UnityTagAttribName", myDefaultUnityTagAttribName, true );
 
@@ -338,10 +340,12 @@ public static partial class HAPI_Host
 	public static bool prTransformChangeTriggersCooks {
 											get { return getBool( "HAPI_TransformChangeTriggersCooks" ); }
 											set { setBool( "HAPI_TransformChangeTriggersCooks", value ); } }
-
 	public static bool prImportTemplatedGeos {
 											get { return getBool( "HAPI_ImportTemplatedGeos" ); }
 											set { setBool( "HAPI_ImportTemplatedGeos", value ); } }
+	public static bool prSplitGeosByGroup {
+											get { return getBool( "HAPI_SplitGeosByGroup" ); }
+											set { setBool( "HAPI_SplitGeosByGroup", value ); } }
 
 	public static string prUnityTagAttribName {
 											get { return getString( "HAPI_UnityTagAttribName" ); }
@@ -506,6 +510,10 @@ public static partial class HAPI_Host
 	public static bool isImportTemplatedGeosDefault()
 											{ return	prImportTemplatedGeos == 
 														myDefaultImportTemplatedGeos; }
+	public static bool isSplitGeosByGroupDefault()
+											{ return	prSplitGeosByGroup ==
+														myDefaultSplitGeosByGroup; }
+
 	public static bool isUnityTagAttribNameDefault()
 											{ return	prUnityTagAttribName ==
 														myDefaultUnityTagAttribName; }
@@ -604,6 +612,7 @@ public static partial class HAPI_Host
 		prPushUnityTransformToHoudini			= myDefaultPushUnityTransformToHoudini;
 		prTransformChangeTriggersCooks			= myDefaultTransformChangeTriggersCooks;
 		prImportTemplatedGeos					= myDefaultImportTemplatedGeos;
+		prSplitGeosByGroup						= myDefaultSplitGeosByGroup;
 
 		prUnityTagAttribName					= myDefaultUnityTagAttribName;
 
@@ -838,8 +847,9 @@ public static partial class HAPI_Host
 				}
 
 				HAPI_CookOptions cook_options = new HAPI_CookOptions();
+				cook_options.splitGeosByGroup = prSplitGeosByGroup;
 				cook_options.maxVerticesPerPrimitive = HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
-				cook_options.refineCurveToLinear = true;
+				cook_options.refineCurveToLinear = HAPI_Constants.HAPI_CURVE_REFINE_TO_LINEAR;
 				cook_options.curveRefineLOD = HAPI_Constants.HAPI_CURVE_LOD;
 
 				// Initialize.

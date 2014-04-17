@@ -30,6 +30,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public bool pushUnityTransformToHoudini;
 	public bool transformChangeTriggersCooks;
 	public bool importTemplatedGeos;
+	public bool splitGeosByGroup;
 	
 	// Geometry Settings
 	public string unityTagAttribName;
@@ -89,6 +90,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 		pushUnityTransformToHoudini 	= HAPI_Host.prPushUnityTransformToHoudini;
 		transformChangeTriggersCooks 	= HAPI_Host.prTransformChangeTriggersCooks;
 		importTemplatedGeos 			= HAPI_Host.prImportTemplatedGeos;
+		splitGeosByGroup				= HAPI_Host.prSplitGeosByGroup;
 		
 		// Set geometry settings.
 		unityTagAttribName 				= HAPI_Host.prUnityTagAttribName;
