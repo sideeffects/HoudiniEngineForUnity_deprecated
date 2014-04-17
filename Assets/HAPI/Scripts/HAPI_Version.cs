@@ -28,14 +28,14 @@ public struct HAPI_Version
 {
 	public const int HOUDINI_MAJOR			= 13;
 	public const int HOUDINI_MINOR			= 0;
-	public const int HOUDINI_BUILD			= 385;
+	public const int HOUDINI_BUILD			= 386;
 
 	public const int ORIG_HOUDINI_MAJOR		= 13;
 	public const int ORIG_HOUDINI_MINOR		= 0;
-	public const int ORIG_HOUDINI_BUILD		= 385;
+	public const int ORIG_HOUDINI_BUILD		= 386;
 
 	public const int HOUDINI_ENGINE_MAJOR	= 1;
 	public const int HOUDINI_ENGINE_MINOR	= 6;
 	
-	public const int HOUDINI_ENGINE_API		= 20;
+	public const int HOUDINI_ENGINE_API		= 22;
 };
