@@ -459,6 +459,27 @@ public class HAPI_WindowSettings : EditorWindow
 			}
 		}
 
+		HAPI_GUI.separator();
+
+		// Split Geos by Group
+		{
+			bool value = HAPI_Host.prSplitGeosByGroup;
+			bool changed = HAPI_GUI.toggle(
+				"split_geos_by_group", 
+				"Split Geos by Group", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.splitGeosByGroup );
+			if ( changed )
+			{
+				HAPI_Host.prSplitGeosByGroup = value;
+				HAPI_Host.repaint();
+			
+				EditorUtility.DisplayDialog(
+					"Restart Required",
+					"This change will take affect only after you restart Unity.",
+					"Ok" );
+			}
+		}
 
 	}
 
