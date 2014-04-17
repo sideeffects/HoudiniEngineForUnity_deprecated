@@ -99,18 +99,21 @@ public class HAPI_AssetUtility
 		// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
 		// causes a double negative - yeah, I know).
 				
-		transform.localPosition = new Vector3( -hapi_transform.position[ 0 ], 
-												hapi_transform.position[ 1 ],
-												hapi_transform.position[ 2 ] );
+		transform.localPosition = new Vector3(
+			-hapi_transform.position[ 0 ],
+			hapi_transform.position[ 1 ],
+			hapi_transform.position[ 2 ] );
 
-		Quaternion quat = Quaternion.Euler( new Vector3(  hapi_transform.rotationEuler[ 0 ],
-														 -hapi_transform.rotationEuler[ 1 ],
-														 -hapi_transform.rotationEuler[ 2 ] ) );
+		Quaternion quat = Quaternion.Euler( new Vector3(
+			hapi_transform.rotationEuler[ 0 ],
+			-hapi_transform.rotationEuler[ 1 ],
+			-hapi_transform.rotationEuler[ 2 ] ) );
 
 		transform.localRotation = quat;
-		transform.localScale = new Vector3( hapi_transform.scale[ 0 ], 
-											hapi_transform.scale[ 1 ], 
-											hapi_transform.scale[ 2 ] );
+		transform.localScale = new Vector3(
+			hapi_transform.scale[ 0 ],
+			hapi_transform.scale[ 1 ],
+			hapi_transform.scale[ 2 ] );
 	}
 
 	public static void applyTransform( HAPI_Transform hapi_transform, Transform transform )
