@@ -22,17 +22,17 @@ using System.Collections;
 using System.Collections.Generic;
 
 [ ExecuteInEditMode ]
-[ CustomEditor( typeof( HAPI_AssetInput ) ) ]
-public class HAPI_AssetGUIInput : HAPI_AssetGUI 
+[ CustomEditor( typeof( HoudiniAssetInput ) ) ]
+public class HoudiniAssetGUIInput : HoudiniAssetGUI 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 
 	public override void OnEnable()
 	{
-		myAssetInput = target as HAPI_AssetInput;
+		myAssetInput = target as HoudiniAssetInput;
 		myGeoAttributeManager = myAssetInput.prGeoAttributeManager;
-		myGeoAttributeManagerGUI = new HAPI_GeoAttributeManagerGUI( myGeoAttributeManager );
+		myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
 
 		base.OnEnable();
 	}
@@ -51,14 +51,14 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 		if ( !is_editable )
-			HAPI_GUI.help( "This mesh is not editable.", MessageType.Info );
+			HoudiniGUI.help( "This mesh is not editable.", MessageType.Info );
 #endif // !UNITY_STANDALONE_WIN
 
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
 
 		myAssetInput.prShowHoudiniControls 
-			= HAPI_GUI.foldout( "Houdini Controls", myAssetInput.prShowHoudiniControls, true );
+			= HoudiniGUI.foldout( "Houdini Controls", myAssetInput.prShowHoudiniControls, true );
 		if ( myAssetInput.prShowHoudiniControls ) 
 		{
 			if ( !myAssetInput.isPrefab() )
@@ -72,7 +72,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		}
 
 		// Draw Help Pane
-		myAssetInput.prShowHelp = HAPI_GUI.foldout( "Asset Help", myAssetInput.prShowHelp, true );
+		myAssetInput.prShowHelp = HoudiniGUI.foldout( "Asset Help", myAssetInput.prShowHelp, true );
 		if ( myAssetInput.prShowHelp )
 			drawHelpBox( myHelpText );
 
@@ -80,43 +80,43 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		// Draw Asset Settings
 		// These don't affect the asset directly so they don't trigger rebuilds.
 
-		myAssetInput.prShowAssetSettings = HAPI_GUI.foldout( "Asset Settings", myAssetInput.prShowAssetSettings, true );
+		myAssetInput.prShowAssetSettings = HoudiniGUI.foldout( "Asset Settings", myAssetInput.prShowAssetSettings, true );
 		if ( myAssetInput.prShowAssetSettings )
 		{
 			// Enable Cooking Toggle
 			createToggleForProperty(
 				"enable_cooking", "Enable Cooking", "prEnableCooking",
-				ref myUndoInfo.enableCooking, null, !HAPI_Host.isEnableCookingDefault() );
+				ref myUndoInfo.enableCooking, null, !HoudiniHost.isEnableCookingDefault() );
 
-			HAPI_GUI.separator();
+			HoudiniGUI.separator();
 
 			// Cooking Triggers Downstream Cooks Toggle
 			createToggleForProperty(
 				"cooking_triggers_downstream_cooks", "Cooking Triggers Downstream Cooks", 
 				"prCookingTriggersDownCooks", ref myUndoInfo.cookingTriggersDownCooks,
-				null, !HAPI_Host.isCookingTriggersDownCooksDefault(),
+				null, !HoudiniHost.isCookingTriggersDownCooksDefault(),
 				!myAssetInput.prEnableCooking, " (all cooking is disabled)" );
 
-			HAPI_GUI.separator();
+			HoudiniGUI.separator();
 
 			// Push Unity Transform To Houdini Engine Toggle
 			createToggleForProperty(
 				"push_unity_transform_to_houdini_engine", "Push Unity Transform To Houdini Engine", 
 				"prPushUnityTransformToHoudini", ref myUndoInfo.pushUnityTransformToHoudini,
-				null, !HAPI_Host.isPushUnityTransformToHoudiniDefault() );
+				null, !HoudiniHost.isPushUnityTransformToHoudiniDefault() );
 
 			// Transform Change Triggers Cooks Toggle
 			createToggleForProperty(
 				"transform_change_triggers_cooks", "Transform Change Triggers Cooks", 
 				"prTransformChangeTriggersCooks", ref myUndoInfo.transformChangeTriggersCooks,
-				null, !HAPI_Host.isTransformChangeTriggersCooksDefault(),
+				null, !HoudiniHost.isTransformChangeTriggersCooksDefault(),
 				!myAssetInput.prEnableCooking, " (all cooking is disabled)" );
 		}
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Point Attributes
 
-		myAssetInput.prShowAttributesTable = HAPI_GUI.foldout( "Point Attributes", myAssetInput.prShowAttributesTable, true );
+		myAssetInput.prShowAttributesTable = HoudiniGUI.foldout( "Point Attributes", myAssetInput.prShowAttributesTable, true );
 		if ( myAssetInput.prShowAttributesTable )
 		{
 			// Draw Create Point Attributes Action Bar
@@ -138,7 +138,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				}
 				else if ( preset_selected > 1 )
 				{
-					HAPI_GeoAttribute.Preset preset = (HAPI_GeoAttribute.Preset) ( preset_selected - 2 );
+					HoudiniGeoAttribute.Preset preset = (HoudiniGeoAttribute.Preset) ( preset_selected - 2 );
 					myGeoAttributeManager.createAttribute( preset );
 					myAssetInput.prHasAttributeChanges = true;
 				}
@@ -149,11 +149,11 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 			if ( myAssetInput.prHasError )
 				help_msg += "\nError: " + myAssetInput.prErrorMsg;
 			if ( myAssetInput.prHasAttributeChanges )
-				HAPI_GUI.help( help_msg, MessageType.Info );
+				HoudiniGUI.help( help_msg, MessageType.Info );
 			else
-				HAPI_GUI.help( "Ready", MessageType.Info );
+				HoudiniGUI.help( "Ready", MessageType.Info );
 
-			HAPI_GUI.separator();
+			HoudiniGUI.separator();
 
 			string[] type_labels = new string[] { "bool", "int", "float", "string" };
 			int[] type_values = new int[] { 0, 1, 2, 3 };
@@ -183,7 +183,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 
 			for ( int i = 0; i < myGeoAttributeManager.prAttributes.Count; ++i )
 			{
-				HAPI_GeoAttribute attrib = myGeoAttributeManager.prAttributes[ i ];
+				HoudiniGeoAttribute attrib = myGeoAttributeManager.prAttributes[ i ];
 
 				EditorGUILayout.BeginHorizontal();
 
@@ -196,7 +196,7 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				}
 
 				// Attribute Type
-				HAPI_GeoAttribute.Type new_attrib_type = (HAPI_GeoAttribute.Type) EditorGUILayout.IntPopup(
+				HoudiniGeoAttribute.Type new_attrib_type = (HoudiniGeoAttribute.Type) EditorGUILayout.IntPopup(
 					(int) attrib.prType, type_labels, type_values, GUILayout.Width( 50 ) );
 				if ( new_attrib_type != attrib.prType )
 				{
@@ -216,23 +216,23 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 				EditorGUILayout.LabelField( "|", GUILayout.Width( 8 ) );
 
 				// Range
-				if ( attrib.prType == HAPI_GeoAttribute.Type.STRING )
+				if ( attrib.prType == HoudiniGeoAttribute.Type.STRING )
 				{
 					EditorGUILayout.LabelField( "N/A", GUILayout.MinWidth( 20 ) );
 				}
 				else
 				{
-					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
+					if ( attrib.prType == HoudiniGeoAttribute.Type.BOOL || attrib.prType == HoudiniGeoAttribute.Type.INT )
 						attrib.prIntMin =
 							EditorGUILayout.IntField( "", attrib.prIntMin, GUILayout.Width( 50 ) );
-					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
+					else if ( attrib.prType == HoudiniGeoAttribute.Type.FLOAT )
 						attrib.prFloatMin =
 							EditorGUILayout.FloatField( "", attrib.prFloatMin, GUILayout.Width( 50 ) );
 
-					if ( attrib.prType == HAPI_GeoAttribute.Type.BOOL || attrib.prType == HAPI_GeoAttribute.Type.INT )
+					if ( attrib.prType == HoudiniGeoAttribute.Type.BOOL || attrib.prType == HoudiniGeoAttribute.Type.INT )
 						attrib.prIntMax =
 							EditorGUILayout.IntField( "", attrib.prIntMax, GUILayout.Width( 50 ) );
-					else if ( attrib.prType == HAPI_GeoAttribute.Type.FLOAT )
+					else if ( attrib.prType == HoudiniGeoAttribute.Type.FLOAT )
 						attrib.prFloatMax =
 							EditorGUILayout.FloatField( "", attrib.prFloatMax, GUILayout.Width( 50 ) );
 				}
@@ -286,9 +286,9 @@ public class HAPI_AssetGUIInput : HAPI_AssetGUI
 		}
 	}
 
-	private HAPI_AssetInput myAssetInput;
-	private HAPI_GeoAttributeManager myGeoAttributeManager;
-	private HAPI_GeoAttributeManagerGUI myGeoAttributeManagerGUI;
+	private HoudiniAssetInput myAssetInput;
+	private HoudiniGeoAttributeManager myGeoAttributeManager;
+	private HoudiniGeoAttributeManagerGUI myGeoAttributeManagerGUI;
 
 	private const string myHelpText = 
 		"- Instantiation -\n" +

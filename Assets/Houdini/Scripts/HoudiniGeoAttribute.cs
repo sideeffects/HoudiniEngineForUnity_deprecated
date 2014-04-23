@@ -17,7 +17,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class HAPI_GeoAttribute : ScriptableObject
+public class HoudiniGeoAttribute : ScriptableObject
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
@@ -323,7 +323,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				for ( int i = 0; i < myTupleSize; ++i )
 					myIntPaintValue[ i ] = Mathf.Clamp( value[ i ], myIntMin, myIntMax );
 			else
-				throw new HAPI_ErrorInvalidArgument( "prIntPaintValue given wrong sized array." );
+				throw new HoudiniErrorInvalidArgument( "prIntPaintValue given wrong sized array." );
 		}
 	}
 	public int prIntMin {
@@ -342,7 +342,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				for ( int i = 0; i < myTupleSize; ++i )
 					myFloatPaintValue[ i ] = Mathf.Clamp( value[ i ], myFloatMin, myFloatMax );
 			else
-				throw new HAPI_ErrorInvalidArgument( "prFloatPaintValue given wrong sized array." );
+				throw new HoudiniErrorInvalidArgument( "prFloatPaintValue given wrong sized array." );
 		}
 	}
 	public float prFloatMin {
@@ -382,7 +382,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 		get
 		{
 			if ( myType == Type.UNDEFINED )
-				throw new HAPI_ErrorInvalidArgument( "Geo attribute not defined." );
+				throw new HoudiniErrorInvalidArgument( "Geo attribute not defined." );
 
 			HAPI_AttributeInfo attr_info = new HAPI_AttributeInfo( prName );
 			attr_info.exists = true;
@@ -395,7 +395,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 			else if ( myType == Type.STRING )
 				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_STRING;
 			else
-				throw new HAPI_ErrorInvalidArgument( "Invalid geo attribute type." );
+				throw new HoudiniErrorInvalidArgument( "Invalid geo attribute type." );
 
 			attr_info.count = myVertexCount;
 			attr_info.tupleSize = myTupleSize;
@@ -407,7 +407,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 
-	public HAPI_GeoAttribute()
+	public HoudiniGeoAttribute()
 	{
 		reset();
 	}
@@ -443,38 +443,38 @@ public class HAPI_GeoAttribute : ScriptableObject
 			case Preset.COLOR:
 			{
 				init(
-					mesh, HAPI_Constants.HAPI_ATTRIB_COLOR, Type.FLOAT,
-					HAPI_Constants.HAPI_COLOR_VECTOR_SIZE );
+					mesh, HoudiniConstants.HAPI_ATTRIB_COLOR, Type.FLOAT,
+					HoudiniConstants.HAPI_COLOR_VECTOR_SIZE );
 
 				// Set the alpha values to 1.
-				if ( HAPI_Constants.HAPI_COLOR_VECTOR_SIZE == 4 )
+				if ( HoudiniConstants.HAPI_COLOR_VECTOR_SIZE == 4 )
 				{
-					myFloatPaintValue[ HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ] = 1.0f;
+					myFloatPaintValue[ HoudiniConstants.HAPI_COLOR_VECTOR_SIZE - 1 ] = 1.0f;
 					for ( int i = 0; i < myVertexCount; ++i )
 						myFloatData[
-							( i * HAPI_Constants.HAPI_COLOR_VECTOR_SIZE ) + 
-							( HAPI_Constants.HAPI_COLOR_VECTOR_SIZE - 1 ) ] = 1.0f;
+							( i * HoudiniConstants.HAPI_COLOR_VECTOR_SIZE ) + 
+							( HoudiniConstants.HAPI_COLOR_VECTOR_SIZE - 1 ) ] = 1.0f;
 				}
 				break;
 			}
 			case Preset.UV:
 			{
 				init(
-					mesh, HAPI_Constants.HAPI_ATTRIB_UV, Type.FLOAT,
-					HAPI_Constants.HAPI_UV_VECTOR_SIZE );
+					mesh, HoudiniConstants.HAPI_ATTRIB_UV, Type.FLOAT,
+					HoudiniConstants.HAPI_UV_VECTOR_SIZE );
 				break;
 			}
 			case Preset.NORMAL:
 			{
 				init(
-					mesh, HAPI_Constants.HAPI_ATTRIB_NORMAL, Type.FLOAT,
-					HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE );
+					mesh, HoudiniConstants.HAPI_ATTRIB_NORMAL, Type.FLOAT,
+					HoudiniConstants.HAPI_NORMAL_VECTOR_SIZE );
 
 				// Compute the normals as initial attribute values.
 				mesh.RecalculateNormals();
 				for ( int i = 0; i < myVertexCount; ++i )
-					for ( int j = 0; j < HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE; ++j )
-						myFloatData[ i * HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE + j ] =
+					for ( int j = 0; j < HoudiniConstants.HAPI_NORMAL_VECTOR_SIZE; ++j )
+						myFloatData[ i * HoudiniConstants.HAPI_NORMAL_VECTOR_SIZE + j ] =
 							mesh.normals[ i ][ j ];
 				break;
 			}
@@ -498,7 +498,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 				init( mesh, "string_attribute", Type.STRING, 1 );
 				break;
 			}
-			default: throw new HAPI_ErrorInvalidArgument( "Invalid HAPI_GeoAttribute.Preset!" );
+			default: throw new HoudiniErrorInvalidArgument( "Invalid HAPI_GeoAttribute.Preset!" );
 		}
 	}
 
@@ -701,7 +701,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 					{
 						int min_max_distance = myIntMax - myIntMin;
 						int max_paint_amount = Mathf.CeilToInt(
-							(float) min_max_distance * HAPI_Host.prPaintBrushRate );
+							(float) min_max_distance * HoudiniHost.prPaintBrushRate );
 
 						int clamped_distance = Mathf.Min( abs_distance, max_paint_amount );
 						float paint_amount = paint_factor * clamped_distance;
@@ -732,7 +732,7 @@ public class HAPI_GeoAttribute : ScriptableObject
 					float distance = new_value - original_value;
 
 					float min_max_distance = myFloatMax - myFloatMin;
-					float max_paint_amount = min_max_distance * HAPI_Host.prPaintBrushRate;
+					float max_paint_amount = min_max_distance * HoudiniHost.prPaintBrushRate;
 
 					float clamped_distance =
 						Mathf.Sign( distance ) * Mathf.Min( Mathf.Abs( distance ), Mathf.Abs( max_paint_amount ) );

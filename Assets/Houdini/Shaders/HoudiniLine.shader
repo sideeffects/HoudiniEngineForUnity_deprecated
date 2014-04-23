@@ -1,4 +1,4 @@
-Shader "HAPI/Line" {
+Shader "Houdini/Line" {
 
 	Properties
 	{

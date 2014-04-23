@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class HAPI_AssetUndoInfo : ScriptableObject
+public class HoudiniAssetUndoInfo : ScriptableObject
 {
 	// View Settings
 	public bool isGeoVisible;
@@ -29,7 +29,7 @@ public class HAPI_AssetUndoInfo : ScriptableObject
 	public int bakeSamplesPerSecond;
 
 	// Initialization
-	public void initialize( HAPI_Asset asset )
+	public void initialize( HoudiniAsset asset )
 	{
 		isGeoVisible 					= asset.prIsGeoVisible;
 		showPinnedInstances 			= asset.prShowPinnedInstances;

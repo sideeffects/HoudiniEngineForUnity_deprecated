@@ -20,10 +20,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 [ System.Serializable ]
-public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< KEY >
+public class HoudiniMap< KEY, VALUE > : ScriptableObject where KEY : IEquatable< KEY >
 {
 
-	public HAPI_Map( string name )
+	public HoudiniMap( string name )
 	{
 		myName = name;
 		myKeys = new List< KEY >();
@@ -81,13 +81,13 @@ public class HAPI_Map< KEY, VALUE > : ScriptableObject where KEY : IEquatable< K
 		if ( myKeys.Count != myValues.Count )
 		{
 			Debug.LogError( myName + " dictionary has unserializable values." );
-			throw new HAPI_ErrorNotFound();
+			throw new HoudiniErrorNotFound();
 		}
 		int index = myKeys.FindIndex( delegate( KEY k ) { return k.Equals( key ); } );
 		if ( index >= 0 )
 			return myValues[ index ];
 		else
-			throw new HAPI_ErrorNotFound();
+			throw new HoudiniErrorNotFound();
 	}
 
 	[SerializeField] protected string myName;

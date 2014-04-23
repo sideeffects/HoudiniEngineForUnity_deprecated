@@ -18,19 +18,19 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-[ CustomEditor( typeof( HAPI_Instance ) ) ]
+[ CustomEditor( typeof( HoudiniInstance ) ) ]
 [ CanEditMultipleObjects ]
-public class HAPI_InstanceGUI : Editor 
+public class HoudiniInstanceGUI : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 
 	public void OnSceneGUI()
 	{
-		HAPI_Instance instance = target as HAPI_Instance;
+		HoudiniInstance instance = target as HoudiniInstance;
 
 		
-		HAPI_Instancer instancer = instance.prInstancer;
+		HoudiniInstancer instancer = instance.prInstancer;
 		if ( instancer == null )
 			return;
 		
@@ -43,13 +43,13 @@ public class HAPI_InstanceGUI : Editor
 
 		if (
 			curr_event.isMouse && curr_event.type == EventType.MouseDown &&
-			HAPI_Host.prAutoPinInstances )
+			HoudiniHost.prAutoPinInstances )
 		{
 			instance.prTransformChanged = false;
 		}
 		else if (
 			curr_event.isMouse && curr_event.type == EventType.MouseUp &&
-			HAPI_Host.prAutoPinInstances && instance.prTransformChanged )
+			HoudiniHost.prAutoPinInstances && instance.prTransformChanged )
 		{
 			instancer.pinObject( instance.gameObject, true );
 			instance.prTransformChanged = false;
@@ -59,7 +59,7 @@ public class HAPI_InstanceGUI : Editor
 
 	public virtual void OnEnable() 
 	{
-		myInstance = target as HAPI_Instance;
+		myInstance = target as HoudiniInstance;
 	}
 
 
@@ -67,10 +67,10 @@ public class HAPI_InstanceGUI : Editor
 	{
 
 		Object[] selection = Selection.objects;
-		HAPI_Instancer instancer = myInstance.prInstancer;
+		HoudiniInstancer instancer = myInstance.prInstancer;
 		if ( selection.Length > 0 )
 		{
-			if ( !HAPI_Host.prAutoPinInstances && GUILayout.Button( "Pin Selection" ) )
+			if ( !HoudiniHost.prAutoPinInstances && GUILayout.Button( "Pin Selection" ) )
 				foreach( Object obj in selection )
 					if ( obj.GetType() == typeof( GameObject ) )
 						instancer.pinObject( (GameObject) obj, true );
@@ -85,7 +85,7 @@ public class HAPI_InstanceGUI : Editor
 			bool is_overridden = instancer.isPointOverridden( myInstance.prInstancePointNumber );
 			if ( is_overridden && GUILayout.Button( "UnPin Instance" ) )
 				instancer.pinObject( myInstance.gameObject, false );
-			else if ( !HAPI_Host.prAutoPinInstances && GUILayout.Button( "Pin Instance" ) )
+			else if ( !HoudiniHost.prAutoPinInstances && GUILayout.Button( "Pin Instance" ) )
 				instancer.pinObject( myInstance.gameObject, true );
 		}
 
@@ -94,5 +94,5 @@ public class HAPI_InstanceGUI : Editor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
-	[SerializeField] private HAPI_Instance myInstance = null;
+	[SerializeField] private HoudiniInstance myInstance = null;
 }

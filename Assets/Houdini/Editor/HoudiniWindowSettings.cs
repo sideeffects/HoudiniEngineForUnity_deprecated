@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-public class HAPI_WindowSettings : EditorWindow 
+public class HoudiniWindowSettings : EditorWindow 
 {
 #if !UNITY_STANDALONE_WIN
 	#pragma warning disable 0414
@@ -32,20 +32,20 @@ public class HAPI_WindowSettings : EditorWindow
 	public static void ShowWindow() 
 	{
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow window = EditorWindow.GetWindow< HAPI_WindowSettings >( false, 
-			HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " " + HAPI_GUIUtility.mySettingsLabel );
+		EditorWindow window = EditorWindow.GetWindow< HoudiniWindowSettings >( false, 
+			HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " " + HoudiniGUIUtility.mySettingsLabel );
 
 		window.autoRepaintOnSceneChange = true;
 
-		if ( !HAPI_SetPath.prIsPathSet )
+		if ( !HoudiniSetPath.prIsPathSet )
 		{
-			HAPI_SetPath.setPath();
-			if ( !HAPI_SetPath.prIsPathSet )
+			HoudiniSetPath.setPath();
+			if ( !HoudiniSetPath.prIsPathSet )
 			{
 				Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 				return;
 			}
-			HAPI_Host.initialize();
+			HoudiniHost.initialize();
 		}
 		
 	}
@@ -57,18 +57,18 @@ public class HAPI_WindowSettings : EditorWindow
 			return;
 		try
 		{
-			if ( !HAPI_SetPath.prIsPathSet )
+			if ( !HoudiniSetPath.prIsPathSet )
 			{
-				HAPI_SetPath.setPath();
-				if ( !HAPI_SetPath.prIsPathSet )
+				HoudiniSetPath.setPath();
+				if ( !HoudiniSetPath.prIsPathSet )
 				{
 					Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 					return;
 				}
-				myEnableDraw = HAPI_Host.initialize();
+				myEnableDraw = HoudiniHost.initialize();
 			}
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogError( error.ToString() );
 		}
@@ -81,22 +81,22 @@ public class HAPI_WindowSettings : EditorWindow
 		GUI.enabled = false;
 #endif // !UNITY_STANDALONE_WIN
 
-		myUndoInfo = HAPI_Host.prHostUndoInfo;
+		myUndoInfo = HoudiniHost.prHostUndoInfo;
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
 
-		if ( GUILayout.Button( HAPI_GUIUtility.myRevertAllSettingsLabel ) )
+		if ( GUILayout.Button( HoudiniGUIUtility.myRevertAllSettingsLabel ) )
 		{
 			if ( EditorUtility.DisplayDialog(
 				"Revert all settings?",
 				"Are you sure you want to revert ALL Houdini plugin settings?", 
 				"Yes", "No" ) )
 			{
-				HAPI_Host.revertAllSettingsToDefaults();
-				HAPI_Host.repaint();
+				HoudiniHost.revertAllSettingsToDefaults();
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		GUIContent[] modes = new GUIContent[ 5 ];
 		modes[ 0 ] = new GUIContent( "General" );
@@ -128,139 +128,139 @@ public class HAPI_WindowSettings : EditorWindow
 	{
 		// Collision Group Name
 		{
-			string value = HAPI_Host.prCollisionGroupName;
-			bool changed = HAPI_GUI.stringField(
+			string value = HoudiniHost.prCollisionGroupName;
+			bool changed = HoudiniGUI.stringField(
 				"collision_group_name", "Colli. Grp.", ref value,
 				myUndoInfo, ref myUndoInfo.collisionGroupName );
 			if ( changed )
-				HAPI_Host.prCollisionGroupName = value;
+				HoudiniHost.prCollisionGroupName = value;
 		}
 
 		// Rendered Collision Group Name
 		{
-			string value = HAPI_Host.prRenderedCollisionGroupName;
-			bool changed = HAPI_GUI.stringField(
+			string value = HoudiniHost.prRenderedCollisionGroupName;
+			bool changed = HoudiniGUI.stringField(
 				"rendered_collision_group_name", 
 				"Rendered Colli. Grp.", ref value, myUndoInfo, 
 				ref myUndoInfo.renderedCollisionGroupName );
 			if ( changed )
-				HAPI_Host.prRenderedCollisionGroupName = value;
+				HoudiniHost.prRenderedCollisionGroupName = value;
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Pin Size
 		{
-			float value = HAPI_Host.prPinSize;
-			bool changed = HAPI_GUI.floatField(
+			float value = HoudiniHost.prPinSize;
+			bool changed = HoudiniGUI.floatField(
 				"pin_size", "Pin Size", ref value, 
 				myUndoInfo, ref myUndoInfo.pinSize );
 			if ( changed )
 			{
-				HAPI_Host.prPinSize = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prPinSize = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Pin Colour
 		{
-			Color value = HAPI_Host.prPinColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prPinColour;
+			bool changed = HoudiniGUI.colourField(
 				"pin_colour", "Pin Color", ref value,
 				myUndoInfo, ref myUndoInfo.pinColour );
 			if ( changed )
 			{
-				HAPI_Host.prPinColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prPinColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Auto pin
 		{
-			bool value = HAPI_Host.prAutoPinInstances;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prAutoPinInstances;
+			bool changed = HoudiniGUI.toggle(
 				"auto_pin_instances", "Auto Pin Instances", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.autoPinInstances );
 			if ( changed )
 			{
-				HAPI_Host.prAutoPinInstances = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prAutoPinInstances = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Enable Drag-and-Drop
 		{
-			bool value = HAPI_Host.prEnableDragAndDrop;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prEnableDragAndDrop;
+			bool changed = HoudiniGUI.toggle(
 				"enable_drag_and_drop", "Enable Drag-and-Drop", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.enableDragAndDrop );
 			if ( changed )
 			{
-				HAPI_Host.prEnableDragAndDrop = value;
-				HAPI_GUIUtility.setDragAndDrop( value );
+				HoudiniHost.prEnableDragAndDrop = value;
+				HoudiniGUIUtility.setDragAndDrop( value );
 			}
 		}
 
 		// Enable Support Warnings
 		{
-			bool value = HAPI_Host.prEnableSupportWarnings;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prEnableSupportWarnings;
+			bool changed = HoudiniGUI.toggle(
 				"enable_support_warnings", "Enable Support Warnings", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.enableSupportWarnings );
 			if ( changed )
-				HAPI_Host.prEnableSupportWarnings = value;
+				HoudiniHost.prEnableSupportWarnings = value;
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Auto Select Asset Root Node
 		{
-			bool value = HAPI_Host.prAutoSelectAssetRootNode;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prAutoSelectAssetRootNode;
+			bool changed = HoudiniGUI.toggle(
 				"auto_select_asset_root_node", 
 				"Auto Select Asset Root Node", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.autoSelectAssetRootNode );
 			if ( changed )
 			{
-				HAPI_Host.prAutoSelectAssetRootNode = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prAutoSelectAssetRootNode = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Hide Geometry On Linking
 		{
-			bool value = HAPI_Host.prHideGeometryOnLinking;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prHideGeometryOnLinking;
+			bool changed = HoudiniGUI.toggle(
 				"hide_geometry_on_linking", 
 				"Hide Geometry On Linking", 
 				ref value, myUndoInfo, 
 				ref myUndoInfo.hideGeometryOnLinking );
 			if ( changed )
 			{
-				HAPI_Host.prHideGeometryOnLinking = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prHideGeometryOnLinking = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Enable particles
 		{
-			bool value = HAPI_Host.prEnablePointsAsParticles;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prEnablePointsAsParticles;
+			bool changed = HoudiniGUI.toggle(
 				"enable_points_as_particles",
 				"Create Points as Particles", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.enablePointsAsParticles );
 			if ( changed )
 			{
-				HAPI_Host.prEnablePointsAsParticles = value;
+				HoudiniHost.prEnablePointsAsParticles = value;
 			}
 		}
 	}
@@ -269,53 +269,53 @@ public class HAPI_WindowSettings : EditorWindow
 	{
 		// Unity Material Attrib Name
 		{
-			string value = HAPI_Host.prUnityMaterialAttribName;
-			bool changed = HAPI_GUI.stringField(
+			string value = HoudiniHost.prUnityMaterialAttribName;
+			bool changed = HoudiniGUI.stringField(
 				"unity_material_attrib_name", 
 				"Unity Mat. Attrib.", 
 				ref value, myUndoInfo, 
 				ref myUndoInfo.unityMaterialAttribName );
 			if ( changed )
-				HAPI_Host.prUnityMaterialAttribName = value;
+				HoudiniHost.prUnityMaterialAttribName = value;
 		}
 
 		// Unity Sub Material Name Attrib Name
 		{
-			string value = HAPI_Host.prUnitySubMaterialNameAttribName;
-			bool changed = HAPI_GUI.stringField(
+			string value = HoudiniHost.prUnitySubMaterialNameAttribName;
+			bool changed = HoudiniGUI.stringField(
 				"unity_sub_material_name_attrib_name", 
 				"Unity SubMat. Name Attrib.", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.unitySubMaterialNameAttribName );
 			if ( changed )
-				HAPI_Host.prUnitySubMaterialNameAttribName = value;
+				HoudiniHost.prUnitySubMaterialNameAttribName = value;
 		}
 
 		// Unity Sub Material Index Attrib Name
 		{
-			string value = HAPI_Host.prUnitySubMaterialIndexAttribName;
-			bool changed = HAPI_GUI.stringField(
+			string value = HoudiniHost.prUnitySubMaterialIndexAttribName;
+			bool changed = HoudiniGUI.stringField(
 				"unity_sub_material_index_attrib_name", 
 				"Unity SubMat. Index Attrib.", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.unitySubMaterialIndexAttribName );
 			if ( changed )
-				HAPI_Host.prUnitySubMaterialIndexAttribName = value;
+				HoudiniHost.prUnitySubMaterialIndexAttribName = value;
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Generate Tangents
 		{
-			bool value = HAPI_Host.prGenerateTangents;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prGenerateTangents;
+			bool changed = HoudiniGUI.toggle(
 				"generate_tangents", "Generate Tangents", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.generateTangents );
 			if ( changed )
 			{
-				HAPI_Host.prGenerateTangents = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prGenerateTangents = value;
+				HoudiniHost.repaint();
 
 				EditorUtility.DisplayDialog(
 					"Rebuilds Required",
@@ -325,19 +325,19 @@ public class HAPI_WindowSettings : EditorWindow
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Don't Create Texture Files
 		{
-			bool value = HAPI_Host.prDontCreateTextureFiles;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prDontCreateTextureFiles;
+			bool changed = HoudiniGUI.toggle(
 				"dont_create_texture_files", 
 				"Don't Create Texture Files (use in-memory textures)", 
 				ref value, myUndoInfo, ref myUndoInfo.dontCreateTextureFiles );
 			if ( changed )
 			{
-				HAPI_Host.prDontCreateTextureFiles = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prDontCreateTextureFiles = value;
+				HoudiniHost.repaint();
 
 				EditorUtility.DisplayDialog(
 					"Rebuilds Required",
@@ -349,17 +349,17 @@ public class HAPI_WindowSettings : EditorWindow
 
 		// Extract Textures In Raw Format
 		{
-			bool value = HAPI_Host.prExtractTexturesInRawFormat;
+			bool value = HoudiniHost.prExtractTexturesInRawFormat;
 			bool was_gui_enabled = GUI.enabled;
-			GUI.enabled = HAPI_Host.prDontCreateTextureFiles;
-			bool changed = HAPI_GUI.toggle(
+			GUI.enabled = HoudiniHost.prDontCreateTextureFiles;
+			bool changed = HoudiniGUI.toggle(
 				"extract_textures_in_raw_format", 
 				"Extract Textures In Raw Format (only works for in-memory textures)", 
 				ref value, myUndoInfo, ref myUndoInfo.extractTexturesInRawFormat );
 			if ( changed )
 			{
-				HAPI_Host.prExtractTexturesInRawFormat = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prExtractTexturesInRawFormat = value;
+				HoudiniHost.repaint();
 			}
 			GUI.enabled = was_gui_enabled;
 		}
@@ -369,110 +369,110 @@ public class HAPI_WindowSettings : EditorWindow
 	{
 		// Enable Cooking
 		{
-			bool value = HAPI_Host.prEnableCooking;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prEnableCooking;
+			bool changed = HoudiniGUI.toggle(
 				"enable_cooking", "Enable Cooking", ref value,
 				myUndoInfo, ref myUndoInfo.enableCooking );
 			if ( changed )
 			{
-				HAPI_Host.prEnableCooking = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prEnableCooking = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Cooking Triggers Downstream Cooks
 		{
-			bool value = HAPI_Host.prCookingTriggersDownCooks;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prCookingTriggersDownCooks;
+			bool changed = HoudiniGUI.toggle(
 				"cooking_triggers_downstream_cooks", 
 				"Cooking Triggers Downstream Cooks", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.cookingTriggersDownCooks );
 			if ( changed )
 			{
-				HAPI_Host.prCookingTriggersDownCooks = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prCookingTriggersDownCooks = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Playmode Per-Frame Cooking
 		{
-			bool value = HAPI_Host.prPlaymodePerFrameCooking;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prPlaymodePerFrameCooking;
+			bool changed = HoudiniGUI.toggle(
 				"playmode_per_frame_cooking", 
 				"Playmode Per-Frame Cooking", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.playmodePerFrameCooking );
 			if ( changed )
 			{
-				HAPI_Host.prPlaymodePerFrameCooking = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prPlaymodePerFrameCooking = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Push Unity Transform To Houdini Engine
 		{
-			bool value = HAPI_Host.prPushUnityTransformToHoudini;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prPushUnityTransformToHoudini;
+			bool changed = HoudiniGUI.toggle(
 				"push_unity_transform_to_houdini", 
 				"Push Unity Transform to Houdini Engine", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.pushUnityTransformToHoudini );
 			if ( changed )
 			{
-				HAPI_Host.prPushUnityTransformToHoudini = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prPushUnityTransformToHoudini = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Transform Change Triggers Cooks
 		{
-			bool value = HAPI_Host.prTransformChangeTriggersCooks;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prTransformChangeTriggersCooks;
+			bool changed = HoudiniGUI.toggle(
 				"transform_change_triggers_cooks", 
 				"Transform Change Triggers Cooks", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.transformChangeTriggersCooks );
 			if ( changed )
 			{
-				HAPI_Host.prTransformChangeTriggersCooks = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prTransformChangeTriggersCooks = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Import Templated Geos
 		{
-			bool value = HAPI_Host.prImportTemplatedGeos;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prImportTemplatedGeos;
+			bool changed = HoudiniGUI.toggle(
 				"import_templated_geos", 
 				"Import Templated Geos", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.importTemplatedGeos );
 			if ( changed )
 			{
-				HAPI_Host.prImportTemplatedGeos = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prImportTemplatedGeos = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Split Geos by Group
 		{
-			bool value = HAPI_Host.prSplitGeosByGroup;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prSplitGeosByGroup;
+			bool changed = HoudiniGUI.toggle(
 				"split_geos_by_group", 
 				"Split Geos by Group", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.splitGeosByGroup );
 			if ( changed )
 			{
-				HAPI_Host.prSplitGeosByGroup = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prSplitGeosByGroup = value;
+				HoudiniHost.repaint();
 			
 				EditorUtility.DisplayDialog(
 					"Restart Required",
@@ -487,38 +487,38 @@ public class HAPI_WindowSettings : EditorWindow
 	{
 		// Unity Tag Attrib Name
 		{
-			string value = HAPI_Host.prUnityTagAttribName;
-			bool changed = HAPI_GUI.stringField(
+			string value = HoudiniHost.prUnityTagAttribName;
+			bool changed = HoudiniGUI.stringField(
 				"unity_tag_attrib_name", "Unity Tag Attrib.", 
 				ref value, myUndoInfo, 
 				ref myUndoInfo.unityTagAttribName );
 			if ( changed )
-				HAPI_Host.prUnityTagAttribName = value;
+				HoudiniHost.prUnityTagAttribName = value;
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Paint Brush Rate
 		{
 			// Everything is opposite here because the higher the number the slower
 			// the paint rate and we want the user to think the higher the number
 			// the FASTER the rate - so we have to invert.
-			float value = HAPI_Host.prPaintBrushRate;
-			bool changed = HAPI_GUI.floatField(
+			float value = HoudiniHost.prPaintBrushRate;
+			bool changed = HoudiniGUI.floatField(
 				"paint_brush_rate", "Paint Brush Rate", 
 				ref value, 0.0f, 1.0f,
 				myUndoInfo,
 				ref myUndoInfo.paintBrushRate );
 			if ( changed )
 			{
-				HAPI_Host.prPaintBrushRate = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prPaintBrushRate = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Painting Mode Hot Key
 		{
-			KeyCode value = HAPI_Host.prPaintingModeHotKey;
+			KeyCode value = HoudiniHost.prPaintingModeHotKey;
 			string[] labels = 
 				System.Enum.GetValues( typeof( KeyCode ) )
 					.Cast< KeyCode >()
@@ -528,38 +528,38 @@ public class HAPI_WindowSettings : EditorWindow
 				System.Enum.GetValues( typeof( KeyCode ) )
 					.Cast< KeyCode >()
 					.ToArray();
-			bool changed = HAPI_GUI.dropdown(
+			bool changed = HoudiniGUI.dropdown(
 				"painting_mode_hot_key", "Painting Key",
 				ref value, labels, values, myUndoInfo,
 				ref myUndoInfo.paintingModeHotKey );
 
 			if ( changed )
 			{
-				HAPI_Host.prPaintingModeHotKey = (KeyCode) value;
-				HAPI_Host.repaint();
+				HoudiniHost.prPaintingModeHotKey = (KeyCode) value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Painting Mode Colour
 		{
-			Color value = HAPI_Host.prPaintingModeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prPaintingModeColour;
+			bool changed = HoudiniGUI.colourField(
 				"painting_mode_colour", "Painting Mode", 
 				ref value, myUndoInfo, 
 				ref myUndoInfo.paintingModeColour );
 
 			if ( changed )
 			{
-				HAPI_Host.prPaintingModeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prPaintingModeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Adding Points Mode Hot Key
 		{
-			KeyCode value = HAPI_Host.prAddingPointsModeHotKey;
+			KeyCode value = HoudiniHost.prAddingPointsModeHotKey;
 			string[] labels =
 				System.Enum.GetValues( typeof( KeyCode ) )
 					.Cast< KeyCode >()
@@ -570,38 +570,38 @@ public class HAPI_WindowSettings : EditorWindow
 					.Cast< KeyCode >()
 					.ToArray();
 
-			bool changed = HAPI_GUI.dropdown(
+			bool changed = HoudiniGUI.dropdown(
 				"adding_points_mode_hot_key", "Adding Points Key",
 				ref value, labels, values, myUndoInfo,
 				ref myUndoInfo.addingPointsModeHotKey );
 
 			if ( changed )
 			{
-				HAPI_Host.prAddingPointsModeHotKey = (KeyCode) value;
-				HAPI_Host.repaint();
+				HoudiniHost.prAddingPointsModeHotKey = (KeyCode) value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Adding Points Mode Colour
 		{
-			Color value = HAPI_Host.prAddingPointsModeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prAddingPointsModeColour;
+			bool changed = HoudiniGUI.colourField(
 				"adding_ponits_mode_colour", "Adding Points Mode", 
 				ref value, myUndoInfo, 
 				ref myUndoInfo.addingPointsModeColour );
 
 			if ( changed )
 			{
-				HAPI_Host.prAddingPointsModeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prAddingPointsModeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Editing Points Mode Hot Key
 		{
-			KeyCode value = HAPI_Host.prEditingPointsModeHotKey;
+			KeyCode value = HoudiniHost.prEditingPointsModeHotKey;
 			string[] labels =
 				System.Enum.GetValues( typeof( KeyCode ) )
 					.Cast< KeyCode >()
@@ -612,127 +612,127 @@ public class HAPI_WindowSettings : EditorWindow
 					.Cast< KeyCode >()
 					.ToArray();
 
-			bool changed = HAPI_GUI.dropdown(
+			bool changed = HoudiniGUI.dropdown(
 				"editing_points_mode_hot_key", "Editing Points Key", 
 				ref value, labels, values, myUndoInfo,
 				ref myUndoInfo.editingPointsModeHotKey );
 
 			if ( changed )
 			{
-				HAPI_Host.prEditingPointsModeHotKey = (KeyCode) value;
-				HAPI_Host.repaint();
+				HoudiniHost.prEditingPointsModeHotKey = (KeyCode) value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Editing Points Mode Colour
 		{
-			Color value = HAPI_Host.prEditingPointsModeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prEditingPointsModeColour;
+			bool changed = HoudiniGUI.colourField(
 				"editing_ponits_mode_colour", "Editing Points Mode", 
 				ref value, myUndoInfo, 
 				ref myUndoInfo.editingPointsModeColour );
 			if ( changed )
 			{
-				HAPI_Host.prEditingPointsModeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prEditingPointsModeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Wireframe Colour
 		{
-			Color value = HAPI_Host.prWireframeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prWireframeColour;
+			bool changed = HoudiniGUI.colourField(
 				"wireframe_colour", "Wireframe", ref value,
 				myUndoInfo, ref myUndoInfo.wireframeColour );
 			if ( changed )
 			{
-				HAPI_Host.prWireframeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prWireframeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Guide Wireframe Colour
 		{
-			Color value = HAPI_Host.prGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prGuideWireframeColour;
+			bool changed = HoudiniGUI.colourField(
 				"guide_wireframe_colour", "Guide Wireframe", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.guideWireframeColour );
 			if ( changed )
 			{
-				HAPI_Host.prGuideWireframeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prGuideWireframeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Unselectable Guide Wireframe Colour
 		{
-			Color value = HAPI_Host.prUnselectableGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prUnselectableGuideWireframeColour;
+			bool changed = HoudiniGUI.colourField(
 				"unselectable_guide_wireframe_colour",
 				"Unselectable Guide",
 				ref value, myUndoInfo,
 				ref myUndoInfo.unselectableGuideWireframeColour );
 			if ( changed )
 			{
-				HAPI_Host.prUnselectableGuideWireframeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prUnselectableGuideWireframeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Unselected Guide Wireframe Colour
 		{
-			Color value = HAPI_Host.prUnselectedGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prUnselectedGuideWireframeColour;
+			bool changed = HoudiniGUI.colourField(
 				"unselected_guide_wireframe_colour",
 				"Unselected Guide",
 				ref value, myUndoInfo,
 				ref myUndoInfo.unselectedGuideWireframeColour );
 			if ( changed )
 			{
-				HAPI_Host.prUnselectedGuideWireframeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prUnselectedGuideWireframeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Selected Guide Wireframe Colour
 		{
-			Color value = HAPI_Host.prSelectedGuideWireframeColour;
-			bool changed = HAPI_GUI.colourField(
+			Color value = HoudiniHost.prSelectedGuideWireframeColour;
+			bool changed = HoudiniGUI.colourField(
 				"selected_guide_wireframe_colour",
 				"Selected Guide",
 				ref value, myUndoInfo,
 				ref myUndoInfo.selectedGuideWireframeColour );
 			if ( changed )
 			{
-				HAPI_Host.prSelectedGuideWireframeColour = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prSelectedGuideWireframeColour = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Guide Point Size
 		{
-			float value = HAPI_Host.prGuidePointSize;
-			bool changed = HAPI_GUI.floatField(
+			float value = HoudiniHost.prGuidePointSize;
+			bool changed = HoudiniGUI.floatField(
 				"guide_point_size", "Guide Point Size", 
 				ref value, 4.0f, 40.0f,
 				myUndoInfo,
 				ref myUndoInfo.guidePointSize );
 			if ( changed )
 			{
-				HAPI_Host.prGuidePointSize = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prGuidePointSize = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Min. Distance For Point Selection
 		{
-			float value = HAPI_Host.prMinDistanceForPointSelection;
-			bool changed = HAPI_GUI.floatField(
+			float value = HoudiniHost.prMinDistanceForPointSelection;
+			bool changed = HoudiniGUI.floatField(
 				"min_distance_for_point_selection", 
 				"Min. Distance For Point Selection", 
 				ref value, 1.0f, 20.0f,
@@ -740,15 +740,15 @@ public class HAPI_WindowSettings : EditorWindow
 				ref myUndoInfo.minDistanceForPointSelection );
 			if ( changed )
 			{
-				HAPI_Host.prMinDistanceForPointSelection = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prMinDistanceForPointSelection = value;
+				HoudiniHost.repaint();
 			}
 		}
 
 		// Guide Min. Distance For Mid Point Insertion
 		{
-			float value = HAPI_Host.prGuideMinDistanceForMidPointInsertion;
-			bool changed = HAPI_GUI.floatField(
+			float value = HoudiniHost.prGuideMinDistanceForMidPointInsertion;
+			bool changed = HoudiniGUI.floatField(
 				"guide_min_distance_for_mid_point_insertion", 
 				"Guide Min. Distance For Mid Point Insertion", 
 				ref value, 1.0f, 20.0f,
@@ -756,24 +756,24 @@ public class HAPI_WindowSettings : EditorWindow
 				ref myUndoInfo.guideMinDistanceForMidPointInsertion );
 			if ( changed )
 			{
-				HAPI_Host.prGuideMinDistanceForMidPointInsertion = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prGuideMinDistanceForMidPointInsertion = value;
+				HoudiniHost.repaint();
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 
 		// Create Groups from Bool Attribute
 		{
-			bool value = HAPI_Host.prCreateGroupsFromBoolAttributes;
-			bool changed = HAPI_GUI.toggle(
+			bool value = HoudiniHost.prCreateGroupsFromBoolAttributes;
+			bool changed = HoudiniGUI.toggle(
 				"create_groups_from_bool_attributes", "Create Groups from Bool Attributes", 
 				ref value, myUndoInfo,
 				ref myUndoInfo.createGroupsFromBoolAttributes );
 			if ( changed )
 			{
-				HAPI_Host.prCreateGroupsFromBoolAttributes = value;
-				HAPI_Host.repaint();
+				HoudiniHost.prCreateGroupsFromBoolAttributes = value;
+				HoudiniHost.repaint();
 			}
 		}
 	}
@@ -782,35 +782,35 @@ public class HAPI_WindowSettings : EditorWindow
 	{
 		// Curve Primitive Type Default
 		{
-			int value = HAPI_Host.prCurvePrimitiveTypeDefault;
+			int value = HoudiniHost.prCurvePrimitiveTypeDefault;
 			string[] labels = { "Polygon", "NURBS", "Bezier" };
 			int[] values = { 0, 1, 2 };
-			bool changed = HAPI_GUI.dropdown(
+			bool changed = HoudiniGUI.dropdown(
 				"curve_primitive_type_default", "Initial Type", 
 				ref value, labels, values, myUndoInfo,
 				ref myUndoInfo.curvePrimitiveTypeDefault );
 			if ( changed )
-				HAPI_Host.prCurvePrimitiveTypeDefault = value;
+				HoudiniHost.prCurvePrimitiveTypeDefault = value;
 		}
 
 		// Curve Method Default
 		{
-			int value = HAPI_Host.prCurveMethodDefault;
+			int value = HoudiniHost.prCurveMethodDefault;
 			string[] labels = { "CVs", "Breakpoints", "Freehand" };
 			int[] values = { 0, 1, 2 };
-			bool changed = HAPI_GUI.dropdown(
+			bool changed = HoudiniGUI.dropdown(
 				"curve_method_default", "Initial Method", 
 				ref value, labels, values, myUndoInfo,
 				ref myUndoInfo.curveMethodDefault );
 			if ( changed )
-				HAPI_Host.prCurveMethodDefault = value;
+				HoudiniHost.prCurveMethodDefault = value;
 		}
 	}
 
 	private static bool myEnableDraw = true;
 	private static int mySettingsTabSelection = 0;
 	private static Vector2 myScrollPosition;
-	private static HAPI_HostUndoInfo myUndoInfo;
+	private static HoudiniHostUndoInfo myUndoInfo;
 
 #if !UNITY_STANDALONE_WIN
 	#pragma warning restore 0414

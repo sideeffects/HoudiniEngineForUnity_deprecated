@@ -18,21 +18,20 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
-using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
-public class HAPI_AssetCurve : HAPI_Asset
+public class HoudiniAssetCurve : HoudiniAsset
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 
-	public HAPI_Curve				prCurve {	get { 
-													HAPI_Curve curve = gameObject.GetComponent< HAPI_Curve >();
+	public HoudiniCurve				prCurve {	get { 
+													HoudiniCurve curve = gameObject.GetComponent< HoudiniCurve >();
 													if ( curve == null )
 													{
-														curve = gameObject.AddComponent< HAPI_Curve >();
+														curve = gameObject.AddComponent< HoudiniCurve >();
 														curve.prControl = this;
 														curve.prParms = this.prParms;
 													}
@@ -43,15 +42,15 @@ public class HAPI_AssetCurve : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_AssetCurve() 
+	public HoudiniAssetCurve() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset created!" );
+			Debug.Log( "HoudiniAssetCurve created!" );
 
 		reset();
 	}
 	
-	~HAPI_AssetCurve()
+	~HoudiniAssetCurve()
 	{}
 
 	public override void reset()
@@ -105,23 +104,23 @@ public class HAPI_AssetCurve : HAPI_Asset
 
 	protected override int buildCreateAsset()
 	{
-		return HAPI_Host.createCurve();
+		return HoudiniHost.createCurve();
 	}
 
-	protected override void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar )
+	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
 	{
 		prCurve.initDefaultParameters();
 	}
 
-	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
+	protected override void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar )
 	{
 		try
 		{
 			prCurve.syncPointsWithParm();
 			prCurve.createObject( 0, 0 );
-			HAPI_Host.repaint();
+			HoudiniHost.repaint();
 		}
-		catch ( HAPI_Error )
+		catch ( HoudiniError )
 		{
 			// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
 			//Debug.LogWarning( error.ToString() );

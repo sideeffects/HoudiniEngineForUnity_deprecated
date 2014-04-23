@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class HAPI_InstancerOverrideInfo : ScriptableObject
+public class HoudiniInstancerOverrideInfo : ScriptableObject
 {
 	public Vector3 translate = new Vector3( 0, 0, 0 );
 	public Vector3 rotate = new Vector3( 0, 0, 0 );

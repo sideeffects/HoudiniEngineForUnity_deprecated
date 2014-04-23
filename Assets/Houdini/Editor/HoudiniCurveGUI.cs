@@ -21,8 +21,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 [ ExecuteInEditMode ]
-[ CustomEditor( typeof( HAPI_Curve ) ) ]
-public class HAPI_CurveGUI : Editor 
+[ CustomEditor( typeof( HoudiniCurve ) ) ]
+public class HoudiniCurveGUI : Editor 
 {
 #if !UNITY_STANDALONE_WIN
 	#pragma warning disable 0414
@@ -33,7 +33,7 @@ public class HAPI_CurveGUI : Editor
 	
 	public void OnEnable() 
 	{
-		myCurve					= target as HAPI_Curve;
+		myCurve					= target as HoudiniCurve;
 
 		myForceInspectorRedraw	= false;
 		myTarget				= null;
@@ -56,19 +56,19 @@ public class HAPI_CurveGUI : Editor
 		myConnectionMesh		= null;
 		myConnectionMaterial	= null;
 
-		myLastMode				= HAPI_Curve.Mode.NONE;
+		myLastMode				= HoudiniCurve.Mode.NONE;
 
-		HAPI_Host.myRepaintDelegate += this.refresh;
-		HAPI_Host.myDeselectionDelegate += this.deselect;
-		HAPI_Host.mySelectionTarget = myCurve.gameObject;
+		HoudiniHost.myRepaintDelegate += this.refresh;
+		HoudiniHost.myDeselectionDelegate += this.deselect;
+		HoudiniHost.mySelectionTarget = myCurve.gameObject;
 	}
 
 	public void OnDisable()
 	{
 		// This is called after OnSceneGUI sometimes for some reason.
-		HAPI_Host.myRepaintDelegate -= this.refresh;
-		HAPI_Host.myDeselectionDelegate -= this.deselect;
-		HAPI_Host.mySelectionTarget = null;
+		HoudiniHost.myRepaintDelegate -= this.refresh;
+		HoudiniHost.myDeselectionDelegate -= this.deselect;
+		HoudiniHost.mySelectionTarget = null;
 		myIsTransformHandleHidden = false;
 	}
 
@@ -97,14 +97,14 @@ public class HAPI_CurveGUI : Editor
 		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 		if ( !is_editable )
-			HAPI_GUI.help( "This curve is not editable.", MessageType.Info );
+			HoudiniGUI.help( "This curve is not editable.", MessageType.Info );
 #endif // !UNITY_STANDALONE_WIN
 
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
 
 		Object target = (Object) myTarget;
-		if ( HAPI_GUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
+		if ( HoudiniGUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
 			myTarget = (GameObject) target;
 
 		GUI.enabled = gui_enable;
@@ -163,7 +163,7 @@ public class HAPI_CurveGUI : Editor
 			{
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
-				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				bool button_press 	= Handles.Button( 	position, 
 														rotation,
 														handle_size,
@@ -209,13 +209,13 @@ public class HAPI_CurveGUI : Editor
 						Vector3 p1 = myCurve.transform.TransformPoint( myCurve.prPoints[ i ] );
 
 						Vector3 closest_point = new Vector3();
-						float distance = HAPI_GUIUtility.closestDistanceBetweenLineAndLineSegment(
+						float distance = HoudiniGUIUtility.closestDistanceBetweenLineAndLineSegment(
 							p0, p1,
 							ray, out closest_point );
 						
 						if ( distance < 
 								HandleUtility.GetHandleSize( closest_point ) / 
-								HAPI_Host.prGuideMinDistanceForMidPointInsertion )
+								HoudiniHost.prGuideMinDistanceForMidPointInsertion )
 						{
 							anchor1 = p0;
 							anchor2 = p1;
@@ -231,8 +231,8 @@ public class HAPI_CurveGUI : Editor
 					int[] line_indices = new int[ point_count ];
 					Vector2[] uvs = new Vector2[ point_count ];
 
-					line_vertices[ 0 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( anchor1, myTempCamera );
-					line_vertices[ 1 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( new_point_location, myTempCamera );
+					line_vertices[ 0 ]	= HoudiniGUIUtility.getCameraNearPlanePoint( anchor1, myTempCamera );
+					line_vertices[ 1 ]	= HoudiniGUIUtility.getCameraNearPlanePoint( new_point_location, myTempCamera );
 					float length		= Vector3.Distance( line_vertices[ 0 ], line_vertices[ 1 ] ) * 
 										  myGuideLinesDashTilingMultiplier;
 					line_indices[ 0 ]	= 0; 
@@ -242,7 +242,7 @@ public class HAPI_CurveGUI : Editor
 
 					if ( is_mid_point )
 					{
-						line_vertices[ 2 ]	= HAPI_GUIUtility.getCameraNearPlanePoint( anchor2, myTempCamera );
+						line_vertices[ 2 ]	= HoudiniGUIUtility.getCameraNearPlanePoint( anchor2, myTempCamera );
 						line_indices[ 2 ]	= 2;
 						length				+= Vector3.Distance( line_vertices[ 1 ], line_vertices[ 2 ] ) * 
 											   myGuideLinesDashTilingMultiplier;
@@ -255,7 +255,7 @@ public class HAPI_CurveGUI : Editor
 					myGuideLinesMesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
 
 					myGuideLinesMaterial.SetPass( 0 );
-					myGuideLinesMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
+					myGuideLinesMaterial.SetColor( "_Color", HoudiniHost.prGuideWireframeColour );
 					myGuideLinesMaterial.SetTextureScale( "_MainTex", new Vector2( 1.0f, 1.0f ) );
 					Graphics.DrawMeshNow( myGuideLinesMesh, Matrix4x4.identity );
 				}
@@ -354,7 +354,7 @@ public class HAPI_CurveGUI : Editor
 						else
 						{
 							float distance = Vector3.Distance( mouse_position, proj_pos );
-							if ( distance < HAPI_Host.prMinDistanceForPointSelection )
+							if ( distance < HoudiniHost.prMinDistanceForPointSelection )
 							{
 								// Once we modify a point we are no longer bound to the user holding down 
 								// the point edit key. Edit point mode is now fully activated.
@@ -368,7 +368,7 @@ public class HAPI_CurveGUI : Editor
 				// Prevent click from being passed lower (this is so stupid!).
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
-				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
 				// Prevent the delete key from deleting the curve in this mode.
@@ -457,14 +457,14 @@ public class HAPI_CurveGUI : Editor
 		// Selection Mesh Draws
 		if ( mySelectionMaterial != null && mySelectionMesh != null )
 		{
-			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize );
-			mySelectionMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
+			mySelectionMaterial.SetFloat( "_PointSize", HoudiniHost.prGuidePointSize );
+			mySelectionMaterial.SetColor( "_Color", HoudiniHost.prGuideWireframeColour );
 			if ( mySelectionMaterial.SetPass( 0 ) )
 			{
 				Graphics.DrawMeshNow( mySelectionMesh, myCurve.transform.localToWorldMatrix );
 			}
 
-			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize - myGuideBorderSize );
+			mySelectionMaterial.SetFloat( "_PointSize", HoudiniHost.prGuidePointSize - myGuideBorderSize );
 			mySelectionMaterial.SetColor( "_Color", Color.white );
 			if ( mySelectionMaterial.SetPass( 1 ) )
 			{
@@ -519,9 +519,9 @@ public class HAPI_CurveGUI : Editor
 		if ( mySelectionMeshColours != null )
 			for ( int i = 0; i < mySelectionMeshColours.Length; ++i )
 				if ( myCurve.prIsEditingPoints )
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectedGuideWireframeColour;
 				else
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectableGuideWireframeColour;
 
 		buildGuideGeometry();
 	}
@@ -539,13 +539,13 @@ public class HAPI_CurveGUI : Editor
 			{
 				mySelectedPointsMask[ point_index ] = false;
 				mySelectedPoints.Remove( point_index );
-				mySelectionMeshColours[ point_index ] = HAPI_Host.prUnselectedGuideWireframeColour;
+				mySelectionMeshColours[ point_index ] = HoudiniHost.prUnselectedGuideWireframeColour;
 			}
 			else
 			{
 				mySelectedPointsMask[ point_index ] = true;
 				mySelectedPoints.Add( point_index );
-				mySelectionMeshColours[ point_index ] = HAPI_Host.prSelectedGuideWireframeColour;
+				mySelectionMeshColours[ point_index ] = HoudiniHost.prSelectedGuideWireframeColour;
 			}
 		}
 
@@ -558,7 +558,7 @@ public class HAPI_CurveGUI : Editor
 
 		if ( myGuideLinesMaterial == null || myGuideLinesTexture == null || myGuideLinesMaterial == null )
 		{
-			myGuideLinesMaterial					= new Material( Shader.Find( "HAPI/DottedLine" ) );
+			myGuideLinesMaterial					= new Material( Shader.Find( "Houdini/DottedLine" ) );
 			myGuideLinesMaterial.hideFlags			= HideFlags.HideAndDontSave;
 
 			myGuideLinesTexture						= new Texture2D( 4, 1, TextureFormat.RGBA32, false );
@@ -583,7 +583,7 @@ public class HAPI_CurveGUI : Editor
 
 		if ( mySelectionMaterial == null )
 		{
-			mySelectionMaterial						= new Material( Shader.Find( "HAPI/CurvePoint" ) );
+			mySelectionMaterial						= new Material( Shader.Find( "Houdini/CurvePoint" ) );
 			mySelectionMaterial.hideFlags			= HideFlags.HideAndDontSave;
 			mySelectionMaterial.shader.hideFlags	= HideFlags.HideAndDontSave;
 		}
@@ -620,9 +620,9 @@ public class HAPI_CurveGUI : Editor
 			for ( int i = 0; i < selection_vertices.Length; ++i )
 			{
 				if ( !myCurve.prIsEditingPoints )
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectableGuideWireframeColour;
 				else
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectedGuideWireframeColour;
 			}
 		}
 
@@ -634,7 +634,7 @@ public class HAPI_CurveGUI : Editor
 
 		if ( myConnectionMaterial == null )
 		{
-			myConnectionMaterial					= new Material( Shader.Find( "HAPI/Line" ) );
+			myConnectionMaterial					= new Material( Shader.Find( "Houdini/Line" ) );
 			myConnectionMaterial.hideFlags			= HideFlags.HideAndDontSave;
 			myConnectionMaterial.shader.hideFlags	= HideFlags.HideAndDontSave;
 		}
@@ -649,30 +649,30 @@ public class HAPI_CurveGUI : Editor
 
 		Color[] connection_colours = new Color[ connection_vertices.Length ];
 		for ( int i = 0; i < connection_vertices.Length; ++i )
-			connection_colours[ i ] = HAPI_Host.prGuideWireframeColour;
+			connection_colours[ i ] = HoudiniHost.prGuideWireframeColour;
 
 		myConnectionMesh.vertices = connection_vertices;
 		myConnectionMesh.colors = connection_colours;
 		myConnectionMesh.SetIndices( connection_indices, MeshTopology.LineStrip, 0 );
 	}
 
-	private void changeModes( ref bool add_points_mode, ref bool edit_points_mode, HAPI_Curve.Mode mode )
+	private void changeModes( ref bool add_points_mode, ref bool edit_points_mode, HoudiniCurve.Mode mode )
 	{
 		switch ( mode )
 		{
-			case HAPI_Curve.Mode.NONE: 
+			case HoudiniCurve.Mode.NONE: 
 				{
 					add_points_mode = false;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_Curve.Mode.ADD:
+			case HoudiniCurve.Mode.ADD:
 				{
 					add_points_mode = true;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_Curve.Mode.EDIT:
+			case HoudiniCurve.Mode.EDIT:
 				{
 					add_points_mode = false;
 					edit_points_mode = true;
@@ -704,16 +704,16 @@ public class HAPI_CurveGUI : Editor
 	{
 		if ( !myCurve.prEditable )
 		{
-			myLastMode					= HAPI_Curve.Mode.NONE;
-			myCurve.prCurrentMode		= HAPI_Curve.Mode.NONE;
+			myLastMode					= HoudiniCurve.Mode.NONE;
+			myCurve.prCurrentMode		= HoudiniCurve.Mode.NONE;
 			myCurve.prIsAddingPoints	= false;
 			myCurve.prIsEditingPoints	= false;
 			myCurve.prModeChangeWait	= false;
 			return;
 		}
 
-		bool add_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prAddingPointsModeHotKey );
-		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prEditingPointsModeHotKey );
+		bool add_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prAddingPointsModeHotKey );
+		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prEditingPointsModeHotKey );
 
 		bool add_points_mode		= myCurve.prIsAddingPoints;
 		bool edit_points_mode		= myCurve.prIsEditingPoints;
@@ -723,7 +723,7 @@ public class HAPI_CurveGUI : Editor
 		{
 			if ( !mode_change_wait && edit_points_mode_key )
 			{
-				myLastMode			= HAPI_Curve.Mode.ADD;
+				myLastMode			= HoudiniCurve.Mode.ADD;
 
 				add_points_mode		= false;
 				edit_points_mode	= true;
@@ -739,7 +739,7 @@ public class HAPI_CurveGUI : Editor
 		{
 			if ( !mode_change_wait && add_points_mode_key )
 			{
-				myLastMode			= HAPI_Curve.Mode.EDIT;
+				myLastMode			= HoudiniCurve.Mode.EDIT;
 
 				add_points_mode		= true;
 				edit_points_mode	= false;
@@ -757,13 +757,13 @@ public class HAPI_CurveGUI : Editor
 			{
 				add_points_mode		= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_Curve.Mode.NONE;
+				myLastMode			= HoudiniCurve.Mode.NONE;
 			}
 			else if ( edit_points_mode_key )
 			{
 				edit_points_mode	= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_Curve.Mode.NONE;
+				myLastMode			= HoudiniCurve.Mode.NONE;
 			}
 		}
 
@@ -792,9 +792,9 @@ public class HAPI_CurveGUI : Editor
 
 	private void drawSceneUI()
 	{
-		string title_text = HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Curve";
-		string add_hotkey_string = HAPI_Host.prAddingPointsModeHotKey.ToString();
-		string edit_hotkey_string = HAPI_Host.prEditingPointsModeHotKey.ToString();
+		string title_text = HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " Curve";
+		string add_hotkey_string = HoudiniHost.prAddingPointsModeHotKey.ToString();
+		string edit_hotkey_string = HoudiniHost.prEditingPointsModeHotKey.ToString();
 		string help_text = "" + add_hotkey_string + ": add points | " + 
 						   edit_hotkey_string + ": edit points";
 
@@ -809,12 +809,12 @@ public class HAPI_CurveGUI : Editor
 		if ( myCurve.prIsAddingPoints )
 		{
 			help_text = "Click in space: add next point | Click a line segment: add midpoint | Backspace: delete last point | ESC or Enter: exit mode";
-			box_color = HAPI_Host.prAddingPointsModeColour;
+			box_color = HoudiniHost.prAddingPointsModeColour;
 		}
 		else if ( myCurve.prIsEditingPoints )
 		{
 			help_text = "Click or drag: select points | Delete: delete selected | Hold Control: toggle-based selection | ESC or Enter: exit mode";
-			box_color = HAPI_Host.prEditingPointsModeColour;
+			box_color = HoudiniHost.prEditingPointsModeColour;
 		}
 
 		if ( !mySceneWindowHasFocus && myCurve.prEditable )
@@ -914,10 +914,10 @@ public class HAPI_CurveGUI : Editor
 			// whos key is being held down...
 			GUI.enabled =
 				!mySceneWindowHasFocus ||
-				( ( myCurrentlyPressedKey != HAPI_Host.prAddingPointsModeHotKey ) &&
-				  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey ) );
-			HAPI_Curve.Mode last_mode = myCurve.prCurrentMode;
-			myCurve.prCurrentMode = (HAPI_Curve.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
+				( ( myCurrentlyPressedKey != HoudiniHost.prAddingPointsModeHotKey ) &&
+				  ( myCurrentlyPressedKey != HoudiniHost.prEditingPointsModeHotKey ) );
+			HoudiniCurve.Mode last_mode = myCurve.prCurrentMode;
+			myCurve.prCurrentMode = (HoudiniCurve.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
 			if ( last_mode != myCurve.prCurrentMode )
 				clearSelection();
 			GUI.enabled = true;
@@ -942,7 +942,7 @@ public class HAPI_CurveGUI : Editor
 			float width					= myTempCamera.pixelWidth;
 			float height				= myTempCamera.pixelHeight;
 
-			if ( myCurve.prCurrentMode == HAPI_Curve.Mode.NONE )
+			if ( myCurve.prCurrentMode == HoudiniCurve.Mode.NONE )
 			{
 				border_texture.SetPixel( 0, 0, new Color( text_color.r, text_color.g, text_color.b, 0.6f ) );
 				border_texture.Apply();
@@ -990,7 +990,7 @@ public class HAPI_CurveGUI : Editor
 		}
 	}
 
-	private HAPI_Curve			myCurve;
+	private HoudiniCurve			myCurve;
 
 	private bool				myForceInspectorRedraw;
 
@@ -1037,7 +1037,7 @@ public class HAPI_CurveGUI : Editor
 	private Mesh				myConnectionMesh;
 	private Material			myConnectionMaterial;
 
-	private HAPI_Curve.Mode myLastMode;
+	private HoudiniCurve.Mode myLastMode;
 
 #if !UNITY_STANDALONE_WIN
 	#pragma warning restore 0414

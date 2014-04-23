@@ -19,7 +19,7 @@ using System;
 using System.Collections;
 
 [Serializable]
-public class HAPI_AssetAccessor
+public class HoudiniAssetAccessor
 {
 	public enum ParmType
 	{
@@ -41,25 +41,25 @@ public class HAPI_AssetAccessor
 
 	// Static methods used to get HAPI_AssetAccessor(s) -------------------------------------------------------------
 
-	public static HAPI_AssetAccessor[] getAllAssetAccessors()
+	public static HoudiniAssetAccessor[] getAllAssetAccessors()
 	{
-		HAPI_Asset[] assets = UnityEngine.Object.FindObjectsOfType( typeof( HAPI_Asset ) ) as HAPI_Asset[];
-		HAPI_AssetAccessor[] accessors = new HAPI_AssetAccessor[ assets.Length ];
+		HoudiniAsset[] assets = UnityEngine.Object.FindObjectsOfType( typeof( HoudiniAsset ) ) as HoudiniAsset[];
+		HoudiniAssetAccessor[] accessors = new HoudiniAssetAccessor[ assets.Length ];
 
 		for ( int i = 0; i < assets.Length; i++ )
 		{
-			accessors[ i ] = new HAPI_AssetAccessor( assets[ i ] );
+			accessors[ i ] = new HoudiniAssetAccessor( assets[ i ] );
 		}
 
 		return accessors;
 	}
 
-	public static HAPI_AssetAccessor getAssetAccessor( GameObject gameObject )
+	public static HoudiniAssetAccessor getAssetAccessor( GameObject gameObject )
 	{
-		HAPI_Asset asset = gameObject.GetComponent< HAPI_Asset >();
+		HoudiniAsset asset = gameObject.GetComponent< HoudiniAsset >();
 		if ( asset )
 		{
-			return new HAPI_AssetAccessor( asset );
+			return new HoudiniAssetAccessor( asset );
 		}
 
 		return null;
@@ -111,7 +111,7 @@ public class HAPI_AssetAccessor
 		if ( parm_info.isInt() )
 			return myAssetParms.prParmIntValues[ parm_info.intValuesIndex + index ];
 		
-		throw new HAPI_ErrorInvalidArgument( name + " is not an int!" );
+		throw new HoudiniErrorInvalidArgument( name + " is not an int!" );
 	}
 	
 	public float getParmFloatValue( string name, int index )
@@ -121,7 +121,7 @@ public class HAPI_AssetAccessor
 		if ( parm_info.isFloat() )
 			return myAssetParms.prParmFloatValues[ parm_info.floatValuesIndex + index ];
 
-		throw new HAPI_ErrorInvalidArgument( name + " is not a float!" );
+		throw new HoudiniErrorInvalidArgument( name + " is not a float!" );
 	}
 	
 	public string getParmStringValue( string name, int index )
@@ -131,7 +131,7 @@ public class HAPI_AssetAccessor
 		if ( parm_info.isString() )
 			return myAssetParms.getParmStrings( parm_info )[ index ];
 
-		throw new HAPI_ErrorInvalidArgument( name + " is not a string!" );
+		throw new HoudiniErrorInvalidArgument( name + " is not a string!" );
 	}
 	
 	public void setParmIntValue( string name, int index, int value )
@@ -139,12 +139,12 @@ public class HAPI_AssetAccessor
 		HAPI_ParmInfo parm_info = myAssetParms.findParm( name );
 		
 		if ( !parm_info.isInt() )
-			throw new HAPI_ErrorInvalidArgument( name + " is not an int!" );
+			throw new HoudiniErrorInvalidArgument( name + " is not an int!" );
 		
 		int values_index = parm_info.intValuesIndex + index;
 		int[] int_value = { value };
 		
-		HAPI_Host.setParmIntValues( myAsset.prNodeId, int_value, values_index, 1 );
+		HoudiniHost.setParmIntValues( myAsset.prNodeId, int_value, values_index, 1 );
 		
 		myAsset.buildClientSide();
 	}
@@ -154,12 +154,12 @@ public class HAPI_AssetAccessor
 		HAPI_ParmInfo parm_info = myAssetParms.findParm( name );
 		
 		if ( !parm_info.isFloat() )
-			throw new HAPI_ErrorInvalidArgument( name + " is not a float!" );
+			throw new HoudiniErrorInvalidArgument( name + " is not a float!" );
 		
 		int values_index = parm_info.floatValuesIndex + index;
 		float[] float_value = { value };
 		
-		HAPI_Host.setParmFloatValues( myAsset.prNodeId, float_value, values_index, 1 );
+		HoudiniHost.setParmFloatValues( myAsset.prNodeId, float_value, values_index, 1 );
 		
 		myAsset.buildClientSide();
 	}
@@ -169,9 +169,9 @@ public class HAPI_AssetAccessor
 		HAPI_ParmInfo parm_info = myAssetParms.findParm( name );
 		
 		if ( !parm_info.isString() )
-			throw new HAPI_ErrorInvalidArgument( name + " is not a string!" );
+			throw new HoudiniErrorInvalidArgument( name + " is not a string!" );
 		
-		HAPI_Host.setParmStringValue( myAsset.prNodeId, value, parm_info.id, index );
+		HoudiniHost.setParmStringValue( myAsset.prNodeId, value, parm_info.id, index );
 		
 		myAsset.buildClientSide();
 	}
@@ -179,11 +179,11 @@ public class HAPI_AssetAccessor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
 
-	private HAPI_AssetAccessor()
+	private HoudiniAssetAccessor()
 	{
 	}
 
-	private HAPI_AssetAccessor( HAPI_Asset asset )
+	private HoudiniAssetAccessor( HoudiniAsset asset )
 	{
 		myAsset = asset;
 		myAssetParms = asset.prParms;
@@ -192,8 +192,8 @@ public class HAPI_AssetAccessor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-	[SerializeField] private HAPI_Asset myAsset;
-	[SerializeField] private HAPI_Parms myAssetParms;
+	[SerializeField] private HoudiniAsset myAsset;
+	[SerializeField] private HoudiniParms myAssetParms;
 
 }
 

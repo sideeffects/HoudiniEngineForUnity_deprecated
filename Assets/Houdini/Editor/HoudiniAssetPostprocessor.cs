@@ -3,7 +3,7 @@ using UnityEditor;
 using System;
 
 [InitializeOnLoad]
-class HAPI_AssetPostprocessor : AssetPostprocessor 
+class HoudiniAssetPostprocessor : AssetPostprocessor 
 {
 
 	static void OnPostprocessAllAssets ( String[] importedAssets,
@@ -13,11 +13,11 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 	{
 		foreach ( string asset_path in deletedAssets )
 		{
-			if ( HAPI_Host.myCleanUpPrefabAssets.ContainsKey( asset_path ) )
+			if ( HoudiniHost.myCleanUpPrefabAssets.ContainsKey( asset_path ) )
 			{
-				int asset_id = HAPI_Host.myCleanUpPrefabAssets[ asset_path ];
-				HAPI_Host.destroyAsset( asset_id );
-				HAPI_Host.myCleanUpPrefabAssets.Remove( asset_path );
+				int asset_id = HoudiniHost.myCleanUpPrefabAssets[ asset_path ];
+				HoudiniHost.destroyAsset( asset_id );
+				HoudiniHost.myCleanUpPrefabAssets.Remove( asset_path );
 			}
 		}
 
@@ -28,7 +28,7 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 				GameObject prefab = AssetDatabase.LoadAssetAtPath( asset_path, typeof( GameObject ) ) as GameObject;
 				if ( prefab )
 				{
-					HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();
+					HoudiniAsset prefab_asset = prefab.GetComponent< HoudiniAsset >();
 					if ( prPrefabToReplace && asset_path.Equals( AssetDatabase.GetAssetPath( prPrefabToReplace ) ) )
 					{
 						prPrefabToReplace = null;
@@ -48,12 +48,12 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 	
 	static void ReplacePrefab()
 	{
-		HAPI_Asset prefab_asset = prPrefabToReplace.GetComponent<HAPI_Asset>();
+		HoudiniAsset prefab_asset = prPrefabToReplace.GetComponent<HoudiniAsset>();
 		if ( prPrefabToReplace && prefab_asset )
 		{
 			foreach ( GameObject obj in GameObject.FindObjectsOfType( typeof( GameObject ) ) )
 			{
-				HAPI_Asset asset = obj.GetComponent< HAPI_Asset >();
+				HoudiniAsset asset = obj.GetComponent< HoudiniAsset >();
 				GameObject prefab_parent = PrefabUtility.GetPrefabParent( obj ) as GameObject;
 				if ( asset && PrefabUtility.Equals( prefab_parent, prPrefabToReplace ) )
 				{
@@ -63,15 +63,15 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						// If the prefab's backup id refers to a valid asset then this signifies the
 						// prefab is being changed due to an "Apply" from a prefab instance. We need
 						// to delete the prefab asset since we are re-creating the prefab. 
-						bool is_applying_changes = HAPI_Host.isAssetValid(
+						bool is_applying_changes = HoudiniHost.isAssetValid(
 							prefab_asset.prBackupAssetId, prefab_asset.prBackupAssetValidationId );
 						if ( is_applying_changes )
 						{
 							try
 							{
-								HAPI_Host.destroyAsset( prefab_asset.prBackupAssetId );
+								HoudiniHost.destroyAsset( prefab_asset.prBackupAssetId );
 							}
-							catch ( HAPI_Error error )
+							catch ( HoudiniError error )
 							{
 								Debug.LogError( "Asset failed to unload: " + error.ToString() );
 							}
@@ -81,11 +81,11 @@ class HAPI_AssetPostprocessor : AssetPostprocessor
 						}
 						
 						// replace prefab with original asset with all children game objects removed
-						HAPI_Control.destroyChildren( asset.transform );
+						HoudiniControl.destroyChildren( asset.transform );
 						GameObject new_prefab = PrefabUtility.ReplacePrefab( asset.gameObject, 
 																			 prPrefabToReplace, 
 																			 ReplacePrefabOptions.ConnectToPrefab ) as GameObject;
-						HAPI_Asset new_prefab_asset = new_prefab.GetComponent< HAPI_Asset >();
+						HoudiniAsset new_prefab_asset = new_prefab.GetComponent< HoudiniAsset >();
 
 						// If applying changes to prefab from prefab instance we also need to retrieve 
 						// all the overriden parameters on the prefab instance so that we can apply 

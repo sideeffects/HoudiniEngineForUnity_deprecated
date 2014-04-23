@@ -20,7 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI 
+public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -177,7 +177,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 					xform.rstOrder = rstOrder;
 				}
 				
-				HAPI_Host.convertTransform( ref xform, HAPI_RSTOrder.HAPI_SRT, HAPI_XYZOrder.HAPI_ZXY );
+				HoudiniHost.convertTransform( ref xform, HAPI_RSTOrder.HAPI_SRT, HAPI_XYZOrder.HAPI_ZXY );
 				
 				// Axis and Rotation conversions:
 				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
@@ -221,7 +221,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 							xform.position[ 1 ] = new_position[ 1 ];
 							xform.position[ 2 ] = new_position[ 2 ];
 							
-							HAPI_Host.convertTransform( ref xform, rstOrder, xyzOrder );
+							HoudiniHost.convertTransform( ref xform, rstOrder, xyzOrder );
 							new_position.x 		= xform.position[ 0 ];
 							new_position.y 		= xform.position[ 1 ];
 							new_position.z 		= xform.position[ 2 ];
@@ -234,10 +234,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = new_position.y;
 						parm_float_values[ parm_info.floatValuesIndex + 2 ] = new_position.z;
 						
-						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
-						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
+						float[] temp_float_values = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+						for ( int pp = 0; pp < HoudiniConstants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HAPI_Host.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
+						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
 						myAsset.savePreset();
 					} // if changed
@@ -265,7 +265,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						xform.rotationOrder = HAPI_XYZOrder.HAPI_ZXY;
 						xform.rstOrder = HAPI_RSTOrder.HAPI_SRT;
 						
-						HAPI_Host.convertTransform( ref xform, rstOrder, xyzOrder );
+						HoudiniHost.convertTransform( ref xform, rstOrder, xyzOrder );
 						
 						HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myRotateParmId );
 						
@@ -274,10 +274,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = -xform.rotationEuler[ 1 ];
 						parm_float_values[ parm_info.floatValuesIndex + 2 ] = -xform.rotationEuler[ 2 ];
 						
-						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
-						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
+						float[] temp_float_values = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+						for ( int pp = 0; pp < HoudiniConstants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HAPI_Host.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
+						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
 						myAsset.savePreset();
 					} // if changed
@@ -297,10 +297,10 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = newScale.y;
 						parm_float_values[ parm_info.floatValuesIndex + 2 ] = newScale.z;
 						
-						float[] temp_float_values = new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
-						for ( int pp = 0; pp < HAPI_Constants.HAPI_POSITION_VECTOR_SIZE; ++pp )
+						float[] temp_float_values = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+						for ( int pp = 0; pp < HoudiniConstants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HAPI_Host.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
+						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
 						myAsset.savePreset();
 					} // if changed
@@ -317,7 +317,7 @@ public partial class HAPI_AssetGUIOTL : HAPI_AssetGUI
 	
 	private void drawPinnedInstances()
 	{
-		HAPI_Instancer instancer = myAsset.gameObject.GetComponentInChildren< HAPI_Instancer >();
+		HoudiniInstancer instancer = myAsset.gameObject.GetComponentInChildren< HoudiniInstancer >();
 		if( instancer == null )
 			return;
 		

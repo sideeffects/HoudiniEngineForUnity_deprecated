@@ -35,13 +35,13 @@ public delegate void RepaintDelegate();
 public delegate void DeselectionDelegate();
 public delegate void PlaymodeStateChangeDelegate();
 
-public class HAPI_Error : System.Exception 
+public class HoudiniError : System.Exception
 {
-	public HAPI_Error() 
+	public HoudiniError() 
 	{
 		myErrorMessage = "Unknown Error";
 	}
-	public HAPI_Error( string msg ) 
+	public HoudiniError( string msg ) 
 	{
 		myErrorMessage = msg;
 	}
@@ -64,32 +64,32 @@ public class HAPI_Error : System.Exception
 	protected string myErrorMessage;
 }
 
-public class HAPI_ErrorUnsupportedPlatform : HAPI_Error
+public class HoudiniErrorUnsupportedPlatform : HoudiniError
 {
-	public HAPI_ErrorUnsupportedPlatform() : base( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG ) {}
+	public HoudiniErrorUnsupportedPlatform() : base( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG ) {}
 }
 
-public class HAPI_ErrorInvalidArgument : HAPI_Error
+public class HoudiniErrorInvalidArgument : HoudiniError
 {
-	public HAPI_ErrorInvalidArgument() : base( "Invalid arugment error." ) {}
-	public HAPI_ErrorInvalidArgument( string msg ) : base( msg ) {}
+	public HoudiniErrorInvalidArgument() : base( "Invalid arugment error." ) {}
+	public HoudiniErrorInvalidArgument( string msg ) : base( msg ) {}
 }
 
-public class HAPI_ErrorNotFound : HAPI_ErrorInvalidArgument
+public class HoudiniErrorNotFound : HoudiniErrorInvalidArgument
 {
-	public HAPI_ErrorNotFound() : base( "Item not found." ) {}
-	public HAPI_ErrorNotFound( string msg ) : base( msg ) {}
+	public HoudiniErrorNotFound() : base( "Item not found." ) {}
+	public HoudiniErrorNotFound( string msg ) : base( msg ) {}
 }
 
-public class HAPI_ErrorProgressCancelled : HAPI_Error 
+public class HoudiniErrorProgressCancelled : HoudiniError 
 {
-	public HAPI_ErrorProgressCancelled() : base( "Load Cancelled by User" ) {}
+	public HoudiniErrorProgressCancelled() : base( "Load Cancelled by User" ) {}
 }
 
-public class HAPI_ErrorIgnorable : HAPI_Error
+public class HoudiniErrorIgnorable : HoudiniError
 {
-	public HAPI_ErrorIgnorable() : base( "Ignorable Error" ) {}
-	public HAPI_ErrorIgnorable( string msg ) : base( msg ) {}
+	public HoudiniErrorIgnorable() : base( "Ignorable Error" ) {}
+	public HoudiniErrorIgnorable( string msg ) : base( msg ) {}
 }
 
 /// <summary>
@@ -100,7 +100,7 @@ public class HAPI_ErrorIgnorable : HAPI_Error
 #if UNITY_EDITOR
 [ InitializeOnLoad ]
 #endif // UNITY_EDITOR
-public static partial class HAPI_Host
+public static partial class HoudiniHost
 {
 	// Global Settings Defaults ---------------------------------------------------------------------------------
 
@@ -164,11 +164,11 @@ public static partial class HAPI_Host
 
 	// Global Settings Undo Info --------------------------------------------------------------------------------
 
-	private static HAPI_HostUndoInfo myHostUndoInfo;
+	private static HoudiniHostUndoInfo myHostUndoInfo;
 
 	// Global Settings Initializations --------------------------------------------------------------------------
 
-	static HAPI_Host()
+	static HoudiniHost()
 	{
 #if UNITY_STANDALONE_WIN
 		// During the batch creation of our .unitypackage file we don't want to actually
@@ -428,12 +428,12 @@ public static partial class HAPI_Host
 
 	// Global Settings Undo Info --------------------------------------------------------------------------------
 
-	public static HAPI_HostUndoInfo prHostUndoInfo 
+	public static HoudiniHostUndoInfo prHostUndoInfo 
 	{
 		get 
 		{ 
 			if ( myHostUndoInfo == null )
-				myHostUndoInfo = ScriptableObject.CreateInstance< HAPI_HostUndoInfo >();
+				myHostUndoInfo = ScriptableObject.CreateInstance< HoudiniHostUndoInfo >();
 			return myHostUndoInfo; 
 		}
 		set { myHostUndoInfo = value; } 
@@ -670,7 +670,7 @@ public static partial class HAPI_Host
 	{
 #if UNITY_STANDALONE_WIN
 		if ( !initialize() )
-			throw new HAPI_Error( "DLL Not Found." );
+			throw new HoudiniError( "DLL Not Found." );
 
 		int library_id = -1;
 
@@ -714,7 +714,7 @@ public static partial class HAPI_Host
 	{
 #if UNITY_STANDALONE_WIN
 		if ( !initialize() )
-			throw new HAPI_Error( "DLL Not Found." );
+			throw new HoudiniError( "DLL Not Found." );
 
 		HAPI_Result status_code = HAPI_LoadHIPFile( path, true );
 		processStatusCode( status_code );
@@ -744,7 +744,7 @@ public static partial class HAPI_Host
 	{
 #if UNITY_STANDALONE_WIN
 		if ( !initialize() )
-			throw new HAPI_Error( "DLL Not Found." );
+			throw new HoudiniError( "DLL Not Found." );
 
 		int asset_id = -1;
 		HAPI_Result status_code = HAPI_CreateCurve( out asset_id );
@@ -760,7 +760,7 @@ public static partial class HAPI_Host
 	{
 #if UNITY_STANDALONE_WIN
 		if ( !initialize() )
-			throw new HAPI_Error( "DLL Not Found." );
+			throw new HoudiniError( "DLL Not Found." );
 
 		int asset_id = -1;
 		HAPI_Result status_code = HAPI_CreateInputAsset( out asset_id, name );
@@ -826,9 +826,9 @@ public static partial class HAPI_Host
 				int houdini_engine_api 		= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API );
 					
 				Debug.Log(  "Running Houdini Engine Unity Plugin Version: " +
-							HAPI_Version.HOUDINI_ENGINE_MAJOR + "." + 
-							HAPI_Version.HOUDINI_ENGINE_MINOR +
-							", API: " + HAPI_Version.HOUDINI_ENGINE_API );
+							HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." + 
+							HoudiniVersion.HOUDINI_ENGINE_MINOR +
+							", API: " + HoudiniVersion.HOUDINI_ENGINE_API );
 					
 				Debug.Log(  "Linking Against Houdini Engine Version: " + 
 							houdini_engine_major + "." + houdini_engine_minor +
@@ -839,25 +839,25 @@ public static partial class HAPI_Host
 					
 				// Make sure we are linking against the expected Houdini Engine API version.
 				// Note: We don't need to be so strict as to require the BUILD to match.
-				if ( houdini_engine_major != HAPI_Version.HOUDINI_ENGINE_MAJOR ||
-						houdini_engine_minor != HAPI_Version.HOUDINI_ENGINE_MINOR ||
-						houdini_engine_api	  != HAPI_Version.HOUDINI_ENGINE_API )
+				if ( houdini_engine_major != HoudiniVersion.HOUDINI_ENGINE_MAJOR ||
+						houdini_engine_minor != HoudiniVersion.HOUDINI_ENGINE_MINOR ||
+						houdini_engine_api	  != HoudiniVersion.HOUDINI_ENGINE_API )
 				{
-					throw new HAPI_Error( "Cannot link to Houdini Engine because of version mismatch." );
+					throw new HoudiniError( "Cannot link to Houdini Engine because of version mismatch." );
 				}
 
 				HAPI_CookOptions cook_options = new HAPI_CookOptions();
 				cook_options.splitGeosByGroup = prSplitGeosByGroup;
-				cook_options.maxVerticesPerPrimitive = HAPI_Constants.HAPI_MAX_VERTICES_PER_FACE;
-				cook_options.refineCurveToLinear = HAPI_Constants.HAPI_CURVE_REFINE_TO_LINEAR;
-				cook_options.curveRefineLOD = HAPI_Constants.HAPI_CURVE_LOD;
+				cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+				cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
+				cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 
 				// Initialize.
 				status_code = HAPI_Initialize( otls_path, dsos_path, cook_options, true, -1 );
 				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
 			}
-			catch ( HAPI_Error error )
+			catch ( HoudiniError error )
 			{
 				Debug.LogError( error.ToString() );
 				return false;
@@ -886,9 +886,9 @@ public static partial class HAPI_Host
 		HAPI_GetStatusString( HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
 
 		if ( code == (int) HAPI_Result.HAPI_RESULT_INVALID_ARGUMENT )
-			throw new HAPI_ErrorInvalidArgument( error_str.ToString() );
+			throw new HoudiniErrorInvalidArgument( error_str.ToString() );
 		else
-			throw new HAPI_Error( error_str.ToString() );
+			throw new HoudiniError( error_str.ToString() );
 #else
 		throw new HAPI_ErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
@@ -897,7 +897,7 @@ public static partial class HAPI_Host
 	public static bool isRuntimeInitialized()
 	{
 #if UNITY_STANDALONE_WIN
-		if ( !HAPI_SetPath.prIsPathSet )
+		if ( !HoudiniSetPath.prIsPathSet )
 			return false;
 		else
 		{
@@ -922,9 +922,9 @@ public static partial class HAPI_Host
 			myRepaintDelegate();
 	}
 
-	public static HAPI_Asset[] getAssets()
+	public static HoudiniAsset[] getAssets()
 	{
-		return UnityEngine.Object.FindObjectsOfType( typeof( HAPI_Asset ) ) as HAPI_Asset[];
+		return UnityEngine.Object.FindObjectsOfType( typeof( HoudiniAsset ) ) as HoudiniAsset[];
 	}
 		
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -941,7 +941,7 @@ public static partial class HAPI_Host
 		// causes other bound functions in this callback list to never be called.
 		try
 		{
-			if ( HAPI_Host.mySelectionTarget != null && myDeselectionDelegate != null )
+			if ( HoudiniHost.mySelectionTarget != null && myDeselectionDelegate != null )
 			{
 				GameObject selected = Selection.activeGameObject;
 				if ( selected != mySelectionTarget )
@@ -979,7 +979,7 @@ public static partial class HAPI_Host
 						if ( prefab )
 						{
 							// Only need to do this if the prefab has been previously loaded.
-							HAPI_Asset prefab_asset = prefab.GetComponent< HAPI_Asset >();
+							HoudiniAsset prefab_asset = prefab.GetComponent< HoudiniAsset >();
 							if ( prefab_asset && 
 									isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
 							{

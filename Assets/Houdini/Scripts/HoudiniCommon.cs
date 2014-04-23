@@ -33,7 +33,7 @@ using HAPI_MaterialId = System.Int32;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Defines
 	
-public struct HAPI_Constants
+public struct HoudiniConstants
 {
 	// Unity-Only Constants ---------------------------------------------
 	//
@@ -118,7 +118,7 @@ public struct HAPI_Constants
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Enums
-	
+
 public enum HAPI_StatusType
 {
 	HAPI_STATUS_RESULT,
@@ -421,24 +421,24 @@ public struct HAPI_Transform
 {
 	public HAPI_Transform( bool initialize_fields )
 	{
-		position			= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
-		rotationQuaternion	= new float[ HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE ];
-		scale				= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
+		position			= new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+		rotationQuaternion	= new float[ HoudiniConstants.HAPI_QUATERNION_VECTOR_SIZE ];
+		scale				= new float[ HoudiniConstants.HAPI_SCALE_VECTOR_SIZE ];
 		rstOrder			= HAPI_RSTOrder.HAPI_SRT;
 	}
 		
 	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE, 
 					ArraySubType = UnmanagedType.R4 ) ]
 	public float[] position;
 				
 	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HAPI_Constants.HAPI_QUATERNION_VECTOR_SIZE, 
+					SizeConst = HoudiniConstants.HAPI_QUATERNION_VECTOR_SIZE, 
 					ArraySubType = UnmanagedType.R4 ) ]
 	public float[] rotationQuaternion;
 		
 	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
+					SizeConst = HoudiniConstants.HAPI_SCALE_VECTOR_SIZE, 
 					ArraySubType = UnmanagedType.R4 ) ]
 	public float[] scale;
 
@@ -450,25 +450,25 @@ public struct HAPI_TransformEuler
 {
 	public HAPI_TransformEuler( bool initialize_fields )
 	{
-		position 		= new float[ HAPI_Constants.HAPI_POSITION_VECTOR_SIZE ];
-		rotationEuler 	= new float[ HAPI_Constants.HAPI_EULER_VECTOR_SIZE ];
-		scale 			= new float[ HAPI_Constants.HAPI_SCALE_VECTOR_SIZE ];
+		position 		= new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+		rotationEuler 	= new float[ HoudiniConstants.HAPI_EULER_VECTOR_SIZE ];
+		scale 			= new float[ HoudiniConstants.HAPI_SCALE_VECTOR_SIZE ];
 		rotationOrder 	= 0;
 		rstOrder 		= 0;
 	}
 
 	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HAPI_Constants.HAPI_POSITION_VECTOR_SIZE, 
+					SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE, 
 					ArraySubType = UnmanagedType.R4 ) ]
 	public float[] position;
 
 	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HAPI_Constants.HAPI_EULER_VECTOR_SIZE, 
+					SizeConst = HoudiniConstants.HAPI_EULER_VECTOR_SIZE, 
 					ArraySubType = UnmanagedType.R4 ) ]
 	public float[] rotationEuler;
 
 	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HAPI_Constants.HAPI_SCALE_VECTOR_SIZE, 
+					SizeConst = HoudiniConstants.HAPI_SCALE_VECTOR_SIZE, 
 					ArraySubType = UnmanagedType.R4 ) ]
 	public float[] scale;
 
@@ -526,17 +526,17 @@ public struct HAPI_AssetInfo
 		
 	// Accessors
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public string label
-	{ get { return HAPI_Host.getString( labelSH ); } private set {} }
+	{ get { return HoudiniHost.getString( labelSH ); } private set {} }
 	public string filePath
-	{ get { return HAPI_Host.getString( filePathSH ); } private set {} }
+	{ get { return HoudiniHost.getString( filePathSH ); } private set {} }
 	public string version
-	{ get { return HAPI_Host.getString( versionSH ); } private set {} }
+	{ get { return HoudiniHost.getString( versionSH ); } private set {} }
 	public string fullOpName
-	{ get { return HAPI_Host.getString( fullOpNameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( fullOpNameSH ); } private set {} }
 	public string helpText
-	{ get { return HAPI_Host.getString( helpTextSH ); } private set {} }
+	{ get { return HoudiniHost.getString( helpTextSH ); } private set {} }
 }
 
 [ StructLayout( LayoutKind.Sequential ) ]
@@ -585,9 +585,9 @@ public struct HAPI_NodeInfo
 	public int parmChoiceCount;
 
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public string internalNodePath
-	{ get { return HAPI_Host.getString( internalNodePathSH ); } private set {} }
+	{ get { return HoudiniHost.getString( internalNodePathSH ); } private set {} }
 }
 
 [ StructLayout( LayoutKind.Sequential ) ]
@@ -709,11 +709,11 @@ public struct HAPI_ParmInfo
 	public int getLabelSH()
 	{ return labelSH; }
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public string label
-	{ get { return HAPI_Host.getString( labelSH ); } private set {} }
+	{ get { return HoudiniHost.getString( labelSH ); } private set {} }
 	public string templateName
-	{ get { return HAPI_Host.getString( templateNameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( templateNameSH ); } private set {} }
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]
@@ -725,9 +725,9 @@ public struct HAPI_ParmChoiceInfo
 		
 	// Accessors
 	public string label
-	{ get { return HAPI_Host.getString( labelSH ); } private set {} }
+	{ get { return HoudiniHost.getString( labelSH ); } private set {} }
 	public string value
-	{ get { return HAPI_Host.getString( valueSH ); } private set {} }
+	{ get { return HoudiniHost.getString( valueSH ); } private set {} }
 }
 	
 // HANDLES ------------------------------------------------------------------------------------------------------
@@ -742,9 +742,9 @@ public struct HAPI_HandleInfo
 
 	// Accessors
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public string typeName
-	{ get { return HAPI_Host.getString( typeNameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( typeNameSH ); } private set {} }
 }
 
 	
@@ -758,9 +758,9 @@ public struct HAPI_HandleBindingInfo
 
 	// Accessors
 	public string handleParmName
-	{ get { return HAPI_Host.getString( handleParmNameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( handleParmNameSH ); } private set {} }
 	public string assetParmName
-	{ get { return HAPI_Host.getString( assetParmNameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( assetParmNameSH ); } private set {} }
 };
 	
 // OBJECTS ------------------------------------------------------------------------------------------------------
@@ -788,9 +788,9 @@ public struct HAPI_ObjectInfo
 
 	// Accessors
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public string objectInstancePath
-	{ get { return HAPI_Host.getString( objectInstancePathSH ); } private set {} }
+	{ get { return HoudiniHost.getString( objectInstancePathSH ); } private set {} }
 }
 	
 // GEOMETRY -----------------------------------------------------------------------------------------------------
@@ -829,7 +829,7 @@ public struct HAPI_GeoInfo
 
 	// Accessors
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]
@@ -899,7 +899,7 @@ public struct HAPI_PartInfo
 
 	// Accessors
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]
@@ -946,11 +946,11 @@ public struct HAPI_ImageFileFormat
 
 	// Accessors
 	public string name
-	{ get { return HAPI_Host.getString( nameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public string description
-	{ get { return HAPI_Host.getString( descriptionSH ); } private set {} }
+	{ get { return HoudiniHost.getString( descriptionSH ); } private set {} }
 	public string defaultExtension
-	{ get { return HAPI_Host.getString( defaultExtensionSH ); } private set {} }
+	{ get { return HoudiniHost.getString( defaultExtensionSH ); } private set {} }
 };
 
 [ StructLayout( LayoutKind.Sequential ) ]
@@ -976,7 +976,7 @@ public struct HAPI_ImageInfo
 
 	// Accessors
 	public string imageFileFormatName
-	{ get { return HAPI_Host.getString( imageFileFormatNameSH ); } private set {} }
+	{ get { return HoudiniHost.getString( imageFileFormatNameSH ); } private set {} }
 
 	// Utility
 	public bool isImageFileFormat( string image_file_format_name )

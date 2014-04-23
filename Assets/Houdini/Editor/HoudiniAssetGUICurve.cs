@@ -22,8 +22,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 [ ExecuteInEditMode ]
-[ CustomEditor( typeof( HAPI_AssetCurve ) ) ]
-public class HAPI_AssetGUICurve : HAPI_AssetGUI 
+[ CustomEditor( typeof( HoudiniAssetCurve ) ) ]
+public class HoudiniAssetGUICurve : HoudiniAssetGUI 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public

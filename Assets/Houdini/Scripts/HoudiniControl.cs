@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using HAPI_NodeId = System.Int32;
 using HAPI_AssetId = System.Int32;
 
-public class HAPI_Control : MonoBehaviour 
+public class HoudiniControl : MonoBehaviour 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -35,21 +35,21 @@ public class HAPI_Control : MonoBehaviour
 	public HAPI_AssetId prAssetId { get { return myAssetId; } set { myAssetId = value; } }
 	public HAPI_NodeId prNodeId { get { return myNodeId; } set { myNodeId = value; } }
 	public HAPI_NodeId prObjectNodeId { get { return myObjectNodeId; } set { myObjectNodeId = value; } }
-	public HAPI_Asset prAsset { get { return myAsset; } set { myAsset = value; } }
+	public HoudiniAsset prAsset { get { return myAsset; } set { myAsset = value; } }
 	public bool prParmsNeedInit
 	{
 		get
 		{
-			HAPI_Parms parms = gameObject.GetComponent< HAPI_Parms >();
+			HoudiniParms parms = gameObject.GetComponent< HoudiniParms >();
 			return ( parms == null ) || ( parms.prPostSerialization );
 		}
 		private set {}
 	}
-	public HAPI_Parms prParms
+	public HoudiniParms prParms
 	{
 		get
 		{
-			HAPI_Parms parms = getOrCreateComponent< HAPI_Parms >();
+			HoudiniParms parms = getOrCreateComponent< HoudiniParms >();
 
 			if ( parms.prControl == false )
 				parms.prControl = this;
@@ -73,12 +73,12 @@ public class HAPI_Control : MonoBehaviour
 	public bool isPrefabInstance()	{ return false; }
 #endif // UNITY_EDITOR
 
-	public HAPI_Control() 
+	public HoudiniControl() 
 	{
 		reset();
 	}
 
-	~HAPI_Control()
+	~HoudiniControl()
 	{
 
 	}
@@ -93,7 +93,7 @@ public class HAPI_Control : MonoBehaviour
 		prAsset = null;
 	}
 
-	public void init( HAPI_Control control )
+	public void init( HoudiniControl control )
 	{
 		prAssetId	= control.prAssetId;
 		prNodeId	= control.prNodeId;
@@ -142,7 +142,7 @@ public class HAPI_Control : MonoBehaviour
 			children.Add( child.gameObject );
 		
 		foreach ( GameObject child in children )
-			HAPI_AssetUtility.destroyGameObject( child );
+			HoudiniAssetUtility.destroyGameObject( child );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,6 +151,6 @@ public class HAPI_Control : MonoBehaviour
 	[SerializeField] private HAPI_AssetId myAssetId;
 	[SerializeField] private HAPI_NodeId myNodeId;
 	[SerializeField] private HAPI_NodeId myObjectNodeId;
-	[SerializeField] private HAPI_Asset myAsset;
+	[SerializeField] private HoudiniAsset myAsset;
 
 }

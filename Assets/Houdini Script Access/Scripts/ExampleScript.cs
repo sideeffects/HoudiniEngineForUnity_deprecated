@@ -29,13 +29,13 @@ public class ExampleScript : MonoBehaviour
 
 	public bool hasAsset()
 	{
-		return gameObject.GetComponent< HAPI_Asset >() != null;
+		return gameObject.GetComponent< HoudiniAsset >() != null;
 	}
 
-	[SerializeField] private HAPI_AssetAccessor myAsset;
+	[SerializeField] private HoudiniAssetAccessor myAsset;
 	[SerializeField] private string parmName;
 	[SerializeField] private int parmSize;
-	[SerializeField] private HAPI_AssetAccessor.ParmType parmType;
+	[SerializeField] private HoudiniAssetAccessor.ParmType parmType;
 	[SerializeField] private int[] parmIntValue;
 	[SerializeField] private float[] parmFloatValue;
 	[SerializeField] private string[] parmStringValue;
@@ -86,7 +86,7 @@ public class ExampleScript : MonoBehaviour
 		myAsset = null;
 		parmName = "";
 		parmSize = 0;
-		parmType = HAPI_AssetAccessor.ParmType.INVALID;
+		parmType = HoudiniAssetAccessor.ParmType.INVALID;
 		parmIntValue = null;
 		parmFloatValue = null;
 		parmStringValue = null;
@@ -94,7 +94,7 @@ public class ExampleScript : MonoBehaviour
 		// If the game object has a HAPI_Asset component then get
 		// the parameters for this asset and set the selected
 		// parameter to be the asset's first parameter
-		myAsset = HAPI_AssetAccessor.getAssetAccessor( gameObject );
+		myAsset = HoudiniAssetAccessor.getAssetAccessor( gameObject );
 		if ( myAsset != null )
 		{
 			Debug.Log( "Asset name: " + myAsset.prName );
@@ -165,7 +165,7 @@ public class ExampleScript : MonoBehaviour
 			parmFloatValue = null;
 			parmStringValue = null;
 
-			if ( parmType == HAPI_AssetAccessor.ParmType.INT )
+			if ( parmType == HoudiniAssetAccessor.ParmType.INT )
 			{
 				parmIntValue = new int[ parmSize ];
 
@@ -174,7 +174,7 @@ public class ExampleScript : MonoBehaviour
 					parmIntValue[ i ] = myAsset.getParmIntValue( parmName, i );
 				}
 			}
-			else if ( parmType == HAPI_AssetAccessor.ParmType.FLOAT )
+			else if ( parmType == HoudiniAssetAccessor.ParmType.FLOAT )
 			{
 				parmFloatValue = new float[ parmSize ];
 				
@@ -183,7 +183,7 @@ public class ExampleScript : MonoBehaviour
 					parmFloatValue[ i ] = myAsset.getParmFloatValue( parmName, i );
 				}
 			}
-			else if ( parmType == HAPI_AssetAccessor.ParmType.STRING )
+			else if ( parmType == HoudiniAssetAccessor.ParmType.STRING )
 			{
 				parmStringValue = new string[ parmSize ];
 				
@@ -193,7 +193,7 @@ public class ExampleScript : MonoBehaviour
 				}
 			}
 		}
-		catch ( HAPI_Error err )
+		catch ( HoudiniError err )
 		{
 			Debug.LogError( err.ToString() );
 		}
@@ -209,15 +209,15 @@ public class ExampleScript : MonoBehaviour
 
 			for ( int i = 0; i < parmSize; i++ )
 			{
-				if ( parmType == HAPI_AssetAccessor.ParmType.INT )
+				if ( parmType == HoudiniAssetAccessor.ParmType.INT )
 					myAsset.setParmIntValue( parmName, i, parmIntValue[ i ] );
-				else if ( parmType == HAPI_AssetAccessor.ParmType.FLOAT )
+				else if ( parmType == HoudiniAssetAccessor.ParmType.FLOAT )
 					myAsset.setParmFloatValue( parmName, i, parmFloatValue[ i ] );
-				else if ( parmType == HAPI_AssetAccessor.ParmType.STRING )
+				else if ( parmType == HoudiniAssetAccessor.ParmType.STRING )
 					myAsset.setParmStringValue( parmName, i, parmStringValue[ i ] );
 			}
 		}
-		catch ( HAPI_Error err )
+		catch ( HoudiniError err )
 		{
 			Debug.LogError( err.ToString() );
 		}
@@ -236,15 +236,15 @@ public class ExampleScript : MonoBehaviour
 
 			for ( int i = 0; i < parmSize; i++ )
 			{
-				if ( parmType == HAPI_AssetAccessor.ParmType.INT )
+				if ( parmType == HoudiniAssetAccessor.ParmType.INT )
 					parmIntValue[ i ] = EditorGUILayout.IntField( parmIntValue[ i ] );
-				else if ( parmType == HAPI_AssetAccessor.ParmType.FLOAT )
+				else if ( parmType == HoudiniAssetAccessor.ParmType.FLOAT )
 					parmFloatValue[ i ] = EditorGUILayout.FloatField( parmFloatValue[ i ] );
-				else if ( parmType == HAPI_AssetAccessor.ParmType.STRING )
+				else if ( parmType == HoudiniAssetAccessor.ParmType.STRING )
 					parmStringValue[ i ] = EditorGUILayout.TextField( parmStringValue[ i ] );
 			}
 		}
-		catch ( HAPI_Error err )
+		catch ( HoudiniError err )
 		{
 			Debug.LogError( err.ToString() );
 		}

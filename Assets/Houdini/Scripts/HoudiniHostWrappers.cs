@@ -33,7 +33,7 @@ using HAPI_GeoId = System.Int32;
 using HAPI_PartId = System.Int32;
 using HAPI_MaterialId = System.Int32;
 
-public static partial class HAPI_Host
+public static partial class HoudiniHost
 {
 	// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 
@@ -940,7 +940,7 @@ public static partial class HAPI_Host
 	/// 	The asset id.
 	/// </param>
 	/// <param name="handle_index">
-	/// 	The index of the handle, from 0 to handleCount - 1 from the call to <see cref="HAPI_Host.loadOTLFile"/>
+	/// 	The index of the handle, from 0 to handleCount - 1 from the call to <see cref="HoudiniHost.loadOTLFile"/>
 	/// </param>
 	/// <param name ="handle_infos">
 	/// 	Array of <see cref="HAPI_HandleBindingInfo"/> exactly the size of <paramref name="length"/>.
@@ -1062,7 +1062,7 @@ public static partial class HAPI_Host
 	/// <param name="transforms">
 	/// 	Array of <see cref="HAPI_Transform"/> at least the size of
 	/// 	<paramref name="length"/>. The <see cref="HAPI_Transform.id"/> of each will be
-	/// 	set to the object id as given by <see cref="HAPI_Host.HAPI_GetObjects"/>.
+	/// 	set to the object id as given by <see cref="HoudiniHost.HAPI_GetObjects"/>.
 	/// </param>
 	/// <param name="start">
 	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - 1.
@@ -1136,7 +1136,7 @@ public static partial class HAPI_Host
 	/// 	The asset id.
 	/// </param>
 	/// <param name="object_id">
-	/// 	The object id returned by <see cref="HAPI_Host.HAPI_GetObjects"/>.
+	/// 	The object id returned by <see cref="HoudiniHost.HAPI_GetObjects"/>.
 	/// </param>
 	/// <param name="transform">
 	/// 	A <see cref="HAPI_TransformEuler"/> that stores the transform.
@@ -1486,7 +1486,7 @@ public static partial class HAPI_Host
 	/// <param name="attr_info">
 	/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
 	/// 	like data type. Generally should be the same struct returned by 
-	/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
+	/// 	<see cref="HoudiniHost.getAttributeInfo"/>.
 	/// </param>
 	/// <param name="data">
 	/// 	An int (string handles) array at least the size of <paramref name="length"/>.
@@ -1957,7 +1957,7 @@ public static partial class HAPI_Host
 	{
 #if UNITY_STANDALONE_WIN
 		if ( count != membership.Length )
-			throw new HAPI_ErrorInvalidArgument( "Membership array not same size as count argument!" );
+			throw new HoudiniErrorInvalidArgument( "Membership array not same size as count argument!" );
 
 		int[] membership_int = new int[ count ];
 		for ( int i = 0; i < count; ++i )
@@ -2614,12 +2614,12 @@ public static partial class HAPI_Host
 			asset_id, object_id, geo_id, part_id, raw_values, start, length );
 		processStatusCode( status_code );
 
-		Vector3[] values = new Vector3[ length / HAPI_Constants.HAPI_CV_VECTOR_SIZE ];
+		Vector3[] values = new Vector3[ length / HoudiniConstants.HAPI_CV_VECTOR_SIZE ];
 		for ( int i = 0; i < values.Length; ++i )
 		{
-			values[ i ].x = raw_values[ i * HAPI_Constants.HAPI_CV_VECTOR_SIZE + 0 ];
-			values[ i ].y = raw_values[ i * HAPI_Constants.HAPI_CV_VECTOR_SIZE + 1 ];
-			values[ i ].z = raw_values[ i * HAPI_Constants.HAPI_CV_VECTOR_SIZE + 2 ];
+			values[ i ].x = raw_values[ i * HoudiniConstants.HAPI_CV_VECTOR_SIZE + 0 ];
+			values[ i ].y = raw_values[ i * HoudiniConstants.HAPI_CV_VECTOR_SIZE + 1 ];
+			values[ i ].z = raw_values[ i * HoudiniConstants.HAPI_CV_VECTOR_SIZE + 2 ];
 		}
 
 		return values;

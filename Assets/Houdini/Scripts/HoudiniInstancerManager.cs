@@ -21,11 +21,11 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-public class HAPI_InstancerManager : MonoBehaviour 
+public class HoudiniInstancerManager : MonoBehaviour 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
-	public List< HAPI_InstancerPersistentData > prInstancerPersistentData 
+	public List< HoudiniInstancerPersistentData > prInstancerPersistentData 
 	{ 
 		get { return myInstancersPersistentData; }
 	}
@@ -33,19 +33,19 @@ public class HAPI_InstancerManager : MonoBehaviour
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Methods
-	public HAPI_InstancerManager() 
+	public HoudiniInstancerManager() 
 	{
-		myInstancersPersistentData = new List< HAPI_InstancerPersistentData >();
+		myInstancersPersistentData = new List< HoudiniInstancerPersistentData >();
 	}
 	
-	~HAPI_InstancerManager()
+	~HoudiniInstancerManager()
 	{
 		
 	}
 
-	public HAPI_InstancerPersistentData getInstancerPersistentData( string instancer_name )
+	public HoudiniInstancerPersistentData getInstancerPersistentData( string instancer_name )
 	{
-		foreach( HAPI_InstancerPersistentData persistent_data in myInstancersPersistentData )
+		foreach( HoudiniInstancerPersistentData persistent_data in myInstancersPersistentData )
 		{
 			if( persistent_data.instancerName == instancer_name )
 				return persistent_data;
@@ -54,10 +54,10 @@ public class HAPI_InstancerManager : MonoBehaviour
 	}
 
 
-	public void updateInstancerData( HAPI_Instancer instancer )
+	public void updateInstancerData( HoudiniInstancer instancer )
 	{
 		bool foundInstancer = false;
-		foreach( HAPI_InstancerPersistentData persistent_data in myInstancersPersistentData )
+		foreach( HoudiniInstancerPersistentData persistent_data in myInstancersPersistentData )
 		{
 			if( persistent_data.instancerName == instancer.name )
 			{
@@ -68,8 +68,8 @@ public class HAPI_InstancerManager : MonoBehaviour
 
 		if( !foundInstancer )
 		{
-			HAPI_InstancerPersistentData instancer_data 
-				= ScriptableObject.CreateInstance< HAPI_InstancerPersistentData>();
+			HoudiniInstancerPersistentData instancer_data 
+				= ScriptableObject.CreateInstance< HoudiniInstancerPersistentData>();
 			instancer_data.instancerName = instancer.name;
 			myInstancersPersistentData.Add( instancer_data );
 		}
@@ -78,5 +78,5 @@ public class HAPI_InstancerManager : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-	[SerializeField] private List< HAPI_InstancerPersistentData > myInstancersPersistentData;
+	[SerializeField] private List< HoudiniInstancerPersistentData > myInstancersPersistentData;
 }

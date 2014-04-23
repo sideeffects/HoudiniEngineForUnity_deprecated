@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using HAPI_NodeId = System.Int32;
 
 [ ExecuteInEditMode ]
-public class HAPI_PartControl : HAPI_GeoControl 
+public class HoudiniPartControl : HoudiniGeoControl 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -38,14 +38,14 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 	public bool 		prTransformChanged { get { return myTransformChanged; } set { myTransformChanged = value; } }
 	
-	public HAPI_GeoControl prGeoControl { get { return myGeoControl; } set { myGeoControl = value; } }
+	public HoudiniGeoControl prGeoControl { get { return myGeoControl; } set { myGeoControl = value; } }
 
-	public HAPI_PartControl()
+	public HoudiniPartControl()
 	{
 		reset();
 	}
 
-	~HAPI_PartControl()
+	~HoudiniPartControl()
 	{
 
 	}
@@ -74,7 +74,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 	public void selectParent()
 	{
 #if UNITY_EDITOR
-		if ( prAsset != null && prAsset.prAutoSelectAssetRootNode && HAPI_Host.prAutoSelectAssetRootNode )
+		if ( prAsset != null && prAsset.prAutoSelectAssetRootNode && HoudiniHost.prAutoSelectAssetRootNode )
 		{
 			GameObject[] selection 	= new GameObject[ 1 ];
 			selection[ 0 ] 			= prAsset.gameObject;
@@ -83,9 +83,9 @@ public class HAPI_PartControl : HAPI_GeoControl
 #endif // UNITY_EDITOR
 	}
 
-	public void init( HAPI_PartControl part_control )
+	public void init( HoudiniPartControl part_control )
 	{
-		init( (HAPI_GeoControl) part_control );
+		init( (HoudiniGeoControl) part_control );
 
 		prAsset			= part_control.prAsset;
 		prPartId		= part_control.prPartId;
@@ -118,7 +118,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 		// Get Part info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Host.getPartInfo( prAssetId, prObjectId, prGeoId, prPartId, out part_info );
+		HoudiniHost.getPartInfo( prAssetId, prObjectId, prGeoId, prPartId, out part_info );
 
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
@@ -152,11 +152,11 @@ public class HAPI_PartControl : HAPI_GeoControl
 				// Get mesh.
 				try
 				{
-					HAPI_AssetUtility.getMesh( 
-						this, part_mesh, prAsset.prGenerateTangents && HAPI_Host.prGenerateTangents );
+					HoudiniAssetUtility.getMesh( 
+						this, part_mesh, prAsset.prGenerateTangents && HoudiniHost.prGenerateTangents );
 				}
-				catch ( HAPI_ErrorIgnorable ) {}
-				catch ( HAPI_Error error )
+				catch ( HoudiniErrorIgnorable ) {}
+				catch ( HoudiniError error )
 				{
 					Debug.LogWarning( error.ToString() );
 					return;
@@ -164,14 +164,14 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 				// Add collider if group name matches. (Should be added after the mesh is set so that it
 				// picks up the mesh automagically)
-				if ( part_info.name.Contains( HAPI_Host.prRenderedCollisionGroupName ) )
+				if ( part_info.name.Contains( HoudiniHost.prRenderedCollisionGroupName ) )
 				{
 					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 					getOrCreateComponent< MeshRenderer >();
 					mesh_collider.enabled = false;
 					mesh_collider.enabled = true;
 				}
-				else if ( part_info.name.Contains( HAPI_Host.prCollisionGroupName ) )
+				else if ( part_info.name.Contains( HoudiniHost.prCollisionGroupName ) )
 				{
 					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 					mesh_collider.enabled = false;
@@ -181,29 +181,29 @@ public class HAPI_PartControl : HAPI_GeoControl
 					getOrCreateComponent< MeshRenderer >();
 
 				// Add Mesh-to-Prefab component.
-				HAPI_MeshToPrefab mesh_saver = getOrCreateComponent< HAPI_MeshToPrefab >();
+				HoudiniMeshToPrefab mesh_saver = getOrCreateComponent< HoudiniMeshToPrefab >();
 				mesh_saver.prGameObject = part_node;
 				mesh_saver.prMeshName = prAsset.prAssetName + "_" + part_node.name;
 			}
-			else if ( HAPI_Host.prEnablePointsAsParticles && part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
+			else if ( HoudiniHost.prEnablePointsAsParticles && part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
 			{
 				// Get position attributes.
-				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
+				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
 				float[] pos_attr = new float[ 0 ];
-				HAPI_AssetUtility.getAttribute(
-					prAssetId, prObjectId, prGeoId, prPartId, HAPI_Constants.HAPI_ATTRIB_POSITION, 
-					ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+				HoudiniAssetUtility.getAttribute(
+					prAssetId, prObjectId, prGeoId, prPartId, HoudiniConstants.HAPI_ATTRIB_POSITION, 
+					ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
 				if ( !pos_attr_info.exists )
-					throw new HAPI_Error( "No position attribute found." );
+					throw new HoudiniError( "No position attribute found." );
 				else if ( pos_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-					throw new HAPI_ErrorIgnorable( "I only understand position as point attributes!" );
+					throw new HoudiniErrorIgnorable( "I only understand position as point attributes!" );
 
 				// Get colour attributes.
-				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_COLOR );
+				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_COLOR );
 				float[] colour_attr = new float[ 0 ];
-				HAPI_AssetUtility.getAttribute( 
-					prAssetId, prObjectId, prGeoId, prPartId, HAPI_Constants.HAPI_ATTRIB_COLOR,
-					ref colour_attr_info, ref colour_attr, HAPI_Host.getAttributeFloatData );
+				HoudiniAssetUtility.getAttribute( 
+					prAssetId, prObjectId, prGeoId, prPartId, HoudiniConstants.HAPI_ATTRIB_COLOR,
+					ref colour_attr_info, ref colour_attr, HoudiniHost.getAttributeFloatData );
 
 				ParticleEmitter particle_emitter = part_node.GetComponent< ParticleEmitter >();
 				if ( particle_emitter == null )
@@ -277,16 +277,16 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 				// If we have a volume, retrieve the volume info
 				HAPI_VolumeInfo volume = new HAPI_VolumeInfo();
-				HAPI_Host.getVolumeInfo( prAssetId, prObjectId, prGeoId, prPartId, ref volume );
+				HoudiniHost.getVolumeInfo( prAssetId, prObjectId, prGeoId, prPartId, ref volume );
 
 				// The volume.transform.scale is the voxel size. Both the particle
 				// delta and the point size are affected by the voxel size.
-				HAPI_AssetUtility.applyTransform( volume.transform, part_node.transform );
-				float particle_delta = HAPI_Constants.HAPI_VOLUME_SURFACE_DELTA_MULT * Mathf.Max( Mathf.Max( 
+				HoudiniAssetUtility.applyTransform( volume.transform, part_node.transform );
+				float particle_delta = HoudiniConstants.HAPI_VOLUME_SURFACE_DELTA_MULT * Mathf.Max( Mathf.Max( 
 					volume.transform.scale[ 0 ],
 					volume.transform.scale[ 1 ] ),
 					volume.transform.scale[ 2 ] );
-				float point_size = HAPI_Constants.HAPI_VOLUME_SURFACE_PT_SIZE_MULT * particle_delta;
+				float point_size = HoudiniConstants.HAPI_VOLUME_SURFACE_PT_SIZE_MULT * particle_delta;
 
 				List< Vector3 > acc_vertices = new List< Vector3 >();
 				List< Vector3 > acc_normals = new List< Vector3 >();
@@ -297,12 +297,12 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 				// Iterate through the voxels and print out the data, for now.
 				HAPI_VolumeTileInfo tile = new HAPI_VolumeTileInfo();
-				HAPI_Host.getFirstVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
+				HoudiniHost.getFirstVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
 				while ( tile.isValid )
 				{
 					for ( int i = 0; i < values.Length; ++i )
 						values[ i ] = 0;
-					HAPI_Host.getVolumeTileFloatData( 
+					HoudiniHost.getVolumeTileFloatData( 
 						prAssetId, prObjectId, prGeoId, prPartId, ref tile, values );
 
 					Vector3 tileMin = new Vector3( tile.minX, tile.minY, tile.minZ );
@@ -316,7 +316,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 								{
 									// Make sure we have enough room in our arrays.
 									if ( current_container_particle_index
-										> HAPI_Constants.HAPI_VOLUME_SURFACE_MAX_PT_PER_C )
+										> HoudiniConstants.HAPI_VOLUME_SURFACE_MAX_PT_PER_C )
 									{
 										createVolumeTilesObject(
 											point_size, part_node.transform, acc_vertices, acc_normals );
@@ -327,7 +327,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 									// Get particle position.
 									Vector3 pos = new Vector3( (float) x, (float) y, (float) z );
-									pos = HAPI_Constants.HAPI_VOLUME_POSITION_MULT * ( pos + tileMin );
+									pos = HoudiniConstants.HAPI_VOLUME_POSITION_MULT * ( pos + tileMin );
 									pos.x = -pos.x;
 									acc_vertices.Add( part_node.transform.TransformPoint( pos ) );
 
@@ -365,7 +365,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 								}
 							}
 
-					HAPI_Host.getNextVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
+					HoudiniHost.getNextVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
 
 					tile_index++;
 				} // tile iteration
@@ -395,7 +395,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 					( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
 
 		// Assign materials.
-		HAPI_AssetUtility.assignMaterial( this, prAsset, ( reload_asset || has_material_changed ) );
+		HoudiniAssetUtility.assignMaterial( this, prAsset, ( reload_asset || has_material_changed ) );
 
 		// Assign unity tag.
 		assignUnityTag();
@@ -407,15 +407,15 @@ public class HAPI_PartControl : HAPI_GeoControl
 		GameObject tiles_node = new GameObject( "VolumeTiles" );
 		tiles_node.transform.parent = parent;
 
-		MeshFilter mesh_filter = HAPI_Control.getOrCreateComponent< MeshFilter >( tiles_node );
-		MeshRenderer mesh_renderer = HAPI_Control.getOrCreateComponent< MeshRenderer >( tiles_node );
+		MeshFilter mesh_filter = HoudiniControl.getOrCreateComponent< MeshFilter >( tiles_node );
+		MeshRenderer mesh_renderer = HoudiniControl.getOrCreateComponent< MeshRenderer >( tiles_node );
 
 		if ( !mesh_filter.sharedMesh )
 			mesh_filter.sharedMesh = new Mesh();
 		mesh_filter.sharedMesh.Clear();
 
 		if ( !mesh_renderer.sharedMaterial )
-			mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/VolumeSurface" ) );
+			mesh_renderer.sharedMaterial = new Material( Shader.Find( "Houdini/VolumeSurface" ) );
 		mesh_renderer.sharedMaterial.SetFloat( "_PointSize", point_size );
 		mesh_renderer.sharedMaterial.SetColor( "_Color", new Color( 0.9f, 0.9f, 0.9f ) );
 
@@ -495,7 +495,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 	private Material createSquare( Color color )
 	{
-		Material mat = new Material( Shader.Find( "HAPI/VolumeSurface" ) );
+		Material mat = new Material( Shader.Find( "Houdini/VolumeSurface" ) );
 		int width = 20;
 		int length = 20;
 		Texture2D tex = new Texture2D( width, length, TextureFormat.RGBA32, false );
@@ -591,8 +591,8 @@ public class HAPI_PartControl : HAPI_GeoControl
 			if ( data[ i ] > -particle_epsilon && data[ i ] < particle_epsilon )
 				particle_count++;
 
-		MeshFilter mesh_filter = HAPI_Control.getOrCreateComponent< MeshFilter >( node );
-		MeshRenderer mesh_renderer = HAPI_Control.getOrCreateComponent< MeshRenderer >( node );
+		MeshFilter mesh_filter = HoudiniControl.getOrCreateComponent< MeshFilter >( node );
+		MeshRenderer mesh_renderer = HoudiniControl.getOrCreateComponent< MeshRenderer >( node );
 
 		if ( !mesh_filter.sharedMesh )
 			mesh_filter.sharedMesh = new Mesh();
@@ -602,7 +602,7 @@ public class HAPI_PartControl : HAPI_GeoControl
 			return;
 
 		if ( !mesh_renderer.sharedMaterial )
-			mesh_renderer.sharedMaterial = new Material( Shader.Find( "HAPI/VolumeSurface" ) );
+			mesh_renderer.sharedMaterial = new Material( Shader.Find( "Houdini/VolumeSurface" ) );
 		mesh_renderer.sharedMaterial.SetFloat( "_PointSize", 70.0f );
 		mesh_renderer.sharedMaterial.SetColor( "_Color", new Color( 1.0f, 0.9f, 0.9f ) );
 
@@ -678,15 +678,15 @@ public class HAPI_PartControl : HAPI_GeoControl
 
 	private void assignUnityTag()
 	{
-		HAPI_AttributeInfo tag_attr_info = new HAPI_AttributeInfo( HAPI_Host.prUnityTagAttribName );
+		HAPI_AttributeInfo tag_attr_info = new HAPI_AttributeInfo( HoudiniHost.prUnityTagAttribName );
 		int[] tag_attr = new int[ 0 ];
-		HAPI_AssetUtility.getAttribute(
-			prAssetId, prObjectId, prGeoId, prPartId, HAPI_Host.prUnityTagAttribName,
-			ref tag_attr_info, ref tag_attr, HAPI_Host.getAttributeStringData );
+		HoudiniAssetUtility.getAttribute(
+			prAssetId, prObjectId, prGeoId, prPartId, HoudiniHost.prUnityTagAttribName,
+			ref tag_attr_info, ref tag_attr, HoudiniHost.getAttributeStringData );
 
 		if ( tag_attr_info.exists )
 		{
-			string tag = HAPI_Host.getString( tag_attr[ 0 ] );
+			string tag = HoudiniHost.getString( tag_attr[ 0 ] );
 			if ( tag != string.Empty )
 			{
 				try
@@ -712,5 +712,5 @@ public class HAPI_PartControl : HAPI_GeoControl
 	[SerializeField] private bool			myTransformChanged;
 	[SerializeField] private bool			myShowPointNumbers;
 
-	[SerializeField] private HAPI_GeoControl myGeoControl;
+	[SerializeField] private HoudiniGeoControl myGeoControl;
 }

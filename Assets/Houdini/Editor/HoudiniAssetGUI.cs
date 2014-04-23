@@ -21,15 +21,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-[ CustomEditor( typeof( HAPI_Asset ) ) ]
-public class HAPI_AssetGUI : Editor 
+[ CustomEditor( typeof( HoudiniAsset ) ) ]
+public class HoudiniAssetGUI : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
 	public virtual void OnEnable() 
 	{
-		myAsset 			= target as HAPI_Asset;
+		myAsset 			= target as HoudiniAsset;
 		myUndoInfo			= myAsset.prAssetUndoInfo;
 		
 		myParmChanges		= true;
@@ -38,9 +38,9 @@ public class HAPI_AssetGUI : Editor
 
 		myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 
-		HAPI_Host.myRepaintDelegate += this.refresh;
-		HAPI_Host.myDeselectionDelegate += this.deselect;
-		HAPI_Host.mySelectionTarget = myAsset.gameObject;
+		HoudiniHost.myRepaintDelegate += this.refresh;
+		HoudiniHost.myDeselectionDelegate += this.deselect;
+		HoudiniHost.mySelectionTarget = myAsset.gameObject;
 		
 		// If selection is a prefab build it ( parameters only ) to allow 
 		// editing of parameters. Only need to build once, the first time
@@ -51,7 +51,7 @@ public class HAPI_AssetGUI : Editor
 			// never gets called for prefab. This only needs to be done
 			// if prefab has already been built.
 			if ( myAsset.prReloadPrefabOnPlaymodeChange &&
-				 HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
+				 HoudiniHost.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
 			{
 				myAsset.prReloadPrefabOnPlaymodeChange = false;
 				myAsset.build(	false,	// reload_asset
@@ -64,7 +64,7 @@ public class HAPI_AssetGUI : Editor
 			}
 			else if (
 				myAsset.prAssetId != myAsset.prBackupAssetId ||
-				!HAPI_Host.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
+				!HoudiniHost.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
 			{
 				myAsset.prAssetId = -1;
 				myAsset.build( true,	// reload_asset
@@ -81,9 +81,9 @@ public class HAPI_AssetGUI : Editor
 
 	public virtual void OnDisable()
 	{
-		HAPI_Host.myRepaintDelegate -= this.refresh;
-		HAPI_Host.myDeselectionDelegate -= this.deselect;
-		HAPI_Host.mySelectionTarget = null;
+		HoudiniHost.myRepaintDelegate -= this.refresh;
+		HoudiniHost.myDeselectionDelegate -= this.deselect;
+		HoudiniHost.mySelectionTarget = null;
 	}
 
 	public virtual void refresh()
@@ -94,8 +94,8 @@ public class HAPI_AssetGUI : Editor
 
 	public virtual void deselect()
 	{
-		if ( HAPI_Host.mySelectionTarget == myAsset.gameObject )
-			HAPI_Host.mySelectionTarget = null;
+		if ( HoudiniHost.mySelectionTarget == myAsset.gameObject )
+			HoudiniHost.mySelectionTarget = null;
 	}
 
 	public override void OnInspectorGUI() 
@@ -120,7 +120,7 @@ public class HAPI_AssetGUI : Editor
 				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE &&
 				 !myAsset.isPrefab() )
 			{
-				myAsset.prShowInputControls = HAPI_GUI.foldout( "Inputs", myAsset.prShowInputControls, true );
+				myAsset.prShowInputControls = HoudiniGUI.foldout( "Inputs", myAsset.prShowInputControls, true );
 			
 				if ( myAsset.prShowInputControls )
 				{
@@ -136,7 +136,7 @@ public class HAPI_AssetGUI : Editor
 					{
 						bool join_last							= false;
 						bool no_label_toggle_last				= true;
-						HAPI_GUIParm input_format_dropdown		= new HAPI_GUIParm( "input_format_dropdown_" + input_index );
+						HoudiniGUIParm input_format_dropdown		= new HoudiniGUIParm( "input_format_dropdown_" + input_index );
 						input_format_dropdown.width				= myInputFormatDropdownWidth;
 						input_format_dropdown.size				= 1;
 						input_format_dropdown.choiceCount		= 2;
@@ -147,7 +147,7 @@ public class HAPI_AssetGUI : Editor
 						string[] input_format_dropdown_labels	= new string[ 2 ] { "Object", "File" };
 						input_format_value[ 0 ]					= (int) myAsset.prGeoInputFormats[ input_index ];
 						
-						HAPI_GUI.dropdown( ref input_format_dropdown, ref input_format_value, 
+						HoudiniGUI.dropdown( ref input_format_dropdown, ref input_format_value, 
 										   input_format_dropdown_labels, input_format_dropdown_values, 
 						                   ref join_last, ref no_label_toggle_last, null, ref input_format_value );
 
@@ -156,10 +156,10 @@ public class HAPI_AssetGUI : Editor
 
 						if ( value == HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_OBJECT )
 						{
-							HAPI_GUIParm geo_input = new HAPI_GUIParm( "geo_input_" + input_index, 
+							HoudiniGUIParm geo_input = new HoudiniGUIParm( "geo_input_" + input_index, 
 																	   myAsset.prGeoInputNames[ input_index ] );
 							Object obj = (Object) myAsset.prUpStreamGeoObjects[ input_index ];
-							myParmChanges |= HAPI_GUI.objectField( ref geo_input, ref obj, 
+							myParmChanges |= HoudiniGUI.objectField( ref geo_input, ref obj, 
 																   typeof( GameObject ), ref join_last,
 																   ref no_label_toggle_last );
 					
@@ -182,7 +182,7 @@ public class HAPI_AssetGUI : Editor
 									myAsset.prUpStreamGeoObjects[ input_index ] = new_obj;
 
 									// Select the asset component (if it exists).
-									HAPI_Asset asset = new_obj.GetComponent< HAPI_Asset >();
+									HoudiniAsset asset = new_obj.GetComponent< HoudiniAsset >();
 
 									// If we're selecting a specific object to input than try and
 									// get the object id. Note that by getting the HAPI_ObjectControl
@@ -191,7 +191,7 @@ public class HAPI_AssetGUI : Editor
 									// drag any gameObject under the asset into another asset's
 									// input and have it all work.
 									int object_index = 0;
-									HAPI_ObjectControl obj_control = new_obj.GetComponent< HAPI_ObjectControl >();
+									HoudiniObjectControl obj_control = new_obj.GetComponent< HoudiniObjectControl >();
 									if ( obj_control )
 									{
 										object_index = obj_control.prObjectId;
@@ -201,7 +201,7 @@ public class HAPI_AssetGUI : Editor
 									// If we are connecting a non-HAPI game object than we need to 
 									// assetize it first by converting it to an Input Asset.
 									if ( asset == null )
-										asset = new_obj.AddComponent< HAPI_AssetInput >();
+										asset = new_obj.AddComponent< HoudiniAssetInput >();
 									
 									if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
 									{
@@ -218,10 +218,10 @@ public class HAPI_AssetGUI : Editor
 						}
 						else
 						{
-							HAPI_GUIParm file_input = new HAPI_GUIParm( "file_input_" + input_index,
+							HoudiniGUIParm file_input = new HoudiniGUIParm( "file_input_" + input_index,
 																		myAsset.prGeoInputNames[ input_index ] );
 							string file_path = myAsset.prFileInputs[ input_index ];
-							myParmChanges |= HAPI_GUI.fileField( ref file_input, ref myDelayBuild, ref file_path,
+							myParmChanges |= HoudiniGUI.fileField( ref file_input, ref myDelayBuild, ref file_path,
 																 ref join_last, ref no_label_toggle_last );
 							if ( myParmChanges )
 							{
@@ -249,7 +249,7 @@ public class HAPI_AssetGUI : Editor
 				} // if
 			} // if
 		}
-		catch ( HAPI_Error e )
+		catch ( HoudiniError e )
 		{
 			Debug.LogError( e.ToString() );
 		}
@@ -271,11 +271,11 @@ public class HAPI_AssetGUI : Editor
 		bool join_last				= false;
 		bool no_label_toggle_last	= true;
 
-		HAPI_GUI.label( "Transform", myInputFormatDropdownWidth, true, ref join_last );
+		HoudiniGUI.label( "Transform", myInputFormatDropdownWidth, true, ref join_last );
 
-		HAPI_GUIParm trans_input	= new HAPI_GUIParm( "trans_input_" + index, myAsset.prTransInputNames[ index ] );
+		HoudiniGUIParm trans_input	= new HoudiniGUIParm( "trans_input_" + index, myAsset.prTransInputNames[ index ] );
 		Object obj					= (Object) myAsset.prUpStreamTransformObjects[ index ];
-		bool changed				= HAPI_GUI.objectField( ref trans_input, ref obj, typeof( GameObject ),
+		bool changed				= HoudiniGUI.objectField( ref trans_input, ref obj, typeof( GameObject ),
 															ref join_last, ref no_label_toggle_last );
 		
 		if ( changed )
@@ -289,7 +289,7 @@ public class HAPI_AssetGUI : Editor
 			{
 				GameObject game_obj = (GameObject) obj;
 				myAsset.prUpStreamTransformObjects[ index ] = game_obj;
-				HAPI_Asset input_asset = game_obj.GetComponent< HAPI_Asset >();
+				HoudiniAsset input_asset = game_obj.GetComponent< HoudiniAsset >();
 				if ( input_asset )
 					myAsset.addAssetAsTransformInput( input_asset, index );
 				else
@@ -350,11 +350,11 @@ public class HAPI_AssetGUI : Editor
 		bool gui_enabled = GUI.enabled;
 		try
 		{
-			PropertyInfo property = typeof( HAPI_Asset ).GetProperty( property_name );
+			PropertyInfo property = typeof( HoudiniAsset ).GetProperty( property_name );
 			if ( property == null )
-				throw new HAPI_ErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
+				throw new HoudiniErrorInvalidArgument( property_name + " is not a valid property of HAPI_Asset!" );
 			if ( property.PropertyType != typeof( bool ) )
-				throw new HAPI_ErrorInvalidArgument( property_name + " is not a boolean!" );
+				throw new HoudiniErrorInvalidArgument( property_name + " is not a boolean!" );
 
 			GUI.enabled = !global_overwrite && !local_overwrite && GUI.enabled;
 
@@ -365,7 +365,7 @@ public class HAPI_AssetGUI : Editor
 
 			bool value = ( bool ) property.GetValue( myAsset, null );
 			bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) != value;
-			bool changed = HAPI_GUI.toggle( name, label, is_bold, ref value, myUndoInfo, ref undo_info_value );
+			bool changed = HoudiniGUI.toggle( name, label, is_bold, ref value, myUndoInfo, ref undo_info_value );
 
 			if ( changed )
 			{
@@ -384,7 +384,7 @@ public class HAPI_AssetGUI : Editor
 		GUI.enabled = gui_enabled;
 	}
 
-	protected HAPI_Asset 	myAsset;
+	protected HoudiniAsset 	myAsset;
 	protected bool			myDelayBuild;
 	protected bool			myParmChanges;
 	protected bool			myUnbuiltChanges;
@@ -392,8 +392,8 @@ public class HAPI_AssetGUI : Editor
 
 	protected Vector2 myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 
-	protected HAPI_AssetUndoInfo myUndoInfo;
-	protected HAPI_Asset myParentPrefabAsset;
+	protected HoudiniAssetUndoInfo myUndoInfo;
+	protected HoudiniAsset myParentPrefabAsset;
 
 	private const int		myInputFormatDropdownWidth = 62;
 }

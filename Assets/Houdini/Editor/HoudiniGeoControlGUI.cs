@@ -18,9 +18,9 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-[ CustomEditor( typeof( HAPI_GeoControl ) ) ]
+[ CustomEditor( typeof( HoudiniGeoControl ) ) ]
 [ CanEditMultipleObjects ]
-public class HAPI_GeoControlGUI : Editor 
+public class HoudiniGeoControlGUI : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -37,7 +37,7 @@ public class HAPI_GeoControlGUI : Editor
 
 	public override void OnInspectorGUI()
 	{
-		HAPI_GUI.help( "Values here are for debugging only and should not be modified directly.", MessageType.Info );
+		HoudiniGUI.help( "Values here are for debugging only and should not be modified directly.", MessageType.Info );
 
 		bool gui_enabled = GUI.enabled;
 		GUI.enabled = false;

@@ -18,7 +18,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class HAPI_ObjectControl : HAPI_Control 
+public class HoudiniObjectControl : HoudiniControl 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -31,12 +31,12 @@ public class HAPI_ObjectControl : HAPI_Control
 
 	public List< GameObject > prGeos {	get { return myGeos; }				set { myGeos = value; } }
 
-	public HAPI_ObjectControl() 
+	public HoudiniObjectControl() 
 	{
 		reset();
 	}
 
-	~HAPI_ObjectControl()
+	~HoudiniObjectControl()
 	{
 
 	}
@@ -54,9 +54,9 @@ public class HAPI_ObjectControl : HAPI_Control
 		myGeos = new List< GameObject >( 0 );
 	}
 
-	public void init( HAPI_ObjectControl object_control )
+	public void init( HoudiniObjectControl object_control )
 	{
-		init( (HAPI_Control) object_control );
+		init( (HoudiniControl) object_control );
 
 		prObjectId		= object_control.prObjectId;
 		prObjectName	= object_control.prObjectName;
@@ -64,7 +64,7 @@ public class HAPI_ObjectControl : HAPI_Control
 	}
 
 	public void init( 
-		int asset_id, int node_id, HAPI_Asset asset, int object_id, string object_name, bool object_visible )
+		int asset_id, int node_id, HoudiniAsset asset, int object_id, string object_name, bool object_visible )
 	{
 		prAssetId		= asset_id;
 		prNodeId		= node_id;
@@ -84,7 +84,7 @@ public class HAPI_ObjectControl : HAPI_Control
 		if ( reload_asset )
 		{
 			for ( int i = 0; i < myGeos.Count; ++i )
-				HAPI_AssetUtility.destroyGameObject( myGeos[ i ] );
+				HoudiniAssetUtility.destroyGameObject( myGeos[ i ] );
 			myGeos.Clear();
 		}
 
@@ -97,19 +97,19 @@ public class HAPI_ObjectControl : HAPI_Control
 			// Remove stale geos.
 			while ( myGeos.Count > object_info.geoCount )
 			{
-				HAPI_AssetUtility.destroyGameObject( myGeos[ object_info.geoCount ] );
+				HoudiniAssetUtility.destroyGameObject( myGeos[ object_info.geoCount ] );
 				myGeos.RemoveAt( object_info.geoCount );
 			}
 
 			// Refresh all geos.
 			for ( int i = 0; i < myGeos.Count; ++i )
-				myGeos[ i ].GetComponent< HAPI_GeoControl >().refresh( reload_asset );
+				myGeos[ i ].GetComponent< HoudiniGeoControl >().refresh( reload_asset );
 		}
 	}
 
 	public void beginBakeAnimation()
 	{
-		myCurveCollection = new HAPI_CurvesCollection();
+		myCurveCollection = new HoudiniCurvesCollection();
 	}
 
 	public void bakeAnimation( float curr_time, GameObject parent_object, HAPI_Transform hapi_transform )
@@ -157,12 +157,12 @@ public class HAPI_ObjectControl : HAPI_Control
 				world_mat.SetTRS( pos, quat, scale );
 				Matrix4x4 local_mat = parent_xform_inverse  * world_mat;
 				
-				quat = HAPI_AssetUtility.getQuaternion( local_mat );
-				scale = HAPI_AssetUtility.getScale( local_mat );
-				pos = HAPI_AssetUtility.getPosition( local_mat );
+				quat = HoudiniAssetUtility.getQuaternion( local_mat );
+				scale = HoudiniAssetUtility.getScale( local_mat );
+				pos = HoudiniAssetUtility.getPosition( local_mat );
 			}
 
-			HAPI_CurvesCollection curves = myCurveCollection;
+			HoudiniCurvesCollection curves = myCurveCollection;
 			
 			addKeyToCurve( curr_time, pos[ 0 ], curves.tx );
 			addKeyToCurve( curr_time, pos[ 1 ], curves.ty );
@@ -175,7 +175,7 @@ public class HAPI_ObjectControl : HAPI_Control
 			addKeyToCurve( curr_time, scale.y, curves.sy );
 			addKeyToCurve( curr_time, scale.z, curves.sz );
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 			return;
@@ -186,7 +186,7 @@ public class HAPI_ObjectControl : HAPI_Control
 	{
 		try
 		{
-			HAPI_CurvesCollection curves = myCurveCollection;
+			HoudiniCurvesCollection curves = myCurveCollection;
 			AnimationClip clip = curves.assignCurvesToClip();
 
 			if ( clip != null )
@@ -205,7 +205,7 @@ public class HAPI_ObjectControl : HAPI_Control
 			
 			return false;
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 			return false;
@@ -227,7 +227,7 @@ public class HAPI_ObjectControl : HAPI_Control
 		child.transform.localRotation	= new Quaternion();
 		child.transform.localScale		= new Vector3( 1.0f, 1.0f, 1.0f );
 
-		HAPI_GeoControl control = child.AddComponent< HAPI_GeoControl >();
+		HoudiniGeoControl control = child.AddComponent< HoudiniGeoControl >();
 		control.init( this );
 		control.prGeoId = geo_id;
 		control.prObjectControl = this;
@@ -250,5 +250,5 @@ public class HAPI_ObjectControl : HAPI_Control
 
 	[SerializeField] private List< GameObject > myGeos;
 	
-	private HAPI_CurvesCollection myCurveCollection = null;
+	private HoudiniCurvesCollection myCurveCollection = null;
 }

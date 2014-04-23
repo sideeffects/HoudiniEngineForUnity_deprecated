@@ -1,4 +1,4 @@
-﻿Shader "HAPI/MeshPoint" {
+﻿Shader "Houdini/MeshPoint" {
 	
 	Properties
 	{

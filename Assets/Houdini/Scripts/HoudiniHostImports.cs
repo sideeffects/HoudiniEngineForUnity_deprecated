@@ -36,7 +36,7 @@ using HAPI_MaterialId = System.Int32;
 /// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
 /// 	Houdini runtime.
 /// </summary>
-public static partial class HAPI_Host
+public static partial class HoudiniHost
 {
 #if UNITY_STANDALONE_WIN
 	// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------

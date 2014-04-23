@@ -1,4 +1,4 @@
-Shader "HAPI/VolumeSurface" {
+Shader "Houdini/VolumeSurface" {
 
 	Properties {
 		_PointSize ("PointSize", Float) = 10.0

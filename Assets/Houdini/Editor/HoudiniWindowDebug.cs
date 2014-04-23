@@ -21,7 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-public class HAPI_WindowDebug : EditorWindow 
+public class HoudiniWindowDebug : EditorWindow 
 {
 #if !UNITY_STANDALONE_WIN
 	#pragma warning disable 0414
@@ -42,11 +42,11 @@ public class HAPI_WindowDebug : EditorWindow
 	{
 		float time = 0.0f;
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow< HAPI_WindowDebug >( false, HAPI_Constants.HAPI_PRODUCT_SHORT_NAME +
-													" " + HAPI_GUIUtility.myDebugLabel );
+		EditorWindow.GetWindow< HoudiniWindowDebug >( false, HoudiniConstants.HAPI_PRODUCT_SHORT_NAME +
+													" " + HoudiniGUIUtility.myDebugLabel );
 		
-		HAPI_Host.getTime( out time );
-		HAPI_WindowDebug.myTime = time;
+		HoudiniHost.getTime( out time );
+		HoudiniWindowDebug.myTime = time;
 	}
 	
 	public void OnGUI() 
@@ -58,44 +58,44 @@ public class HAPI_WindowDebug : EditorWindow
 		GUI.enabled = false;
 #endif // !UNITY_STANDALONE_WIN
 
-		if ( GUILayout.Button( HAPI_GUIUtility.mySaveHoudiniSceneLabel ) )
+		if ( GUILayout.Button( HoudiniGUIUtility.mySaveHoudiniSceneLabel ) )
 		{
 			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
-			if ( hip_file_path != "" && HAPI_Host.hasScene() )
-				HAPI_Host.saveScene( hip_file_path );
+			if ( hip_file_path != "" && HoudiniHost.hasScene() )
+				HoudiniHost.saveScene( hip_file_path );
 			else
 				Debug.LogError( "Nothing to save." );
 		}
 		
-		if ( GUILayout.Button( HAPI_GUIUtility.myLoadAssetLabel ) )
+		if ( GUILayout.Button( HoudiniGUIUtility.myLoadAssetLabel ) )
 		{
-			string asset_file_path = HAPI_GUIUtility.promptForOTLPath();
-			HAPI_GUIUtility.instantiateAsset( asset_file_path );
+			string asset_file_path = HoudiniGUIUtility.promptForOTLPath();
+			HoudiniGUIUtility.instantiateAsset( asset_file_path );
 		}
 
-		if ( HAPI_GUI.floatField( "global_time", "Global Time", ref myTime, null, ref myTime ) )
+		if ( HoudiniGUI.floatField( "global_time", "Global Time", ref myTime, null, ref myTime ) )
 		{
 			try
 			{
-				if ( !HAPI_SetPath.prIsPathSet )
+				if ( !HoudiniSetPath.prIsPathSet )
 				{
-					HAPI_SetPath.setPath();
-					if ( !HAPI_SetPath.prIsPathSet )
+					HoudiniSetPath.setPath();
+					if ( !HoudiniSetPath.prIsPathSet )
 					{
 						Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 						return;
 					}
-					HAPI_Host.initialize();
+					HoudiniHost.initialize();
 				}
-				HAPI_Host.setTime( myTime );
+				HoudiniHost.setTime( myTime );
 			}
-			catch ( HAPI_Error error )
+			catch ( HoudiniError error )
 			{
 				Debug.LogError( error.ToString() );
 			}
 		}
 
-		HAPI_GUI.separator();
+		HoudiniGUI.separator();
 		
 		
 		string path = Application.dataPath;
@@ -109,7 +109,7 @@ public class HAPI_WindowDebug : EditorWindow
 				DirectoryInfo core = new DirectoryInfo( path + "//OTLs/Core" );
 					
 				if ( !core.Exists )
-					throw new HAPI_Error( "Project/Assets/OTLs/Core directory does not exist!" );
+					throw new HoudiniError( "Project/Assets/OTLs/Core directory does not exist!" );
 					
 				foreach ( FileInfo fi in core.GetFiles() )
 					if ( fi.Extension == ".otl" )
@@ -127,7 +127,7 @@ public class HAPI_WindowDebug : EditorWindow
 		try
 		{
 			if ( !di.Exists )
-				throw new HAPI_Error( "Project/Assets/OTLs directory does not exist!" );
+				throw new HoudiniError( "Project/Assets/OTLs directory does not exist!" );
 				
 			foreach ( DirectoryInfo child_directory in di.GetDirectories() )
 			{
@@ -197,7 +197,7 @@ public class HAPI_WindowDebug : EditorWindow
 	
 	private void loadOTL( FileInfo fi )
 	{
-		HAPI_GUIUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
+		HoudiniGUIUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
 	}
 
 	private static List< OTLDirectory >	myOTLDirectories  	= new List< OTLDirectory >();
