@@ -18,7 +18,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class HAPI_ParmsUndoInfo : ScriptableObject
+public class HoudiniParmsUndoInfo : ScriptableObject
 {	
 	public List< string > parmNames = new List< string >();
 	public List< int > parmIndices = new List< int >();

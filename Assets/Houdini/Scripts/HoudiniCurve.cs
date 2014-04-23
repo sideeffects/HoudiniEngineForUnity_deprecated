@@ -21,15 +21,14 @@ using UnityEditor;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
-using Utility = HAPI_AssetUtility;
 
 // Typedefs
 using HAPI_NodeId = System.Int32;
 
 [ ExecuteInEditMode ]
-[ RequireComponent( typeof( HAPI_Control ) ) ]
-[ RequireComponent( typeof( HAPI_Parms ) ) ]
-public class HAPI_Curve : MonoBehaviour
+[ RequireComponent( typeof( HoudiniControl ) ) ]
+[ RequireComponent( typeof( HoudiniParms ) ) ]
+public class HoudiniCurve : MonoBehaviour
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
@@ -46,9 +45,9 @@ public class HAPI_Curve : MonoBehaviour
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 	
-	public HAPI_Control		prControl {					get { return myControl; } 
+	public HoudiniControl		prControl {					get { return myControl; } 
 														set { myControl = value; } }
-	public HAPI_Parms		prParms {					get { return myParms; }
+	public HoudiniParms		prParms {					get { return myParms; }
 														set { myParms = value; } }
 
 	public List< Vector3 > 	prPoints {					get { return myPoints; } 
@@ -79,7 +78,7 @@ public class HAPI_Curve : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_Curve() 
+	public HoudiniCurve() 
 	{
 #if UNITY_EDITOR
 		EditorApplication.playmodeStateChanged += playmodeStateChanged;
@@ -87,7 +86,7 @@ public class HAPI_Curve : MonoBehaviour
 		reset();
 	}
 	
-	~HAPI_Curve()
+	~HoudiniCurve()
 	{
 #if UNITY_EDITOR
 		EditorApplication.playmodeStateChanged -= playmodeStateChanged;
@@ -189,7 +188,7 @@ public class HAPI_Curve : MonoBehaviour
 			parm += " ";
 		}
 		
-		HAPI_Host.setParmStringValue( prControl.prNodeId, parm, 2, 0 );
+		HoudiniHost.setParmStringValue( prControl.prNodeId, parm, 2, 0 );
 		
 		prControl.prAsset.buildClientSide();
 		prControl.prAsset.savePreset();
@@ -205,7 +204,7 @@ public class HAPI_Curve : MonoBehaviour
 			HAPI_ParmInfo coords_parm_info = prParms.findParm( "coords" );
 
 			string point_list = 
-				HAPI_Host.getString( prParms.prParmStringValues[ coords_parm_info.stringValuesIndex ] );
+				HoudiniHost.getString( prParms.prParmStringValues[ coords_parm_info.stringValuesIndex ] );
 
 			if ( point_list == null )
 				return;
@@ -275,7 +274,7 @@ public class HAPI_Curve : MonoBehaviour
 
 			Color[] line_colours = new Color[ prVertices.Length ];
 			for ( int i = 0; i < prVertices.Length; ++i )
-				line_colours[ i ] = HAPI_Host.prWireframeColour;
+				line_colours[ i ] = HoudiniHost.prWireframeColour;
 
 			mesh.Clear();
 		
@@ -293,12 +292,12 @@ public class HAPI_Curve : MonoBehaviour
 		try
 		{
 			// Get position attributes (this is all we get for the curve's geometry).
-			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
+			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
-			Utility.getAttribute( prControl.prAsset.prAssetId, object_id, geo_id, 0, HAPI_Constants.HAPI_ATTRIB_POSITION, 
-								  ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+			HoudiniAssetUtility.getAttribute( prControl.prAsset.prAssetId, object_id, geo_id, 0, HoudiniConstants.HAPI_ATTRIB_POSITION, 
+								  ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
-				throw new HAPI_Error( "No position attribute found." );
+				throw new HoudiniError( "No position attribute found." );
 
 			int vertex_count = pos_attr_info.count;
 			
@@ -327,7 +326,7 @@ public class HAPI_Curve : MonoBehaviour
 				mesh_renderer.tag = "EditorOnly"; 
 		
 				// Set generic texture so it's not pink.
-				Material line_material = new Material( Shader.Find( "HAPI/Line" ) );
+				Material line_material = new Material( Shader.Find( "Houdini/Line" ) );
 				mesh_renderer.material = line_material;
 			}
 
@@ -338,7 +337,7 @@ public class HAPI_Curve : MonoBehaviour
 			AssetDatabase.Refresh();
 #endif // UNITY_EDITOR
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
@@ -356,8 +355,8 @@ public class HAPI_Curve : MonoBehaviour
 		{
 			HAPI_ParmInfo primitive_type_parm	= prParms.findParm( "type" );
 			HAPI_ParmInfo method_parm			= prParms.findParm( "method" );
-			int primitive_type_parm_default		= HAPI_Host.prCurvePrimitiveTypeDefault;
-			int method_parm_default				= HAPI_Host.prCurveMethodDefault;
+			int primitive_type_parm_default		= HoudiniHost.prCurvePrimitiveTypeDefault;
+			int method_parm_default				= HoudiniHost.prCurveMethodDefault;
 			int primitive_type_parm_int_values	= primitive_type_parm.intValuesIndex;
 			int method_parm_int_values			= method_parm.intValuesIndex;
 
@@ -367,12 +366,12 @@ public class HAPI_Curve : MonoBehaviour
 			int[] temp_int_values = new int[ 1 ];
 
 			temp_int_values[ 0 ] = primitive_type_parm_default;
-			HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, primitive_type_parm.intValuesIndex, 1 );
+			HoudiniHost.setParmIntValues( prControl.prNodeId, temp_int_values, primitive_type_parm.intValuesIndex, 1 );
 
 			temp_int_values[ 0 ] = method_parm_default;
-			HAPI_Host.setParmIntValues( prControl.prNodeId, temp_int_values, method_parm.intValuesIndex, 1 );
+			HoudiniHost.setParmIntValues( prControl.prNodeId, temp_int_values, method_parm.intValuesIndex, 1 );
 			
-			HAPI_Host.cookAsset( prControl.prAsset.prAssetId );
+			HoudiniHost.cookAsset( prControl.prAsset.prAssetId );
 		}
 		catch {}
 	}
@@ -385,14 +384,14 @@ public class HAPI_Curve : MonoBehaviour
 		// In certain situations, sepcifically after loading a scene, the gameObject "function"
 		// may throw an exception here along the lines of:
 		//
-		// UnityEngine.MissingReferenceException: The object of type 'HAPI_AssetCurve' has been destroyed but you are still trying to access it.
+		// UnityEngine.MissingReferenceException: The object of type 'HoudiniAssetCurve' has been destroyed but you are still trying to access it.
 		// Your script should either check if it is null or you should not destroy the object.
 		//  at (wrapper managed-to-native) UnityEngine.Component:InternalGetGameObject ()
 		//	  at UnityEngine.Component.get_gameObject () [0x00000] in C:\BuildAgent\work\7535de4ca26c26ac\Runtime\ExportGenerated\Editor\UnityEngineComponent.cs:170 
-		//	  at HAPI_AssetCurve.playmodeStateChanged () [0x00000] in D:\Storage\Projects\Unity4EmptyProject\Assets\HAPI\Scripts\HAPI_AssetCurve.cs:369 
+		//	  at HoudiniAssetCurve.playmodeStateChanged () [0x00000] in D:\Storage\Projects\Unity4EmptyProject\Assets\Houdini\Scripts\HoudiniAssetCurve.cs:369 
 		//	Source: UnityEngine
 		//	UnityEngine.Debug:Log(Object)
-		//	HAPI_AssetCurve:playmodeStateChanged() (at Assets/HAPI/Scripts/HAPI_AssetCurve.cs:384)
+		//	HoudiniAssetCurve:playmodeStateChanged() (at Assets/Houdini/Scripts/HoudiniAssetCurve.cs:384)
 		//	UnityEditor.Toolbar:OnGUI()
 		//
 		// This is not good since we don't know why the curve does not yet have an initialization.
@@ -441,8 +440,8 @@ public class HAPI_Curve : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-	[SerializeField] private HAPI_Control		myControl;
-	[SerializeField] private HAPI_Parms			myParms;
+	[SerializeField] private HoudiniControl		myControl;
+	[SerializeField] private HoudiniParms			myParms;
 	
 	[SerializeField] private List< Vector3 >	myPoints;
 	[SerializeField] private Vector3[]			myVertices;

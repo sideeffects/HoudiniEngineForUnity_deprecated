@@ -19,28 +19,28 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// 	GUI companion to <see cref="HAPI_Instancer"/>. Responsible for generating the custom Inspector for
+/// 	GUI companion to <see cref="HoudiniInstancer"/>. Responsible for generating the custom Inspector for
 /// 	our instancer
 /// </summary>
-[ CustomEditor( typeof( HAPI_Instancer ) ) ]
-public class HAPI_InstancerGUI : Editor 
+[ CustomEditor( typeof( HoudiniInstancer ) ) ]
+public class HoudiniInstancerGUI : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
 	public void OnEnable() 
 	{
-		myInstancer = target as HAPI_Instancer;
+		myInstancer = target as HoudiniInstancer;
 	}
 	
 	public void OnSceneGUI()
 	{
-		myInstancer = target as HAPI_Instancer;
+		myInstancer = target as HoudiniInstancer;
 		
 		if ( myInstancer != null )
 			myInstancer.drawAllPins();
 		
 	}
 	
-	private HAPI_Instancer	 	myInstancer;
+	private HoudiniInstancer	 	myInstancer;
 }

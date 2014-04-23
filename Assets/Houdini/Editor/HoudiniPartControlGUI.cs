@@ -18,29 +18,29 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-[ CustomEditor( typeof( HAPI_PartControl ) ) ]
+[ CustomEditor( typeof( HoudiniPartControl ) ) ]
 [ CanEditMultipleObjects ]
-public class HAPI_PartControlGUI : Editor 
+public class HoudiniPartControlGUI : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 
 	public void OnSceneGUI()
 	{
-		HAPI_PartControl control = target as HAPI_PartControl;
+		HoudiniPartControl control = target as HoudiniPartControl;
 		control.selectParent();
 
 		if ( control.prShowPointNumbers )
 		{
 			// Get position attributes.
-			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HAPI_Constants.HAPI_ATTRIB_POSITION );
+			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
-			HAPI_AssetUtility.getAttribute(
+			HoudiniAssetUtility.getAttribute(
 				myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId, 
-				myPartControl.prPartId, HAPI_Constants.HAPI_ATTRIB_POSITION, 
-				ref pos_attr_info, ref pos_attr, HAPI_Host.getAttributeFloatData );
+				myPartControl.prPartId, HoudiniConstants.HAPI_ATTRIB_POSITION, 
+				ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
-				throw new HAPI_Error( "No position attribute found." );
+				throw new HoudiniError( "No position attribute found." );
 
 			int point_count = pos_attr.Length / 3;
 			// Determine which control point was pressed for modification.
@@ -53,7 +53,7 @@ public class HAPI_PartControlGUI : Editor
 			}
 		}
 
-		HAPI_Instance instance = findInstanceControlInParent();
+		HoudiniInstance instance = findInstanceControlInParent();
 		if ( instance == null )
 			return;
 		
@@ -66,13 +66,13 @@ public class HAPI_PartControlGUI : Editor
 
 		if (
 			curr_event.isMouse && curr_event.type == EventType.MouseDown &&
-			HAPI_Host.prAutoPinInstances )
+			HoudiniHost.prAutoPinInstances )
 		{
 			control.prTransformChanged = false;
 		}
 		else if (
 			curr_event.isMouse && curr_event.type == EventType.MouseUp &&
-			HAPI_Host.prAutoPinInstances && control.prTransformChanged )
+			HoudiniHost.prAutoPinInstances && control.prTransformChanged )
 		{
 			instance.prInstancer.pinObject( control.gameObject, true );
 			control.prTransformChanged = false;
@@ -80,12 +80,12 @@ public class HAPI_PartControlGUI : Editor
 		}
 	}
 
-	private HAPI_Instance findInstanceControlInParent()
+	private HoudiniInstance findInstanceControlInParent()
 	{
 		Transform parent = myPartControl.gameObject.transform.parent;
 		while( parent != null )
 		{
-			HAPI_Instance instance = parent.gameObject.GetComponent< HAPI_Instance >();
+			HoudiniInstance instance = parent.gameObject.GetComponent< HoudiniInstance >();
 			if( instance != null )
 				return instance;
 			parent = parent.parent;
@@ -95,14 +95,14 @@ public class HAPI_PartControlGUI : Editor
 
 	public virtual void OnEnable() 
 	{
-		myPartControl = target as HAPI_PartControl;
+		myPartControl = target as HoudiniPartControl;
 	}
 
 	public override void OnInspectorGUI() 
 	{
 		{
 			bool value = myPartControl.prShowPointNumbers;
-			bool changed = HAPI_GUI.toggle( "show_point_numbers", "Show Point Numbers", ref value,
+			bool changed = HoudiniGUI.toggle( "show_point_numbers", "Show Point Numbers", ref value,
 			                                null, ref value );
 			myPartControl.prShowPointNumbers = value;
 			if ( changed )
@@ -115,8 +115,8 @@ public class HAPI_PartControlGUI : Editor
 			{
 				MeshFilter mesh_filter			= myPartControl.gameObject.GetComponent< MeshFilter >();
 				Mesh shared_mesh				= mesh_filter.sharedMesh;
-				HAPI_PartControl part_control	= myPartControl.gameObject.GetComponent< HAPI_PartControl >();
-				HAPI_AssetUtility.setMesh(		myPartControl.prAsset.prAssetId, 
+				HoudiniPartControl part_control	= myPartControl.gameObject.GetComponent< HoudiniPartControl >();
+				HoudiniAssetUtility.setMesh(		myPartControl.prAsset.prAssetId, 
 												myPartControl.prObjectId,
 												myPartControl.prGeoId,
 												ref shared_mesh,
@@ -128,7 +128,7 @@ public class HAPI_PartControlGUI : Editor
 			
 			if ( GUILayout.Button( "Clear Edits" ) ) 
 			{
-				HAPI_Host.revertGeo( myPartControl.prAsset.prAssetId,
+				HoudiniHost.revertGeo( myPartControl.prAsset.prAssetId,
 									 myPartControl.prObjectId,
 									 myPartControl.prGeoId );
 				
@@ -136,7 +136,7 @@ public class HAPI_PartControlGUI : Editor
 			}
 		}
 
-		HAPI_GUI.help( "Values here are for debugging only and should not be modified directly.", MessageType.Info );
+		HoudiniGUI.help( "Values here are for debugging only and should not be modified directly.", MessageType.Info );
 		bool gui_enabled = GUI.enabled;
 		GUI.enabled = false;
 		DrawDefaultInspector();
@@ -146,5 +146,5 @@ public class HAPI_PartControlGUI : Editor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
-	[SerializeField] private HAPI_PartControl myPartControl = null;
+	[SerializeField] private HoudiniPartControl myPartControl = null;
 }

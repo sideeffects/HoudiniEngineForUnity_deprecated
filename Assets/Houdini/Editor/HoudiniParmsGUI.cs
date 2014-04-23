@@ -21,33 +21,33 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-[ CustomEditor( typeof( HAPI_Parms ) ) ]
-public class HAPI_ParmsGUI : Editor
+[ CustomEditor( typeof( HoudiniParms ) ) ]
+public class HoudiniParmsGUI : Editor
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
 	public void OnEnable()
 	{
-		myParms = target as HAPI_Parms;
+		myParms = target as HoudiniParms;
 		myAsset = myParms.prControl.prAsset;
 
 		myParmChanges		= true;
 		myUnbuiltChanges 	= false;
 		myFocusChanged 		= true;
 
-		HAPI_Host.myRepaintDelegate += this.refresh;
-		HAPI_Host.myDeselectionDelegate += this.deselect;
-		HAPI_Host.myPlaymodeStateChangeDelegate += this.playmodeStateChange;
-		HAPI_Host.mySelectionTarget = myParms.gameObject;
+		HoudiniHost.myRepaintDelegate += this.refresh;
+		HoudiniHost.myDeselectionDelegate += this.deselect;
+		HoudiniHost.myPlaymodeStateChangeDelegate += this.playmodeStateChange;
+		HoudiniHost.mySelectionTarget = myParms.gameObject;
 	}
 
 	public void OnDisable()
 	{
-		HAPI_Host.myRepaintDelegate -= this.refresh;
-		HAPI_Host.myDeselectionDelegate -= this.deselect;
-		HAPI_Host.myPlaymodeStateChangeDelegate -= this.playmodeStateChange;
-		HAPI_Host.mySelectionTarget = null;
+		HoudiniHost.myRepaintDelegate -= this.refresh;
+		HoudiniHost.myDeselectionDelegate -= this.deselect;
+		HoudiniHost.myPlaymodeStateChangeDelegate -= this.playmodeStateChange;
+		HoudiniHost.mySelectionTarget = null;
 
 		myParmChanges = false;
 		applyChanges( true, true );
@@ -61,8 +61,8 @@ public class HAPI_ParmsGUI : Editor
 
 	public virtual void deselect()
 	{
-		if ( HAPI_Host.mySelectionTarget == myParms.gameObject )
-			HAPI_Host.mySelectionTarget = null;
+		if ( HoudiniHost.mySelectionTarget == myParms.gameObject )
+			HoudiniHost.mySelectionTarget = null;
 	}
 
 	public void playmodeStateChange()
@@ -78,7 +78,7 @@ public class HAPI_ParmsGUI : Editor
 			if ( record_undo )
 			{
 				string changed_parm_name = "Parameter Change";
-				if ( myParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
+				if ( myParms.prLastChangedParmId != HoudiniConstants.HAPI_INVALID_PARM_ID )
 					changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
 
 				Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
@@ -109,8 +109,8 @@ public class HAPI_ParmsGUI : Editor
 				current_event.type == EventType.ValidateCommand && 
 				current_event.commandName == "UndoRedoPerformed" )
 			{
-				HAPI_ParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HAPI_ParmsUndoInfo;
-				bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HAPI_Asset >() != null;
+				HoudiniParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HoudiniParmsUndoInfo;
+				bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HoudiniAsset >() != null;
 						
 						// First find all multiparms and add/remove instances as necessary
 				foreach ( HAPI_ParmInfo parm in myParms.prParms )
@@ -166,7 +166,7 @@ public class HAPI_ParmsGUI : Editor
 
 							int[] values = new int[ parm.size ];
 							Array.Copy( undo_info.parmIntValues, new_value_index, values, 0, parm.size );
-							HAPI_Host.setParmIntValues(
+							HoudiniHost.setParmIntValues(
 								myParms.prControl.prNodeId, values, 
 								parm.intValuesIndex, parm.size );
 
@@ -188,7 +188,7 @@ public class HAPI_ParmsGUI : Editor
 
 							float[] values = new float[ parm.size ];
 							Array.Copy( undo_info.parmFloatValues, new_value_index, values, 0, parm.size );
-							HAPI_Host.setParmFloatValues(
+							HoudiniHost.setParmFloatValues(
 								myParms.prControl.prNodeId, values, 
 								parm.floatValuesIndex, parm.size );
 
@@ -213,7 +213,7 @@ public class HAPI_ParmsGUI : Editor
 							{
 								myParmChanges = true;
 
-								HAPI_Host.setParmStringValue(
+								HoudiniHost.setParmStringValue(
 									myParms.prControl.prNodeId, 
 									new_string_value, parm.id, i );
 
@@ -239,7 +239,7 @@ public class HAPI_ParmsGUI : Editor
 			HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 			if ( !is_editable )
-				HAPI_GUI.help( "The parameters on this node are readonly.", MessageType.Info );
+				HoudiniGUI.help( "The parameters on this node are readonly.", MessageType.Info );
 #endif // !UNITY_STANDALONE_WIN
 
 			bool gui_enable = GUI.enabled;
@@ -257,8 +257,8 @@ public class HAPI_ParmsGUI : Editor
 			bool record_undo = current_event.commandName != "UndoRedoPerformed";
 			applyChanges( commit_changes, record_undo );
 		}
-		catch ( HAPI_ErrorIgnorable ) {}
-		catch ( HAPI_Error error )
+		catch ( HoudiniErrorIgnorable ) {}
+		catch ( HoudiniError error )
 		{
 			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
@@ -290,7 +290,7 @@ public class HAPI_ParmsGUI : Editor
 		int[] parm_int_values		= myParms.prParmIntValues;
 		float[] parm_float_values	= myParms.prParmFloatValues;
 
-		HAPI_GUIParm gui_parm 		= new HAPI_GUIParm( parm );
+		HoudiniGUIParm gui_parm 		= new HoudiniGUIParm( parm );
 
 		// overridden parameters should not be bold in play mode
 		gui_parm.isBold				= myParms.isParmOverridden( parm.id ) && 
@@ -300,7 +300,7 @@ public class HAPI_ParmsGUI : Editor
 		// Integer Parameter
 		if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
-			changed = HAPI_GUI.multiparmField(
+			changed = HoudiniGUI.multiparmField(
 				ref gui_parm, ref myDelayBuild, ref parm_int_values,
 				ref join_last, ref no_label_toggle_last );
 		}
@@ -326,7 +326,7 @@ public class HAPI_ParmsGUI : Editor
 					values.Add( i );
 				}
 				
-				changed = HAPI_GUI.dropdown(
+				changed = HoudiniGUI.dropdown(
 					ref gui_parm, ref parm_int_values,
 					labels.ToArray(), values.ToArray(),
 					ref join_last, ref no_label_toggle_last,
@@ -334,7 +334,7 @@ public class HAPI_ParmsGUI : Editor
 			}
 			else
 			{
-				changed = HAPI_GUI.intField(
+				changed = HoudiniGUI.intField(
 					ref gui_parm, ref myDelayBuild, ref parm_int_values,
 					ref join_last, ref no_label_toggle_last, null, 
 					ref parm_int_values );
@@ -344,7 +344,7 @@ public class HAPI_ParmsGUI : Editor
 		// Float Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
 		{
-			changed = HAPI_GUI.floatField(
+			changed = HoudiniGUI.floatField(
 				ref gui_parm, ref myDelayBuild, ref parm_float_values, 
 				ref join_last, ref no_label_toggle_last, null, 
 				ref parm_float_values );
@@ -377,7 +377,7 @@ public class HAPI_ParmsGUI : Editor
 				string[] values_temp = myParms.getParmStrings( parm );
 				gui_parm.valuesIndex = 0; // Since we're piping a de-handled temp array.
 
-				changed = HAPI_GUI.dropdown(
+				changed = HoudiniGUI.dropdown(
 					ref gui_parm, ref values_temp,
 					labels.ToArray(), values.ToArray(),
 					ref join_last, ref no_label_toggle_last,
@@ -393,7 +393,7 @@ public class HAPI_ParmsGUI : Editor
 				// The given string array is only for this parm so we need to set the values index to 0.
 				gui_parm.valuesIndex = 0;
 			
-				changed = HAPI_GUI.stringField(
+				changed = HoudiniGUI.stringField(
 					ref gui_parm, ref myDelayBuild, ref values,
 					ref join_last, ref no_label_toggle_last, null,
 					ref values );
@@ -409,7 +409,7 @@ public class HAPI_ParmsGUI : Editor
 		{
 			string[] path = myParms.getParmStrings( parm );
 			
-			changed = HAPI_GUI.fileField(
+			changed = HoudiniGUI.fileField(
 				ref gui_parm, ref myDelayBuild, ref path[ 0 ],
 				ref join_last, ref no_label_toggle_last );
 			
@@ -420,7 +420,7 @@ public class HAPI_ParmsGUI : Editor
 		// Toggle Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_TOGGLE )
 		{
-			changed = HAPI_GUI.toggle(
+			changed = HoudiniGUI.toggle(
 				ref gui_parm, ref parm_int_values,
 				ref join_last, ref no_label_toggle_last,
 				null, ref parm_int_values );
@@ -429,7 +429,7 @@ public class HAPI_ParmsGUI : Editor
 		// Color Parameter
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_COLOR )
 		{
-			changed = HAPI_GUI.colourField(
+			changed = HoudiniGUI.colourField(
 				ref gui_parm, ref myDelayBuild, ref parm_float_values,
 				ref join_last, ref no_label_toggle_last, null,
 				ref parm_float_values );
@@ -459,7 +459,7 @@ public class HAPI_ParmsGUI : Editor
 					values.Add( i );
 				}
 				
-				changed = HAPI_GUI.dropdown(
+				changed = HoudiniGUI.dropdown(
 					ref gui_parm, ref parm_int_values,
 					labels.ToArray(), values.ToArray(),
 					ref join_last, ref no_label_toggle_last,
@@ -467,14 +467,14 @@ public class HAPI_ParmsGUI : Editor
 			}
 			else
 			{
-				changed = HAPI_GUI.button( ref gui_parm, ref join_last, ref no_label_toggle_last );
+				changed = HoudiniGUI.button( ref gui_parm, ref join_last, ref no_label_toggle_last );
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Separator
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_SEPARATOR )
 		{
-			HAPI_GUI.separator();
+			HoudiniGUI.separator();
 		}
 		
 		if ( myAsset.hasProgressBarBeenUsed() && parm.id == myParms.prLastChangedParmId )
@@ -512,7 +512,7 @@ public class HAPI_ParmsGUI : Editor
 		// Loop through all the parameters.
 		while ( current_index < myParms.prParmCount )
 		{
-			int current_parent_id = HAPI_Constants.HAPI_INVALID_PARM_ID; // The root has parent id -1.
+			int current_parent_id = HoudiniConstants.HAPI_INVALID_PARM_ID; // The root has parent id -1.
 			
 			// If we're not at the root (empty parent stack), get the current parent id and parent 
 			// count from the stack as well as decrement the parent count as we're about to parse 
@@ -622,7 +622,7 @@ public class HAPI_ParmsGUI : Editor
 					if ( myParms.prFolderListSelections.Count <= folder_list_count )
 					{
 						myParms.prFolderListSelections.Add( 0 );
-						myParms.prFolderListSelectionIds.Add( HAPI_Constants.HAPI_INVALID_PARM_ID );
+						myParms.prFolderListSelectionIds.Add( HoudiniConstants.HAPI_INVALID_PARM_ID );
 					}
 					
 					int selected_folder 	= myParms.prFolderListSelections[ folder_list_count ];
@@ -665,7 +665,7 @@ public class HAPI_ParmsGUI : Editor
 
 				GUILayout.EndHorizontal();
 				if ( instance_length > 1 )
-					HAPI_GUI.separator();
+					HoudiniGUI.separator();
 			}
 			else
 			{
@@ -691,8 +691,8 @@ public class HAPI_ParmsGUI : Editor
 		return changed;
 	}
 	
-	private HAPI_Parms myParms;
-	private HAPI_Asset myAsset;
+	private HoudiniParms myParms;
+	private HoudiniAsset myAsset;
 
 	private bool myDelayBuild;
 	private bool myParmChanges;

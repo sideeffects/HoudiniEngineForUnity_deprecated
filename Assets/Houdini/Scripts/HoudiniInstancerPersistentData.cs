@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class HAPI_InstancerPersistentData : ScriptableObject
+public class HoudiniInstancerPersistentData : ScriptableObject
 {
 	public string instancerName;
 	public List< string > uniqueNames;
@@ -12,13 +12,13 @@ public class HAPI_InstancerPersistentData : ScriptableObject
 	public List< bool > recalculateVariations;
 	public bool showInstancerGUI = true;
 
-	public List< HAPI_InstancerOverrideInfo > overriddenInstances; 
+	public List< HoudiniInstancerOverrideInfo > overriddenInstances; 
 
-	public HAPI_InstancerPersistentData()
+	public HoudiniInstancerPersistentData()
 	{
 		uniqueNames = new List< string >();
 		objsToInstantiate = new List< GameObject > ();
-		overriddenInstances = new List< HAPI_InstancerOverrideInfo >();
+		overriddenInstances = new List< HoudiniInstancerOverrideInfo >();
 		numObjsToInstantiate = new List< int >();
 		variationChoice = new List< int >();
 		recalculateVariations = new List< bool >();

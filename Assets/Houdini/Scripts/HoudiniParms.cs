@@ -22,14 +22,13 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
-using Utility = HAPI_AssetUtility;
 
 // Typedefs
 using HAPI_StringHandle = System.Int32;
 using HAPI_NodeId = System.Int32;
 
-[ RequireComponent( typeof( HAPI_Control ) ) ]
-public class HAPI_Parms : MonoBehaviour
+[ RequireComponent( typeof( HoudiniControl ) ) ]
+public class HoudiniParms : MonoBehaviour
 {
 	public enum AssetType
 	{
@@ -46,7 +45,7 @@ public class HAPI_Parms : MonoBehaviour
 
 	// Assets -------------------------------------------------------------------------------------------------------
 
-	public HAPI_Control				prControl {						get { return myControl; } 
+	public HoudiniControl				prControl {						get { return myControl; } 
 																	set { myControl = value; } }
 
 	// Parameters ---------------------------------------------------------------------------------------------------
@@ -79,7 +78,7 @@ public class HAPI_Parms : MonoBehaviour
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
 
-	public HAPI_ParmsUndoInfo 		prParmsUndoInfo {				get { return myParmsUndoInfo; }
+	public HoudiniParmsUndoInfo 		prParmsUndoInfo {				get { return myParmsUndoInfo; }
 																	private set { } }
 
 	public List< int > 				prFolderListSelections {		get { return myFolderListSelections; } 
@@ -95,12 +94,12 @@ public class HAPI_Parms : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_Parms() 
+	public HoudiniParms() 
 	{
 		reset();
 	}
 	
-	~HAPI_Parms() 
+	~HoudiniParms() 
 	{}
 	
 	public void removeMultiparmInstance( HAPI_ParmInfo parm )
@@ -188,14 +187,14 @@ public class HAPI_Parms : MonoBehaviour
 	{
 		if ( prParms == null )
 		{
-			throw new HAPI_ErrorNotFound( "Parameters have not been initialized!" );
+			throw new HoudiniErrorNotFound( "Parameters have not been initialized!" );
 		}
 
 		for ( int i = 0; i < prParms.Length; ++i )
 			if ( prParms[ i ].name == name )
 				return prParms[ i ];
 
-		throw new HAPI_ErrorNotFound( "Parameter with the name " + name + " does not exist!" );
+		throw new HoudiniErrorNotFound( "Parameter with the name " + name + " does not exist!" );
 	}
 	
 	public bool isParmOverridden( int parm_id )
@@ -220,7 +219,7 @@ public class HAPI_Parms : MonoBehaviour
 				for ( int p = 0; p < parm.size; ++p )
 				{
 					int values_index = parm.stringValuesIndex + p;
-					string string_value = HAPI_Host.getString( prParmStringValues[ values_index ] );
+					string string_value = HoudiniHost.getString( prParmStringValues[ values_index ] );
 
 					myParmStrings[ parm.id ][ p ] = string_value;
 					myParmsUndoInfo.parmStringValues[ values_index ] = string_value;
@@ -239,7 +238,7 @@ public class HAPI_Parms : MonoBehaviour
 			return false;
 
 		// Get the node info again
-		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prControl.prNodeId );
+		HAPI_NodeInfo node_info	= HoudiniHost.getNodeInfo( prControl.prNodeId );
 
 		if ( prParmCount != node_info.parmCount )
 			return false;
@@ -254,8 +253,8 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Get parameter int values.
 		int[] houdini_int_values = new int[ prParmIntValueCount ];
-		Utility.getArray1Id( 
-			prControl.prNodeId, HAPI_Host.getParmIntValues, houdini_int_values, prParmIntValueCount );
+		HoudiniAssetUtility.getArray1Id( 
+			prControl.prNodeId, HoudiniHost.getParmIntValues, houdini_int_values, prParmIntValueCount );
 		if ( prParmIntValues.Length != houdini_int_values.Length )
 			return false;
 		for ( int i = 0; i < prParmIntValueCount; ++i )
@@ -264,8 +263,8 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Get parameter float values.
 		float[] houdini_float_values = new float[ prParmFloatValueCount ];
-		Utility.getArray1Id( 
-			prControl.prNodeId, HAPI_Host.getParmFloatValues, houdini_float_values, prParmFloatValueCount );
+		HoudiniAssetUtility.getArray1Id( 
+			prControl.prNodeId, HoudiniHost.getParmFloatValues, houdini_float_values, prParmFloatValueCount );
 		if ( prParmFloatValues.Length != houdini_float_values.Length )
 			return false;
 		for ( int i = 0; i < prParmFloatValueCount; ++i )
@@ -274,13 +273,13 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Get parameter string (handle) values.
 		int[] houdini_string_values = new int[ prParmStringValueCount ];
-		Utility.getArray1Id( 
-			prControl.prNodeId, HAPI_Host.getParmStringValues, houdini_string_values, prParmStringValueCount );
+		HoudiniAssetUtility.getArray1Id( 
+			prControl.prNodeId, HoudiniHost.getParmStringValues, houdini_string_values, prParmStringValueCount );
 		if ( prParmStringValues.Length != houdini_string_values.Length )
 			return false;
 		for ( int i = 0; i < prParmStringValueCount; ++i )
-			if ( !HAPI_Host.getString( prParmStringValues[ i ] ).Equals(
-				HAPI_Host.getString( houdini_string_values[ i ] ) ) )
+			if ( !HoudiniHost.getString( prParmStringValues[ i ] ).Equals(
+				HoudiniHost.getString( houdini_string_values[ i ] ) ) )
 				return false;
 
 		return true;
@@ -302,10 +301,10 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Create undo info if it hasn't been created already
 		if ( myParmsUndoInfo == null )
-			myParmsUndoInfo = ScriptableObject.CreateInstance< HAPI_ParmsUndoInfo >();
+			myParmsUndoInfo = ScriptableObject.CreateInstance< HoudiniParmsUndoInfo >();
 
 		// Get the node info again
-		HAPI_NodeInfo node_info	= HAPI_Host.getNodeInfo( prControl.prNodeId );
+		HAPI_NodeInfo node_info	= HoudiniHost.getNodeInfo( prControl.prNodeId );
 
 		prParmCount 			= node_info.parmCount;
 		prParmIntValueCount		= node_info.parmIntValueCount;
@@ -315,33 +314,33 @@ public class HAPI_Parms : MonoBehaviour
 
 		// Get all parameters.
 		prParms = new HAPI_ParmInfo[ prParmCount ];
-		Utility.getArray1Id( prControl.prNodeId, HAPI_Host.getParameters, prParms, prParmCount );
+		HoudiniAssetUtility.getArray1Id( prControl.prNodeId, HoudiniHost.getParameters, prParms, prParmCount );
 
 		// Get parameter int values.
 		prParmIntValues = new int[ prParmIntValueCount ];
-		Utility.getArray1Id( 
-			prControl.prNodeId, HAPI_Host.getParmIntValues, prParmIntValues, prParmIntValueCount );
+		HoudiniAssetUtility.getArray1Id( 
+			prControl.prNodeId, HoudiniHost.getParmIntValues, prParmIntValues, prParmIntValueCount );
 
 		myParmsUndoInfo.parmIntValues = new int[ prParmIntValueCount ];
 		Array.Copy( prParmIntValues, myParmsUndoInfo.parmIntValues, prParmIntValueCount );
 
 		// Get parameter float values.
 		prParmFloatValues = new float[ prParmFloatValueCount ];
-		Utility.getArray1Id( 
-			prControl.prNodeId, HAPI_Host.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
+		HoudiniAssetUtility.getArray1Id( 
+			prControl.prNodeId, HoudiniHost.getParmFloatValues, prParmFloatValues, prParmFloatValueCount );
 
 		myParmsUndoInfo.parmFloatValues = new float[ prParmFloatValueCount ];
 		Array.Copy( prParmFloatValues, myParmsUndoInfo.parmFloatValues, prParmFloatValueCount );
 
 		// Get parameter string (handle) values.
 		prParmStringValues = new int[ prParmStringValueCount ];
-		Utility.getArray1Id( 
-			prControl.prNodeId, HAPI_Host.getParmStringValues, prParmStringValues, prParmStringValueCount );
+		HoudiniAssetUtility.getArray1Id( 
+			prControl.prNodeId, HoudiniHost.getParmStringValues, prParmStringValues, prParmStringValueCount );
 
 		// Get parameter choice lists.
 		prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
-		Utility.getArray1Id( 
-			prControl.prNodeId, HAPI_Host.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
+		HoudiniAssetUtility.getArray1Id( 
+			prControl.prNodeId, HoudiniHost.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
 
 		// Build the map of parm id -> parm
 		for ( int i = 0; i < prParms.Length; ++i )
@@ -373,9 +372,9 @@ public class HAPI_Parms : MonoBehaviour
 
 #if UNITY_EDITOR
 		// Set which parameter values have been overridden (only needed for a prefab instance)
-		if ( prControl && prControl.isPrefabInstance() && gameObject.GetComponent< HAPI_Asset >() != null )
+		if ( prControl && prControl.isPrefabInstance() && gameObject.GetComponent< HoudiniAsset >() != null )
 		{
-			HAPI_Asset prefab_asset = prControl.prAsset.getParentPrefabAsset();
+			HoudiniAsset prefab_asset = prControl.prAsset.getParentPrefabAsset();
 			if ( prefab_asset && prefab_asset.prParms != null && 
 				prefab_asset.prParms.prParms != null && 
 				!prefab_asset.isApplyingChangesToPrefab() )
@@ -396,7 +395,7 @@ public class HAPI_Parms : MonoBehaviour
 	
 	// Checks if the parameter with the given id parm_id represents the same parameter 
 	// with the same value in this set of parameters and another set of parameters parmsB.
-	public bool isParmSameInPrefab( int parm_id, HAPI_Parms parmsB )
+	public bool isParmSameInPrefab( int parm_id, HoudiniParms parmsB )
 	{
 		HAPI_ParmInfo parm_infoA = findParm( parm_id );
 		HAPI_ParmInfo parm_infoB = parmsB.findParm( parm_id );
@@ -468,7 +467,7 @@ public class HAPI_Parms : MonoBehaviour
 		int first_removed_instance = multiparm.instanceCount - num_instances + multiparm.instanceStartOffset;
 
 		for ( int i = 0; i < num_instances; ++i )
-			HAPI_Host.removeMultiparmInstance(
+			HoudiniHost.removeMultiparmInstance(
 				prControl.prNodeId,
 				multiparm.id, // The multiparm list
 				first_removed_instance );
@@ -484,7 +483,7 @@ public class HAPI_Parms : MonoBehaviour
 		int insert_position = multiparm.instanceCount + multiparm.instanceStartOffset;
 
 		for ( int i = 0; i < num_instances; ++i )
-			HAPI_Host.insertMultiparmInstance(
+			HoudiniHost.insertMultiparmInstance(
 				prControl.prNodeId,
 				multiparm.id, // The multiparm list
 				insert_position );
@@ -500,13 +499,13 @@ public class HAPI_Parms : MonoBehaviour
 		setChangedParameterIntoHost( prLastChangedParmId );
 
 		if ( myToInsertInstance )
-			HAPI_Host.insertMultiparmInstance(
+			HoudiniHost.insertMultiparmInstance(
 				prControl.prNodeId,
 				myMultiparmInstancePos.parentId, // The multiparm list
 				myMultiparmInstancePos.instanceNum );
 
 		if ( myToRemoveInstance )
-			HAPI_Host.removeMultiparmInstance(
+			HoudiniHost.removeMultiparmInstance(
 				prControl.prNodeId,
 				myMultiparmInstancePos.parentId, // The multiparm list
 				myMultiparmInstancePos.instanceNum );
@@ -516,7 +515,7 @@ public class HAPI_Parms : MonoBehaviour
 
 		myToInsertInstance = false;
 		myToRemoveInstance = false;
-		prLastChangedParmId = HAPI_Constants.HAPI_INVALID_PARM_ID;
+		prLastChangedParmId = HoudiniConstants.HAPI_INVALID_PARM_ID;
 	}
 
 	public void setChangedParameterIntoHost( int id )
@@ -533,7 +532,7 @@ public class HAPI_Parms : MonoBehaviour
 		if ( (HAPI_ParmType) parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			int[] values = new int[ 1 ];
-			HAPI_Host.getParmIntValues( prControl.prNodeId, values, parm.intValuesIndex, 1);
+			HoudiniHost.getParmIntValues( prControl.prNodeId, values, parm.intValuesIndex, 1);
 
 			int difference = prParmIntValues[ parm.intValuesIndex ] - values[ 0 ];
 			if ( difference > 0 )
@@ -547,18 +546,18 @@ public class HAPI_Parms : MonoBehaviour
 		{
 			float[] values = new float[ parm.size ];
 			Array.Copy( prParmFloatValues, parm.floatValuesIndex, values, 0, parm.size );
-			HAPI_Host.setParmFloatValues( prControl.prNodeId, values, parm.floatValuesIndex, parm.size );
+			HoudiniHost.setParmFloatValues( prControl.prNodeId, values, parm.floatValuesIndex, parm.size );
 		}
 		else if ( parm.isInt() && (HAPI_ParmType) parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			int[] values = new int[ parm.size ];
 			Array.Copy( prParmIntValues, parm.intValuesIndex, values, 0, parm.size );
-			HAPI_Host.setParmIntValues( prControl.prNodeId, values, parm.intValuesIndex, parm.size );
+			HoudiniHost.setParmIntValues( prControl.prNodeId, values, parm.intValuesIndex, parm.size );
 		}
 		else if ( parm.isString() )
 		{
 			for ( int p = 0; p < myParmStrings[ parm.id ].Length; ++p )
-				HAPI_Host.setParmStringValue( prControl.prNodeId, myParmStrings[ parm.id ][ p ], parm.id, p );
+				HoudiniHost.setParmStringValue( prControl.prNodeId, myParmStrings[ parm.id ][ p ], parm.id, p );
 		}
 	}
 	
@@ -567,7 +566,7 @@ public class HAPI_Parms : MonoBehaviour
 	
 	// Assets -------------------------------------------------------------------------------------------------------
 
-	[SerializeField] private HAPI_Control			myControl;
+	[SerializeField] private HoudiniControl			myControl;
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
@@ -601,7 +600,7 @@ public class HAPI_Parms : MonoBehaviour
 
 	[SerializeField] private int					myLastChangedParmId;
 
-	[SerializeField] private HAPI_ParmsUndoInfo		myParmsUndoInfo;
+	[SerializeField] private HoudiniParmsUndoInfo		myParmsUndoInfo;
 
 	// Indices of the currently selected folders in the Inspector.
 	// A 1:1 mapping with myFolderListSelectionIds.

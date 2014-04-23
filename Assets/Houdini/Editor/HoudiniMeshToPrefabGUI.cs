@@ -20,18 +20,18 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// 	GUI companion to <see cref="HAPI_MeshToPrefab"/>. Responsible for generating the custom Inspector for
+/// 	GUI companion to <see cref="HoudiniMeshToPrefab"/>. Responsible for generating the custom Inspector for
 /// 	our mesh saving component
 /// </summary>
-[ CustomEditor( typeof( HAPI_MeshToPrefab ) ) ]
-public class HAPI_MeshToPrefabGUI : Editor 
+[ CustomEditor( typeof( HoudiniMeshToPrefab ) ) ]
+public class HoudiniMeshToPrefabGUI : Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
 	public void OnEnable()
 	{
-		myMeshToPrefab = target as HAPI_MeshToPrefab;
+		myMeshToPrefab = target as HoudiniMeshToPrefab;
 	}
 
 	public override void OnInspectorGUI() 
@@ -45,7 +45,7 @@ public class HAPI_MeshToPrefabGUI : Editor
 
 			if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ) ) ) 
 			{
-				string prompt_result_path = HAPI_GUIUtility.promptForPrefabPath( old_prefab_path );
+				string prompt_result_path = HoudiniGUIUtility.promptForPrefabPath( old_prefab_path );
 				if ( prompt_result_path.Length > 0 )
 					new_prefab_path = prompt_result_path;
 			}
@@ -58,6 +58,6 @@ public class HAPI_MeshToPrefabGUI : Editor
 			myMeshToPrefab.SaveToPrefab();
 	}
 
-	private HAPI_MeshToPrefab myMeshToPrefab;
+	private HoudiniMeshToPrefab myMeshToPrefab;
 	private int myFileChooserButtonWidth = 50;
 }

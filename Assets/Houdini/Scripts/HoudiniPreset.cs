@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class HAPI_Preset : ScriptableObject {
+public class HoudiniPreset : ScriptableObject {
 	[SerializeField] public byte[] myPreset;
 }

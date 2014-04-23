@@ -9,7 +9,7 @@ using System.Collections.Generic;
 #pragma warning disable 0414 // Initialized but unused Private Member Variable
 #endif // !UNITY_STANDALONE_WIN
 
-public class HAPI_GeoAttributeManagerGUI
+public class HoudiniGeoAttributeManagerGUI
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -28,7 +28,7 @@ public class HAPI_GeoAttributeManagerGUI
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
-	public HAPI_GeoAttributeManagerGUI( HAPI_GeoAttributeManager manager ) 
+	public HoudiniGeoAttributeManagerGUI( HoudiniGeoAttributeManager manager ) 
 	{
 		myManager				= manager;
 
@@ -46,19 +46,19 @@ public class HAPI_GeoAttributeManagerGUI
 		mySelectedPoints		= new List< int >();
 		mySelectedPointsMask	= new List< bool >();
 
-		myLastMode				= HAPI_GeoAttributeManager.Mode.NONE;
+		myLastMode				= HoudiniGeoAttributeManager.Mode.NONE;
 
-		HAPI_Host.myRepaintDelegate += this.refresh;
-		HAPI_Host.myDeselectionDelegate += this.deselect;
-		HAPI_Host.mySelectionTarget = myManager.prTransform.gameObject;
+		HoudiniHost.myRepaintDelegate += this.refresh;
+		HoudiniHost.myDeselectionDelegate += this.deselect;
+		HoudiniHost.mySelectionTarget = myManager.prTransform.gameObject;
 	}
 
-	~HAPI_GeoAttributeManagerGUI()
+	~HoudiniGeoAttributeManagerGUI()
 	{
 		// This is called after OnSceneGUI sometimes for some reason.
-		HAPI_Host.myRepaintDelegate -= this.refresh;
-		HAPI_Host.myDeselectionDelegate -= this.deselect;
-		HAPI_Host.mySelectionTarget = null;
+		HoudiniHost.myRepaintDelegate -= this.refresh;
+		HoudiniHost.myDeselectionDelegate -= this.deselect;
+		HoudiniHost.mySelectionTarget = null;
 		myIsTransformHandleHidden = false;
 	}
 
@@ -147,7 +147,7 @@ public class HAPI_GeoAttributeManagerGUI
 
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
-				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				Handles.Button( position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
 				Ray ray = myTempCamera.ScreenPointToRay( myFirstMousePosition );
@@ -169,7 +169,7 @@ public class HAPI_GeoAttributeManagerGUI
 
 					// Consume scroll-wheel event.
 					if ( current_event.type == EventType.ScrollWheel
-						&& areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey ) )
+						&& areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prPaintingModeHotKey ) )
 					{
 						myManager.prBrushRadius += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
 						current_event.Use();
@@ -262,7 +262,7 @@ public class HAPI_GeoAttributeManagerGUI
 						else
 						{
 							float distance = Vector3.Distance( mouse_position, proj_pos );
-							if ( distance < HAPI_Host.prMinDistanceForPointSelection )
+							if ( distance < HoudiniHost.prMinDistanceForPointSelection )
 							{
 								// Once we modify a point we are no longer bound to the user holding down 
 								// the point edit key. Edit point mode is now fully activated.
@@ -276,7 +276,7 @@ public class HAPI_GeoAttributeManagerGUI
 				// Prevent click from being passed lower (this is so stupid!).
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
-				Quaternion rotation = HAPI_AssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
 
 				// Prevent the delete key from deleting the mesh in this mode.
@@ -348,14 +348,14 @@ public class HAPI_GeoAttributeManagerGUI
 		// Selection Mesh Draws
 		if ( mySelectionMaterial != null && mySelectionMesh != null && myManager.prIsEditingPoints )
 		{
-			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize );
-			mySelectionMaterial.SetColor( "_Color", HAPI_Host.prGuideWireframeColour );
+			mySelectionMaterial.SetFloat( "_PointSize", HoudiniHost.prGuidePointSize );
+			mySelectionMaterial.SetColor( "_Color", HoudiniHost.prGuideWireframeColour );
 			if ( mySelectionMaterial.SetPass( 0 ) )
 			{
 				Graphics.DrawMeshNow( mySelectionMesh, myManager.prTransform.localToWorldMatrix );
 			}
 
-			mySelectionMaterial.SetFloat( "_PointSize", HAPI_Host.prGuidePointSize - myGuideBorderSize );
+			mySelectionMaterial.SetFloat( "_PointSize", HoudiniHost.prGuidePointSize - myGuideBorderSize );
 			mySelectionMaterial.SetColor( "_Color", Color.white );
 			if ( mySelectionMaterial.SetPass( 1 ) )
 			{
@@ -410,9 +410,9 @@ public class HAPI_GeoAttributeManagerGUI
 		if ( mySelectionMeshColours != null )
 			for ( int i = 0; i < mySelectionMeshColours.Length; ++i )
 				if ( myManager.prIsEditingPoints )
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectedGuideWireframeColour;
 				else
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectableGuideWireframeColour;
 
 		buildGuideGeometry();
 	}
@@ -430,13 +430,13 @@ public class HAPI_GeoAttributeManagerGUI
 			{
 				mySelectedPointsMask[ point_index ] = false;
 				mySelectedPoints.Remove( point_index );
-				mySelectionMeshColours[ point_index ] = HAPI_Host.prUnselectedGuideWireframeColour;
+				mySelectionMeshColours[ point_index ] = HoudiniHost.prUnselectedGuideWireframeColour;
 			}
 			else
 			{
 				mySelectedPointsMask[ point_index ] = true;
 				mySelectedPoints.Add( point_index );
-				mySelectionMeshColours[ point_index ] = HAPI_Host.prSelectedGuideWireframeColour;
+				mySelectionMeshColours[ point_index ] = HoudiniHost.prSelectedGuideWireframeColour;
 			}
 		}
 
@@ -452,7 +452,7 @@ public class HAPI_GeoAttributeManagerGUI
 
 		if ( mySelectionMaterial == null )
 		{
-			mySelectionMaterial						= new Material( Shader.Find( "HAPI/MeshPoint" ) );
+			mySelectionMaterial						= new Material( Shader.Find( "Houdini/MeshPoint" ) );
 			mySelectionMaterial.hideFlags			= HideFlags.HideAndDontSave;
 			mySelectionMaterial.shader.hideFlags	= HideFlags.HideAndDontSave;
 		}
@@ -489,9 +489,9 @@ public class HAPI_GeoAttributeManagerGUI
 			for ( int i = 0; i < selection_vertices.Length; ++i )
 			{
 				if ( !myManager.prIsEditingPoints )
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectableGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectableGuideWireframeColour;
 				else
-					mySelectionMeshColours[ i ] = HAPI_Host.prUnselectedGuideWireframeColour;
+					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectedGuideWireframeColour;
 			}
 		}
 
@@ -500,23 +500,23 @@ public class HAPI_GeoAttributeManagerGUI
 		mySelectionMesh.SetIndices( selection_indices, MeshTopology.Points, 0 );
 	}
 
-	private void changeModes( ref bool paint_mode, ref bool edit_points_mode, HAPI_GeoAttributeManager.Mode mode )
+	private void changeModes( ref bool paint_mode, ref bool edit_points_mode, HoudiniGeoAttributeManager.Mode mode )
 	{
 		switch ( mode )
 		{
-			case HAPI_GeoAttributeManager.Mode.NONE: 
+			case HoudiniGeoAttributeManager.Mode.NONE: 
 				{
 					paint_mode = false;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_GeoAttributeManager.Mode.PAINT:
+			case HoudiniGeoAttributeManager.Mode.PAINT:
 				{
 					paint_mode = true;
 					edit_points_mode = false;
 					break;
 				}
-			case HAPI_GeoAttributeManager.Mode.EDIT:
+			case HoudiniGeoAttributeManager.Mode.EDIT:
 				{
 					paint_mode = false;
 					edit_points_mode = true;
@@ -548,16 +548,16 @@ public class HAPI_GeoAttributeManagerGUI
 	{
 		if ( !myManager.prEditable )
 		{
-			myLastMode = HAPI_GeoAttributeManager.Mode.NONE;
-			myManager.prCurrentMode = HAPI_GeoAttributeManager.Mode.NONE;
+			myLastMode = HoudiniGeoAttributeManager.Mode.NONE;
+			myManager.prCurrentMode = HoudiniGeoAttributeManager.Mode.NONE;
 			myManager.prIsPaintingPoints = false;
 			myManager.prIsEditingPoints = false;
 			myManager.prModeChangeWait = false;
 			return;
 		}
 
-		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prPaintingModeHotKey );
-		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HAPI_Host.prEditingPointsModeHotKey );
+		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prPaintingModeHotKey );
+		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prEditingPointsModeHotKey );
 
 		bool paint_mode				= myManager.prIsPaintingPoints;
 		bool edit_points_mode		= myManager.prIsEditingPoints;
@@ -567,7 +567,7 @@ public class HAPI_GeoAttributeManagerGUI
 		{
 			if ( !mode_change_wait && edit_points_mode_key )
 			{
-				myLastMode			= HAPI_GeoAttributeManager.Mode.PAINT;
+				myLastMode			= HoudiniGeoAttributeManager.Mode.PAINT;
 
 				paint_mode			= false;
 				edit_points_mode	= true;
@@ -583,7 +583,7 @@ public class HAPI_GeoAttributeManagerGUI
 		{
 			if ( !mode_change_wait && paint_mode_key )
 			{
-				myLastMode			= HAPI_GeoAttributeManager.Mode.EDIT;
+				myLastMode			= HoudiniGeoAttributeManager.Mode.EDIT;
 
 				paint_mode			= true;
 				edit_points_mode	= false;
@@ -601,13 +601,13 @@ public class HAPI_GeoAttributeManagerGUI
 			{
 				paint_mode			= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_GeoAttributeManager.Mode.NONE;
+				myLastMode			= HoudiniGeoAttributeManager.Mode.NONE;
 			}
 			else if ( edit_points_mode_key )
 			{
 				edit_points_mode	= true;
 				mode_change_wait	= true;
-				myLastMode			= HAPI_GeoAttributeManager.Mode.NONE;
+				myLastMode			= HoudiniGeoAttributeManager.Mode.NONE;
 			}
 		}
 
@@ -638,9 +638,9 @@ public class HAPI_GeoAttributeManagerGUI
 
 	private void drawToolSceneUI()
 	{
-		string title_text = HAPI_Constants.HAPI_PRODUCT_SHORT_NAME + " Input Geo";
-		string paint_hotkey_string = HAPI_Host.prPaintingModeHotKey.ToString();
-		string edit_hotkey_string = HAPI_Host.prEditingPointsModeHotKey.ToString();
+		string title_text = HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " Input Geo";
+		string paint_hotkey_string = HoudiniHost.prPaintingModeHotKey.ToString();
+		string edit_hotkey_string = HoudiniHost.prEditingPointsModeHotKey.ToString();
 		string help_text = "" + paint_hotkey_string + ": paint | " + 
 						   edit_hotkey_string + ": edit points";
 
@@ -655,12 +655,12 @@ public class HAPI_GeoAttributeManagerGUI
 		if ( myManager.prIsPaintingPoints )
 		{
 			help_text = "Click on mesh: paint attribute | " + paint_hotkey_string + " + Mouse Scroll: change brush size | ESC or Enter: exit mode";
-			box_color = HAPI_Host.prPaintingModeColour;
+			box_color = HoudiniHost.prPaintingModeColour;
 		}
 		else if ( myManager.prIsEditingPoints )
 		{
 			help_text = "Click or drag: select points | Hold Control: toggle-based selection | ESC or Enter: exit mode";
-			box_color = HAPI_Host.prEditingPointsModeColour;
+			box_color = HoudiniHost.prEditingPointsModeColour;
 		}
 
 		if ( !mySceneWindowHasFocus && myManager.prEditable )
@@ -760,10 +760,10 @@ public class HAPI_GeoAttributeManagerGUI
 			// whos key is being held down...
 			GUI.enabled = 
 				!mySceneWindowHasFocus ||
-				( ( myCurrentlyPressedKey != HAPI_Host.prPaintingModeHotKey ) &&
-				  ( myCurrentlyPressedKey != HAPI_Host.prEditingPointsModeHotKey ) );
-			HAPI_GeoAttributeManager.Mode last_mode = myManager.prCurrentMode;
-			myManager.prCurrentMode = (HAPI_GeoAttributeManager.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
+				( ( myCurrentlyPressedKey != HoudiniHost.prPaintingModeHotKey ) &&
+				  ( myCurrentlyPressedKey != HoudiniHost.prEditingPointsModeHotKey ) );
+			HoudiniGeoAttributeManager.Mode last_mode = myManager.prCurrentMode;
+			myManager.prCurrentMode = (HoudiniGeoAttributeManager.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
 			if ( last_mode != myManager.prCurrentMode )
 				clearSelection();
 			GUI.enabled = true;
@@ -788,7 +788,7 @@ public class HAPI_GeoAttributeManagerGUI
 			float width					= myTempCamera.pixelWidth;
 			float height				= myTempCamera.pixelHeight;
 
-			if ( myManager.prCurrentMode == HAPI_GeoAttributeManager.Mode.NONE )
+			if ( myManager.prCurrentMode == HoudiniGeoAttributeManager.Mode.NONE )
 			{
 				border_texture.SetPixel( 0, 0, new Color( text_color.r, text_color.g, text_color.b, 0.6f ) );
 				border_texture.Apply();
@@ -823,7 +823,7 @@ public class HAPI_GeoAttributeManagerGUI
 		string rate_text = "Rate:";
 		string liveup_text = "Live Updates";
 
-		Color box_color = HAPI_Host.prPaintingModeColour;
+		Color box_color = HoudiniHost.prPaintingModeColour;
 		Color text_color = Color.white;
 
 		Color original_color		= GUI.color;
@@ -954,7 +954,7 @@ public class HAPI_GeoAttributeManagerGUI
 		// Draw rate field.
 		EditorGUIUtility.LookLikeControls( rate_text_width, field_width );
 		GUI.SetNextControlName( myPaintValuesFieldName + "RATE" );
-		HAPI_Host.prPaintBrushRate = EditorGUI.FloatField( rate_field_rect, rate_text, HAPI_Host.prPaintBrushRate );
+		HoudiniHost.prPaintBrushRate = EditorGUI.FloatField( rate_field_rect, rate_text, HoudiniHost.prPaintBrushRate );
 
 		// Draw live updates toggle.
 		GUI.SetNextControlName( myPaintValuesFieldName + "LIVE_UPDATES" );
@@ -1034,7 +1034,7 @@ public class HAPI_GeoAttributeManagerGUI
 				int drawn_field_start_index = 0;
 
 				if ( myManager.prActiveAttribute.prName.StartsWith( "Cd" ) &&
-					myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
+					myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
 					myManager.prActiveAttribute.prTupleSize >= 3 )
 				{
 					Color old_colour = new Color( 
@@ -1061,22 +1061,22 @@ public class HAPI_GeoAttributeManagerGUI
 				for ( int i = drawn_field_start_index; i < myManager.prActiveAttribute.prTupleSize; ++i )
 				{
 					GUI.SetNextControlName( myPaintValuesFieldName + i );
-					if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.BOOL
-						|| myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.INT )
+					if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.BOOL
+						|| myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.INT )
 						myManager.prActiveAttribute.prIntPaintValue[ i ] = Mathf.Clamp(
 							EditorGUILayout.IntField(
 								"", myManager.prActiveAttribute.prIntPaintValue[ i ],
 								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) ),
 							myManager.prActiveAttribute.prIntMin,
 							myManager.prActiveAttribute.prIntMax );
-					else if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT )
+					else if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT )
 						myManager.prActiveAttribute.prFloatPaintValue[ i ] = Mathf.Clamp(
 							EditorGUILayout.FloatField(
 								"", myManager.prActiveAttribute.prFloatPaintValue[ i ],
 								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) ),
 							myManager.prActiveAttribute.prFloatMin,
 							myManager.prActiveAttribute.prFloatMax );
-					else if ( myManager.prActiveAttribute.prType == HAPI_GeoAttribute.Type.STRING )
+					else if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.STRING )
 					{
 						string new_value = EditorGUILayout.TextField(
 							"", myManager.prActiveAttribute.prStringPaintValue[ i ],
@@ -1139,7 +1139,7 @@ public class HAPI_GeoAttributeManagerGUI
 		}
 	}
 
-	private HAPI_GeoAttributeManager myManager;
+	private HoudiniGeoAttributeManager myManager;
 
 	private bool				myForceInspectorRedraw;
 
@@ -1185,7 +1185,7 @@ public class HAPI_GeoAttributeManagerGUI
 	[SerializeField] 
 	private List< bool >		mySelectedPointsMask;
 
-	private HAPI_GeoAttributeManager.Mode myLastMode;
+	private HoudiniGeoAttributeManager.Mode myLastMode;
 }
 
 #if !UNITY_STANDALONE_WIN

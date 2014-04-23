@@ -22,7 +22,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [ ExecuteInEditMode ]
-public class HAPI_Instance: MonoBehaviour
+public class HoudiniInstance : MonoBehaviour
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -31,15 +31,15 @@ public class HAPI_Instance: MonoBehaviour
 	public GameObject 	prObjectToInstantiate { get { return myObjectToInstantiate; } set { myObjectToInstantiate = value; } }
 	public bool 		prTransformChanged { get { return myTransformChanged; } set { myTransformChanged = value; } }
 
-	public HAPI_Instancer prInstancer { get { return myInstancer; } set { myInstancer = value; } }
+	public HoudiniInstancer prInstancer { get { return myInstancer; } set { myInstancer = value; } }
 
 
-	public HAPI_Instance()
+	public HoudiniInstance()
 	{
 		reset();
 	}
 
-	~HAPI_Instance()
+	~HoudiniInstance()
 	{
 
 	}
@@ -80,6 +80,6 @@ public class HAPI_Instance: MonoBehaviour
 	[SerializeField] private GameObject		myObjectToInstantiate;
 	[SerializeField] private Matrix4x4		myLastLocalToWorld;
 	[SerializeField] private bool			myTransformChanged;
-	[SerializeField] private HAPI_Instancer myInstancer;
+	[SerializeField] private HoudiniInstancer myInstancer;
 
 }

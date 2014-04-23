@@ -5,7 +5,7 @@ using UnityEditor;
 #endif // UNITY_EDITOR
 using System.Collections.Generic;
 
-public class HAPI_MeshToPrefab : MonoBehaviour
+public class HoudiniMeshToPrefab : MonoBehaviour
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -17,7 +17,7 @@ public class HAPI_MeshToPrefab : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_MeshToPrefab () 
+	public HoudiniMeshToPrefab () 
 	{
 		prGameObject = null;
 		prPathToPrefab = "Assets/";

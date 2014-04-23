@@ -1,4 +1,4 @@
-Shader "HAPI/CurvePoint" {
+Shader "Houdini/CurvePoint" {
 	
 	Properties
 	{

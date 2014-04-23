@@ -24,10 +24,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
-using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
-public abstract class HAPI_Asset : HAPI_Control
+public abstract class HoudiniAsset : HoudiniControl
 {
 	public enum AssetType
 	{
@@ -62,13 +61,13 @@ public abstract class HAPI_Asset : HAPI_Control
 	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; } 
 																	set { myAssetSubType = value; } }
 
-	public HAPI_AssetUndoInfo prAssetUndoInfo 
+	public HoudiniAssetUndoInfo prAssetUndoInfo 
 	{
 		get
 		{
 			if ( myAssetOTLUndoInfo == null )
 			{
-				myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HAPI_AssetUndoInfo >();
+				myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HoudiniAssetUndoInfo >();
 				myAssetOTLUndoInfo.initialize( this );
 			}
 			return myAssetOTLUndoInfo;
@@ -79,12 +78,12 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
-	public HAPI_PresetMap prPresetsMap 
+	public HoudiniPresetMap prPresetsMap 
 	{					
 		get 
 		{ 
 			if ( myPresetsMap == null )
-				myPresetsMap = ScriptableObject.CreateInstance< HAPI_PresetMap >();
+				myPresetsMap = ScriptableObject.CreateInstance< HoudiniPresetMap >();
 			return myPresetsMap;
 		}
 		private set { }
@@ -103,16 +102,16 @@ public abstract class HAPI_Asset : HAPI_Control
 	public List< string >			prFileInputs {					get { return myFileInputs; } 
 																	set { myFileInputs = value; } }
 	
-	public List< HAPI_Asset >		prDownStreamTransformAssets {	get { return myDownStreamTransformAssets; } 
+	public List< HoudiniAsset >		prDownStreamTransformAssets {	get { return myDownStreamTransformAssets; } 
 																	set { myDownStreamTransformAssets = value; } }
-	public List< HAPI_Asset >		prUpStreamTransformAssets {		get { return myUpStreamTransformAssets; } 
+	public List< HoudiniAsset >		prUpStreamTransformAssets {		get { return myUpStreamTransformAssets; } 
 																	set { myUpStreamTransformAssets = value; } }
 	public List< GameObject >		prUpStreamTransformObjects {	get { return myUpStreamTransformObjects; } 
 																	set { myUpStreamTransformObjects = value; } }
 	
-	public List< HAPI_Asset >		prDownStreamGeoAssets {			get { return myDownStreamGeoAssets; } 
+	public List< HoudiniAsset >		prDownStreamGeoAssets {			get { return myDownStreamGeoAssets; } 
 																	set { myDownStreamGeoAssets = value; } }
-	public List< HAPI_Asset >		prUpStreamGeoAssets {			get { return myUpStreamGeoAssets; } 
+	public List< HoudiniAsset >		prUpStreamGeoAssets {			get { return myUpStreamGeoAssets; } 
 																	set { myUpStreamGeoAssets = value; } }
 	public List< GameObject >		prUpStreamGeoObjects {			get { return myUpStreamGeoObjects; } 
 																	set { myUpStreamGeoObjects = value; } }
@@ -166,14 +165,14 @@ public abstract class HAPI_Asset : HAPI_Control
 	public bool						prShowPinnedInstances {			get { return myShowPinnedInstances; }
 																	set { myShowPinnedInstances = value; } }
 	public bool	prAutoSelectAssetRootNode {		get { return (	myAutoSelectAssetRootNode && 
-																HAPI_Host.isAutoSelectAssetRootNodeDefault() )
-														  || (	HAPI_Host.prAutoSelectAssetRootNode &&
-																!HAPI_Host.isAutoSelectAssetRootNodeDefault() ); } 
+																HoudiniHost.isAutoSelectAssetRootNodeDefault() )
+														  || (	HoudiniHost.prAutoSelectAssetRootNode &&
+																!HoudiniHost.isAutoSelectAssetRootNodeDefault() ); } 
 												set { myAutoSelectAssetRootNode = value; } }
 	public bool	prHideGeometryOnLinking {		get { return (	myHideGeometryOnLinking && 
-																HAPI_Host.isHideGeometryOnLinkingDefault() )
-														  || (	HAPI_Host.prHideGeometryOnLinking &&
-																!HAPI_Host.isHideGeometryOnLinkingDefault() ); } 
+																HoudiniHost.isHideGeometryOnLinkingDefault() )
+														  || (	HoudiniHost.prHideGeometryOnLinking &&
+																!HoudiniHost.isHideGeometryOnLinkingDefault() ); } 
 												set { myHideGeometryOnLinking = value; } }
 
 	public HAPI_ShaderType			prMaterialShaderType {	get { return myMaterialShaderType; }
@@ -183,41 +182,41 @@ public abstract class HAPI_Asset : HAPI_Control
 	public bool						prShowOnlyVertexColours{get { return myShowOnlyVertexColours; }
 															set { myShowOnlyVertexColours = value; } }
 	public bool						prGenerateTangents {	get { return (	myGenerateTangents && 
-																			HAPI_Host.isGenerateTangentsDefault() )
-																	|| (	HAPI_Host.prGenerateTangents &&
-																			!HAPI_Host.isGenerateTangentsDefault() ); } 
+																			HoudiniHost.isGenerateTangentsDefault() )
+																	|| (	HoudiniHost.prGenerateTangents &&
+																			!HoudiniHost.isGenerateTangentsDefault() ); } 
 															set { myGenerateTangents = value; } }
 
 	public bool	prEnableCooking {				get { return (	myEnableCooking && 
-																HAPI_Host.isEnableCookingDefault() )
-														  || (	HAPI_Host.prEnableCooking &&
-																!HAPI_Host.isEnableCookingDefault() ); } 
+																HoudiniHost.isEnableCookingDefault() )
+														  || (	HoudiniHost.prEnableCooking &&
+																!HoudiniHost.isEnableCookingDefault() ); } 
 												set { myEnableCooking = value; } }
 	public bool	prCookingTriggersDownCooks {	get { return (	myCookingTriggersDownCooks && 
-																HAPI_Host.isCookingTriggersDownCooksDefault() )
-														  || (	HAPI_Host.prCookingTriggersDownCooks &&
-																!HAPI_Host.isCookingTriggersDownCooksDefault() ); } 
+																HoudiniHost.isCookingTriggersDownCooksDefault() )
+														  || (	HoudiniHost.prCookingTriggersDownCooks &&
+																!HoudiniHost.isCookingTriggersDownCooksDefault() ); } 
 												set { myCookingTriggersDownCooks = value; } }
 	public bool	prPlaymodePerFrameCooking {		get { return (	myPlaymodePerFrameCooking && 
-																HAPI_Host.isPlaymodePerFrameCookingDefault() )
-														  || (	HAPI_Host.prPlaymodePerFrameCooking &&
-																!HAPI_Host.isPlaymodePerFrameCookingDefault() ); } 
+																HoudiniHost.isPlaymodePerFrameCookingDefault() )
+														  || (	HoudiniHost.prPlaymodePerFrameCooking &&
+																!HoudiniHost.isPlaymodePerFrameCookingDefault() ); } 
 												set { myPlaymodePerFrameCooking = value; } }
 	public bool	prPushUnityTransformToHoudini {	get { return (	myPushUnityTransformToHoudini && 
-																HAPI_Host.isPushUnityTransformToHoudiniDefault() )
-														  || (	HAPI_Host.prPushUnityTransformToHoudini &&
-																!HAPI_Host.isPushUnityTransformToHoudiniDefault() ); } 
+																HoudiniHost.isPushUnityTransformToHoudiniDefault() )
+														  || (	HoudiniHost.prPushUnityTransformToHoudini &&
+																!HoudiniHost.isPushUnityTransformToHoudiniDefault() ); } 
 												set { myPushUnityTransformToHoudini = value; } }
 	public bool	prTransformChangeTriggersCooks{ get { return (	myTransformChangeTriggersCooks && 
-																HAPI_Host.isTransformChangeTriggersCooksDefault() )
-														  || (	HAPI_Host.prTransformChangeTriggersCooks &&
-																!HAPI_Host.isTransformChangeTriggersCooksDefault() ); } 
+																HoudiniHost.isTransformChangeTriggersCooksDefault() )
+														  || (	HoudiniHost.prTransformChangeTriggersCooks &&
+																!HoudiniHost.isTransformChangeTriggersCooksDefault() ); } 
 												set { myTransformChangeTriggersCooks = value; } }
 
 	public bool	prImportTemplatedGeos{ get { return (			myImportTemplatedGeos && 
-																HAPI_Host.isImportTemplatedGeosDefault() )
-														  || (	HAPI_Host.prImportTemplatedGeos &&
-																!HAPI_Host.isImportTemplatedGeosDefault() ); } 
+																HoudiniHost.isImportTemplatedGeosDefault() )
+														  || (	HoudiniHost.prImportTemplatedGeos &&
+																!HoudiniHost.isImportTemplatedGeosDefault() ); } 
 												set { myImportTemplatedGeos = value; } }
 
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
@@ -245,20 +244,20 @@ public abstract class HAPI_Asset : HAPI_Control
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_Asset() 
+	public HoudiniAsset() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset created - Instance Id: " + GetInstanceID() );
+			Debug.Log( "HoudiniAsset created - Instance Id: " + GetInstanceID() );
 		
-		HAPI_SetPath.setPath();
+		HoudiniSetPath.setPath();
 
 		reset();
 	}
 	
-	~HAPI_Asset() 
+	~HoudiniAsset() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset destroyed - Instance Id:" + GetInstanceID() );
+			Debug.Log( "HoudiniAsset destroyed - Instance Id:" + GetInstanceID() );
 	}
 	
 	public virtual void Awake()
@@ -309,13 +308,13 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	// Transform related connection methods -------------------------------------------------------
 
-	public void addAssetAsTransformInput( HAPI_Asset asset, int index )
+	public void addAssetAsTransformInput( HoudiniAsset asset, int index )
 	{
 		if ( prUpStreamTransformAssets[ index ] == asset )
 			return;
 		
 		prUpStreamTransformAssets[ index ] = asset;
-		HAPI_Host.connectAssetTransform( asset.prAssetId, prAssetId, index );
+		HoudiniHost.connectAssetTransform( asset.prAssetId, prAssetId, index );
 		asset.addDownstreamTransformAsset( this );
 	}
 	
@@ -324,27 +323,27 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( prUpStreamTransformAssets[ index ] != null )
 		{
 			prUpStreamTransformAssets[ index ].removeDownstreamTransformAsset( this );
-			HAPI_Host.disconnectAssetTransform( prAssetId, index );
+			HoudiniHost.disconnectAssetTransform( prAssetId, index );
 			prUpStreamTransformAssets[ index ] = null;
 		}
 		
 	}
 	
-	public void removeAssetAsTransformInput( HAPI_Asset asset )
+	public void removeAssetAsTransformInput( HoudiniAsset asset )
 	{
 		for ( int ii = 0; ii < prUpStreamTransformAssets.Count; ++ii )
 		{
 			if ( prUpStreamTransformAssets[ii] == asset )
 			{
 				prUpStreamTransformAssets[ ii ] = null;
-				HAPI_Host.disconnectAssetTransform( prAssetId, ii );
+				HoudiniHost.disconnectAssetTransform( prAssetId, ii );
 				
 				asset.removeDownstreamTransformAsset( this );
 			}
 		}
 	}
 	
-	public int getAssetTransformConnectionIndex( HAPI_Asset asset )
+	public int getAssetTransformConnectionIndex( HoudiniAsset asset )
 	{
 		for ( int ii = 0; ii < prUpStreamTransformAssets.Count; ii++ )
 			if ( prUpStreamTransformAssets[ii] == asset )
@@ -353,27 +352,27 @@ public abstract class HAPI_Asset : HAPI_Control
 		return -1;
 	}
 	
-	public void addDownstreamTransformAsset( HAPI_Asset asset )
+	public void addDownstreamTransformAsset( HoudiniAsset asset )
 	{
-		foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+		foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
 			if ( downstream_asset == asset )
 				return;
 		
 		prDownStreamTransformAssets.Add( asset );
 	}
 	
-	public void removeDownstreamTransformAsset( HAPI_Asset asset )
+	public void removeDownstreamTransformAsset( HoudiniAsset asset )
 	{
 		prDownStreamTransformAssets.Remove( asset );
 	}
 	
 	// Geometry related connection methods -------------------------------------------------------
 	
-	public void addAssetAsGeoInput( HAPI_Asset asset, int object_index, int index )
+	public void addAssetAsGeoInput( HoudiniAsset asset, int object_index, int index )
 	{
 		prUpStreamGeoAssets[ index ] = asset;
 
-		HAPI_Host.connectAssetGeometry( asset.prAssetId, object_index, prAssetId, index );
+		HoudiniHost.connectAssetGeometry( asset.prAssetId, object_index, prAssetId, index );
 		asset.addDownstreamGeoAsset( this );
 
 		// We have to save the presets here because this connection might change a parm
@@ -383,11 +382,11 @@ public abstract class HAPI_Asset : HAPI_Control
 			savePreset();
 #endif // UNITY_EDITOR
 
-		if ( HAPI_Host.prHideGeometryOnLinking && asset.prHideGeometryOnLinking )
+		if ( HoudiniHost.prHideGeometryOnLinking && asset.prHideGeometryOnLinking )
 		{
 			asset.prIsGeoVisible = false;
-			HAPI_PartControl[] controls = asset.GetComponentsInChildren< HAPI_PartControl >();
-			foreach ( HAPI_PartControl control in controls )
+			HoudiniPartControl[] controls = asset.GetComponentsInChildren< HoudiniPartControl >();
+			foreach ( HoudiniPartControl control in controls )
 			{
 				if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
 					 && control.gameObject.GetComponent< MeshRenderer >() != null )
@@ -395,9 +394,9 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 
 			// update undo info if needed
-			if ( asset.GetType() == typeof( HAPI_AssetOTL ) )
+			if ( asset.GetType() == typeof( HoudiniAssetOTL ) )
 			{
-				HAPI_AssetOTL asset_otl = asset as HAPI_AssetOTL;
+				HoudiniAssetOTL asset_otl = asset as HoudiniAssetOTL;
 				asset_otl.prAssetUndoInfo.isGeoVisible = false;
 			}
 		}
@@ -408,7 +407,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		prUpStreamGeoAssets[ index ] = null;
 		prUpStreamGeoAdded[ index ] = true;
 
-		HAPI_Host.setFileInput( prAssetId, index, path );
+		HoudiniHost.setFileInput( prAssetId, index, path );
 	}
 
 #if UNITY_EDITOR
@@ -435,7 +434,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 		}
 		
-		HAPI_Host.setTransformAnimCurve( node_id, transform_component, keys, curve.length );
+		HoudiniHost.setTransformAnimCurve( node_id, transform_component, keys, curve.length );
 	}
 
 	protected void marshalRotation( int node_id, AnimationClipCurveData[] curve_datas )
@@ -472,9 +471,9 @@ public abstract class HAPI_Asset : HAPI_Control
 				Quaternion quat = new Quaternion( key_qx.value, key_qy.value, key_qz.value, key_qw.value );
 				Vector3 eulerAngle = quat.eulerAngles;
 
-				HAPI_AssetUtility.addKeyToCurve( key_qx.time, eulerAngle.x, rx );
-				HAPI_AssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.y, ry );
-				HAPI_AssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.z, rz );
+				HoudiniAssetUtility.addKeyToCurve( key_qx.time, eulerAngle.x, rx );
+				HoudiniAssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.y, ry );
+				HoudiniAssetUtility.addKeyToCurve( key_qx.time, -eulerAngle.z, rz );
 			}
 			
 			marshalAnimCurve( node_id, rx, HAPI_TransformComponent.HAPI_TRANSFORM_RX );
@@ -517,30 +516,30 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( prUpStreamGeoAssets[ index ] != null )
 			{
 				prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
-				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
+				HoudiniHost.disconnectAssetGeometry( prAssetId, index );
 				prUpStreamGeoAssets[ index ] = null;
 				prUpStreamGeoAdded[ index ] = false;
 			}
 			else if ( prUpStreamGeoAdded[ index ] )
 			{
-				HAPI_Host.disconnectAssetGeometry( prAssetId, index );
+				HoudiniHost.disconnectAssetGeometry( prAssetId, index );
 				prUpStreamGeoAdded[ index ] = false;
 			}
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogError( error.ToString() );
 		}
 	}
 	
-	public void removeDownstreamGeoAsset( HAPI_Asset asset )
+	public void removeDownstreamGeoAsset( HoudiniAsset asset )
 	{
 		prDownStreamGeoAssets.Remove( asset );
 	}
 	
-	public void addDownstreamGeoAsset( HAPI_Asset asset )
+	public void addDownstreamGeoAsset( HoudiniAsset asset )
 	{
-		foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+		foreach ( HoudiniAsset downstream_asset in prDownStreamGeoAssets )
 			if ( downstream_asset == asset )
 				return;
 		
@@ -549,23 +548,23 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public virtual void OnDestroy()
 	{
-		if ( prAssetId >= 0 && HAPI_Host.isRealDestroy() 
+		if ( prAssetId >= 0 && HoudiniHost.isRealDestroy() 
 #if UNITY_EDITOR && UNITY_4_3
 			&& !BuildPipeline.isBuildingPlayer
 #endif // UNITY_4_3
 			)
 
 		{
-			foreach ( HAPI_Asset upstream_asset in prUpStreamTransformAssets )
+			foreach ( HoudiniAsset upstream_asset in prUpStreamTransformAssets )
 				if ( upstream_asset != null )
 					upstream_asset.removeDownstreamTransformAsset( this );
 			
-			List< HAPI_Asset > downstream_asset_list = new List< HAPI_Asset >();
+			List< HoudiniAsset > downstream_asset_list = new List< HoudiniAsset >();
 			
-			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+			foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
 				downstream_asset_list.Add( downstream_asset );
 			
-			foreach ( HAPI_Asset downstream_asset in downstream_asset_list )
+			foreach ( HoudiniAsset downstream_asset in downstream_asset_list )
 				downstream_asset.removeAssetAsTransformInput( this );
 			
 			prUpStreamTransformAssets.Clear();
@@ -573,9 +572,9 @@ public abstract class HAPI_Asset : HAPI_Control
 			
 			try
 			{
-				HAPI_Host.destroyAsset( prAssetId );
+				HoudiniHost.destroyAsset( prAssetId );
 			}
-			catch ( HAPI_Error error )
+			catch ( HoudiniError error )
 			{
 				Debug.LogError( "Asset failed to unload: " + error.ToString() );
 			}
@@ -591,7 +590,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		return (
 			isPrefabInstance() && 
 			prAssetId != prBackupAssetId &&
-			HAPI_Host.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) );
+			HoudiniHost.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) );
 	}
 	
 	public bool isInstantiatingPrefab()
@@ -599,7 +598,7 @@ public abstract class HAPI_Asset : HAPI_Control
 #if UNITY_EDITOR
 		if ( isPrefabInstance() && prBackupAssetId < 0 )
 		{
-			HAPI_Asset prefab_asset = getParentPrefabAsset();
+			HoudiniAsset prefab_asset = getParentPrefabAsset();
 			if ( prefab_asset )
 			{
 				return prAssetId == prefab_asset.prAssetId;
@@ -615,7 +614,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		return (
 			isPrefab() && 
 			prAssetId != prBackupAssetId && 
-			HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) );
+			HoudiniHost.isAssetValid( prAssetId, prAssetValidationId ) );
 #else
 		return false;
 #endif // UNITY_EDITOR
@@ -623,7 +622,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public bool isDuplicatingAsset()
 	{
-		foreach ( HAPI_Asset asset in FindObjectsOfType( typeof( HAPI_Asset ) ) as HAPI_Asset[] )
+		foreach ( HoudiniAsset asset in FindObjectsOfType( typeof( HoudiniAsset ) ) as HoudiniAsset[] )
 		{
 			if ( asset.prAssetId == prAssetId &&
 				asset.GetInstanceID() != GetInstanceID() )
@@ -648,7 +647,7 @@ public abstract class HAPI_Asset : HAPI_Control
 #if UNITY_EDITOR
 		if ( isPrefabInstance() )
 		{
-			HAPI_Asset prefab_asset = getParentPrefabAsset();
+			HoudiniAsset prefab_asset = getParentPrefabAsset();
 			if ( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
 				return;
 		}
@@ -683,7 +682,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			}
 			else if (
 				!isInstantiatingPrefab() &&
-				HAPI_Host.isAssetValid( prAssetId, prAssetValidationId ) &&
+				HoudiniHost.isAssetValid( prAssetId, prAssetValidationId ) &&
 				!isDuplicatingAsset() )
 			{
 				// Reloading asset after mode change or script-reload.
@@ -753,12 +752,12 @@ public abstract class HAPI_Asset : HAPI_Control
 		prMaxGeoInputCount 				= 0;
 		prFileInputs 					= new List< string >();
 		
-		prDownStreamTransformAssets		= new List< HAPI_Asset >();
-		prUpStreamTransformAssets 		= new List< HAPI_Asset >();
+		prDownStreamTransformAssets		= new List< HoudiniAsset >();
+		prUpStreamTransformAssets 		= new List< HoudiniAsset >();
 		prUpStreamTransformObjects 		= new List< GameObject >();
 		
-		prDownStreamGeoAssets 			= new List< HAPI_Asset >();
-		prUpStreamGeoAssets 			= new List< HAPI_Asset >();
+		prDownStreamGeoAssets 			= new List< HoudiniAsset >();
+		prUpStreamGeoAssets 			= new List< HoudiniAsset >();
 		prUpStreamGeoObjects 			= new List< GameObject >();
 		prUpStreamGeoAdded 				= new List< bool >();
 
@@ -789,20 +788,20 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		prIsGeoVisible					= true;
 		prShowPinnedInstances			= true;
-		prAutoSelectAssetRootNode 		= HAPI_Host.myDefaultAutoSelectAssetRootNode;
-		prHideGeometryOnLinking			= HAPI_Host.myDefaultHideGeometryOnLinking;
+		prAutoSelectAssetRootNode 		= HoudiniHost.myDefaultAutoSelectAssetRootNode;
+		prHideGeometryOnLinking			= HoudiniHost.myDefaultHideGeometryOnLinking;
 
 		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
 		prRenderResolution				= new Vector2( 1000, 1000 );
 		prShowOnlyVertexColours			= false;
 		prGenerateTangents				= true;
 
-		prEnableCooking					= HAPI_Host.myDefaultEnableCooking;
-		prCookingTriggersDownCooks		= HAPI_Host.myDefaultCookingTriggersDownCooks;
+		prEnableCooking					= HoudiniHost.myDefaultEnableCooking;
+		prCookingTriggersDownCooks		= HoudiniHost.myDefaultCookingTriggersDownCooks;
 		prPlaymodePerFrameCooking		= false;
-		prPushUnityTransformToHoudini	= HAPI_Host.myDefaultPushUnityTransformToHoudini;
-		prTransformChangeTriggersCooks	= HAPI_Host.myDefaultTransformChangeTriggersCooks;
-		prImportTemplatedGeos 			= HAPI_Host.myDefaultImportTemplatedGeos;
+		prPushUnityTransformToHoudini	= HoudiniHost.myDefaultPushUnityTransformToHoudini;
+		prTransformChangeTriggersCooks	= HoudiniHost.myDefaultTransformChangeTriggersCooks;
+		prImportTemplatedGeos 			= HoudiniHost.myDefaultImportTemplatedGeos;
 
 		prEnableLogging					= false;
 
@@ -826,13 +825,13 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		if ( isPrefab() )
 		{
-			if ( prParms.prLastChangedParmId != HAPI_Constants.HAPI_INVALID_PARM_ID )
+			if ( prParms.prLastChangedParmId != HoudiniConstants.HAPI_INVALID_PARM_ID )
 			{
 				HAPI_ParmInfo parm_info = prParms.findParm( prParms.prLastChangedParmId );
 				prUpdatePrefabInstanceParmNames.Add( parm_info.name );
 			}
 			
-			HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+			HoudiniProgressBar progress_bar = new HoudiniProgressBar();
 			try 
 			{
 				// only need to update parameters for prefab
@@ -903,7 +902,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		#pragma warning disable 0162
 #endif // !UNITY_STANDALONE_WIN
 
-		if ( !HAPI_SetPath.prIsPathSet )
+		if ( !HoudiniSetPath.prIsPathSet )
 		{
 			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
 			return false;
@@ -915,7 +914,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( isPrefabInstance() )
 			processParentPrefab();
 
-		HAPI_ProgressBar progress_bar	= new HAPI_ProgressBar();
+		HoudiniProgressBar progress_bar	= new HoudiniProgressBar();
 		progress_bar.prUseDelay			= use_delay_for_progress_bar;
 		progress_bar.prAsset			= this;
 
@@ -943,9 +942,9 @@ public abstract class HAPI_Asset : HAPI_Control
 					// to delete this HAPI asset and create a new one for this OTL.
 					try
 					{
-						HAPI_Host.destroyAsset( prAssetId );
+						HoudiniHost.destroyAsset( prAssetId );
 					}
-					catch ( HAPI_Error ) {}
+					catch ( HoudiniError ) {}
 
 					// Once an asset is unloaded its id will is obviously no longer valid, so reset it here.
 					prAssetId = -1;
@@ -972,8 +971,8 @@ public abstract class HAPI_Asset : HAPI_Control
 
 					progress_bar.statusCheckLoop();
 
-					prAssetInfo = HAPI_Host.getAssetInfo( asset_id );
-					HAPI_NodeInfo node_info = HAPI_Host.getNodeInfo( prAssetInfo.nodeId );
+					prAssetInfo = HoudiniHost.getAssetInfo( asset_id );
+					HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo( prAssetInfo.nodeId );
 					
 					if ( reload_asset )
 						Debug.Log( 
@@ -983,7 +982,7 @@ public abstract class HAPI_Asset : HAPI_Control
 							"Unique Node Id: " + node_info.uniqueHoudiniNodeId + "\n" +
 							"Internal Node Path: " + node_info.internalNodePath + "\n" );
 				}
-				catch ( HAPI_Error error )
+				catch ( HoudiniError error )
 				{
 					Debug.LogError( "Asset not loaded: " + error.ToString() );
 					// Nothing to build since the load failed.
@@ -993,9 +992,9 @@ public abstract class HAPI_Asset : HAPI_Control
 					{
 						try
 						{
-							HAPI_Host.destroyAsset( prAssetId );
+							HoudiniHost.destroyAsset( prAssetId );
 						}
-						catch ( HAPI_Error ) {}
+						catch ( HoudiniError ) {}
 					}
 					
 					// Clean up.
@@ -1014,7 +1013,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				
 			}
 			
-			prAssetInfo = HAPI_Host.getAssetInfo( prAssetId );
+			prAssetInfo = HoudiniHost.getAssetInfo( prAssetId );
 			
 			// For convenience we copy some asset info properties locally (since they are constant anyway).
 			// More imporantly, structs are not serialized and therefore putting them into their own
@@ -1040,7 +1039,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( isPrefab() )
 			{
 				string prefab_path = AssetDatabase.GetAssetPath( GetInstanceID() );
-				HAPI_Host.myCleanUpPrefabAssets[ prefab_path ] = prAssetId;
+				HoudiniHost.myCleanUpPrefabAssets[ prefab_path ] = prAssetId;
 			}
 #endif // UNITY_EDITOR
 
@@ -1073,15 +1072,15 @@ public abstract class HAPI_Asset : HAPI_Control
 					// serialized value so don't change transform. 
 					if ( !is_reverting_prefab_instance )
 					{
-						transform.localPosition = Utility.getPosition( myLastLocalToWorld );
-						transform.localRotation = Utility.getQuaternion( myLastLocalToWorld );
+						transform.localPosition = HoudiniAssetUtility.getPosition( myLastLocalToWorld );
+						transform.localRotation = HoudiniAssetUtility.getQuaternion( myLastLocalToWorld );
 
-						Vector3 scale = Utility.getScale( myLastLocalToWorld );
+						Vector3 scale = HoudiniAssetUtility.getScale( myLastLocalToWorld );
 						if ( !( Mathf.Approximately( 0.0f, scale.x )
 							&& Mathf.Approximately( 0.0f, scale.y )
 							&& Mathf.Approximately( 0.0f, scale.z ) ) )
 						{
-							transform.localScale = Utility.getScale( myLastLocalToWorld );
+							transform.localScale = HoudiniAssetUtility.getScale( myLastLocalToWorld );
 						}
 					}
 					
@@ -1113,7 +1112,7 @@ public abstract class HAPI_Asset : HAPI_Control
 			{
 				// Need to re-acquire all the params for all the child controls that have parms exposed.
 				prParms.getParameterValues();
-				foreach ( HAPI_Parms parms in GetComponentsInChildren< HAPI_Parms >() )
+				foreach ( HoudiniParms parms in GetComponentsInChildren< HoudiniParms >() )
 					parms.getParameterValues();
 
 				// Custom work during a full build (custom to each subclass).
@@ -1134,15 +1133,15 @@ public abstract class HAPI_Asset : HAPI_Control
 				prObjectTransforms = new HAPI_Transform[ prObjectCount ];
 			
 			// Refresh object info arrays as they are lost after serialization.
-			Utility.getArray1Id( prAssetId, HAPI_Host.getObjects, prObjects, prObjectCount );
-			Utility.getArray2Id( prAssetId, HAPI_RSTOrder.HAPI_SRT, HAPI_Host.getObjectTransforms, 
+			HoudiniAssetUtility.getArray1Id( prAssetId, HoudiniHost.getObjects, prObjects, prObjectCount );
+			HoudiniAssetUtility.getArray2Id( prAssetId, HAPI_RSTOrder.HAPI_SRT, HoudiniHost.getObjectTransforms, 
 					 			 prObjectTransforms, prObjectCount );
 			
 			if ( !serialization_recovery_only )
 			{
 				// Set asset's transform.
 				if ( prPushUnityTransformToHoudini )
-					Utility.getHoudiniTransformAndApply( prAssetId, prAssetName, transform );
+					HoudiniAssetUtility.getHoudiniTransformAndApply( prAssetId, prAssetName, transform );
 			
 				progress_bar.prMessage = "Loading and composing objects...";
 			
@@ -1167,8 +1166,8 @@ public abstract class HAPI_Asset : HAPI_Control
 			if ( reload_asset && !prPresetsMap.isEmpty() )
 				build( false, false, false, false, false, true );
 		}
-		catch ( HAPI_ErrorIgnorable ) {}
-		catch ( HAPI_ErrorProgressCancelled error )
+		catch ( HoudiniErrorIgnorable ) {}
+		catch ( HoudiniErrorProgressCancelled error )
 		{
 			// If in play mode, disable live cooks.
 #if UNITY_EDITOR
@@ -1180,7 +1179,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
@@ -1204,13 +1203,13 @@ public abstract class HAPI_Asset : HAPI_Control
 		return true;
 	}
 	
-	public void updateParameters( HAPI_ProgressBar progress_bar )
+	public void updateParameters( HoudiniProgressBar progress_bar )
 	{
 		// Update prefab instance after parameter change on prefab if needed
 #if UNITY_EDITOR
 		if ( isPrefabInstance() && prUpdatePrefabInstanceParmNames.Count > 0 )
 		{
-			HAPI_Asset prefab_asset = getParentPrefabAsset();
+			HoudiniAsset prefab_asset = getParentPrefabAsset();
 
 			foreach ( string parm_name in prUpdatePrefabInstanceParmNames )
 			{
@@ -1263,7 +1262,7 @@ public abstract class HAPI_Asset : HAPI_Control
 
 		prParms.setChangedParametersIntoHost();
 
-		HAPI_Host.cookAsset( prAssetId );
+		HoudiniHost.cookAsset( prAssetId );
 		progress_bar.statusCheckLoop();
 
 		myProgressBarJustUsed = true;
@@ -1300,14 +1299,14 @@ public abstract class HAPI_Asset : HAPI_Control
 			// the bare minimum.
 			if ( prTransformChangeTriggersCooks )
 			{
-				foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+				foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
 					downstream_asset.buildClientSide();
 			
-				foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+				foreach ( HoudiniAsset downstream_asset in prDownStreamGeoAssets )
 					downstream_asset.buildClientSide();
 			}
 		}
-		catch ( HAPI_Error err )
+		catch ( HoudiniError err )
 		{
 			Debug.LogError( err.ToString() );
 		}
@@ -1317,7 +1316,7 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 #if UNITY_EDITOR
 		// Get/Create directory for the asset being baked.
-		string baked_asset_path = HAPI_Constants.HAPI_BAKED_ASSETS_PATH + "/" + prAssetName;
+		string baked_asset_path = HoudiniConstants.HAPI_BAKED_ASSETS_PATH + "/" + prAssetName;
 
 		DirectoryInfo baked_asset_dir = new DirectoryInfo( baked_asset_path );
 		int i = 0;
@@ -1368,7 +1367,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		GameObject new_object = Instantiate( gameObject ) as GameObject;
 
 		// Bake all meshes and materials created by HAPI_PartControls.
-		foreach ( HAPI_PartControl part_control in new_object.GetComponentsInChildren< HAPI_PartControl >() )
+		foreach ( HoudiniPartControl part_control in new_object.GetComponentsInChildren< HoudiniPartControl >() )
 		{
 			// Bake meshes.
 			MeshFilter mesh_filter = part_control.GetComponent< MeshFilter >();
@@ -1452,13 +1451,13 @@ public abstract class HAPI_Asset : HAPI_Control
 		// Delete all HAPI components from prefab. (Order here matters because of inter-dependencies!)
 		// Note: If you move or edit this list please update the wiki reminder about this list
 		// on the Runtime wiki page.
-		removeComponentsFromChildren< HAPI_Curve >( new_object );
-		removeComponentsFromChildren< HAPI_MeshToPrefab >( new_object );
-		removeComponentsFromChildren< HAPI_InstancerManager >( new_object );
-		removeComponentsFromChildren< HAPI_Instancer >( new_object );
-		removeComponentsFromChildren< HAPI_Instance >( new_object );
-		removeComponentsFromChildren< HAPI_Parms >( new_object );
-		removeComponentsFromChildren< HAPI_Control >( new_object );
+		removeComponentsFromChildren< HoudiniCurve >( new_object );
+		removeComponentsFromChildren< HoudiniMeshToPrefab >( new_object );
+		removeComponentsFromChildren< HoudiniInstancerManager >( new_object );
+		removeComponentsFromChildren< HoudiniInstancer >( new_object );
+		removeComponentsFromChildren< HoudiniInstance >( new_object );
+		removeComponentsFromChildren< HoudiniParms >( new_object );
+		removeComponentsFromChildren< HoudiniControl >( new_object );
 
 		// Create prefab.
 		string prefab_path = rel_baked_asset_path + "/" + gameObject.name + ".prefab";
@@ -1474,7 +1473,7 @@ public abstract class HAPI_Asset : HAPI_Control
 								float end_time, 
 								int samples_per_second,
 								GameObject parent_object,
-								HAPI_ProgressBar progress_bar )
+								HoudiniProgressBar progress_bar )
 	{
 #if UNITY_EDITOR
 		try
@@ -1493,12 +1492,12 @@ public abstract class HAPI_Asset : HAPI_Control
 				{
 					if ( !obj_info.isInstancer )
 					{
-						HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
+						HoudiniObjectControl obj_control = game_object.GetComponent< HoudiniObjectControl >();
 						obj_control.beginBakeAnimation();
 					}
 					else
 					{
-						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
+						HoudiniInstancer instancer = game_object.GetComponent< HoudiniInstancer >();
 						instancer.beginBakeAnimation();
 					}
 				}
@@ -1513,25 +1512,25 @@ public abstract class HAPI_Asset : HAPI_Control
 			progress_bar.prCurrentValue = 0;
 			for ( float curr_time = start_time; curr_time <= end_time; curr_time += delta_time )
 			{
-				HAPI_Host.setTime( curr_time );
+				HoudiniHost.setTime( curr_time );
 				
-				HAPI_Host.cookAsset( prAssetId );
+				HoudiniHost.cookAsset( prAssetId );
 				
 				HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 					
 				while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 				{
-					state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+					state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
 				}
 
 				if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 				{
 					state = HAPI_State.HAPI_STATE_READY;
-					HAPI_Host.throwRuntimeError();
+					HoudiniHost.throwRuntimeError();
 				}
 				
 				HAPI_Transform[] object_transforms = new HAPI_Transform[ prObjectCount ];
-				Utility.getArray2Id( prAssetId, HAPI_RSTOrder.HAPI_SRT, HAPI_Host.getObjectTransforms, 
+				HoudiniAssetUtility.getArray2Id( prAssetId, HAPI_RSTOrder.HAPI_SRT, HoudiniHost.getObjectTransforms, 
 						 			 object_transforms, prObjectCount );
 				
 				for ( int ii = 0; ii < num_objects; ii++ )
@@ -1543,12 +1542,12 @@ public abstract class HAPI_Asset : HAPI_Control
 					{
 						if ( !obj_info.isInstancer )
 						{
-							HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
+							HoudiniObjectControl obj_control = game_object.GetComponent< HoudiniObjectControl >();
 							obj_control.bakeAnimation( curr_time, parent_object, object_transforms[ ii ] );
 						}
 						else
 						{
-							HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
+							HoudiniInstancer instancer = game_object.GetComponent< HoudiniInstancer >();
 							instancer.bakeAnimation( curr_time, parent_object );
 						}
 					}
@@ -1570,13 +1569,13 @@ public abstract class HAPI_Asset : HAPI_Control
 				{
 					if ( !obj_info.isInstancer )
 					{
-						HAPI_ObjectControl obj_control = game_object.GetComponent< HAPI_ObjectControl >();
+						HoudiniObjectControl obj_control = game_object.GetComponent< HoudiniObjectControl >();
 						if ( obj_control.endBakeAnimation() )
 							found_anim = true;
 					}
 					else
 					{
-						HAPI_Instancer instancer = game_object.GetComponent< HAPI_Instancer >();
+						HoudiniInstancer instancer = game_object.GetComponent< HoudiniInstancer >();
 						if ( instancer.endBakeAnimation( parent_object ) )
 							found_anim = true;
 					}
@@ -1588,7 +1587,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				EditorUtility.DisplayDialog( "Bake Error", "No animation was found to bake", "OK" );
 			}
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 		}
@@ -1601,11 +1600,11 @@ public abstract class HAPI_Asset : HAPI_Control
 		{
 			if ( myPreset != null && myPreset.Length > 0 )
 			{
-				HAPI_Host.setPreset( prNodeId, myPreset );
-				HAPI_Host.cookAsset( prAssetId );
+				HoudiniHost.setPreset( prNodeId, myPreset );
+				HoudiniHost.cookAsset( prAssetId );
 			}
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 		}
@@ -1620,7 +1619,7 @@ public abstract class HAPI_Asset : HAPI_Control
 #if UNITY_EDITOR
 		try
 		{
-			myPreset = HAPI_Host.getPreset( prNodeId );
+			myPreset = HoudiniHost.getPreset( prNodeId );
 
 			// This tells Unity that values have been overridden for this 
 			// prefab instance (in this case the preset).
@@ -1633,16 +1632,16 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public bool isAssetValid()
 	{
-		return HAPI_Host.isAssetValid( prAssetId, prAssetInfo.validationId );
+		return HoudiniHost.isAssetValid( prAssetId, prAssetInfo.validationId );
 	}
 
 #if UNITY_EDITOR
-	public HAPI_Asset getParentPrefabAsset()
+	public HoudiniAsset getParentPrefabAsset()
 	{
 		GameObject prefab = PrefabUtility.GetPrefabParent( gameObject ) as GameObject;
 		if ( prefab )
 		{
-			return prefab.GetComponent< HAPI_Asset >();
+			return prefab.GetComponent< HoudiniAsset >();
 		}
 		return null;
 	}
@@ -1650,8 +1649,8 @@ public abstract class HAPI_Asset : HAPI_Control
 
 	public void applyGeoVisibilityToParts()
 	{
-		HAPI_PartControl[] controls = GetComponentsInChildren< HAPI_PartControl >();
-		foreach ( HAPI_PartControl control in controls )
+		HoudiniPartControl[] controls = GetComponentsInChildren< HoudiniPartControl >();
+		foreach ( HoudiniPartControl control in controls )
 		{
 			if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
 				&& control.gameObject.GetComponent< MeshRenderer >() != null )
@@ -1669,10 +1668,10 @@ public abstract class HAPI_Asset : HAPI_Control
 	protected abstract int buildCreateAsset();
 
 	// Inherited classes should override this for work they need done during the full build step only. (Optional)
-	protected virtual void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar ) {}
+	protected virtual void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar ) {}
 
 	// Inherited classes should override this with however they wish to load objects in the prObjects array.
-	protected abstract void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar );
+	protected abstract void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar );
 
 	// -------------------------------------------------------------------------------------------------------------
 
@@ -1680,25 +1679,25 @@ public abstract class HAPI_Asset : HAPI_Control
 	{
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
 
-		HAPI_TransformEuler hapi_transform = Utility.getHapiTransform( local_to_world );
-		HAPI_Host.setAssetTransform( prAssetId, ref hapi_transform );
+		HAPI_TransformEuler hapi_transform = HoudiniAssetUtility.getHapiTransform( local_to_world );
+		HoudiniHost.setAssetTransform( prAssetId, ref hapi_transform );
 
 		float [] parm_data = new float[ 3 ];
 
 		try
 		{
 			HAPI_ParmInfo parm_info = prParms.findParm( "t" );
-			HAPI_Host.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
+			HoudiniHost.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
 				prParms.prParmFloatValues[ parm_info.floatValuesIndex + i ] = parm_data[ i ];
 
 			parm_info = prParms.findParm( "r" );
-			HAPI_Host.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
+			HoudiniHost.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
 				prParms.prParmFloatValues[ parm_info.floatValuesIndex + i ] = parm_data[ i ];
 
 			parm_info = prParms.findParm( "s" );
-			HAPI_Host.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
+			HoudiniHost.getParmFloatValues( prNodeId, parm_data, parm_info.floatValuesIndex, 3 );
 			for ( int i = 0; i < 3; ++i )
 				prParms.prParmFloatValues[ parm_info.floatValuesIndex + i ] = parm_data[ i ];
 		}
@@ -1751,19 +1750,19 @@ public abstract class HAPI_Asset : HAPI_Control
 		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 			for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
 				if ( prUpStreamTransformAssets[ ii ] )
-					HAPI_Host.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
+					HoudiniHost.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
 
-		foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+		foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
 		{
 			int index = downstream_asset.getAssetTransformConnectionIndex( this );
 			if ( index >= 0 )
-				HAPI_Host.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
+				HoudiniHost.connectAssetTransform( prAssetId, downstream_asset.prAssetId, index );
 		}
 		
 		// Fill input names.
 		for ( int i = 0; i < prMaxTransInputCount; ++i )
 		{
-			string trans_input_name = HAPI_Host.getInputName( prAssetId, i, 
+			string trans_input_name = HoudiniHost.getInputName( prAssetId, i, 
 															  HAPI_InputType.HAPI_INPUT_TRANSFORM );
 			if ( trans_input_name == "" )
 				trans_input_name = "Transform Input #" + ( i + 1 );
@@ -1771,7 +1770,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		}
 		for ( int i = 0; i < prMaxGeoInputCount; ++i )
 		{
-			string geo_input_name = HAPI_Host.getInputName( prAssetId, i, 
+			string geo_input_name = HoudiniHost.getInputName( prAssetId, i, 
 															HAPI_InputType.HAPI_INPUT_GEOMETRY );
 			if ( geo_input_name == "" )
 				geo_input_name = "Geometry Input #" + ( i + 1 );
@@ -1783,11 +1782,11 @@ public abstract class HAPI_Asset : HAPI_Control
 	protected void processParentPrefab()
 	{
 #if UNITY_EDITOR
-		HAPI_Asset prefab_asset = getParentPrefabAsset();
+		HoudiniAsset prefab_asset = getParentPrefabAsset();
 		if ( prefab_asset )
 		{
 			// if prefab has not been built yet then build it
-			if ( !HAPI_Host.isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
+			if ( !HoudiniHost.isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
 			{
 				prefab_asset.prAssetId = -1;
 				prefab_asset.build(
@@ -1825,7 +1824,7 @@ public abstract class HAPI_Asset : HAPI_Control
 		
 		if ( !serialization_recovery_only )
 		{
-			foreach ( HAPI_Asset downstream_asset in prDownStreamTransformAssets )
+			foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
 			{
 				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
@@ -1839,7 +1838,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				prEnableCooking = true;
 			}
 			
-			foreach ( HAPI_Asset downstream_asset in prDownStreamGeoAssets )
+			foreach ( HoudiniAsset downstream_asset in prDownStreamGeoAssets )
 			{
 				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
@@ -1862,7 +1861,7 @@ public abstract class HAPI_Asset : HAPI_Control
 				{
 					GameObject game_obj = prUpStreamTransformObjects[ i ];
 
-					HAPI_Asset asset = game_obj.GetComponent< HAPI_Asset >();
+					HoudiniAsset asset = game_obj.GetComponent< HoudiniAsset >();
 					if ( asset )
 					{
 						if ( !asset.isAssetValid() )
@@ -1884,8 +1883,8 @@ public abstract class HAPI_Asset : HAPI_Control
 				{
 					GameObject new_obj = prUpStreamGeoObjects[ i ];
 
-					HAPI_Asset asset = null;
-					HAPI_PartControl part_control = new_obj.GetComponent< HAPI_PartControl >();
+					HoudiniAsset asset = null;
+					HoudiniPartControl part_control = new_obj.GetComponent< HoudiniPartControl >();
 							
 					int object_index = 0;
 					if ( part_control )
@@ -1894,12 +1893,12 @@ public abstract class HAPI_Asset : HAPI_Control
 						asset = part_control.prAsset;
 					}
 					else
-						asset = new_obj.GetComponent< HAPI_Asset >();
+						asset = new_obj.GetComponent< HoudiniAsset >();
 
 					// If we are connecting a non-HAPI game object than we need to 
 					// assetize it first by converting it to an Input Asset.
 					if ( !asset )
-						asset = new_obj.AddComponent< HAPI_AssetInput >();
+						asset = new_obj.AddComponent< HoudiniAssetInput >();
 
 					if ( !asset.isAssetValid() )
 					{
@@ -1956,18 +1955,18 @@ public abstract class HAPI_Asset : HAPI_Control
 	[SerializeField] private int					myMaxGeoInputCount;
 	[SerializeField] private List< string >			myFileInputs;
 	
-	[SerializeField] private List< HAPI_Asset >		myDownStreamTransformAssets;
-	[SerializeField] private List< HAPI_Asset >		myUpStreamTransformAssets;
+	[SerializeField] private List< HoudiniAsset >		myDownStreamTransformAssets;
+	[SerializeField] private List< HoudiniAsset >		myUpStreamTransformAssets;
 	[SerializeField] private List< GameObject >		myUpStreamTransformObjects;
 	
-	[SerializeField] private List< HAPI_Asset >		myDownStreamGeoAssets;
-	[SerializeField] private List< HAPI_Asset >		myUpStreamGeoAssets;
+	[SerializeField] private List< HoudiniAsset >		myDownStreamGeoAssets;
+	[SerializeField] private List< HoudiniAsset >		myUpStreamGeoAssets;
 	[SerializeField] private List< GameObject >		myUpStreamGeoObjects;
 	[SerializeField] private List< bool >			myUpStreamGeoAdded;
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
-	[SerializeField] private HAPI_PresetMap			myPresetsMap;
+	[SerializeField] private HoudiniPresetMap			myPresetsMap;
 
 	// Objects ------------------------------------------------------------------------------------------------------
 	
@@ -2028,6 +2027,6 @@ public abstract class HAPI_Asset : HAPI_Control
 	private int myBackupAssetValidationId;
 	private bool myReloadPrefabOnPlaymodeChange;
 	[SerializeField] private List< string > myUpdatePrefabInstanceParmNames;
-	[SerializeField] private HAPI_AssetUndoInfo	myAssetOTLUndoInfo;
+	[SerializeField] private HoudiniAssetUndoInfo	myAssetOTLUndoInfo;
 
 }

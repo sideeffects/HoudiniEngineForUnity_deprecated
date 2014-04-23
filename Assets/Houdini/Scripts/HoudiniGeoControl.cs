@@ -24,7 +24,7 @@ using System.Collections.Generic;
 // Typedefs
 using HAPI_NodeId = System.Int32;
 
-public class HAPI_GeoControl : HAPI_ObjectControl 
+public class HoudiniGeoControl : HoudiniObjectControl 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -36,16 +36,16 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	public HAPI_GeoType prGeoType {		get { return myGeoType; }	set { myGeoType = value; } }
 	public bool prIsEditable {			get { return myIsEditable; }set { myIsEditable = value; } }
 	public bool prIsDisplay {			get { return myIsDisplay; }	set { myIsDisplay = value; } }
-	public HAPI_ObjectControl prObjectControl { get { return myObjectControl; } set { myObjectControl = value; } }
+	public HoudiniObjectControl prObjectControl { get { return myObjectControl; } set { myObjectControl = value; } }
 
 	public List< GameObject > prParts {	get { return myParts; }		set { myParts = value; } }
 
-	public HAPI_GeoControl() 
+	public HoudiniGeoControl() 
 	{
 		reset();
 	}
 
-	~HAPI_GeoControl()
+	~HoudiniGeoControl()
 	{
 
 	}
@@ -66,9 +66,9 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		myParts			= new List< GameObject >( 0 );
 	}
 
-	public void init( HAPI_GeoControl geo_control )
+	public void init( HoudiniGeoControl geo_control )
 	{
-		init( (HAPI_ObjectControl) geo_control );
+		init( (HoudiniObjectControl) geo_control );
 
 		prGeoId			= geo_control.prGeoId;
 		prGeoName		= geo_control.prGeoName;
@@ -105,7 +105,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 
 		// Get Geo info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Host.getGeoInfo( prAssetId, prObjectId, prGeoId, out geo_info );
+		HoudiniHost.getGeoInfo( prAssetId, prObjectId, prGeoId, out geo_info );
 
 		if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_INPUT )
 			return;
@@ -116,7 +116,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		if ( reload_asset || geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
 			for ( int i = 0; i < myParts.Count; ++i )
-				HAPI_AssetUtility.destroyGameObject( myParts[ i ] );
+				HoudiniAssetUtility.destroyGameObject( myParts[ i ] );
 			myParts.Clear();
 		}
 
@@ -154,14 +154,14 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 				// Remove stale geos.
 				while ( myParts.Count > geo_info.partCount )
 				{
-					HAPI_AssetUtility.destroyGameObject( myParts[ geo_info.partCount ] );
+					HoudiniAssetUtility.destroyGameObject( myParts[ geo_info.partCount ] );
 					myParts.RemoveAt( geo_info.partCount );
 				}
 			}
 		
 			// Refresh all geos.
 			for ( int i = 0; i < myParts.Count; ++i )
-				myParts[ i ].GetComponent< HAPI_PartControl >().refresh( 
+				myParts[ i ].GetComponent< HoudiniPartControl >().refresh( 
 					reload_asset, geo_info.hasGeoChanged, geo_info.hasMaterialChanged );
 
 			if ( reload_asset && geo_info.partCount > 0 )
@@ -169,17 +169,17 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 				HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
 				int[] script_attr = new int[ 0 ];
 			
-				HAPI_AssetUtility.getAttribute( 
+				HoudiniAssetUtility.getAttribute( 
 					prAssetId, prObjectId, prGeoId, 0, "Unity_Script",
-					ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStringData );
+					ref script_attr_info, ref script_attr, HoudiniHost.getAttributeStringData );
 			
 				if ( script_attr_info.exists && script_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL )
-					throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as detail attributes!" );
+					throw new HoudiniErrorIgnorable( "I only understand Unity_Script as detail attributes!" );
 			
 				if ( script_attr_info.exists && script_attr.Length > 0 )
 				{
-					string script_to_attach = HAPI_Host.getString( script_attr[ 0 ] );
-					HAPI_AssetUtility.attachScript( geo_node, script_to_attach );
+					string script_to_attach = HoudiniHost.getString( script_attr[ 0 ] );
+					HoudiniAssetUtility.attachScript( geo_node, script_to_attach );
 				}
 			}
 		}
@@ -209,7 +209,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 			// To keep things consistent with Unity workflow, we should not save parameter changes
 			// while in Play mode.
 			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
-				prAsset.prPresetsMap.set( getFullControlNameAndPath(), HAPI_Host.getPreset( prNodeId ) );
+				prAsset.prPresetsMap.set( getFullControlNameAndPath(), HoudiniHost.getPreset( prNodeId ) );
 #endif // UNITY_EDITOR
 		}
 	}
@@ -225,9 +225,9 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 			
 			if ( prAsset.prPresetsMap.contains( getFullControlNameAndPath() ) )
 			{
-				HAPI_PresetMap map = prAsset.prPresetsMap;
+				HoudiniPresetMap map = prAsset.prPresetsMap;
 				byte[] preset = map.get( getFullControlNameAndPath() );
-				HAPI_Host.setPreset( prNodeId, preset );
+				HoudiniHost.setPreset( prNodeId, preset );
 
 				// Unfortunately, we need to build everything again because we just changed
 				// the parameters on our geo node.
@@ -240,23 +240,23 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 			}
 		}
 
-		HAPI_Curve curve = gameObject.GetComponent< HAPI_Curve >();
+		HoudiniCurve curve = gameObject.GetComponent< HoudiniCurve >();
 		if ( curve == null )
 		{
-			curve = gameObject.AddComponent< HAPI_Curve >();
+			curve = gameObject.AddComponent< HoudiniCurve >();
 			curve.prControl = this;
 			curve.prParms = prParms;
 			curve.prEditable = editable;
-			curve.prCurrentMode = HAPI_Curve.Mode.NONE;
+			curve.prCurrentMode = HoudiniCurve.Mode.NONE;
 		}
 
 		try
 		{
 			curve.syncPointsWithParm();
 			curve.createObject( object_id, geo_id );
-			HAPI_Host.repaint();
+			HoudiniHost.repaint();
 		}
-		catch ( HAPI_Error )
+		catch ( HoudiniError )
 		{
 			// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
 		}
@@ -274,7 +274,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 		child.transform.localRotation	= new Quaternion();
 		child.transform.localScale		= new Vector3( 1.0f, 1.0f, 1.0f );
 
-		HAPI_PartControl control = child.AddComponent< HAPI_PartControl >();
+		HoudiniPartControl control = child.AddComponent< HoudiniPartControl >();
 		control.init( this );
 		control.prPartId = part_id;
 		control.prGeoControl = this;
@@ -290,7 +290,7 @@ public class HAPI_GeoControl : HAPI_ObjectControl
 	[SerializeField] private HAPI_GeoType	myGeoType;
 	[SerializeField] private bool			myIsEditable;
 	[SerializeField] private bool			myIsDisplay;
-	[SerializeField] private HAPI_ObjectControl myObjectControl;
+	[SerializeField] private HoudiniObjectControl myObjectControl;
 
 	[SerializeField] private List< GameObject > myParts;
 }

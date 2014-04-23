@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class HAPI_HostUndoInfo : ScriptableObject
+public class HoudiniHostUndoInfo : ScriptableObject
 {
 	// General Settings
 	public string collisionGroupName;
@@ -56,7 +56,7 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public int curveMethodDefault;
 
 	// Initialization --------------------------------------------------------------------------
-	public HAPI_HostUndoInfo()
+	public HoudiniHostUndoInfo()
 	{
 		initialize();
 	}
@@ -64,55 +64,55 @@ public class HAPI_HostUndoInfo : ScriptableObject
 	public void initialize()
 	{
 		// Set general settings.
-		collisionGroupName 				= HAPI_Host.prCollisionGroupName;
-		renderedCollisionGroupName 		= HAPI_Host.prRenderedCollisionGroupName;
-		pinSize 						= HAPI_Host.prPinSize;
-		pinColour 						= HAPI_Host.prPinColour;
-		autoPinInstances 				= HAPI_Host.prAutoPinInstances;
-		enableDragAndDrop 				= HAPI_Host.prEnableDragAndDrop;
-		enableSupportWarnings 			= HAPI_Host.prEnableSupportWarnings;
-		autoSelectAssetRootNode 		= HAPI_Host.prAutoSelectAssetRootNode;
-		hideGeometryOnLinking 			= HAPI_Host.prHideGeometryOnLinking;
-		enablePointsAsParticles 		= HAPI_Host.prEnablePointsAsParticles;
+		collisionGroupName 				= HoudiniHost.prCollisionGroupName;
+		renderedCollisionGroupName 		= HoudiniHost.prRenderedCollisionGroupName;
+		pinSize 						= HoudiniHost.prPinSize;
+		pinColour 						= HoudiniHost.prPinColour;
+		autoPinInstances 				= HoudiniHost.prAutoPinInstances;
+		enableDragAndDrop 				= HoudiniHost.prEnableDragAndDrop;
+		enableSupportWarnings 			= HoudiniHost.prEnableSupportWarnings;
+		autoSelectAssetRootNode 		= HoudiniHost.prAutoSelectAssetRootNode;
+		hideGeometryOnLinking 			= HoudiniHost.prHideGeometryOnLinking;
+		enablePointsAsParticles 		= HoudiniHost.prEnablePointsAsParticles;
 		
 		// Set material settings.
-		unityMaterialAttribName 		= HAPI_Host.prUnityMaterialAttribName;
-		unitySubMaterialNameAttribName 	= HAPI_Host.prUnitySubMaterialNameAttribName;
-		unitySubMaterialIndexAttribName = HAPI_Host.prUnitySubMaterialIndexAttribName;
-		generateTangents 				= HAPI_Host.prGenerateTangents;
-		dontCreateTextureFiles 			= HAPI_Host.prDontCreateTextureFiles;
-		extractTexturesInRawFormat 		= HAPI_Host.prExtractTexturesInRawFormat;
+		unityMaterialAttribName 		= HoudiniHost.prUnityMaterialAttribName;
+		unitySubMaterialNameAttribName 	= HoudiniHost.prUnitySubMaterialNameAttribName;
+		unitySubMaterialIndexAttribName = HoudiniHost.prUnitySubMaterialIndexAttribName;
+		generateTangents 				= HoudiniHost.prGenerateTangents;
+		dontCreateTextureFiles 			= HoudiniHost.prDontCreateTextureFiles;
+		extractTexturesInRawFormat 		= HoudiniHost.prExtractTexturesInRawFormat;
 		
 		// Set cooking settings.
-		enableCooking 					= HAPI_Host.prEnableCooking;
-		cookingTriggersDownCooks 		= HAPI_Host.prCookingTriggersDownCooks;
-		playmodePerFrameCooking 		= HAPI_Host.prPlaymodePerFrameCooking;
-		pushUnityTransformToHoudini 	= HAPI_Host.prPushUnityTransformToHoudini;
-		transformChangeTriggersCooks 	= HAPI_Host.prTransformChangeTriggersCooks;
-		importTemplatedGeos 			= HAPI_Host.prImportTemplatedGeos;
-		splitGeosByGroup				= HAPI_Host.prSplitGeosByGroup;
+		enableCooking 					= HoudiniHost.prEnableCooking;
+		cookingTriggersDownCooks 		= HoudiniHost.prCookingTriggersDownCooks;
+		playmodePerFrameCooking 		= HoudiniHost.prPlaymodePerFrameCooking;
+		pushUnityTransformToHoudini 	= HoudiniHost.prPushUnityTransformToHoudini;
+		transformChangeTriggersCooks 	= HoudiniHost.prTransformChangeTriggersCooks;
+		importTemplatedGeos 			= HoudiniHost.prImportTemplatedGeos;
+		splitGeosByGroup				= HoudiniHost.prSplitGeosByGroup;
 		
 		// Set geometry settings.
-		unityTagAttribName 				= HAPI_Host.prUnityTagAttribName;
-		paintBrushRate					= HAPI_Host.prPaintBrushRate;
-		paintingModeHotKey 				= HAPI_Host.prPaintingModeHotKey;
-		paintingModeColour 				= HAPI_Host.prPaintingModeColour;
-		addingPointsModeHotKey 			= HAPI_Host.prAddingPointsModeHotKey;
-		addingPointsModeColour 			= HAPI_Host.prAddingPointsModeColour;
-		editingPointsModeHotKey 		= HAPI_Host.prEditingPointsModeHotKey;
-		editingPointsModeColour 		= HAPI_Host.prEditingPointsModeColour;
-		wireframeColour 				= HAPI_Host.prWireframeColour;
-		guideWireframeColour 			= HAPI_Host.prGuideWireframeColour;
-		unselectableGuideWireframeColour = HAPI_Host.prUnselectableGuideWireframeColour;
-		unselectedGuideWireframeColour 	= HAPI_Host.prUnselectedGuideWireframeColour;
-		selectedGuideWireframeColour 	= HAPI_Host.prSelectedGuideWireframeColour;
-		guidePointSize 					= HAPI_Host.prGuidePointSize;
-		minDistanceForPointSelection 	= HAPI_Host.prMinDistanceForPointSelection;
-		guideMinDistanceForMidPointInsertion = HAPI_Host.prGuideMinDistanceForMidPointInsertion;
+		unityTagAttribName 				= HoudiniHost.prUnityTagAttribName;
+		paintBrushRate					= HoudiniHost.prPaintBrushRate;
+		paintingModeHotKey 				= HoudiniHost.prPaintingModeHotKey;
+		paintingModeColour 				= HoudiniHost.prPaintingModeColour;
+		addingPointsModeHotKey 			= HoudiniHost.prAddingPointsModeHotKey;
+		addingPointsModeColour 			= HoudiniHost.prAddingPointsModeColour;
+		editingPointsModeHotKey 		= HoudiniHost.prEditingPointsModeHotKey;
+		editingPointsModeColour 		= HoudiniHost.prEditingPointsModeColour;
+		wireframeColour 				= HoudiniHost.prWireframeColour;
+		guideWireframeColour 			= HoudiniHost.prGuideWireframeColour;
+		unselectableGuideWireframeColour = HoudiniHost.prUnselectableGuideWireframeColour;
+		unselectedGuideWireframeColour 	= HoudiniHost.prUnselectedGuideWireframeColour;
+		selectedGuideWireframeColour 	= HoudiniHost.prSelectedGuideWireframeColour;
+		guidePointSize 					= HoudiniHost.prGuidePointSize;
+		minDistanceForPointSelection 	= HoudiniHost.prMinDistanceForPointSelection;
+		guideMinDistanceForMidPointInsertion = HoudiniHost.prGuideMinDistanceForMidPointInsertion;
 		
 		// Set curve settings.
-		curvePrimitiveTypeDefault		= HAPI_Host.prCurvePrimitiveTypeDefault;
-		curveMethodDefault				= HAPI_Host.prCurveMethodDefault;
+		curvePrimitiveTypeDefault		= HoudiniHost.prCurvePrimitiveTypeDefault;
+		curveMethodDefault				= HoudiniHost.prCurveMethodDefault;
 	}
 }
 

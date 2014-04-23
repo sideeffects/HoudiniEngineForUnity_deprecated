@@ -21,24 +21,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-[ CustomEditor( typeof( HAPI_InstancerManager ) ) ]
-public partial class HAPI_InstancerManagerGUI: Editor 
+[ CustomEditor( typeof( HoudiniInstancerManager ) ) ]
+public partial class HoudiniInstancerManagerGUI: Editor 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 
 	public virtual void OnEnable() 
 	{
-		myInstanceManager = target as HAPI_InstancerManager;
+		myInstanceManager = target as HoudiniInstancerManager;
 
-		myAssetOTL 			= myInstanceManager.gameObject.GetComponent< HAPI_AssetOTL >();
+		myAssetOTL 			= myInstanceManager.gameObject.GetComponent< HoudiniAssetOTL >();
 	}
 	
 	public override void OnInspectorGUI() 
 	{
 
 
-		HAPI_Instancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HAPI_Instancer >();
+		HoudiniInstancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HoudiniInstancer >();
 		if( !myAssetOTL.isPrefab() && instancers.Length > 0 )
 		{
 
@@ -50,21 +50,21 @@ public partial class HAPI_InstancerManagerGUI: Editor
 
 	private void generateAssetInstanceControls()
 	{
-		HAPI_InstancerManager instancer_manager = myAssetOTL.gameObject.GetComponent< HAPI_InstancerManager >();
+		HoudiniInstancerManager instancer_manager = myAssetOTL.gameObject.GetComponent< HoudiniInstancerManager >();
 		if( instancer_manager == null )
 			return;
 
-		List< HAPI_InstancerPersistentData > instancer_persistent_data = instancer_manager.prInstancerPersistentData;
+		List< HoudiniInstancerPersistentData > instancer_persistent_data = instancer_manager.prInstancerPersistentData;
 
-		HAPI_Instancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HAPI_Instancer >();
+		HoudiniInstancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HoudiniInstancer >();
 
-		foreach( HAPI_Instancer instancer in instancers )
+		foreach( HoudiniInstancer instancer in instancers )
 		{
-			HAPI_InstancerPersistentData persistent_data = null;
+			HoudiniInstancerPersistentData persistent_data = null;
 
 			for( int ii = 0; ii < instancer_persistent_data.Count; ii++ )
 			{
-				HAPI_InstancerPersistentData data = instancer_persistent_data[ ii ];
+				HoudiniInstancerPersistentData data = instancer_persistent_data[ ii ];
 				if( data.instancerName == instancer.name )
 				{
 					persistent_data = data;
@@ -78,7 +78,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 				continue;
 			}
 
-			persistent_data.showInstancerGUI = HAPI_GUI.foldout(
+			persistent_data.showInstancerGUI = HoudiniGUI.foldout(
 				persistent_data.instancerName, persistent_data.showInstancerGUI, true );
 			if ( persistent_data.showInstancerGUI )
 			{
@@ -107,7 +107,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 							if ( jj == 0 )
 								label = instanced_name;
 
-							changed |= HAPI_GUI.objectField(
+							changed |= HoudiniGUI.objectField(
 								"object_to_instantiate", label, ref obj, typeof( GameObject ) );
 
 							if ( changed )
@@ -170,7 +170,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 				
 				if ( changed )
 				{
-					HAPI_ProgressBar progress_bar = new HAPI_ProgressBar();
+					HoudiniProgressBar progress_bar = new HoudiniProgressBar();
 					instancer.instanceObjects( progress_bar );
 					progress_bar.clearProgressBar();
 
@@ -185,7 +185,7 @@ public partial class HAPI_InstancerManagerGUI: Editor
 		}
 	}
 
-	private HAPI_AssetOTL myAssetOTL;
-	private HAPI_InstancerManager myInstanceManager;
+	private HoudiniAssetOTL myAssetOTL;
+	private HoudiniInstancerManager myInstanceManager;
 
 }

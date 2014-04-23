@@ -3,7 +3,7 @@ using UnityEditor;
 using System;
 
 [InitializeOnLoad]
-class HAPI_AssetModificationProcessor : UnityEditor.AssetModificationProcessor 
+class HoudiniAssetModificationProcessor : UnityEditor.AssetModificationProcessor 
 {
 	
 	static void OnWillCreateAsset( string assetPath )

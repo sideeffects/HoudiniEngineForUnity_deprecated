@@ -5,7 +5,7 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-public class HAPI_ProgressBar
+public class HoudiniProgressBar
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -17,12 +17,12 @@ public class HAPI_ProgressBar
 	public string			prTitle { get; set; }
 	public string			prMessage { get; set; }
 	public bool				prUseDelay { get; set; }
-	public HAPI_Asset		prAsset { get; set; }
+	public HoudiniAsset		prAsset { get; set; }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_ProgressBar() 
+	public HoudiniProgressBar() 
 	{
 		prCurrentValue		= 0;
 		prCurrentDuration	= new System.TimeSpan( 0 );
@@ -41,7 +41,7 @@ public class HAPI_ProgressBar
 		prAsset				= null;
 	}
 
-	~HAPI_ProgressBar()
+	~HoudiniProgressBar()
 	{
 		// Cannot clear progress bar here because clearProgressBar can only be called
 		// from the main thread while destructors are usually called by another thread
@@ -60,12 +60,12 @@ public class HAPI_ProgressBar
 
 		while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 		{
-			state = (HAPI_State) HAPI_Host.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+			state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
 
 			if ( state == HAPI_State.HAPI_STATE_COOKING )
 			{
-				prCurrentValue = HAPI_Host.getCookingCurrentCount();
-				prTotal = HAPI_Host.getCookingTotalCount();
+				prCurrentValue = HoudiniHost.getCookingCurrentCount();
+				prTotal = HoudiniHost.getCookingTotalCount();
 			}
 			else
 			{
@@ -73,7 +73,7 @@ public class HAPI_ProgressBar
 				prTotal = 100;
 			}
 
-			prMessage = HAPI_Host.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
+			prMessage = HoudiniHost.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
 
 			if ( progress_cancelled )
 				EditorUtility.DisplayProgressBar( prTitle, "Aborting...", 0 );
@@ -83,7 +83,7 @@ public class HAPI_ProgressBar
 				{
 					displayProgressBar();
 				}
-				catch ( HAPI_ErrorProgressCancelled )
+				catch ( HoudiniErrorProgressCancelled )
 				{
 					progress_cancelled = true;
 					EditorUtility.DisplayProgressBar( prTitle, "Aborting...", 0 );
@@ -93,12 +93,12 @@ public class HAPI_ProgressBar
 
 		// We want to propage the cancellation of the progress still, even if it is after a delay.
 		if ( progress_cancelled )
-			throw new HAPI_ErrorProgressCancelled();
+			throw new HoudiniErrorProgressCancelled();
 
 		if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
 		{
 			state = HAPI_State.HAPI_STATE_READY;
-			HAPI_Host.throwRuntimeError();
+			HoudiniHost.throwRuntimeError();
 		}
 #endif // UNITY_EDITOR
 	}
@@ -136,7 +136,7 @@ public class HAPI_ProgressBar
 		// This delay for displaying the progress bar is so the bar won't flicker for really quick updates
 		// (less than a few seconds). Also, when we do show the progress bar the focus of the current 
 		// inspector control is lost.
-		if ( prUseDelay && delta.TotalSeconds < HAPI_Constants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
+		if ( prUseDelay && delta.TotalSeconds < HoudiniConstants.HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW )
 		{
 			EditorUtility.ClearProgressBar();
 			return;
@@ -175,8 +175,8 @@ public class HAPI_ProgressBar
 			prCurrentDuration = new System.TimeSpan( 0 );
 			myLastValue = -1;
 			myLastMsg = "";
-			HAPI_Host.interrupt();
-			throw new HAPI_ErrorProgressCancelled();
+			HoudiniHost.interrupt();
+			throw new HoudiniErrorProgressCancelled();
 		}
 		else
 		{

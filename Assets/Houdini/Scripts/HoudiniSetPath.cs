@@ -10,9 +10,9 @@ using Microsoft.Win32;
 #if UNITY_EDITOR
 [ InitializeOnLoad ]
 #endif // UNITY_EDITOR
-public class HAPI_SetPath
+public class HoudiniSetPath
 {
-	static HAPI_SetPath()
+	static HoudiniSetPath()
 	{
 		setPath();
 	}
@@ -47,7 +47,7 @@ public class HAPI_SetPath
 				{
 					houdini_app_path = getAppPath( current_app_name );
 				}
-				catch ( HAPI_Error )
+				catch ( HoudiniError )
 				{
 					if ( current_app_name == "Houdini" )
 					{
@@ -94,7 +94,7 @@ public class HAPI_SetPath
 			myIsPathSet = true;
 #endif // UNITY_STANDALONE_WIN
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogError( error.ToString() );
 		}
@@ -122,18 +122,18 @@ public class HAPI_SetPath
 
 		RegistryKey sesi_key = local_machine.OpenSubKey( "Software\\Side Effects Software\\" + app_name );
 		if ( sesi_key == null )
-			throw new HAPI_Error( "No 32-bit " + app_name + " installation found!" );
+			throw new HoudiniError( "No 32-bit " + app_name + " installation found!" );
 
-		string correct_version = HAPI_Version.HOUDINI_MAJOR + "." + HAPI_Version.HOUDINI_MINOR + "." +
-									HAPI_Version.HOUDINI_BUILD;
+		string correct_version = HoudiniVersion.HOUDINI_MAJOR + "." + HoudiniVersion.HOUDINI_MINOR + "." +
+									HoudiniVersion.HOUDINI_BUILD;
 
 		// Note the extra 0 for the "minor-minor" version that's needed here.
-		string correct_version_key = HAPI_Version.HOUDINI_MAJOR + "." + HAPI_Version.HOUDINI_MINOR + 
-										".0." + HAPI_Version.HOUDINI_BUILD;
+		string correct_version_key = HoudiniVersion.HOUDINI_MAJOR + "." + HoudiniVersion.HOUDINI_MINOR + 
+										".0." + HoudiniVersion.HOUDINI_BUILD;
 
 		app_path = (string) sesi_key.GetValue( correct_version_key );
 		if ( app_path == null || app_path.Length == 0 )
-			throw new HAPI_Error( "The correct version (" + correct_version + ") of " + app_name + 
+			throw new HoudiniError( "The correct version (" + correct_version + ") of " + app_name + 
 									" was not found on the system!" );
 		else if ( app_path.EndsWith( "\\" ) || app_path.EndsWith( "/" ) )
 			app_path = app_path.Remove( app_path.Length - 1 );

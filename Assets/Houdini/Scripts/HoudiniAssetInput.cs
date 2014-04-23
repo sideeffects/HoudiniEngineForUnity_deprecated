@@ -19,11 +19,10 @@ using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Utility = HAPI_AssetUtility;
 
 [ ExecuteInEditMode ]
 [ RequireComponent( typeof( MeshFilter ) ) ]
-public class HAPI_AssetInput : HAPI_Asset
+public class HoudiniAssetInput : HoudiniAsset
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -44,21 +43,21 @@ public class HAPI_AssetInput : HAPI_Asset
 														set { myEditableMesh = value; } }
 	public Mesh			prOriginalMesh {				get { return myOriginalMesh; }
 														set { myOriginalMesh = value; } }
-	public HAPI_GeoAttributeManager prGeoAttributeManager { get { return myGeoAttributeManager; }
+	public HoudiniGeoAttributeManager prGeoAttributeManager { get { return myGeoAttributeManager; }
 															private set {} }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_AssetInput() 
+	public HoudiniAssetInput() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_Asset created!" );
+			Debug.Log( "HoudiniAssetInput created!" );
 
 		reset();
 	}
 	
-	~HAPI_AssetInput()
+	~HoudiniAssetInput()
 	{}
 
 	public override void reset()
@@ -121,7 +120,7 @@ public class HAPI_AssetInput : HAPI_Asset
 		if ( prOriginalMesh )
 			mesh_filter.sharedMesh = prOriginalMesh;
 
-		HAPI_Host.destroyAsset( prAssetId );
+		HoudiniHost.destroyAsset( prAssetId );
 
 		reset();
 	}
@@ -131,10 +130,10 @@ public class HAPI_AssetInput : HAPI_Asset
 
 	protected override int buildCreateAsset()
 	{
-		return HAPI_Host.createInputAsset( transform.name );
+		return HoudiniHost.createInputAsset( transform.name );
 	}
 
-	protected override void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar )
+	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
 	{
 		cloneMesh();
 
@@ -143,12 +142,12 @@ public class HAPI_AssetInput : HAPI_Asset
 			MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
 			MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 
-			myGeoAttributeManager = ScriptableObject.CreateInstance< HAPI_GeoAttributeManager >();
+			myGeoAttributeManager = ScriptableObject.CreateInstance< HoudiniGeoAttributeManager >();
 			myGeoAttributeManager.init( prEditableMesh, mesh_renderer, mesh_collider, transform );
 		}
 	}
 
-	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
+	protected override void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar )
 	{
 		try
 		{
@@ -156,12 +155,12 @@ public class HAPI_AssetInput : HAPI_Asset
 			const int geo_id = 0;
 
 			// Write marshalled geo to Input Asset.
-			HAPI_AssetUtility.setMesh(
+			HoudiniAssetUtility.setMesh(
 				prAssetId, object_id, geo_id, ref myEditableMesh, null, myGeoAttributeManager );
 
 			// Apply the input asset transform to the marshaled object in the Houdini scene.
-			HAPI_TransformEuler trans = Utility.getHapiTransform( transform.localToWorldMatrix );
-			HAPI_Host.setObjectTransform( prAssetId, object_id, trans );
+			HAPI_TransformEuler trans = HoudiniAssetUtility.getHapiTransform( transform.localToWorldMatrix );
+			HoudiniHost.setObjectTransform( prAssetId, object_id, trans );
 
 			// Marshall in the animation.
 			Animation anim_component = GetComponent< Animation >();
@@ -179,9 +178,9 @@ public class HAPI_AssetInput : HAPI_Asset
 						}
 					}
 
-			HAPI_Host.repaint();
+			HoudiniHost.repaint();
 		}
-		catch ( HAPI_Error )
+		catch ( HoudiniError )
 		{
 			// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
 			//Debug.LogWarning( error.ToString() );
@@ -208,7 +207,7 @@ public class HAPI_AssetInput : HAPI_Asset
 
 		// Check for invalid attribute names.
 		Regex attribute_name_regex = new Regex( "^[a-zA-Z0-9-_]*$" );
-		foreach ( HAPI_GeoAttribute attribute in myGeoAttributeManager.prAttributes )
+		foreach ( HoudiniGeoAttribute attribute in myGeoAttributeManager.prAttributes )
 		{
 			if ( attribute.prName == "" )
 			{
@@ -255,7 +254,7 @@ public class HAPI_AssetInput : HAPI_Asset
 			if ( !prOriginalMesh )
 				prOriginalMesh = mesh_filter.mesh;
 			if ( !prOriginalMesh )
-				throw new HAPI_ErrorNotFound( "No mesh found on the Mesh Filter!" );
+				throw new HoudiniErrorNotFound( "No mesh found on the Mesh Filter!" );
 
 			prEditableMesh = Mesh.Instantiate( prOriginalMesh ) as Mesh;
 			prEditableMesh.name = prOriginalMesh.name + " (Editable Copy)";
@@ -277,5 +276,5 @@ public class HAPI_AssetInput : HAPI_Asset
 	[SerializeField] private Mesh			myEditableMesh;
 	[SerializeField] private Mesh			myOriginalMesh;
 
-	[SerializeField] private HAPI_GeoAttributeManager myGeoAttributeManager;
+	[SerializeField] private HoudiniGeoAttributeManager myGeoAttributeManager;
 }

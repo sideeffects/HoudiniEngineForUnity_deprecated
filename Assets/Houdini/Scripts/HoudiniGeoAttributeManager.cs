@@ -18,7 +18,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class HAPI_GeoAttributeManager : ScriptableObject {
+public class HoudiniGeoAttributeManager : ScriptableObject {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Enums
 	
@@ -70,9 +70,9 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	public Material		prOriginalMaterial {			get { return myOriginalMaterial; }
 														set { myOriginalMaterial = value; } }
 
-	public HAPI_GeoAttribute prActiveAttribute {		get { return myActiveAttribute; }
+	public HoudiniGeoAttribute prActiveAttribute {		get { return myActiveAttribute; }
 														private set {} }
-	public List< HAPI_GeoAttribute > prAttributes {		get { return myAttributes; }
+	public List< HoudiniGeoAttribute > prAttributes {		get { return myAttributes; }
 														set { myAttributes = value; } }
 
 	public void reset()
@@ -98,7 +98,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		prOriginalMaterial = null;
 
 		myActiveAttribute = null;
-		prAttributes = new List< HAPI_GeoAttribute >();
+		prAttributes = new List< HoudiniGeoAttribute >();
 	}
 
 	public void init( Mesh mesh, MeshRenderer mesh_renderer, MeshCollider mesh_collider, Transform trans )
@@ -126,10 +126,10 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 			{
 				prEditableMaterial = Material.Instantiate( prOriginalMaterial ) as Material;
 				prEditableMaterial.name = prOriginalMaterial.name + " (Editable Copy)";
-				prEditableMaterial.shader = Shader.Find( "HAPI/SpecularVertexColor" );
+				prEditableMaterial.shader = Shader.Find( "Houdini/SpecularVertexColor" );
 			}
 			else
-				prEditableMaterial = new Material( Shader.Find( "HAPI/SpecularVertexColor" ) );
+				prEditableMaterial = new Material( Shader.Find( "Houdini/SpecularVertexColor" ) );
 		}
 	}
 
@@ -174,20 +174,20 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		{
 			myMesh.colors = prActiveAttribute.getColorRepresentation();
 			if ( prActiveAttribute.prName == "N" &&
-				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_NORMAL_VECTOR_SIZE )
+				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_NORMAL_VECTOR_SIZE )
 				myMesh.normals = prActiveAttribute.prFloatDataVec3;
 			else if ( prActiveAttribute.prName == "uv" &&
-				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv = prActiveAttribute.prFloatDataVec2;
 			else if ( prActiveAttribute.prName == "uv1" &&
-				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv1 = prActiveAttribute.prFloatDataVec2;
 			else if ( prActiveAttribute.prName == "uv2" &&
-				prActiveAttribute.prType == HAPI_GeoAttribute.Type.FLOAT &&
-				prActiveAttribute.prTupleSize == HAPI_Constants.HAPI_UV_VECTOR_SIZE )
+				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv2 = prActiveAttribute.prFloatDataVec2;
 		}
 		else
@@ -199,7 +199,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		if ( !myMesh || !myMeshCollider || !myTransform )
 			return;
 
-		if ( !prActiveAttribute || prActiveAttribute.prType == HAPI_GeoAttribute.Type.UNDEFINED )
+		if ( !prActiveAttribute || prActiveAttribute.prType == HoudiniGeoAttribute.Type.UNDEFINED )
 			return;
 
 		Vector3[] verts = myMesh.vertices;
@@ -259,21 +259,21 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 			}
 	}
 
-	public HAPI_GeoAttribute createAttribute()
+	public HoudiniGeoAttribute createAttribute()
 	{
 		return createAttribute( "new_attribute" );
 	}
-	public HAPI_GeoAttribute createAttribute( string suggested_name )
+	public HoudiniGeoAttribute createAttribute( string suggested_name )
 	{
 		string temp_name = getUniqueAttributeName( suggested_name );
-		HAPI_GeoAttribute new_attribute = ScriptableObject.CreateInstance< HAPI_GeoAttribute >();
-		new_attribute.init( myMesh, temp_name, HAPI_GeoAttribute.Type.FLOAT, 3 );
+		HoudiniGeoAttribute new_attribute = ScriptableObject.CreateInstance< HoudiniGeoAttribute >();
+		new_attribute.init( myMesh, temp_name, HoudiniGeoAttribute.Type.FLOAT, 3 );
 		addAttribute( new_attribute );
 		return new_attribute;
 	}
-	public HAPI_GeoAttribute createAttribute( HAPI_GeoAttribute.Preset preset )
+	public HoudiniGeoAttribute createAttribute( HoudiniGeoAttribute.Preset preset )
 	{
-		HAPI_GeoAttribute new_attribute = ScriptableObject.CreateInstance< HAPI_GeoAttribute >();
+		HoudiniGeoAttribute new_attribute = ScriptableObject.CreateInstance< HoudiniGeoAttribute >();
 		new_attribute.init( myMesh, preset );
 		new_attribute.prName = getUniqueAttributeName( new_attribute.prName );
 		addAttribute( new_attribute );
@@ -298,7 +298,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 		refreshMesh();
 	}
 
-	private void addAttribute( HAPI_GeoAttribute new_attribute )
+	private void addAttribute( HoudiniGeoAttribute new_attribute )
 	{
 		myAttributes.Add( new_attribute );
 
@@ -348,7 +348,7 @@ public class HAPI_GeoAttributeManager : ScriptableObject {
 	[SerializeField] private Material		myEditableMaterial;
 	[SerializeField] private Material		myOriginalMaterial;
 
-	[SerializeField] private HAPI_GeoAttribute myActiveAttribute;
-	[SerializeField] private List< HAPI_GeoAttribute > myAttributes;
+	[SerializeField] private HoudiniGeoAttribute myActiveAttribute;
+	[SerializeField] private List< HoudiniGeoAttribute > myAttributes;
 
 }

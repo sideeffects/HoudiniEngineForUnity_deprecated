@@ -4,13 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 
 [ InitializeOnLoad ]
-public class HAPI_GUIUtility : Editor 
+public class HoudiniGUIUtility : Editor 
 {
-	static HAPI_GUIUtility()
+	static HoudiniGUIUtility()
 	{
 		EditorApplication.update += update;
 
-		if ( HAPI_Host.prEnableDragAndDrop )
+		if ( HoudiniHost.prEnableDragAndDrop )
 		{
 			EditorApplication.hierarchyWindowChanged += hierarchyWindowChanged;
 			EditorApplication.hierarchyWindowItemOnGUI += hierarchyWindowItemOnGUI;
@@ -78,12 +78,12 @@ public class HAPI_GUIUtility : Editor
 			if ( file_path.Length <= 0 )
 				return;
 			
-			HAPI_Host.loadHip( file_path );
+			HoudiniHost.loadHip( file_path );
 			
-			HAPI_ProgressBar progressBar = new HAPI_ProgressBar();
+			HoudiniProgressBar progressBar = new HoudiniProgressBar();
 			progressBar.statusCheckLoop();
 			
-			int[] asset_ids = HAPI_Host.getAssetIdsFromLoadHIPFile();
+			int[] asset_ids = HoudiniHost.getAssetIdsFromLoadHIPFile();
 			
 			foreach ( int asset_id in asset_ids )
 			{
@@ -91,10 +91,10 @@ public class HAPI_GUIUtility : Editor
 				GameObject game_object = new GameObject( myDefaultAssetLabel );
 				
 				// Add HAPI Object Control script component.
-				game_object.AddComponent( "HAPI_AssetOTL" );
-				HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
+				game_object.AddComponent< HoudiniAssetOTL >();
+				HoudiniAssetOTL asset = game_object.GetComponent< HoudiniAssetOTL >();
 				
-				asset.prAssetType = HAPI_Asset.AssetType.TYPE_HIP;
+				asset.prAssetType = HoudiniAsset.AssetType.TYPE_HIP;
 				// Set that asset path.
 				asset.prAssetPath = file_path;
 				
@@ -112,7 +112,7 @@ public class HAPI_GUIUtility : Editor
 				game_object.name 		= asset_name;
 			}
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogError( error.ToString() );
 		}
@@ -127,10 +127,9 @@ public class HAPI_GUIUtility : Editor
 		GameObject game_object = new GameObject( myDefaultAssetLabel );
 		
 		// Add HAPI Object Control script component.
-		game_object.AddComponent( "HAPI_AssetOTL" );
-		HAPI_AssetOTL asset = game_object.GetComponent< HAPI_AssetOTL >();
+		HoudiniAssetOTL asset = game_object.AddComponent< HoudiniAssetOTL >();
 		
-		asset.prAssetType = HAPI_Asset.AssetType.TYPE_OTL;
+		asset.prAssetType = HoudiniAsset.AssetType.TYPE_OTL;
 		// Set that asset path.
 		asset.prAssetPath = file_path;
 		

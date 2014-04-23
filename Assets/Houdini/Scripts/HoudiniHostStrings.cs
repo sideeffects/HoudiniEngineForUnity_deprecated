@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
-public static partial class HAPI_Host
+public static partial class HoudiniHost
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public

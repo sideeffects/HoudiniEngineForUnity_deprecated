@@ -24,11 +24,9 @@ using UnityEditor;
 using System.Runtime.InteropServices;
 using System.Collections;
 using System.Collections.Generic;
-using Utility = HAPI_AssetUtility;
-
 
 [ ExecuteInEditMode ]
-public class HAPI_AssetOTL : HAPI_Asset 
+public class HoudiniAssetOTL : HoudiniAsset 
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
@@ -43,10 +41,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_AssetOTL() 
+	public HoudiniAssetOTL() 
 	{
 		if ( prEnableLogging )
-			Debug.Log( "HAPI_AssetOTL created - Instance Id: " + GetInstanceID() );
+			Debug.Log( "HoudiniAssetOTL created - Instance Id: " + GetInstanceID() );
 		
 		// These variables need to keep between asset reloads.
 		prAssetPath = "";
@@ -54,13 +52,13 @@ public class HAPI_AssetOTL : HAPI_Asset
 		reset();
 	}
 	
-	~HAPI_AssetOTL() 
+	~HoudiniAssetOTL() 
 	{}
 	
 	public override void reset()
 	{
 		// Save the asset type so we can restore it after the reset.
-		HAPI_Asset.AssetType asset_type = prAssetType;
+		HoudiniAsset.AssetType asset_type = prAssetType;
 
 		base.reset();
 		
@@ -83,14 +81,14 @@ public class HAPI_AssetOTL : HAPI_Asset
 #endif // UNITY_EDITOR
 			prPlaymodePerFrameCooking )
 		{
-			HAPI_Host.setTime( Time.time );
+			HoudiniHost.setTime( Time.time );
 			buildClientSide();
 		}
 	}
 
 	public override bool buildAll()
 	{
-		bool unload_asset_first = ( prAssetType == HAPI_Asset.AssetType.TYPE_OTL );
+		bool unload_asset_first = ( prAssetType == HoudiniAsset.AssetType.TYPE_OTL );
 
 		return base.build(	true,	// reload_asset
 							unload_asset_first,
@@ -108,7 +106,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 								bool use_delay_for_progress_bar ) 
 	{
 		unload_asset_first = unload_asset_first 
-							 && prAssetType == HAPI_Asset.AssetType.TYPE_OTL 
+							 && prAssetType == HoudiniAsset.AssetType.TYPE_OTL 
 							 && ( !serialization_recovery_only || 
 								  isPrefab() );
 
@@ -125,16 +123,16 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 	protected override int buildCreateAsset()
 	{
-		return HAPI_Host.loadOTL( prAssetPath );
+		return HoudiniHost.loadOTL( prAssetPath );
 	}
 
-	protected override void buildFullBuildCustomWork( ref HAPI_ProgressBar progress_bar )
+	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
 	{
 		progress_bar.prMessage = "Loading handles...";
 				
 		// Get exposed handle information.
 		prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
-		Utility.getArray1Id( prAssetId, HAPI_Host.getHandleInfo, prHandleInfos, prHandleCount );
+		HoudiniAssetUtility.getArray1Id( prAssetId, HoudiniHost.getHandleInfo, prHandleInfos, prHandleCount );
 				
 		// Get handles.
 		prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
@@ -144,20 +142,20 @@ public class HAPI_AssetOTL : HAPI_Asset
 			HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
 
 #if UNITY_EDITOR
-			if ( handle_info.typeName != "xform" && HAPI_Host.prEnableSupportWarnings )
+			if ( handle_info.typeName != "xform" && HoudiniHost.prEnableSupportWarnings )
 				Debug.LogWarning( "Handle " + handle_info.name + " of type " 
 								   	+ handle_info.typeName + " is unsupported at this time." );
 #endif // UNITY_EDITOR
 
 			HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
-			Utility.getArray2Id( prAssetId, handle_index, HAPI_Host.getHandleBindingInfo, 
+			HoudiniAssetUtility.getArray2Id( prAssetId, handle_index, HoudiniHost.getHandleBindingInfo, 
 								 	binding_infos, handle_info.bindingsCount );
 
 			prHandleBindingInfos.Add( binding_infos );
 		}
 	}
 
-	protected override void buildCreateObjects( bool reload_asset, ref HAPI_ProgressBar progress_bar )
+	protected override void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar )
 	{
 		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 		{
@@ -171,7 +169,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 					createObject( object_index, reload_asset );
 				}
 			}
-			catch ( HAPI_Error error )
+			catch ( HoudiniError error )
 			{
 				// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
 				Debug.LogWarning( error.ToString() );
@@ -193,7 +191,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 					if( reload_asset || object_info.haveGeosChanged )
 						instanceObjects( object_index, progress_bar );
 				}
-				catch ( HAPI_Error error )
+				catch ( HoudiniError error )
 				{
 					// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
 					Debug.LogWarning( error.ToString() );
@@ -206,20 +204,20 @@ public class HAPI_AssetOTL : HAPI_Asset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
 	
-	private void instanceObjects( int object_id, HAPI_ProgressBar progress_bar )
+	private void instanceObjects( int object_id, HoudiniProgressBar progress_bar )
 	{
 		HAPI_ObjectInfo object_info		= prObjects[ object_id ];
-		HAPI_Instancer instancer		= null;
+		HoudiniInstancer instancer		= null;
 		
 		Transform old_instancer_transform = transform.Find( object_info.name );
-		if ( old_instancer_transform && old_instancer_transform.gameObject.GetComponent< HAPI_Instancer >() )
+		if ( old_instancer_transform && old_instancer_transform.gameObject.GetComponent< HoudiniInstancer >() )
 		{
-			instancer = old_instancer_transform.gameObject.GetComponent< HAPI_Instancer >();
+			instancer = old_instancer_transform.gameObject.GetComponent< HoudiniInstancer >();
 		}
 		else
 		{
 
-			if( gameObject.GetComponent< HAPI_InstancerManager >() == null )
+			if( gameObject.GetComponent< HoudiniInstancerManager >() == null )
 				gameObject.AddComponent( "HAPI_InstancerManager" );
 
 			GameObject main_object = new GameObject( object_info.name );
@@ -227,9 +225,9 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 			main_object.AddComponent( "HAPI_Instancer" );
 			prGameObjects[ object_id ] = main_object;
-			instancer = main_object.GetComponent< HAPI_Instancer >();
+			instancer = main_object.GetComponent< HoudiniInstancer >();
 
-			HAPI_InstancerManager instancer_manager = gameObject.GetComponent< HAPI_InstancerManager >();
+			HoudiniInstancerManager instancer_manager = gameObject.GetComponent< HoudiniInstancerManager >();
 			instancer_manager.updateInstancerData( instancer );
 		}
 		
@@ -241,7 +239,7 @@ public class HAPI_AssetOTL : HAPI_Asset
 
 	private void createObject( int object_id, bool reload_asset )
 	{
-		HAPI_ObjectControl object_control = null;
+		HoudiniObjectControl object_control = null;
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
 		// Create main underling.
@@ -251,13 +249,13 @@ public class HAPI_AssetOTL : HAPI_Asset
 			prGameObjects[ object_id ].transform.parent = transform;
 			prGameObjects[ object_id ].isStatic = gameObject.isStatic;
 
-			object_control = prGameObjects[ object_id ].AddComponent< HAPI_ObjectControl >();
+			object_control = prGameObjects[ object_id ].AddComponent< HoudiniObjectControl >();
 			object_control.init(
 				prAssetId, object_info.nodeId, prAsset, object_id, object_info.name, object_info.isVisible );
 		}
 		else
 		{
-			object_control = prGameObjects[ object_id ].GetComponent< HAPI_ObjectControl >();
+			object_control = prGameObjects[ object_id ].GetComponent< HoudiniObjectControl >();
 		}
 		GameObject main_child = prGameObjects[ object_id ];
 		
@@ -269,10 +267,10 @@ public class HAPI_AssetOTL : HAPI_Asset
 			{
 				// Get transforms.
 				HAPI_Transform trans = prObjectTransforms[ object_id ];
-				Utility.applyTransform( trans, main_child.transform );
+				HoudiniAssetUtility.applyTransform( trans, main_child.transform );
 			}
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			DestroyImmediate( main_child );
 			prGameObjects[ object_id ] = null;

@@ -1,4 +1,4 @@
-Shader "HAPI/SpecularVertexColor" {
+Shader "Houdini/SpecularVertexColor" {
 	Properties {
 		_Color ("Main Color", Color) = (1,1,1,1)
 		_SpecColor ("Spec Color", Color) = (1,1,1,1)

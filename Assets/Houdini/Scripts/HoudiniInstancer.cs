@@ -4,10 +4,10 @@ using UnityEditor;
 #endif // UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
-using Utility = HAPI_AssetUtility;
+using Utility = HoudiniAssetUtility;
 using System;
 
-public class HAPI_CurvesCollection
+public class HoudiniCurvesCollection
 {
 	public AnimationCurve tx = new AnimationCurve();
 	public AnimationCurve ty = new AnimationCurve();
@@ -41,27 +41,27 @@ public class HAPI_CurvesCollection
 	
 	public AnimationClip assignCurvesToClip()
 	{
-		HAPI_CurvesCollection curves = this;
+		HoudiniCurvesCollection curves = this;
 						
-		AnimationClip clip = new AnimationClip();			
+		AnimationClip clip = new AnimationClip();
 		
 		bool found_nonconst_curve = false;
 		
 		if( !curves.isConstantAnimCurve( curves.tx ) )
 		{
-			clip.SetCurve( "", typeof(Transform), "localPosition.x", curves.tx );				
+			clip.SetCurve( "", typeof(Transform), "localPosition.x", curves.tx );
 			found_nonconst_curve = true;
 		}
 		
 		if( !curves.isConstantAnimCurve( curves.ty ) )
 		{
-			clip.SetCurve( "", typeof(Transform), "localPosition.y", curves.ty );				
+			clip.SetCurve( "", typeof(Transform), "localPosition.y", curves.ty );
 			found_nonconst_curve = true;
 		}
 		
 		if( !curves.isConstantAnimCurve( curves.tz ) )
 		{				
-			clip.SetCurve( "", typeof(Transform), "localPosition.z", curves.tz );							
+			clip.SetCurve( "", typeof(Transform), "localPosition.z", curves.tz );
 			found_nonconst_curve = true;
 		}
 		
@@ -70,8 +70,8 @@ public class HAPI_CurvesCollection
 			!curves.isConstantAnimCurve( curves.qz ) ||
 			!curves.isConstantAnimCurve( curves.qw ) )
 		{
-			clip.SetCurve( "", typeof(Transform), "localRotation.x", curves.qx );				
-			clip.SetCurve( "", typeof(Transform), "localRotation.y", curves.qy );				
+			clip.SetCurve( "", typeof(Transform), "localRotation.x", curves.qx );
+			clip.SetCurve( "", typeof(Transform), "localRotation.y", curves.qy );
 			clip.SetCurve( "", typeof(Transform), "localRotation.z", curves.qz );
 			clip.SetCurve( "", typeof(Transform), "localRotation.w", curves.qw );
 			found_nonconst_curve = true;
@@ -79,13 +79,13 @@ public class HAPI_CurvesCollection
 		
 		if( !curves.isConstantAnimCurve( curves.sx ) )
 		{
-			clip.SetCurve( "", typeof(Transform), "localScale.x", curves.sx );				
+			clip.SetCurve( "", typeof(Transform), "localScale.x", curves.sx );
 			found_nonconst_curve = true;
 		}	
 		
 		if( !curves.isConstantAnimCurve( curves.sy ) )
 		{
-			clip.SetCurve( "", typeof(Transform), "localScale.y", curves.sy );				
+			clip.SetCurve( "", typeof(Transform), "localScale.y", curves.sy );
 			found_nonconst_curve = true;
 		}
 		
@@ -105,23 +105,23 @@ public class HAPI_CurvesCollection
 	
 }
 
-public class HAPI_Instancer : MonoBehaviour 
+public class HoudiniInstancer : MonoBehaviour
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 
-	public HAPI_Asset 	prAsset { get { return myAsset; } set { myAsset = value; } }
+	public HoudiniAsset 	prAsset { get { return myAsset; } set { myAsset = value; } }
 	public int 			prObjectId { get { return myObjectId; } set { myObjectId = value; } }
 
-	public HAPI_InstancerPersistentData prPersistentData
+	public HoudiniInstancerPersistentData prPersistentData
 	{
 		get
 		{
-			HAPI_InstancerManager instancer_manager = prAsset.GetComponent< HAPI_InstancerManager >();
+			HoudiniInstancerManager instancer_manager = prAsset.GetComponent< HoudiniInstancerManager >();
 			if( instancer_manager == null )
 				return null;
 
-			HAPI_InstancerPersistentData data = instancer_manager.getInstancerPersistentData( this.name );
+			HoudiniInstancerPersistentData data = instancer_manager.getInstancerPersistentData( this.name );
 			if( data == null )
 				Debug.LogError("Unable to retrieve persistent data for instancer " + this.name );
 
@@ -132,7 +132,7 @@ public class HAPI_Instancer : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
 	
-	public HAPI_Instancer () 
+	public HoudiniInstancer () 
 	{
 		prAsset = null;
 		prObjectId = -1;
@@ -145,10 +145,10 @@ public class HAPI_Instancer : MonoBehaviour
 	{		
 		int current_max_point_index = total_points - 1;
 
-		HAPI_InstancerPersistentData data = prPersistentData;
+		HoudiniInstancerPersistentData data = prPersistentData;
 		for ( int ii = 0; ii < data.overriddenInstances.Count; ii++ )
 		{
-			HAPI_InstancerOverrideInfo override_info = data.overriddenInstances[ ii ];
+			HoudiniInstancerOverrideInfo override_info = data.overriddenInstances[ ii ];
 			
 			Vector3 pos = override_info.translate;
 			
@@ -211,7 +211,7 @@ public class HAPI_Instancer : MonoBehaviour
 				bool syncAssetTransformSetting			= false;
 				bool enableCooking						= true;
 				
-				HAPI_Asset hapi_asset = user_instance.GetComponent< HAPI_Asset >();
+				HoudiniAsset hapi_asset = user_instance.GetComponent< HoudiniAsset >();
 				if ( hapi_asset != null )
 				{
 					liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
@@ -223,7 +223,7 @@ public class HAPI_Instancer : MonoBehaviour
 				}
 				
 				obj = Instantiate( user_instance, new Vector3(0,0,0), Quaternion.identity ) as GameObject;
-				HAPI_Asset hapi_asset_on_clone =  obj.GetComponent< HAPI_Asset >();
+				HoudiniAsset hapi_asset_on_clone =  obj.GetComponent< HoudiniAsset >();
 				if ( hapi_asset_on_clone != null )
 				{
 					Destroy( hapi_asset_on_clone );
@@ -237,7 +237,7 @@ public class HAPI_Instancer : MonoBehaviour
 				}
 			}
 
-			HAPI_Instance instance = (HAPI_Instance) obj.AddComponent( "HAPI_Instance" );
+			HoudiniInstance instance = (HoudiniInstance) obj.AddComponent( "HAPI_Instance" );
 			instance.prInstancePointNumber = point_index;
 			instance.prObjectToInstantiate = user_instance;
 			instance.prInstancer = this;
@@ -266,7 +266,7 @@ public class HAPI_Instancer : MonoBehaviour
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
 
-			HAPI_Instance instance = (HAPI_Instance) obj.AddComponent( "HAPI_Instance" );
+			HoudiniInstance instance = (HoudiniInstance) obj.AddComponent( "HAPI_Instance" );
 
 			
 			instance.prInstancePointNumber = point_index;
@@ -299,19 +299,19 @@ public class HAPI_Instancer : MonoBehaviour
 		obj.transform.parent = transform;
 		
 		if ( attach_script_exists )
-			HAPI_AssetUtility.attachScript( obj, attach_script );
+			HoudiniAssetUtility.attachScript( obj, attach_script );
 	}
 	
 	public bool hasOverriddenInstances()
 	{
-		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		HoudiniInstancerPersistentData persistent_data = prPersistentData;
 		return persistent_data.overriddenInstances.Count > 0;
 	}
 	
 	public bool isPointOverridden( int point_index )
 	{
-		HAPI_InstancerPersistentData persistent_data = prPersistentData;
-		foreach ( HAPI_InstancerOverrideInfo override_info in persistent_data.overriddenInstances )
+		HoudiniInstancerPersistentData persistent_data = prPersistentData;
+		foreach ( HoudiniInstancerOverrideInfo override_info in persistent_data.overriddenInstances )
 		{
 			if( override_info.instancePointNumber == point_index )
 				return true;
@@ -322,7 +322,7 @@ public class HAPI_Instancer : MonoBehaviour
 
 	public void pinObject( GameObject pin_object, bool pin )
 	{		
-		HAPI_Instance instance = pin_object.GetComponent< HAPI_Instance >();
+		HoudiniInstance instance = pin_object.GetComponent< HoudiniInstance >();
 		if ( instance == null )
 		{
 			//The user might be moving the part instead of the object, so we should
@@ -330,7 +330,7 @@ public class HAPI_Instancer : MonoBehaviour
 			Transform parent = pin_object.transform.parent;
 			while ( parent != null )
 			{
-				instance = parent.gameObject.GetComponent< HAPI_Instance >();
+				instance = parent.gameObject.GetComponent< HoudiniInstance >();
 				if( instance != null )
 					break;
 				parent = parent.parent;
@@ -346,8 +346,8 @@ public class HAPI_Instancer : MonoBehaviour
 		{
 			Transform game_object_xform = pin_object.transform;
 			
-			HAPI_InstancerOverrideInfo override_info =
-				ScriptableObject.CreateInstance< HAPI_InstancerOverrideInfo >();
+			HoudiniInstancerOverrideInfo override_info =
+				ScriptableObject.CreateInstance< HoudiniInstancerOverrideInfo >();
 			
 			override_info.translate = game_object_xform.position;
 			override_info.rotate = game_object_xform.rotation.eulerAngles;
@@ -371,13 +371,13 @@ public class HAPI_Instancer : MonoBehaviour
 		}
 	}
 	
-	public bool pinInstance( HAPI_InstancerOverrideInfo info )
+	public bool pinInstance( HoudiniInstancerOverrideInfo info )
 	{
-		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		HoudiniInstancerPersistentData persistent_data = prPersistentData;
 		int ii = 0;
 		for( ii = 0; ii < persistent_data.overriddenInstances.Count; ii++ )
 		{
-			HAPI_InstancerOverrideInfo override_info = persistent_data.overriddenInstances[ ii ];
+			HoudiniInstancerOverrideInfo override_info = persistent_data.overriddenInstances[ ii ];
 			if( override_info.instancePointNumber == info.instancePointNumber )
 			{
 				persistent_data.overriddenInstances.RemoveAt( ii );
@@ -392,17 +392,17 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	public void unPinAllInstances()
 	{
-		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		HoudiniInstancerPersistentData persistent_data = prPersistentData;
 		persistent_data.overriddenInstances.Clear();		
 	}
 	
 	public void unPinInstance( int point_index )
 	{
-		HAPI_InstancerPersistentData persistent_data = prPersistentData;
+		HoudiniInstancerPersistentData persistent_data = prPersistentData;
 		int index_to_remove = -1;
 		for( int ii = 0 ; ii < persistent_data.overriddenInstances.Count ; ii++ )
 		{
-			HAPI_InstancerOverrideInfo override_info = persistent_data.overriddenInstances[ ii ];
+			HoudiniInstancerOverrideInfo override_info = persistent_data.overriddenInstances[ ii ];
 			if( override_info.instancePointNumber == point_index )
 			{
 				index_to_remove = ii;
@@ -418,8 +418,8 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	public void drawAllPins()
 	{
-		HAPI_InstancerPersistentData persistent_data = prPersistentData;
-		foreach ( HAPI_InstancerOverrideInfo override_info in persistent_data.overriddenInstances )
+		HoudiniInstancerPersistentData persistent_data = prPersistentData;
+		foreach ( HoudiniInstancerOverrideInfo override_info in persistent_data.overriddenInstances )
 		{
 			drawPin( override_info );
 						
@@ -428,15 +428,15 @@ public class HAPI_Instancer : MonoBehaviour
 	
 	public void drawPin( int point_index )
 	{
-		HAPI_InstancerPersistentData persistent_data = prPersistentData;
-		foreach ( HAPI_InstancerOverrideInfo override_info in persistent_data.overriddenInstances )
+		HoudiniInstancerPersistentData persistent_data = prPersistentData;
+		foreach ( HoudiniInstancerOverrideInfo override_info in persistent_data.overriddenInstances )
 		{
 			if( override_info.instancePointNumber == point_index )
 				drawPin( override_info );
 		}				
 	}
 	
-	public void drawPin( HAPI_InstancerOverrideInfo override_info )
+	public void drawPin( HoudiniInstancerOverrideInfo override_info )
 	{
 		// TODO: This code should be on the companion Editor class, not here!
 
@@ -459,7 +459,7 @@ public class HAPI_Instancer : MonoBehaviour
 		if(scale_factor < scale_factor_tweak1 )
 			scale_factor = scale_factor_tweak1;
 		
-		scale_factor *= HAPI_Host.prPinSize;
+		scale_factor *= HoudiniHost.prPinSize;
 			
 		Handles.color = new Color( 1.0f, 1.0f, 1.0f, 1.0f );		
 		
@@ -483,7 +483,7 @@ public class HAPI_Instancer : MonoBehaviour
 		mat.m11 = 1.0f;
 		Handles.matrix = mat;
 		
-		Handles.color = HAPI_Host.prPinColour;	
+		Handles.color = HoudiniHost.prPinColour;	
 		position.y = pin_sphere_displacement;
 		Handles.SphereCap  ( override_info.instancePointNumber,
 							 position,
@@ -501,18 +501,18 @@ public class HAPI_Instancer : MonoBehaviour
 			
 		// Get Detail info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Host.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
+		HoudiniHost.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
 		if ( geo_info.partCount == 0 )
 			return;
 		
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Host.getPartInfo( prAsset.prAssetId, prObjectId, 0, 0, out part_info );
+		HoudiniHost.getPartInfo( prAsset.prAssetId, prObjectId, 0, 0, out part_info );
 		if ( prAsset.prEnableLogging )
 			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
 					   + "points: " + part_info.pointCount );
 				
 		if ( part_info.pointCount > 65000 )
-			throw new HAPI_Error( "Point count (" + part_info.pointCount + ") above limit (" + 65000 + ")!" );
+			throw new HoudiniError( "Point count (" + part_info.pointCount + ") above limit (" + 65000 + ")!" );
 		
 		myNumInstances = part_info.pointCount;
 	}
@@ -523,14 +523,14 @@ public class HAPI_Instancer : MonoBehaviour
 		{
 			cacheNumInstances();
 			
-			myCurvesCollection = new HAPI_CurvesCollection[ myNumInstances ];
+			myCurvesCollection = new HoudiniCurvesCollection[ myNumInstances ];
 			for ( int ii = 0; ii < myNumInstances; ++ii )
 			{
-				myCurvesCollection[ ii ] = new HAPI_CurvesCollection();
+				myCurvesCollection[ ii ] = new HoudiniCurvesCollection();
 				
 			}
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 			return;
@@ -546,7 +546,7 @@ public class HAPI_Instancer : MonoBehaviour
 																			
 			HAPI_Transform[] instance_transforms = new HAPI_Transform[ myNumInstances ];
 			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, HAPI_RSTOrder.HAPI_SRT, 
-								 HAPI_Host.getInstanceTransforms, instance_transforms, myNumInstances );
+								 HoudiniHost.getInstanceTransforms, instance_transforms, myNumInstances );
 											
 						
 			Matrix4x4 parent_xform_inverse = Matrix4x4.identity;
@@ -594,30 +594,30 @@ public class HAPI_Instancer : MonoBehaviour
 					world_mat.SetTRS( pos, quat, scale );					
 					Matrix4x4 local_mat = parent_xform_inverse  * world_mat;					
 					
-					quat = HAPI_AssetUtility.getQuaternion( local_mat );
-					scale = HAPI_AssetUtility.getScale( local_mat );
-					pos = HAPI_AssetUtility.getPosition( local_mat );
+					quat = HoudiniAssetUtility.getQuaternion( local_mat );
+					scale = HoudiniAssetUtility.getScale( local_mat );
+					pos = HoudiniAssetUtility.getPosition( local_mat );
 				}
 				
-				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];						
+				HoudiniCurvesCollection curves = myCurvesCollection[ ii ];						
 				
-				HAPI_AssetUtility.addKeyToCurve( curr_time, pos[0], curves.tx );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, pos[1], curves.ty );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, pos[2], curves.tz );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.x, curves.qx );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.y, curves.qy );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.z, curves.qz );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, quat.w, curves.qw );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, scale.x, curves.sx );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, scale.y, curves.sy );
-				HAPI_AssetUtility.addKeyToCurve( curr_time, scale.z, curves.sz );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, pos[0], curves.tx );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, pos[1], curves.ty );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, pos[2], curves.tz );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, quat.x, curves.qx );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, quat.y, curves.qy );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, quat.z, curves.qz );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, quat.w, curves.qw );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, scale.x, curves.sx );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, scale.y, curves.sy );
+				HoudiniAssetUtility.addKeyToCurve( curr_time, scale.z, curves.sz );
 				
 				
 				
 			}
 			
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 			return;
@@ -634,29 +634,29 @@ public class HAPI_Instancer : MonoBehaviour
 		
 		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );		
 		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "instance", 
-							  ref instance_attr_info, ref instance_attr, HAPI_Host.getAttributeStringData );
+							  ref instance_attr_info, ref instance_attr, HoudiniHost.getAttributeStringData );
 		
 		if ( !instance_attr_info.exists )
 			return;
 		
 		if ( instance_attr_info.exists && instance_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_ErrorIgnorable( "I only understand instance as point attributes!" );
+			throw new HoudiniErrorIgnorable( "I only understand instance as point attributes!" );
 		
 		if ( instance_attr_info.exists && instance_attr.Length != myNumInstances )
-			throw new HAPI_Error( "Unexpected instance_hint array length found for asset: " 
+			throw new HoudiniError( "Unexpected instance_hint array length found for asset: " 
 								  + prAsset.prAssetId + "!" );
 				
 		
 		HAPI_AttributeInfo name_attr_info = new HAPI_AttributeInfo( "name" );		
 		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "name", 
-							  ref name_attr_info, ref name_attr, HAPI_Host.getAttributeStringData );
+							  ref name_attr_info, ref name_attr, HoudiniHost.getAttributeStringData );
 					
 		
 		if ( name_attr_info.exists && name_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-			throw new HAPI_ErrorIgnorable( "I only understand name as point attributes!" );
+			throw new HoudiniErrorIgnorable( "I only understand name as point attributes!" );
 		
 		if ( name_attr_info.exists && name_attr.Length != myNumInstances )
-			throw new HAPI_Error( "Unexpected name array length found for asset: " 
+			throw new HoudiniError( "Unexpected name array length found for asset: " 
 								  + prAsset.prAssetId + "!" );
 	}
 	
@@ -669,7 +669,7 @@ public class HAPI_Instancer : MonoBehaviour
 			{												
 				GameObject child = transform.GetChild( ii ).gameObject;
 																				
-				HAPI_CurvesCollection curves = myCurvesCollection[ ii ];
+				HoudiniCurvesCollection curves = myCurvesCollection[ ii ];
 				
 				AnimationClip clip = curves.assignCurvesToClip();
 				
@@ -690,7 +690,7 @@ public class HAPI_Instancer : MonoBehaviour
 			return found_non_const_curve;
 						
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 			return false;
@@ -699,7 +699,7 @@ public class HAPI_Instancer : MonoBehaviour
 
 	private void updateUniqueInstantiatedNames( List < string > unique_instantiated_names )
 	{
-		HAPI_InstancerPersistentData instancer_data = prPersistentData;
+		HoudiniInstancerPersistentData instancer_data = prPersistentData;
 		
 		List< string > existing_unique_names = instancer_data.uniqueNames;
 		List< string > names_to_add = new List< string >();
@@ -735,7 +735,7 @@ public class HAPI_Instancer : MonoBehaviour
 
 	}
 			
-	public void instanceObjects( HAPI_ProgressBar progress_bar )
+	public void instanceObjects( HoudiniProgressBar progress_bar )
 	{
 		try
 		{
@@ -745,7 +745,7 @@ public class HAPI_Instancer : MonoBehaviour
 			
 			// Get Detail info.
 			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-			HAPI_Host.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
+			HoudiniHost.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
 			if ( geo_info.partCount == 0 )
 				return;
 			
@@ -753,19 +753,19 @@ public class HAPI_Instancer : MonoBehaviour
 											
 			HAPI_Transform[] instance_transforms = new HAPI_Transform[ myNumInstances ];
 			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, HAPI_RSTOrder.HAPI_SRT, 
-								 HAPI_Host.getInstanceTransforms, instance_transforms, myNumInstances );
+								 HoudiniHost.getInstanceTransforms, instance_transforms, myNumInstances );
 			
 			// Get scale point attributes.
 			HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
 			float[] scale_attr = new float[ 0 ];
 			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "scale",
-								  ref scale_attr_info, ref scale_attr, HAPI_Host.getAttributeFloatData );
+								  ref scale_attr_info, ref scale_attr, HoudiniHost.getAttributeFloatData );
 			
 			if ( scale_attr_info.exists && scale_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-				throw new HAPI_ErrorIgnorable( "I only understand scale as point attributes!" );
+				throw new HoudiniErrorIgnorable( "I only understand scale as point attributes!" );
 			
 			if ( scale_attr_info.exists && scale_attr.Length != myNumInstances * 3 )
-				throw new HAPI_Error( 
+				throw new HoudiniError( 
 					"Unexpected scale array length found for asset: " + prAsset.prAssetId + "!\n" +
 					"Expected length of: " + myNumInstances * 3 + " but given: " + scale_attr.Length );
 			
@@ -773,13 +773,13 @@ public class HAPI_Instancer : MonoBehaviour
 			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
 			int[] script_attr = new int[ 0 ];
 			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "Unity_Script",
-								  ref script_attr_info, ref script_attr, HAPI_Host.getAttributeStringData );
+								  ref script_attr_info, ref script_attr, HoudiniHost.getAttributeStringData );
 			
 			if ( script_attr_info.exists && script_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-				throw new HAPI_ErrorIgnorable( "I only understand Unity_Script as point attributes!" );
+				throw new HoudiniErrorIgnorable( "I only understand Unity_Script as point attributes!" );
 			
 			if ( script_attr_info.exists && script_attr.Length != myNumInstances )
-				throw new HAPI_Error( "Unexpected Unity_Script array length found for asset: " + prAsset.prAssetId + "!" );
+				throw new HoudiniError( "Unexpected Unity_Script array length found for asset: " + prAsset.prAssetId + "!" );
 						
 			
 			int[] instance_attr = null;
@@ -792,7 +792,7 @@ public class HAPI_Instancer : MonoBehaviour
 			instanceOverriddenObjects( myNumInstances, exclusion_list );
 
 			List < string > unique_instantiated_names = new List< string >();
-			HAPI_InstancerPersistentData persistent_data = prPersistentData;
+			HoudiniInstancerPersistentData persistent_data = prPersistentData;
 			if( persistent_data.variationChoice.Count != myNumInstances )
 			{
 				if( myNumInstances > persistent_data.variationChoice.Count )
@@ -827,7 +827,7 @@ public class HAPI_Instancer : MonoBehaviour
 				{					
 					if( name_attr.Length > 0 )
 					{
-						string obj_name	= HAPI_Host.getString( name_attr[ ii ] );
+						string obj_name	= HoudiniHost.getString( name_attr[ ii ] );
 						int object_index = prAsset.findObjectByName( obj_name );
 						if ( object_index >= 0 )
 						{
@@ -845,7 +845,7 @@ public class HAPI_Instancer : MonoBehaviour
 					}
 					else 
 					{
-						string instanceObjectPath	= HAPI_Host.getString( instance_attr[ ii ] );
+						string instanceObjectPath	= HoudiniHost.getString( instance_attr[ ii ] );
 						string[] pathItems			= instanceObjectPath.Split('/');
 						string instanceObjectName	= pathItems[ pathItems.Length - 1 ];
 																																		
@@ -856,7 +856,7 @@ public class HAPI_Instancer : MonoBehaviour
 							objToInstantiate = GameObject.Find( instanceObjectName );
 					}
 					
-					HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
+					HoudiniAsset hapi_asset = objToInstantiate.GetComponent< HoudiniAsset >();
 					if ( hapi_asset != null )
 					{
 						liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
@@ -922,16 +922,16 @@ public class HAPI_Instancer : MonoBehaviour
 					Matrix4x4 global_mat = parent_mat * local_mat;
 
 					
-					euler = HAPI_AssetUtility.getQuaternion( global_mat ).eulerAngles;
-					pos = HAPI_AssetUtility.getPosition( global_mat );
-					scale = HAPI_AssetUtility.getScale( global_mat );
+					euler = HoudiniAssetUtility.getQuaternion( global_mat ).eulerAngles;
+					pos = HoudiniAssetUtility.getPosition( global_mat );
+					scale = HoudiniAssetUtility.getScale( global_mat );
 					
 						
 					//mat.SetTRS( pos, 
 					
 					string script_to_attach = "";
 					if( script_attr_info.exists )
-						script_to_attach = HAPI_Host.getString( script_attr[ ii ] );
+						script_to_attach = HoudiniHost.getString( script_attr[ ii ] );
 					instanceObject( objToInstantiate, 
 								 	pos,
 									euler,									
@@ -942,7 +942,7 @@ public class HAPI_Instancer : MonoBehaviour
 									script_to_attach );
 						
 
-					HAPI_Asset hapi_asset = objToInstantiate.GetComponent< HAPI_Asset >();
+					HoudiniAsset hapi_asset = objToInstantiate.GetComponent< HoudiniAsset >();
 					if ( hapi_asset != null )
 					{
 						hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;
@@ -957,7 +957,7 @@ public class HAPI_Instancer : MonoBehaviour
 
 
 		}
-		catch ( HAPI_Error error )
+		catch ( HoudiniError error )
 		{
 			Debug.LogWarning( error.ToString() );
 			return;
@@ -979,10 +979,10 @@ public class HAPI_Instancer : MonoBehaviour
 	}
 
 	
-	[SerializeField] private HAPI_Asset myAsset;
+	[SerializeField] private HoudiniAsset myAsset;
 	[SerializeField] private int myObjectId;
 	[SerializeField] private int myNumInstances;
 
 	
-	private HAPI_CurvesCollection[] myCurvesCollection;
+	private HoudiniCurvesCollection[] myCurvesCollection;
 }
