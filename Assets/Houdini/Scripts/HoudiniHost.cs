@@ -326,8 +326,14 @@ public static partial class HoudiniHost
 											set { setBool( "HAPI_GenerateTangents", value ); } }
 
 	public static bool prEnableCooking {
+#if UNITY_EDITOR
 											get { return getBool( "HAPI_EnableCooking" ); }
-											set { setBool( "HAPI_EnableCooking", value ); } }
+											set { setBool( "HAPI_EnableCooking", value ); }
+#else
+											get { return getBool( "HAPI_EnableCooking" ) && HoudiniConstants.HAPI_ENABLE_RUNTIME; }
+											set {}
+#endif // UNITY_EDITOR
+									   }
 	public static bool prCookingTriggersDownCooks {
 											get { return getBool( "HAPI_CookingTriggersDownCooks" ); }
 											set { setBool( "HAPI_CookingTriggersDownCooks", value ); } }
