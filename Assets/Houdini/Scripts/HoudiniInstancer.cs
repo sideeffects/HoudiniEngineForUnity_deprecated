@@ -237,7 +237,7 @@ public class HoudiniInstancer : MonoBehaviour
 				}
 			}
 
-			HoudiniInstance instance = (HoudiniInstance) obj.AddComponent( "HAPI_Instance" );
+			HoudiniInstance instance = obj.AddComponent< HoudiniInstance >();
 			instance.prInstancePointNumber = point_index;
 			instance.prObjectToInstantiate = user_instance;
 			instance.prInstancer = this;
@@ -266,9 +266,8 @@ public class HoudiniInstancer : MonoBehaviour
 		{
 			obj = Instantiate( objToInstantiate, pos, Quaternion.Euler( euler ) ) as GameObject;
 
-			HoudiniInstance instance = (HoudiniInstance) obj.AddComponent( "HAPI_Instance" );
+			HoudiniInstance instance = obj.AddComponent< HoudiniInstance >();
 
-			
 			instance.prInstancePointNumber = point_index;
 			instance.prObjectToInstantiate = objToInstantiate;
 			instance.prInstancer = this;

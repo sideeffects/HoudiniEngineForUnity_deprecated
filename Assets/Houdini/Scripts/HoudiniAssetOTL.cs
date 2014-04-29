@@ -218,12 +218,12 @@ public class HoudiniAssetOTL : HoudiniAsset
 		{
 
 			if( gameObject.GetComponent< HoudiniInstancerManager >() == null )
-				gameObject.AddComponent( "HAPI_InstancerManager" );
+				gameObject.AddComponent< HoudiniInstancerManager >();
 
 			GameObject main_object = new GameObject( object_info.name );
 			main_object.transform.parent = transform;
 
-			main_object.AddComponent( "HAPI_Instancer" );
+			main_object.AddComponent< HoudiniInstancer >();
 			prGameObjects[ object_id ] = main_object;
 			instancer = main_object.GetComponent< HoudiniInstancer >();
 
