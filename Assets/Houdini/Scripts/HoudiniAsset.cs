@@ -555,18 +555,24 @@ public abstract class HoudiniAsset : HoudiniControl
 			)
 
 		{
+			// Remove this asset as transform output from the upstream assets.
 			foreach ( HoudiniAsset upstream_asset in prUpStreamTransformAssets )
 				if ( upstream_asset != null )
 					upstream_asset.removeDownstreamTransformAsset( this );
-			
-			List< HoudiniAsset > downstream_asset_list = new List< HoudiniAsset >();
-			
-			foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
-				downstream_asset_list.Add( downstream_asset );
-			
-			foreach ( HoudiniAsset downstream_asset in downstream_asset_list )
-				downstream_asset.removeAssetAsTransformInput( this );
-			
+
+			// Remove this asset as geo output from the upstream assets.
+			foreach ( HoudiniAsset upstream_asset in prUpStreamGeoAssets )
+				if ( upstream_asset != null )
+					upstream_asset.removeDownstreamGeoAsset( this );
+
+			{
+				List< HoudiniAsset > downstream_asset_list = new List< HoudiniAsset >();
+				foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
+					downstream_asset_list.Add( downstream_asset );
+				foreach ( HoudiniAsset downstream_asset in downstream_asset_list )
+					downstream_asset.removeAssetAsTransformInput( this );
+			}
+
 			prUpStreamTransformAssets.Clear();
 			prDownStreamTransformAssets.Clear();
 			
