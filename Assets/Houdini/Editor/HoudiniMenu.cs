@@ -81,8 +81,7 @@ public class HoudiniMenu : MonoBehaviour
 		GameObject game_object = new GameObject( "curve" );
 		
 		// Add HAPI Object Control script component.
-		game_object.AddComponent( "HAPI_AssetCurve" );
-		HoudiniAssetCurve asset = game_object.GetComponent< HoudiniAssetCurve >();
+		HoudiniAssetCurve asset = game_object.AddComponent< HoudiniAssetCurve >();
 		
 		asset.prAssetSubType = HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
 		
