@@ -51,7 +51,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return value;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -69,7 +69,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return status;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -88,7 +88,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetStatusStringBufLength( status_type, out buffer_size );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -115,7 +115,7 @@ public static partial class HoudiniHost
 			
 		return string_value;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -130,7 +130,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return count;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -148,7 +148,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return count;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -174,7 +174,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -204,7 +204,7 @@ public static partial class HoudiniHost
 
 		return transform;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -239,7 +239,7 @@ public static partial class HoudiniHost
 
 		return transform;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -266,7 +266,7 @@ public static partial class HoudiniHost
 
 		return output;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -293,7 +293,7 @@ public static partial class HoudiniHost
 
 		return output;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -317,7 +317,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetStringBufLength( string_handle, out buffer_length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -343,7 +343,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetString( string_handle, string_value, buffer_length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -361,7 +361,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetTime( out time );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -377,7 +377,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetTime( time );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -409,7 +409,7 @@ public static partial class HoudiniHost
 		else
 			return false;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -427,7 +427,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return asset_info;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -444,7 +444,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_CookAsset( asset_id, System.IntPtr.Zero );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -457,7 +457,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_Interrupt();
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -484,7 +484,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetAssetTransform( asset_id, rst_order, rot_order, out transform );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -504,7 +504,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetAssetTransform( asset_id, ref transform );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -533,7 +533,7 @@ public static partial class HoudiniHost
 		string name = getString( name_sh );
 		return name;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -554,7 +554,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return node_info;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -572,7 +572,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return global_nodes;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -602,7 +602,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetParameters( node_id, parm_infos, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -629,7 +629,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return parm_id;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -659,7 +659,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetParmIntValues( node_id, values, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -689,7 +689,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetParmFloatValues( node_id, values, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -723,7 +723,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetParmStringValues( node_id, evaluate, values, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -752,7 +752,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetParmChoiceLists( node_id, parm_choices, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -782,7 +782,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetParmIntValues( node_id, values, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -812,7 +812,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetParmFloatValues( node_id, values, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -841,7 +841,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetParmStringValue( node_id, value, parm_id, index );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -869,7 +869,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_InsertMultiparmInstance( node_id, parm_id, instance_position );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -897,7 +897,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_RemoveMultiparmInstance( node_id, parm_id, instance_position );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -928,7 +928,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetHandleInfo( asset_id, handle_infos, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -961,7 +961,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetHandleBindingInfo( asset_id, handle_index, handle_infos, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -990,7 +990,7 @@ public static partial class HoudiniHost
 
 		return preset;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1010,7 +1010,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetPreset( node_id, preset, preset.Length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1043,7 +1043,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetObjects( asset_id, object_infos, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1080,7 +1080,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetObjectTransforms( asset_id, rst_order, transforms, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -1122,7 +1122,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, rst_order, transforms, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1149,7 +1149,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetObjectTransform( asset_id, object_id, transform );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -1180,7 +1180,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetGeoInfo( asset_id, object_id, geo_id, out geo_info );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1209,7 +1209,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1246,7 +1246,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetFaceCounts( asset_id, object_id, geo_id, part_id, face_counts, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1283,7 +1283,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetVertexList( asset_id, object_id, geo_id, part_id, vertex_list, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1321,7 +1321,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return info;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1368,7 +1368,7 @@ public static partial class HoudiniHost
 
 		return name_strings;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1414,7 +1414,7 @@ public static partial class HoudiniHost
 													ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1460,7 +1460,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1508,7 +1508,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1552,7 +1552,7 @@ public static partial class HoudiniHost
 
 		return name_strings;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1600,7 +1600,7 @@ public static partial class HoudiniHost
 
 		return membership_bools;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1629,7 +1629,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetGeoInfo( asset_id, object_id, geo_id, ref geo_info );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1656,7 +1656,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetPartInfo( asset_id, object_id, geo_id, ref part_info );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1691,7 +1691,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetFaceCounts( asset_id, object_id, geo_id, face_counts, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1726,7 +1726,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetVertexList( asset_id, object_id, geo_id, vertex_list, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1757,7 +1757,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_AddAttribute( asset_id, object_id, geo_id, name, ref attr_info );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1800,7 +1800,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1843,7 +1843,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1886,7 +1886,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1917,7 +1917,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, group_type, group_name );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1967,7 +1967,7 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, group_type, group_name, membership_int, 0, count );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -1990,7 +1990,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_CommitGeo( asset_id, object_id, geo_id );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -2015,7 +2015,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_RevertGeo( asset_id, object_id, geo_id );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -2039,7 +2039,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetFileInput( asset_id, input_idx, file_name );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -2076,7 +2076,7 @@ public static partial class HoudiniHost
 		node_id = geo_input_info.objectNodeId;
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -2109,7 +2109,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_ConnectAssetTransform( asset_id_from, asset_id_to, input_idx );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 		
@@ -2131,7 +2131,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_DisconnectAssetTransform( asset_id, input_idx );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2166,13 +2166,13 @@ public static partial class HoudiniHost
 			asset_id_from, object_id_from, asset_id_to, input_idx );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
-		
-	/// <summary> 
+
+	/// <summary>
 	/// 	Break an existing connection on geometry
-	/// </summary>	
+	/// </summary>
 	///
 	/// <param name ="asset_id">
 	///			The asset id of the asset
@@ -2181,14 +2181,13 @@ public static partial class HoudiniHost
 	///			The index on the asset where the connection
 	///			should be broken.
 	///	</param>
-		
 	public static void disconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx )
 	{
 #if UNITY_STANDALONE_WIN
 		HAPI_Result status_code = HAPI_DisconnectAssetGeometry( asset_id, input_idx );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2212,7 +2211,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return material_info;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2236,7 +2235,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_RenderMaterialToImage( asset_id, material_id, shader_type );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2261,7 +2260,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_RenderTextureToImage( asset_id, material_id, parm_id );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2279,7 +2278,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return format_count;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2298,7 +2297,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return formats;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2323,7 +2322,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return image_info;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2346,7 +2345,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetImageInfo( asset_id, material_id, image_info );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2382,7 +2381,7 @@ public static partial class HoudiniHost
 
 		return image_plane_names;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2438,7 +2437,7 @@ public static partial class HoudiniHost
 		string destination_file_path = getString( destination_file_path_sh );
 		return destination_file_path;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2495,7 +2494,7 @@ public static partial class HoudiniHost
 
 		return buffer;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2511,7 +2510,7 @@ public static partial class HoudiniHost
 			node_id, parm_id, parm_index, curve_keyframes, keyframe_count );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2524,7 +2523,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_SetTransformAnimCurve( node_id, transform_component, curve_keyframes, keyframe_count );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2534,7 +2533,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_ResetSimulation( asset_id );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2548,7 +2547,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetVolumeInfo( asset_id, object_id, geo_id, part_id, ref volume_info );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2560,7 +2559,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetFirstVolumeTile( asset_id, object_id, geo_id, part_id, ref tile );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2572,7 +2571,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetNextVolumeTile( asset_id, object_id, geo_id, part_id, ref next );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2584,7 +2583,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetVolumeTileFloatData( asset_id, object_id, geo_id, part_id, ref tile, values );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2600,7 +2599,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return curve_info;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2624,7 +2623,7 @@ public static partial class HoudiniHost
 
 		return values;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2639,7 +2638,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return counts;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2654,7 +2653,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return orders;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
@@ -2669,7 +2668,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 		return knots;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 }
