@@ -49,7 +49,6 @@ public class HoudiniInstance : MonoBehaviour
 		myInstancePointNumber = -1;
 		myTransformChanged = false;
 		myInstancer = null;
-
 	}
 	
 	public void Awake()
