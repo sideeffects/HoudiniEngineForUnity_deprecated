@@ -712,7 +712,7 @@ public static partial class HoudiniHost
 
 		return asset_id;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
 	}
 		
@@ -725,7 +725,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_LoadHIPFile( path, true );
 		processStatusCode( status_code );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
 	}
 		
@@ -742,7 +742,7 @@ public static partial class HoudiniHost
 
 		return asset_ids;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
 	}
 		
@@ -758,7 +758,7 @@ public static partial class HoudiniHost
 
 		return asset_id;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
 	}
 
@@ -774,7 +774,7 @@ public static partial class HoudiniHost
 
 		return asset_id;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
 	}
 
@@ -790,7 +790,7 @@ public static partial class HoudiniHost
 			
 		return true;
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
 	}
 
@@ -896,7 +896,7 @@ public static partial class HoudiniHost
 		else
 			throw new HoudiniError( error_str.ToString() );
 #else
-		throw new HAPI_ErrorUnsupportedPlatform();
+		throw new HoudiniErrorUnsupportedPlatform();
 #endif // UNITY_STANDALONE_WIN
 	}
 
