@@ -46,12 +46,83 @@ public class HoudiniPartControlGUI : Editor
 			// Determine which control point was pressed for modification.
 			for ( int i = 0; i < point_count; ++i ) 
 			{
-				Vector3 position 	= new Vector3( -pos_attr[ i * 3 + 0 ], pos_attr[ i * 3 + 1 ], pos_attr[ i * 3 + 2 ] );
-				//float handle_size 	= HandleUtility.GetHandleSize( position ) * 0.06f;
+				Vector3 position = new Vector3(
+					-pos_attr[ i * 3 + 0 ], pos_attr[ i * 3 + 1 ], pos_attr[ i * 3 + 2 ] );
+				position = myPartControl.transform.TransformPoint( position );
 
-				Handles.Label( position, new GUIContent("" + i ) );
+				Color original_color = GUI.color;
+				GUIStyle style = new GUIStyle( GUI.skin.label );
+
+				GUI.color = Color.yellow;
+				style.fontStyle = FontStyle.Normal;
+				style.fontSize = 12;
+				Handles.Label( position, new GUIContent( "" + i ), style );
+
+				GUI.color = original_color;
 			}
 		}
+
+		/*
+		{
+			try
+			{
+				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
+				float[] pos_attr = new float[ 0 ];
+				HoudiniAssetUtility.getAttribute(
+					myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId, 
+					myPartControl.prPartId, HoudiniConstants.HAPI_ATTRIB_POSITION, 
+					ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
+				if ( !pos_attr_info.exists )
+					throw new HoudiniError( "No position attribute found." );
+
+				bool[] membership = HoudiniHost.getGroupMembership(
+					myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId,
+					myPartControl.prPartId, HAPI_GroupType.HAPI_GROUPTYPE_POINT, "exteriorPoints" );
+
+				int point_count = pos_attr.Length / 3;
+
+				if ( membership.Length != point_count )
+					Debug.LogError( "WTF" );
+
+				// Determine which control point was pressed for modification.
+				for ( int i = 0; i < point_count; ++i ) 
+				{
+					if ( membership[ i ] )
+					{
+						Vector3 position = new Vector3( -pos_attr[ i * 3 + 0 ], pos_attr[ i * 3 + 1 ], pos_attr[ i * 3 + 2 ] );
+						Handles.Label( position, new GUIContent("" + i ) );
+					}
+				}
+			}
+			catch
+			{}
+
+			try
+			{
+				bool[] membership = HoudiniHost.getGroupMembership(
+					myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId,
+					myPartControl.prPartId, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, "LG_4" );
+
+				Mesh mesh = myPartControl.GetComponent< MeshFilter >().sharedMesh;
+				if ( membership.Length != mesh.triangles.Length / 3 )
+					Debug.LogError( "WTF" );
+
+				for ( int i = 0; i < mesh.triangles.Length / 3; ++i )
+				{
+					if ( membership[ i ] )
+					{
+						Vector3[] vects = new Vector3[ 4 ];
+						vects[ 0 ] = mesh.vertices[ mesh.triangles[ i * 3 + 0 ] ];
+						vects[ 1 ] = mesh.vertices[ mesh.triangles[ i * 3 + 0 ] ];
+						vects[ 2 ] = mesh.vertices[ mesh.triangles[ i * 3 + 1 ] ];
+						vects[ 3 ] = mesh.vertices[ mesh.triangles[ i * 3 + 2 ] ];
+						Handles.DrawSolidRectangleWithOutline( vects, Color.red, Color.yellow );
+					}
+				}
+			}
+			catch
+			{}
+		}*/
 
 		HoudiniInstance instance = findInstanceControlInParent();
 		if ( instance == null )
@@ -100,47 +171,79 @@ public class HoudiniPartControlGUI : Editor
 
 	public override void OnInspectorGUI() 
 	{
+		myPartControl.prShowDisplayOptions =
+			HoudiniGUI.foldout( "Display Options", myPartControl.prShowDisplayOptions, true );
+		if ( myPartControl.prShowDisplayOptions )
 		{
-			bool value = myPartControl.prShowPointNumbers;
-			bool changed = HoudiniGUI.toggle( "show_point_numbers", "Show Point Numbers", ref value,
-			                                null, ref value );
-			myPartControl.prShowPointNumbers = value;
-			if ( changed )
-				EditorUtility.SetDirty( myPartControl );
+			{
+				
+			}
+
+			{ // Show Houdini Point Numbers
+				bool value = myPartControl.prShowPointNumbers;
+				bool undo_value = false;
+				bool changed = HoudiniGUI.toggle(
+					"show_point_numbers", "Show Houdini Point Numbers", ref value,
+					null, ref undo_value );
+				myPartControl.prShowPointNumbers = value;
+				if ( changed )
+					EditorUtility.SetDirty( myPartControl );
+			}
 		}
 
-		if ( myPartControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
+		myPartControl.prShowIntermediateResultControls =
+			HoudiniGUI.foldout( "Intermediate Results", myPartControl.prShowIntermediateResultControls, true );
+		if ( myPartControl.prShowIntermediateResultControls )
 		{
+			bool gui_enabled = GUI.enabled;
+			if ( myPartControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
+			{
+				HoudiniGUI.help(
+					"Only specially marked intermediate results geometries can be edited.",
+					MessageType.Info );
+				GUI.enabled = false;
+			}
+
 			if ( GUILayout.Button( "Update Intermediate Result" ) ) 
 			{
-				MeshFilter mesh_filter			= myPartControl.gameObject.GetComponent< MeshFilter >();
-				Mesh shared_mesh				= mesh_filter.sharedMesh;
-				HoudiniPartControl part_control	= myPartControl.gameObject.GetComponent< HoudiniPartControl >();
-				HoudiniAssetUtility.setMesh(		myPartControl.prAsset.prAssetId, 
-												myPartControl.prObjectId,
-												myPartControl.prGeoId,
-												ref shared_mesh,
-												part_control,
-												null );
+				MeshFilter mesh_filter = myPartControl.gameObject.GetComponent< MeshFilter >();
+				Mesh shared_mesh = mesh_filter.sharedMesh;
+				HoudiniPartControl part_control = myPartControl.gameObject.GetComponent< HoudiniPartControl >();
+
+				HoudiniAssetUtility.setMesh(
+					myPartControl.prAsset.prAssetId, 
+					myPartControl.prObjectId,
+					myPartControl.prGeoId,
+					ref shared_mesh,
+					part_control,
+					null );
 				
 				myPartControl.prAsset.buildClientSide();
 			}
 			
 			if ( GUILayout.Button( "Clear Edits" ) ) 
 			{
-				HoudiniHost.revertGeo( myPartControl.prAsset.prAssetId,
-									 myPartControl.prObjectId,
-									 myPartControl.prGeoId );
+				HoudiniHost.revertGeo(
+					myPartControl.prAsset.prAssetId,
+					myPartControl.prObjectId,
+					myPartControl.prGeoId );
 				
 				myPartControl.prAsset.buildClientSide();
 			}
+
+			GUI.enabled = gui_enabled;
 		}
 
-		HoudiniGUI.help( "Values here are for debugging only and should not be modified directly.", MessageType.Info );
-		bool gui_enabled = GUI.enabled;
-		GUI.enabled = false;
-		DrawDefaultInspector();
-		GUI.enabled = gui_enabled;
+		myPartControl.prShowInfo =
+			HoudiniGUI.foldout( "Info", myPartControl.prShowInfo, true );
+		if ( myPartControl.prShowInfo )
+		{
+			HoudiniGUI.help( "Values here are for debugging only and should not be modified directly.", MessageType.Info );
+			bool gui_enabled = GUI.enabled;
+			GUI.enabled = false;
+			DrawDefaultInspector();
+			GUI.enabled = gui_enabled;
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
