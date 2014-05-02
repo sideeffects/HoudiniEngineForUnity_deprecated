@@ -116,7 +116,7 @@ public class HoudiniMenu : MonoBehaviour
 	// -----------------------------------------------------------------------
 	// Debug Menus (Hidden by Default)
 
-	//[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/Create Simple Input Geo", false, 1000 ) ]
+	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Simple Input Geo", false, 1000 ) ]
 	static private void createSimpleInputGeo() 
 	{
 		int asset_id = HoudiniHost.createInputAsset( "simple_input_geo_test" );
