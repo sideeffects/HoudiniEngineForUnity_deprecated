@@ -781,6 +781,38 @@ public static partial class HoudiniHost
 		[Out] float[] knots,
 		int start, int length );
 
+	// CACHING --------------------------------------------------------------------------------------------------
+
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SaveGeoToFile(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		string file_name );
+
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_LoadGeoFromFile(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		string file_name );
+
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetGeoSize(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		string format, out int size );
+
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SaveGeoToMemory(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		[Out] byte[] buffer, int size );
+
+	[ DllImport( "libHAPI", CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_LoadGeoFromMemory(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		string format, byte[] buffer, int size );
+
 #endif // UNITY_STANDALONE_WIN
 }
 

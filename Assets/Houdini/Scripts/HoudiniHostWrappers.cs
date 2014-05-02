@@ -2671,4 +2671,66 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
+
+	// CACHING --------------------------------------------------------------------------------------------------
+
+	public static void saveGeoToFile(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
+		string file_name )
+	{
+#if UNITY_STANDALONE_WIN
+		HAPI_Result status_code = HAPI_SaveGeoToFile(
+			asset_id, object_id, geo_id, file_name );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void loadGeoFromFile(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
+		string file_name )
+	{
+#if UNITY_STANDALONE_WIN
+		HAPI_Result status_code = HAPI_LoadGeoFromFile(
+			asset_id, object_id, geo_id, file_name );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static byte[] saveGeoToMemory(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
+		string format )
+	{
+#if UNITY_STANDALONE_WIN
+		int size;
+		HAPI_Result status_code = HAPI_GetGeoSize(
+			asset_id, object_id, geo_id, format, out size );
+		processStatusCode( status_code );
+
+		byte[] memory = new byte[ size ];
+		status_code = HAPI_SaveGeoToMemory(
+			asset_id, object_id, geo_id, memory, size );
+		processStatusCode( status_code );
+
+		return memory;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void loadGeoFromMemory(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
+		string format, byte[] buffer )
+	{
+#if UNITY_STANDALONE_WIN
+		HAPI_Result status_code = HAPI_LoadGeoFromMemory(
+			asset_id, object_id, geo_id, format, buffer, buffer.Length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
 }
