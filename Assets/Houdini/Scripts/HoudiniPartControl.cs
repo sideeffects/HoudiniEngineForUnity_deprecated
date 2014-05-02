@@ -30,15 +30,38 @@ public class HoudiniPartControl : HoudiniGeoControl
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
-	public int			prPartId {		get { return myPartId; }		set { myPartId = value; } }
-	public string		prPartName {	get { return myPartName; }		set { myPartName = value; } }
-	public int			prMaterialId {	get { return myMaterialId; }	set { myMaterialId = value; } }
-	public int[]		prVertexList {	get { return myVertexList; }	set { myVertexList = value; } }
-	public bool			prShowPointNumbers { get { return myShowPointNumbers; }	set { myShowPointNumbers = value; } }
+	public int		prPartId {							get { return myPartId; }
+														set { myPartId = value; } }
+	public string	prPartName {						get { return myPartName; }
+														set { myPartName = value; } }
+	public int		prMaterialId {						get { return myMaterialId; }
+														set { myMaterialId = value; } }
+	public int[]	prVertexList {						get { return myVertexList; }
+														set { myVertexList = value; } }
 
-	public bool 		prTransformChanged { get { return myTransformChanged; } set { myTransformChanged = value; } }
+	public bool		prShowDisplayOptions {				get { return myShowDisplayOptions; }
+														set { myShowDisplayOptions = value; } }
+	public bool		prShowPointGroup {					get { return myShowPointGroup; }
+														set { myShowPointGroup = value; } }
+	public string	prSelectedPointGroup {				get { return mySelectedPointGroup; }
+														set { mySelectedPointGroup = value; } }
+	public bool		prShowPrimitiveGroup {				get { return myShowPrimitiveGroup; }
+														set { myShowPrimitiveGroup = value; } }
+	public string	prSelectedPrimitiveGroup {			get { return mySelectedPrimitiveGroup; }
+														set { mySelectedPrimitiveGroup = value; } }
+	public bool		prShowPointNumbers {				get { return myShowPointNumbers; }
+														set { myShowPointNumbers = value; } }
+
+	public bool		prShowIntermediateResultControls {	get { return myShowIntermediateResultControls; }
+														set { myShowIntermediateResultControls = value; } }
+	public bool		prShowInfo {						get { return myShowInfo; }
+														set { myShowInfo = value; } }
+
+	public bool 	prTransformChanged {				get { return myTransformChanged; }
+														set { myTransformChanged = value; } }
 	
-	public HoudiniGeoControl prGeoControl { get { return myGeoControl; } set { myGeoControl = value; } }
+	public HoudiniGeoControl prGeoControl {				get { return myGeoControl; }
+														set { myGeoControl = value; } }
 
 	public HoudiniPartControl()
 	{
@@ -56,12 +79,21 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
-		prPartId 		= -1;
-		prPartName		= "part_name";
-		prMaterialId 	= -1;
-		prVertexList 	= new int[ 1 ];
+		prPartId = -1;
+		prPartName = "part_name";
+		prMaterialId = -1;
+		prVertexList = new int[ 1 ];
 		myTransformChanged = false;
+
+		myShowDisplayOptions = true;
+		myShowPointGroup = false;
+		mySelectedPointGroup = "";
+		myShowPrimitiveGroup = false;
+		mySelectedPrimitiveGroup = "";
 		myShowPointNumbers = false;
+
+		myShowIntermediateResultControls = false;
+		myShowInfo = false;
 
 		myGeoControl = null;
 	}
@@ -710,7 +742,16 @@ public class HoudiniPartControl : HoudiniGeoControl
 	[SerializeField] private int[]			myVertexList;
 	[SerializeField] private Matrix4x4		myLastLocalToWorld;
 	[SerializeField] private bool			myTransformChanged;
+
+	[SerializeField] private bool			myShowDisplayOptions;
 	[SerializeField] private bool			myShowPointNumbers;
+	[SerializeField] private bool			myShowPointGroup;
+	[SerializeField] private string			mySelectedPointGroup;
+	[SerializeField] private bool			myShowPrimitiveGroup;
+	[SerializeField] private string			mySelectedPrimitiveGroup;
+
+	[SerializeField] private bool			myShowIntermediateResultControls;
+	[SerializeField] private bool			myShowInfo;
 
 	[SerializeField] private HoudiniGeoControl myGeoControl;
 }
