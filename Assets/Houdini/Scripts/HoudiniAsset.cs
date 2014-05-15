@@ -548,10 +548,10 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public virtual void OnDestroy()
 	{
-		if ( prAssetId >= 0 && HoudiniHost.isRealDestroy() 
-#if UNITY_EDITOR && UNITY_4_3
+		if ( prAssetId >= 0 && HoudiniHost.isRealDestroy()
+#if UNITY_EDITOR
 			&& !BuildPipeline.isBuildingPlayer
-#endif // UNITY_4_3
+#endif // UNITY_EDITOR
 			)
 
 		{
@@ -642,11 +642,11 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public virtual void OnEnable()
 	{
-#if UNITY_STANDALONE_WIN
-#if UNITY_EDITOR && UNITY_4_3
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if UNITY_EDITOR
 		if ( BuildPipeline.isBuildingPlayer )
 			return;
-#endif // UNITY_EDITOR && UNITY_4_3
+#endif // UNITY_EDITOR
 
 		// If this is being called because changes are being applied
 		// to the prefab of this instance do nothing
@@ -715,7 +715,7 @@ public abstract class HoudiniAsset : HoudiniControl
 					);
 			}
 		}
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public virtual void OnDisable()
@@ -901,12 +901,11 @@ public abstract class HoudiniAsset : HoudiniControl
 							   bool cook_downstream_assets,
 							   bool use_delay_for_progress_bar )
 	{
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		return false;
 		#pragma warning disable 0162
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		if ( !HoudiniSetPath.prIsPathSet )
 		{
@@ -1200,11 +1199,10 @@ public abstract class HoudiniAsset : HoudiniControl
 			myProgressBarJustUsed = false;
 		}
 
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		#pragma warning restore 0162
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		
 		return true;
 	}

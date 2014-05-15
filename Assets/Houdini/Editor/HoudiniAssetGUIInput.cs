@@ -44,15 +44,14 @@ public class HoudiniAssetGUIInput : HoudiniAssetGUI
 
 		bool is_editable = true;
 
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		is_editable = false;
 		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 		if ( !is_editable )
 			HoudiniGUI.help( "This mesh is not editable.", MessageType.Info );
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;

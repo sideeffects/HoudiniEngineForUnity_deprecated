@@ -100,13 +100,12 @@ public class HoudiniAssetGUI : Editor
 
 	public override void OnInspectorGUI() 
 	{
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		bool gui_enable = GUI.enabled;
 		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		try
 		{
@@ -254,9 +253,9 @@ public class HoudiniAssetGUI : Editor
 			Debug.LogError( e.ToString() );
 		}
 		
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		GUI.enabled = gui_enable;
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public virtual void OnSceneGUI()

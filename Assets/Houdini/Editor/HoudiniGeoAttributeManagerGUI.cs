@@ -4,10 +4,10 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 #pragma warning disable 0162 // Unreachable Code
 #pragma warning disable 0414 // Initialized but unused Private Member Variable
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 public class HoudiniGeoAttributeManagerGUI
 {
@@ -79,11 +79,10 @@ public class HoudiniGeoAttributeManagerGUI
 	
 	public void OnSceneGUI() 
 	{
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		return;
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		if ( myManager == null )
 			return;
@@ -363,11 +362,10 @@ public class HoudiniGeoAttributeManagerGUI
 			}
 		}
 
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		#pragma warning restore 0162
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1188,8 +1186,8 @@ public class HoudiniGeoAttributeManagerGUI
 	private HoudiniGeoAttributeManager.Mode myLastMode;
 }
 
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 #pragma warning restore 0162 // Unreachable Code
 #pragma warning restore 0414 // Initialized but unused Private Member Variable
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
