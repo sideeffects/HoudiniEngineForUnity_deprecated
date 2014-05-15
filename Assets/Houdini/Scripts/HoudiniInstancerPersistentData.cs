@@ -12,6 +12,12 @@ public class HoudiniInstancerPersistentData : ScriptableObject
 	public List< bool > recalculateVariations;
 	public bool showInstancerGUI = true;
 
+	// Due to the difference between Houdini's coordinate system and that of Unity,
+	// most assets from unity won't look right until a 90 degree rotation in X is 
+	// introduced.
+	public Vector3 rotationalOffset = new Vector3( 90, 0 , 0 );
+	public Vector3 scaleOffset = new Vector3( 1, 1 , 1 );
+
 	public List< HoudiniInstancerOverrideInfo > overriddenInstances; 
 
 	public HoudiniInstancerPersistentData()

@@ -85,6 +85,14 @@ public partial class HoudiniInstancerManagerGUI: Editor
 				bool changed = false;
 				
 				{
+					Vector3 dummy = new Vector3();
+					changed |= HoudiniGUI.floatField( 
+						"RotationOffset", "Rotation Offset", 
+						ref persistent_data.rotationalOffset, null, ref dummy );
+
+					changed |= HoudiniGUI.floatField( 
+						"ScaleOffset", "Scale Offset", ref persistent_data.scaleOffset, null, ref dummy );
+					
 					List< string > unique_names = persistent_data.uniqueNames;
 					
 					for ( int ii = 0; ii < unique_names.Count; ii++ )
