@@ -244,21 +244,19 @@ public class HoudiniInstancer : MonoBehaviour
 
 			obj.transform.localPosition = pos;
 
-			// Due to the difference between Houdini's coordinate system and that of Unity,
-			// most assets from unity won't look right until a 90 degree rotation in X is 
-			// introduced.
+
 			Quaternion quat = Quaternion.Euler( new Vector3(
-				90 + user_instance.transform.localRotation.eulerAngles.x + euler.x,
-				user_instance.transform.localRotation.eulerAngles.y + euler.y,
-				user_instance.transform.localRotation.eulerAngles.z + euler.z ) );
+				prPersistentData.rotationalOffset.x + user_instance.transform.localRotation.eulerAngles.x + euler.x,
+				prPersistentData.rotationalOffset.y + user_instance.transform.localRotation.eulerAngles.y + euler.y,
+				prPersistentData.rotationalOffset.z + user_instance.transform.localRotation.eulerAngles.z + euler.z ) );
 
 			obj.transform.localRotation = quat;
 			if ( scale_exists )
 			{
 				obj.transform.localScale = new Vector3(
-					user_instance.transform.localScale.x * scale.x,
-					user_instance.transform.localScale.y * scale.y,
-					user_instance.transform.localScale.z * scale.z );
+					prPersistentData.scaleOffset.x * user_instance.transform.localScale.x * scale.x,
+					prPersistentData.scaleOffset.y * user_instance.transform.localScale.y * scale.y,
+					prPersistentData.scaleOffset.z * user_instance.transform.localScale.z * scale.z );
 			}
 		}
 		else
