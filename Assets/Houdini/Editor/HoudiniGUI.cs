@@ -560,6 +560,32 @@ public class HoudiniGUI : Editor
 		undo_value = undo_values[ 0 ];
 		return changed;
 	}
+
+	public static bool floatField(
+		string name, string label, ref Vector3 value, Object undo_info, ref Vector3 undo_value )
+	{
+		HoudiniGUIParm gui_parm = new HoudiniGUIParm( name, label );
+		gui_parm.size = 3;
+		float[] values = new float[ 3 ];
+		values[ 0 ] = value.x;
+		values[ 1 ] = value.y;
+		values[ 2 ] = value.z;
+		float[] undo_values = new float[ 3 ];
+		undo_values[ 0 ] = undo_value.x;
+		undo_values[ 1 ] = undo_value.y;
+		undo_values[ 2 ] = undo_value.z;
+		bool delay_build = false;
+		bool changed = floatField( ref gui_parm, ref delay_build, ref values, undo_info, ref undo_values );
+		value.x = values[ 0 ];
+		value.y = values[ 1 ];
+		value.z = values[ 2 ];
+		undo_value.x = undo_values[ 0 ];
+		undo_value.y = undo_values[ 1 ];
+		undo_value.z = undo_values[ 2 ];
+		return changed;
+	}
+
+
 	public static bool floatField(
 		string name, string label, ref float value, float ui_min, 
 		float ui_max, Object undo_info, ref float undo_value )
