@@ -24,9 +24,9 @@ using System.Collections.Generic;
 [ CustomEditor( typeof( HoudiniCurve ) ) ]
 public class HoudiniCurveGUI : Editor 
 {
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	#pragma warning disable 0414
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -90,15 +90,14 @@ public class HoudiniCurveGUI : Editor
 
 		bool is_editable = myCurve.prEditable;
 
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		is_editable = false;
 		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 		if ( !is_editable )
 			HoudiniGUI.help( "This curve is not editable.", MessageType.Info );
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
@@ -112,12 +111,11 @@ public class HoudiniCurveGUI : Editor
 	
 	public void OnSceneGUI() 
 	{
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		return;
 		#pragma warning disable 0162
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		if ( myCurve == null )
 			return;
@@ -472,11 +470,9 @@ public class HoudiniCurveGUI : Editor
 			}
 		}
 
-		// We can only build or do anything if we can link to our dll which
-		// can only happen on the Windows x86 platform.
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		#pragma warning restore 0162
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1039,7 +1035,7 @@ public class HoudiniCurveGUI : Editor
 
 	private HoudiniCurve.Mode myLastMode;
 
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	#pragma warning restore 0414
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 }

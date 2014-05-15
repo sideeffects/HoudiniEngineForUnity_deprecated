@@ -181,6 +181,9 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
 				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv = prActiveAttribute.prFloatDataVec2;
+
+			// Unity 4.x has mesh.uv, uv1, and uv2 while Unity 5.x has mesh.uv, uv2, and uv3. Sigh.
+#if false
 			else if ( prActiveAttribute.prName == "uv1" &&
 				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
 				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
@@ -189,6 +192,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
 				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv2 = prActiveAttribute.prFloatDataVec2;
+#endif
 		}
 		else
 			myMesh.colors = new Color[ myMesh.vertexCount ];

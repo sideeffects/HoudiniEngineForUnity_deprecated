@@ -37,11 +37,11 @@ public class HoudiniMenu : MonoBehaviour
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadAssetLabel, true, 0 ) ]
 	static private bool validateCreateHAPIObject() 
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		return true;
 #else
 		return false;
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLaunchOrboltPage, false, 1 ) ]
@@ -106,11 +106,11 @@ public class HoudiniMenu : MonoBehaviour
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, true, 100 ) ]
 	static private bool validateCreateCurve()
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		return true;
 #else
 		return false;
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	// -----------------------------------------------------------------------

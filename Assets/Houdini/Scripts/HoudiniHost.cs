@@ -27,10 +27,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 
-#if !UNITY_4_3
-#warning Houdini for Unity relies on some Unity 4.3-only features. It is recommended you upgrade to Unity 4.3 as soon as possible.
-#endif // UNITY_4_3
-
 public delegate void RepaintDelegate();
 public delegate void DeselectionDelegate();
 public delegate void PlaymodeStateChangeDelegate();
@@ -170,13 +166,13 @@ public static partial class HoudiniHost
 
 	static HoudiniHost()
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		// During the batch creation of our .unitypackage file we don't want to actually
 		// initialize  We use this environment variable to inhibit initialization.
 		string no_init = System.Environment.GetEnvironmentVariable( "HAPI_UNITY_NO_INIT" );
 		if ( no_init != null )
 			return;
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 #if UNITY_EDITOR
 		EditorApplication.update				+= update;
@@ -667,14 +663,14 @@ public static partial class HoudiniHost
 		
 	public static void saveScene( string file_name )
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		HAPI_SaveHIPFile( file_name );
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 		
 	public static int loadOTL( string path ) 
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !initialize() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -713,12 +709,12 @@ public static partial class HoudiniHost
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 		
 	public static void loadHip( string path ) 
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !initialize() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -726,12 +722,12 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 		
 	public static int[] getAssetIdsFromLoadHIPFile()
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		int asset_count = 0;
 		HAPI_Result status_code = HAPI_GetAssetCountFromLoadHIPFile( ref asset_count );
 		processStatusCode( status_code );
@@ -743,12 +739,12 @@ public static partial class HoudiniHost
 		return asset_ids;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 		
 	public static int createCurve()
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !initialize() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -759,12 +755,12 @@ public static partial class HoudiniHost
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public static int createInputAsset( string name )
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !initialize() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -775,12 +771,12 @@ public static partial class HoudiniHost
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public static bool destroyAsset( int asset_id ) 
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( asset_id < 0 )
 			return false;
 			
@@ -791,7 +787,7 @@ public static partial class HoudiniHost
 		return true;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public static bool isRealDestroy()
@@ -805,7 +801,7 @@ public static partial class HoudiniHost
 
 	public static bool initialize()
 	{
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		return false;
 #else
 		// During the batch creation of our .unitypackage file we don't want to actually
@@ -878,12 +874,12 @@ public static partial class HoudiniHost
 		}
 
 		return true;
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public static void throwRuntimeError()
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		int buffer_size = 4000;
 		int code;
 		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_RESULT, out code );
@@ -897,12 +893,12 @@ public static partial class HoudiniHost
 			throw new HoudiniError( error_str.ToString() );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public static bool isRuntimeInitialized()
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !HoudiniSetPath.prIsPathSet )
 			return false;
 		else
@@ -919,7 +915,7 @@ public static partial class HoudiniHost
 		}
 #else
 		return false;
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	public static void repaint()
@@ -963,7 +959,7 @@ public static partial class HoudiniHost
 
 	private static void playmodeStateChanged()
 	{
-#if UNITY_EDITOR && UNITY_STANDALONE_WIN
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		// We need to catch any exceptions here because if we let any out they will stall
 		// the entire callback chain bound to EditorApplication.playmodeStateChanged which
 		// causes other bound functions in this callback list to never be called.
@@ -1005,20 +1001,20 @@ public static partial class HoudiniHost
 		{
 			Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 		}
-#endif // UNITY_EDITOR && UNITY_STANDALONE_WIN
+#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
 	private static string getAllFoldersInPath( string path )
 	{
 		string paths = "";
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !Directory.Exists( path ) )
 			return "";
 
 		DirectoryInfo di = new DirectoryInfo( path );
 		foreach ( DirectoryInfo child_directory in di.GetDirectories() )
 			paths += ";" + getAllFoldersInPath( child_directory.FullName );
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		return path + paths;
 	}

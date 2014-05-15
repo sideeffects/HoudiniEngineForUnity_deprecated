@@ -22,9 +22,9 @@ using System.Linq;
 
 public class HoudiniWindowSettings : EditorWindow 
 {
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	#pragma warning disable 0414
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -52,7 +52,7 @@ public class HoudiniWindowSettings : EditorWindow
 	
 	public void OnGUI() 
 	{
-#if UNITY_STANDALONE_WIN
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !myEnableDraw )
 			return;
 		try
@@ -72,14 +72,14 @@ public class HoudiniWindowSettings : EditorWindow
 		{
 			Debug.LogError( error.ToString() );
 		}
-#endif // UNITY_STANDALONE_WIN
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		bool gui_enable = GUI.enabled;
 
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 
 		myUndoInfo = HoudiniHost.prHostUndoInfo;
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
@@ -812,7 +812,7 @@ public class HoudiniWindowSettings : EditorWindow
 	private static Vector2 myScrollPosition;
 	private static HoudiniHostUndoInfo myUndoInfo;
 
-#if !UNITY_STANDALONE_WIN
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	#pragma warning restore 0414
-#endif // !UNITY_STANDALONE_WIN
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 }
