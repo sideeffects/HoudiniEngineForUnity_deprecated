@@ -47,3 +47,4 @@ The plug-in is supported on Windows only for now.
 1. Open the console and ensure Houdini Engine loaded successfully by looking for an entry starting with "Linking Against Houdini Engine Version:". You should also see a menu at the top named _Houdini Engine_.
 1. You are now ready to load Houdini Digital Assets into Unity.
 
+
