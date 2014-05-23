@@ -899,8 +899,6 @@ public struct HAPI_PartInfo
 
 	public HAPI_PartId id;
 	private HAPI_StringHandle nameSH;
-
-	public HAPI_MaterialId materialId;
 		
 	public int faceCount;
 	public int vertexCount;
@@ -952,6 +950,9 @@ public struct HAPI_MaterialInfo
 	public HAPI_MaterialId id;
 	public HAPI_AssetId assetId;
 	public HAPI_NodeId nodeId;
+
+	[ MarshalAs( UnmanagedType.U1 ) ]
+	public bool exists;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool hasChanged;

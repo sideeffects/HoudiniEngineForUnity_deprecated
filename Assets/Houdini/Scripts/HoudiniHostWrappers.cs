@@ -2193,21 +2193,27 @@ public static partial class HoudiniHost
 
 	// MATERIALS ------------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Fill a <see cref="HAPI_MaterialInfo"> struct with information about the material
-	/// 	used and stored in an asset.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	public static HAPI_MaterialInfo getMaterial( HAPI_AssetId asset_id, HAPI_MaterialId material_id )
+	public static HAPI_MaterialInfo getMaterialOnPart(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		HAPI_Result status_code = HAPI_GetMaterial( asset_id, material_id, out material_info );
+		HAPI_Result status_code = HAPI_GetMaterialOnPart(
+			asset_id, object_id, geo_id, part_id, out material_info );
+		processStatusCode( status_code );
+		return material_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_MaterialInfo getMaterialOnGroup(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string group_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		HAPI_Result status_code = HAPI_GetMaterialOnGroup(
+			asset_id, object_id, geo_id, group_name, out material_info );
 		processStatusCode( status_code );
 		return material_info;
 #else

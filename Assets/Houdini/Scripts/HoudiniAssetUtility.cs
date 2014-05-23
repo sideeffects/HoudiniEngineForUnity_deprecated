@@ -799,8 +799,9 @@ public class HoudiniAssetUtility
 	{
 		GameObject part_node = part_control.gameObject;
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HoudiniHost.getPartInfo( asset.prAssetId, part_control.prObjectId, part_control.prGeoId, 
-							   part_control.prPartId, out part_info );
+		HoudiniHost.getPartInfo(
+			asset.prAssetId, part_control.prObjectId, part_control.prGeoId, 
+			part_control.prPartId, out part_info );
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
 		if ( is_mesh
@@ -810,7 +811,13 @@ public class HoudiniAssetUtility
 #endif // UNITY_EDITOR
 			)
 		{
-			part_control.prMaterialId = part_info.materialId;
+			HAPI_MaterialInfo material_info = HoudiniHost.getMaterialOnPart(
+				asset.prAssetId, part_control.prObjectId, part_control.prGeoId,
+				part_control.prPartId );
+			if ( material_info.exists )
+				part_control.prMaterialId = material_info.id;
+			else
+				part_control.prMaterialId = -1;
 		
 			MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
 			if ( !mesh_renderer )
@@ -823,7 +830,6 @@ public class HoudiniAssetUtility
 				
 				if ( part_control.prMaterialId >= 0 ) // If the material is valid.
 				{
-					HAPI_MaterialInfo material_info = HoudiniHost.getMaterial( asset.prAssetId, part_info.materialId );
 					update_houdini_material &= material_info.hasChanged;
 
 					if ( update_houdini_material || mesh_renderer.sharedMaterial.mainTexture == null )
@@ -1470,7 +1476,6 @@ public class HoudiniAssetUtility
 		geo_info.id 					= geo_id;
 
 		HAPI_PartInfo part_info			= new HAPI_PartInfo();
-		part_info.materialId 			= -1;
 
 		if ( setting_raw_mesh )
 		{

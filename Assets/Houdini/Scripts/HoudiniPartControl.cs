@@ -151,6 +151,11 @@ public class HoudiniPartControl : HoudiniGeoControl
 		// Get Part info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HoudiniHost.getPartInfo( prAssetId, prObjectId, prGeoId, prPartId, out part_info );
+		HAPI_MaterialInfo material_info = HoudiniHost.getMaterialOnPart(
+			prAssetId, prObjectId, prGeoId, prPartId );
+		int part_material_id = -1;
+		if ( material_info.exists )
+			part_material_id = material_info.id;
 
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
@@ -162,7 +167,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		if ( reload_asset || has_geo_changed )
 		{
 			// Initialize our part control.
-			init( -1, part_info.id, part_info.name, part_info.materialId );
+			init( -1, part_info.id, part_info.name, part_material_id );
 
 			// Overwrite name.
 			part_node.name = part_info.name;
