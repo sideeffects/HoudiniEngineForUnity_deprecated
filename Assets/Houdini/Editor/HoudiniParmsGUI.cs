@@ -521,20 +521,29 @@ public class HoudiniParmsGUI : Editor
 				current_parent_id = parent_id_stack.Peek();
 				
 				if ( parent_count_stack.Count == 0 ) Debug.LogError( "" );
+
+				// Get the leftover parameter count of the current folder.
+				int current_parent_count = parent_count_stack.Peek();
 				
 				// If the current parameter, whatever it may be, does not belong to the current active
 				// parent then skip it. This check has to be done here because we do not want to
 				// increment the top of the parent_count_stack as if we included a parameter in the
 				// current folder.
-				if ( parms[ current_index ].parentId != current_parent_id )
+				//
+				// There is a special case of this where the folder starts off as having zero
+				// parameters (and empty folder) and therefore the very next parameter is not
+				// parented under the current folder so we need to check if we're the empty folder.
+				if ( current_parent_count != 0 && parms[ current_index ].parentId != current_parent_id )
 				{
 					current_index++;
 					continue;
 				}
-				
-				int current_parent_count = parent_count_stack.Peek();
+
+				// Decrement the leftover parameter count. Note that it is safe to decrement
+				// even if the current folder is already empty (the empty folder). We'll get
+				// -1 but the check just checks for <= 0.
 				current_parent_count--;
-				
+
 				// If we've reached the last parameter in the current folder we need to pop the parent 
 				// stacks (we're done with the current folder). Otherwise, update the top of the 
 				// parent_count_stack.
