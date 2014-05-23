@@ -614,8 +614,15 @@ public static partial class HoudiniHost
 		
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetMaterial(
-		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
+	HAPI_GetMaterialOnPart(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		out HAPI_MaterialInfo material_info );
+
+	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetMaterialOnGroup(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		string group_name,
 		out HAPI_MaterialInfo material_info );
 
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
