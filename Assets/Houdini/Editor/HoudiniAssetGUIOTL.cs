@@ -270,6 +270,22 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			"import_templated_geos", "Import Templated Geos", "prImportTemplatedGeos",
 			ref myUndoInfo.importTemplatedGeos, null, !HoudiniHost.isImportTemplatedGeosDefault(),
 			!myAsset.prEnableCooking, " (all cooking is disabled)" );
+
+		HoudiniGUI.separator();
+
+		// Split Geos by Group Toggle
+		{
+			createToggleForProperty(
+				"split_geos_by_group_override", "Override Split Geos by Group", "prSplitGeosByGroupOverride",
+				ref myUndoInfo.splitGeosByGroupOverride, null );
+			createToggleForProperty(
+				"split_geos_by_group", "Split Geos by Group", "prSplitGeosByGroup",
+				ref myUndoInfo.splitGeosByGroup, () => EditorUtility.DisplayDialog(
+					"Rebuild Required",
+					"This change will take affect only after a full asset rebuild.",
+					"Ok" ), false,
+				!myAsset.prSplitGeosByGroupOverride, " (check the override checkbox to enable)" );
+		}
 	}
 
 	private void generateAssetSettings()

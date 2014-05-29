@@ -202,7 +202,7 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CookAsset(
-		HAPI_AssetId asset_id, HAPI_CookOptions cook_options );
+		HAPI_AssetId asset_id, ref HAPI_CookOptions cook_options );
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CookAsset(

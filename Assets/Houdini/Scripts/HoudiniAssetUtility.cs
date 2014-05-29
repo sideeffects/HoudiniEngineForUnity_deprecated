@@ -817,7 +817,7 @@ public class HoudiniAssetUtility
 			return;
 
 		// Determine if we are dealing with multiple materials per-mesh.
-		bool has_multiple_materials = !HoudiniHost.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0;
+		bool has_multiple_materials = !asset.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0;
 
 		// Count the number of materials.
 		int material_count = 0;
@@ -1447,7 +1447,7 @@ public class HoudiniAssetUtility
 			calculateMeshTangents( mesh );
 
 		// Create the submeshes if needed.
-		if ( !HoudiniHost.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0 )
+		if ( !part_control.prAsset.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0 )
 		{
 			string[] groups = HoudiniHost.getGroupNames(
 				asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM );

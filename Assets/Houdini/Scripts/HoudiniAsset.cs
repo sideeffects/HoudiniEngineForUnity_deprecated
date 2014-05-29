@@ -213,11 +213,18 @@ public abstract class HoudiniAsset : HoudiniControl
 																!HoudiniHost.isTransformChangeTriggersCooksDefault() ); } 
 												set { myTransformChangeTriggersCooks = value; } }
 
-	public bool	prImportTemplatedGeos{ get { return (			myImportTemplatedGeos && 
+	public bool	prImportTemplatedGeos { get { return (			myImportTemplatedGeos && 
 																HoudiniHost.isImportTemplatedGeosDefault() )
 														  || (	HoudiniHost.prImportTemplatedGeos &&
 																!HoudiniHost.isImportTemplatedGeosDefault() ); } 
 												set { myImportTemplatedGeos = value; } }
+
+	public bool prSplitGeosByGroupOverride {	get { return mySplitGeosByGroupOverride; }
+												set { mySplitGeosByGroupOverride = value; } }
+	public bool prSplitGeosByGroup { get { return prSplitGeosByGroupOverride
+														? mySplitGeosByGroup
+														: HoudiniHost.prSplitGeosByGroup; } 
+												set { mySplitGeosByGroup = value; } }
 
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
 																	set { myEnableLogging = value; } }
@@ -808,6 +815,8 @@ public abstract class HoudiniAsset : HoudiniControl
 		prPushUnityTransformToHoudini	= HoudiniHost.myDefaultPushUnityTransformToHoudini;
 		prTransformChangeTriggersCooks	= HoudiniHost.myDefaultTransformChangeTriggersCooks;
 		prImportTemplatedGeos 			= HoudiniHost.myDefaultImportTemplatedGeos;
+		prSplitGeosByGroupOverride		= false;
+		prSplitGeosByGroup				= HoudiniHost.myDefaultSplitGeosByGroup;
 
 		prEnableLogging					= false;
 
@@ -1266,7 +1275,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		prParms.setChangedParametersIntoHost();
 
-		HoudiniHost.cookAsset( prAssetId );
+		HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup );
 		progress_bar.statusCheckLoop();
 
 		myProgressBarJustUsed = true;
@@ -1518,7 +1527,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			{
 				HoudiniHost.setTime( curr_time );
 				
-				HoudiniHost.cookAsset( prAssetId );
+				HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup );
 				
 				HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 					
@@ -1605,7 +1614,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			if ( myPreset != null && myPreset.Length > 0 )
 			{
 				HoudiniHost.setPreset( prNodeId, myPreset );
-				HoudiniHost.cookAsset( prAssetId );
+				HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup );
 			}
 		}
 		catch ( HoudiniError error )
@@ -2013,6 +2022,8 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private bool					myPushUnityTransformToHoudini;
 	[SerializeField] private bool					myTransformChangeTriggersCooks;
 	[SerializeField] private bool					myImportTemplatedGeos;
+	[SerializeField] private bool					mySplitGeosByGroupOverride;
+	[SerializeField] private bool					mySplitGeosByGroup;
 	
 	[SerializeField] private bool					myEnableLogging;
 

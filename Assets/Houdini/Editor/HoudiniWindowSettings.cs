@@ -444,6 +444,8 @@ public class HoudiniWindowSettings : EditorWindow
 			}
 		}
 
+		HoudiniGUI.separator();
+
 		// Import Templated Geos
 		{
 			bool value = HoudiniHost.prImportTemplatedGeos;
@@ -465,8 +467,8 @@ public class HoudiniWindowSettings : EditorWindow
 		{
 			bool value = HoudiniHost.prSplitGeosByGroup;
 			bool changed = HoudiniGUI.toggle(
-				"split_geos_by_group", 
-				"Split Geos by Group", 
+				"split_geos_by_group",
+				"Split Geos by Group",
 				ref value, myUndoInfo,
 				ref myUndoInfo.splitGeosByGroup );
 			if ( changed )
@@ -475,8 +477,8 @@ public class HoudiniWindowSettings : EditorWindow
 				HoudiniHost.repaint();
 			
 				EditorUtility.DisplayDialog(
-					"Restart Required",
-					"This change will take affect only after you restart Unity.",
+					"Rebuild Required",
+					"This change will take affect only after a full asset rebuild.",
 					"Ok" );
 			}
 		}

@@ -431,17 +431,15 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Initiate a cook on this asset. Note that this may trigger cooks on other assets if they 
-	/// 	are connected.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	public static void cookAsset( HAPI_AssetId asset_id )
+	public static void cookAsset( HAPI_AssetId asset_id, bool splitGeosByGroup )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		HAPI_Result status_code = HAPI_CookAsset( asset_id, System.IntPtr.Zero );
+		HAPI_CookOptions cook_options = new HAPI_CookOptions();
+		cook_options.splitGeosByGroup = splitGeosByGroup;
+		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
+		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
+		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
