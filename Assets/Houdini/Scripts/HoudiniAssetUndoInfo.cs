@@ -22,6 +22,8 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 	public bool pushUnityTransformToHoudini;
 	public bool transformChangeTriggersCooks;
 	public bool importTemplatedGeos;
+	public bool splitGeosByGroupOverride;
+	public bool splitGeosByGroup;
 
 	// Bake Settings
 	public float bakeStartTime;
@@ -45,6 +47,8 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 		pushUnityTransformToHoudini		= asset.prPushUnityTransformToHoudini;
 		transformChangeTriggersCooks 	= asset.prTransformChangeTriggersCooks;
 		importTemplatedGeos 			= asset.prImportTemplatedGeos;
+		splitGeosByGroupOverride		= asset.prSplitGeosByGroupOverride;
+		splitGeosByGroup				= asset.prSplitGeosByGroup;
 		bakeStartTime					= asset.prBakeStartTime;
 		bakeEndTime						= asset.prBakeEndTime;
 		bakeSamplesPerSecond			= asset.prBakeSamplesPerSecond;

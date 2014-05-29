@@ -120,7 +120,7 @@ public class HoudiniMenu : MonoBehaviour
 	static private void createSimpleInputGeo() 
 	{
 		int asset_id = HoudiniHost.createInputAsset( "simple_input_geo_test" );
-		HoudiniHost.cookAsset( asset_id );
+		HoudiniHost.cookAsset( asset_id, HoudiniHost.prSplitGeosByGroup );
 
 		HAPI_PartInfo new_part = new HAPI_PartInfo();
 		new_part.vertexCount = 3;
