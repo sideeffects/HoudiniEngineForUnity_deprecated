@@ -794,84 +794,137 @@ public class HoudiniAssetUtility
 		return ( alpha < 0.95f );
 	}
 
-	public static void assignMaterial( HoudiniPartControl part_control, HoudiniAsset asset, 
-									   bool update_houdini_material )
+	public static void assignMaterial(
+		HoudiniPartControl part_control, HoudiniAsset asset, bool update_houdini_material )
 	{
-		GameObject part_node = part_control.gameObject;
+		// Get all the juicy infos.
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HoudiniHost.getGeoInfo(
+			asset.prAssetId, part_control.prObjectId, part_control.prGeoId, out geo_info );
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HoudiniHost.getPartInfo(
 			asset.prAssetId, part_control.prObjectId, part_control.prGeoId, 
 			part_control.prPartId, out part_info );
-		bool is_mesh = ( part_info.vertexCount > 0 );
 
-		if ( is_mesh
+		// Determine if this is a mesh and therefore actually needs to be textured.
+		bool is_mesh = ( part_info.vertexCount > 0 );
+		if ( !is_mesh
 #if UNITY_EDITOR
-			&& ( !part_control.prPartName.Contains( HoudiniHost.prCollisionGroupName ) || 
-			part_control.prPartName.Contains( HoudiniHost.prRenderedCollisionGroupName ) )
+			|| ( part_control.prPartName.Contains( HoudiniHost.prCollisionGroupName ) && 
+				!part_control.prPartName.Contains( HoudiniHost.prRenderedCollisionGroupName ) )
 #endif // UNITY_EDITOR
 			)
+			return;
+
+		// Determine if we are dealing with multiple materials per-mesh.
+		bool has_multiple_materials = !HoudiniHost.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0;
+
+		// Count the number of materials.
+		int material_count = 0;
+		if ( has_multiple_materials )
+			material_count = geo_info.primitiveGroupCount;
+		else
+			material_count = 1;
+
+		// Get the mesh renderer.
+		GameObject part_node = part_control.gameObject;
+		MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
+		if ( !mesh_renderer )
+			throw new HoudiniError( "No mesh renderer!" );
+
+		// Get the shared materials array or create one if it doesn't exist.
+		Material[] materials = null;
+		if ( mesh_renderer.sharedMaterials != null && mesh_renderer.sharedMaterials.Length == material_count )
+			materials = mesh_renderer.sharedMaterials;
+		else
+			materials = new Material[ material_count ];
+
+		// If we are dealing with multiple materials fetch the groups.
+		string[] groups = null;
+		if ( has_multiple_materials )
 		{
-			HAPI_MaterialInfo material_info = HoudiniHost.getMaterialOnPart(
+			groups = HoudiniHost.getGroupNames(
 				asset.prAssetId, part_control.prObjectId, part_control.prGeoId,
-				part_control.prPartId );
-			if ( material_info.exists )
-				part_control.prMaterialId = material_info.id;
+				HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
+			if ( groups.Length != geo_info.primitiveGroupCount )
+				Debug.LogError( "Inconsistent group counts on geo." );
+		}
+
+		// Go through each material and update, create, or load it.
+		for ( int m = 0; m < material_count; ++m )
+		{
+			Material material = null;
+
+			// First check for a Unity material setup. If this is a Unity material
+			// we can skip the rest of the loop body.
+			if ( has_multiple_materials )
+				material = null; // TODO: getUnityMaterialOnGroup().
 			else
-				part_control.prMaterialId = -1;
-		
-			MeshRenderer mesh_renderer = part_node.GetComponent< MeshRenderer >();
-			if ( !mesh_renderer )
-				throw new HoudiniError( "No mesh renderer!" );
-
-			if ( !assignUnityMaterial( part_control, part_node, mesh_renderer ) )
+				material = getUnityMaterialOnPart( part_control );
+			if ( material != null )
 			{
-				if ( mesh_renderer.sharedMaterial == null )
-					mesh_renderer.sharedMaterial = new Material( Shader.Find( "Houdini/SpecularVertexColor" ) );
-				
-				if ( part_control.prMaterialId >= 0 ) // If the material is valid.
-				{
-					update_houdini_material &= material_info.hasChanged;
+				materials[ m ] = material;
+				continue;
+			}
 
-					if ( update_houdini_material || mesh_renderer.sharedMaterial.mainTexture == null )
-					{
-						// Reset textures.
-						mesh_renderer.sharedMaterial.mainTexture = null;
-						mesh_renderer.sharedMaterial.SetTexture( "_NormalMap", null );
+			// Get the material from the shared materials list or create it if it doesn't exist.
+			if ( materials[ m ] != null )
+				material = materials[ m ];
+			else
+				material = new Material( Shader.Find( "Houdini/SpecularVertexColor" ) );
+
+			// Get the material info.
+			HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+			if ( has_multiple_materials )
+				material_info = HoudiniHost.getMaterialOnGroup(
+					asset.prAssetId, part_control.prObjectId, part_control.prGeoId, groups[ m ] );
+			else
+				material_info = HoudiniHost.getMaterialOnPart(
+					asset.prAssetId, part_control.prObjectId, part_control.prGeoId,
+					part_control.prPartId );
+			if ( !material_info.exists )
+				continue;
+
+			// Check if we actually need to update the material.
+			if ( !update_houdini_material && !material_info.hasChanged && material.mainTexture != null )
+				continue;
+
+			// Reset textures.
+			material.mainTexture = null;
+			material.SetTexture( "_NormalMap", null );
 	
-						// Assign vertex color shader if the flag says so.
-						if ( asset.prShowOnlyVertexColours )
-						{
-							mesh_renderer.sharedMaterial.shader = Shader.Find( "Houdini/SpecularVertexColor" );
-						}
-						else
-						{
-							// Assign the transparency shader if this material is transparent or unassign it otherwise.
-							if ( isMaterialTransparent( material_info ) )
-								mesh_renderer.sharedMaterial.shader = Shader.Find( "Houdini/AlphaSpecularVertexColor" );
-							else
-								mesh_renderer.sharedMaterial.shader = Shader.Find( "Houdini/SpecularVertexColor" );
+			// Assign vertex color shader if the flag says so.
+			if ( asset.prShowOnlyVertexColours )
+				material.shader = Shader.Find( "Houdini/SpecularVertexColor" );
+			else
+			{
+				// Assign the transparency shader if this material is transparent or unassign it otherwise.
+				if ( isMaterialTransparent( material_info ) )
+					material.shader = Shader.Find( "Houdini/AlphaSpecularVertexColor" );
+				else
+					material.shader = Shader.Find( "Houdini/SpecularVertexColor" );
 	
-							setRenderResolution( asset.prRenderResolution );
+				setRenderResolution( asset.prRenderResolution );
 	
-							// Before assigning material, make sure that if the asset is a prefab instance, all 
-							// modifications are saved before assignHoudiniMaterial is called because ImportAsset may 
-							// be called within this function which will cause OnEnable to be called on all prefab 
-							// instances if the prefab is dirty
+				// Before assigning material, make sure that if the asset is a prefab instance, all 
+				// modifications are saved before assignHoudiniMaterial is called because ImportAsset may 
+				// be called within this function which will cause OnEnable to be called on all prefab 
+				// instances if the prefab is dirty.
 #if UNITY_EDITOR
-							if ( asset.isPrefabInstance() )
-								PrefabUtility.RecordPrefabInstancePropertyModifications( asset );
+				if ( asset.isPrefabInstance() )
+					PrefabUtility.RecordPrefabInstancePropertyModifications( asset );
 #endif // UNITY_EDITOR
 
-							Material material = mesh_renderer.sharedMaterial;
-							string folder_path = HoudiniConstants.HAPI_TEXTURES_PATH + "/" + 
-												 part_control.prAsset.prAssetName;
-							assignHoudiniMaterial( ref material, material_info, folder_path, 
-												   asset.prMaterialShaderType );
-						}
-					}
-				}
+				string folder_path =
+					HoudiniConstants.HAPI_TEXTURES_PATH + "/" + part_control.prAsset.prAssetName;
+				assignHoudiniMaterial(
+					ref material, material_info, folder_path, asset.prMaterialShaderType );
 			}
+
+			materials[ m ] = material;
 		}
+
+		mesh_renderer.sharedMaterials = materials;
 	}
 
 	public static Texture2D extractHoudiniImageToTexture( 
@@ -1058,8 +1111,7 @@ public class HoudiniAssetUtility
 		}
 	}
 
-	public static bool assignUnityMaterial( HoudiniPartControl part_control, GameObject part_node,
-											MeshRenderer mesh_renderer )
+	public static Material getUnityMaterialOnPart( HoudiniPartControl part_control )
 	{
 		// Get position attributes.
 		int asset_id	= part_control.prAssetId;
@@ -1091,16 +1143,16 @@ public class HoudiniAssetUtility
 
 		if ( material_attr_info.exists )
 		{
-			Material material			= (Material) Resources.Load( material_path, typeof( Material ) );
+			Material material = (Material) Resources.Load( material_path, typeof( Material ) );
 
 #if UNITY_EDITOR
-			bool has_sub_material_name		= sub_material_name_attr_info.exists && 
-											  HoudiniHost.getString( sub_material_name_attr[ 0 ] ) != "";
-			bool has_sub_material_index		= sub_material_index_attr_info.exists;
+			bool has_sub_material_name =
+				sub_material_name_attr_info.exists && HoudiniHost.getString( sub_material_name_attr[ 0 ] ) != "";
+			bool has_sub_material_index = sub_material_index_attr_info.exists;
 
-			string sub_material_name	= has_sub_material_name ? HoudiniHost.getString( sub_material_name_attr[ 0 ] ) 
-																: "";
-			int sub_material_index		= has_sub_material_index ? sub_material_index_attr[ 0 ] : 0;
+			string sub_material_name =
+				has_sub_material_name ? HoudiniHost.getString( sub_material_name_attr[ 0 ] ) : "";
+			int sub_material_index = has_sub_material_index ? sub_material_index_attr[ 0 ] : 0;
 
 			if ( material == null )
 			{
@@ -1134,17 +1186,14 @@ public class HoudiniAssetUtility
 					material = substance_importer.GetMaterials()[ sub_material_index ];
 				}
 				else
-					Debug.LogWarning( "sub_material_index (" + sub_material_index + ") out of range for " +
-									  "material: " + abs_path );
+					Debug.LogWarning(
+						"sub_material_index (" + sub_material_index + ") out of range for material: " + abs_path );
 			}
 #endif // UNITY_EDITOR
-
-			mesh_renderer.sharedMaterial = material;
-
-			return true;
+			return material;
 		}
 		else
-			return false;
+			return null;
 	}
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
@@ -1157,6 +1206,9 @@ public class HoudiniAssetUtility
 		int part_id		= part_control.prPartId;
 
 		// Get Detail info.
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HoudiniHost.getGeoInfo(
+			 asset_id, object_id, geo_id, out geo_info );
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HoudiniHost.getPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
 		
@@ -1390,6 +1442,40 @@ public class HoudiniAssetUtility
 
 		if ( generate_tangents && !tangent_attr_info.exists )
 			calculateMeshTangents( mesh );
+
+		// Create the submeshes if needed.
+		if ( !HoudiniHost.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0 )
+		{
+			string[] groups = HoudiniHost.getGroupNames(
+				asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
+
+			mesh.subMeshCount = groups.Length;
+			for ( int g = 0; g < groups.Length; ++g )
+			{
+				string group = groups[ g ];
+				bool[] mem = HoudiniHost.getGroupMembership(
+					asset_id, object_id, geo_id, part_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, group );
+
+				int membership_count = 0;
+				foreach ( bool m in mem )
+					if ( m ) membership_count++;
+
+				if ( membership_count <= 0 )
+					continue;
+
+				int[] group_triangles = new int[ membership_count * 3 ];
+				int current_triangle = 0;
+				for ( int i = 0; i < part_info.faceCount; ++i )
+					if ( mem[ i ] )
+					{
+						for ( int j = 0; j < 3; ++j )
+							group_triangles[ current_triangle * 3 + j ] = i * 3 + j;
+						current_triangle++;
+					}
+
+				mesh.SetTriangles( group_triangles, g );
+			}
+		}
 	}
 
 	private static void setMeshPointAttribute(
