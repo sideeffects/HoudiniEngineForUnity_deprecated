@@ -871,7 +871,10 @@ public class HoudiniAssetUtility
 			if ( materials[ m ] != null )
 				material = materials[ m ];
 			else
+			{
 				material = new Material( Shader.Find( "Houdini/SpecularVertexColor" ) );
+				materials[ m ] = material;
+			}
 
 			// Get the material info.
 			HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
