@@ -34,8 +34,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 														set { myPartId = value; } }
 	public string	prPartName {						get { return myPartName; }
 														set { myPartName = value; } }
-	public int		prMaterialId {						get { return myMaterialId; }
-														set { myMaterialId = value; } }
 	public int[]	prVertexList {						get { return myVertexList; }
 														set { myVertexList = value; } }
 
@@ -81,7 +79,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 		
 		prPartId = -1;
 		prPartName = "part_name";
-		prMaterialId = -1;
 		prVertexList = new int[ 1 ];
 		myTransformChanged = false;
 
@@ -122,15 +119,13 @@ public class HoudiniPartControl : HoudiniGeoControl
 		prAsset			= part_control.prAsset;
 		prPartId		= part_control.prPartId;
 		prPartName		= part_control.prPartName;
-		prMaterialId	= part_control.prMaterialId;
 	}
 
-	public void init( HAPI_NodeId node_id, int part_id, string part_name, int material_id )
+	public void init( HAPI_NodeId node_id, int part_id, string part_name )
 	{
 		prNodeId		= node_id;
 		prPartId		= part_id;
 		prPartName		= part_name;
-		prMaterialId	= material_id;
 	}
 
 	public override string getFullControlNameAndPath()
@@ -151,11 +146,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 		// Get Part info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HoudiniHost.getPartInfo( prAssetId, prObjectId, prGeoId, prPartId, out part_info );
-		HAPI_MaterialInfo material_info = HoudiniHost.getMaterialOnPart(
-			prAssetId, prObjectId, prGeoId, prPartId );
-		int part_material_id = -1;
-		if ( material_info.exists )
-			part_material_id = material_info.id;
 
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
@@ -167,7 +157,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		if ( reload_asset || has_geo_changed )
 		{
 			// Initialize our part control.
-			init( -1, part_info.id, part_info.name, part_material_id );
+			init( -1, part_info.id, part_info.name );
 
 			// Overwrite name.
 			part_node.name = part_info.name;
@@ -743,7 +733,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	[SerializeField] private int			myPartId;
 	[SerializeField] private string			myPartName;
-	[SerializeField] private int			myMaterialId;
 	[SerializeField] private int[]			myVertexList;
 	[SerializeField] private Matrix4x4		myLastLocalToWorld;
 	[SerializeField] private bool			myTransformChanged;
