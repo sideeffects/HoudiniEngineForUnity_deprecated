@@ -668,7 +668,7 @@ public static partial class HoudiniHost
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 		
-	public static int loadOTL( string path ) 
+	public static int loadOTL( string path, bool split_geos_by_group ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !initialize() )
@@ -702,9 +702,10 @@ public static partial class HoudiniHost
 
 		int asset_id = -1;
 		string first_asset_name = asset_names[ 0 ];
-		bool cook_on_load = true;
+		bool cook_on_load = false;
 		status_code = HAPI_InstantiateAsset( first_asset_name, cook_on_load, out asset_id );
 		processStatusCode( status_code );
+		cookAsset( asset_id, split_geos_by_group );
 
 		return asset_id;
 #else

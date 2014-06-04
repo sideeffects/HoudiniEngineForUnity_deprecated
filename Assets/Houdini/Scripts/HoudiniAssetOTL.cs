@@ -123,7 +123,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 	protected override int buildCreateAsset()
 	{
-		return HoudiniHost.loadOTL( prAssetPath );
+		return HoudiniHost.loadOTL( prAssetPath, prSplitGeosByGroup );
 	}
 
 	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
