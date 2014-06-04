@@ -431,11 +431,11 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void cookAsset( HAPI_AssetId asset_id, bool splitGeosByGroup )
+	public static void cookAsset( HAPI_AssetId asset_id, bool split_geos_by_group )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		HAPI_CookOptions cook_options = new HAPI_CookOptions();
-		cook_options.splitGeosByGroup = splitGeosByGroup;
+		cook_options.splitGeosByGroup = split_geos_by_group;
 		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
 		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
