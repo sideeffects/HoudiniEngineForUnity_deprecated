@@ -865,19 +865,18 @@ public class HoudiniInstancer : MonoBehaviour
 					}
 				}
 
-				if( !unique_instantiated_names.Contains( objToInstantiate.name ) )
-				{
-					unique_instantiated_names.Add( objToInstantiate.name );
-				}
-
-				// Set progress bar information.
-				progress_bar.prCurrentValue = ii;
-				progress_bar.prMessage = "Instancing: " + objToInstantiate.name + " (" + ii + " of " + myNumInstances + ")";
-				progress_bar.displayProgressBar();
-				
 				if ( objToInstantiate != null )
 				{
-					
+					// Set progress bar information.
+					progress_bar.prCurrentValue = ii;
+					progress_bar.prMessage = "Instancing: " + objToInstantiate.name + " (" + ii + " of " + myNumInstances + ")";
+					progress_bar.displayProgressBar();
+
+					if ( !unique_instantiated_names.Contains( objToInstantiate.name ) )
+					{
+						unique_instantiated_names.Add( objToInstantiate.name );
+					}
+	
 					Vector3 pos = new Vector3();
 					
 					// Apply object transforms.
