@@ -437,6 +437,7 @@ public static partial class HoudiniHost
 		HAPI_CookOptions cook_options = new HAPI_CookOptions();
 		cook_options.splitGeosByGroup = split_geos_by_group;
 		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+		cook_options.cookErrorSearchMode = HoudiniConstants.HAPI_COOK_ERROR_SEARCH_MODE;
 		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );

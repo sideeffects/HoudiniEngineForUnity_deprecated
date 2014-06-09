@@ -32,7 +32,7 @@ using HAPI_MaterialId = System.Int32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Defines
-	
+
 public struct HoudiniConstants
 {
 	// Unity-Only Constants ---------------------------------------------
@@ -59,6 +59,9 @@ public struct HoudiniConstants
 	public const int HAPI_SEC_BEFORE_PROGRESS_BAR_SHOW	= 3;
 	public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 	public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
+
+	public const HAPI_CookErrorSearchMode HAPI_COOK_ERROR_SEARCH_MODE =
+		HAPI_CookErrorSearchMode.HAPI_COOKERRORSEARCH_FULL;
 
 	public const bool HAPI_CURVE_REFINE_TO_LINEAR		= true;
 	public const float HAPI_CURVE_LOD					= 8.0f;
@@ -164,12 +167,24 @@ public enum HAPI_Result
 public enum HAPI_State
 {
 	HAPI_STATE_READY,
-	HAPI_STATE_READY_WITH_ERRORS,
+	HAPI_STATE_READY_WITH_FATAL_ERRORS,
+	HAPI_STATE_READY_WITH_COOK_ERRORS,
 	HAPI_STATE_STARTING_COOK,
 	HAPI_STATE_COOKING,
 	HAPI_STATE_STARTING_LOAD,
 	HAPI_STATE_LOADING,
-	HAPI_STATE_MAX
+	HAPI_STATE_MAX,
+
+	HAPI_STATE_MAX_READY_STATE = HAPI_STATE_READY_WITH_COOK_ERRORS
+};
+
+public enum HAPI_CookErrorSearchMode
+{
+	HAPI_COOKERRORSEARCH_NONE,
+	HAPI_COOKERRORSEARCH_MINIMAL,
+	HAPI_COOKERRORSEARCH_FULL,
+
+	HAPI_COOKERRORSEARCH_DEFAULT = HAPI_COOKERRORSEARCH_MINIMAL
 };
 
 public enum HAPI_RampType
@@ -563,23 +578,28 @@ public struct HAPI_AssetInfo
 public struct HAPI_CookOptions
 {
 	/// Normally, geos are split into parts in two different ways. First it
-    /// is split by group and within each group it is split by primitive type.
-    ///
-    /// For example, if you have a geo with group1 covering half of the mesh
-    /// and volume1 and group2 covering the other half of the mesh, all of
-    /// curve1, and volume2 you will end up with 5 parts. First two parts
-    /// will be for the half-mesh of group1 and volume1, and the last three
-    /// will cover group2.
-    ///
-    /// This toggle lets you disable the splitting by group and just have
-    /// the geo be split by primitive type alone. By default, this is true
-    /// and therefore geos will be split by group and primitive type. If
-    /// set to false, geos will only be split by primtive type.
+	/// is split by group and within each group it is split by primitive type.
+	///
+	/// For example, if you have a geo with group1 covering half of the mesh
+	/// and volume1 and group2 covering the other half of the mesh, all of
+	/// curve1, and volume2 you will end up with 5 parts. First two parts
+	/// will be for the half-mesh of group1 and volume1, and the last three
+	/// will cover group2.
+	///
+	/// This toggle lets you disable the splitting by group and just have
+	/// the geo be split by primitive type alone. By default, this is true
+	/// and therefore geos will be split by group and primitive type. If
+	/// set to false, geos will only be split by primtive type.
     [ MarshalAs( UnmanagedType.U1 ) ] public bool splitGeosByGroup;
 
 	/// For meshes only, this is enforced by convexing the mesh. Use -1
-    /// to avoid convexing at all and get some performance boost.
+	/// to avoid convexing at all and get some performance boost.
 	public int maxVerticesPerPrimitive;
+
+	/// Specify how much work to be done when a SOP geometry node fails to
+	/// generate geometry data. The more error searching the more expensive
+	/// geometry cook failures become.
+	public HAPI_CookErrorSearchMode cookErrorSearchMode; 
 
 	// Curves
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool refineCurveToLinear;

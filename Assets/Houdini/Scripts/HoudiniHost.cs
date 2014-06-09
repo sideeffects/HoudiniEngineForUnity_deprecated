@@ -852,6 +852,7 @@ public static partial class HoudiniHost
 				HAPI_CookOptions cook_options = new HAPI_CookOptions();
 				cook_options.splitGeosByGroup = prSplitGeosByGroup;
 				cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+				cook_options.cookErrorSearchMode = HoudiniConstants.HAPI_COOK_ERROR_SEARCH_MODE;
 				cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 				cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 
@@ -876,6 +877,15 @@ public static partial class HoudiniHost
 
 		return true;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+	}
+
+	public static string getRuntimeErrorMessage()
+	{
+		int buffer_size = 4000;
+		HAPI_GetStatusStringBufLength( HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
+		StringBuilder error_str = new StringBuilder( buffer_size );
+		HAPI_GetStatusString( HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
+		return error_str.ToString();
 	}
 
 	public static void throwRuntimeError()
