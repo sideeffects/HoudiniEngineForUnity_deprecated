@@ -1531,12 +1531,16 @@ public abstract class HoudiniAsset : HoudiniControl
 				
 				HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 					
-				while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
-				{
+				while ( (int) state > (int) HAPI_State.HAPI_STATE_MAX_READY_STATE )
 					state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
-				}
 
-				if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
+				if ( state == HAPI_State.HAPI_STATE_READY_WITH_COOK_ERRORS )
+				{
+					state = HAPI_State.HAPI_STATE_READY;
+					Debug.LogWarning(
+						"Cook Errors at time: " + curr_time + "\n" + HoudiniHost.getRuntimeErrorMessage() );
+				}
+				else if ( state == HAPI_State.HAPI_STATE_READY_WITH_FATAL_ERRORS )
 				{
 					state = HAPI_State.HAPI_STATE_READY;
 					HoudiniHost.throwRuntimeError();

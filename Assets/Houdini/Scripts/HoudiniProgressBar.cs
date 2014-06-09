@@ -58,7 +58,7 @@ public class HoudiniProgressBar
 
 		bool progress_cancelled = false;
 
-		while ( state != HAPI_State.HAPI_STATE_READY && state != HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
+		while ( (int) state > (int) HAPI_State.HAPI_STATE_MAX_READY_STATE )
 		{
 			state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
 
@@ -95,7 +95,12 @@ public class HoudiniProgressBar
 		if ( progress_cancelled )
 			throw new HoudiniErrorProgressCancelled();
 
-		if ( state == HAPI_State.HAPI_STATE_READY_WITH_ERRORS )
+		if ( state == HAPI_State.HAPI_STATE_READY_WITH_COOK_ERRORS )
+		{
+			state = HAPI_State.HAPI_STATE_READY;
+			Debug.LogWarning( HoudiniHost.getRuntimeErrorMessage() );
+		}
+		else if ( state == HAPI_State.HAPI_STATE_READY_WITH_FATAL_ERRORS )
 		{
 			state = HAPI_State.HAPI_STATE_READY;
 			HoudiniHost.throwRuntimeError();
