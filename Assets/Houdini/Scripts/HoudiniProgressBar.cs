@@ -73,7 +73,9 @@ public class HoudiniProgressBar
 				prTotal = 100;
 			}
 
-			prMessage = HoudiniHost.getStatusString( HAPI_StatusType.HAPI_STATUS_STATE );
+			prMessage = HoudiniHost.getStatusString(
+				HAPI_StatusType.HAPI_STATUS_STATE,
+				HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_WARNINGS );
 
 			if ( progress_cancelled )
 				EditorUtility.DisplayProgressBar( prTitle, "Aborting...", 0 );

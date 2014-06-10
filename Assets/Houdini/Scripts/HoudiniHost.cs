@@ -852,7 +852,6 @@ public static partial class HoudiniHost
 				HAPI_CookOptions cook_options = new HAPI_CookOptions();
 				cook_options.splitGeosByGroup = prSplitGeosByGroup;
 				cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-				cook_options.cookErrorSearchMode = HoudiniConstants.HAPI_COOK_ERROR_SEARCH_MODE;
 				cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 				cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 
@@ -881,27 +880,23 @@ public static partial class HoudiniHost
 
 	public static string getRuntimeErrorMessage()
 	{
-		int buffer_size = 4000;
-		HAPI_GetStatusStringBufLength( HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
-		StringBuilder error_str = new StringBuilder( buffer_size );
-		HAPI_GetStatusString( HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
-		return error_str.ToString();
+		return getStatusString(
+			HAPI_StatusType.HAPI_STATUS_RESULT,
+			HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_WARNINGS );
 	}
 
 	public static void throwRuntimeError()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		int buffer_size = 4000;
 		int code;
 		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_RESULT, out code );
-		HAPI_GetStatusStringBufLength( HAPI_StatusType.HAPI_STATUS_RESULT, out buffer_size );
-		StringBuilder error_str = new StringBuilder( buffer_size );
-		HAPI_GetStatusString( HAPI_StatusType.HAPI_STATUS_RESULT, error_str );
+
+		string status_string = getRuntimeErrorMessage();
 
 		if ( code == (int) HAPI_Result.HAPI_RESULT_INVALID_ARGUMENT )
-			throw new HoudiniErrorInvalidArgument( error_str.ToString() );
+			throw new HoudiniErrorInvalidArgument( status_string );
 		else
-			throw new HoudiniError( error_str.ToString() );
+			throw new HoudiniError( status_string );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )

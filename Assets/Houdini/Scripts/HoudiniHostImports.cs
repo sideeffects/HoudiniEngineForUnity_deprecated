@@ -70,7 +70,10 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetStatusStringBufLength( HAPI_StatusType status_code, out int buffer_size );
+	HAPI_GetStatusStringBufLength(
+		HAPI_StatusType status_code,
+		HAPI_StatusVerbosity verbosity,
+		out int buffer_size );
 
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
