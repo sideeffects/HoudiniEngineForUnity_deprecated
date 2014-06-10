@@ -1850,4 +1850,94 @@ public class HoudiniAssetUtility
 			}
 		}
 	}
+
+	public static void loadHipFile( string file_path )
+	{
+		try
+		{
+			if ( file_path.Length <= 0 )
+				return;
+			
+			HoudiniHost.loadHip( file_path );
+			
+			HoudiniProgressBar progressBar = new HoudiniProgressBar();
+			progressBar.statusCheckLoop();
+			
+			int[] asset_ids = HoudiniHost.getNewAssetIds();
+			
+			foreach ( int asset_id in asset_ids )
+			{
+				// Create game object.
+				GameObject game_object = new GameObject( "Houdini Asset" );
+				
+				// Add HAPI Object Control script component.
+				game_object.AddComponent< HoudiniAssetOTL >();
+				HoudiniAssetOTL asset = game_object.GetComponent< HoudiniAssetOTL >();
+				
+				asset.prAssetType = HoudiniAsset.AssetType.TYPE_HIP;
+				// Set that asset path.
+				asset.prAssetPath = file_path;
+				
+				asset.prAssetId = asset_id;
+				
+				bool build_result = asset.buildAll();
+				if ( build_result == false ) // Something is not right. Clean up.
+				{
+					Object.DestroyImmediate( game_object );
+					return;
+				}
+				
+				// Set new object name from asset name.
+				string asset_name		= asset.prAssetInfo.name;
+				game_object.name 		= asset_name;
+			}
+		}
+		catch ( HoudiniError error )
+		{
+			Debug.LogError( error.ToString() );
+		}
+	}
+	
+	public static void checkForNewAssets()
+	{
+		try
+		{			
+			int[] asset_ids = HoudiniHost.getNewAssetIds();
+			if( asset_ids.Length == 0 )
+				return;
+
+			foreach ( int asset_id in asset_ids )
+			{
+				// Create game object.
+				GameObject game_object = new GameObject( "Generated Houdini Asset" );
+				
+				// Add HAPI Object Control script component.
+				game_object.AddComponent< HoudiniAssetOTL >();
+				HoudiniAssetOTL asset = game_object.GetComponent< HoudiniAssetOTL >();
+				
+				asset.prAssetType = HoudiniAsset.AssetType.TYPE_HIP;
+				// Set that asset path.
+				asset.prAssetPath = "";
+				
+				asset.prAssetId = asset_id;
+				HoudiniHost.cookAsset( asset_id, true );
+				
+				bool build_result = asset.buildAll();
+				if ( build_result == false ) // Something is not right. Clean up.
+				{
+					Object.DestroyImmediate( game_object );
+					return;
+				}
+				
+				// Set new object name from asset name.
+				string asset_name		= asset.prAssetInfo.name;
+				game_object.name 		= asset_name;
+
+			}
+		}
+		catch ( HoudiniError error )
+		{
+			Debug.LogError( error.ToString() );
+		}
+	}
 }

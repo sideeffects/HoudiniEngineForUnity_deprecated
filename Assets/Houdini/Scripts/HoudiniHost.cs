@@ -726,15 +726,15 @@ public static partial class HoudiniHost
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 		
-	public static int[] getAssetIdsFromLoadHIPFile()
+	public static int[] getNewAssetIds()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		int asset_count = 0;
-		HAPI_Result status_code = HAPI_GetAssetCountFromLoadHIPFile( ref asset_count );
+		HAPI_Result status_code = HAPI_CheckForNewAssets( ref asset_count );
 		processStatusCode( status_code );
 
 		int[] asset_ids = new int[ asset_count ];
-		status_code = HAPI_GetAssetIdsFromLoadHIPFile( asset_ids );
+		status_code = HAPI_GetNewAssetIds( asset_ids );
 		processStatusCode( status_code );
 
 		return asset_ids;
