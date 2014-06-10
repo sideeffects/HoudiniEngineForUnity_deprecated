@@ -37,12 +37,6 @@ public static partial class HoudiniHost
 {
 	// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Gives back a certain environment integer like version number.
-	/// </summary>
-	/// <param name="int_type">
-	/// 	On of <see cref="HAPI_EnvIntType"/>.
-	/// </param>
 	public static int getEnvInt( HAPI_EnvIntType int_type )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
@@ -55,12 +49,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Gives back the status code for a specific status type.
-	/// </summary>
-	/// <param name="status_type">
-	/// 	On of <see cref="HAPI_StatusType"/>.
-	/// </param>
 	public static int getStatus( HAPI_StatusType status_type )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
@@ -73,42 +61,18 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Return length of string buffer storing status string message.
-	/// </summary>
-	/// <param name="status_type">
-	/// 	On of <see cref="HAPI_StatusType"/>.
-	/// </param>
-	/// <param name="buffer_size">
-	///		Length of buffer char array ready to be filled.
-	/// </param>
-	private static void getStatusStringBufLength( HAPI_StatusType status_type, out int buffer_size )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		HAPI_Result status_code = HAPI_GetStatusStringBufLength( status_type, out buffer_size );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	/// <summary>
-	/// 	Return status string message.
-	/// </summary>
-	/// <param name="status_type">
-	/// 	On of <see cref="HAPI_StatusType"/>.
-	/// </param>
-	public static string getStatusString( HAPI_StatusType status_type )
+	public static string getStatusString( HAPI_StatusType status_type, HAPI_StatusVerbosity verbosity )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		int buffer_size = 0;
-		getStatusStringBufLength( status_type, out buffer_size );
+		HAPI_Result status_code = HAPI_GetStatusStringBufLength( status_type, verbosity, out buffer_size );
+		processStatusCode( status_code );
 
 		if ( buffer_size <= 0 )
 			return "";
 
 		StringBuilder string_builder = new StringBuilder( buffer_size );
-		HAPI_Result status_code = HAPI_GetStatusString( status_type, string_builder );
+		status_code = HAPI_GetStatusString( status_type, string_builder );
 		processStatusCode( status_code );
 
 		string string_value = string_builder.ToString();
@@ -437,7 +401,6 @@ public static partial class HoudiniHost
 		HAPI_CookOptions cook_options = new HAPI_CookOptions();
 		cook_options.splitGeosByGroup = split_geos_by_group;
 		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-		cook_options.cookErrorSearchMode = HoudiniConstants.HAPI_COOK_ERROR_SEARCH_MODE;
 		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );

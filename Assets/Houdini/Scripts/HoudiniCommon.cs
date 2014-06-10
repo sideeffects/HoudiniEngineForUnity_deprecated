@@ -60,9 +60,6 @@ public struct HoudiniConstants
 	public const int HAPI_MIN_VERTICES_PER_FACE			= 3;
 	public const int HAPI_MAX_VERTICES_PER_FACE			= 3;
 
-	public const HAPI_CookErrorSearchMode HAPI_COOK_ERROR_SEARCH_MODE =
-		HAPI_CookErrorSearchMode.HAPI_COOKERRORSEARCH_FULL;
-
 	public const bool HAPI_CURVE_REFINE_TO_LINEAR		= true;
 	public const float HAPI_CURVE_LOD					= 8.0f;
 
@@ -145,9 +142,24 @@ public struct HoudiniConstants
 public enum HAPI_StatusType
 {
 	HAPI_STATUS_RESULT,
-	HAPI_STATUS_WARNING,
 	HAPI_STATUS_STATE,
 	HAPI_STATUS_MAX
+};
+
+public enum HAPI_StatusVerbosity
+{
+	HAPI_STATUSVERBOSITY_0,
+	HAPI_STATUSVERBOSITY_1,
+	HAPI_STATUSVERBOSITY_2,
+
+	HAPI_STATUSVERBOSITY_ALL = HAPI_STATUSVERBOSITY_2,
+
+	/// Used for Results.
+	/// @{
+	HAPI_STATUSVERBOSITY_ERRORS = HAPI_STATUSVERBOSITY_0,
+	HAPI_STATUSVERBOSITY_WARNINGS = HAPI_STATUSVERBOSITY_1,
+	HAPI_STATUSVERBOSITY_MESSAGES = HAPI_STATUSVERBOSITY_2
+	/// @}
 };
 
 public enum HAPI_Result 
@@ -176,15 +188,6 @@ public enum HAPI_State
 	HAPI_STATE_MAX,
 
 	HAPI_STATE_MAX_READY_STATE = HAPI_STATE_READY_WITH_COOK_ERRORS
-};
-
-public enum HAPI_CookErrorSearchMode
-{
-	HAPI_COOKERRORSEARCH_NONE,
-	HAPI_COOKERRORSEARCH_MINIMAL,
-	HAPI_COOKERRORSEARCH_FULL,
-
-	HAPI_COOKERRORSEARCH_DEFAULT = HAPI_COOKERRORSEARCH_MINIMAL
 };
 
 public enum HAPI_RampType
@@ -595,11 +598,6 @@ public struct HAPI_CookOptions
 	/// For meshes only, this is enforced by convexing the mesh. Use -1
 	/// to avoid convexing at all and get some performance boost.
 	public int maxVerticesPerPrimitive;
-
-	/// Specify how much work to be done when a SOP geometry node fails to
-	/// generate geometry data. The more error searching the more expensive
-	/// geometry cook failures become.
-	public HAPI_CookErrorSearchMode cookErrorSearchMode; 
 
 	// Curves
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool refineCurveToLinear;
