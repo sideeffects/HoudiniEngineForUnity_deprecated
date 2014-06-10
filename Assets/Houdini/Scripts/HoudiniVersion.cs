@@ -37,5 +37,5 @@ public struct HoudiniVersion
 	public const int HOUDINI_ENGINE_MAJOR	= 1;
 	public const int HOUDINI_ENGINE_MINOR	= 7;
 	
-	public const int HOUDINI_ENGINE_API		= 16;
+	public const int HOUDINI_ENGINE_API		= 18;
 };
