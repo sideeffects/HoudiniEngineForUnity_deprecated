@@ -51,11 +51,11 @@ public class HoudiniMenu : MonoBehaviour
 	}
 
 	// Hidden intentionally for now.
-	//[ MenuItem( HAPI_Constants.HAPI_PRODUCT_NAME + "/" + HAPI_GUIUtility.myLoadHipLabel, false, 1 ) ]
+	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, false, 1 ) ]
 	static private void loadHipFile() 
 	{
 		string hip_file_path = HoudiniGUIUtility.promptForHIPPath();
-		HoudiniGUIUtility.loadHipFile( hip_file_path );
+		HoudiniAssetUtility.loadHipFile( hip_file_path );
 	}
 
 	// -----------------------------------------------------------------------

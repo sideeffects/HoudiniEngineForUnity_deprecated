@@ -240,11 +240,11 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetAssetCountFromLoadHIPFile( ref int asset_count );
+	HAPI_CheckForNewAssets( ref int asset_count );
 
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetAssetIdsFromLoadHIPFile( [Out] HAPI_AssetId[] asset_ids );
+	HAPI_GetNewAssetIds( [Out] HAPI_AssetId[] asset_ids );
 
 	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
