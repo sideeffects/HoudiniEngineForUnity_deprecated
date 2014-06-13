@@ -486,7 +486,7 @@ public class HoudiniParms : MonoBehaviour
 			HoudiniHost.insertMultiparmInstance(
 				prControl.prNodeId,
 				multiparm.id, // The multiparm list
-				insert_position );
+				insert_position + i );
 	}
 
 	public void setChangedParametersIntoHost()
