@@ -28,14 +28,14 @@ public struct HoudiniVersion
 {
 	public const int HOUDINI_MAJOR			= 14;
 	public const int HOUDINI_MINOR			= 0;
-	public const int HOUDINI_BUILD			= 1;
+	public const int HOUDINI_BUILD			= 6;
 
 	public const int ORIG_HOUDINI_MAJOR		= 14;
 	public const int ORIG_HOUDINI_MINOR		= 0;
-	public const int ORIG_HOUDINI_BUILD		= 1;
+	public const int ORIG_HOUDINI_BUILD		= 6;
 
 	public const int HOUDINI_ENGINE_MAJOR	= 1;
 	public const int HOUDINI_ENGINE_MINOR	= 8;
 	
-	public const int HOUDINI_ENGINE_API		= 5;
+	public const int HOUDINI_ENGINE_API		= 6;
 };
