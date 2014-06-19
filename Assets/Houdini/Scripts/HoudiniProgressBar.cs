@@ -60,7 +60,7 @@ public class HoudiniProgressBar
 
 		while ( (int) state > (int) HAPI_State.HAPI_STATE_MAX_READY_STATE )
 		{
-			state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+			state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_COOK_STATE );
 
 			if ( state == HAPI_State.HAPI_STATE_COOKING )
 			{
@@ -74,7 +74,7 @@ public class HoudiniProgressBar
 			}
 
 			prMessage = HoudiniHost.getStatusString(
-				HAPI_StatusType.HAPI_STATUS_STATE,
+				HAPI_StatusType.HAPI_STATUS_COOK_STATE,
 				HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_WARNINGS );
 
 			if ( progress_cancelled )
@@ -100,12 +100,13 @@ public class HoudiniProgressBar
 		if ( state == HAPI_State.HAPI_STATE_READY_WITH_COOK_ERRORS )
 		{
 			state = HAPI_State.HAPI_STATE_READY;
-			Debug.LogWarning( HoudiniHost.getRuntimeErrorMessage() );
+			string messages = HoudiniHost.getCookErrorMessage();
+			Debug.LogWarning( messages );
 		}
 		else if ( state == HAPI_State.HAPI_STATE_READY_WITH_FATAL_ERRORS )
 		{
 			state = HAPI_State.HAPI_STATE_READY;
-			HoudiniHost.throwRuntimeError();
+			HoudiniHost.throwCookError();
 		}
 #endif // UNITY_EDITOR
 	}

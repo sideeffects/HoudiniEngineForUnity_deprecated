@@ -102,7 +102,7 @@ public class HoudiniAssetCurve : HoudiniAsset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected Methods
 
-	protected override int buildCreateAsset()
+	protected override int buildCreateAsset( HoudiniProgressBar progress_bar )
 	{
 		return HoudiniHost.createCurve();
 	}

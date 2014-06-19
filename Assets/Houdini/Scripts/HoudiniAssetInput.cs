@@ -128,7 +128,7 @@ public class HoudiniAssetInput : HoudiniAsset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected Methods
 
-	protected override int buildCreateAsset()
+	protected override int buildCreateAsset( HoudiniProgressBar progress_bar )
 	{
 		return HoudiniHost.createInputAsset( transform.name );
 	}

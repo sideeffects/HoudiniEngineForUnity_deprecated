@@ -975,15 +975,13 @@ public abstract class HoudiniAsset : HoudiniControl
 						is_first_time_build = true;
 
 					if ( unload_asset_first )
-						asset_id = buildCreateAsset();
+						asset_id = buildCreateAsset( progress_bar );
 					else
 						asset_id = prAssetId;
 
 					// We need to update the prAssetId in case the cook is aborted/fails 
 					// and we need to clean up (unload the asset) in the catch.
 					prAssetId = asset_id;
-
-					progress_bar.statusCheckLoop();
 
 					prAssetInfo = HoudiniHost.getAssetInfo( asset_id );
 					HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo( prAssetInfo.nodeId );
@@ -1277,6 +1275,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup );
 		progress_bar.statusCheckLoop();
+		HoudiniAssetUtility.checkForNewAssets();
 
 		myProgressBarJustUsed = true;
 		
@@ -1532,18 +1531,18 @@ public abstract class HoudiniAsset : HoudiniControl
 				HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 					
 				while ( (int) state > (int) HAPI_State.HAPI_STATE_MAX_READY_STATE )
-					state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_STATE );
+					state = (HAPI_State) HoudiniHost.getStatus( HAPI_StatusType.HAPI_STATUS_COOK_STATE );
 
 				if ( state == HAPI_State.HAPI_STATE_READY_WITH_COOK_ERRORS )
 				{
 					state = HAPI_State.HAPI_STATE_READY;
 					Debug.LogWarning(
-						"Cook Errors at time: " + curr_time + "\n" + HoudiniHost.getRuntimeErrorMessage() );
+						"Cook Errors at time: " + curr_time + "\n" + HoudiniHost.getCookErrorMessage() );
 				}
 				else if ( state == HAPI_State.HAPI_STATE_READY_WITH_FATAL_ERRORS )
 				{
 					state = HAPI_State.HAPI_STATE_READY;
-					HoudiniHost.throwRuntimeError();
+					HoudiniHost.throwCookError();
 				}
 				
 				HAPI_Transform[] object_transforms = new HAPI_Transform[ prObjectCount ];
@@ -1682,7 +1681,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	
 	// Inherited classes should override this with their specific call to the HAPI_Host asset create method.
 	// For example: OTLs need to call HAPI_Host.loadOTL( path ), curves need to call HAPI_Host.createCurve().
-	protected abstract int buildCreateAsset();
+	protected abstract int buildCreateAsset( HoudiniProgressBar progress_bar );
 
 	// Inherited classes should override this for work they need done during the full build step only. (Optional)
 	protected virtual void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar ) {}
