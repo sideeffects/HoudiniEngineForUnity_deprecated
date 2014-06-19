@@ -405,8 +405,6 @@ public static partial class HoudiniHost
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );
 		processStatusCode( status_code );
-
-		HoudiniAssetUtility.checkForNewAssets();
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif

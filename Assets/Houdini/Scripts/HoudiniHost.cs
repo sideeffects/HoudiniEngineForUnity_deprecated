@@ -668,7 +668,7 @@ public static partial class HoudiniHost
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 		
-	public static int loadOTL( string path, bool split_geos_by_group ) 
+	public static int loadOTL( string path, bool split_geos_by_group, HoudiniProgressBar progress_bar ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		if ( !initialize() )
@@ -705,7 +705,10 @@ public static partial class HoudiniHost
 		bool cook_on_load = false;
 		status_code = HAPI_InstantiateAsset( first_asset_name, cook_on_load, out asset_id );
 		processStatusCode( status_code );
+		progress_bar.statusCheckLoop();
 		cookAsset( asset_id, split_geos_by_group );
+		progress_bar.statusCheckLoop();
+		HoudiniAssetUtility.checkForNewAssets();
 
 		return asset_id;
 #else
@@ -878,20 +881,44 @@ public static partial class HoudiniHost
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
-	public static string getRuntimeErrorMessage()
+	public static string getCallErrorMessage()
 	{
 		return getStatusString(
-			HAPI_StatusType.HAPI_STATUS_RESULT,
+			HAPI_StatusType.HAPI_STATUS_CALL_RESULT,
 			HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_WARNINGS );
 	}
 
-	public static void throwRuntimeError()
+	public static string getCookErrorMessage()
+	{
+		return getStatusString(
+			HAPI_StatusType.HAPI_STATUS_COOK_RESULT,
+			HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_WARNINGS );
+	}
+
+	public static void throwCallError()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		int code;
-		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_RESULT, out code );
+		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_CALL_RESULT, out code );
 
-		string status_string = getRuntimeErrorMessage();
+		string status_string = getCallErrorMessage();
+
+		if ( code == (int) HAPI_Result.HAPI_RESULT_INVALID_ARGUMENT )
+			throw new HoudiniErrorInvalidArgument( status_string );
+		else
+			throw new HoudiniError( status_string );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+	}
+
+	public static void throwCookError()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+		int code;
+		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_CALL_RESULT, out code );
+
+		string status_string = getCookErrorMessage();
 
 		if ( code == (int) HAPI_Result.HAPI_RESULT_INVALID_ARGUMENT )
 			throw new HoudiniErrorInvalidArgument( status_string );
@@ -1033,7 +1060,7 @@ public static partial class HoudiniHost
 	private static void processStatusCode( HAPI_Result code )
 	{
 		if ( hasCallFailed( code ) )
-			throwRuntimeError();
+			throwCallError();
 	}
 
 	private static int getInt( string name )

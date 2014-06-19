@@ -121,9 +121,9 @@ public class HoudiniAssetOTL : HoudiniAsset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected Methods
 
-	protected override int buildCreateAsset()
+	protected override int buildCreateAsset( HoudiniProgressBar progress_bar )
 	{
-		return HoudiniHost.loadOTL( prAssetPath, prSplitGeosByGroup );
+		return HoudiniHost.loadOTL( prAssetPath, prSplitGeosByGroup, progress_bar );
 	}
 
 	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
