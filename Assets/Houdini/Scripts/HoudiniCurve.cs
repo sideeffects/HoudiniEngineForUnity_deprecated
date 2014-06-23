@@ -93,6 +93,101 @@ public class HoudiniCurve : MonoBehaviour
 #endif // UNITY_EDITOR
 	}
 
+	void OnDrawGizmos() {
+		if ( gameObject.GetComponent< MeshFilter >() == null )
+			return; //throw new MissingComponentException( "Missing MeshFilter." );
+		if ( gameObject.GetComponent< MeshFilter >().sharedMesh == null )
+			return; //throw new HAPI_Error( "Missing sharedMesh on curve object." );
+		if ( gameObject.GetComponent< MeshRenderer >() == null )
+			return; //throw new MissingComponentException( "Missing MeshRenderer." );
+
+		Mesh mesh = gameObject.GetComponent< MeshFilter >().sharedMesh;
+
+		Color old_gizmo_color = Gizmos.color;
+
+		if ( Selection.Contains( gameObject ) )
+			Gizmos.color = HoudiniHost.prSelectedGuideWireframeColour;
+		else
+			Gizmos.color = HoudiniHost.prWireframeColour;
+
+		for ( int i = 0; i < mesh.vertexCount - 1; ++i )
+		{
+			Vector3 from = mesh.vertices[ i ];
+			Vector3 to = mesh.vertices[ i + 1 ];
+
+			from = transform.TransformPoint( from );
+			to = transform.TransformPoint( to );
+
+			Camera tempCamera = Camera.current;
+			from = tempCamera.WorldToScreenPoint( from );
+			to = tempCamera.WorldToScreenPoint( to );
+
+			int thickness = 1;
+			for ( int a = -thickness; a <= thickness; ++a )
+				for ( int b = -thickness; b <= thickness; ++b )
+				{
+					Vector3 fromf = from;
+					Vector3 tof = to;
+					fromf.x += a;
+					fromf.y += b;
+					tof.x += a;
+					tof.y += b;
+
+					fromf = tempCamera.ScreenToWorldPoint( fromf );
+					tof = tempCamera.ScreenToWorldPoint( tof );
+					Gizmos.DrawLine( fromf, tof );
+				}
+		}
+
+		Gizmos.color = new Color( 1.0f, 0.0f, 1.0f, 0.0f );
+
+		for ( int i = 0; i < mesh.vertexCount - 1; ++i )
+		{
+			Vector3 from = mesh.vertices[ i ];
+			Vector3 to = mesh.vertices[ i + 1 ];
+
+			from = transform.TransformPoint( from );
+			to = transform.TransformPoint( to );
+
+			Camera tempCamera = Camera.current;
+			from = tempCamera.WorldToScreenPoint( from );
+			to = tempCamera.WorldToScreenPoint( to );
+
+			if ( from.x < 0.0f || from.x > tempCamera.pixelWidth )
+				continue;
+			if ( from.y < 0.0f || from.y > tempCamera.pixelHeight )
+				continue;
+			if ( to.x < 0.0f || to.x > tempCamera.pixelWidth )
+				continue;
+			if ( to.y < 0.0f || to.y > tempCamera.pixelHeight )
+				continue;
+
+			if ( from.z < 0.0f || to.z < 0.0f )
+				continue;
+
+			from.z = 0.1f;
+			to.z = 0.1f;
+
+			int thickness = 3;
+			for ( int a = -thickness; a <= thickness; ++a )
+				for ( int b = -thickness; b <= thickness; ++b )
+				{
+					Vector3 fromf = from;
+					Vector3 tof = to;
+					fromf.x += a;
+					fromf.y += b;
+					tof.x += a;
+					tof.y += b;
+
+					fromf = tempCamera.ScreenToWorldPoint( fromf );
+					tof = tempCamera.ScreenToWorldPoint( tof );
+					Gizmos.DrawLine( fromf, tof );
+				}
+		}
+
+		Gizmos.color = old_gizmo_color;
+	}
+
 	public void addPoint( Vector3 pos )
 	{
 #if UNITY_EDITOR
@@ -441,7 +536,7 @@ public class HoudiniCurve : MonoBehaviour
 	// Serialized Private Data
 
 	[SerializeField] private HoudiniControl		myControl;
-	[SerializeField] private HoudiniParms			myParms;
+	[SerializeField] private HoudiniParms		myParms;
 	
 	[SerializeField] private List< Vector3 >	myPoints;
 	[SerializeField] private Vector3[]			myVertices;
