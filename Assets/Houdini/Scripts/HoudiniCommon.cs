@@ -614,6 +614,8 @@ public struct HAPI_NodeInfo
 	public HAPI_AssetId assetId;
 	public HAPI_StringHandle nameSH;
 
+	public int totalCookCount;
+
 	public int uniqueHoudiniNodeId;
 	private HAPI_StringHandle internalNodePathSH;
 
