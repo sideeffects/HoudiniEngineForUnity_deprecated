@@ -166,7 +166,8 @@ public class HoudiniGUIUtility : Editor
 	
 	public const string mySaveHoudiniSceneLabel		= "Save Current Houdini Scene...";
 	public const string myLoadAssetLabel			= "Load Houdini Asset...";
-	public const string myLoadHipLabel				= "Load .hip File...";
+	public const string myLoadHipLabel				= "Load Houdini Scene...";
+	public const string mySaveHipLabel				= "Save Houdini Scene...";
 	public const string myLaunchOrboltPage			= "Get Assets";
 	public const string myRevertAllSettingsLabel	= "Revert All Settings";
 	public const string myCreateCurveLabel			= "Create Curve";
