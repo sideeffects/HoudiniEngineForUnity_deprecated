@@ -71,11 +71,13 @@ public struct HoudiniConstants
 #if UNITY_STANDALONE_WIN
 	public const string HAPI_LIBRARY					= "libHAPI";
 #elif UNITY_STANDALONE_OSX
-	public const string HAPI_LIBRARY					= "/Library/Frameworks/Houdini.framework/Versions/" +
-														  HoudiniVersion.HOUDINI_MAJOR + "." +
-														  HoudiniVersion.HOUDINI_MINOR + "." +
-														  HoudiniVersion.HOUDINI_BUILD +
-														  "/Houdini";
+	//public const string HAPI_LIBRARY					= "/Library/Frameworks/Houdini.framework/Versions/" +
+	//													  HoudiniVersion.HOUDINI_MAJOR + "." +
+	//													  HoudiniVersion.HOUDINI_MINOR + "." +
+	//													  HoudiniVersion.HOUDINI_BUILD +
+	//													  "/Houdini";
+	// $HFS/Frameworks/Houdini.framework/Versions/Current
+	public const string HAPI_LIBRARY					= "/Library/Frameworks/Houdini.framework/Versions/14.0.11/Houdini";
 #else
 	#error Unsupported platform!
 #endif
