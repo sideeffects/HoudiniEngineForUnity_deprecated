@@ -68,20 +68,6 @@ public struct HoudiniConstants
 	public const float HAPI_VOLUME_SURFACE_DELTA_MULT	= 1.2f;
 	public const float HAPI_VOLUME_SURFACE_PT_SIZE_MULT = 1800.0f;
 
-#if UNITY_STANDALONE_WIN
-	public const string HAPI_LIBRARY					= "libHAPI";
-#elif UNITY_STANDALONE_OSX
-	//public const string HAPI_LIBRARY					= "/Library/Frameworks/Houdini.framework/Versions/" +
-	//													  HoudiniVersion.HOUDINI_MAJOR + "." +
-	//													  HoudiniVersion.HOUDINI_MINOR + "." +
-	//													  HoudiniVersion.HOUDINI_BUILD +
-	//													  "/Houdini";
-	// $HFS/Frameworks/Houdini.framework/Versions/Current
-	public const string HAPI_LIBRARY					= "/Library/Frameworks/Houdini.framework/Versions/14.0.11/Houdini";
-#else
-	#error Unsupported platform!
-#endif
-
 	// Shared Constants -------------------------------------------------
 	//
 	// IMPORTANT: Changes to these constants will not change the behavior of the
