@@ -41,11 +41,11 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_IsInitialized();
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_Initialize(
 		string otl_search_path,
@@ -54,68 +54,68 @@ public static partial class HoudiniHost
 		[ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
 		int cooking_thread_stack_size );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_Cleanup();
 
 	// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetEnvInt( HAPI_EnvIntType int_type, out int value );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetStatus( HAPI_StatusType status_code, out int status );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetStatusStringBufLength(
 		HAPI_StatusType status_code,
 		HAPI_StatusVerbosity verbosity,
 		out int buffer_size );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetStatusString( HAPI_StatusType status_code, StringBuilder buffer );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetCookingTotalCount( out int count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetCookingCurrentCount( out int count );
 
 	// UTILITY --------------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConvertTransform(
 		ref HAPI_TransformEuler transform_in_out,
 		HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConvertMatrixToQuat(
 		float[] mat,
 		HAPI_RSTOrder rst_order,
 		ref HAPI_Transform transform_out );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConvertMatrixToEuler(
 		float[] mat,
 		HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order,
 		ref HAPI_TransformEuler transform_out );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConvertTransformQuatToMatrix(
 		HAPI_Transform transform,
 		[Out] float[] matrix );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConvertTransformEulerToMatrix(
 		HAPI_TransformEuler transform,
@@ -123,13 +123,13 @@ public static partial class HoudiniHost
 		
 	// STRINGS --------------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetStringBufLength(
 		HAPI_StringHandle string_handle,
 		out int buffer_length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetString(
 		HAPI_StringHandle string_handle,
@@ -138,97 +138,97 @@ public static partial class HoudiniHost
 
 	// TIME -----------------------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetTime( out float time );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetTime( float time );
 
 	// ASSETS ---------------------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_IsAssetValid(
 		HAPI_AssetId asset_id, int asset_validation_id,
 		out int answer );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result 
 	HAPI_LoadAssetLibraryFromFile(
 		string file_path,
 		out HAPI_AssetLibraryId library_id );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result 
 	HAPI_LoadAssetLibraryFromMemory(
 		byte[] library_buffer, int library_buffer_size,
 		out HAPI_AssetLibraryId library_id );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result 
 	HAPI_GetAvailableAssetCount(
 		HAPI_AssetLibraryId library_id,
 		out int asset_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result 
 	HAPI_GetAvailableAssets(
 		HAPI_AssetLibraryId library_id,
 		[Out] HAPI_StringHandle[] asset_names,
 		int asset_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result 
 	HAPI_InstantiateAsset(
 		string asset_name,
 		[ MarshalAs( UnmanagedType.U1 ) ] bool cook_on_load,
 		out HAPI_AssetId asset_id );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CreateCurve( out HAPI_AssetId asset_id );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CreateInputAsset( out HAPI_AssetId asset_id, string name );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_DestroyAsset( HAPI_AssetId asset_id );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetAssetInfo( HAPI_AssetId asset_id, ref HAPI_AssetInfo asset_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CookAsset(
 		HAPI_AssetId asset_id, ref HAPI_CookOptions cook_options );
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CookAsset(
 		HAPI_AssetId asset_id, System.IntPtr cook_options );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_Interrupt();
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetAssetTransform(
 		HAPI_AssetId asset_id,
 		HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order,
 		out HAPI_TransformEuler transform );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetAssetTransform(
 		HAPI_AssetId asset_id,
 		ref HAPI_TransformEuler transform );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetInputName( 
 		HAPI_AssetId asset_id,
@@ -237,63 +237,63 @@ public static partial class HoudiniHost
 
 	// HIP FILES ------------------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_LoadHIPFile( string file_name, [ MarshalAs( UnmanagedType.U1 ) ] bool cook_on_load );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CheckForNewAssets( ref int asset_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetNewAssetIds( [Out] HAPI_AssetId[] asset_ids );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SaveHIPFile( string file_name );
 
 	// NODES ----------------------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetNodeInfo( HAPI_NodeId node_id, ref HAPI_NodeInfo node_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetGlobalNodes( out HAPI_GlobalNodes global_nodes );
 
 	// PARAMETERS -----------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParameters(
 		HAPI_NodeId node_id,
 		[Out] HAPI_ParmInfo[] parm_infos,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmIdFromName(
 		HAPI_NodeId node_id,
 		string name,
 		out HAPI_ParmId parm_id );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmIntValues(
 		HAPI_NodeId node_id,
 		[Out] int[] values,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmFloatValues(
 		HAPI_NodeId node_id,
 		[Out] float[] values,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmStringValues(
 		HAPI_NodeId node_id,
@@ -301,28 +301,28 @@ public static partial class HoudiniHost
 		[Out] HAPI_StringHandle[] values,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmChoiceLists(
 		HAPI_NodeId node_id,
 		[Out] HAPI_ParmChoiceInfo[] parm_choices, 
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetParmIntValues(
 		HAPI_NodeId node_id,
 		int[] values,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetParmFloatValues(
 		HAPI_NodeId node_id,
 		float[] values,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetParmStringValue(
 		HAPI_NodeId node_id,
@@ -330,14 +330,14 @@ public static partial class HoudiniHost
 		HAPI_ParmId parm_id,
 		int index );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_InsertMultiparmInstance(
 		HAPI_NodeId node_id,
 		HAPI_ParmId parm_id,
 		int instance_position );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_RemoveMultiparmInstance(
 		HAPI_NodeId node_id,
@@ -346,14 +346,14 @@ public static partial class HoudiniHost
 		
 	// HANDLES --------------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetHandleInfo(
 		HAPI_AssetId asset_id, 
 		[Out] HAPI_HandleInfo[] handle_infos,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetHandleBindingInfo(
 		HAPI_AssetId asset_id,
@@ -363,28 +363,28 @@ public static partial class HoudiniHost
 		
 	// PRESETS --------------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetPresetBufLength( HAPI_NodeId node_id, ref int buffer_length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetPreset( HAPI_NodeId node_id, [Out] byte[] preset, int buffer_length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetPreset( HAPI_NodeId node_id, byte[] preset, int buffer_length );
 		
 	// OBJECTS --------------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetObjects(
 		HAPI_AssetId asset_id,
 		[Out] HAPI_ObjectInfo[] object_infos, 
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetObjectTransforms(
 		HAPI_AssetId asset_id,
@@ -392,7 +392,7 @@ public static partial class HoudiniHost
 		[Out] HAPI_Transform[] transforms,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetInstanceTransforms(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
@@ -400,7 +400,7 @@ public static partial class HoudiniHost
 		[Out] HAPI_Transform[] transforms,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetObjectTransform(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id,
@@ -408,40 +408,40 @@ public static partial class HoudiniHost
 		
 	// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetGeoInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		out HAPI_GeoInfo geo_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetPartInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		out HAPI_PartInfo part_info );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetFaceCounts(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		[Out] int[] face_counts,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetVertexList(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		[Out] int[] vertex_list,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetAttributeInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		string name, HAPI_AttributeOwner owner,
 		ref HAPI_AttributeInfo attr_info );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetAttributeNames(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
@@ -449,7 +449,7 @@ public static partial class HoudiniHost
 		[Out] HAPI_StringHandle[] attribute_names,
 		int count );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetAttributeIntData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
@@ -458,7 +458,7 @@ public static partial class HoudiniHost
 		[Out] int[] data,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetAttributeFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
@@ -467,7 +467,7 @@ public static partial class HoudiniHost
 		[Out] float[] data,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetAttributeStringData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
@@ -476,7 +476,7 @@ public static partial class HoudiniHost
 		[Out] int[] data,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetGroupNames(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
@@ -484,7 +484,7 @@ public static partial class HoudiniHost
 		[Out] HAPI_StringHandle[] group_names,
 		int group_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetGroupMembership(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
@@ -495,40 +495,40 @@ public static partial class HoudiniHost
 
 	// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetGeoInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		ref HAPI_GeoInfo geo_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetPartInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		ref HAPI_PartInfo part_info );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetFaceCounts(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		int[] face_counts,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetVertexList(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		int[] vertex_list,
 		int start, int length );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_AddAttribute(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		string name,
 		ref HAPI_AttributeInfo attr_info );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetAttributeIntData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
@@ -537,7 +537,7 @@ public static partial class HoudiniHost
 		int[] data,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetAttributeFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
@@ -546,7 +546,7 @@ public static partial class HoudiniHost
 		float[] data,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetAttributeStringData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
@@ -555,14 +555,14 @@ public static partial class HoudiniHost
 		string[] data,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_AddGroup(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_GroupType group_type,
 		string group_name );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetGroupMembership(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
@@ -571,21 +571,21 @@ public static partial class HoudiniHost
 		[Out] int[] membership,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CommitGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_RevertGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id );
 		
 	// GEOMETRY INPUT -------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetFileInput( HAPI_AssetId asset_id, int input_idx, string file_name );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CreateGeoInput( 
 		HAPI_AssetId asset_id, int input_idx,
@@ -593,89 +593,89 @@ public static partial class HoudiniHost
 		
 	// INTER ASSET ----------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConnectAssetTransform(
 		HAPI_AssetId asset_id_from, HAPI_AssetId asset_id_to, int input_idx );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_DisconnectAssetTransform( HAPI_AssetId asset_id, int input_idx );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConnectAssetGeometry( 
 		HAPI_AssetId asset_id_from, HAPI_ObjectId object_id_from,
 		HAPI_AssetId asset_id_to,
 		int input_idx );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_DisconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx );
 		
 	// MATERIALS ------------------------------------------------------------------------------------------------
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetMaterialOnPart(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		out HAPI_MaterialInfo material_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetMaterialOnGroup(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		string group_name,
 		out HAPI_MaterialInfo material_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_RenderMaterialToImage(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 		HAPI_ShaderType shader_type );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_RenderTextureToImage(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 		HAPI_ParmId parm_id );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetSupportedImageFileFormatCount( out int file_format_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetSupportedImageFileFormats(
 		[Out] HAPI_ImageFileFormat[] formats,
 		int file_format_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetImageInfo(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 		out HAPI_ImageInfo image_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetImageInfo(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 		HAPI_ImageInfo image_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetImagePlaneCount(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 		out int image_plane_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetImagePlanes(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
 		[Out] HAPI_StringHandle[] image_planes,
 		int image_plane_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ExtractImageToFile(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
@@ -685,7 +685,7 @@ public static partial class HoudiniHost
 		string destination_file_name,
 		out int destination_file_path );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ExtractImageToMemory(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
@@ -693,7 +693,7 @@ public static partial class HoudiniHost
 		string image_planes,
 		out int buffer_size );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetImageMemoryBuffer(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
@@ -702,7 +702,7 @@ public static partial class HoudiniHost
 
 	// SIMULATION/ANIMATIONS ------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetAnimCurve(
 		HAPI_NodeId node_id, HAPI_ParmId parm_id,
@@ -710,45 +710,45 @@ public static partial class HoudiniHost
 		HAPI_Keyframe[] curve_keyframes,
 		int keyframe_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetTransformAnimCurve(
 		HAPI_NodeId node_id, HAPI_TransformComponent transform_component,
 		HAPI_Keyframe[] curve_keyframes,
 		int keyframe_count );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ResetSimulation( HAPI_AssetId asset_id );
 
 	// VOLUMES --------------------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetVolumeInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeInfo volume_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetFirstVolumeTile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile );
 		
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetNextVolumeTile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo next );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetVolumeTileFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile,
 		[Out] float[] values );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetVolumeTileIntData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
@@ -757,34 +757,34 @@ public static partial class HoudiniHost
 
 	// CURVES ---------------------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetCurveInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_CurveInfo curve_info );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetCurveVertices(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		[Out] float[] vertices,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetCurveCounts(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		[Out] int[] counts,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetCurveOrders(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		[Out] int[] orders,
 		int start, int length );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetCurveKnots(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
@@ -793,31 +793,31 @@ public static partial class HoudiniHost
 
 	// CACHING --------------------------------------------------------------------------------------------------
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SaveGeoToFile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		string file_name );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_LoadGeoFromFile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		string file_name );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetGeoSize(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		string format, out int size );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SaveGeoToMemory(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		[Out] byte[] buffer, int size );
 
-	[ DllImport( HoudiniConstants.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_LoadGeoFromMemory(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
