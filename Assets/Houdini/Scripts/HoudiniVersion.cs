@@ -38,4 +38,12 @@ public struct HoudiniVersion
 	public const int HOUDINI_ENGINE_MINOR	= 8;
 	
 	public const int HOUDINI_ENGINE_API		= 7;
+	
+#if UNITY_STANDALONE_WIN
+	public const string HAPI_LIBRARY		= "libHAPI";
+#elif UNITY_STANDALONE_OSX
+	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/ 14.0.12/Houdini";
+#else
+	#error Unsupported platform!
+#endif
 };
