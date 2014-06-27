@@ -70,7 +70,7 @@ public class HoudiniWindowDebug : EditorWindow
 		if ( GUILayout.Button( HoudiniGUIUtility.myLoadAssetLabel ) )
 		{
 			string asset_file_path = HoudiniGUIUtility.promptForOTLPath();
-			HoudiniGUIUtility.instantiateAsset( asset_file_path );
+			HoudiniAssetUtility.instantiateAsset( asset_file_path );
 		}
 
 		if ( HoudiniGUI.floatField( "global_time", "Global Time", ref myTime, null, ref myTime ) )
@@ -197,7 +197,7 @@ public class HoudiniWindowDebug : EditorWindow
 	
 	private void loadOTL( FileInfo fi )
 	{
-		HoudiniGUIUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
+		HoudiniAssetUtility.instantiateAsset( fi.DirectoryName + "\\" + fi.Name );
 	}
 
 	private static List< OTLDirectory >	myOTLDirectories  	= new List< OTLDirectory >();

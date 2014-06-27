@@ -69,7 +69,6 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		pinSize 						= HoudiniHost.prPinSize;
 		pinColour 						= HoudiniHost.prPinColour;
 		autoPinInstances 				= HoudiniHost.prAutoPinInstances;
-		enableDragAndDrop 				= HoudiniHost.prEnableDragAndDrop;
 		enableSupportWarnings 			= HoudiniHost.prEnableSupportWarnings;
 		autoSelectAssetRootNode 		= HoudiniHost.prAutoSelectAssetRootNode;
 		hideGeometryOnLinking 			= HoudiniHost.prHideGeometryOnLinking;
