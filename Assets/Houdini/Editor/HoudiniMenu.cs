@@ -32,7 +32,7 @@ public class HoudiniMenu : MonoBehaviour
 	static private void createHAPIObject() 
 	{
 		string asset_file_path = HoudiniGUIUtility.promptForOTLPath();
-		HoudiniGUIUtility.instantiateAsset( asset_file_path );
+		HoudiniAssetUtility.instantiateAsset( asset_file_path );
 	}
 
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadAssetLabel, true, 0 ) ]

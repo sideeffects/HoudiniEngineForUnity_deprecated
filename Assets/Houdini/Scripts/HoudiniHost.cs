@@ -113,7 +113,6 @@ public static partial class HoudiniHost
 	private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
 	private const bool myDefaultAutoPinInstances						= true;
 
-	private const bool myDefaultEnableDragAndDrop						= true;
 	private const bool myDefaultEnableSupportWarnings					= true;
 
 	public const bool myDefaultAutoSelectAssetRootNode					= true;
@@ -202,7 +201,6 @@ public static partial class HoudiniHost
 		setColour(	"HAPI_PinColour", myDefaultPinColour, true );
 		setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
 
-		setBool(	"HAPI_EnableDragAndDrop", myDefaultEnableDragAndDrop, true );
 		setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
 			
 		setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
@@ -299,9 +297,6 @@ public static partial class HoudiniHost
 											get { return getBool( "HAPI_AutopinInstances" ); } 
 											set { setBool( "HAPI_AutopinInstances", value ); } }
 
-	public static bool prEnableDragAndDrop {
-											get { return getBool( "HAPI_EnableDragAndDrop" ); } 
-											set { setBool( "HAPI_EnableDragAndDrop", value ); } }
 	public static bool prEnableSupportWarnings {
 											get { return getBool( "HAPI_EnableSupportWarnings" ); } 
 											set { setBool( "HAPI_EnableSupportWarnings", value ); } }
@@ -476,9 +471,6 @@ public static partial class HoudiniHost
 											{ return	prAutoPinInstances == 
 														myDefaultAutoPinInstances; }
 
-	public static bool isEnableDragAndDropDefault()
-											{ return	prEnableDragAndDrop == 
-														myDefaultEnableDragAndDrop; }
 	public static bool isEnableSupportWarningsDefault()
 											{ return	prEnableSupportWarnings == 
 														myDefaultEnableSupportWarnings; }
@@ -598,7 +590,6 @@ public static partial class HoudiniHost
 		prPinColour								= myDefaultPinColour;
 		prAutoPinInstances						= myDefaultAutoPinInstances;
 
-		prEnableDragAndDrop						= myDefaultEnableDragAndDrop;
 		prEnableSupportWarnings					= myDefaultEnableSupportWarnings;
 
 		prAutoSelectAssetRootNode				= myDefaultAutoSelectAssetRootNode;
@@ -965,17 +956,80 @@ public static partial class HoudiniHost
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
+	private static string[] myLastPaths;
+	private static int myLastPathsRealLoss = 0;
 	private static void update()
 	{
 #if UNITY_EDITOR
-		//EditorWindow window = EditorWindow.GetWindow< EditorWindow >( false, null );
-		//window.Repaint();
-
 		// We need to catch any exceptions here because if we let any out they will stall
 		// the entire callback chain bound to EditorApplication.update which
 		// causes other bound functions in this callback list to never be called.
 		try
 		{
+
+			if ( myLastPaths == null )
+				myLastPaths = new string[ 0 ];
+
+			bool drag_contains_otls = false;
+			if ( DragAndDrop.paths.Length > 0 )
+				myLastPathsRealLoss = 0;
+			foreach ( string path in DragAndDrop.paths )
+				if ( path.EndsWith( ".otl" ) )
+				{
+					drag_contains_otls = true;
+					DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+					break;
+				}
+			 
+			if ( drag_contains_otls && DragAndDrop.paths.Length > myLastPaths.Length )
+			{
+				myLastPaths = new string[ DragAndDrop.paths.Length ];
+				for ( int i = 0; i < DragAndDrop.paths.Length; ++i )
+					myLastPaths[ i ] = DragAndDrop.paths[ i ];
+			}
+			else if ( myLastPaths.Length > 0 && DragAndDrop.paths.Length == 0 )
+			{
+				if ( myLastPathsRealLoss < 100 )
+					myLastPathsRealLoss++;
+				else
+				{
+					EditorWindow mouse_window = EditorWindow.mouseOverWindow;
+					if ( mouse_window )
+					{
+						//Vector3 placement = Vector3.zero;
+						if ( mouse_window.title == "UnityEditor.HierarchyWindow" )
+						{
+							//SceneView scene = SceneView.lastActiveSceneView;
+							//Camera cam = scene.camera;
+							// UnityEditor.HierarchyWindow
+							// UnityEditor.SceneView
+							//UnityEditor.SceneHierarchyWindow
+							//EditorWindow mouse_window = EditorWindow.mouseOverWindow;
+							//Debug.Log( mouse_window );
+						}
+						else if ( mouse_window.title == "UnityEditor.SceneView" )
+						{
+
+						}
+
+						if ( mouse_window.title == "UnityEditor.HierarchyWindow"
+							|| mouse_window.title == "UnityEditor.SceneView" )
+						{
+							for ( int i = 0; i < myLastPaths.Length; ++i )
+							{
+								string path = myLastPaths[ i ];
+								if ( path.Contains( ".otl" ) )
+								{
+									HoudiniAssetUtility.instantiateAsset( path );
+								}
+							}
+						}
+					}
+
+					myLastPaths = new string[ 0 ];
+				}
+			}
+
 			if ( HoudiniHost.mySelectionTarget != null && myDeselectionDelegate != null )
 			{
 				GameObject selected = Selection.activeGameObject;

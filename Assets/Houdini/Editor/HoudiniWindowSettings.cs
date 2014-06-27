@@ -191,20 +191,6 @@ public class HoudiniWindowSettings : EditorWindow
 
 		HoudiniGUI.separator();
 
-		// Enable Drag-and-Drop
-		{
-			bool value = HoudiniHost.prEnableDragAndDrop;
-			bool changed = HoudiniGUI.toggle(
-				"enable_drag_and_drop", "Enable Drag-and-Drop", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.enableDragAndDrop );
-			if ( changed )
-			{
-				HoudiniHost.prEnableDragAndDrop = value;
-				HoudiniGUIUtility.setDragAndDrop( value );
-			}
-		}
-
 		// Enable Support Warnings
 		{
 			bool value = HoudiniHost.prEnableSupportWarnings;
