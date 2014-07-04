@@ -120,6 +120,9 @@ public class HoudiniCurveGUI : Editor
 		if ( myCurve == null )
 			return;
 
+		// Enable point size on OpenGL.
+		HoudiniHost.preDrawSetup();
+
 		// First Remake and Draw Guide Geometry if necessary.
 		if ( mySelectionMesh == null )
 			buildGuideGeometry();
