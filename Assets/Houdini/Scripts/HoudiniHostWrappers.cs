@@ -1105,10 +1105,10 @@ public static partial class HoudiniHost
 	/// </param>
 	public static void setObjectTransform(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id,
-		HAPI_TransformEuler transform )
+		ref HAPI_TransformEuler transform )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		HAPI_Result status_code = HAPI_SetObjectTransform( asset_id, object_id, transform );
+		HAPI_Result status_code = HAPI_SetObjectTransform( asset_id, object_id, ref transform );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();

@@ -404,7 +404,7 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_SetObjectTransform(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id,
-		HAPI_TransformEuler transform );
+		ref HAPI_TransformEuler transform );
 		
 	// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 		
