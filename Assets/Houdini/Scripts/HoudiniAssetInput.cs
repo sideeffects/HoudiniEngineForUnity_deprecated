@@ -160,7 +160,7 @@ public class HoudiniAssetInput : HoudiniAsset
 
 			// Apply the input asset transform to the marshaled object in the Houdini scene.
 			HAPI_TransformEuler trans = HoudiniAssetUtility.getHapiTransform( transform.localToWorldMatrix );
-			HoudiniHost.setObjectTransform( prAssetId, object_id, trans );
+			HoudiniHost.setObjectTransform( prAssetId, object_id, ref trans );
 
 			// Marshall in the animation.
 			Animation anim_component = GetComponent< Animation >();
