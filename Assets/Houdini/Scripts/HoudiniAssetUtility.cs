@@ -895,7 +895,7 @@ public class HoudiniAssetUtility
 			// First check for a Unity material setup. If this is a Unity material
 			// we can skip the rest of the loop body.
 			if ( has_multiple_materials )
-				material = null; // TODO: getUnityMaterialOnGroup().
+				material = getUnityMaterialOnGroup( part_control, groups[ m ] );
 			else
 				material = getUnityMaterialOnPart( part_control );
 			if ( material != null )
@@ -1151,6 +1151,111 @@ public class HoudiniAssetUtility
 		}
 	}
 
+	public static Material getUnityMaterial( string material_path, int index, HoudiniPartControl part_control )
+	{
+		// Get position attributes.
+		int asset_id	= part_control.prAssetId;
+		int object_id	= part_control.prObjectId;
+		int geo_id		= part_control.prGeoId;
+		int part_id		= part_control.prPartId;
+
+		HAPI_AttributeInfo sub_material_name_attr_info =
+			new HAPI_AttributeInfo( HoudiniHost.prUnitySubMaterialNameAttribName );
+		int[] sub_material_name_attr = new int[ 0 ];
+		getAttribute(
+			asset_id, object_id, geo_id, part_id, HoudiniHost.prUnitySubMaterialNameAttribName,
+			ref sub_material_name_attr_info, ref sub_material_name_attr, HoudiniHost.getAttributeStringData );
+
+		HAPI_AttributeInfo sub_material_index_attr_info =
+			new HAPI_AttributeInfo( HoudiniHost.prUnitySubMaterialIndexAttribName );
+
+		int[] sub_material_index_attr = new int[ 0 ];
+		getAttribute(
+			asset_id, object_id, geo_id, part_id, HoudiniHost.prUnitySubMaterialIndexAttribName, 
+			ref sub_material_index_attr_info, ref sub_material_index_attr, HoudiniHost.getAttributeIntData );
+
+		Material material = (Material) Resources.Load( material_path, typeof( Material ) );
+
+#if UNITY_EDITOR
+		bool has_sub_material_name =
+			sub_material_name_attr_info.exists && HoudiniHost.getString( sub_material_name_attr[ index ] ) != "";
+		bool has_sub_material_index = sub_material_index_attr_info.exists;
+
+		string sub_material_name =
+			has_sub_material_name ? HoudiniHost.getString( sub_material_name_attr[ index ] ) : "";
+		int sub_material_index = has_sub_material_index ? sub_material_index_attr[ index ] : 0;
+
+		if ( material == null )
+		{
+			// Try explicit import.
+			AssetDatabase.ImportAsset( material_path, ImportAssetOptions.Default );
+			material = (Material) AssetDatabase.LoadAssetAtPath( material_path, typeof( Material ) );
+		}
+
+		if ( material != null && ( has_sub_material_name || has_sub_material_index ) )
+		{
+			// Try Substance materials.
+			string abs_path = AssetDatabase.GetAssetPath( material );
+
+			SubstanceImporter substance_importer = AssetImporter.GetAtPath( abs_path ) as SubstanceImporter;
+				
+			if ( has_sub_material_name )
+			{
+				ProceduralMaterial[] procedural_materials = substance_importer.GetMaterials();
+				for ( int i = 0; i < procedural_materials.Length; ++i )
+				{
+					if ( procedural_materials[ i ].name == sub_material_name )
+					{
+						material = procedural_materials[ i ];
+						break;
+					}
+				}
+			}
+			else if ( sub_material_index >= 0 && 
+						sub_material_index < substance_importer.GetMaterialCount() )
+			{
+				material = substance_importer.GetMaterials()[ sub_material_index ];
+			}
+			else
+				Debug.LogWarning(
+					"sub_material_index (" + sub_material_index + ") out of range for material: " + abs_path );
+		}
+#endif // UNITY_EDITOR
+		return material;
+	}
+
+	public static Material getUnityMaterialOnGroup( HoudiniPartControl part_control, string group_name )
+	{
+		// Get position attributes.
+		int asset_id	= part_control.prAssetId;
+		int object_id	= part_control.prObjectId;
+		int geo_id		= part_control.prGeoId;
+		int part_id		= part_control.prPartId;
+
+		HAPI_AttributeInfo material_attr_info = new HAPI_AttributeInfo( HoudiniHost.prUnityMaterialAttribName );
+		int[] material_attr = new int[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniHost.prUnityMaterialAttribName, 
+					  ref material_attr_info, ref material_attr, HoudiniHost.getAttributeStringData );
+
+		if ( !material_attr_info.exists )
+			return null;
+
+		bool[] group_membership = HoudiniHost.getGroupMembership(
+			asset_id, object_id, geo_id, part_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, group_name );
+
+		int index = 0;
+		string material_path = "";
+		for ( int i = 0; i < material_attr_info.count; ++i )
+			if ( group_membership[ i ] )
+			{
+				material_path = HoudiniHost.getString( material_attr[ i ] );
+				index = i;
+				break;
+			}
+
+		return getUnityMaterial( material_path, index, part_control );
+	}
+
 	public static Material getUnityMaterialOnPart( HoudiniPartControl part_control )
 	{
 		// Get position attributes.
@@ -1164,76 +1269,14 @@ public class HoudiniAssetUtility
 		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniHost.prUnityMaterialAttribName, 
 					  ref material_attr_info, ref material_attr, HoudiniHost.getAttributeStringData );
 
+		if ( !material_attr_info.exists )
+			return null;
+
 		// Need to get the material path here because the next call to HAPI_Host.getAttributeStrData will
 		// overwrite the string ids in material_attr.
-		string material_path = material_attr_info.exists ? HoudiniHost.getString( material_attr[ 0 ] )
-														 : "";
+		string material_path = HoudiniHost.getString( material_attr[ 0 ] );
 
-		HAPI_AttributeInfo sub_material_name_attr_info = new HAPI_AttributeInfo( 
-																HoudiniHost.prUnitySubMaterialNameAttribName );
-		int[] sub_material_name_attr = new int[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniHost.prUnitySubMaterialNameAttribName, 
-					  ref sub_material_name_attr_info, ref sub_material_name_attr, HoudiniHost.getAttributeStringData );
-
-		HAPI_AttributeInfo sub_material_index_attr_info = new HAPI_AttributeInfo( 
-																HoudiniHost.prUnitySubMaterialIndexAttribName );
-		int[] sub_material_index_attr = new int[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniHost.prUnitySubMaterialIndexAttribName, 
-					  ref sub_material_index_attr_info, ref sub_material_index_attr, HoudiniHost.getAttributeIntData );
-
-		if ( material_attr_info.exists )
-		{
-			Material material = (Material) Resources.Load( material_path, typeof( Material ) );
-
-#if UNITY_EDITOR
-			bool has_sub_material_name =
-				sub_material_name_attr_info.exists && HoudiniHost.getString( sub_material_name_attr[ 0 ] ) != "";
-			bool has_sub_material_index = sub_material_index_attr_info.exists;
-
-			string sub_material_name =
-				has_sub_material_name ? HoudiniHost.getString( sub_material_name_attr[ 0 ] ) : "";
-			int sub_material_index = has_sub_material_index ? sub_material_index_attr[ 0 ] : 0;
-
-			if ( material == null )
-			{
-				// Try explicit import.
-				AssetDatabase.ImportAsset( material_path, ImportAssetOptions.Default );
-				material = (Material) AssetDatabase.LoadAssetAtPath( material_path, typeof( Material ) );
-			}
-
-			if ( material != null && ( has_sub_material_name || has_sub_material_index ) )
-			{
-				// Try Substance materials.
-				string abs_path = AssetDatabase.GetAssetPath( material );
-
-				SubstanceImporter substance_importer = AssetImporter.GetAtPath( abs_path ) as SubstanceImporter;
-				
-				if ( has_sub_material_name )
-				{
-					ProceduralMaterial[] procedural_materials = substance_importer.GetMaterials();
-					for ( int i = 0; i < procedural_materials.Length; ++i )
-					{
-						if ( procedural_materials[ i ].name == sub_material_name )
-						{
-							material = procedural_materials[ i ];
-							break;
-						}
-					}
-				}
-				else if ( sub_material_index >= 0 && 
-						  sub_material_index < substance_importer.GetMaterialCount() )
-				{
-					material = substance_importer.GetMaterials()[ sub_material_index ];
-				}
-				else
-					Debug.LogWarning(
-						"sub_material_index (" + sub_material_index + ") out of range for material: " + abs_path );
-			}
-#endif // UNITY_EDITOR
-			return material;
-		}
-		else
-			return null;
+		return getUnityMaterial( material_path, 0, part_control );
 	}
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
