@@ -14,6 +14,8 @@ public struct HoudiniGUIParm
 	
 	public HoudiniGUIParm( string name, string label, int size )
 	{
+		id				= -1;
+
 		this.size		= size;
 		choiceCount 	= 0;
 		width			= -1;
@@ -48,6 +50,8 @@ public struct HoudiniGUIParm
 	
 	public HoudiniGUIParm( HAPI_ParmInfo info )
 	{
+		id				= info.id;
+
 		size 			= info.size;
 		choiceCount 	= info.choiceCount;
 		width			= -1;
@@ -86,7 +90,9 @@ public struct HoudiniGUIParm
 		
 		isBold 			= false;
 	}
-	
+
+	public int id;
+
 	public int size;
 	public int choiceCount;
 	public int width;
@@ -143,8 +149,6 @@ public class HoudiniGUI : Editor
 	public static void label( string value, int width, bool join_next, ref bool join_last )
 	{
 		initializeConstants();
-
-		
 	}
 
 	public static void help( string value, MessageType message_type )
