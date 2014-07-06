@@ -289,7 +289,7 @@ public class HoudiniParmsGUI : Editor
 		int[] parm_int_values		= myParms.prParmIntValues;
 		float[] parm_float_values	= myParms.prParmFloatValues;
 
-		HoudiniGUIParm gui_parm 		= new HoudiniGUIParm( parm );
+		HoudiniGUIParm gui_parm 	= new HoudiniGUIParm( parm );
 
 		// overridden parameters should not be bold in play mode
 		gui_parm.isBold				= myParms.isParmOverridden( parm.id ) && 
