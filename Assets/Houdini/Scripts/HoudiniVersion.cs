@@ -37,7 +37,7 @@ public struct HoudiniVersion
 	public const int HOUDINI_ENGINE_MAJOR	= 1;
 	public const int HOUDINI_ENGINE_MINOR	= 7;
 	
-	public const int HOUDINI_ENGINE_API		= 20;
+	public const int HOUDINI_ENGINE_API		= 21;
 	
 #if UNITY_STANDALONE_WIN
 	public const string HAPI_LIBRARY		= "libHAPI";
