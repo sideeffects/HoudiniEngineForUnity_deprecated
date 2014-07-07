@@ -403,17 +403,50 @@ public class HoudiniParmsGUI : Editor
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
-		// File Field
-		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FILE )
+		// File Path Field
+		else if ( parm.isFilePath() )
 		{
 			string[] path = myParms.getParmStrings( parm );
-			
+
+			if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_PATH_FILE_GEO )
+				gui_parm.label += " (geo)";
+			else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_PATH_FILE_IMAGE )
+				gui_parm.label += " (image)";
+
+			string file_pattern = parm.typeInfo;
+			if ( file_pattern != "" )
+				gui_parm.label += " (" + file_pattern + ")";
+
+			HAPI_Permissions permissions = parm.permissions;
+			if ( permissions == HAPI_Permissions.HAPI_PERMISSIONS_READ_ONLY )
+				gui_parm.label += " (read-only)";
+			else if ( permissions == HAPI_Permissions.HAPI_PERMISSIONS_WRITE_ONLY )
+				gui_parm.label += " (write-only)";
+
 			changed = HoudiniGUI.fileField(
 				ref gui_parm, ref myDelayBuild, ref path[ 0 ],
 				ref join_last, ref no_label_toggle_last );
 			
 			if ( changed )
 				myParms.setParmStrings( parm, path );
+		}
+		///////////////////////////////////////////////////////////////////////
+		// Node Path Field
+		else if ( parm.isNodePath() )
+		{
+			bool gui_enable = GUI.enabled;
+			GUI.enabled = false; // This is not yet supported.
+
+			string op_filter = parm.typeInfo;
+			if ( op_filter != "" )
+				gui_parm.label += " (" + op_filter + ")";
+
+			UnityEngine.Object temp_object = null;
+			HoudiniGUI.objectField(
+				ref gui_parm, ref temp_object, typeof( GameObject ),
+				ref join_last, ref no_label_toggle_last );
+
+			GUI.enabled = gui_enable;
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter

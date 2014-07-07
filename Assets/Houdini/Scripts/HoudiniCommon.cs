@@ -179,6 +179,15 @@ public enum HAPI_State
 	HAPI_STATE_MAX_READY_STATE = HAPI_STATE_READY_WITH_COOK_ERRORS
 };
 
+public enum HAPI_Permissions
+{
+	HAPI_PERMISSIONS_NON_APPLICABLE,
+	HAPI_PERMISSIONS_READ_WRITE,
+	HAPI_PERMISSIONS_READ_ONLY,
+	HAPI_PERMISSIONS_WRITE_ONLY,
+	HAPI_PERMISSIONS_MAX
+};
+
 public enum HAPI_RampType
 {
 	HAPI_RAMPTYPE_INVALID = -1,
@@ -186,7 +195,7 @@ public enum HAPI_RampType
 	HAPI_RAMPTYPE_COLOR,
 	HAPI_RAMPTYPE_MAX
 };
-	
+
 public enum HAPI_ParmType
 {
 	HAPI_PARMTYPE_INT = 0,
@@ -198,8 +207,11 @@ public enum HAPI_ParmType
 	HAPI_PARMTYPE_COLOR,
 		
 	HAPI_PARMTYPE_STRING,
-	HAPI_PARMTYPE_FILE,
-		
+	HAPI_PARMTYPE_PATH_FILE,
+	HAPI_PARMTYPE_PATH_FILE_GEO,
+	HAPI_PARMTYPE_PATH_FILE_IMAGE,
+	HAPI_PARMTYPE_PATH_NODE,
+
 	HAPI_PARMTYPE_FOLDERLIST,
 
 	HAPI_PARMTYPE_FOLDER,
@@ -216,7 +228,16 @@ public enum HAPI_ParmType
 	HAPI_PARMTYPE_FLOAT_END			= HAPI_PARMTYPE_COLOR,
 		
 	HAPI_PARMTYPE_STRING_START		= HAPI_PARMTYPE_STRING,
-	HAPI_PARMTYPE_STRING_END		= HAPI_PARMTYPE_FILE,
+	HAPI_PARMTYPE_STRING_END		= HAPI_PARMTYPE_PATH_NODE,
+
+	HAPI_PARMTYPE_PATH_START		= HAPI_PARMTYPE_PATH_FILE,
+	HAPI_PARMTYPE_PATH_END			= HAPI_PARMTYPE_PATH_NODE,
+
+	HAPI_PARMTYPE_PATH_FILE_START	= HAPI_PARMTYPE_PATH_FILE,
+	HAPI_PARMTYPE_PATH_FILE_END		= HAPI_PARMTYPE_PATH_FILE_IMAGE,
+
+	HAPI_PARMTYPE_PATH_NODE_START	= HAPI_PARMTYPE_PATH_NODE,
+	HAPI_PARMTYPE_PATH_NODE_END		= HAPI_PARMTYPE_PATH_NODE,
 
 	HAPI_PARMTYPE_CONTAINER_START 	= HAPI_PARMTYPE_FOLDERLIST,
 	HAPI_PARMTYPE_CONTAINER_END 	= HAPI_PARMTYPE_FOLDERLIST,
@@ -648,6 +669,21 @@ public struct HAPI_ParmInfo
 		return ( type >= HAPI_ParmType.HAPI_PARMTYPE_STRING_START &&
 			type <= HAPI_ParmType.HAPI_PARMTYPE_STRING_END );
 	}
+	public bool isPath()
+	{
+		return ( type >= HAPI_ParmType.HAPI_PARMTYPE_PATH_START &&
+			type <= HAPI_ParmType.HAPI_PARMTYPE_PATH_END );
+	}
+	public bool isFilePath()
+	{
+		return ( type >= HAPI_ParmType.HAPI_PARMTYPE_PATH_FILE_START &&
+			type <= HAPI_ParmType.HAPI_PARMTYPE_PATH_FILE_END );
+	}
+	public bool isNodePath()
+	{
+		return ( type >= HAPI_ParmType.HAPI_PARMTYPE_PATH_NODE_START &&
+			type <= HAPI_ParmType.HAPI_PARMTYPE_PATH_NODE_END );
+	}
 	public bool isNonValue()
 	{
 		return ( type >= HAPI_ParmType.HAPI_PARMTYPE_NONVALUE_START &&
@@ -660,6 +696,10 @@ public struct HAPI_ParmInfo
 	public HAPI_ParmId parentId;
 
 	public HAPI_ParmType type;
+	public HAPI_StringHandle typeInfoSH;
+
+	public HAPI_Permissions permissions;
+
 	public int size; // Tuple Size
 	public int choiceCount;
 
@@ -695,16 +735,16 @@ public struct HAPI_ParmInfo
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool hasUIMax;
 
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float min;
 
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float max;
 
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float UIMin;
 
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float UIMax;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
@@ -733,10 +773,14 @@ public struct HAPI_ParmInfo
 	public HAPI_RampType rampType;
 
 	// Accessors
+	public int getTypeInfoSH()
+	{ return typeInfoSH; }
 	public int getNameSH()
 	{ return nameSH; }
 	public int getLabelSH()
 	{ return labelSH; }
+	public string typeInfo
+	{ get { return HoudiniHost.getString( typeInfoSH ); } private set {} }
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public string label

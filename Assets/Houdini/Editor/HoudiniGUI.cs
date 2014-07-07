@@ -16,6 +16,8 @@ public struct HoudiniGUIParm
 	{
 		id				= -1;
 
+		typeInfo		= "";
+
 		this.size		= size;
 		choiceCount 	= 0;
 		width			= -1;
@@ -51,6 +53,8 @@ public struct HoudiniGUIParm
 	public HoudiniGUIParm( HAPI_ParmInfo info )
 	{
 		id				= info.id;
+
+		typeInfo		= info.typeInfo;
 
 		size 			= info.size;
 		choiceCount 	= info.choiceCount;
@@ -92,6 +96,8 @@ public struct HoudiniGUIParm
 	}
 
 	public int id;
+
+	public string typeInfo;
 
 	public int size;
 	public int choiceCount;
@@ -902,9 +908,10 @@ public class HoudiniGUI : Editor
 		HoudiniGUIParm parm = new HoudiniGUIParm( name, label );
 		return fileField( ref parm, ref delay_build, ref path );
 	}
-	public static bool fileField( ref HoudiniGUIParm parm,
-								  ref bool delay_build,
-								  ref string path )
+	public static bool fileField(
+		ref HoudiniGUIParm parm,
+		ref bool delay_build,
+		ref string path )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
 		return fileField(
@@ -941,10 +948,21 @@ public class HoudiniGUI : Editor
 		string new_path = EditorGUILayout.TextField( old_path, text_field_style );
 		if ( new_path != old_path ) // Check if the field is being used instead of the slider.
 			delay_build = true;
-		
+
 		if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ), myLineHeightGUI ) ) 
 		{
-			string prompt_path = EditorUtility.OpenFilePanel( "Select File", old_path, "*" );;
+			string file_pattern = "*";
+			if ( parm.typeInfo != "" )
+			{
+				file_pattern = parm.typeInfo;
+				file_pattern = file_pattern.Replace( " ", ";" );
+				if ( file_pattern.StartsWith( "*." ) )
+					file_pattern = file_pattern.Substring( 2 );
+				else if ( file_pattern.StartsWith( "*" ) )
+					file_pattern = file_pattern.Substring( 1 );
+			}
+
+			string prompt_path = EditorUtility.OpenFilePanel( "Select File", old_path, file_pattern );;
 			if ( prompt_path.Length > 0 )
 				new_path = prompt_path;
 		}

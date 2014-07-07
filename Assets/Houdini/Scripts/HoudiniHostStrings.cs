@@ -28,6 +28,9 @@ public static partial class HoudiniHost
 		
 	public static string getString( int string_handle )
 	{
+		if ( string_handle <= 0 )
+			return "";
+
 		int length = 0;
 		getStringBufLength( string_handle, out length );
 			
