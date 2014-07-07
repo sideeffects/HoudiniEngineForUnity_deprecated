@@ -850,7 +850,7 @@ public static partial class HoudiniHost
 				cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 
 				// Initialize.
-				status_code = HAPI_Initialize( otls_path, dsos_path, cook_options, true, -1 );
+				status_code = HAPI_Initialize( otls_path, dsos_path, ref cook_options, true, -1 );
 				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
 			}

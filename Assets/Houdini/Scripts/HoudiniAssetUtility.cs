@@ -985,7 +985,7 @@ public class HoudiniAssetUtility
 					image_info.interleaved = true;
 					image_info.packing = HAPI_ImagePacking.HAPI_IMAGE_PACKING_RGBA;
 
-					HoudiniHost.setImageInfo( material_info.assetId, material_info.id, image_info );
+					HoudiniHost.setImageInfo( material_info.assetId, material_info.id, ref image_info );
 
 					// Extract image to memory.
 					byte[] image_data = HoudiniHost.extractImageToMemory( 
