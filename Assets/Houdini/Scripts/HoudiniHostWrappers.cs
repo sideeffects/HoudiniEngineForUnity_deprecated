@@ -220,7 +220,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		float[] raw_matrix = new float[ 16 ];
-		HAPI_Result status_code = HAPI_ConvertTransformQuatToMatrix( transform, raw_matrix );
+		HAPI_Result status_code = HAPI_ConvertTransformQuatToMatrix( ref transform, raw_matrix );
 		processStatusCode( status_code );
 
 		Matrix4x4 output = new Matrix4x4();
@@ -247,7 +247,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		float[] raw_matrix = new float[ 16 ];
-		HAPI_Result status_code = HAPI_ConvertTransformEulerToMatrix( transform, raw_matrix );
+		HAPI_Result status_code = HAPI_ConvertTransformEulerToMatrix( ref transform, raw_matrix );
 		processStatusCode( status_code );
 
 		Matrix4x4 output = new Matrix4x4();
@@ -2307,10 +2307,11 @@ public static partial class HoudiniHost
 	/// <param name="image_info">
 	///		A <see cref="HAPI_ImageInfo"/> with the new image information.
 	/// </param>
-	public static void setImageInfo( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ImageInfo image_info )
+	public static void setImageInfo(
+		HAPI_AssetId asset_id, HAPI_MaterialId material_id, ref HAPI_ImageInfo image_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		HAPI_Result status_code = HAPI_SetImageInfo( asset_id, material_id, image_info );
+		HAPI_Result status_code = HAPI_SetImageInfo( asset_id, material_id, ref image_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();

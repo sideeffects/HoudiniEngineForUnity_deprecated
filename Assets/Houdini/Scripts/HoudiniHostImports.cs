@@ -50,7 +50,7 @@ public static partial class HoudiniHost
 	HAPI_Initialize(
 		string otl_search_path,
 		string dso_search_path,
-		HAPI_CookOptions cook_options,
+		ref HAPI_CookOptions cook_options,
 		[ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
 		int cooking_thread_stack_size );
 
@@ -112,13 +112,13 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConvertTransformQuatToMatrix(
-		HAPI_Transform transform,
+		ref HAPI_Transform transform,
 		[Out] float[] matrix );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConvertTransformEulerToMatrix(
-		HAPI_TransformEuler transform,
+		ref HAPI_TransformEuler transform,
 		[Out] float[] matrix );
 		
 	// STRINGS --------------------------------------------------------------------------------------------------
@@ -660,7 +660,7 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_SetImageInfo(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
-		HAPI_ImageInfo image_info );
+		ref HAPI_ImageInfo image_info );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
