@@ -133,117 +133,63 @@ public class HoudiniAssetGUI : Editor
 
 					for ( int input_index = 0; input_index < myAsset.prMaxGeoInputCount; ++input_index )
 					{
-						bool join_last							= false;
-						bool no_label_toggle_last				= true;
-						HoudiniGUIParm input_format_dropdown		= new HoudiniGUIParm( "input_format_dropdown_" + input_index );
-						input_format_dropdown.width				= myInputFormatDropdownWidth;
-						input_format_dropdown.size				= 1;
-						input_format_dropdown.choiceCount		= 2;
-						input_format_dropdown.joinNext			= true;
-						input_format_dropdown.labelNone			= true;
-						int[] input_format_value				= new int[ 1 ] { 0 };
-						int[] input_format_dropdown_values		= new int[ 2 ] { 0, 1 };
-						string[] input_format_dropdown_labels	= new string[ 2 ] { "Object", "File" };
-						input_format_value[ 0 ]					= (int) myAsset.prGeoInputFormats[ input_index ];
-						
-						HoudiniGUI.dropdown( ref input_format_dropdown, ref input_format_value, 
-										   input_format_dropdown_labels, input_format_dropdown_values, 
-						                   ref join_last, ref no_label_toggle_last, null, ref input_format_value );
+						bool join_last = false;
+						bool no_label_toggle_last = true;
 
-						HAPI_GeoInputFormat value				= (HAPI_GeoInputFormat) input_format_value[ 0 ];
-						myAsset.prGeoInputFormats[ input_index ]= value;
-
-						if ( value == HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_OBJECT )
-						{
-							HoudiniGUIParm geo_input = new HoudiniGUIParm( "geo_input_" + input_index, 
-																	   myAsset.prGeoInputNames[ input_index ] );
-							Object obj = (Object) myAsset.prUpStreamGeoObjects[ input_index ];
-							myParmChanges |= HoudiniGUI.objectField( ref geo_input, ref obj, 
-																   typeof( GameObject ), ref join_last,
-																   ref no_label_toggle_last );
+						HoudiniGUIParm geo_input = new HoudiniGUIParm(
+							"geo_input_" + input_index, myAsset.prGeoInputNames[ input_index ] );
+						Object obj = (Object) myAsset.prUpStreamGeoObjects[ input_index ];
+						myParmChanges |= HoudiniGUI.objectField(
+							ref geo_input, ref obj, typeof( GameObject ), ref join_last, ref no_label_toggle_last );
 					
-							if ( myParmChanges )
+						if ( myParmChanges )
+						{
+							if ( !obj )
 							{
-								if ( !obj )
+								myAsset.removeGeoInput( input_index );
+								myAsset.prUpStreamGeoObjects[ input_index ] = null;
+								myAsset.prUpStreamGeoAssets[ input_index ] = null;
+								myAsset.buildClientSide();
+							}
+							else
+							{
+								GameObject new_obj = (GameObject) obj;
+								myAsset.prUpStreamGeoObjects[ input_index ] = new_obj;
+
+								// Select the asset component (if it exists).
+								HoudiniAsset asset = new_obj.GetComponent< HoudiniAsset >();
+
+								// If we're selecting a specific object to input than try and
+								// get the object id. Note that by getting the HAPI_ObjectControl
+								// component we also cover the geo and part controls because
+								// they all inherit from HAPI_ObjectControl. The user can therefore
+								// drag any gameObject under the asset into another asset's
+								// input and have it all work.
+								int object_index = 0;
+								HoudiniObjectControl obj_control = new_obj.GetComponent< HoudiniObjectControl >();
+								if ( obj_control )
 								{
-									myAsset.removeGeoInput( input_index );
-									myAsset.prUpStreamGeoObjects[ input_index ] = null;
-									myAsset.prUpStreamGeoAssets[ input_index ] = null;
-									
-									myAsset.prFileInputs[ input_index ] = "";
-									myAsset.buildClientSide();
+									object_index = obj_control.prObjectId;
+									asset = obj_control.prAsset;
 								}
-								else
-								{
-									myAsset.prFileInputs[ input_index ] = "";
 
-									GameObject new_obj = (GameObject) obj;
-									myAsset.prUpStreamGeoObjects[ input_index ] = new_obj;
-
-									// Select the asset component (if it exists).
-									HoudiniAsset asset = new_obj.GetComponent< HoudiniAsset >();
-
-									// If we're selecting a specific object to input than try and
-									// get the object id. Note that by getting the HAPI_ObjectControl
-									// component we also cover the geo and part controls because
-									// they all inherit from HAPI_ObjectControl. The user can therefore
-									// drag any gameObject under the asset into another asset's
-									// input and have it all work.
-									int object_index = 0;
-									HoudiniObjectControl obj_control = new_obj.GetComponent< HoudiniObjectControl >();
-									if ( obj_control )
-									{
-										object_index = obj_control.prObjectId;
-										asset = obj_control.prAsset;
-									}
-
-									// If we are connecting a non-HAPI game object than we need to 
-									// assetize it first by converting it to an Input Asset.
-									if ( asset == null )
-										asset = new_obj.AddComponent< HoudiniAssetInput >();
+								// If we are connecting a non-HAPI game object than we need to 
+								// assetize it first by converting it to an Input Asset.
+								if ( asset == null )
+									asset = new_obj.AddComponent< HoudiniAssetInput >();
 									
-									if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
+								if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
+								{
+									if ( myAsset == asset )
+										Debug.LogError( "Can't connect an asset to itself!" );
+									else
 									{
-										if ( myAsset == asset )
-											Debug.LogError( "Can't connect an asset to itself!" );
-										else
-										{
-											myAsset.addAssetAsGeoInput( asset, object_index, input_index );
-											myAsset.buildClientSide();
-										}
+										myAsset.addAssetAsGeoInput( asset, object_index, input_index );
+										myAsset.buildClientSide();
 									}
 								}
 							}
 						}
-						else
-						{
-							HoudiniGUIParm file_input = new HoudiniGUIParm( "file_input_" + input_index,
-																		myAsset.prGeoInputNames[ input_index ] );
-							string file_path = myAsset.prFileInputs[ input_index ];
-							myParmChanges |= HoudiniGUI.fileField( ref file_input, ref myDelayBuild, ref file_path,
-																 ref join_last, ref no_label_toggle_last );
-							if ( myParmChanges )
-							{
-								if ( file_path.Equals("") )
-								{
-									myAsset.removeGeoInput( input_index );
-									myAsset.prFileInputs[ input_index ] = "";
-									
-									myAsset.prUpStreamGeoObjects[ input_index ] = null;
-									myAsset.prUpStreamGeoAssets[ input_index ] = null;
-									myAsset.buildClientSide();
-								}
-								else
-								{
-									myAsset.prFileInputs[ input_index ] = file_path;
-									myAsset.addFileAsGeoInput( file_path, input_index );
-									
-									myAsset.prUpStreamGeoObjects[ input_index ] = null;
-									myAsset.prUpStreamGeoAssets[ input_index ] = null;
-									myAsset.buildClientSide();
-								}
-							}
-						} // if
 					} // for
 				} // if
 			} // if

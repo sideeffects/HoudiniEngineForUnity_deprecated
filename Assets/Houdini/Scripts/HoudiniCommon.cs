@@ -113,6 +113,9 @@ public struct HoudiniConstants
 	// convert to.
 	public const string HAPI_DEFAULT_IMAGE_FORMAT_NAME	= HAPI_PNG_FORMAT_NAME;
 
+	/// Name of subnet OBJ node containing the global nodes.
+	public const string HAPI_GLOBAL_NODES_NODE_NAME		= "GlobalNodes";
+
 	public const string HAPI_UNSUPPORTED_PLATFORM_MSG   =
 		"Houdini Plugin for Unity currently only supports the Standalone Windows platform in Editor.\n" +
 		"\n" +
@@ -273,7 +276,6 @@ public enum HAPI_AssetSubType
 	HAPI_ASSETSUBTYPE_DEFAULT,
 	HAPI_ASSETSUBTYPE_CURVE,
 	HAPI_ASSETSUBTYPE_INPUT,
-	HAPI_ASSETSUBTYPE_EXTERNALINPUT,
 	HAPI_ASSETSUBTYPE_MAX
 }
 
@@ -446,18 +448,6 @@ public enum HAPI_EnvIntType
 		
 	HAPI_ENVINT_MAX,
 };
-
-// Unity-Only:
-
-public enum HAPI_GeoInputFormat
-{
-	HAPI_GEO_INPUT_FORMAT_INVALID = -1,
-	HAPI_GEO_INPUT_FORMAT_OBJECT,
-	HAPI_GEO_INPUT_FORMAT_FILE,
-	HAPI_GEO_INPUT_FORMAT_MAX,
-
-	HAPI_GEO_INPUT_FORMAT_DEFAULT = HAPI_GEO_INPUT_FORMAT_OBJECT
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Main API Structs
