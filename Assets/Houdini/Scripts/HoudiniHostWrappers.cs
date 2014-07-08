@@ -1980,70 +1980,9 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
-		
-	// GEOMETRY INPUT -------------------------------------------------------------------------------------------
-		
-	/// <summary> 
-	/// 	Set a file as input to an asset.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id returned by HAPI_LoadOTLFile().
-	/// </param>
-	/// <param name="input_idx">
-	///		The index of the input - 0 for an asset that has just
-	///	</param>		
-	/// <param name="file_name">
-	///		Name of the file to use as input to the given asset
-	/// </param>
-	public static void setFileInput( HAPI_AssetId asset_id, int input_idx, string file_name )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		HAPI_Result status_code = HAPI_SetFileInput( asset_id, input_idx, file_name );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-		
-	/// <summary> 
-	/// 	Create a geometry input node.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id returned by HAPI_LoadOTLFile().
-	/// </param>
-	/// <param name="input_idx">
-	///		The index of the input - 0 for an asset that has just one input.
-	///	</param>
-	/// <param name="object_id">
-	///		Object id corresponding to created input node. Use this id to push geometry to this input. Note 
-	///		that this id will usually be 0 if geometry is piped to a geometry type asset but will could be 
-	///		non-zero if geometry is piped to an object type asset.
-	/// </param>
-	/// <param name="geo_id">
-	///		Geometry id corresponding to created input node. Use this id to push geometry to this input.
-	/// </param>
-	/// <param name="node_id">
-	///		The node id of the exposed object node so that parameters such as transform information, may
-	///		be set on the exposed node.
-	/// </param>
-	public static void createGeoInput(
-		HAPI_AssetId asset_id, int input_idx, 
-		out HAPI_ObjectId object_id, out HAPI_GeoId geo_id, out int node_id )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		HAPI_GeoInputInfo geo_input_info = new HAPI_GeoInputInfo();
-		HAPI_Result status_code = HAPI_CreateGeoInput( asset_id, input_idx, out geo_input_info );
-		object_id = geo_input_info.objectId;
-		geo_id = geo_input_info.geoId;
-		node_id = geo_input_info.objectNodeId;
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-		
+
 	// INTER-ASSET ----------------------------------------------------------------------------------------------
-		
+
 	/// <summary>	Connect two assets of compatible types together.  For 
 	///		example we can connect two object level assets or
 	///		two sop level assets together.  Note this method does

@@ -578,21 +578,9 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_RevertGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id );
-		
-	// GEOMETRY INPUT -------------------------------------------------------------------------------------------
-		
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
-	HAPI_SetFileInput( HAPI_AssetId asset_id, int input_idx, string file_name );
-		
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
-	HAPI_CreateGeoInput( 
-		HAPI_AssetId asset_id, int input_idx,
-		out HAPI_GeoInputInfo geo_input_info );
-		
+
 	// INTER ASSET ----------------------------------------------------------------------------------------------
-		
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_ConnectAssetTransform(
@@ -612,9 +600,9 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_DisconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx );
-		
+
 	// MATERIALS ------------------------------------------------------------------------------------------------
-		
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetMaterialOnPart(

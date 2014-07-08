@@ -99,8 +99,6 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myMinGeoInputCount = value; } }
 	public int						prMaxGeoInputCount {			get { return myMaxGeoInputCount; } 
 																	set { myMaxGeoInputCount = value; } }
-	public List< string >			prFileInputs {					get { return myFileInputs; } 
-																	set { myFileInputs = value; } }
 	
 	public List< HoudiniAsset >		prDownStreamTransformAssets {	get { return myDownStreamTransformAssets; } 
 																	set { myDownStreamTransformAssets = value; } }
@@ -233,10 +231,7 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myTransInputNames = value; } }
 	public List< string >			prGeoInputNames {				get { return myGeoInputNames; }
 																	set { myGeoInputNames = value; } }
-	public List< HAPI_GeoInputFormat >	prGeoInputFormats {			get { return myGeoInputFormats; }
-																	set { myGeoInputFormats = value; } }
 
-	
 	// Prefabs ------------------------------------------------------------------------------------------------------
 	
 	public int prBackupAssetId {							get { return myBackupAssetId; }
@@ -407,14 +402,6 @@ public abstract class HoudiniAsset : HoudiniControl
 				asset_otl.prAssetUndoInfo.isGeoVisible = false;
 			}
 		}
-	}
-
-	public void addFileAsGeoInput( string path, int index )
-	{
-		prUpStreamGeoAssets[ index ] = null;
-		prUpStreamGeoAdded[ index ] = true;
-
-		HoudiniHost.setFileInput( prAssetId, index, path );
 	}
 
 #if UNITY_EDITOR
@@ -763,7 +750,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		prMaxTransInputCount 			= 0;
 		prMinGeoInputCount 				= 0;
 		prMaxGeoInputCount 				= 0;
-		prFileInputs 					= new List< string >();
 		
 		prDownStreamTransformAssets		= new List< HoudiniAsset >();
 		prUpStreamTransformAssets 		= new List< HoudiniAsset >();
@@ -822,7 +808,6 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		prTransInputNames				= new List< string >();
 		prGeoInputNames					= new List< string >();
-		prGeoInputFormats				= new List< HAPI_GeoInputFormat >();
 		
 		myProgressBarJustUsed 			= false;
 		
@@ -1732,10 +1717,9 @@ public abstract class HoudiniAsset : HoudiniControl
 				}
 		}
 	
-		if ( prMaxGeoInputCount > 0 && prFileInputs.Count <= 0 )
+		if ( prMaxGeoInputCount > 0 )
 			for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
 			{
-				prFileInputs.Add( "" );
 				prUpStreamGeoAssets.Add( null );
 				prUpStreamGeoObjects.Add( null );
 				prUpStreamGeoAdded.Add( false );
@@ -1755,10 +1739,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		}
 	
 		int numValidGeoInputs = 0;
-		for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
-			if ( prFileInputs[ ii ] != "" )
-				numValidGeoInputs++;
-	
 		if ( numValidGeoInputs < prMinGeoInputCount )
 			Debug.LogWarning( "Insufficent Geo Inputs to Asset. " +
 							  "Please provide inputs in the Inputs section." );
@@ -1791,7 +1771,6 @@ public abstract class HoudiniAsset : HoudiniControl
 			if ( geo_input_name == "" )
 				geo_input_name = "Geometry Input #" + ( i + 1 );
 			prGeoInputNames.Add( geo_input_name );
-			prGeoInputFormats.Add( HAPI_GeoInputFormat.HAPI_GEO_INPUT_FORMAT_DEFAULT );
 		}
 	}
 
@@ -1969,20 +1948,19 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private int 					myMaxTransInputCount;
 	[SerializeField] private int 					myMinGeoInputCount;
 	[SerializeField] private int					myMaxGeoInputCount;
-	[SerializeField] private List< string >			myFileInputs;
 	
-	[SerializeField] private List< HoudiniAsset >		myDownStreamTransformAssets;
-	[SerializeField] private List< HoudiniAsset >		myUpStreamTransformAssets;
+	[SerializeField] private List< HoudiniAsset >	myDownStreamTransformAssets;
+	[SerializeField] private List< HoudiniAsset >	myUpStreamTransformAssets;
 	[SerializeField] private List< GameObject >		myUpStreamTransformObjects;
 	
-	[SerializeField] private List< HoudiniAsset >		myDownStreamGeoAssets;
-	[SerializeField] private List< HoudiniAsset >		myUpStreamGeoAssets;
+	[SerializeField] private List< HoudiniAsset >	myDownStreamGeoAssets;
+	[SerializeField] private List< HoudiniAsset >	myUpStreamGeoAssets;
 	[SerializeField] private List< GameObject >		myUpStreamGeoObjects;
 	[SerializeField] private List< bool >			myUpStreamGeoAdded;
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
-	[SerializeField] private HoudiniPresetMap			myPresetsMap;
+	[SerializeField] private HoudiniPresetMap		myPresetsMap;
 
 	// Objects ------------------------------------------------------------------------------------------------------
 	
@@ -2032,8 +2010,6 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	[SerializeField] private List< string >			myTransInputNames;
 	[SerializeField] private List< string >			myGeoInputNames;
-	[SerializeField] 
-	private List< HAPI_GeoInputFormat >				myGeoInputFormats;
 
 	
 	// Private Temporary Data
