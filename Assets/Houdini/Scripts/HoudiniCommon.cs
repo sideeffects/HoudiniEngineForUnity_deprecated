@@ -740,6 +740,9 @@ public struct HAPI_ParmInfo
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool invisible;
 
+	[ MarshalAs( UnmanagedType.U1 ) ]
+	public bool spare;
+
 	// Whether this parm should be on the same line as the next parm.
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool joinNext;
