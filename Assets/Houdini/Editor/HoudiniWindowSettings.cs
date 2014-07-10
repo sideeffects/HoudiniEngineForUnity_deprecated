@@ -98,12 +98,13 @@ public class HoudiniWindowSettings : EditorWindow
 
 		HoudiniGUI.separator();
 
-		GUIContent[] modes = new GUIContent[ 5 ];
+		GUIContent[] modes = new GUIContent[ 6 ];
 		modes[ 0 ] = new GUIContent( "General" );
 		modes[ 1 ] = new GUIContent( "Materials" );
 		modes[ 2 ] = new GUIContent( "Cooking" );
 		modes[ 3 ] = new GUIContent( "Geometry" );
 		modes[ 4 ] = new GUIContent( "Curves" );
+		modes[ 5 ] = new GUIContent( "Advanced" );
 		mySettingsTabSelection = GUILayout.Toolbar( mySettingsTabSelection, modes );
 
 		switch ( mySettingsTabSelection )
@@ -113,6 +114,7 @@ public class HoudiniWindowSettings : EditorWindow
 			case 2: generateCookingSettings(); break;
 			case 3: generateGeometrySettings(); break;
 			case 4: generateCurveSettings(); break;
+			case 5: generateAdvancedSettings(); break;
 			default: Debug.LogError( "Invalid Settings Tab." ); break;
 		}
 
@@ -126,29 +128,6 @@ public class HoudiniWindowSettings : EditorWindow
 	
 	private static void generateGeneralSettings()
 	{
-		// Collision Group Name
-		{
-			string value = HoudiniHost.prCollisionGroupName;
-			bool changed = HoudiniGUI.stringField(
-				"collision_group_name", "Colli. Grp.", ref value,
-				myUndoInfo, ref myUndoInfo.collisionGroupName );
-			if ( changed )
-				HoudiniHost.prCollisionGroupName = value;
-		}
-
-		// Rendered Collision Group Name
-		{
-			string value = HoudiniHost.prRenderedCollisionGroupName;
-			bool changed = HoudiniGUI.stringField(
-				"rendered_collision_group_name", 
-				"Rendered Colli. Grp.", ref value, myUndoInfo, 
-				ref myUndoInfo.renderedCollisionGroupName );
-			if ( changed )
-				HoudiniHost.prRenderedCollisionGroupName = value;
-		}
-
-		HoudiniGUI.separator();
-
 		// Pin Size
 		{
 			float value = HoudiniHost.prPinSize;
@@ -238,44 +217,6 @@ public class HoudiniWindowSettings : EditorWindow
 
 	private static void generateMaterialSettings()
 	{
-		// Unity Material Attrib Name
-		{
-			string value = HoudiniHost.prUnityMaterialAttribName;
-			bool changed = HoudiniGUI.stringField(
-				"unity_material_attrib_name", 
-				"Unity Mat. Attrib.", 
-				ref value, myUndoInfo, 
-				ref myUndoInfo.unityMaterialAttribName );
-			if ( changed )
-				HoudiniHost.prUnityMaterialAttribName = value;
-		}
-
-		// Unity Sub Material Name Attrib Name
-		{
-			string value = HoudiniHost.prUnitySubMaterialNameAttribName;
-			bool changed = HoudiniGUI.stringField(
-				"unity_sub_material_name_attrib_name", 
-				"Unity SubMat. Name Attrib.", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.unitySubMaterialNameAttribName );
-			if ( changed )
-				HoudiniHost.prUnitySubMaterialNameAttribName = value;
-		}
-
-		// Unity Sub Material Index Attrib Name
-		{
-			string value = HoudiniHost.prUnitySubMaterialIndexAttribName;
-			bool changed = HoudiniGUI.stringField(
-				"unity_sub_material_index_attrib_name", 
-				"Unity SubMat. Index Attrib.", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.unitySubMaterialIndexAttribName );
-			if ( changed )
-				HoudiniHost.prUnitySubMaterialIndexAttribName = value;
-		}
-
-		HoudiniGUI.separator();
-
 		// Generate Tangents
 		{
 			bool value = HoudiniHost.prGenerateTangents;
@@ -453,24 +394,10 @@ public class HoudiniWindowSettings : EditorWindow
 					"Ok" );
 			}
 		}
-
 	}
 
 	private static void generateGeometrySettings()
 	{
-		// Unity Tag Attrib Name
-		{
-			string value = HoudiniHost.prUnityTagAttribName;
-			bool changed = HoudiniGUI.stringField(
-				"unity_tag_attrib_name", "Unity Tag Attrib.", 
-				ref value, myUndoInfo, 
-				ref myUndoInfo.unityTagAttribName );
-			if ( changed )
-				HoudiniHost.prUnityTagAttribName = value;
-		}
-
-		HoudiniGUI.separator();
-
 		// Paint Brush Rate
 		{
 			// Everything is opposite here because the higher the number the slower
@@ -780,9 +707,116 @@ public class HoudiniWindowSettings : EditorWindow
 		}
 	}
 
+	private static void generateAdvancedSettings()
+	{
+		if ( !myEnableAdvancedSettings )
+		{
+			if ( HoudiniGUI.button(
+				"allow_advanced_settings", "Allow Editing of Advanced Settings" ) )
+			{
+				if ( EditorUtility.DisplayDialog(
+					"Careful!",
+					"Changing these settings can cause the Houdini Engine plugin to stop working. " +
+					"Are you sure you want to edit them?", 
+					"Yes", "No" ) )
+				{
+					myEnableAdvancedSettings = true;
+				}
+			}
+		}
+		else
+		{
+			if ( HoudiniGUI.button(
+				"disallow_advanced_settings", "Disallow Editing of Advanced Settings" ) )
+			{
+				myEnableAdvancedSettings = false;
+			}
+		}
+
+		HoudiniGUI.separator();
+
+		bool gui_enabled = GUI.enabled;
+		GUI.enabled = myEnableAdvancedSettings;
+
+		// Collision Group Name
+		{
+			string value = HoudiniHost.prCollisionGroupName;
+			bool changed = HoudiniGUI.stringField(
+				"collision_group_name", "Colli. Grp.", ref value,
+				myUndoInfo, ref myUndoInfo.collisionGroupName );
+			if ( changed )
+				HoudiniHost.prCollisionGroupName = value;
+		}
+
+		// Rendered Collision Group Name
+		{
+			string value = HoudiniHost.prRenderedCollisionGroupName;
+			bool changed = HoudiniGUI.stringField(
+				"rendered_collision_group_name", 
+				"Rendered Colli. Grp.", ref value, myUndoInfo, 
+				ref myUndoInfo.renderedCollisionGroupName );
+			if ( changed )
+				HoudiniHost.prRenderedCollisionGroupName = value;
+		}
+
+		HoudiniGUI.separator();
+
+		// Unity Material Attrib Name
+		{
+			string value = HoudiniHost.prUnityMaterialAttribName;
+			bool changed = HoudiniGUI.stringField(
+				"unity_material_attrib_name", 
+				"Unity Mat. Attrib.", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.unityMaterialAttribName );
+			if ( changed )
+				HoudiniHost.prUnityMaterialAttribName = value;
+		}
+
+		// Unity Sub Material Name Attrib Name
+		{
+			string value = HoudiniHost.prUnitySubMaterialNameAttribName;
+			bool changed = HoudiniGUI.stringField(
+				"unity_sub_material_name_attrib_name", 
+				"Unity SubMat. Name Attrib.", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.unitySubMaterialNameAttribName );
+			if ( changed )
+				HoudiniHost.prUnitySubMaterialNameAttribName = value;
+		}
+
+		// Unity Sub Material Index Attrib Name
+		{
+			string value = HoudiniHost.prUnitySubMaterialIndexAttribName;
+			bool changed = HoudiniGUI.stringField(
+				"unity_sub_material_index_attrib_name", 
+				"Unity SubMat. Index Attrib.", 
+				ref value, myUndoInfo,
+				ref myUndoInfo.unitySubMaterialIndexAttribName );
+			if ( changed )
+				HoudiniHost.prUnitySubMaterialIndexAttribName = value;
+		}
+
+		HoudiniGUI.separator();
+
+		// Unity Tag Attrib Name
+		{
+			string value = HoudiniHost.prUnityTagAttribName;
+			bool changed = HoudiniGUI.stringField(
+				"unity_tag_attrib_name", "Unity Tag Attrib.", 
+				ref value, myUndoInfo, 
+				ref myUndoInfo.unityTagAttribName );
+			if ( changed )
+				HoudiniHost.prUnityTagAttribName = value;
+		}
+
+		GUI.enabled = gui_enabled;
+	}
+
 	private static bool myEnableDraw = true;
 	private static int mySettingsTabSelection = 0;
 	private static Vector2 myScrollPosition;
+	private static bool myEnableAdvancedSettings = false;
 	private static HoudiniHostUndoInfo myUndoInfo;
 
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
