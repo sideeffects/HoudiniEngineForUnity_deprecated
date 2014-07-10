@@ -1238,7 +1238,6 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup );
 		progress_bar.statusCheckLoop();
-		HoudiniAssetUtility.checkForNewAssets();
 
 		myProgressBarJustUsed = true;
 		
