@@ -153,11 +153,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			"auto_select_asset_root_node", "Auto Select Asset Root Node", 
 			"prAutoSelectAssetRootNode", ref myUndoInfo.autoSelectAssetRootNode,
 			null, !HoudiniHost.isAutoSelectAssetRootNodeDefault() );
-		
-		// Hide When Fed to Other Asset
-		createToggleForProperty(
-			"hide_geometry_on_linking", "Hide Geometry On Linking", "prHideGeometryOnLinking",
-			ref myUndoInfo.hideGeometryOnLinking, null, !HoudiniHost.isHideGeometryOnLinkingDefault() );
 	}
 	
 	private void generateMaterialSettings()

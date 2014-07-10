@@ -12,7 +12,6 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	public bool enableDragAndDrop;
 	public bool enableSupportWarnings;
 	public bool autoSelectAssetRootNode;
-	public bool hideGeometryOnLinking;
 	public bool enablePointsAsParticles;
 
 	// Material Settings
@@ -71,7 +70,6 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		autoPinInstances 				= HoudiniHost.prAutoPinInstances;
 		enableSupportWarnings 			= HoudiniHost.prEnableSupportWarnings;
 		autoSelectAssetRootNode 		= HoudiniHost.prAutoSelectAssetRootNode;
-		hideGeometryOnLinking 			= HoudiniHost.prHideGeometryOnLinking;
 		enablePointsAsParticles 		= HoudiniHost.prEnablePointsAsParticles;
 		
 		// Set material settings.

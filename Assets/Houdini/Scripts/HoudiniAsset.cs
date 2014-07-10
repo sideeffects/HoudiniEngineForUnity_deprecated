@@ -167,11 +167,6 @@ public abstract class HoudiniAsset : HoudiniControl
 														  || (	HoudiniHost.prAutoSelectAssetRootNode &&
 																!HoudiniHost.isAutoSelectAssetRootNodeDefault() ); } 
 												set { myAutoSelectAssetRootNode = value; } }
-	public bool	prHideGeometryOnLinking {		get { return (	myHideGeometryOnLinking && 
-																HoudiniHost.isHideGeometryOnLinkingDefault() )
-														  || (	HoudiniHost.prHideGeometryOnLinking &&
-																!HoudiniHost.isHideGeometryOnLinkingDefault() ); } 
-												set { myHideGeometryOnLinking = value; } }
 
 	public HAPI_ShaderType			prMaterialShaderType {	get { return myMaterialShaderType; }
 															set { myMaterialShaderType = value; } }
@@ -383,25 +378,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		if ( !EditorApplication.isPlaying )
 			savePreset();
 #endif // UNITY_EDITOR
-
-		if ( HoudiniHost.prHideGeometryOnLinking && asset.prHideGeometryOnLinking )
-		{
-			asset.prIsGeoVisible = false;
-			HoudiniPartControl[] controls = asset.GetComponentsInChildren< HoudiniPartControl >();
-			foreach ( HoudiniPartControl control in controls )
-			{
-				if ( control.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
-					 && control.gameObject.GetComponent< MeshRenderer >() != null )
-					control.gameObject.GetComponent< MeshRenderer >().enabled = false;
-			}
-
-			// update undo info if needed
-			if ( asset.GetType() == typeof( HoudiniAssetOTL ) )
-			{
-				HoudiniAssetOTL asset_otl = asset as HoudiniAssetOTL;
-				asset_otl.prAssetUndoInfo.isGeoVisible = false;
-			}
-		}
 	}
 
 #if UNITY_EDITOR
@@ -788,7 +764,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		prIsGeoVisible					= true;
 		prShowPinnedInstances			= true;
 		prAutoSelectAssetRootNode 		= HoudiniHost.myDefaultAutoSelectAssetRootNode;
-		prHideGeometryOnLinking			= HoudiniHost.myDefaultHideGeometryOnLinking;
 
 		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
 		prRenderResolution				= new Vector2( 1000, 1000 );
@@ -1990,7 +1965,6 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private bool					myIsGeoVisible;
 	[SerializeField] private bool					myShowPinnedInstances;
 	[SerializeField] private bool					myAutoSelectAssetRootNode;
-	[SerializeField] private bool					myHideGeometryOnLinking;
 
 	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
 	[SerializeField] private Vector2				myRenderResolution;

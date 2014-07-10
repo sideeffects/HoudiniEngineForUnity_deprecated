@@ -74,7 +74,6 @@ public class HoudiniAssetInput : HoudiniAsset
 		
 		// Overwrite some settings that should be different by default for input assets than other asset types.
 		prAutoSelectAssetRootNode	= false;
-		prHideGeometryOnLinking		= false;
 		prAssetType					= AssetType.TYPE_INPUT;
 
 		myGeoAttributeManager		= null;
