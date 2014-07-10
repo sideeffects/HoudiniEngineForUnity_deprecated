@@ -690,7 +690,6 @@ public static partial class HoudiniHost
 		progress_bar.statusCheckLoop();
 		cookAsset( asset_id, split_geos_by_group );
 		progress_bar.statusCheckLoop();
-		HoudiniAssetUtility.checkForNewAssets();
 
 		return asset_id;
 #else

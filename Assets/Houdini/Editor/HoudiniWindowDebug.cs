@@ -73,6 +73,15 @@ public class HoudiniWindowDebug : EditorWindow
 			HoudiniAssetUtility.instantiateAsset( asset_file_path );
 		}
 
+		HoudiniGUI.separator();
+
+		if ( GUILayout.Button( "Check for New Untracked Asset Nodes" ) )
+		{
+			HoudiniAssetUtility.checkForNewAssets();
+		}
+
+		HoudiniGUI.separator();
+
 		if ( HoudiniGUI.floatField( "global_time", "Global Time", ref myTime, null, ref myTime ) )
 		{
 			try
@@ -96,8 +105,7 @@ public class HoudiniWindowDebug : EditorWindow
 		}
 
 		HoudiniGUI.separator();
-		
-		
+
 		string path = Application.dataPath;
 		
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
