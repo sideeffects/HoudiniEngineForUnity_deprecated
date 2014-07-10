@@ -116,7 +116,6 @@ public static partial class HoudiniHost
 	private const bool myDefaultEnableSupportWarnings					= true;
 
 	public const bool myDefaultAutoSelectAssetRootNode					= true;
-	public const bool myDefaultHideGeometryOnLinking					= true;
 
 	private const bool myDefaultEnablePointsAsParticles 				= true;
 
@@ -204,7 +203,6 @@ public static partial class HoudiniHost
 		setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
 			
 		setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
-		setBool(	"HAPI_HideGeometryOnLinking", myDefaultHideGeometryOnLinking, true );
 
 		setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
 
@@ -304,9 +302,6 @@ public static partial class HoudiniHost
 	public static bool prAutoSelectAssetRootNode {
 											get { return getBool( "HAPI_AutoSelectAssetRootNode" ); } 
 											set { setBool( "HAPI_AutoSelectAssetRootNode", value ); } }
-	public static bool prHideGeometryOnLinking {
-											get { return getBool( "HAPI_HideGeometryOnLinking" ); } 
-											set { setBool( "HAPI_HideGeometryOnLinking", value ); } }
 
 	public static bool prEnablePointsAsParticles {
 											get { return getBool( "HAPI_EnablePointsAsParticles" ); }
@@ -478,9 +473,6 @@ public static partial class HoudiniHost
 	public static bool isAutoSelectAssetRootNodeDefault()
 											{ return	prAutoSelectAssetRootNode == 
 														myDefaultAutoSelectAssetRootNode; }
-	public static bool isHideGeometryOnLinkingDefault()
-											{ return	prHideGeometryOnLinking == 
-														myDefaultHideGeometryOnLinking; }
 
 	public static bool isGenerateTangentsDefault()
 											{ return	prGenerateTangents ==
@@ -593,7 +585,6 @@ public static partial class HoudiniHost
 		prEnableSupportWarnings					= myDefaultEnableSupportWarnings;
 
 		prAutoSelectAssetRootNode				= myDefaultAutoSelectAssetRootNode;
-		prHideGeometryOnLinking					= myDefaultHideGeometryOnLinking;
 
 		prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
 

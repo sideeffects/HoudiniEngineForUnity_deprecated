@@ -59,7 +59,6 @@ public class HoudiniAssetCurve : HoudiniAsset
 		
 		// Overwrite some settings that should be different by default for curves than other asset types.
 		prAutoSelectAssetRootNode	= true;
-		prHideGeometryOnLinking		= false;
 		prAssetType					= AssetType.TYPE_CURVE;
 	}
 

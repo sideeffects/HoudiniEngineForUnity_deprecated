@@ -219,21 +219,6 @@ public class HoudiniWindowSettings : EditorWindow
 			}
 		}
 
-		// Hide Geometry On Linking
-		{
-			bool value = HoudiniHost.prHideGeometryOnLinking;
-			bool changed = HoudiniGUI.toggle(
-				"hide_geometry_on_linking", 
-				"Hide Geometry On Linking", 
-				ref value, myUndoInfo, 
-				ref myUndoInfo.hideGeometryOnLinking );
-			if ( changed )
-			{
-				HoudiniHost.prHideGeometryOnLinking = value;
-				HoudiniHost.repaint();
-			}
-		}
-
 		HoudiniGUI.separator();
 
 		// Enable particles

@@ -7,7 +7,6 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 	public bool isGeoVisible;
 	public bool showPinnedInstances;
 	public bool autoSelectAssetRootNode;
-	public bool hideGeometryOnLinking;
 
 	// Material Settings
 	public HAPI_ShaderType materialShaderType;
@@ -36,7 +35,6 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 		isGeoVisible 					= asset.prIsGeoVisible;
 		showPinnedInstances 			= asset.prShowPinnedInstances;
 		autoSelectAssetRootNode 		= asset.prAutoSelectAssetRootNode;
-		hideGeometryOnLinking 			= asset.prHideGeometryOnLinking;
 		materialShaderType 				= asset.prMaterialShaderType;
 		renderResolution 				= asset.prRenderResolution;
 		showOnlyVertexColours 			= asset.prShowOnlyVertexColours;
