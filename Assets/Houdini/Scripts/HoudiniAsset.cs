@@ -146,6 +146,8 @@ public abstract class HoudiniAsset : HoudiniControl
 	
 	public bool 					prShowHoudiniControls {			get { return myShowHoudiniControls; } 
 																	set { myShowHoudiniControls = value; } }
+	public bool						prShowCookLog {					get { return myCookLog; }
+																	set { myCookLog = value; } }
 	public bool 					prShowHelp {					get { return myShowHelp; } 
 																	set { myShowHelp = value; } }
 	public bool 					prShowAssetSettings {			get { return myShowAssetSettings; } 
@@ -755,6 +757,7 @@ public abstract class HoudiniAsset : HoudiniControl
 		// GUI ------------------------------------------------------------------------------------------------------
 		
 		prShowHoudiniControls 			= true;
+		prShowCookLog					= false;
 		prShowHelp						= false;
 		prShowAssetSettings				= true;
 		prShowBakeOptions				= false;
@@ -1956,6 +1959,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private bool 					myShowHoudiniControls;
+	[SerializeField] private bool					myCookLog;
 	[SerializeField] private bool					myShowHelp;
 	[SerializeField] private bool 					myShowAssetSettings;
 	[SerializeField] private bool 					myShowBakeOptions;

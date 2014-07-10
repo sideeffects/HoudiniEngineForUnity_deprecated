@@ -193,6 +193,11 @@ public class HoudiniAssetGUI : Editor
 					} // for
 				} // if
 			} // if
+
+			// Draw Cook Log Pane
+			myAsset.prShowCookLog = HoudiniGUI.foldout( "Asset Cook Log", myAsset.prShowCookLog, true );
+			if ( myAsset.prShowCookLog )
+				drawCookLog();
 		}
 		catch ( HoudiniError e )
 		{
@@ -267,6 +272,35 @@ public class HoudiniAssetGUI : Editor
 		EditorGUILayout.EndScrollView();
 	}
 
+	protected void drawCookLog()
+	{
+		if ( HoudiniGUI.button( "get_cook_log", "Get Cook Log" ) )
+		{
+			myAsset.buildClientSide();
+			myLastCookLog = HoudiniHost.getStatusString(
+				HAPI_StatusType.HAPI_STATUS_COOK_RESULT,
+				HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_MESSAGES );
+		}
+
+		float width = (float) Screen.width - 60;
+
+		myCookLogScrollPosition = EditorGUILayout.BeginScrollView(
+			myCookLogScrollPosition, GUILayout.Height( 200 ) );
+
+		GUIStyle sel_label = new GUIStyle( GUI.skin.label );
+		sel_label.stretchWidth = true;
+		sel_label.wordWrap = true;
+
+		float height = sel_label.CalcHeight( 
+			new GUIContent( myLastCookLog ), width );
+
+		EditorGUILayout.SelectableLabel( 
+			myLastCookLog, sel_label, GUILayout.Width( width ),
+			GUILayout.Height( height ) );
+
+		EditorGUILayout.EndScrollView();
+	}
+
 	protected delegate void valueChangedFunc();
 
 	protected void createToggleForProperty(
@@ -335,6 +369,9 @@ public class HoudiniAssetGUI : Editor
 	protected bool			myUnbuiltChanges;
 	protected bool 			myFocusChanged;
 
+	protected Vector2 myCookLogScrollPosition = new Vector2( 0.0f, 0.0f );
+	protected string myLastCookLog = "";
+	
 	protected Vector2 myHelpScrollPosition = new Vector2( 0.0f, 0.0f );
 
 	protected HoudiniAssetUndoInfo myUndoInfo;
