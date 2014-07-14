@@ -96,6 +96,8 @@ public struct HoudiniConstants
 	public const string HAPI_ATTRIB_TANGENT				= "tangentu";
 	public const string HAPI_ATTRIB_COLOR				= "Cd";
 
+	public const string HAPI_UNGROUPED_GROUP_NAME		= "__ungrouped_group";
+
 	// Common image file format names (to use with the material extract APIs).
 	// Note that you may still want to check if they are supported via
 	// HAPI_GetSupportedImageFileFormats() since all formats are loaded 
