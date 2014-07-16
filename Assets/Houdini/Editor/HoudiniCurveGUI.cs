@@ -443,6 +443,7 @@ public class HoudiniCurveGUI : Editor
 					}
 
 					// Remake and Draw Guide Geometry
+					myCurve.updatePoints();
 					buildGuideGeometry();
 				}
 			} // Delete?
