@@ -1532,10 +1532,28 @@ public class HoudiniAssetUtility
 			string[] groups = HoudiniHost.getGroupNames(
 				asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
 
-			mesh.subMeshCount = groups.Length;
+			// Handle collision groups.
+			MeshCollider[] old_colliders = part_control.gameObject.GetComponents< MeshCollider >();
+			foreach ( MeshCollider collider in old_colliders )
+				GameObject.DestroyImmediate( collider );
+			List< string > collision_groups = new List< string >();
 			for ( int g = 0; g < groups.Length; ++g )
 			{
 				string group = groups[ g ];
+				if ( group.Contains( HoudiniHost.prRenderedCollisionGroupName ) ||
+					group.Contains( HoudiniHost.prCollisionGroupName ) )
+				{
+					collision_groups.Add( group );
+				}
+			}
+
+			int regular_group_count = groups.Length - collision_groups.Count;
+
+			mesh.subMeshCount = regular_group_count;
+			for ( int g = 0; g < groups.Length; ++g )
+			{
+				string group = groups[ g ];
+
 				bool[] mem = HoudiniHost.getGroupMembership(
 					asset_id, object_id, geo_id, part_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, group );
 
@@ -1556,7 +1574,23 @@ public class HoudiniAssetUtility
 						current_triangle++;
 					}
 
-				mesh.SetTriangles( group_triangles, g );
+				if ( group.Contains( HoudiniHost.prRenderedCollisionGroupName ) ||
+					group.Contains( HoudiniHost.prCollisionGroupName ) )
+				{
+					MeshCollider new_collider = part_control.gameObject.AddComponent< MeshCollider >();
+					Mesh collision_mesh = new Mesh();
+					collision_mesh.vertices = vertices;
+					collision_mesh.triangles = group_triangles;
+					collision_mesh.normals = normals;
+					collision_mesh.RecalculateBounds();
+					new_collider.sharedMesh = collision_mesh;
+					new_collider.enabled = false;
+					new_collider.enabled = true;
+				}
+				else
+				{
+					mesh.SetTriangles( group_triangles, g );
+				}
 			}
 		}
 	}
