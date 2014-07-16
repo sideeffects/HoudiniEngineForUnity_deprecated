@@ -263,8 +263,6 @@ public class HoudiniCurve : MonoBehaviour
 #endif // UNITY_EDITOR
 
 		prPoints[ index ] = pos;
-		
-		updatePoints();
 	}
 	
 	public void updatePoints()
