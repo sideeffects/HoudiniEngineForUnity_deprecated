@@ -1532,24 +1532,12 @@ public class HoudiniAssetUtility
 			string[] groups = HoudiniHost.getGroupNames(
 				asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
 
-			// Handle collision groups.
+			// Destroy any existing colliders.
 			MeshCollider[] old_colliders = part_control.gameObject.GetComponents< MeshCollider >();
 			foreach ( MeshCollider collider in old_colliders )
 				GameObject.DestroyImmediate( collider );
-			List< string > collision_groups = new List< string >();
-			for ( int g = 0; g < groups.Length; ++g )
-			{
-				string group = groups[ g ];
-				if ( group.Contains( HoudiniHost.prRenderedCollisionGroupName ) ||
-					group.Contains( HoudiniHost.prCollisionGroupName ) )
-				{
-					collision_groups.Add( group );
-				}
-			}
 
-			int regular_group_count = groups.Length - collision_groups.Count;
-
-			mesh.subMeshCount = regular_group_count;
+			mesh.subMeshCount = 0;
 			for ( int g = 0; g < groups.Length; ++g )
 			{
 				string group = groups[ g ];
@@ -1561,18 +1549,30 @@ public class HoudiniAssetUtility
 				foreach ( bool m in mem )
 					if ( m ) membership_count++;
 
+				int[] group_triangles;
 				if ( membership_count <= 0 )
-					continue;
-
-				int[] group_triangles = new int[ membership_count * 3 ];
-				int current_triangle = 0;
-				for ( int i = 0; i < part_info.faceCount; ++i )
-					if ( mem[ i ] )
-					{
-						for ( int j = 0; j < 3; ++j )
-							group_triangles[ current_triangle * 3 + j ] = i * 3 + j;
-						current_triangle++;
-					}
+				{
+					// If we encounter an empty group just create a single dummy 
+					// triangle (because you can't have a 0-triangle mesh) and
+					// pretend like it's a valid group so the rest of the submesh
+					// code can work without special cases.
+					group_triangles = new int[ 3 ];
+					group_triangles[ 0 ] = 0;
+					group_triangles[ 1 ] = 0;
+					group_triangles[ 2 ] = 0;
+				}
+				else
+				{
+					group_triangles = new int[ membership_count * 3 ];
+					int current_triangle = 0;
+					for ( int i = 0; i < part_info.faceCount; ++i )
+						if ( mem[ i ] )
+						{
+							for ( int j = 0; j < 3; ++j )
+								group_triangles[ current_triangle * 3 + j ] = i * 3 + j;
+							current_triangle++;
+						}
+				}
 
 				if ( group.Contains( HoudiniHost.prRenderedCollisionGroupName ) ||
 					group.Contains( HoudiniHost.prCollisionGroupName ) )
@@ -1587,8 +1587,11 @@ public class HoudiniAssetUtility
 					new_collider.enabled = false;
 					new_collider.enabled = true;
 				}
-				else
+				
+				if ( group.Contains( HoudiniHost.prRenderedCollisionGroupName )
+					|| !group.Contains( HoudiniHost.prCollisionGroupName ) )
 				{
+					mesh.subMeshCount++;
 					mesh.SetTriangles( group_triangles, g );
 				}
 			}
