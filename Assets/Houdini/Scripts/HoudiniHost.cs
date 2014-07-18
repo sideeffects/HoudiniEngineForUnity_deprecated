@@ -127,7 +127,7 @@ public static partial class HoudiniHost
 	public const bool myDefaultPushUnityTransformToHoudini				= true;
 	public const bool myDefaultTransformChangeTriggersCooks				= false;
 	public const bool myDefaultImportTemplatedGeos						= false;
-	public const bool myDefaultSplitGeosByGroup							= false;
+	public const bool myDefaultSplitGeosByGroup							= true;
 
 	private const string myDefaultUnityTagAttribName					= "unity_tag";
 
