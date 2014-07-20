@@ -158,7 +158,7 @@ public class HoudiniCurveGUI : Editor
 		drawSceneUI();
 
 		// Add points.
-		if ( !current_event.alt )
+		if ( !current_event.alt && !( current_event.type == EventType.MouseDown && current_event.button == 1 ) )
 		{
 			if ( myCurve.prIsAddingPoints )
 			{

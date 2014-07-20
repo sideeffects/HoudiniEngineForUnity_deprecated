@@ -117,7 +117,7 @@ public class HoudiniGeoAttributeManagerGUI
 		// Draw scene UI.
 		drawSceneUI();
 
-		if ( !current_event.alt )
+		if ( !current_event.alt && !( current_event.type == EventType.MouseDown && current_event.button == 1 ) )
 		{
 			if ( myManager.prIsPaintingPoints )
 			{
