@@ -159,8 +159,12 @@ public class HoudiniInstancer : MonoBehaviour
 			GameObject object_to_instantiate = override_info.objectToInstantiate;
 			if( object_to_instantiate == null )
 			{
-				data.overriddenInstances.RemoveAt( ii );
-				continue;
+				object_to_instantiate = GameObject.Find( override_info.objectToInstantiatePath );
+				if( object_to_instantiate == null )
+				{
+					data.overriddenInstances.RemoveAt( ii );
+					continue;
+				}
 			}
 
 			instanceObject( object_to_instantiate, 
@@ -317,6 +321,17 @@ public class HoudiniInstancer : MonoBehaviour
 		return false;
 	}
 
+	public static string getGameObjectPath( GameObject obj )
+	{
+		string path = "/" + obj.name;
+		while ( obj.transform.parent != null )
+		{
+			obj = obj.transform.parent.gameObject;
+			path = "/" + obj.name + path;
+		}
+		return path;
+	}
+
 	public void pinObject( GameObject pin_object, bool pin )
 	{		
 		HoudiniInstance instance = pin_object.GetComponent< HoudiniInstance >();
@@ -362,6 +377,7 @@ public class HoudiniInstancer : MonoBehaviour
 			
 			override_info.scale = scale;
 			override_info.objectToInstantiate = instance.prObjectToInstantiate;
+			override_info.objectToInstantiatePath = getGameObjectPath( instance.prObjectToInstantiate );
 			override_info.instancePointNumber = instance.prInstancePointNumber;
 			
 			pinInstance( override_info );
