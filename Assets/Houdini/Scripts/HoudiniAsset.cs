@@ -1635,25 +1635,8 @@ public abstract class HoudiniAsset : HoudiniControl
 				control.gameObject.GetComponent< MeshRenderer >().enabled = prIsGeoVisible;
 		}
 	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Protected Methods
 
-	// Build Custom Work Methods -----------------------------------------------------------------------------------
-	
-	// Inherited classes should override this with their specific call to the HAPI_Host asset create method.
-	// For example: OTLs need to call HAPI_Host.loadOTL( path ), curves need to call HAPI_Host.createCurve().
-	protected abstract int buildCreateAsset( HoudiniProgressBar progress_bar );
-
-	// Inherited classes should override this for work they need done during the full build step only. (Optional)
-	protected virtual void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar ) {}
-
-	// Inherited classes should override this with however they wish to load objects in the prObjects array.
-	protected abstract void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar );
-
-	// -------------------------------------------------------------------------------------------------------------
-
-	protected void pushAssetTransformToHoudini()
+	public void pushAssetTransformToHoudini()
 	{
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
 
@@ -1681,6 +1664,23 @@ public abstract class HoudiniAsset : HoudiniControl
 		}
 		catch {}
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Protected Methods
+
+	// Build Custom Work Methods -----------------------------------------------------------------------------------
+	
+	// Inherited classes should override this with their specific call to the HAPI_Host asset create method.
+	// For example: OTLs need to call HAPI_Host.loadOTL( path ), curves need to call HAPI_Host.createCurve().
+	protected abstract int buildCreateAsset( HoudiniProgressBar progress_bar );
+
+	// Inherited classes should override this for work they need done during the full build step only. (Optional)
+	protected virtual void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar ) {}
+
+	// Inherited classes should override this with however they wish to load objects in the prObjects array.
+	protected abstract void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar );
+
+	// -------------------------------------------------------------------------------------------------------------
 	
 	protected void initAssetConnections()
 	{

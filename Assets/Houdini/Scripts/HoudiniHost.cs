@@ -175,6 +175,8 @@ public static partial class HoudiniHost
 #if UNITY_EDITOR
 		EditorApplication.update				+= update;
 		EditorApplication.playmodeStateChanged	+= playmodeStateChanged;
+		EditorApplication.hierarchyWindowItemOnGUI += hierarchyWindowItemOnGUI;
+		SceneView.onSceneGUIDelegate			+= onSceneGUIDelegate;
 #endif // UNITY_EDITOR
 
 		if ( !isRuntimeInitialized() )
@@ -946,8 +948,6 @@ public static partial class HoudiniHost
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static string[] myLastPaths;
-	private static int myLastPathsRealLoss = 0;
 	private static void update()
 	{
 #if UNITY_EDITOR
@@ -956,70 +956,6 @@ public static partial class HoudiniHost
 		// causes other bound functions in this callback list to never be called.
 		try
 		{
-
-			if ( myLastPaths == null )
-				myLastPaths = new string[ 0 ];
-
-			bool drag_contains_otls = false;
-			if ( DragAndDrop.paths.Length > 0 )
-				myLastPathsRealLoss = 0;
-			foreach ( string path in DragAndDrop.paths )
-				if ( path.EndsWith( ".otl" ) )
-				{
-					drag_contains_otls = true;
-					DragAndDrop.visualMode = DragAndDropVisualMode.Move;
-					break;
-				}
-			 
-			if ( drag_contains_otls && DragAndDrop.paths.Length > myLastPaths.Length )
-			{
-				myLastPaths = new string[ DragAndDrop.paths.Length ];
-				for ( int i = 0; i < DragAndDrop.paths.Length; ++i )
-					myLastPaths[ i ] = DragAndDrop.paths[ i ];
-			}
-			else if ( myLastPaths.Length > 0 && DragAndDrop.paths.Length == 0 )
-			{
-				if ( myLastPathsRealLoss < 100 )
-					myLastPathsRealLoss++;
-				else
-				{
-					EditorWindow mouse_window = EditorWindow.mouseOverWindow;
-					if ( mouse_window )
-					{
-						//Vector3 placement = Vector3.zero;
-						if ( mouse_window.title == "UnityEditor.HierarchyWindow" )
-						{
-							//SceneView scene = SceneView.lastActiveSceneView;
-							//Camera cam = scene.camera;
-							// UnityEditor.HierarchyWindow
-							// UnityEditor.SceneView
-							//UnityEditor.SceneHierarchyWindow
-							//EditorWindow mouse_window = EditorWindow.mouseOverWindow;
-							//Debug.Log( mouse_window );
-						}
-						else if ( mouse_window.title == "UnityEditor.SceneView" )
-						{
-
-						}
-
-						if ( mouse_window.title == "UnityEditor.HierarchyWindow"
-							|| mouse_window.title == "UnityEditor.SceneView" )
-						{
-							for ( int i = 0; i < myLastPaths.Length; ++i )
-							{
-								string path = myLastPaths[ i ];
-								if ( path.Contains( ".otl" ) )
-								{
-									HoudiniAssetUtility.instantiateAsset( path );
-								}
-							}
-						}
-					}
-
-					myLastPaths = new string[ 0 ];
-				}
-			}
-
 			if ( HoudiniHost.mySelectionTarget != null && myDeselectionDelegate != null )
 			{
 				GameObject selected = Selection.activeGameObject;
@@ -1079,6 +1015,65 @@ public static partial class HoudiniHost
 			Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 		}
 #endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+	}
+
+	private static void hierarchyWindowItemOnGUI( int instanceID, Rect selectionRect )
+	{
+		processDragEvent( Event.current, null );
+	}
+
+	private static void onSceneGUIDelegate( SceneView sceneView )
+	{
+		processDragEvent( Event.current, sceneView );
+	}
+
+	private static void processDragEvent( Event drag_event, SceneView scene_view )
+	{
+		if ( drag_event != null &&
+				( drag_event.type == EventType.DragUpdated || drag_event.type == EventType.DragPerform ) )
+		{
+			bool drag_contains_otls = false;
+			foreach ( string path in DragAndDrop.paths )
+				if ( path.EndsWith( ".otl" ) )
+				{
+					drag_contains_otls = true;
+					DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+					break;
+				}
+				
+			if ( drag_event.type == EventType.DragPerform )
+			{
+				Vector3 initial_asset_position = new Vector3( 0.0f, 0.0f, 0.0f );
+				if ( scene_view )
+				{
+					Camera camera = scene_view.camera;
+					Vector3 mouse_position = drag_event.mousePosition;
+					// Camera.current.pixelHeight != Screen.height for some reason.
+					mouse_position.y = camera.pixelHeight - mouse_position.y;
+					Ray ray = camera.ScreenPointToRay( mouse_position );
+					ray.origin = camera.transform.position;
+					Plane plane = new Plane();
+					plane.SetNormalAndPosition( Vector3.up, Vector3.zero );
+					float enter = 0.0f;
+					plane.Raycast( ray, out enter );
+					enter = Mathf.Clamp( enter, camera.nearClipPlane, camera.farClipPlane );
+ 					initial_asset_position = ray.origin + ray.direction * enter;
+					Debug.Log( initial_asset_position );
+				}
+
+				for ( int i = 0; i < DragAndDrop.paths.Length; ++i )
+				{
+					string path = DragAndDrop.paths[ i ];
+					if ( path.Contains( ".otl" ) )
+					{
+						HoudiniAssetUtility.instantiateAsset( path, initial_asset_position );
+					}
+				}
+			}
+
+			if ( drag_contains_otls )
+				drag_event.Use();
+		}
 	}
 
 	private static string getAllFoldersInPath( string path )
