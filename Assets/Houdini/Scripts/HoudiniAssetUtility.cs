@@ -163,12 +163,16 @@ public class HoudiniAssetUtility
 
 	public static void instantiateAsset( string file_path )
 	{
+		instantiateAsset( file_path, Vector3.zero );
+	}
+	public static void instantiateAsset( string file_path, Vector3 initial_position )
+	{
 		if ( file_path.Length <= 0 )
 			return;
 
 		// Create game object.
 		GameObject game_object = new GameObject( "New Asset" );
-		
+
 		// Add HAPI Object Control script component.
 		HoudiniAssetOTL asset = game_object.AddComponent< HoudiniAssetOTL >();
 		
@@ -187,7 +191,16 @@ public class HoudiniAssetUtility
 			UnityEngine.Object.DestroyImmediate( game_object );
 			return;
 		}
-		
+
+		// Apply transform.
+		if ( initial_position != Vector3.zero )
+		{
+			game_object.transform.localPosition = initial_position;
+			if ( asset.prPushUnityTransformToHoudini )
+				asset.pushAssetTransformToHoudini();
+			asset.buildClientSide();
+		}
+
 		// Set new object name from asset name.
 		string asset_name		= asset.prAssetInfo.name;
 		game_object.name 		= asset_name;

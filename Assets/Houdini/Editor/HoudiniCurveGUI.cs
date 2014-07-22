@@ -188,6 +188,7 @@ public class HoudiniCurveGUI : Editor
 					plane.SetNormalAndPosition( Vector3.up, Vector3.zero );
 					float enter = 0.0f;
 					plane.Raycast( ray, out enter );
+					enter = Mathf.Clamp( enter, myTempCamera.nearClipPlane, myTempCamera.farClipPlane );
  					intersection = ray.origin + ray.direction * enter;
 				}
 
