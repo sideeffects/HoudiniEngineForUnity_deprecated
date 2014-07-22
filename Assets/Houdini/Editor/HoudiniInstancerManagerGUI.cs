@@ -37,12 +37,28 @@ public partial class HoudiniInstancerManagerGUI: Editor
 	public override void OnInspectorGUI() 
 	{
 
-
 		HoudiniInstancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HoudiniInstancer >();
 		if( !myAssetOTL.isPrefab() && instancers.Length > 0 )
 		{
 
 			generateAssetInstanceControls();
+		}
+
+		Event current_event = Event.current;
+		
+		if (
+			current_event.type == EventType.ValidateCommand && 
+			current_event.commandName == "UndoRedoPerformed" )
+		{
+			
+			foreach( HoudiniInstancer instancer in instancers )
+			{
+				HoudiniProgressBar progress_bar = new HoudiniProgressBar();
+				instancer.instanceObjects( progress_bar );
+				progress_bar.clearProgressBar();
+			}
+
+			Repaint();
 		}
 	}
 	
@@ -77,6 +93,8 @@ public partial class HoudiniInstancerManagerGUI: Editor
 				Debug.LogError("Can't find persistent data for instancer: " + instancer.name );
 				continue;
 			}
+
+			Undo.RecordObject( persistent_data, "Houdini Instancer Change" );
 
 			persistent_data.showInstancerGUI = HoudiniGUI.foldout(
 				persistent_data.instancerName, persistent_data.showInstancerGUI, true );

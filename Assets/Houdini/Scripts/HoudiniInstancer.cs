@@ -387,6 +387,7 @@ public class HoudiniInstancer : MonoBehaviour
 	public bool pinInstance( HoudiniInstancerOverrideInfo info )
 	{
 		HoudiniInstancerPersistentData persistent_data = prPersistentData;
+		Undo.RecordObject( persistent_data, "Houdini Pin Instance" );
 		int ii = 0;
 		for( ii = 0; ii < persistent_data.overriddenInstances.Count; ii++ )
 		{
@@ -406,12 +407,14 @@ public class HoudiniInstancer : MonoBehaviour
 	public void unPinAllInstances()
 	{
 		HoudiniInstancerPersistentData persistent_data = prPersistentData;
+		Undo.RecordObject( persistent_data, "Houdini Unpin All Instances" );
 		persistent_data.overriddenInstances.Clear();		
 	}
 	
 	public void unPinInstance( int point_index )
 	{
 		HoudiniInstancerPersistentData persistent_data = prPersistentData;
+		Undo.RecordObject( persistent_data, "Houdini Unpin Instance" );
 		int index_to_remove = -1;
 		for( int ii = 0 ; ii < persistent_data.overriddenInstances.Count ; ii++ )
 		{
