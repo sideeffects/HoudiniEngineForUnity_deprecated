@@ -944,9 +944,39 @@ public static partial class HoudiniHost
 	{
 		return UnityEngine.Object.FindObjectsOfType( typeof( HoudiniAsset ) ) as HoudiniAsset[];
 	}
-		
+
+	public static void log( string message )
+	{
+		message = processStringForConsole( message );
+		Debug.Log( message );
+	}
+
+	public static void logWarning( string message )
+	{
+		message = processStringForConsole( message );
+		Debug.LogWarning( message );
+	}
+
+	public static void logError( string message )
+	{
+		message = processStringForConsole( message );
+		Debug.LogError( message );
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private static string processStringForConsole( string str )
+	{
+		// Truncate the message manually due to bug:
+		// http://fogbugz.unity3d.com/default.asp?621738_mhks4v903k1799iv
+		if ( str.Length > 10000 )
+		{
+			str = str.Substring( 0, 9000 );
+			str += "...";
+		}
+		return str;
+	}
 
 	private static void update()
 	{

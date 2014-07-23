@@ -101,7 +101,7 @@ public class HoudiniProgressBar
 		{
 			state = HAPI_State.HAPI_STATE_READY;
 			string messages = HoudiniHost.getCookErrorMessage();
-			Debug.LogWarning( messages );
+			HoudiniHost.logWarning( messages );
 		}
 		else if ( state == HAPI_State.HAPI_STATE_READY_WITH_FATAL_ERRORS )
 		{
