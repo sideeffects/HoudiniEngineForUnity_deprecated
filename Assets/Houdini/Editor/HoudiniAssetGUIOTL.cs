@@ -44,13 +44,13 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		// Draw Game Object Controls
 		
 
-		myAsset.prShowHoudiniControls 
+		myAsset.prShowHoudiniControls
 			= HoudiniGUI.foldout( "Houdini Controls", myAsset.prShowHoudiniControls, true );
-		if ( myAsset.prShowHoudiniControls ) 
+		if ( myAsset.prShowHoudiniControls )
 		{
 			if ( !myAsset.isPrefab() )
 			{
-				if ( GUILayout.Button( "Rebuild" ) ) 
+				if ( GUILayout.Button( "Rebuild" ) )
 					myAsset.buildAll();
 	
 				if ( GUILayout.Button( "Recook" ) )
