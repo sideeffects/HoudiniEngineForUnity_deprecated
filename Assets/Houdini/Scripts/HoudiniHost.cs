@@ -1058,7 +1058,6 @@ public static partial class HoudiniHost
 					plane.Raycast( ray, out enter );
 					enter = Mathf.Clamp( enter, camera.nearClipPlane, camera.farClipPlane );
  					initial_asset_position = ray.origin + ray.direction * enter;
-					Debug.Log( initial_asset_position );
 				}
 
 				for ( int i = 0; i < DragAndDrop.paths.Length; ++i )
