@@ -503,6 +503,12 @@ public class HoudiniParmsGUI : Editor
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
+		// Label
+		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_LABEL )
+		{
+			HoudiniGUI.label( ref gui_parm, ref join_last, ref no_label_toggle_last );
+		}
+		///////////////////////////////////////////////////////////////////////
 		// Separator
 		else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_SEPARATOR )
 		{

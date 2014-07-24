@@ -16,6 +16,7 @@ public struct HoudiniGUIParm
 	{
 		id				= -1;
 
+		type			= HAPI_ParmType.HAPI_PARMTYPE_INT;
 		typeInfo		= "";
 
 		this.size		= size;
@@ -54,6 +55,7 @@ public struct HoudiniGUIParm
 	{
 		id				= info.id;
 
+		type			= info.type;
 		typeInfo		= info.typeInfo;
 
 		size 			= info.size;
@@ -97,6 +99,7 @@ public struct HoudiniGUIParm
 
 	public int id;
 
+	public HAPI_ParmType type;
 	public string typeInfo;
 
 	public int size;
@@ -150,11 +153,6 @@ public class HoudiniGUI : Editor
 		join_last = join_next;
 		if ( !join_next )
 			EditorGUILayout.EndHorizontal();
-	}
-
-	public static void label( string value, int width, bool join_next, ref bool join_last )
-	{
-		initializeConstants();
 	}
 
 	public static void help( string value, MessageType message_type )
@@ -1276,6 +1274,61 @@ public class HoudiniGUI : Editor
 		return changed;
 	}
 
+	public static void label(
+		ref HoudiniGUIParm parm,
+		ref bool join_last, ref bool no_label_toggle_last )
+	{
+		if ( !parm.labelNone )
+		{
+			GUIContent label_content = new GUIContent( parm.label );
+
+			float label_final_width =
+				( parm.isChildOfMultiParm ? myLabelWidthMulti : myLabelWidth ) +
+				(float) parm.labelExtraWidth;
+			GUILayoutOption label_final_height = myLineHeightGUI;
+			
+			if ( parm.isBold )
+				myLabelStyle.fontStyle = FontStyle.Bold;
+			else
+				myLabelStyle.fontStyle = FontStyle.Normal;
+
+			if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_LABEL )
+			{
+				myLabelStyle.alignment	= TextAnchor.MiddleLeft;
+				myLabelStyle.wordWrap	= true;
+			}
+			else
+			{
+				myLabelStyle.alignment	= TextAnchor.MiddleRight;
+				myLabelStyle.wordWrap	= false;
+			}
+
+			if ( join_last && !no_label_toggle_last )
+			{
+				float min_width;
+				float max_width;
+				myLabelStyle.CalcMinMaxWidth( label_content, out min_width, out max_width );
+				label_final_width = min_width + (float) parm.labelExtraWidth;
+			}
+			else if ( !join_last && parm.type != HAPI_ParmType.HAPI_PARMTYPE_LABEL )
+			{
+				// Add padding for the toggle column.
+				EditorGUILayout.LabelField( "", myToggleWidthGUI );
+			}
+
+			GUILayoutOption label_final_width_gui = GUILayout.Width( label_final_width );
+			if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_LABEL )
+			{
+				float height = myLabelStyle.CalcHeight( label_content, label_final_width );
+				label_final_height = GUILayout.Height( height );
+			}
+
+			EditorGUILayout.SelectableLabel(
+				parm.label, myLabelStyle, label_final_width_gui, label_final_height );
+			no_label_toggle_last = false;
+		}
+	}
+
 	public static bool separator()
 	{
 		EditorGUILayout.Separator();
@@ -1338,46 +1391,7 @@ public class HoudiniGUI : Editor
 		
 		return last_double_rect;
 	}
-	
-	private static void label(
-		ref HoudiniGUIParm parm,
-		ref bool join_last, ref bool no_label_toggle_last )
-	{
-		if ( !parm.labelNone )
-		{
-			float label_final_width =
-				( parm.isChildOfMultiParm ? myLabelWidthMulti : myLabelWidth ) +
-				(float) parm.labelExtraWidth;
-			
-			if ( parm.isBold )
-			{
-				myLabelStyle.fontStyle = FontStyle.Bold;
-			}
-			else
-			{
-				myLabelStyle.fontStyle = FontStyle.Normal;
-			}
-			
-			if ( join_last && !no_label_toggle_last )
-			{
-				float min_width;
-				float max_width;
-				myLabelStyle.CalcMinMaxWidth( new GUIContent( parm.label ), out min_width, out max_width );
-				label_final_width = min_width + (float) parm.labelExtraWidth;
-			}
-			else if ( !join_last )
-			{
-				// Add padding for the toggle column.
-				EditorGUILayout.LabelField( "", myToggleWidthGUI );
-			}
 
-			GUILayoutOption label_final_width_gui = GUILayout.Width( label_final_width );
-
-			EditorGUILayout.SelectableLabel( parm.label, myLabelStyle, label_final_width_gui, myLineHeightGUI );
-			no_label_toggle_last = false;
-		}
-	}
-	
 	private static void initializeConstants()
 	{
 		if ( myLabelStyle == null )
