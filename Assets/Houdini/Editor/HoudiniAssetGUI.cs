@@ -221,8 +221,6 @@ public class HoudiniAssetGUI : Editor
 		bool join_last				= false;
 		bool no_label_toggle_last	= true;
 
-		HoudiniGUI.label( "Transform", myInputFormatDropdownWidth, true, ref join_last );
-
 		HoudiniGUIParm trans_input	= new HoudiniGUIParm( "trans_input_" + index, myAsset.prTransInputNames[ index ] );
 		Object obj					= (Object) myAsset.prUpStreamTransformObjects[ index ];
 		bool changed				= HoudiniGUI.objectField( ref trans_input, ref obj, typeof( GameObject ),
