@@ -35,6 +35,10 @@ public class HoudiniAssetOTL : HoudiniAsset
 	
 	public string prAssetPath {							get { return myAssetPath; } 
 														set { myAssetPath = value; } }
+	public HoudiniGeoControl prActiveEditPaintGeo {		get { return myActiveEditPaintGeo; }
+														set { myActiveEditPaintGeo = value; } }
+	public List< HoudiniGeoControl > prEditPaintGeos {	get { return myEditPaintGeos; }
+														set { myEditPaintGeos = value; } }
 	public HAPI_HandleInfo[] prHandleInfos { get; set; }
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
 	
@@ -63,7 +67,11 @@ public class HoudiniAssetOTL : HoudiniAsset
 		base.reset();
 		
 		// Please keep these in the same order and grouping as their declarations at the top.
-		
+
+		prAssetPath					= "";
+		prActiveEditPaintGeo		= null;
+		prEditPaintGeos				= new List< HoudiniGeoControl >();
+
 		prHandleInfos 				= new HAPI_HandleInfo[ 0 ];
 		prHandleBindingInfos 		= null;
 
@@ -117,7 +125,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 		return true;
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected Methods
 
@@ -201,6 +209,17 @@ public class HoudiniAssetOTL : HoudiniAsset
 			}
 		}
 
+		// Enumerate edit and paint geos.
+#if HAPI_PAINT_SUPPORT
+		HoudiniGeoControl[] geo_controls = gameObject.GetComponentsInChildren< HoudiniGeoControl >();
+		myEditPaintGeos.Clear();
+		foreach ( HoudiniGeoControl geo_control in geo_controls )
+		{
+			if ( geo_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
+				&& geo_control.GetType() == typeof( HoudiniGeoControl ) )
+				myEditPaintGeos.Add( geo_control );
+		}
+#endif // HAPI_PAINT_SUPPORT
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,5 +304,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data
 	
-	[SerializeField] private string					myAssetPath;
+	[SerializeField] private string myAssetPath;
+	[SerializeField] private HoudiniGeoControl myActiveEditPaintGeo;
+	[SerializeField] private List< HoudiniGeoControl > myEditPaintGeos;
 }

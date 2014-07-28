@@ -1629,15 +1629,16 @@ public class HoudiniAssetUtility
 		attr_info.storage 		= HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
 		attr_info.count 		= part_info.pointCount;
 		attr_info.tupleSize 	= tuple_size;
-		HoudiniHost.addAttribute(
-			asset_id, object_id, geo_id, 
-			attr, ref attr_info );
-		
+
 		float[] attr_values = new float[ part_info.pointCount * tuple_size ];
 
 		bool data_ok = true;
 		if ( setting_raw_mesh )
 		{
+			HoudiniHost.addAttribute(
+				asset_id, object_id, geo_id,
+				attr, ref attr_info );
+
 			for ( int i = 0; i < part_info.pointCount; ++i )
 				for ( int j = 0; j < tuple_size; ++j )
 			{
@@ -1656,6 +1657,10 @@ public class HoudiniAssetUtility
 		}
 		else if ( attr == HoudiniConstants.HAPI_ATTRIB_POSITION )
 		{
+			HoudiniHost.addAttribute(
+				asset_id, object_id, geo_id,
+				attr, ref attr_info );
+
 			for ( int ii = 0; ii < part_control.prVertexList.Length; ii++ )
 			{
 				int point_index = part_control.prVertexList[ ii ] * 3;
@@ -1773,49 +1778,97 @@ public class HoudiniAssetUtility
 		// Add and set additional attributes.
 		if ( attribute_manager )
 		{
-			foreach ( HoudiniGeoAttribute attribute in attribute_manager.prAttributes )
+			if ( setting_raw_mesh )
 			{
-				HAPI_AttributeInfo attr_info = attribute.prAttributeInfo;
-				HoudiniHost.addAttribute( asset_id, object_id, geo_id, attribute.prName, ref attr_info );
-
-				if ( attribute.prType == HoudiniGeoAttribute.Type.BOOL ||
-					attribute.prType == HoudiniGeoAttribute.Type.INT )
+				foreach ( HoudiniGeoAttribute attribute in attribute_manager.prAttributes )
 				{
-					int[] int_data = attribute.prIntData;
-					setAttribute(
-						asset_id, object_id, geo_id, attribute.prName, 
-						ref attr_info, ref int_data, HoudiniHost.setAttributeIntData );
+					HAPI_AttributeInfo attr_info = attribute.prAttributeInfo;
 
-					if ( HoudiniHost.prCreateGroupsFromBoolAttributes
-						&& attribute.prType == HoudiniGeoAttribute.Type.BOOL
-						&& attribute.prTupleSize == 1 )
+					// TODO: Hack! We want to create a point attribute when marshalling input geos
+					// in but the attribute manager only really works with vertices. However,
+					// when marshalling geometry in, each vertex has its own point, so we just
+					// "pretend" we are dealing with a point attribute.
+					attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+
+					HoudiniHost.addAttribute( asset_id, object_id, geo_id, attribute.prName, ref attr_info );
+
+					if ( attribute.prType == HoudiniGeoAttribute.Type.BOOL ||
+						attribute.prType == HoudiniGeoAttribute.Type.INT )
 					{
-						HoudiniHost.addGroup(
-							asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
-							attribute.prName );
-						bool[] bool_data = new bool[ int_data.Length ];
-						for ( int i = 0; i < int_data.Length; ++i )
-							bool_data[ i ] = int_data[ i ] > 0;
-						HoudiniHost.setGroupMembership(
-							asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
-							attribute.prName, bool_data, bool_data.Length );
+						int[] int_data = attribute.prIntData;
+						setAttribute(
+							asset_id, object_id, geo_id, attribute.prName, 
+							ref attr_info, ref int_data, HoudiniHost.setAttributeIntData );
+
+						if ( HoudiniHost.prCreateGroupsFromBoolAttributes
+							&& attribute.prType == HoudiniGeoAttribute.Type.BOOL
+							&& attribute.prTupleSize == 1 )
+						{
+							HoudiniHost.addGroup(
+								asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
+								attribute.prName );
+							bool[] bool_data = new bool[ int_data.Length ];
+							for ( int i = 0; i < int_data.Length; ++i )
+								bool_data[ i ] = int_data[ i ] > 0;
+							HoudiniHost.setGroupMembership(
+								asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
+								attribute.prName, bool_data, bool_data.Length );
+						}
+					}
+					else if ( attribute.prType == HoudiniGeoAttribute.Type.FLOAT )
+					{
+						float[] float_data = attribute.prFloatData;
+						setAttribute(
+							asset_id, object_id, geo_id, attribute.prName, 
+							ref attr_info, ref float_data, HoudiniHost.setAttributeFloatData );
+					}
+					else if ( attribute.prType == HoudiniGeoAttribute.Type.STRING )
+					{
+						string[] string_data = attribute.prStringData;
+						setAttribute(
+							asset_id, object_id, geo_id, attribute.prName, 
+							ref attr_info, ref string_data, HoudiniHost.setAttributeStringData );
 					}
 				}
-				else if ( attribute.prType == HoudiniGeoAttribute.Type.FLOAT )
+			}
+#if HAPI_PAINT_SUPPORT
+			else
+			{
+				foreach ( HoudiniGeoAttribute attribute in attribute_manager.prAttributes )
 				{
-					float[] int_data = attribute.prFloatData;
-					setAttribute(
-						asset_id, object_id, geo_id, attribute.prName, 
-						ref attr_info, ref int_data, HoudiniHost.setAttributeFloatData );
-				}
-				else if ( attribute.prType == HoudiniGeoAttribute.Type.STRING )
-				{
-					string[] string_data = attribute.prStringData;
-					setAttribute(
-						asset_id, object_id, geo_id, attribute.prName, 
-						ref attr_info, ref string_data, HoudiniHost.setAttributeStringData );
+					HAPI_AttributeInfo attr_info = attribute.prAttributeInfo;
+					attr_info.owner = attribute.prOriginalAttributeOwner;
+					if ( attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+						attr_info.count = part_info.pointCount;
+					HoudiniHost.addAttribute( asset_id, object_id, geo_id, attribute.prName, ref attr_info );
+
+					if ( attribute.prType == HoudiniGeoAttribute.Type.BOOL ||
+						attribute.prType == HoudiniGeoAttribute.Type.INT )
+					{
+						int[] int_data =
+							attribute.getIntPointValues( part_info.pointCount, vertex_list );
+						setAttribute(
+							asset_id, object_id, geo_id, attribute.prName, 
+							ref attr_info, ref int_data, HoudiniHost.setAttributeIntData );
+					}
+					else if ( attribute.prType == HoudiniGeoAttribute.Type.FLOAT )
+					{
+						float[] float_data =
+							attribute.getFloatPointValues( part_info.pointCount, vertex_list );
+						setAttribute(
+							asset_id, object_id, geo_id, attribute.prName, 
+							ref attr_info, ref float_data, HoudiniHost.setAttributeFloatData );
+					}
+					else if ( attribute.prType == HoudiniGeoAttribute.Type.STRING )
+					{
+						string[] string_data = attribute.prStringData;
+						setAttribute(
+							asset_id, object_id, geo_id, attribute.prName, 
+							ref attr_info, ref string_data, HoudiniHost.setAttributeStringData );
+					}
 				}
 			}
+#endif // HAPI_PAINT_SUPPORT
 		}
 
 		HoudiniHost.commitGeo( asset_id, object_id, geo_id );

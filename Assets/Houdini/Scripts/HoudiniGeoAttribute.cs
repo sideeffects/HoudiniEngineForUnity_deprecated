@@ -221,6 +221,11 @@ public class HoudiniGeoAttribute : ScriptableObject
 			myType = new_type;
 		}
 	}
+	public HAPI_AttributeOwner prOriginalAttributeOwner
+	{
+		get { return myOriginalAttributeOwner; }
+		set { myOriginalAttributeOwner = value; }
+	}
 	public int prTupleSize
 	{
 		get
@@ -386,7 +391,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 
 			HAPI_AttributeInfo attr_info = new HAPI_AttributeInfo( prName );
 			attr_info.exists = true;
-			attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+			attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX;
 
 			if ( myType == Type.BOOL || myType == Type.INT )
 				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_INT;
@@ -417,6 +422,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 		myName = "NO_NAME";
 
 		myType = Type.UNDEFINED;
+		myOriginalAttributeOwner = HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX;
 		myTupleSize = 1;
 		myVertexCount = 0;
 
@@ -624,6 +630,28 @@ public class HoudiniGeoAttribute : ScriptableObject
 		return colors;
 	}
 
+	public int[] getIntPointValues( int point_count, int[] vertex_list )
+	{
+		int[] point_values = new int[ point_count * myTupleSize ];
+		for ( int i = 0; i < vertex_list.Length; ++i )
+			for ( int tuple = 0; tuple < myTupleSize; ++tuple )
+				point_values[ vertex_list[ i ] * myTupleSize + tuple ] =
+					prIntData[ i * myTupleSize + tuple ];
+
+		return point_values;
+	}
+
+	public float[] getFloatPointValues( int point_count, int[] vertex_list )
+	{
+		float[] point_values = new float[ point_count * myTupleSize ];
+		for ( int i = 0; i < vertex_list.Length; ++i )
+			for ( int tuple = 0; tuple < myTupleSize; ++tuple )
+				point_values[ vertex_list[ i ] * myTupleSize + tuple ] =
+					prFloatData[ i * myTupleSize + tuple ];
+
+		return point_values;
+	}
+
 	public void fit()
 	{
 		if ( myVertexCount > 0 )
@@ -771,6 +799,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 	[SerializeField] private string myName;
 
 	[SerializeField] private Type myType;
+	[SerializeField] private HAPI_AttributeOwner myOriginalAttributeOwner;
 	[SerializeField] private int myTupleSize;
 	[SerializeField] private int myVertexCount;
 

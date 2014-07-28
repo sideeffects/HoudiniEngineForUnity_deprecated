@@ -84,8 +84,44 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				generateAssetBakeControls();
 		}
 
+		///////////////////////////////////////////////////////////////////////
+		// Draw Paint Tools
+#if HAPI_PAINT_SUPPORT
+		if( !myAsset.isPrefab() )
+		{
+			myAsset.prShowPaintTools = HoudiniGUI.foldout( "Paint Tools", myAssetOTL.prShowPaintTools, true );
+			if ( myAsset.prShowPaintTools )
+				generatePaintToolGUI();
+		}
+#endif // HAPI_PAINT_SUPPORT
 	}
-	
+
+	public override void OnSceneGUI()
+	{
+		base.OnSceneGUI();
+
+#if HAPI_PAINT_SUPPORT
+		if ( myGeoAttributeManagerGUI != null )
+		{
+			myGeoAttributeManagerGUI.OnSceneGUI();
+			if ( myGeoAttributeManager != null && myGeoAttributeManager.prHasChanged && myGeoAttributeManager.prLiveUpdates )
+			{
+				myGeoAttributeManager.prHasChanged = false;
+
+				HoudiniPartControl part_control =
+					myAssetOTL.prActiveEditPaintGeo.prParts[ 0 ].GetComponent< HoudiniPartControl >();
+				Mesh mesh = part_control.GetComponent< MeshFilter >().sharedMesh;
+				HoudiniAssetUtility.setMesh(
+					part_control.prAssetId, part_control.prObjectId, part_control.prGeoId,
+					ref mesh, part_control, myGeoAttributeManager );
+				myAssetOTL.buildClientSide();
+			}
+		}
+#endif // HAPI_PAINT_SUPPORT
+
+		handlesOnSceneGUI();
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
 	
@@ -136,8 +172,23 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		}
 	}
 
+#if HAPI_PAINT_SUPPORT
+	private void generatePaintToolGUI()
+	{
+		foreach ( HoudiniGeoControl geo_control in myAssetOTL.prEditPaintGeos )
+		{
+			if ( HoudiniGUI.button( geo_control.prGeoName, geo_control.prGeoName ) )
+			{
+				myAssetOTL.prActiveEditPaintGeo = geo_control;
+				myGeoAttributeManager = geo_control.prGeoAttributeManager;
+				myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
+			}
+		}
+	}
+#endif // HAPI_PAINT_SUPPORT
+
 	private void generateViewSettings()
-	{	
+	{
 		// Show Geometries
 		createToggleForProperty(
 			"show_geometries", "Show Geometries", "prIsGeoVisible", 
@@ -301,4 +352,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 	}
 
 	private HoudiniAssetOTL myAssetOTL;
+	private HoudiniGeoAttributeManager myGeoAttributeManager;
+	private HoudiniGeoAttributeManagerGUI myGeoAttributeManagerGUI;
 }

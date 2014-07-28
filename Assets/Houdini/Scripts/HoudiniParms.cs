@@ -41,11 +41,11 @@ public class HoudiniParms : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Properties
 	
-	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
+	// Please keep these in the same order and grouping as their initializations reset().
 
 	// Assets -------------------------------------------------------------------------------------------------------
 
-	public HoudiniControl				prControl {						get { return myControl; } 
+	public HoudiniControl				prControl {					get { return myControl; } 
 																	set { myControl = value; } }
 
 	// Parameters ---------------------------------------------------------------------------------------------------
