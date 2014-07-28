@@ -291,7 +291,7 @@ public class HoudiniParmsGUI : Editor
 
 		HoudiniGUIParm gui_parm 	= new HoudiniGUIParm( parm );
 
-		// overridden parameters should not be bold in play mode
+		// Overridden parameters should not be bold in play mode.
 		gui_parm.isBold				= myParms.isParmOverridden( parm.id ) && 
 									  !EditorApplication.isPlayingOrWillChangePlaymode;
 

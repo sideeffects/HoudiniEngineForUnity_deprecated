@@ -24,10 +24,8 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
-	public override void OnSceneGUI()
+	public void handlesOnSceneGUI()
 	{
-		base.OnSceneGUI();
-
 		if ( myAssetOTL.prShowPinnedInstances )
 			drawPinnedInstances();
 		

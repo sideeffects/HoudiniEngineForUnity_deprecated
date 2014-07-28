@@ -154,6 +154,8 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myShowAssetSettings = value; } }
 	public bool 					prShowBakeOptions {				get { return myShowBakeOptions; } 
 																	set { myShowBakeOptions = value; } }
+	public bool						prShowPaintTools {				get { return myShowPaintTools; }
+																	set { myShowPaintTools = value; } }
 	
 	public bool						prShowInputControls {			get { return myShowInputControls; } 
 																	set { myShowInputControls = value; } }
@@ -761,6 +763,7 @@ public abstract class HoudiniAsset : HoudiniControl
 		prShowHelp						= false;
 		prShowAssetSettings				= true;
 		prShowBakeOptions				= false;
+		prShowPaintTools				= false;
 		prShowInputControls 			= true;
 		prAssetSettingsCategory			= 0;
 
@@ -1962,6 +1965,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private bool					myShowHelp;
 	[SerializeField] private bool 					myShowAssetSettings;
 	[SerializeField] private bool 					myShowBakeOptions;
+	[SerializeField] private bool					myShowPaintTools;
 	[SerializeField] private bool					myShowInputControls;
 	[SerializeField] private int					myAssetOptionsCategory;
 
