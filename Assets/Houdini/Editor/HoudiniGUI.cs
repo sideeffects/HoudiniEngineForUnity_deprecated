@@ -284,60 +284,45 @@ public class HoudiniGUI : Editor
 				break;
 			}
 
+		// If the old value is blank just assume the first choice is selected.
 		if ( old_mapped_value < 0 )
 		{
-			string error_message = 
-				"Dropdown value outside range of possible values!\n" +
-				"Type: " + typeof( T ) + "\n" +
-				"Parm Choicecount: " + parm.choiceCount + "\n" +
-				"Old Value: " + old_value + "\n" +
-				"Dropdown Values: ";
-
-			for ( int i = 0; i < dropdown_values.Length; ++i )
-				error_message += "\n    " + dropdown_values[ i ] + ", ";
-
-			// Current value not possible!
-			EditorGUILayout.SelectableLabel( 
-				error_message, GUILayout.Height( myLineHeight * dropdown_values.Length + 4 * myLineHeight ) );
+			old_mapped_value = 0;
+			changed |= true;
 		}
+
+		// Get Style
+		GUIStyle popup_style = new GUIStyle( EditorStyles.popup );
+		if ( parm.isBold )
+			popup_style.fontStyle = FontStyle.Bold;
+
+		// Draw popup.
+		GUI.SetNextControlName(
+			parm.name + " " + parm.instanceNum + " dropdown_field" );
+		int new_mapped_value = 0;
+		if ( parm.width >= 0 )
+			new_mapped_value = EditorGUILayout.IntPopup(
+				old_mapped_value, dropdown_labels, mapped_values,
+				popup_style, GUILayout.Width( parm.width ) );
 		else
+			new_mapped_value = EditorGUILayout.IntPopup(
+				old_mapped_value, dropdown_labels, mapped_values, popup_style );
+
+		T new_value = dropdown_values[ new_mapped_value ];
+
+		// Determine if value changed and update parameter value.
+		if ( !new_value.Equals( old_value ) )
 		{
-			// Get Style
-			GUIStyle popup_style = new GUIStyle( EditorStyles.popup );
-			if ( parm.isBold )
+			values[ parm.valuesIndex ] = new_value;
+
+			// record undo info
+			if ( undo_info != null )
 			{
-				popup_style.fontStyle = FontStyle.Bold;
+				Undo.RecordObject( undo_info, parm.label );
+				undo_values[ parm.valuesIndex ] = new_value;
 			}
-			
-			// Draw popup.
-			GUI.SetNextControlName( parm.name +
-			                        " " + parm.instanceNum +
-			                        " dropdown_field" );
-			int new_mapped_value = 0;
-			if ( parm.width >= 0 )
-				new_mapped_value = EditorGUILayout.IntPopup(
-					old_mapped_value, dropdown_labels, mapped_values,
-					popup_style, GUILayout.Width( parm.width ) );
-			else
-				new_mapped_value = EditorGUILayout.IntPopup(
-					old_mapped_value, dropdown_labels, mapped_values, popup_style );
 
-			T new_value = dropdown_values[ new_mapped_value ];
-
-			// Determine if value changed and update parameter value.
-			if ( !new_value.Equals( old_value ) )
-			{
-				values[ parm.valuesIndex ] = new_value;
-
-				// record undo info
-				if ( undo_info != null )
-				{
-					Undo.RecordObject( undo_info, parm.label );
-					undo_values[ parm.valuesIndex ] = new_value;
-				}
-
-				changed |= true;
-			}
+			changed |= true;
 		}
 
 		// Decide whether to join with the next parameter on the same line or not
