@@ -296,6 +296,10 @@ public class HoudiniGUI : Editor
 		if ( parm.isBold )
 			popup_style.fontStyle = FontStyle.Bold;
 
+		// Sanitize Slashes
+		for ( int i = 0; i < dropdown_labels.Length; ++i )
+			dropdown_labels[ i ] = dropdown_labels[ i ].Replace( "/", "\u2044" );
+
 		// Draw popup.
 		GUI.SetNextControlName(
 			parm.name + " " + parm.instanceNum + " dropdown_field" );
