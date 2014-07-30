@@ -28,21 +28,21 @@ public struct HoudiniVersion
 {
 	public const int HOUDINI_MAJOR			= 14;
 	public const int HOUDINI_MINOR			= 0;
-	public const int HOUDINI_BUILD			= 46;
+	public const int HOUDINI_BUILD			= 47;
 
 	public const int ORIG_HOUDINI_MAJOR		= 14;
 	public const int ORIG_HOUDINI_MINOR		= 0;
-	public const int ORIG_HOUDINI_BUILD		= 46;
+	public const int ORIG_HOUDINI_BUILD		= 47;
 
 	public const int HOUDINI_ENGINE_MAJOR	= 1;
 	public const int HOUDINI_ENGINE_MINOR	= 8;
 	
-	public const int HOUDINI_ENGINE_API		= 12;
+	public const int HOUDINI_ENGINE_API		= 13;
 	
 #if UNITY_STANDALONE_WIN
 	public const string HAPI_LIBRARY		= "libHAPI";
 #elif UNITY_STANDALONE_OSX
-	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/14.0.46/Houdini";
+	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/14.0.47/Houdini";
 #else
 	#error Unsupported platform!
 #endif
