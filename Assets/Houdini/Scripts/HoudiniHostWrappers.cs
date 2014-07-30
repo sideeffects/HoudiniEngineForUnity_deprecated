@@ -37,6 +37,18 @@ public static partial class HoudiniHost
 {
 	// DIAGNOSTICS ----------------------------------------------------------------------------------------------
 
+	public static HAPI_License getCurrentLicense()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+		int value;
+		HAPI_Result status_code = HAPI_GetEnvInt( HAPI_EnvIntType.HAPI_ENVINT_LICENSE, out value );
+		processStatusCode( status_code );
+		return (HAPI_License) value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static int getEnvInt( HAPI_EnvIntType int_type )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )

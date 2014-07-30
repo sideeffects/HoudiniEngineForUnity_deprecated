@@ -132,6 +132,15 @@ public struct HoudiniConstants
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Enums
 
+public enum HAPI_License
+{
+	HAPI_LICENSE_NONE,
+	HAPI_LICENSE_HOUDINI_ENGINE,
+	HAPI_LICENSE_HOUDINI,
+	HAPI_LICENSE_HOUDINI_FX,
+	HAPI_LICENSE_MAX
+};
+
 public enum HAPI_StatusType
 {
 	HAPI_STATUS_CALL_RESULT,
@@ -419,13 +428,13 @@ public enum HAPI_ImagePacking
 public enum HAPI_EnvIntType
 {
 	HAPI_ENVINT_INVALID = -1,
-		
+
 	// The three components of the Houdini version that HAPI is
 	// expecting to compile against.
 	HAPI_ENVINT_VERSION_HOUDINI_MAJOR,
 	HAPI_ENVINT_VERSION_HOUDINI_MINOR,
 	HAPI_ENVINT_VERSION_HOUDINI_BUILD,
-		
+
 	// The three components of the Houdini version that HAPI belongs to.
 	// The HAPI library itself can come from a different baseline than
 	// the Houdini it is being compiled against when we do something like 
@@ -436,11 +445,11 @@ public enum HAPI_EnvIntType
 	HAPI_ENVINT_VERSION_ORIG_HOUDINI_MAJOR,
 	HAPI_ENVINT_VERSION_ORIG_HOUDINI_MINOR,
 	HAPI_ENVINT_VERSION_ORIG_HOUDINI_BUILD,
-		
+
 	// The two components of the Houdini Engine (marketed) version.
 	HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR,
 	HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR,
-		
+
 	// This is a monotonously increasing API version number that can be used
 	// to lock against a certain API for compatibility purposes. Basically,
 	// when this number changes code compiled against the h methods
@@ -448,7 +457,10 @@ public enum HAPI_EnvIntType
 	// cause this version to increase. This number will be reset to 0
 	// every time the Houdini Engine version is bumped.
 	HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API,
-		
+
+	/// License Type. See ::HAPI_License.
+	HAPI_ENVINT_LICENSE,
+
 	HAPI_ENVINT_MAX,
 };
 
