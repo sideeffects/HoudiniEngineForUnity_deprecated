@@ -627,7 +627,7 @@ public static partial class HoudiniHost
 		prCurvePrimitiveTypeDefault				= myDefaultCurvePrimitiveTypeDefault;
 		prCurveMethodDefault					= myDefaultCurveMethodDefault;
 
-		// reset undo info so values match with above settings
+		// Reset undo info so values match with above settings.
 		prHostUndoInfo.initialize();
 	}
 
