@@ -69,7 +69,7 @@ public class HoudiniWindowDebug : EditorWindow
 				ext = "hiplc";
 			}
 
-			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene" + ext, ext );
+			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene", ext );
 			if ( hip_file_path != "" && HoudiniHost.hasScene() )
 				HoudiniHost.saveScene( hip_file_path );
 		}
