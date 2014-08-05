@@ -20,7 +20,7 @@ public class HoudiniGUIUtility : Editor
 	}
 	public static string promptForOTLPath( string old_path )
 	{
-		string ext = ".otl;*.hda;*.otllc;*.hdalc";
+		string ext = "otl;*.hda;*.otllc;*.hdalc;*.otlnc;*.hdanc";
 		string new_path = EditorUtility.OpenFilePanel( "Load Houdini Asset", old_path, ext );
 		return new_path;
 	}
@@ -31,7 +31,7 @@ public class HoudiniGUIUtility : Editor
 	}
 	public static string promptForHIPPath( string old_path )
 	{
-		string ext = ".hip;*.hiplc";
+		string ext = "hip;*.hiplc;*.hipnc";
 		string new_path = EditorUtility.OpenFilePanel( "Open Houdini HIP", old_path, ext );
 		return new_path;
 	}

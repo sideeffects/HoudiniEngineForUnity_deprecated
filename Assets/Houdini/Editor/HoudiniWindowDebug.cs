@@ -61,12 +61,12 @@ public class HoudiniWindowDebug : EditorWindow
 		if ( GUILayout.Button( HoudiniGUIUtility.mySaveHoudiniSceneLabel ) )
 		{
 			HAPI_License license = HoudiniHost.getCurrentLicense();
-			string ext = ".hip";
+			string ext = "hip";
 
 			if ( license == HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE_INDIE
 				|| license == HAPI_License.HAPI_LICENSE_HOUDINI_INDIE )
 			{
-				ext = ".hiplc";
+				ext = "hiplc";
 			}
 
 			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene" + ext, ext );
