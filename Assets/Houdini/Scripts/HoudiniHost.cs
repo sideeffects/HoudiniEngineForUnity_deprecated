@@ -1060,7 +1060,7 @@ public static partial class HoudiniHost
 	private static bool isHoudiniAssetFile( string path )
 	{
 		return ( path.EndsWith( ".otl" ) || path.EndsWith( ".otllc" )
-			|| path.EndsWith( ".had" ) || path.EndsWith( ".hdalc" ) );
+			|| path.EndsWith( ".hda" ) || path.EndsWith( ".hdalc" ) );
 	}
 
 	private static void processDragEvent( Event drag_event, SceneView scene_view )
