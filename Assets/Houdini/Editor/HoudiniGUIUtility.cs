@@ -19,9 +19,9 @@ public class HoudiniGUIUtility : Editor
 		return promptForOTLPath( "" );
 	}
 	public static string promptForOTLPath( string old_path )
-	{		
-		// Prompt for the absolute path to the .otl file to use.
-		string new_path = EditorUtility.OpenFilePanel( "Open Houdini OTL", old_path, "otl" );
+	{
+		string ext = ".otl;*.hda;*.otllc;*.hdalc";
+		string new_path = EditorUtility.OpenFilePanel( "Load Houdini Asset", old_path, ext );
 		return new_path;
 	}
 	
@@ -30,9 +30,9 @@ public class HoudiniGUIUtility : Editor
 		return promptForHIPPath( "" );
 	}
 	public static string promptForHIPPath( string old_path )
-	{		
-		// Prompt for the absolute path to the .otl file to use.
-		string new_path = EditorUtility.OpenFilePanel( "Open Houdini HIP", old_path, "hip" );
+	{
+		string ext = ".hip;*.hiplc";
+		string new_path = EditorUtility.OpenFilePanel( "Open Houdini HIP", old_path, ext );
 		return new_path;
 	}
 	

@@ -1057,6 +1057,12 @@ public static partial class HoudiniHost
 		processDragEvent( Event.current, sceneView );
 	}
 
+	private static bool isHoudiniAssetFile( string path )
+	{
+		return ( path.EndsWith( ".otl" ) || path.EndsWith( ".otllc" )
+			|| path.EndsWith( ".had" ) || path.EndsWith( ".hdalc" ) );
+	}
+
 	private static void processDragEvent( Event drag_event, SceneView scene_view )
 	{
 		if ( drag_event != null &&
@@ -1064,7 +1070,7 @@ public static partial class HoudiniHost
 		{
 			bool drag_contains_otls = false;
 			foreach ( string path in DragAndDrop.paths )
-				if ( path.EndsWith( ".otl" ) )
+				if ( isHoudiniAssetFile( path ) )
 				{
 					drag_contains_otls = true;
 					DragAndDrop.visualMode = DragAndDropVisualMode.Move;
@@ -1093,7 +1099,7 @@ public static partial class HoudiniHost
 				for ( int i = 0; i < DragAndDrop.paths.Length; ++i )
 				{
 					string path = DragAndDrop.paths[ i ];
-					if ( path.Contains( ".otl" ) )
+					if ( isHoudiniAssetFile( path ) )
 					{
 						HoudiniAssetUtility.instantiateAsset( path, initial_asset_position );
 					}

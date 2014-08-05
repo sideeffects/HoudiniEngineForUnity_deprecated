@@ -60,11 +60,18 @@ public class HoudiniWindowDebug : EditorWindow
 
 		if ( GUILayout.Button( HoudiniGUIUtility.mySaveHoudiniSceneLabel ) )
 		{
-			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
+			HAPI_License license = HoudiniHost.getCurrentLicense();
+			string ext = ".hip";
+
+			if ( license == HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE_INDIE
+				|| license == HAPI_License.HAPI_LICENSE_HOUDINI_INDIE )
+			{
+				ext = ".hiplc";
+			}
+
+			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene" + ext, ext );
 			if ( hip_file_path != "" && HoudiniHost.hasScene() )
 				HoudiniHost.saveScene( hip_file_path );
-			else
-				Debug.LogError( "Nothing to save." );
 		}
 		
 		if ( GUILayout.Button( HoudiniGUIUtility.myLoadAssetLabel ) )
