@@ -1275,13 +1275,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			// Do note that the build function is fairly conditional and should only build
 			// the bare minimum.
 			if ( prTransformChangeTriggersCooks )
-			{
-				foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
-					downstream_asset.buildClientSide();
-			
-				foreach ( HoudiniAsset downstream_asset in prDownStreamGeoAssets )
-					downstream_asset.buildClientSide();
-			}
+				buildClientSide();
 		}
 		catch ( HoudiniError err )
 		{
