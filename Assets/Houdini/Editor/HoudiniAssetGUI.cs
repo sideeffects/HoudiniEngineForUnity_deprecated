@@ -103,7 +103,7 @@ public class HoudiniAssetGUI : Editor
 		// We can only build or do anything if we can link to our libraries.
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		bool gui_enable = GUI.enabled;
-		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
+		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 

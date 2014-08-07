@@ -332,6 +332,7 @@ public class HoudiniInstancer : MonoBehaviour
 		return path;
 	}
 
+#if UNITY_EDITOR
 	public void pinObject( GameObject pin_object, bool pin )
 	{		
 		HoudiniInstance instance = pin_object.GetComponent< HoudiniInstance >();
@@ -401,7 +402,6 @@ public class HoudiniInstancer : MonoBehaviour
 		
 		persistent_data.overriddenInstances.Add( info );
 		return true;
-		
 	}
 	
 	public void unPinAllInstances()
@@ -456,7 +456,6 @@ public class HoudiniInstancer : MonoBehaviour
 	{
 		// TODO: This code should be on the companion Editor class, not here!
 
-#if UNITY_EDITOR
 		float handle_size 	= HandleUtility.GetHandleSize( override_info.translate );		
 		
 		Matrix4x4 old_handles_mat = Handles.matrix;
@@ -507,9 +506,8 @@ public class HoudiniInstancer : MonoBehaviour
 							 scale_factor*1.3f );
 		
 		Handles.matrix = old_handles_mat;
-#endif // UNITY_EDITOR
 	}
-	
+#endif // UNITY_EDITOR
 	
 	private void cacheNumInstances()
 	{

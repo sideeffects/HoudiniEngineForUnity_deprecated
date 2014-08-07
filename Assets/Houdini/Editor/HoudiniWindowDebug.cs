@@ -54,7 +54,7 @@ public class HoudiniWindowDebug : EditorWindow
 		bool gui_enable = GUI.enabled;
 
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
-		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
+		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 

@@ -206,9 +206,11 @@ public class HoudiniAssetUtility
 		game_object.name 		= asset_name;
 		
 		// Select the new houdini asset.
+#if UNITY_EDITOR
 		GameObject[] selection 	= new GameObject[ 1 ];
 		selection[ 0 ] 			= game_object;
 		Selection.objects 		= selection;
+#endif // UNITY_EDITOR
 	}
 
 	public static void calculateMeshTangents( Mesh mesh )
