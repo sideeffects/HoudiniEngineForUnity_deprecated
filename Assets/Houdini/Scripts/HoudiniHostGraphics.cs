@@ -43,6 +43,7 @@ public static partial class HoudiniHost
 
 	private static bool myIsOpenGL;
 
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
 	[ DllImport( LibGLPath ) ]
 	private static extern void glEnable( uint cap );
 
@@ -53,4 +54,7 @@ public static partial class HoudiniHost
 		if ( myIsOpenGL )
 			glEnable( GL_VERTEX_PROGRAM_POINT_SIZE );
 	}
+#else
+	public static void preDrawSetup() {}
+#endif
 }

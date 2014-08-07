@@ -119,13 +119,13 @@ public struct HoudiniConstants
 	public const string HAPI_GLOBAL_NODES_NODE_NAME		= "GlobalNodes";
 
 	public const string HAPI_UNSUPPORTED_PLATFORM_MSG   =
-		"Houdini Plugin for Unity currently only supports the Standalone Windows platform in Editor.\n" +
+		"Houdini Plugin for Unity currently only supports the Standalone Windows and Mac OSX platforms in Editor.\n" +
 		"\n" +
 		"To switch to the Standalone Windows platform go to File > Build Settings... and under 'Platform' " +
 		"choose 'PC, Mac & Linux Standalone' and click 'Switch Platform'. Afterwards, on the right hand side, " +
-		"under 'Target Platform' choose 'Windows'.\n" +
+		"under 'Target Platform' choose 'Windows' or 'Mac OS X'.\n" +
 		"\n" +
-		"When you switch back to the Standalone Windows platform you might need to Rebuild each asset to get back " +
+		"When you switch back to the Standalone Windows or Mac platform you might need to Rebuild each asset to get back " +
 		"the controls. Just click on the 'Rebuild' button in the Houdini Asset's Inspector.";
 }
 	

@@ -93,7 +93,7 @@ public class HoudiniCurveGUI : Editor
 		// We can only build or do anything if we can link to our libraries.
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		is_editable = false;
-		HAPI_GUI.help( HAPI_Constants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
+		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 		if ( !is_editable )
 			HoudiniGUI.help( "This curve is not editable.", MessageType.Info );

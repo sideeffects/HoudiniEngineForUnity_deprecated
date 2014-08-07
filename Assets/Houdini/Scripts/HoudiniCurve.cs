@@ -94,6 +94,7 @@ public class HoudiniCurve : MonoBehaviour
 	}
 
 	void OnDrawGizmos() {
+#if UNITY_EDITOR
 		if ( gameObject.GetComponent< MeshFilter >() == null )
 			return; //throw new MissingComponentException( "Missing MeshFilter." );
 		if ( gameObject.GetComponent< MeshFilter >().sharedMesh == null )
@@ -186,6 +187,7 @@ public class HoudiniCurve : MonoBehaviour
 		}
 
 		Gizmos.color = old_gizmo_color;
+#endif // UNITY_EDITOR
 	}
 
 	public void addPoint( Vector3 pos )

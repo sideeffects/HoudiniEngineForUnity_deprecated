@@ -1047,6 +1047,7 @@ public static partial class HoudiniHost
 #endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 	}
 
+#if UNITY_EDITOR
 	private static void hierarchyWindowItemOnGUI( int instanceID, Rect selectionRect )
 	{
 		processDragEvent( Event.current, null );
@@ -1110,6 +1111,7 @@ public static partial class HoudiniHost
 				drag_event.Use();
 		}
 	}
+#endif // UNITY_EDITOR
 
 	private static string getAllFoldersInPath( string path )
 	{
