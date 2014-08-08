@@ -58,8 +58,11 @@ public class HoudiniAssetCurve : HoudiniAsset
 		base.reset();
 		
 		// Overwrite some settings that should be different by default for curves than other asset types.
-		prAutoSelectAssetRootNode	= true;
-		prAssetType					= AssetType.TYPE_CURVE;
+		prAutoSelectAssetRootNode = true;
+		prCookingTriggersDownCooks = true;
+		prPushUnityTransformToHoudini = true;
+		prTransformChangeTriggersCooks = true;
+		prAssetType = AssetType.TYPE_CURVE;
 	}
 
 	public override void OnEnable()
