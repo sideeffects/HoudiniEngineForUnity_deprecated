@@ -1313,10 +1313,10 @@ public class HoudiniAssetUtility
 		// Make sure our primitive and vertex numbers are supported by Unity.
 		// TODO: add this limit in a more proper place
 		if ( part_info.faceCount > 65000 * 3 )
-			throw new HoudiniError( "Face count (" + part_info.faceCount 
+			throw new HoudiniError( part_control.name + ": Face count (" + part_info.faceCount 
 								  + ") above limit (" + ( 65000 * 3 ) + ")!" );
 		if ( part_info.vertexCount > 65000 )
-			throw new HoudiniError( "Vertex count (" + part_info.vertexCount + ") above limit (" + 65000 + ")!" );
+			throw new HoudiniError( part_control.name + ": Vertex count (" + part_info.vertexCount + ") above limit (" + 65000 + ")!" );
 
 		// For Debugging.
 #if false
