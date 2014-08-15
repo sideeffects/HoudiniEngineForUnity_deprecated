@@ -248,13 +248,12 @@ public class HoudiniInstancer : MonoBehaviour
 
 			obj.transform.localPosition = pos;
 
+			// Rotation order is important here. Bug: #63304
+			Quaternion user_angle_rot = user_instance.transform.localRotation;
+			Quaternion offset_rot = Quaternion.Euler( prPersistentData.rotationalOffset );
+			Quaternion instance_rot = Quaternion.Euler( euler );
+			obj.transform.localRotation = instance_rot * offset_rot * user_angle_rot;
 
-			Quaternion quat = Quaternion.Euler( new Vector3(
-				prPersistentData.rotationalOffset.x + user_instance.transform.localRotation.eulerAngles.x + euler.x,
-				prPersistentData.rotationalOffset.y + user_instance.transform.localRotation.eulerAngles.y + euler.y,
-				prPersistentData.rotationalOffset.z + user_instance.transform.localRotation.eulerAngles.z + euler.z ) );
-
-			obj.transform.localRotation = quat;
 			if ( scale_exists )
 			{
 				obj.transform.localScale = new Vector3(
