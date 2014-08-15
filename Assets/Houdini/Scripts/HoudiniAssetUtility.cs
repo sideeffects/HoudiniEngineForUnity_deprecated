@@ -1774,7 +1774,7 @@ public class HoudiniAssetUtility
 
 		setMeshPointAttribute( 
 			asset_id, object_id, geo_id, 
-			HoudiniConstants.HAPI_ATTRIB_UV, 2, uvs3,
+			HoudiniConstants.HAPI_ATTRIB_UV, 3, uvs3,
 			setting_raw_mesh, false, part_info, part_control );
 
 		// Add and set additional attributes.
