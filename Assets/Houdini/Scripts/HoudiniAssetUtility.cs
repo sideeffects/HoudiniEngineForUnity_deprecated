@@ -659,11 +659,14 @@ public class HoudiniAssetUtility
 		bool comma = false;
 		foreach ( string name in names )
 		{
+			HAPI_AttributeInfo attribute_info =
+				HoudiniHost.getAttributeInfo( asset_id, object_id, geo_id, part_id, name, owner );
+
 			if ( comma )
 				msg += ",";
 			else
 				comma = true;
-			msg += " " + name;
+			msg += " " + name + "( " + attribute_info.originalOwner + " )";
 		}
 		
 		Debug.Log( msg );
