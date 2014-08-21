@@ -988,11 +988,12 @@ public struct HAPI_AttributeInfo
 {		
 	public HAPI_AttributeInfo( string attr_name )
 	{
-		exists 		= false;
-		owner 		= HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
-		storage 	= HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
-		count 		= 0;
-		tupleSize 	= 0;
+		exists 			= false;
+		owner 			= HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
+		storage 		= HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
+		originalOwner	= HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
+		count 			= 0;
+		tupleSize 		= 0;
 	}
 		
 	[ MarshalAs( UnmanagedType.U1 ) ]
@@ -1000,6 +1001,8 @@ public struct HAPI_AttributeInfo
 		
 	public HAPI_AttributeOwner owner;
 	public HAPI_StorageType storage;
+
+	public HAPI_AttributeOwner originalOwner;
 
 	public int count;
 	public int tupleSize;
