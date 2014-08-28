@@ -146,6 +146,14 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_SetTime( float time );
 
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetTimelineOptions( ref HAPI_TimelineOptions timeline_options );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetTimelineOptions( ref HAPI_TimelineOptions timeline_options );
+
 	// ASSETS ---------------------------------------------------------------------------------------------------
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]

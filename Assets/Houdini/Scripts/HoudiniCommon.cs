@@ -530,9 +530,20 @@ public struct HAPI_TransformEuler
 	public HAPI_XYZOrder rotationOrder;
 	public HAPI_RSTOrder rstOrder;
 }
-	
+
+// TIME ---------------------------------------------------------------------------------------------------------
+
+[ StructLayout( LayoutKind.Sequential ) ]
+public struct HAPI_TimelineOptions
+{
+    public float fps;
+
+    public float startTime;
+    public float endTime;
+}
+
 // ASSETS -------------------------------------------------------------------------------------------------------
-		
+
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_AssetInfo 
 {

@@ -40,12 +40,11 @@ public class HoudiniWindowDebug : EditorWindow
 
 	public static void ShowWindow() 
 	{
-		float time = 0.0f;
 		// Show existing window instance. If one doesn't exist, make one.
 		EditorWindow.GetWindow< HoudiniWindowDebug >( false, HoudiniConstants.HAPI_PRODUCT_SHORT_NAME +
 													" " + HoudiniGUIUtility.myDebugLabel );
 		
-		HoudiniHost.getTime( out time );
+		float time = HoudiniHost.getTime();
 		HoudiniWindowDebug.myTime = time;
 	}
 	

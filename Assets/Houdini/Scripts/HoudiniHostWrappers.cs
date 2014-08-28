@@ -331,11 +331,13 @@ public static partial class HoudiniHost
 	/// <param name="time">
 	/// 	Time as a float in seconds.
 	/// </param>
-	public static void getTime( out float time )
+	public static float getTime()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+		float time;
 		HAPI_Result status_code = HAPI_GetTime( out time );
 		processStatusCode( status_code );
+		return time;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -357,7 +359,29 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	// ASSETS ---------------------------------------------------------------------------------------------------------
+	public static HAPI_TimelineOptions getTimelineOptions()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+		HAPI_TimelineOptions timeline_options = new HAPI_TimelineOptions();
+		HAPI_Result status_code = HAPI_GetTimelineOptions( ref timeline_options );
+		processStatusCode( status_code );
+		return timeline_options;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setTimelineOptions( HAPI_TimelineOptions timeline_options )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+		HAPI_Result status_code = HAPI_SetTimelineOptions( ref timeline_options );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	// ASSETS -------------------------------------------------------------------------------------------------------
 
 	/// <summary>
 	/// 	Determine if your instance of the asset actually still exists inside the Houdini scene. 
