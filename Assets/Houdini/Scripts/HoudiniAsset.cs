@@ -90,15 +90,11 @@ public abstract class HoudiniAsset : HoudiniControl
 	}
 
 	// Inputs -------------------------------------------------------------------------------------------------------
-	
-	public int 						prMinTransInputCount {			get { return myMinTransInputCount; } 
-																	set { myMinTransInputCount = value; } }
-	public int 						prMaxTransInputCount {			get { return myMaxTransInputCount; } 
-																	set { myMaxTransInputCount = value; } }
-	public int 						prMinGeoInputCount {			get { return myMinGeoInputCount; } 
-																	set { myMinGeoInputCount = value; } }
-	public int						prMaxGeoInputCount {			get { return myMaxGeoInputCount; } 
-																	set { myMaxGeoInputCount = value; } }
+
+	public int 						prTransformInputCount {			get { return myTransformInputCount; } 
+																	set { myTransformInputCount = value; } }
+	public int						prGeoInputCount {				get { return myGeoInputCount; } 
+																	set { myGeoInputCount = value; } }
 	
 	public List< HoudiniAsset >		prDownStreamTransformAssets {	get { return myDownStreamTransformAssets; } 
 																	set { myDownStreamTransformAssets = value; } }
@@ -726,10 +722,8 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		// Inputs ---------------------------------------------------------------------------------------------------
 		
-		prMinTransInputCount 			= 0;
-		prMaxTransInputCount 			= 0;
-		prMinGeoInputCount 				= 0;
-		prMaxGeoInputCount 				= 0;
+		prTransformInputCount 			= 0;
+		prGeoInputCount 				= 0;
 		
 		prDownStreamTransformAssets		= new List< HoudiniAsset >();
 		prUpStreamTransformAssets 		= new List< HoudiniAsset >();
@@ -1008,10 +1002,8 @@ public abstract class HoudiniAsset : HoudiniControl
 			prAssetName					= prAssetInfo.name;
 			prAssetHelp					= prAssetInfo.helpText;
 			prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
-			prMinTransInputCount		= prAssetInfo.minTransInputCount;
-			prMaxTransInputCount		= prAssetInfo.maxTransInputCount;
-			prMinGeoInputCount 			= prAssetInfo.minGeoInputCount;
-			prMaxGeoInputCount			= prAssetInfo.maxGeoInputCount;
+			prTransformInputCount		= prAssetInfo.transformInputCount;
+			prGeoInputCount			= prAssetInfo.geoInputCount;
 
 #if UNITY_EDITOR
 			if ( isPrefab() )
@@ -1683,42 +1675,24 @@ public abstract class HoudiniAsset : HoudiniControl
 	{
 		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
 		{
-			if ( prMaxTransInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
-				for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
+			if ( prTransformInputCount > 0 && prUpStreamTransformAssets.Count <= 0 )
+				for ( int ii = 0; ii < prTransformInputCount ; ++ii )
 				{
 					prUpStreamTransformAssets.Add( null );
 					prUpStreamTransformObjects.Add( null );
 				}
 		}
 	
-		if ( prMaxGeoInputCount > 0 )
-			for ( int ii = 0; ii < prMaxGeoInputCount ; ++ii )
+		if ( prGeoInputCount > 0 )
+			for ( int ii = 0; ii < prGeoInputCount ; ++ii )
 			{
 				prUpStreamGeoAssets.Add( null );
 				prUpStreamGeoObjects.Add( null );
 				prUpStreamGeoAdded.Add( false );
 			}
-	
-		// Check for min input fields set.
+
 		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-		{
-			int numValidTransformInputs = 0;
-			for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
-				if ( prUpStreamTransformAssets[ ii ] )
-					numValidTransformInputs++;
-		
-			if ( numValidTransformInputs < prMinTransInputCount )
-				Debug.LogWarning( "Insufficent Transform Inputs to Asset. " +
-								  "Please provide inputs in the Inputs section." );
-		}
-	
-		int numValidGeoInputs = 0;
-		if ( numValidGeoInputs < prMinGeoInputCount )
-			Debug.LogWarning( "Insufficent Geo Inputs to Asset. " +
-							  "Please provide inputs in the Inputs section." );
-	
-		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-			for ( int ii = 0; ii < prMaxTransInputCount ; ++ii )
+			for ( int ii = 0; ii < prTransformInputCount ; ++ii )
 				if ( prUpStreamTransformAssets[ ii ] )
 					HoudiniHost.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
 
@@ -1730,7 +1704,7 @@ public abstract class HoudiniAsset : HoudiniControl
 		}
 		
 		// Fill input names.
-		for ( int i = 0; i < prMaxTransInputCount; ++i )
+		for ( int i = 0; i < prTransformInputCount; ++i )
 		{
 			string trans_input_name = HoudiniHost.getInputName( prAssetId, i, 
 															  HAPI_InputType.HAPI_INPUT_TRANSFORM );
@@ -1738,7 +1712,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				trans_input_name = "Transform Input #" + ( i + 1 );
 			prTransInputNames.Add( trans_input_name );
 		}
-		for ( int i = 0; i < prMaxGeoInputCount; ++i )
+		for ( int i = 0; i < prGeoInputCount; ++i )
 		{
 			string geo_input_name = HoudiniHost.getInputName( prAssetId, i, 
 															HAPI_InputType.HAPI_INPUT_GEOMETRY );
@@ -1918,10 +1892,8 @@ public abstract class HoudiniAsset : HoudiniControl
 	
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
-	[SerializeField] private int 					myMinTransInputCount;
-	[SerializeField] private int 					myMaxTransInputCount;
-	[SerializeField] private int 					myMinGeoInputCount;
-	[SerializeField] private int					myMaxGeoInputCount;
+	[SerializeField] private int 					myTransformInputCount;
+	[SerializeField] private int					myGeoInputCount;
 	
 	[SerializeField] private List< HoudiniAsset >	myDownStreamTransformAssets;
 	[SerializeField] private List< HoudiniAsset >	myUpStreamTransformAssets;
