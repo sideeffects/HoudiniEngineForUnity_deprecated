@@ -584,12 +584,10 @@ public struct HAPI_AssetInfo
 
 	public int objectCount;
 	public int handleCount;
-		
-	public int minTransInputCount;
-	public int maxTransInputCount;
-	public int minGeoInputCount;
-	public int maxGeoInputCount;
-		
+
+	public int transformInputCount;
+	public int geoInputCount;
+
 	// Accessors
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }

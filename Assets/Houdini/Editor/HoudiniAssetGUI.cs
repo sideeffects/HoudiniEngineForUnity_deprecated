@@ -115,7 +115,7 @@ public class HoudiniAssetGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
 
-			if ( ( myAsset.prMaxTransInputCount > 0 || myAsset.prMaxGeoInputCount > 0 ) &&
+			if ( ( myAsset.prTransformInputCount > 0 || myAsset.prGeoInputCount > 0 ) &&
 				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE &&
 				 !myAsset.isPrefab() )
 			{
@@ -124,14 +124,14 @@ public class HoudiniAssetGUI : Editor
 				if ( myAsset.prShowInputControls )
 				{
 					if ( myAsset.prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
-						for ( int ii = 0; ii < myAsset.prMaxTransInputCount; ++ii )
+						for ( int ii = 0; ii < myAsset.prTransformInputCount; ++ii )
 							myParmChanges |= setTransformInput( ii );
 					
 					if ( myAsset.prUpStreamGeoObjects == null || myAsset.prUpStreamGeoAssets == null ||
 						 myAsset.prUpStreamGeoObjects.Count <= 0 || myAsset.prUpStreamGeoAssets.Count <= 0 )
 						return;
 
-					for ( int input_index = 0; input_index < myAsset.prMaxGeoInputCount; ++input_index )
+					for ( int input_index = 0; input_index < myAsset.prGeoInputCount; ++input_index )
 					{
 						bool join_last = false;
 						bool no_label_toggle_last = true;
