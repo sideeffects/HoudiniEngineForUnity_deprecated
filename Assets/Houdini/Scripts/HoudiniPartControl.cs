@@ -147,6 +147,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HoudiniHost.getPartInfo( prAssetId, prObjectId, prGeoId, prPartId, out part_info );
 
+		bool is_empty = part_info.vertexCount <= 0 && part_info.pointCount <= 0;
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
 		// TODO: Make this info a permanent UI display.
@@ -162,7 +163,21 @@ public class HoudiniPartControl : HoudiniGeoControl
 			// Overwrite name.
 			part_node.name = part_info.name;
 
-			if ( is_mesh ) // Valid mesh.
+			if ( is_empty )
+			{
+				// Add required components.
+				MeshFilter mesh_filter = getOrCreateComponent< MeshFilter >();
+
+				// Get or create mesh.
+				Mesh part_mesh 				= mesh_filter.sharedMesh;
+				if ( part_mesh == null ) 
+				{
+					mesh_filter.mesh 		= new Mesh();
+					part_mesh 				= mesh_filter.sharedMesh;
+				}
+				part_mesh.Clear();
+			}
+			else if ( is_mesh ) // Valid mesh.
 			{
 				// Add required components.
 				MeshFilter mesh_filter = getOrCreateComponent< MeshFilter >();
