@@ -1,35 +1,39 @@
 Shader "Houdini/SpecularVertexColor" {
 	Properties {
 		_Color ("Main Color", Color) = (1,1,1,1)
-		_SpecColor ("Spec Color", Color) = (1,1,1,1)
-		_Emission ("Emmisive Color", Color) = (0,0,0,0)
-		_Shininess ("Shininess", Range (0.01, 1)) = 0.7
-		_MainTex ("Base (RGB)", 2D) = "white" {}
-		_SpecularMap("Specular Map", 2D) = "black" {}
-		_NormalMap ("Normal Map", 2D) = "bump" {}
-		_BumpMap ("Bump Map", 2D) = "bump" {}
-		_DisplacementMap ("Displacement Map", 2D) = "black" {}
+		_SpecColor ("Specular Color", Color) = (0.5, 0.5, 0.5, 1)
+		_Shininess ("Shininess", Range (0.03, 1)) = 0.078125
+		_MainTex ("Base (RGB) Gloss (A)", 2D) = "white" {}
+		_BumpMap ("Normalmap", 2D) = "bump" {}
+	}
+	SubShader { 
+		Tags { "RenderType"="Opaque" }
+		LOD 400
+	
+		CGPROGRAM
+			#pragma surface surf BlinnPhong
+
+			sampler2D _MainTex;
+			sampler2D _BumpMap;
+			fixed4 _Color;
+			half _Shininess;
+
+			struct Input {
+				float2 uv_MainTex;
+				float2 uv_BumpMap;
+				float4 color: Color;
+			};
+
+			void surf ( Input IN, inout SurfaceOutput o ) {
+				fixed4 tex = tex2D( _MainTex, IN.uv_MainTex );
+				o.Albedo = tex.rgb * _Color.rgb * IN.color.rgb;
+				o.Gloss = tex.a;
+				o.Alpha = tex.a * _Color.a;
+				o.Specular = _Shininess;
+				o.Normal = UnpackNormal( tex2D( _BumpMap, IN.uv_BumpMap ) );
+			}
+		ENDCG
 	}
 
-	SubShader {
-		Pass {
-			Material {
-				Shininess [_Shininess]
-				Specular [_SpecColor]
-				Emission [_Emission]
-			}
-			ColorMaterial AmbientAndDiffuse
-			Lighting On
-			SeparateSpecular On
-			SetTexture [_MainTex] {
-				Combine texture * primary, texture * primary
-			}
-			SetTexture [_MainTex] {
-				constantColor [_Color]
-				Combine previous * constant DOUBLE, previous * constant
-			}
-		}
-	}
-
-	Fallback "Specular", 1
+	FallBack "Specular"
 }
