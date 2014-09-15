@@ -1344,6 +1344,16 @@ public abstract class HoudiniAsset : HoudiniControl
 				Mesh mesh_copy = Mesh.Instantiate( mesh_filter.sharedMesh ) as Mesh;
 				mesh_copy.name = mesh_name;
 				mesh_filter.sharedMesh = mesh_copy;
+
+				// Assigned saved mesh to mesh collider also.
+				MeshCollider mesh_collider = part_control.GetComponent< MeshCollider >();
+				if ( mesh_collider )
+				{
+					mesh_collider.sharedMesh = mesh_copy;
+					mesh_collider.enabled = false;
+					mesh_collider.enabled = true;
+				}
+
 				AssetDatabase.CreateAsset( mesh_filter.sharedMesh, mesh_path );
 				AssetDatabase.SaveAssets();
 			}
