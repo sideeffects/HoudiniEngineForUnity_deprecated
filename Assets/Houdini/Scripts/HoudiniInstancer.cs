@@ -261,6 +261,13 @@ public class HoudiniInstancer : MonoBehaviour
 					prPersistentData.scaleOffset.y * user_instance.transform.localScale.y * scale.y,
 					prPersistentData.scaleOffset.z * user_instance.transform.localScale.z * scale.z );
 			}
+			else
+			{
+				obj.transform.localScale = new Vector3(
+					prPersistentData.scaleOffset.x * user_instance.transform.localScale.x,
+					prPersistentData.scaleOffset.y * user_instance.transform.localScale.y,
+					prPersistentData.scaleOffset.z * user_instance.transform.localScale.z );
+			}
 		}
 		else
 #endif // UNITY_EDITOR
