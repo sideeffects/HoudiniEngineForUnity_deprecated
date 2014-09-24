@@ -841,9 +841,7 @@ public class HoudiniInstancer : MonoBehaviour
 				
 				GameObject objToInstantiate = null;
 				
-				if ( object_info.objectToInstanceId >= 0 )
-					objToInstantiate = prAsset.prGameObjects[ object_info.objectToInstanceId ];
-				else if ( instance_attr.Length > 0 || name_attr.Length > 0 )
+				if ( instance_attr.Length > 0 || name_attr.Length > 0 )
 				{					
 					if( name_attr.Length > 0 )
 					{
@@ -875,18 +873,23 @@ public class HoudiniInstancer : MonoBehaviour
 						else
 							objToInstantiate = GameObject.Find( instanceObjectName );
 					}
-					
-					HoudiniAsset hapi_asset = objToInstantiate.GetComponent< HoudiniAsset >();
-					if ( hapi_asset != null )
+
+					if ( objToInstantiate != null )
 					{
-						liveTransformPropagationSetting			= hapi_asset.prTransformChangeTriggersCooks;
-						syncAssetTransformSetting				= hapi_asset.prPushUnityTransformToHoudini;
-						enableCooking							= hapi_asset.prEnableCooking;
-						hapi_asset.prTransformChangeTriggersCooks	= false;
-						hapi_asset.prPushUnityTransformToHoudini			= false;
-						hapi_asset.prEnableCooking				= false;
+						HoudiniAsset hapi_asset = objToInstantiate.GetComponent< HoudiniAsset >();
+						if ( hapi_asset != null )
+						{
+							liveTransformPropagationSetting				= hapi_asset.prTransformChangeTriggersCooks;
+							syncAssetTransformSetting					= hapi_asset.prPushUnityTransformToHoudini;
+							enableCooking								= hapi_asset.prEnableCooking;
+							hapi_asset.prTransformChangeTriggersCooks	= false;
+							hapi_asset.prPushUnityTransformToHoudini	= false;
+							hapi_asset.prEnableCooking					= false;
+						}
 					}
 				}
+				else if ( object_info.objectToInstanceId >= 0 )
+					objToInstantiate = prAsset.prGameObjects[ object_info.objectToInstanceId ];
 
 				if ( objToInstantiate != null )
 				{
