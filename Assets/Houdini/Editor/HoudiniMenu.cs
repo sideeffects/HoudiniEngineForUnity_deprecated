@@ -136,6 +136,59 @@ public class HoudiniMenu : MonoBehaviour
 	// -----------------------------------------------------------------------
 	// Debug Menus (Hidden by Default)
 
+	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Two Curves and a Merge", false, 1000 ) ]
+	static private void blah()
+	{
+		int curve1 = HoudiniHost.createInputAsset( "curve1" );
+		{
+			HAPI_PartInfo new_part = new HAPI_PartInfo();
+			new_part.vertexCount = 3;
+			new_part.pointCount = 3;
+			new_part.faceCount = 2;
+			new_part.isCurve = true;
+			HoudiniHost.setPartInfo( curve1, 0, 0, ref new_part );
+
+			HAPI_AttributeInfo attrib_info = new HAPI_AttributeInfo( "P" );
+			attrib_info.exists = true;
+			attrib_info.count = 3; // 3 points
+			attrib_info.tupleSize = 3; // 3 floats per point (x, y, z)
+			attrib_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+			attrib_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+			HoudiniHost.addAttribute( curve1, 0, 0, "P", ref attrib_info );
+
+			float[] positions = new float[ 9 ] { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+			HoudiniHost.setAttributeFloatData( curve1, 0, 0, "P", ref attrib_info, positions, 0, 3 );
+
+			int[] vertices = new int[ 3 ] { 0, 1, 2 };
+			HoudiniHost.setVertexList( curve1, 0, 0, vertices, 0, 3 );
+
+			int[] face_counts = new int[ 2 ] { 2, 2 }; // 3 edges for the first face (the only face)
+			HoudiniHost.setFaceCounts( curve1, 0, 0, face_counts, 0, 2 );
+
+			HoudiniHost.commitGeo( curve1, 0, 0 );
+		}
+
+		int curve2 = HoudiniHost.createInputAsset( "curve2" );
+
+		int merge = HoudiniHost.instantiateAsset( "SOP/merge", true );
+		int convert = HoudiniHost.instantiateAsset( "SOP/convert", true );
+
+		HoudiniHost.connectAssetGeometry( curve1, 0, merge, 0 );
+		HoudiniHost.connectAssetGeometry( curve2, 0, merge, 1 );
+		HoudiniHost.connectAssetGeometry( merge, 0, convert, 0 );
+
+		HAPI_AssetInfo convert_info = HoudiniHost.getAssetInfo( convert );
+
+		Debug.Log( HoudiniHost.getNodeInfo( HoudiniHost.getAssetInfo( merge ).nodeId ).parmCount );
+
+		int convert_to_parm_id = HoudiniHost.getParmIdFromName( convert_info.nodeId, "totype" );
+		HAPI_ParmInfo[] convert_to_parm_info = new HAPI_ParmInfo[ 1 ];
+		int[] value_arr = new int[ 1 ];
+		value_arr[ 0 ] = 2;
+		HoudiniHost.setParmIntValues( convert_info.nodeId, value_arr, convert_to_parm_id, 1 );
+		HoudiniHost.cookAsset( convert, true );
+	}
+
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Simple Input Geo", false, 1000 ) ]
 	static private void createSimpleInputGeo() 
 	{
