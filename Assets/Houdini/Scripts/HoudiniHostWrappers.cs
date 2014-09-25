@@ -415,10 +415,14 @@ public static partial class HoudiniHost
 
 	public static HAPI_AssetId instantiateAsset( string asset_name, bool cook_on_load )
 	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
 		HAPI_AssetId asset_id = 0;
 		HAPI_Result status_code = HAPI_InstantiateAsset( asset_name, cook_on_load, out asset_id );
 		processStatusCode( status_code );
 		return asset_id;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
 	}
 
 	/// <summary>
