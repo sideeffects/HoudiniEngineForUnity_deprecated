@@ -182,7 +182,7 @@ public class HoudiniMenu : MonoBehaviour
 		Debug.Log( HoudiniHost.getNodeInfo( HoudiniHost.getAssetInfo( merge ).nodeId ).parmCount );
 
 		int convert_to_parm_id = HoudiniHost.getParmIdFromName( convert_info.nodeId, "totype" );
-		HAPI_ParmInfo[] convert_to_parm_info = new HAPI_ParmInfo[ 1 ];
+		//HAPI_ParmInfo[] convert_to_parm_info = new HAPI_ParmInfo[ 1 ];
 		int[] value_arr = new int[ 1 ];
 		value_arr[ 0 ] = 2;
 		HoudiniHost.setParmIntValues( convert_info.nodeId, value_arr, convert_to_parm_id, 1 );
