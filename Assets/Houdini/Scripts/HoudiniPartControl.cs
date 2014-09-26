@@ -150,6 +150,16 @@ public class HoudiniPartControl : HoudiniGeoControl
 		bool is_empty = part_info.vertexCount <= 0 && part_info.pointCount <= 0;
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
+		// For Debugging.
+#if false
+		Debug.Log( "ATTRIBS" );
+			HoudiniAssetUtility.printAllAttributeNames( prAssetId, prObjectId, prGeoId, prPartId );
+		Debug.Log( "GROUPS" );
+			HoudiniAssetUtility.printAllGroups( prAssetId, prObjectId, prGeoId, prPartId );
+		Debug.Log( "DONE" );
+		Debug.Log( "" );
+#endif
+
 		// TODO: Make this info a permanent UI display.
 		//if ( prEnableLogging && ( reload_asset || has_geo_changed || has_material_changed ) )
 		//	Debug.Log( "Obj #" + part_control.prObjectId + " (" + part_control.prObjectName + "): "

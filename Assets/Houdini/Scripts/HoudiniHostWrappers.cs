@@ -1600,9 +1600,13 @@ public static partial class HoudiniHost
 		int count = part_info.getElementCountByGroupType( group_type );
 
 		int[] membership = new int[ count ];
-		status_code = HAPI_GetGroupMembership(
-			asset_id, object_id, geo_id, part_id, group_type, group_name, membership, 0, count );
-		processStatusCode( status_code );
+
+		if ( count > 0 )
+		{
+			status_code = HAPI_GetGroupMembership(
+				asset_id, object_id, geo_id, part_id, group_type, group_name, membership, 0, count );
+			processStatusCode( status_code );
+		}
 
 		bool[] membership_bools = new bool[ count ];
 		for ( int i = 0; i < count; ++i )

@@ -1321,15 +1321,6 @@ public class HoudiniAssetUtility
 		if ( part_info.vertexCount > 65000 )
 			throw new HoudiniError( part_control.name + ": Vertex count (" + part_info.vertexCount + ") above limit (" + 65000 + ")!" );
 
-		// For Debugging.
-#if false
-		Debug.Log( "ATTRIBS" );
-			printAllAttributeNames( asset_id, object_id, geo_id, part_id );
-		Debug.Log( "GROUPS" );
-			printAllGroups( asset_id, object_id, geo_id, part_id );
-		Debug.Log( "DONE" );
-#endif
-
 		// Get Face counts.
 		int[] face_counts = new int[ part_info.faceCount ];
 		getArray4Id( asset_id, object_id, geo_id, part_id, HoudiniHost.getFaceCounts, 
