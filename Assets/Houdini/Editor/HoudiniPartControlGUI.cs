@@ -176,7 +176,19 @@ public class HoudiniPartControlGUI : Editor
 		if ( myPartControl.prShowDisplayOptions )
 		{
 			{
-				
+				if ( HoudiniGUI.button( "print_attribute_names", "Print Attribute Names" ) )
+				{
+					HoudiniAssetUtility.printAllAttributeNames(
+						myPartControl.prAssetId, myPartControl.prObjectId,
+						myPartControl.prGeoId, myPartControl.prPartId );
+				}
+
+				if ( HoudiniGUI.button( "print_group_info", "Print Group Info" ) )
+				{
+					HoudiniAssetUtility.printAllGroups(
+						myPartControl.prAssetId, myPartControl.prObjectId,
+						myPartControl.prGeoId, myPartControl.prPartId );
+				}
 			}
 
 			{ // Show Houdini Point Numbers

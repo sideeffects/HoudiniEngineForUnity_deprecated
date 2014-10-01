@@ -54,7 +54,7 @@ public class HoudiniMenu : MonoBehaviour
 	}
 
 	// Hidden intentionally for now.
-	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, false, 1 ) ]
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, false, 1 ) ]
 	//[ MenuItem( "File/" + HoudiniGUIUtility.myLoadHipLabel, false, -100000 ) ]
 	static private void loadHipFile() 
 	{
@@ -135,6 +135,20 @@ public class HoudiniMenu : MonoBehaviour
 
 	// -----------------------------------------------------------------------
 	// Debug Menus (Hidden by Default)
+
+	/*[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/TEst", false, 1000 ) ]
+	static private void blah2()
+	{
+		int input = HoudiniHost.createInputAsset( "in" );
+		HoudiniHost.loadGeoFromFile( input, 0, 0, "foo.geo" );
+		HoudiniHost.cookAsset( input, false );
+		Debug.Log( "ATTRIBS" );
+			HoudiniAssetUtility.printAllAttributeNames( input, 0, 0, 1 );
+		Debug.Log( "GROUPS" );
+			HoudiniAssetUtility.printAllGroups( input, 0, 0, 1 );
+		Debug.Log( "DONE" );
+		Debug.Log( "" );
+	}*/
 
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Two Curves and a Merge", false, 1000 ) ]
 	static private void blah()
