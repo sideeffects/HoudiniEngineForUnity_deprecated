@@ -42,7 +42,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 	public Mesh			prEditableMesh {				get { return myMesh; }
 														private set {} }
 	public MeshCollider prMeshCollider {				get { return myMeshCollider; }
-														private set {} }
+														set { myMeshCollider = value; } }
 	public Transform	prTransform {					get { return myTransform; }
 														private set {} }
 
@@ -133,13 +133,36 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 		}
 	}
 
+	public void reInit( Mesh mesh, MeshRenderer mesh_renderer, MeshCollider mesh_collider, Transform trans )
+	{
+		myMesh = mesh;
+		myMeshRenderer = mesh_renderer;
+		myMeshCollider = mesh_collider;
+		myTransform = trans;
+
+		if ( myMesh.colors == null )
+		{
+			Color[] colours = new Color[ myMesh.vertexCount ];
+			for ( int i = 0; i < myMesh.vertexCount; ++i )
+				colours[ i ] = new Color( 1.0f, 1.0f, 1.0f );
+			myMesh.colors = colours;
+		}
+	}
+
 	public void changeMode( Mode new_mode )
 	{
-		if ( !myMesh || !myMeshRenderer || !myMeshCollider )
-			return;
-
 		if ( new_mode != myCurrentMode )
 		{
+			if ( !myMesh )
+				Debug.LogWarning( "Can't paint on mesh. No mesh found!" );
+			if ( !myMeshRenderer )
+				Debug.LogWarning( "Can't paint on mesh. No mesh renderer found!" );
+			if ( !myMeshCollider )
+				Debug.LogWarning( "Can't paint on mesh. No mesh collider found!" );
+
+			if ( !myMesh || !myMeshRenderer || !myMeshCollider )
+				return;
+
 			if ( new_mode == Mode.NONE )
 			{
 				// Note that this assignment causes extra events to be 
