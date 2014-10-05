@@ -230,7 +230,24 @@ public class HoudiniPartControl : HoudiniGeoControl
 					mesh_collider.enabled = true;
 				}
 				else
+				{
 					getOrCreateComponent< MeshRenderer >();
+				}
+
+#if !HAPI_PAINT_SUPPORT
+				if ( myGeoControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
+				{
+					MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
+					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
+					if ( myGeoControl.prGeoAttributeManager )
+					{
+						myGeoControl.prGeoAttributeManager.reInit(
+							part_mesh, mesh_renderer, mesh_collider, transform );
+					}
+					mesh_collider.enabled = false;
+					mesh_collider.enabled = true;
+				}
+#endif // !HAPI_PAINT_SUPPORT
 
 				// Add Mesh-to-Prefab component.
 				HoudiniMeshToPrefab mesh_saver = getOrCreateComponent< HoudiniMeshToPrefab >();

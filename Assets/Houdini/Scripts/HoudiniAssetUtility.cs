@@ -1489,7 +1489,8 @@ public class HoudiniAssetUtility
 			colours[ i ].g = 1.0f;
 			colours[ i ].b = 1.0f;
 			colours[ i ].a = 1.0f;
-			if ( colour_attr_info.exists )
+			if ( colour_attr_info.exists &&
+				part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 			{
 				// If the colours are per vertex just query directly into the normals array we filled above.
 				if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
@@ -1523,12 +1524,20 @@ public class HoudiniAssetUtility
 		mesh.triangles 	= triangles;
 		mesh.uv 		= uvs;
 		mesh.normals 	= normals;
-		mesh.colors		= colours;
 		if ( generate_tangents )
 			mesh.tangents	= tangents;
-		
+
+#if !HAPI_PAINT_SUPPORT
+		// We don't want to set these if we're generating intermediate geo mesh because
+		// we would overwrite the painted values.
+		if ( part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
+#endif // !HAPI_PAINT_SUPPORT
+		{
+			mesh.colors		= colours;
+		}
+
 		mesh.RecalculateBounds();
-		
+
 		if ( !normal_attr_info.exists )
 			mesh.RecalculateNormals();
 
@@ -1669,7 +1678,7 @@ public class HoudiniAssetUtility
 		else
 		{
 			data_ok = false;
-			Debug.LogWarning( "Marshalling of " + attr + " for editing not supported at this time." );
+			//Debug.LogWarning( "Marshalling of " + attr + " for editing not supported at this time." );
 		}
 
 		if ( data_ok )
@@ -1827,7 +1836,7 @@ public class HoudiniAssetUtility
 					}
 				}
 			}
-#if HAPI_PAINT_SUPPORT
+#if !HAPI_PAINT_SUPPORT
 			else
 			{
 				foreach ( HoudiniGeoAttribute attribute in attribute_manager.prAttributes )
@@ -1864,7 +1873,7 @@ public class HoudiniAssetUtility
 					}
 				}
 			}
-#endif // HAPI_PAINT_SUPPORT
+#endif // !HAPI_PAINT_SUPPORT
 		}
 
 		HoudiniHost.commitGeo( asset_id, object_id, geo_id );
