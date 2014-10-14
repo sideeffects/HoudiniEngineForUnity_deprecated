@@ -628,6 +628,13 @@ public struct HAPI_CookOptions
 	// Curves
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool refineCurveToLinear;
 	public float curveRefineLOD;
+
+	/// If this option is turned on, then we will recursively clear the 
+	/// errors and warnings (and messages) of all nodes before performing
+	/// the cook.
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool clearErrorsAndWarnings;
+
+
 }
 
 // NODES --------------------------------------------------------------------------------------------------------
