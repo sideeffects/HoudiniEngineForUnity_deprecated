@@ -323,7 +323,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 					particles[ i ].position = new Vector3( pos_attr[ i * 3 + 0 ], 
 														   pos_attr[ i * 3 + 1 ], 
 														   pos_attr[ i * 3 + 2 ] );
-					if ( colour_attr_info.exists )
+					if ( colour_attr_info.exists && colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					{
 						float alpha =
 							colour_attr_info.tupleSize == 4
