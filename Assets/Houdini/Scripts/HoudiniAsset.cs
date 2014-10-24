@@ -612,7 +612,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public virtual void OnEnable()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 #if UNITY_EDITOR
 		if ( BuildPipeline.isBuildingPlayer )
 			return;
@@ -685,7 +685,7 @@ public abstract class HoudiniAsset : HoudiniControl
 					);
 			}
 		}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	public virtual void OnDisable()
@@ -871,10 +871,10 @@ public abstract class HoudiniAsset : HoudiniControl
 							   bool use_delay_for_progress_bar )
 	{
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return false;
 		#pragma warning disable 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( !HoudiniSetPath.prIsPathSet )
 		{
@@ -1165,9 +1165,9 @@ public abstract class HoudiniAsset : HoudiniControl
 		}
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		#pragma warning restore 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		
 		return true;
 	}

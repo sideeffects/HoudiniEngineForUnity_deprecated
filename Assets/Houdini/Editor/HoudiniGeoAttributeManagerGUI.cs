@@ -4,10 +4,10 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 #pragma warning disable 0162 // Unreachable Code
 #pragma warning disable 0414 // Initialized but unused Private Member Variable
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 public class HoudiniGeoAttributeManagerGUI
 {
@@ -80,9 +80,9 @@ public class HoudiniGeoAttributeManagerGUI
 	public void OnSceneGUI() 
 	{
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( myManager == null )
 			return;
@@ -445,9 +445,9 @@ public class HoudiniGeoAttributeManagerGUI
 		}
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		#pragma warning restore 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1268,8 +1268,8 @@ public class HoudiniGeoAttributeManagerGUI
 	private HoudiniGeoAttributeManager.Mode myLastMode;
 }
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 #pragma warning restore 0162 // Unreachable Code
 #pragma warning restore 0414 // Initialized but unused Private Member Variable
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 

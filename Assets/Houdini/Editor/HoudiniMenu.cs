@@ -39,11 +39,11 @@ public class HoudiniMenu : MonoBehaviour
 	//[ MenuItem( "GameObject/Create Other/Houdini Asset", true, 12000 ) ]
 	static private bool validateCreateHAPIObject() 
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return true;
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLaunchOrboltPage, false, 1 ) ]
@@ -126,11 +126,11 @@ public class HoudiniMenu : MonoBehaviour
 	//[ MenuItem( "GameObject/Create Other/Houdini Curve Asset", true, 12010 ) ]
 	static private bool validateCreateCurve()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return true;
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	// -----------------------------------------------------------------------
