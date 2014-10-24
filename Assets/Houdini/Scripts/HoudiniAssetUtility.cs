@@ -1347,7 +1347,19 @@ public class HoudiniAssetUtility
 		float[] uv_attr = new float[ 0 ];
 		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV, 
 					  ref uv_attr_info, ref uv_attr, HoudiniHost.getAttributeFloatData );
-		
+		// Get uv2 attributes.
+		HAPI_AttributeInfo uv2_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_UV2 );
+		uv2_attr_info.tupleSize = 2;
+		float[] uv2_attr = new float[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV2, 
+					  ref uv2_attr_info, ref uv2_attr, HoudiniHost.getAttributeFloatData );
+		// Get uv3 attributes.
+		HAPI_AttributeInfo uv3_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_UV3 );
+		uv3_attr_info.tupleSize = 2;
+		float[] uv3_attr = new float[ 0 ];
+		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV3, 
+					  ref uv3_attr_info, ref uv3_attr, HoudiniHost.getAttributeFloatData );
+
 		// Get normal attributes.
 		HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_NORMAL );
 		float[] normal_attr = new float[ 0 ];
@@ -1373,6 +1385,8 @@ public class HoudiniAssetUtility
 		Vector3[] vertices 	= new Vector3[ 	part_info.vertexCount ];
 		int[] triangles 	= new int[ 		part_info.faceCount * 3 ];
 		Vector2[] uvs 		= new Vector2[ 	part_info.vertexCount ];
+		Vector2[] uv2s		= new Vector2[  part_info.vertexCount ];
+		Vector2[] uv3s		= new Vector2[  part_info.vertexCount ];
 		Vector3[] normals 	= new Vector3[ 	part_info.vertexCount ];
 		Color[] colours		= new Color[	part_info.vertexCount ];
 		Vector4[] tangents	= generate_tangents ? new Vector4[ part_info.vertexCount ] : null;
@@ -1388,7 +1402,7 @@ public class HoudiniAssetUtility
 				if ( j == 0 )
 					vertices[ i ][ j ] *= -1;
 			}
-			
+
 			// Fill UVs.
 			if ( uv_attr_info.exists )
 			{
@@ -1403,7 +1417,33 @@ public class HoudiniAssetUtility
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ vertex_list[ i ] * 2 + j ];
 			}
-			
+			if ( uv2_attr_info.exists )
+			{
+				// If the UVs are per vertex just query directly into the UV array we filled above.
+				if ( uv2_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+					for ( int j = 0; j < 2; ++j )
+						uv2s[ i ][ j ] = uv2_attr[ i * 2 + j ];
+				
+				// If the UVs are per point use the vertex list array point indicies to query into
+				// the UV array we filled above.
+				else if ( uv2_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					for ( int j = 0; j < 2; ++j )
+						uv2s[ i ][ j ] = uv2_attr[ vertex_list[ i ] * 2 + j ];
+			}
+			if ( uv3_attr_info.exists )
+			{
+				// If the UVs are per vertex just query directly into the UV array we filled above.
+				if ( uv3_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+					for ( int j = 0; j < 2; ++j )
+						uv3s[ i ][ j ] = uv3_attr[ i * 2 + j ];
+				
+				// If the UVs are per point use the vertex list array point indicies to query into
+				// the UV array we filled above.
+				else if ( uv3_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					for ( int j = 0; j < 2; ++j )
+						uv3s[ i ][ j ] = uv3_attr[ vertex_list[ i ] * 2 + j ];
+			}
+
 			// Fill normals.
 			if ( normal_attr_info.exists )
 			{
@@ -1523,6 +1563,10 @@ public class HoudiniAssetUtility
 		mesh.vertices 	= vertices;
 		mesh.triangles 	= triangles;
 		mesh.uv 		= uvs;
+		if ( uv2_attr_info.exists )
+			mesh.uv1	= uv2s;
+		if ( uv3_attr_info.exists )
+			mesh.uv2	= uv3s;
 		mesh.normals 	= normals;
 		if ( generate_tangents )
 			mesh.tangents	= tangents;
