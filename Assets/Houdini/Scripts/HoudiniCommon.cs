@@ -92,6 +92,8 @@ public struct HoudiniConstants
 	// Default Attributes' Names
 	public const string HAPI_ATTRIB_POSITION			= "P";
 	public const string HAPI_ATTRIB_UV					= "uv";
+	public const string HAPI_ATTRIB_UV2					= "uv2";
+	public const string HAPI_ATTRIB_UV3					= "uv3";
 	public const string HAPI_ATTRIB_NORMAL				= "N";
 	public const string HAPI_ATTRIB_TANGENT				= "tangentu";
 	public const string HAPI_ATTRIB_COLOR				= "Cd";
