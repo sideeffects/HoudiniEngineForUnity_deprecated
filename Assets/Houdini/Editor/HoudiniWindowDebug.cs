@@ -23,10 +23,10 @@ using System.IO;
 
 public class HoudiniWindowDebug : EditorWindow 
 {
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning disable 0414
 	#pragma warning disable 0649
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -52,10 +52,10 @@ public class HoudiniWindowDebug : EditorWindow
 	{
 		bool gui_enable = GUI.enabled;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( GUILayout.Button( HoudiniGUIUtility.mySaveHoudiniSceneLabel ) )
 		{
@@ -135,7 +135,7 @@ public class HoudiniWindowDebug : EditorWindow
 			}
 		}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 
 		try
@@ -185,7 +185,7 @@ public class HoudiniWindowDebug : EditorWindow
 		{
 			Debug.LogError( "Directory navigation failed: " + e.ToString() );
 		}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		GUILayout.EndScrollView();
 
@@ -221,8 +221,8 @@ public class HoudiniWindowDebug : EditorWindow
 	private static Vector2 			myScrollPosition;
 	private static float			myTime;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning restore 0414
 	#pragma warning restore 0649
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 }

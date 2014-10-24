@@ -101,11 +101,11 @@ public class HoudiniAssetGUI : Editor
 	public override void OnInspectorGUI() 
 	{
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		bool gui_enable = GUI.enabled;
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		try
 		{
@@ -204,9 +204,9 @@ public class HoudiniAssetGUI : Editor
 			Debug.LogError( e.ToString() );
 		}
 		
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		GUI.enabled = gui_enable;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	public virtual void OnSceneGUI()

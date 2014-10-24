@@ -233,13 +233,13 @@ public class HoudiniParmsGUI : Editor
 			bool is_editable = myParms.prEditable;
 
 			// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 			is_editable = false;
 			HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 			if ( !is_editable )
 				HoudiniGUI.help( "The parameters on this node are readonly.", MessageType.Info );
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 			bool gui_enable = GUI.enabled;
 			GUI.enabled = is_editable;

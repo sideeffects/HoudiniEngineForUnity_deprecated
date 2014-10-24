@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEditor;
 #endif // UNITY_EDITOR
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 using Microsoft.Win32;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 #if UNITY_EDITOR
 [ InitializeOnLoad ]
@@ -114,7 +114,7 @@ public class HoudiniSetPath
 			return app_path;
 #endif // UNITY_EDITOR
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		// For Windows, we look at the registry entries made by the Houdini installer. We look for the 
 		// "active version" key which gives us the most recently installed Houdini version. Using the
 		// active version we find the registry made by that particular installer and find the install
@@ -147,7 +147,7 @@ public class HoudiniSetPath
 		//#error "Your current platform is not yet fully supported. Binaries search path not set."
 		Debug.LogError( "Your current platform is not yet full support. Binaries search path not set." );
 
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		return app_path;
 	}
