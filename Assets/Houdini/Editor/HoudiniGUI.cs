@@ -887,24 +887,24 @@ public class HoudiniGUI : Editor
 		return changed;
 	}
 	
-	public static bool fileField(
+	public static bool fileOpenField(
 		string name, string label,
 		ref bool delay_build,
 		ref string path )
 	{
 		HoudiniGUIParm parm = new HoudiniGUIParm( name, label );
-		return fileField( ref parm, ref delay_build, ref path );
+		return fileOpenField( ref parm, ref delay_build, ref path );
 	}
-	public static bool fileField(
+	public static bool fileOpenField(
 		ref HoudiniGUIParm parm,
 		ref bool delay_build,
 		ref string path )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return fileField(
+		return fileOpenField(
 			ref parm, ref delay_build, ref path, ref join_last, ref no_label_toggle_last );
 	}
-	public static bool fileField(
+	public static bool fileOpenField(
 		ref HoudiniGUIParm parm,
 		ref bool delay_build,
 		ref string path,
@@ -950,6 +950,88 @@ public class HoudiniGUI : Editor
 			}
 
 			string prompt_path = EditorUtility.OpenFilePanel( "Select File", old_path, file_pattern );;
+			if ( prompt_path.Length > 0 )
+				new_path = prompt_path;
+		}
+		
+		if ( new_path != old_path )
+		{
+			path = new_path;
+			changed |= true;
+		}
+		
+		// Decide whether to join with the next parameter on the same line or not
+		// but also save our status for the next parameter.
+		join_last = ( parm.joinNext && parm_size <= 1 );
+		if ( !parm.joinNext || parm_size > 1 )
+			EditorGUILayout.EndHorizontal();
+		
+		return changed;
+	}
+
+	public static bool fileSaveField(
+		string name, string label,
+		ref bool delay_build,
+		ref string path )
+	{
+		HoudiniGUIParm parm = new HoudiniGUIParm( name, label );
+		return fileSaveField( ref parm, ref delay_build, ref path );
+	}
+	public static bool fileSaveField(
+		ref HoudiniGUIParm parm,
+		ref bool delay_build,
+		ref string path )
+	{
+		bool join_last = false; bool no_label_toggle_last = false;
+		return fileSaveField(
+			ref parm, ref delay_build, ref path, ref join_last, ref no_label_toggle_last );
+	}
+	public static bool fileSaveField(
+		ref HoudiniGUIParm parm,
+		ref bool delay_build,
+		ref string path,
+		ref bool join_last, ref bool no_label_toggle_last )
+	{
+		initializeConstants();
+		
+		bool changed = false;
+		int parm_size = parm.size;
+		
+		// Decide whether to join with the previous parameter on the same line or not.
+		if ( !join_last || parm_size > 1 )
+			EditorGUILayout.BeginHorizontal();
+		
+		label( ref parm, ref join_last, ref no_label_toggle_last );
+		
+		// Get style
+		GUIStyle text_field_style = new GUIStyle( EditorStyles.textField );
+		if ( parm.isBold )
+		{
+			text_field_style.fontStyle	= FontStyle.Bold;
+		}
+		
+		string old_path = path;
+		GUI.SetNextControlName( parm.name +
+								" " + parm.instanceNum +
+								" " + " file_field" );
+		string new_path = EditorGUILayout.TextField( old_path, text_field_style );
+		if ( new_path != old_path ) // Check if the field is being used instead of the slider.
+			delay_build = true;
+
+		if ( GUILayout.Button( "...", GUILayout.Width( myFileChooserButtonWidth ), myLineHeightGUI ) ) 
+		{
+			string file_pattern = "*";
+			if ( parm.typeInfo != "" )
+			{
+				file_pattern = parm.typeInfo;
+				file_pattern = file_pattern.Replace( " ", ";" );
+				if ( file_pattern.StartsWith( "*." ) )
+					file_pattern = file_pattern.Substring( 2 );
+				else if ( file_pattern.StartsWith( "*" ) )
+					file_pattern = file_pattern.Substring( 1 );
+			}
+
+			string prompt_path = EditorUtility.SaveFilePanel( "Select File", old_path, "", file_pattern );;
 			if ( prompt_path.Length > 0 )
 				new_path = prompt_path;
 		}
