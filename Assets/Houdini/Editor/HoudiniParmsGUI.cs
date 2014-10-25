@@ -419,14 +419,22 @@ public class HoudiniParmsGUI : Editor
 
 			HAPI_Permissions permissions = parm.permissions;
 			if ( permissions == HAPI_Permissions.HAPI_PERMISSIONS_READ_ONLY )
+			{
 				gui_parm.label += " (read-only)";
-			else if ( permissions == HAPI_Permissions.HAPI_PERMISSIONS_WRITE_ONLY )
-				gui_parm.label += " (write-only)";
+				changed = HoudiniGUI.fileOpenField(
+					ref gui_parm, ref myDelayBuild, ref path[ 0 ],
+					ref join_last, ref no_label_toggle_last );
+			}
+			else
+			{
+				if ( permissions == HAPI_Permissions.HAPI_PERMISSIONS_WRITE_ONLY )
+					gui_parm.label += " (write-only)";
 
-			changed = HoudiniGUI.fileField(
-				ref gui_parm, ref myDelayBuild, ref path[ 0 ],
-				ref join_last, ref no_label_toggle_last );
-			
+				changed = HoudiniGUI.fileSaveField(
+					ref gui_parm, ref myDelayBuild, ref path[ 0 ],
+					ref join_last, ref no_label_toggle_last );
+			}
+
 			if ( changed )
 				myParms.setParmStrings( parm, path );
 		}
