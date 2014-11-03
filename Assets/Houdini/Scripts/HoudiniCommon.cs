@@ -738,8 +738,8 @@ public struct HAPI_ParmInfo
 	// them too much. The only guarantee here is that the folder names will
 	// be unique among all other parameter names.
 	private HAPI_StringHandle nameSH;
-	private HAPI_StringHandle labelSH;
-
+	private HAPI_StringHandle labelSH;	
+	
 	// If this parameter is a multiparm instance than the templateNameSH
 	// will be the hash-templated parm name, containing #'s for the 
 	// parts of the name that use the instance number. Compared to the
@@ -747,6 +747,8 @@ public struct HAPI_ParmInfo
 	// replaced by the instance number. For regular parms, the templateNameSH
 	// is identical to the nameSH.
 	private HAPI_StringHandle templateNameSH;
+	
+	private HAPI_StringHandle helpSH;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool hasMin;
@@ -815,6 +817,8 @@ public struct HAPI_ParmInfo
 	{ get { return HoudiniHost.getString( labelSH ); } private set {} }
 	public string templateName
 	{ get { return HoudiniHost.getString( templateNameSH ); } private set {} }
+	public string help
+	{ get { return HoudiniHost.getString( helpSH ); } private set {} }
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]
