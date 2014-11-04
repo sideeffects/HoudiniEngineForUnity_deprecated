@@ -142,13 +142,11 @@ public class HoudiniAssetGUI : Editor
 						myParmChanges |= HoudiniGUI.objectField(
 							ref geo_input, ref obj, typeof( GameObject ), ref join_last, ref no_label_toggle_last );
 					
-						if ( myParmChanges )
+						if ( myParmChanges || !myAsset.isGeoInputValid( input_index ) )
 						{
 							if ( !obj )
 							{
 								myAsset.removeGeoInput( input_index );
-								myAsset.prUpStreamGeoObjects[ input_index ] = null;
-								myAsset.prUpStreamGeoAssets[ input_index ] = null;
 								myAsset.buildClientSide();
 							}
 							else
@@ -173,12 +171,12 @@ public class HoudiniAssetGUI : Editor
 									asset = obj_control.prAsset;
 								}
 
-								// If we are connecting a non-HAPI game object than we need to 
-								// assetize it first by converting it to an Input Asset.
 								if ( asset == null )
-									asset = new_obj.AddComponent< HoudiniAssetInput >();
-									
-								if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
+								{
+									myAsset.addGeoAsGeoInput( new_obj, input_index );
+									myAsset.buildClientSide();
+								}
+								else if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
 								{
 									if ( myAsset == asset )
 										Debug.LogError( "Can't connect an asset to itself!" );
