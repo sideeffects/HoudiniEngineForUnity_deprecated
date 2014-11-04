@@ -28,7 +28,6 @@ public class HoudiniMenu : MonoBehaviour
 	// Private
 	
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadAssetLabel, false, 0 ) ]
-	//[ MenuItem( "GameObject/Create Other/Houdini Asset...", false, 12000 ) ]
 	static private void createHAPIObject() 
 	{
 		string asset_file_path = HoudiniGUIUtility.promptForOTLPath();
@@ -36,7 +35,6 @@ public class HoudiniMenu : MonoBehaviour
 	}
 
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadAssetLabel, true, 0 ) ]
-	//[ MenuItem( "GameObject/Create Other/Houdini Asset", true, 12000 ) ]
 	static private bool validateCreateHAPIObject() 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -46,16 +44,8 @@ public class HoudiniMenu : MonoBehaviour
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
-	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLaunchOrboltPage, false, 1 ) ]
-	//[ MenuItem( "Window/Houdini Asset Store (Orbolt)", false, 203 ) ]
-	static private void launchOrboltPage() 
-	{
-		Application.OpenURL( "http://www.orbolt.com/unity" );
-	}
-
 	// Hidden intentionally for now.
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, false, 1 ) ]
-	//[ MenuItem( "File/" + HoudiniGUIUtility.myLoadHipLabel, false, -100000 ) ]
 	static private void loadHipFile() 
 	{
 		string hip_file_path = HoudiniGUIUtility.promptForHIPPath();
@@ -64,7 +54,6 @@ public class HoudiniMenu : MonoBehaviour
 
 	// Hidden intentionally for now.
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.mySaveHipLabel, false, 1 ) ]
-	//[ MenuItem( "File/" + HoudiniGUIUtility.mySaveHipLabel, false, 1 ) ]
 	static private void saveHipFile() 
 	{
 		string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
@@ -75,16 +64,22 @@ public class HoudiniMenu : MonoBehaviour
 	}
 
 	// -----------------------------------------------------------------------
+
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLaunchOrboltPage, false, 30 ) ]
+	static private void launchOrboltPage() 
+	{
+		Application.OpenURL( "http://www.orbolt.com/unity" );
+	}
+
+	// -----------------------------------------------------------------------
 	
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myDebugLabel + " Window", false, 50 ) ]
-	//[ MenuItem( "Window/Houdini Debug", false, 202 ) ]
 	static private void debugWindow()
 	{
 		HoudiniWindowDebug.ShowWindow();
 	}
 
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.mySettingsLabel + " Window", false, 51 ) ]
-	//[ MenuItem( "Window/Houdini Settings", false, 201 ) ]
 	static private void settingsWindow()
 	{
 		HoudiniWindowSettings.ShowWindow();
@@ -92,8 +87,40 @@ public class HoudiniMenu : MonoBehaviour
 
 	// -----------------------------------------------------------------------
 
-	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, false, 100 ) ]
-	//[ MenuItem( "GameObject/Create Other/Houdini Curve Asset", false, 12010 ) ]
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myConvertToInputAssetLabel, false, 100 ) ]
+	static private void convertToInputAsset()
+	{
+		foreach( GameObject obj in Selection.gameObjects )
+		{
+			bool not_an_asset = ( obj.GetComponent< HoudiniAsset >() == null );
+			bool has_mesh_filter = ( obj.GetComponent< MeshFilter >() != null );
+			if ( not_an_asset && has_mesh_filter )
+			{
+				obj.AddComponent< HoudiniAssetInput >();
+			}
+		}
+	}
+
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myConvertToInputAssetLabel, true, 100 ) ]
+	static private bool validateConvertToInputAsset()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		foreach( GameObject obj in Selection.gameObjects )
+		{
+			bool not_an_asset = ( obj.GetComponent< HoudiniAsset >() == null );
+			bool has_mesh_filter = ( obj.GetComponent< MeshFilter >() != null );
+			if ( not_an_asset && has_mesh_filter )
+			{
+				return true;
+			}
+		}
+		return false;
+#else
+		return false;
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+	}
+
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, false, 101 ) ]
 	static private void createCurve()
 	{
 		// Create game object.
@@ -122,8 +149,7 @@ public class HoudiniMenu : MonoBehaviour
 		Selection.objects 		= selection;
 	}
 
-	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, true, 100 ) ]
-	//[ MenuItem( "GameObject/Create Other/Houdini Curve Asset", true, 12010 ) ]
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, true, 101 ) ]
 	static private bool validateCreateCurve()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )

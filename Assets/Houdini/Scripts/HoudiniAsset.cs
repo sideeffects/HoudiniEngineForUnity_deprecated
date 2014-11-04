@@ -54,11 +54,11 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myAssetName = value; } }
 	public string					prAssetHelp {					get { return myAssetHelp; }
 																	set { myAssetHelp = value; } }
-	public AssetType				prAssetType {					get { return myAssetType; } 
+	public AssetType				prAssetType {					get { return myAssetType; }
 																	set { myAssetType = value; } }
-	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; } 
+	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; }
 																	set { myHAPIAssetType = value; } }
-	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; } 
+	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; }
 																	set { myAssetSubType = value; } }
 
 	public HoudiniAssetUndoInfo prAssetUndoInfo 
@@ -109,8 +109,8 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myUpStreamGeoAssets = value; } }
 	public List< GameObject >		prUpStreamGeoObjects {			get { return myUpStreamGeoObjects; } 
 																	set { myUpStreamGeoObjects = value; } }
-	public List< bool >				prUpStreamGeoAdded {			get { return myUpStreamGeoAdded; } 
-																	set { myUpStreamGeoAdded = value; } }
+	public List< int >				prUpStreamGeoInputAssetIds {	get { return myUpStreamGeoInputAssetIds; } 
+																	set { myUpStreamGeoInputAssetIds = value; } }
 
 	// Objects ------------------------------------------------------------------------------------------------------
 	
@@ -380,6 +380,37 @@ public abstract class HoudiniAsset : HoudiniControl
 #endif // UNITY_EDITOR
 	}
 
+	public void addGeoAsGeoInput( GameObject obj, int index )
+	{
+		if ( prUpStreamGeoInputAssetIds[ index ] < 0 || 
+			!HoudiniHost.isAssetValid(
+				prUpStreamGeoInputAssetIds[ index ], myUpStreamGeoInputAssetValidationIds[ index ] ) )
+		{
+			prUpStreamGeoInputAssetIds[ index ] = HoudiniHost.createInputAsset( prAssetName + "_GeoInput_" + index );
+			HAPI_AssetInfo asset_info = HoudiniHost.getAssetInfo( prUpStreamGeoInputAssetIds[ index ] );
+			myUpStreamGeoInputAssetValidationIds[ index ] = asset_info.validationId;
+		}
+
+		// Add the geo info onto the asset.
+		if ( !obj.GetComponent< MeshFilter >() )
+		{
+			Debug.LogWarning( "No mesh filter found on input geo object: " + obj.name );
+			return;
+		}
+		Mesh mesh = obj.GetComponent< MeshFilter >().sharedMesh;
+		HoudiniAssetUtility.setMesh(
+			prUpStreamGeoInputAssetIds[ index ], 0, 0, ref mesh, null, null );
+
+		HoudiniHost.connectAssetGeometry( prUpStreamGeoInputAssetIds[ index ], 0, prAssetId, index );
+
+		// We have to save the presets here because this connection might change a parm
+		// and we want to save it.
+#if UNITY_EDITOR
+		if ( !EditorApplication.isPlaying )
+			savePreset();
+#endif // UNITY_EDITOR
+	}
+
 #if UNITY_EDITOR
 	protected void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponent transform_component )
 	{
@@ -479,6 +510,20 @@ public abstract class HoudiniAsset : HoudiniControl
 #endif // UNITY_EDITOR
 	}
 
+	public bool isGeoInputValid( int index )
+	{
+		if ( prUpStreamGeoObjects[ index ] != null )
+		{
+			return prUpStreamGeoAssets[ index ] != null ||
+				( prUpStreamGeoInputAssetIds[ index ] >= 0 && HoudiniHost.isAssetValid(
+					prUpStreamGeoInputAssetIds[ index ], myUpStreamGeoInputAssetValidationIds[ index ] ) );
+		}
+		else
+		{
+			return prUpStreamGeoAssets[ index ] == null && prUpStreamGeoInputAssetIds[ index ] == -1;
+		}
+	}
+
 	public void removeGeoInput( int index )
 	{
 		try
@@ -488,13 +533,20 @@ public abstract class HoudiniAsset : HoudiniControl
 				prUpStreamGeoAssets[ index ].removeDownstreamGeoAsset( this );
 				HoudiniHost.disconnectAssetGeometry( prAssetId, index );
 				prUpStreamGeoAssets[ index ] = null;
-				prUpStreamGeoAdded[ index ] = false;
 			}
-			else if ( prUpStreamGeoAdded[ index ] )
+			else if ( prUpStreamGeoInputAssetIds[ index ] >= 0 )
 			{
 				HoudiniHost.disconnectAssetGeometry( prAssetId, index );
-				prUpStreamGeoAdded[ index ] = false;
+				HoudiniHost.destroyAsset( prUpStreamGeoInputAssetIds[ index ] );
+				prUpStreamGeoInputAssetIds[ index ] = -1;
+				myUpStreamGeoInputAssetValidationIds[ index ] = -1;
 			}
+
+			// Full value reset.
+			prUpStreamGeoObjects[ index ] = null;
+			prUpStreamGeoAssets[ index ] = null;
+			prUpStreamGeoInputAssetIds[ index ] = -1;
+			myUpStreamGeoInputAssetValidationIds[ index ] = -1;
 		}
 		catch ( HoudiniError error )
 		{
@@ -732,7 +784,8 @@ public abstract class HoudiniAsset : HoudiniControl
 		prDownStreamGeoAssets 			= new List< HoudiniAsset >();
 		prUpStreamGeoAssets 			= new List< HoudiniAsset >();
 		prUpStreamGeoObjects 			= new List< GameObject >();
-		prUpStreamGeoAdded 				= new List< bool >();
+		prUpStreamGeoInputAssetIds		= new List< int >();
+		myUpStreamGeoInputAssetValidationIds = new List< int >();
 
 		// Objects --------------------------------------------------------------------------------------------------
 		
@@ -1698,7 +1751,8 @@ public abstract class HoudiniAsset : HoudiniControl
 			{
 				prUpStreamGeoAssets.Add( null );
 				prUpStreamGeoObjects.Add( null );
-				prUpStreamGeoAdded.Add( false );
+				prUpStreamGeoInputAssetIds.Add( -1 );
+				myUpStreamGeoInputAssetValidationIds.Add( -1 );
 			}
 
 		if ( prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
@@ -1848,19 +1902,21 @@ public abstract class HoudiniAsset : HoudiniControl
 					else
 						asset = new_obj.GetComponent< HoudiniAsset >();
 
-					// If we are connecting a non-HAPI game object than we need to 
-					// assetize it first by converting it to an Input Asset.
 					if ( !asset )
-						asset = new_obj.AddComponent< HoudiniAssetInput >();
-
-					if ( !asset.isAssetValid() )
 					{
-						// No need to cache because since we're in here it means prEnableCooking == true.
-						prEnableCooking = false;
-						asset.OnEnable();
-						prEnableCooking = true;
+						addGeoAsGeoInput( new_obj, i );
 					}
-					addAssetAsGeoInput( asset, object_index, i );
+					else
+					{
+						if ( !asset.isAssetValid() )
+						{
+							// No need to cache because since we're in here it means prEnableCooking == true.
+							prEnableCooking = false;
+							asset.OnEnable();
+							prEnableCooking = true;
+						}
+						addAssetAsGeoInput( asset, object_index, i );
+					}
 
 					need_rebuild_after_reconnect = true;
 				}
@@ -1912,7 +1968,8 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private List< HoudiniAsset >	myDownStreamGeoAssets;
 	[SerializeField] private List< HoudiniAsset >	myUpStreamGeoAssets;
 	[SerializeField] private List< GameObject >		myUpStreamGeoObjects;
-	[SerializeField] private List< bool >			myUpStreamGeoAdded;
+	[SerializeField] private List< int >			myUpStreamGeoInputAssetIds;
+	[SerializeField] private List< int >			myUpStreamGeoInputAssetValidationIds;
 
 	// Parameters ---------------------------------------------------------------------------------------------------
 
