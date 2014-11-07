@@ -252,7 +252,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -402,7 +402,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -631,7 +631,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -770,7 +770,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -864,7 +864,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -916,7 +916,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -998,7 +998,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -1099,7 +1099,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		if ( !parm.joinNext )
@@ -1221,7 +1221,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		label( ref parm, ref join_last, ref no_label_toggle_last );
@@ -1314,7 +1314,7 @@ public class HoudiniGUI : Editor
 		int parm_size = parm.size;
 		
 		// Decide whether to join with the previous parameter on the same line or not.
-		if ( !join_last || parm_size > 1 )
+		if ( !join_last )
 			EditorGUILayout.BeginHorizontal();
 		
 		if ( !parm.joinNext )
