@@ -738,7 +738,7 @@ public struct HAPI_ParmInfo
 	// them too much. The only guarantee here is that the folder names will
 	// be unique among all other parameter names.
 	private HAPI_StringHandle nameSH;
-	private HAPI_StringHandle labelSH;	
+	private HAPI_StringHandle labelSH;
 	
 	// If this parameter is a multiparm instance than the templateNameSH
 	// will be the hash-templated parm name, containing #'s for the 
@@ -776,6 +776,9 @@ public struct HAPI_ParmInfo
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool invisible;
+
+	[ MarshalAs( UnmanagedType.U1 ) ]
+	public bool disabled;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool spare;
