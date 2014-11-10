@@ -591,6 +591,22 @@ public abstract class HoudiniAsset : HoudiniControl
 				if ( upstream_asset != null )
 					upstream_asset.removeDownstreamGeoAsset( this );
 
+			// Clean up any geo inputs.
+			foreach ( int asset_id in prUpStreamGeoInputAssetIds )
+			{
+				if ( asset_id >= 0 )
+				{
+					try
+					{
+						HoudiniHost.destroyAsset( asset_id );
+					}
+					catch ( HoudiniError error )
+					{
+						Debug.LogError( "Asset failed to unload input asset: " + error.ToString() );
+					}
+				}
+			}
+
 			{
 				List< HoudiniAsset > downstream_asset_list = new List< HoudiniAsset >();
 				foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
