@@ -36,6 +36,8 @@ public struct HoudiniGUIParm
 		max 			= 0.0f;
 		UIMin 			= 0.0f;
 		UIMax 			= 0.0f;
+
+		disabled		= false;
 		
 		joinNext 		= false;
 		labelNone 		= false;
@@ -75,6 +77,8 @@ public struct HoudiniGUIParm
 		max 			= info.max;
 		UIMin 			= info.UIMin;
 		UIMax 			= info.UIMax;
+
+		disabled		= info.disabled;
 		
 		joinNext 		= info.joinNext;
 		labelNone 		= info.labelNone;
@@ -119,6 +123,8 @@ public struct HoudiniGUIParm
 	public float max;
 	public float UIMin;
 	public float UIMax;
+
+	public bool disabled;
 	
 	public bool joinNext;
 	public bool labelNone;
@@ -245,6 +251,7 @@ public class HoudiniGUI : Editor
 		ref T[] undo_values )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		bool is_undo_event = Event.current.type == EventType.ValidateCommand && 
@@ -335,6 +342,8 @@ public class HoudiniGUI : Editor
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
 		
+		restoreGUIEnable();
+
 		return changed;
 	}
 	
@@ -395,6 +404,7 @@ public class HoudiniGUI : Editor
 		ref int[] undo_values )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		bool is_undo_event = Event.current.type == EventType.ValidateCommand && 
@@ -493,7 +503,9 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
-		
+
+		restoreGUIEnable();
+
 		return changed;
 	}
 
@@ -504,6 +516,7 @@ public class HoudiniGUI : Editor
 		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		// Decide whether to join with the previous parameter on the same line or not.
 		GUILayout.BeginHorizontal();
@@ -539,6 +552,8 @@ public class HoudiniGUI : Editor
 		// Determine if value changed and update parameter value.
 		if ( new_value != old_value )
 			values[ parm.valuesIndex ] = new_value;
+
+		restoreGUIEnable();
 		
 		return new_value != old_value;
 	}
@@ -624,6 +639,7 @@ public class HoudiniGUI : Editor
 		ref float[] undo_values )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		bool is_undo_event = Event.current.type == EventType.ValidateCommand && 
@@ -721,6 +737,8 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
 		
 		return changed;
 	}
@@ -763,6 +781,7 @@ public class HoudiniGUI : Editor
 		ref string[] undo_values )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		bool is_undo_event = Event.current.type == EventType.ValidateCommand && 
@@ -838,6 +857,8 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
 		
 		return changed;
 	}
@@ -859,6 +880,7 @@ public class HoudiniGUI : Editor
 		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		int parm_size = parm.size;
@@ -883,6 +905,8 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
 		
 		return changed;
 	}
@@ -911,6 +935,7 @@ public class HoudiniGUI : Editor
 		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		int parm_size = parm.size;
@@ -965,6 +990,8 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
 		
 		return changed;
 	}
@@ -993,6 +1020,7 @@ public class HoudiniGUI : Editor
 		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		int parm_size = parm.size;
@@ -1047,6 +1075,8 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
 		
 		return changed;
 	}
@@ -1092,6 +1122,7 @@ public class HoudiniGUI : Editor
 		ref int[] undo_values )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		bool is_undo_event = Event.current.type == EventType.ValidateCommand && 
@@ -1159,6 +1190,8 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
 		
 		return changed;
 	}
@@ -1214,6 +1247,7 @@ public class HoudiniGUI : Editor
 		ref float[] undo_values )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		bool is_undo_event = Event.current.type == EventType.ValidateCommand && 
@@ -1290,6 +1324,8 @@ public class HoudiniGUI : Editor
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
 		
+		restoreGUIEnable();
+
 		return changed;
 	}
 	
@@ -1309,6 +1345,7 @@ public class HoudiniGUI : Editor
 		ref bool join_last, ref bool no_label_toggle_last )
 	{
 		initializeConstants();
+		disableGUI( parm.disabled );
 		
 		bool changed = false;
 		int parm_size = parm.size;
@@ -1341,6 +1378,8 @@ public class HoudiniGUI : Editor
 		join_last = ( parm.joinNext && parm_size <= 1 );
 		if ( !parm.joinNext || parm_size > 1 )
 			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
 		
 		return changed;
 	}
@@ -1434,7 +1473,23 @@ public class HoudiniGUI : Editor
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
-	
+
+	private static void disableGUI( bool disabled )
+	{
+		if ( myIsDisablingGUI )
+			restoreGUIEnable();
+
+		myPreviousGUIEnableState = GUI.enabled;
+		GUI.enabled = !disabled;
+		myIsDisablingGUI = true;
+	}
+
+	private static void restoreGUIEnable()
+	{
+		GUI.enabled = myPreviousGUIEnableState;
+		myIsDisablingGUI = false;
+	}
+
 	/// <summary>
 	/// 	Creates two empty label fields, gets the rectangles from each, and combines it to create
 	/// 	the last double rectangle. This is used for <see cref="GUI.HorizontalSlider"/> which
@@ -1465,6 +1520,14 @@ public class HoudiniGUI : Editor
 
 	private static void initializeConstants()
 	{
+		if ( myIsDisablingGUI )
+		{
+			restoreGUIEnable();
+		}
+
+		myIsDisablingGUI = false;
+		myPreviousGUIEnableState = false;
+
 		if ( myLabelStyle == null )
 		{
 			myLabelStyle			= new GUIStyle( GUI.skin.label );
@@ -1478,7 +1541,10 @@ public class HoudiniGUI : Editor
 		if ( mySliderThumbStyle == null )
 			mySliderThumbStyle = new GUIStyle( GUI.skin.horizontalSliderThumb );
 	}
-	
+
+	private static bool myIsDisablingGUI;
+	private static bool myPreviousGUIEnableState;
+
 	private static GUIStyle myLabelStyle;
 	private static GUIStyle mySliderStyle;
 	private static GUIStyle mySliderThumbStyle;
