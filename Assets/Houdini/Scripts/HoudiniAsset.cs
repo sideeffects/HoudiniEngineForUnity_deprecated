@@ -401,6 +401,10 @@ public abstract class HoudiniAsset : HoudiniControl
 		HoudiniAssetUtility.setMesh(
 			prUpStreamGeoInputAssetIds[ index ], 0, 0, ref mesh, null, null );
 
+		// Set the asset transform from the source GameObject transform.
+		HAPI_TransformEuler trans = HoudiniAssetUtility.getHapiTransform( obj.transform.localToWorldMatrix );
+		HoudiniHost.setAssetTransform( prUpStreamGeoInputAssetIds[ index ], ref trans );
+
 		HoudiniHost.connectAssetGeometry( prUpStreamGeoInputAssetIds[ index ], 0, prAssetId, index );
 
 		// We have to save the presets here because this connection might change a parm
