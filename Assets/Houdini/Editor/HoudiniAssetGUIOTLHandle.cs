@@ -213,7 +213,29 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				{
 					if ( myTranslateParmId < 0 )
 						continue;
-					
+
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myTranslateParmId );
+
+					if ( parm_info.invisible )
+						continue;
+
+					GUIStyle style = new GUIStyle( EditorStyles.textField );
+					style.contentOffset = new Vector2( 1.4f, 1.4f );
+					string handle_name = handleInfo.name;
+					if ( parm_info.disabled )
+						handle_name = handle_name + " (disabled)";
+					GUIContent content = new GUIContent( handle_name );
+					content.tooltip = handle_name;
+					Handles.Label( position, content, style );
+
+					if ( parm_info.disabled )
+					{
+						Handles.lighting = false;
+						Handles.PositionHandle( position, rotation );
+						Handles.lighting = true;
+						continue;
+					}
+
 					Vector3 new_position = Handles.PositionHandle( position, rotation );
 
 					if ( new_position != position )
@@ -240,8 +262,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 							new_position.z 		= xform.position[ 2 ];
 						}
 
-						HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myTranslateParmId );
-						
 						// the - in the x coordinate is to convert back to "Houdini" coordinates
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = -new_position.x; 
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = new_position.y;
@@ -260,6 +280,28 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				{
 					if ( myRotateParmId < 0 )
 						continue;
+
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myRotateParmId );
+
+					if ( parm_info.invisible )
+						continue;
+
+					GUIStyle style = new GUIStyle( EditorStyles.textField );
+					style.contentOffset = new Vector2( 1.4f, 1.4f );
+					string handle_name = handleInfo.name;
+					if ( parm_info.disabled )
+						handle_name = handle_name + " (disabled)";
+					GUIContent content = new GUIContent( handle_name );
+					content.tooltip = handle_name;
+					Handles.Label( position, content, style );
+
+					if ( parm_info.disabled )
+					{
+						Handles.lighting = false;
+						Handles.RotationHandle( rotation, position );
+						Handles.lighting = true;
+						continue;
+					}
 					
 					Quaternion new_rotation = Handles.RotationHandle( rotation, position );
 						
@@ -289,8 +331,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 						
 						HoudiniHost.convertTransform( ref xform, rstOrder, xyzOrder );
 						
-						HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myRotateParmId );
-						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = xform.rotationEuler[ 0 ];
 						// the - in the y & z coordinate is to convert back to "Houdini" coordinates
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = -xform.rotationEuler[ 1 ];
@@ -309,6 +349,28 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				{
 					if ( myScaleParmId < 0 )
 						continue;
+
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myScaleParmId );
+
+					if ( parm_info.invisible )
+						continue;
+
+					GUIStyle style = new GUIStyle( EditorStyles.textField );
+					style.contentOffset = new Vector2( 1.4f, 1.4f );
+					string handle_name = handleInfo.name;
+					if ( parm_info.disabled )
+						handle_name = handle_name + " (disabled)";
+					GUIContent content = new GUIContent( handle_name );
+					content.tooltip = handle_name;
+					Handles.Label( position, content, style );
+
+					if ( parm_info.disabled )
+					{
+						Handles.lighting = false;
+						Handles.ScaleHandle( scale, position, rotation, 1.0f );
+						Handles.lighting = true;
+						continue;
+					}
 					
 					Vector3 new_scale = Handles.ScaleHandle( scale, position, rotation, 1.0f );
 					
@@ -322,8 +384,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 							myOpInProgress = true;
 						}
 
-						HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myScaleParmId );
-						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = new_scale.x;
 						parm_float_values[ parm_info.floatValuesIndex + 1 ] = new_scale.y;
 						parm_float_values[ parm_info.floatValuesIndex + 2 ] = new_scale.z;
