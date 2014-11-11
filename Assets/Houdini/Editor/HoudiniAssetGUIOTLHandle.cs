@@ -28,7 +28,11 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 	{
 		if ( myAssetOTL.prShowPinnedInstances )
 			drawPinnedInstances();
-		
+
+		// On mouse up the drag operation is completed.
+		if ( Event.current.type == EventType.MouseUp )
+			myOpInProgress = false;
+
 		string currentGlobalManipTool = Tools.current.ToString();
 
 		if ( currentGlobalManipTool == "Rotate" )
@@ -48,7 +52,10 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		
 		if ( handleInfos == null )
 			return;
-		
+
+		// Detect changes and build asset only when changed.
+		bool changed = false;
+
 		for ( int ii = 0; ii < handleInfos.Length; ++ii )
 		{
 			HAPI_HandleInfo handleInfo = handleInfos[ ii ];
@@ -208,9 +215,17 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 						continue;
 					
 					Vector3 new_position = Handles.PositionHandle( position, rotation );
-						
-					if ( GUI.changed )
+
+					if ( new_position != position )
 					{
+						changed = true;
+
+						if ( !myOpInProgress )
+						{
+							Undo.RecordObject( myAssetOTL.prParms.prParmsUndoInfo, handleInfo.name );
+							myOpInProgress = true;
+						}
+
 						if ( rstOrder == HAPI_RSTOrder.HAPI_TSR 
 							 || rstOrder == HAPI_RSTOrder.HAPI_STR 
 							 || rstOrder == HAPI_RSTOrder.HAPI_SRT )
@@ -224,7 +239,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 							new_position.y 		= xform.position[ 1 ];
 							new_position.z 		= xform.position[ 2 ];
 						}
-						
+
 						HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myTranslateParmId );
 						
 						// the - in the x coordinate is to convert back to "Houdini" coordinates
@@ -237,6 +252,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
 						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
+
 						myAsset.savePreset();
 					} // if changed
 				}
@@ -245,11 +261,19 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 					if ( myRotateParmId < 0 )
 						continue;
 					
-					Quaternion newRotQuat = Handles.RotationHandle( rotation, position );
+					Quaternion new_rotation = Handles.RotationHandle( rotation, position );
 						
-					if ( GUI.changed )
+					if ( new_rotation != rotation )
 					{
-						Vector3 newRot = newRotQuat.eulerAngles;
+						changed = true;
+
+						if ( !myOpInProgress )
+						{
+							Undo.RecordObject( myAssetOTL.prParms.prParmsUndoInfo, handleInfo.name );
+							myOpInProgress = true;
+						}
+
+						Vector3 newRot = new_rotation.eulerAngles;
 						
 						xform.position[0] = 0;
 						xform.position[1] = 0;
@@ -277,6 +301,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
 						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
+
 						myAsset.savePreset();
 					} // if changed
 				}
@@ -285,28 +310,37 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 					if ( myScaleParmId < 0 )
 						continue;
 					
-					Vector3 newScale = Handles.ScaleHandle( scale, position, rotation, 1.0f );
+					Vector3 new_scale = Handles.ScaleHandle( scale, position, rotation, 1.0f );
 					
-					if ( GUI.changed )
+					if ( new_scale != scale )
 					{
+						changed = true;
+
+						if ( !myOpInProgress )
+						{
+							Undo.RecordObject( myAssetOTL.prParms.prParmsUndoInfo, handleInfo.name );
+							myOpInProgress = true;
+						}
+
 						HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myScaleParmId );
 						
-						parm_float_values[ parm_info.floatValuesIndex + 0 ] = newScale.x;
-						parm_float_values[ parm_info.floatValuesIndex + 1 ] = newScale.y;
-						parm_float_values[ parm_info.floatValuesIndex + 2 ] = newScale.z;
+						parm_float_values[ parm_info.floatValuesIndex + 0 ] = new_scale.x;
+						parm_float_values[ parm_info.floatValuesIndex + 1 ] = new_scale.y;
+						parm_float_values[ parm_info.floatValuesIndex + 2 ] = new_scale.z;
 						
 						float[] temp_float_values = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
 						for ( int pp = 0; pp < HoudiniConstants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
 						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
 													  parm_info.size );
+
 						myAsset.savePreset();
 					} // if changed
 				} // if myManipMode
 			} // if typeName
 		} // for each handle
 		
-		if ( GUI.changed )
+		if ( changed )
 			myAssetOTL.buildClientSide();
 	}
 
@@ -329,7 +363,9 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		Scale
 	}
 	
-	private XformManipMode myManipMode 	= XformManipMode.Translate;	
+	private XformManipMode myManipMode 	= XformManipMode.Translate;
+
+	private bool myOpInProgress			= false;
 	
 	private int myTranslateParmId 		= -1;
 	private int myRotateParmId 			= -1;

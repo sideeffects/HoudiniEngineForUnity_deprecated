@@ -109,122 +109,7 @@ public class HoudiniParmsGUI : Editor
 				current_event.type == EventType.ValidateCommand && 
 				current_event.commandName == "UndoRedoPerformed" )
 			{
-				HoudiniParmsUndoInfo undo_info = ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HoudiniParmsUndoInfo;
-				bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HoudiniAsset >() != null;
-						
-						// First find all multiparms and add/remove instances as necessary
-				foreach ( HAPI_ParmInfo parm in myParms.prParms )
-				{
-					if (
-						parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST &&
-						undo_info.parmNames.Contains( parm.name ) )
-					{
-						// get value of multiparm from undo info
-						int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
-						int new_value = undo_info.parmIntValues[ new_value_index ];
-
-						// get current value of multiparm
-						int current_value = myParms.prParmIntValues[ parm.intValuesIndex ];
-
-						// add/remove number of instances from current parameters to match number
-						// of parameters from undo info
-						int difference = new_value - current_value;
-						if ( difference > 0 )
-							myParms.appendMultiparmInstances( parm, difference );
-						else if ( difference < 0 )
-							myParms.removeMultiparmInstances( parm, -difference );
-						else
-							continue;
-
-						myParms.getParameterValues();
-						myParmChanges = true;
-
-						if ( update_prefab_instance )
-						{
-							myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-						}
-					}
-				}
-				
-				// Next loop through all parameters and copy changed values over from undo info
-				foreach ( HAPI_ParmInfo parm in myParms.prParms )
-				{
-					if ( !undo_info.parmNames.Contains( parm.name ) )
-						continue;
-
-					if ( parm.isInt() )
-					{
-						int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
-						int new_int_value = undo_info.parmIntValues[ new_value_index ];
-						int current_int_value = myParms.prParmIntValues[ parm.intValuesIndex ];
-
-						if (
-							new_int_value != current_int_value &&
-							parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
-						{
-							myParmChanges = true;
-
-							int[] values = new int[ parm.size ];
-							Array.Copy( undo_info.parmIntValues, new_value_index, values, 0, parm.size );
-							HoudiniHost.setParmIntValues(
-								myParms.prControl.prNodeId, values, 
-								parm.intValuesIndex, parm.size );
-
-							if ( update_prefab_instance )
-							{
-								myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-							}
-						}
-					}
-					else if ( parm.isFloat() )
-					{
-						int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
-						float new_float_value = undo_info.parmFloatValues[ new_value_index ];
-						float current_float_value = myParms.prParmFloatValues[ parm.floatValuesIndex ];
-
-						if ( new_float_value != current_float_value )
-						{
-							myParmChanges = true;
-
-							float[] values = new float[ parm.size ];
-							Array.Copy( undo_info.parmFloatValues, new_value_index, values, 0, parm.size );
-							HoudiniHost.setParmFloatValues(
-								myParms.prControl.prNodeId, values, 
-								parm.floatValuesIndex, parm.size );
-
-							if ( update_prefab_instance )
-							{
-								myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-							}
-						}
-					}
-					else if ( parm.isString() )
-					{
-						string[] current_string_values = new string[ parm.size ];
-						current_string_values = myParms.getParmStrings( parm );
-						
-						for ( int i = 0; i < parm.size; i++ )
-						{
-							int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
-							string new_string_value = undo_info.parmStringValues[ new_value_index + i ];
-							string current_string_value = current_string_values[ i ];
-							
-							if ( string.Compare( current_string_value, new_string_value ) != 0 )
-							{
-								myParmChanges = true;
-
-								HoudiniHost.setParmStringValue(
-									myParms.prControl.prNodeId, 
-									new_string_value, parm.id, i );
-
-								if ( update_prefab_instance )
-								{
-									myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-								}
-							}
-						}
-					}
-				}
+				performUndo();
 			}
 
 			///////////////////////////////////////////////////////////////////////
@@ -268,10 +153,145 @@ public class HoudiniParmsGUI : Editor
 	}
 
 	public virtual void OnSceneGUI()
-	{}
+	{
+		Event current_event = Event.current;
+		if (
+				current_event.type == EventType.ValidateCommand && 
+				current_event.commandName == "UndoRedoPerformed" )
+		{
+			performUndo();
+		}
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
+	
+	private void performUndo()
+	{
+		HoudiniParmsUndoInfo undo_info =
+			ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HoudiniParmsUndoInfo;
+		bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HoudiniAsset >() != null;
+						
+		// First find all multiparms and add/remove instances as necessary.
+		foreach ( HAPI_ParmInfo parm in myParms.prParms )
+		{
+			if (
+				parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST &&
+				undo_info.parmNames.Contains( parm.name ) )
+			{
+				// Get value of multiparm from undo info.
+				int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+				int new_value = undo_info.parmIntValues[ new_value_index ];
+
+				// get current value of multiparm
+				int current_value = myParms.prParmIntValues[ parm.intValuesIndex ];
+
+				// Add/Remove number of instances from current parameters to match number
+				// of parameters from undo info.
+				int difference = new_value - current_value;
+				if ( difference > 0 )
+					myParms.appendMultiparmInstances( parm, difference );
+				else if ( difference < 0 )
+					myParms.removeMultiparmInstances( parm, -difference );
+				else
+					continue;
+
+				myParms.getParameterValues();
+				myParmChanges = true;
+
+				if ( update_prefab_instance )
+				{
+					myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+				}
+			}
+		}
+
+		// Next loop through all parameters and copy changed values over from undo info.
+		foreach ( HAPI_ParmInfo parm in myParms.prParms )
+		{
+			if ( !undo_info.parmNames.Contains( parm.name ) )
+				continue;
+
+			if ( parm.isInt() )
+			{
+				int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+
+				bool is_different = false;
+				for ( int idx = 0; idx < parm.size; ++idx )
+					is_different |=
+						undo_info.parmIntValues[ new_value_index + idx ] !=
+							myParms.prParmIntValues[ parm.intValuesIndex + idx ];
+
+				if ( is_different && parm.type != HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
+				{
+					myParmChanges = true;
+
+					int[] values = new int[ parm.size ];
+					Array.Copy( undo_info.parmIntValues, new_value_index, values, 0, parm.size );
+					HoudiniHost.setParmIntValues(
+						myParms.prControl.prNodeId, values, 
+						parm.intValuesIndex, parm.size );
+
+					if ( update_prefab_instance )
+					{
+						myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+					}
+				}
+			}
+			else if ( parm.isFloat() )
+			{
+				int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+
+				bool is_different = false;
+				for ( int idx = 0; idx < parm.size; ++idx )
+					is_different |=
+						undo_info.parmFloatValues[ new_value_index + idx ] !=
+							myParms.prParmFloatValues[ parm.floatValuesIndex + idx ];
+
+				if ( is_different )
+				{
+					myParmChanges = true;
+
+					float[] values = new float[ parm.size ];
+					Array.Copy( undo_info.parmFloatValues, new_value_index, values, 0, parm.size );
+					HoudiniHost.setParmFloatValues(
+						myParms.prControl.prNodeId, values, 
+						parm.floatValuesIndex, parm.size );
+
+					if ( update_prefab_instance )
+					{
+						myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+					}
+				}
+			}
+			else if ( parm.isString() )
+			{
+				string[] current_string_values = new string[ parm.size ];
+				current_string_values = myParms.getParmStrings( parm );
+						
+				for ( int i = 0; i < parm.size; i++ )
+				{
+					int new_value_index = undo_info.parmIndices[ undo_info.parmNames.IndexOf( parm.name ) ];
+					string new_string_value = undo_info.parmStringValues[ new_value_index + i ];
+					string current_string_value = current_string_values[ i ];
+
+					if ( string.Compare( current_string_value, new_string_value ) != 0 )
+					{
+						myParmChanges = true;
+
+						HoudiniHost.setParmStringValue(
+							myParms.prControl.prNodeId, 
+							new_string_value, parm.id, i );
+
+						if ( update_prefab_instance )
+						{
+							myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
+						}
+					}
+				}
+			} // By type of parm.
+		} // For all parms.
+	}
 
 	protected bool generateAssetControl( int index, ref bool join_last, ref bool no_label_toggle_last )
 	{
