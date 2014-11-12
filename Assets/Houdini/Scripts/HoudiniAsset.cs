@@ -1436,60 +1436,73 @@ public abstract class HoudiniAsset : HoudiniControl
 			if ( mesh_renderer )
 			{
 				Material material = mesh_renderer.sharedMaterial;
-				Material material_copy = Material.Instantiate( material ) as Material;
-				mesh_renderer.sharedMaterial = material_copy;
 
-				// Bake shader needed by material.
-				if ( material_copy.shader )
+				// Only bake material if using internal material.
+				if ( !AssetDatabase.Contains( material ) )
 				{
-					Shader shader_copy = Shader.Instantiate( material_copy.shader ) as Shader;
+					Material material_copy = Material.Instantiate( material ) as Material;
+					mesh_renderer.sharedMaterial = material_copy;
 
-					string shader_name = shader_copy.name.Substring( Mathf.Max( 0, shader_copy.name.LastIndexOf( '/' ) + 1 ) );
-					string shader_path = rel_shaders_path + "/" + shader_name + ".asset";
-
-					AssetDatabase.CreateAsset( shader_copy, shader_path );
-					AssetDatabase.SaveAssets();
-
-					material_copy.shader = shader_copy;
-				}
-
-				// Bake texture needed by material.
-				if ( material_copy.mainTexture )
-				{
-					string texture_name = Path.GetFileName( AssetDatabase.GetAssetPath( material_copy.mainTexture ) ); 
-					string texture_path = rel_textures_path + "/" + texture_name;
-
-					Texture2D texture = AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
-					if( !texture )
+					// Bake shader needed by material.
+					if ( material_copy.shader )
 					{
-						AssetDatabase.CopyAsset( AssetDatabase.GetAssetPath( material_copy.mainTexture ), texture_path );
-						AssetDatabase.ImportAsset( texture_path, ImportAssetOptions.Default );
+						Shader shader_copy = Shader.Instantiate( material_copy.shader ) as Shader;
 
-						texture = AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+						string shader_name =
+							shader_copy.name.Substring( Mathf.Max( 0, shader_copy.name.LastIndexOf( '/' ) + 1 ) );
+						string shader_path =
+							rel_shaders_path + "/" + shader_name + ".asset";
+
+						AssetDatabase.CreateAsset( shader_copy, shader_path );
+						AssetDatabase.SaveAssets();
+
+						material_copy.shader = shader_copy;
 					}
 
-					material_copy.mainTexture = texture;
-				}
+					// Bake texture needed by material.
+					if ( material_copy.mainTexture )
+					{
+						string texture_name =
+							Path.GetFileName( AssetDatabase.GetAssetPath( material_copy.mainTexture ) ); 
+						string texture_path = rel_textures_path + "/" + texture_name;
 
-				string material_name = part_control.prGeoControl.prObjectControl.name + "_" +
-										part_control.prGeoControl.name + "_" +
-										part_control.name + "_" +
-										"mat";
-				string mat_path = rel_materials_path + "/" + material_name + ".asset";
-				material_copy.name = material_name;
+						Texture2D texture =
+							AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+						if ( !texture )
+						{
+							AssetDatabase.CopyAsset(
+								AssetDatabase.GetAssetPath( material_copy.mainTexture ),
+								texture_path );
+							AssetDatabase.ImportAsset( texture_path, ImportAssetOptions.Default );
 
-				if ( !AssetDatabase.Contains( material_copy ) )
-				{
-					AssetDatabase.CreateAsset( material_copy, mat_path );
-					AssetDatabase.SaveAssets();
-				}
-				else
-				{
-					Debug.LogWarning(
-						"Note: " + material_copy.name + " is an external Unity material " +
-						"and will not be saved in the Baked Assets folder.\n" +
-						"The prefab will depend on this material existing in:\n" +
-						AssetDatabase.GetAssetPath( material_copy ) );
+							texture =
+								AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+						}
+
+						material_copy.mainTexture = texture;
+					}
+
+					string material_name =
+						part_control.prGeoControl.prObjectControl.name + "_" +
+						part_control.prGeoControl.name + "_" +
+						part_control.name + "_" +
+						"mat";
+					string mat_path = rel_materials_path + "/" + material_name + ".asset";
+					material_copy.name = material_name;
+
+					if ( !AssetDatabase.Contains( material_copy ) )
+					{
+						AssetDatabase.CreateAsset( material_copy, mat_path );
+						AssetDatabase.SaveAssets();
+					}
+					else
+					{
+						Debug.LogWarning(
+							"Note: " + material_copy.name + " is an external Unity material " +
+							"and will not be saved in the Baked Assets folder.\n" +
+							"The prefab will depend on this material existing in:\n" +
+							AssetDatabase.GetAssetPath( material_copy ) );
+					}
 				}
 			}
 		}
