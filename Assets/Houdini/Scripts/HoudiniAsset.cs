@@ -1405,16 +1405,22 @@ public abstract class HoudiniAsset : HoudiniControl
 		// Bake all meshes and materials created by HAPI_PartControls.
 		foreach ( HoudiniPartControl part_control in new_object.GetComponentsInChildren< HoudiniPartControl >() )
 		{
+			if ( part_control.prObjectControl.GetComponent< HoudiniInstance >() )
+				continue;
+
 			// Bake meshes.
 			MeshFilter mesh_filter = part_control.GetComponent< MeshFilter >();
 			if ( mesh_filter )
 			{
-				string mesh_name = part_control.prGeoControl.prObjectControl.name + "_" +
-								   part_control.prGeoControl.name + "_" +
-								   part_control.name + "_" +
-								   "mesh";
+				Mesh mesh = mesh_filter.sharedMesh;
+
+				string mesh_name =
+					part_control.prGeoControl.prObjectControl.name + "_" +
+					part_control.prGeoControl.name + "_" +
+					part_control.name + "_" +
+					"mesh";
 				string mesh_path = rel_meshes_path + "/" + mesh_name + ".asset";
-				Mesh mesh_copy = Mesh.Instantiate( mesh_filter.sharedMesh ) as Mesh;
+				Mesh mesh_copy = Mesh.Instantiate( mesh ) as Mesh;
 				mesh_copy.name = mesh_name;
 				mesh_filter.sharedMesh = mesh_copy;
 
@@ -1505,6 +1511,14 @@ public abstract class HoudiniAsset : HoudiniControl
 					}
 				}
 			}
+		}
+
+		// Re-instance to have the instances use the copied (and baked) meshes from the
+		// now-baked instanced objects.
+		foreach ( HoudiniInstancer instancer in new_object.GetComponentsInChildren< HoudiniInstancer >() )
+		{
+			HoudiniProgressBar progress_bar = new HoudiniProgressBar();
+			instancer.instanceObjects( progress_bar );
 		}
 
 		// Delete all HAPI components from prefab. (Order here matters because of inter-dependencies!)

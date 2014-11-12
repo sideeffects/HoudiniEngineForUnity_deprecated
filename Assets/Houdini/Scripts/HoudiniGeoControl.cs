@@ -381,6 +381,7 @@ public class HoudiniGeoControl : HoudiniObjectControl
 		control.init( this );
 		control.prPartId = part_id;
 		control.prGeoControl = this;
+		control.prObjectControl = prObjectControl;
 
 		return child;
 	}
