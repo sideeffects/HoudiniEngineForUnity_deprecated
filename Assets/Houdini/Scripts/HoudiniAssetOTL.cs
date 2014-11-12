@@ -153,14 +153,6 @@ public class HoudiniAssetOTL : HoudiniAsset
 			progress_bar.incrementProgressBar();
 			HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
 
-#if UNITY_EDITOR
-			if ( handle_info.typeName != "xform"
-				&& handle_info.typeName != "followpath"
-				&& HoudiniHost.prEnableSupportWarnings )
-				Debug.LogWarning( "Handle " + handle_info.name + " of type " 
-								   	+ handle_info.typeName + " is unsupported at this time." );
-#endif // UNITY_EDITOR
-
 			HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
 			HoudiniAssetUtility.getArray2Id( prAssetId, handle_index, HoudiniHost.getHandleBindingInfo, 
 								 	binding_infos, handle_info.bindingsCount );
