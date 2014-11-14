@@ -1480,7 +1480,7 @@ public class HoudiniGUI : Editor
 			restoreGUIEnable();
 
 		myPreviousGUIEnableState = GUI.enabled;
-		GUI.enabled = !disabled;
+		GUI.enabled = !disabled && myPreviousGUIEnableState;
 		myIsDisablingGUI = true;
 	}
 
