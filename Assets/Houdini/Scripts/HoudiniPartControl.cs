@@ -276,7 +276,13 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 				ParticleEmitter particle_emitter = part_node.GetComponent< ParticleEmitter >();
 				if ( particle_emitter == null )
+				{
+#if UNITY_4_5 || UNITY_4_6
+					particle_emitter = part_node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
+#else
 					particle_emitter = part_node.AddComponent< EllipsoidParticleEmitter >() as ParticleEmitter;
+#endif // UNITY_4_5 || UNITY_4_6
+				}
 				particle_emitter.ClearParticles();
 				
 				particle_emitter.emit = false;
@@ -613,7 +619,11 @@ public class HoudiniPartControl : HoudiniGeoControl
 			return;
 		}
 
+#if UNITY_4_5 || UNITY_4_6
+		ParticleEmitter particle_emitter = node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
+#else
 		ParticleEmitter particle_emitter = node.AddComponent< EllipsoidParticleEmitter >() as ParticleEmitter;
+#endif // UNITY_4_5 || UNITY_4_6
 		particle_emitter.emit = false;
 		particle_emitter.maxSize = volume.transform.scale[0]*2;
 		particle_emitter.minSize = volume.transform.scale[1]*2;
