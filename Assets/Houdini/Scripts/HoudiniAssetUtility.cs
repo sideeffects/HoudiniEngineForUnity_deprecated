@@ -25,6 +25,17 @@ using System.IO;
 
 public class HoudiniAssetUtility
 {
+	// TYPES -----------------------------------------------------------------------------------------------------------
+
+	public static System.Type getTypeByName( string name )
+	{
+		foreach ( System.Reflection.Assembly assembly in System.AppDomain.CurrentDomain.GetAssemblies() )
+			foreach ( System.Type type in assembly.GetTypes() )
+				if ( type.Name == name )
+					return type;
+		return null;
+	}
+
 	// TRANSFORMS ------------------------------------------------------------------------------------------------------
 
 	public static Quaternion getQuaternion( Matrix4x4 m )
@@ -1563,10 +1574,17 @@ public class HoudiniAssetUtility
 		mesh.vertices 	= vertices;
 		mesh.triangles 	= triangles;
 		mesh.uv 		= uvs;
+#if UNITY_4_5 || UNITY_4_6
 		if ( uv2_attr_info.exists )
 			mesh.uv1	= uv2s;
 		if ( uv3_attr_info.exists )
 			mesh.uv2	= uv3s;
+#else
+		if ( uv2_attr_info.exists )
+			mesh.uv2	= uv2s;
+		if ( uv3_attr_info.exists )
+			mesh.uv3	= uv3s;
+#endif // UNITY_4_5 || UNITY_4_6
 		mesh.normals 	= normals;
 		if ( generate_tangents )
 			mesh.tangents	= tangents;
@@ -1974,28 +1992,28 @@ public class HoudiniAssetUtility
 		JSONObject json_object = new JSONObject( attach_script );
 		Dictionary< string, string > dictionary = json_object.ToDictionary();
 		
-		if( !dictionary.ContainsKey("script") )
+		if ( !dictionary.ContainsKey( "script" ) )
 		{
-			Debug.LogError("script key not found in scripts attribute!");
+			Debug.LogError( "Script key not found in scripts attribute!" );
 			return;
 		}
 
-		if( (dictionary.Count - 1) % 3 != 0 )
+		if ( (dictionary.Count - 1) % 3 != 0 )
 		{
 			Debug.LogError("Improper number of entries in scripts attribute!");
 			return;
 		}
-					
-		Component comp = obj.AddComponent( dictionary["script"] );
-		if( comp == null )
+
+		Component comp = obj.AddComponent( getTypeByName( dictionary[ "script" ] ) );
+		if ( comp == null )
 		{
-			Debug.LogError("Unable to attach component " + dictionary["script"] );
+			Debug.LogError( "Unable to attach component " + dictionary[ "script" ] );
 			return;
 		}
 		
-		int num_args = (dictionary.Count - 1) / 3;
+		int num_args = ( dictionary.Count - 1 ) / 3;
 		
-		for( int ii = 0; ii < num_args; ii++ )
+		for ( int ii = 0; ii < num_args; ii++ )
 		{
 			string arg_name_str = "arg" + ii + "Name";
 			string arg_type_str = "arg" + ii + "Type";

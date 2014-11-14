@@ -44,10 +44,7 @@ Shader "Houdini/VolumeSurface" {
 					float3 worldSpaceObjectPos = mul( v.vertex, _Object2World ).xyz;
 					float dist = distance( worldSpaceObjectPos.xyz, _WorldSpaceCameraPos.xyz );
 
-					// Note that unity_Scale is only valid if the object is scaled uniformly.
-					// Otherwise, the scaling will be done on the CPU for some reason
-					// and unity_Scale will be just 1.0f.
-					o.size = _PointSize * ( 1 / dist ) * ( 1 / unity_Scale.w );
+					o.size = _PointSize * ( 1 / dist );
 					return o;
 				}
 
