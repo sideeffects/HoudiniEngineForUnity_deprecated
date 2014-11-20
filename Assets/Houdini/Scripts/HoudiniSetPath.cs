@@ -133,7 +133,18 @@ public class HoudiniSetPath
 		string correct_version_key = HoudiniVersion.HOUDINI_MAJOR + "." + HoudiniVersion.HOUDINI_MINOR + 
 										".0." + HoudiniVersion.HOUDINI_BUILD;
 
-		app_path = (string) sesi_key.GetValue( correct_version_key );
+		string[] sesi_key_value_names = sesi_key.GetValueNames();
+		string matched_correct_version_key = correct_version_key;
+		foreach ( string value_name in sesi_key_value_names )
+		{
+			if ( value_name.StartsWith( correct_version_key ) )
+			{
+				matched_correct_version_key = value_name;
+				break;
+			}
+		}
+
+		app_path = (string) sesi_key.GetValue( matched_correct_version_key );
 		if ( app_path == null || app_path.Length == 0 )
 			throw new HoudiniError( "The correct version (" + correct_version + ") of " + app_name + 
 									" was not found on the system!" );
