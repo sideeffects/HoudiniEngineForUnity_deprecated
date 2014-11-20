@@ -1115,15 +1115,20 @@ public abstract class HoudiniAsset : HoudiniControl
 					// serialized value so don't change transform. 
 					if ( !is_reverting_prefab_instance )
 					{
-						transform.localPosition = HoudiniAssetUtility.getPosition( myLastLocalToWorld );
-						transform.localRotation = HoudiniAssetUtility.getQuaternion( myLastLocalToWorld );
+						Matrix4x4 world_to_local = Matrix4x4.identity;
+						if ( transform.parent )
+							world_to_local = transform.parent.worldToLocalMatrix;
+						Matrix4x4 local = myLastLocalToWorld * world_to_local;
 
-						Vector3 scale = HoudiniAssetUtility.getScale( myLastLocalToWorld );
+						transform.localPosition = HoudiniAssetUtility.getPosition( local );
+						transform.localRotation = HoudiniAssetUtility.getQuaternion( local );
+
+						Vector3 scale = HoudiniAssetUtility.getScale( local );
 						if ( !( Mathf.Approximately( 0.0f, scale.x )
 							&& Mathf.Approximately( 0.0f, scale.y )
 							&& Mathf.Approximately( 0.0f, scale.z ) ) )
 						{
-							transform.localScale = HoudiniAssetUtility.getScale( myLastLocalToWorld );
+							transform.localScale = HoudiniAssetUtility.getScale( local );
 						}
 					}
 					
