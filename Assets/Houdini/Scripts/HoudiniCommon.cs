@@ -438,6 +438,7 @@ public enum HAPI_EnvIntType
 	HAPI_ENVINT_VERSION_HOUDINI_MAJOR,
 	HAPI_ENVINT_VERSION_HOUDINI_MINOR,
 	HAPI_ENVINT_VERSION_HOUDINI_BUILD,
+	HAPI_ENVINT_VERSION_HOUDINI_PATCH,
 
 	// The three components of the Houdini version that HAPI belongs to.
 	// The HAPI library itself can come from a different baseline than
@@ -449,6 +450,7 @@ public enum HAPI_EnvIntType
 	HAPI_ENVINT_VERSION_ORIG_HOUDINI_MAJOR,
 	HAPI_ENVINT_VERSION_ORIG_HOUDINI_MINOR,
 	HAPI_ENVINT_VERSION_ORIG_HOUDINI_BUILD,
+	HAPI_ENVINT_VERSION_ORIG_HOUDINI_PATCH,
 
 	// The two components of the Houdini Engine (marketed) version.
 	HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR,

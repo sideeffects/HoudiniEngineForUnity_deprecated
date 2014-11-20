@@ -810,6 +810,7 @@ public static partial class HoudiniHost
 				int houdini_major 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MAJOR );
 				int houdini_minor 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MINOR );
 				int houdini_build 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_BUILD );
+				int houdini_patch			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_PATCH );
 				int houdini_engine_major 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR );
 				int houdini_engine_minor 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR );
 				int houdini_engine_api 		= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API );
@@ -824,7 +825,8 @@ public static partial class HoudiniHost
 							", API: " + houdini_engine_api );
 					
 				Debug.Log(  "Underlying Houdini Core Version: " + 
-							houdini_major + "." + houdini_minor + "." + houdini_build );
+							houdini_major + "." + houdini_minor + "." + houdini_build
+							+ ( houdini_patch > 0 ? "." + houdini_patch : "" ) );
 					
 				// Make sure we are linking against the expected Houdini Engine API version.
 				// Note: We don't need to be so strict as to require the BUILD to match.
