@@ -110,7 +110,7 @@ public class HoudiniAssetUtility
 		// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
 		// causes a double negative - yeah, I know).
 				
-		transform.localPosition = new Vector3(
+		transform.position = new Vector3(
 			-hapi_transform.position[ 0 ],
 			hapi_transform.position[ 1 ],
 			hapi_transform.position[ 2 ] );
@@ -119,12 +119,23 @@ public class HoudiniAssetUtility
 			hapi_transform.rotationEuler[ 0 ],
 			-hapi_transform.rotationEuler[ 1 ],
 			-hapi_transform.rotationEuler[ 2 ] ) );
+		transform.rotation = quat;
 
-		transform.localRotation = quat;
-		transform.localScale = new Vector3(
+		Vector3 world_to_local_scale = Vector3.one;
+		if ( transform.parent )
+		{
+			Matrix4x4 world_to_local = transform.parent.worldToLocalMatrix;
+			world_to_local_scale = HoudiniAssetUtility.getScale( world_to_local );
+		}
+		Vector3 world_scale = new Vector3(
 			hapi_transform.scale[ 0 ],
 			hapi_transform.scale[ 1 ],
 			hapi_transform.scale[ 2 ] );
+		Vector3 local_scale = new Vector3(
+			world_to_local_scale.x * world_scale.x,
+			world_to_local_scale.y * world_scale.y,
+			world_to_local_scale.z * world_scale.z );
+		transform.localScale = local_scale;
 	}
 
 	public static void applyTransform( HAPI_Transform hapi_transform, Transform transform )
