@@ -352,7 +352,11 @@ public class HoudiniGeoAttributeManagerGUI
 			if ( mySelectionMaterial.SetPass( 0 ) )
 			{
 				// TODO: Clean this up!
+#if UNITY_4_5 || UNITY_4_6
 				if ( PlayerSettings.useDirect3D11 )
+#else
+				if ( PlayerSettings.graphicsAPI == GraphicsAPI.Direct3D11 )
+#endif
 				{
 					Camera tempCamera = Camera.current;
 					float s = ( HoudiniHost.prGuidePointSize ) / 2.0f;
@@ -400,7 +404,11 @@ public class HoudiniGeoAttributeManagerGUI
 			if ( mySelectionMaterial.SetPass( 1 ) )
 			{
 				// TODO: Clean this up!
+#if UNITY_4_5 || UNITY_4_6
 				if ( PlayerSettings.useDirect3D11 )
+#else
+				if ( PlayerSettings.graphicsAPI == GraphicsAPI.Direct3D11 )
+#endif
 				{
 					Camera tempCamera = Camera.current;
 					float s = ( HoudiniHost.prGuidePointSize - myGuideBorderSize ) / 2.0f;
