@@ -1475,22 +1475,47 @@ public abstract class HoudiniAsset : HoudiniControl
 					{
 						string texture_name =
 							Path.GetFileName( AssetDatabase.GetAssetPath( material_copy.mainTexture ) ); 
-						string texture_path = rel_textures_path + "/" + texture_name;
 
-						Texture2D texture =
-							AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
-						if ( !texture )
+						if ( texture_name == "" )
 						{
-							AssetDatabase.CopyAsset(
-								AssetDatabase.GetAssetPath( material_copy.mainTexture ),
-								texture_path );
+							// This is for when we use in-memory textures. We need to actually
+							// bake them out to file now.
+
+							Texture2D orig_texture = material_copy.mainTexture as Texture2D;
+							byte[] orig_texture_png = orig_texture.EncodeToPNG();
+
+							string name =
+								part_control.prObjectName + "_" +
+								part_control.prGeoName + "_" +
+								part_control.prPartName + ".png";
+							string texture_path = rel_textures_path + "/" + name;
+
+							File.WriteAllBytes( texture_path, orig_texture_png );
+
 							AssetDatabase.ImportAsset( texture_path, ImportAssetOptions.Default );
-
-							texture =
-								AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+							Texture2D texture =
+								AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;;
+							material_copy.mainTexture = texture;
 						}
+						else
+						{
+							string texture_path = rel_textures_path + "/" + texture_name;
 
-						material_copy.mainTexture = texture;
+							Texture2D texture =
+								AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+							if ( !texture )
+							{
+								AssetDatabase.CopyAsset(
+									AssetDatabase.GetAssetPath( material_copy.mainTexture ),
+									texture_path );
+								AssetDatabase.ImportAsset( texture_path, ImportAssetOptions.Default );
+
+								texture =
+									AssetDatabase.LoadAssetAtPath( texture_path, typeof(Texture2D) ) as Texture2D;
+							}
+
+							material_copy.mainTexture = texture;
+						}
 					}
 
 					string material_name =
