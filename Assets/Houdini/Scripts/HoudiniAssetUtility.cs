@@ -1585,7 +1585,7 @@ public class HoudiniAssetUtility
 		mesh.vertices 	= vertices;
 		mesh.triangles 	= triangles;
 		mesh.uv 		= uvs;
-#if UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
 		if ( uv2_attr_info.exists )
 			mesh.uv1	= uv2s;
 		if ( uv3_attr_info.exists )
@@ -1595,7 +1595,7 @@ public class HoudiniAssetUtility
 			mesh.uv2	= uv2s;
 		if ( uv3_attr_info.exists )
 			mesh.uv3	= uv3s;
-#endif // UNITY_4_5 || UNITY_4_6
+#endif // UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
 		mesh.normals 	= normals;
 		if ( generate_tangents )
 			mesh.tangents	= tangents;
