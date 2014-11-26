@@ -701,8 +701,9 @@ public class HoudiniParmsGUI : Editor
 						myParms.prFolderListSelectionIds.Add( HoudiniConstants.HAPI_INVALID_PARM_ID );
 					}
 					
-					int selected_folder 	= myParms.prFolderListSelections[ folder_list_count ];
-					selected_folder 		= GUILayout.Toolbar( selected_folder, tab_labels.ToArray() );
+					int selected_folder = myParms.prFolderListSelections[ folder_list_count ];
+					selected_folder = Mathf.Clamp( selected_folder, 0, tab_labels.Count - 1 );
+					selected_folder = GUILayout.Toolbar( selected_folder, tab_labels.ToArray() );
 					myParms.prFolderListSelections[ folder_list_count ] = selected_folder;
 					
 					// Push only the selected folder info to the parent stacks since for this depth and this folder
