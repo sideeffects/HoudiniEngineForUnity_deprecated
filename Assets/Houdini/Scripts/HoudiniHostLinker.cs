@@ -29,6 +29,17 @@ using System.IO;
 
 public static partial class HoudiniHost
 {
+	public static string prLastInitializationError;
+
+	public static bool isInstallationOk()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		return prHoudiniSceneExists;
+#else
+		return false;
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+	}
+
 	public static bool isRuntimeInitialized()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -62,6 +73,12 @@ public static partial class HoudiniHost
 		if ( no_init != null )
 			return false;
 
+		if ( !HoudiniSetPath.prIsPathSet )
+		{
+			prLastInitializationError = HoudiniSetPath.prLastError;
+			return false;
+		}
+
 		if ( !prHoudiniSceneExists )
 		{
 			HAPI_Result status_code;
@@ -71,15 +88,11 @@ public static partial class HoudiniHost
 				string dsos_path = getAllFoldersInPath( Application.dataPath + "/DSOs" );
 
 				// Check version match.
-					
-				int houdini_major 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MAJOR );
-				int houdini_minor 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MINOR );
-				int houdini_build 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_BUILD );
-				int houdini_patch			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_PATCH );
 				int houdini_engine_major 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR );
 				int houdini_engine_minor 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR );
 				int houdini_engine_api 		= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API );
-					
+
+				/*
 				Debug.Log(  "Running Houdini Engine Unity Plugin Version: " +
 							HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." + 
 							HoudiniVersion.HOUDINI_ENGINE_MINOR +
@@ -92,14 +105,23 @@ public static partial class HoudiniHost
 				Debug.Log(  "Underlying Houdini Core Version: " + 
 							houdini_major + "." + houdini_minor + "." + houdini_build
 							+ ( houdini_patch > 0 ? "." + houdini_patch : "" ) );
-					
+				*/
+
 				// Make sure we are linking against the expected Houdini Engine API version.
 				// Note: We don't need to be so strict as to require the BUILD to match.
 				if ( houdini_engine_major != HoudiniVersion.HOUDINI_ENGINE_MAJOR ||
 						houdini_engine_minor != HoudiniVersion.HOUDINI_ENGINE_MINOR ||
-						houdini_engine_api	  != HoudiniVersion.HOUDINI_ENGINE_API )
+						houdini_engine_api != HoudiniVersion.HOUDINI_ENGINE_API )
 				{
-					throw new HoudiniError( "Cannot link to Houdini Engine because of version mismatch." );
+					prLastInitializationError =
+						"Houdini Engine version mis-match. Expected " +
+						HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
+						HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
+						HoudiniVersion.HOUDINI_ENGINE_API + ". Got " +
+						houdini_engine_major + "." +
+						houdini_engine_minor + "." +
+						houdini_engine_api + ".";
+					return false;
 				}
 
 				HAPI_CookOptions cook_options = new HAPI_CookOptions();
@@ -115,12 +137,12 @@ public static partial class HoudiniHost
 			}
 			catch ( HoudiniError error )
 			{
-				Debug.LogError( error.ToString() );
+				prLastInitializationError = error.ToString();
 				return false;
 			}
 			catch ( System.Exception error )
 			{
-				Debug.LogError( error.ToString() );
+				prLastInitializationError = error.ToString();
 				return false;
 			}
 
@@ -129,5 +151,84 @@ public static partial class HoudiniHost
 
 		return true;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+	}
+
+	public static void displayHoudiniEngineInstallInfo()
+	{
+		string installed_version_msg = "";
+		string dialog_title = "";
+		if ( isInstallationOk() )
+		{
+			int houdini_major 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MAJOR );
+			int houdini_minor 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MINOR );
+			int houdini_build 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_BUILD );
+			int houdini_patch			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_PATCH );
+			int houdini_engine_major 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR );
+			int houdini_engine_minor 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR );
+			int houdini_engine_api 		= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API );
+			installed_version_msg =
+				"Installed Houdini Version: " +
+				houdini_major + "." +
+				houdini_minor + "." +
+				houdini_build + 
+				( houdini_patch > 0 ? "." + houdini_patch : "" ) + "\n" +
+				"Installed Houdini Engine Version: " +
+				houdini_engine_major + "." +
+				houdini_engine_minor + "." +
+				houdini_engine_api + "\n" +
+				"Houdini Binaries Path: " + HoudiniSetPath.prHoudiniPath;
+			dialog_title = "Houdini Engine Installation Info";
+		}
+		else
+		{
+			installed_version_msg =
+				"Reason for Installation Detection Failure: " + prLastInitializationError;
+			dialog_title = "No Houdini Engine Installed";
+		}
+
+		string full_message = 
+			"Required Houdini Version: " +
+			HoudiniVersion.HOUDINI_MAJOR + "." +
+			HoudiniVersion.HOUDINI_MINOR + "." +
+			HoudiniVersion.HOUDINI_BUILD + "\n" +
+			"Required Houdini Engine Version: " +
+			HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
+			HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
+			HoudiniVersion.HOUDINI_ENGINE_API + "\n" +
+			installed_version_msg + 
+			"\n\n" +
+			"PATH Variable: \n" +
+			System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process );
+
+		Debug.Log( full_message );
+		EditorUtility.DisplayDialog( dialog_title, full_message, "Ok" );
+	}
+
+	public static string getMissingEngineInstallHelpString()
+	{
+		return
+			"You are missing the correct Houdini (" +
+			HoudiniVersion.HOUDINI_MAJOR + "." +
+			HoudiniVersion.HOUDINI_MINOR + "." +
+			HoudiniVersion.HOUDINI_BUILD +
+			") and Houdini Engine (" +
+			HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
+			HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
+			HoudiniVersion.HOUDINI_ENGINE_API + ") installation.";
+	}
+
+	private static string getAllFoldersInPath( string path )
+	{
+		string paths = "";
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		if ( !Directory.Exists( path ) )
+			return "";
+
+		DirectoryInfo di = new DirectoryInfo( path );
+		foreach ( DirectoryInfo child_directory in di.GetDirectories() )
+			paths += ";" + getAllFoldersInPath( child_directory.FullName );
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+
+		return path + paths;
 	}
 }
