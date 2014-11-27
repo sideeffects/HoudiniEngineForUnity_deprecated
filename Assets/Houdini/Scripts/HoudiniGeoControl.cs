@@ -302,6 +302,7 @@ public class HoudiniGeoControl : HoudiniObjectControl
 					false,			// unload_asset_first
 					false,			// serializatin_recovery_only
 					false,			// force_reconnect
+					false,			// is_duplication
 					prAsset.prCookingTriggersDownCooks,
 					true			// use_delay_for_progress_bar
 				);

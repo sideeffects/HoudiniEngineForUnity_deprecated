@@ -58,6 +58,7 @@ public class HoudiniAssetGUI : Editor
 								false,	// unload_asset_first
 								true,	// serializatin_recovery_only
 								false,	// force_reconnect
+								false,	// is_duplication
 								false,	// cook_downstream_assets
 								false	// use_delay_for_progress_bar
 					 		 );
@@ -71,6 +72,7 @@ public class HoudiniAssetGUI : Editor
 							   true,	// unload_asset_first
 							   true,	// serializatin_recovery_only
 							   false,	// force_reconnect
+							   false,	// is_duplication
 							   false,	// cook_downstream_assets
 							   false	// use_delay_for_progress_bar
 					 		 );
@@ -122,7 +124,8 @@ public class HoudiniAssetGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
 
-			if ( ( myAsset.prTransformInputCount > 0 || myAsset.prGeoInputCount > 0 ) &&
+			if ( HoudiniHost.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) &&
+				( myAsset.prTransformInputCount > 0 || myAsset.prGeoInputCount > 0 ) &&
 				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE &&
 				 !myAsset.isPrefab() )
 			{

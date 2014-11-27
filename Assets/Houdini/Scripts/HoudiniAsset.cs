@@ -382,7 +382,12 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public void addGeoAsGeoInput( GameObject obj, int index )
 	{
-		if ( prUpStreamGeoInputAssetIds[ index ] < 0 || 
+		addGeoAsGeoInput( obj, index, false );
+	}
+	public void addGeoAsGeoInput( GameObject obj, int index, bool is_duplication )
+	{
+		if ( is_duplication ||
+			prUpStreamGeoInputAssetIds[ index ] < 0 || 
 			!HoudiniHost.isAssetValid(
 				prUpStreamGeoInputAssetIds[ index ], myUpStreamGeoInputAssetValidationIds[ index ] ) )
 		{
@@ -704,6 +709,8 @@ public abstract class HoudiniAsset : HoudiniControl
 		}
 #endif // UNITY_EDITOR
 
+		bool is_duplication = isDuplicatingAsset();
+
 		// If this asset is a prefab instance that is being reverted 
 		// reload the asset in order to restore it's asset id and 
 		// asset validation id from the backup and to load the preset
@@ -715,6 +722,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				false,	// unload_asset_first
 				false,	// serializatin_recovery_only
 				true,	// force_reconnect
+				false,	// is_duplication
 				false,	// cook_downstream_assets
 				false	// use_delay_for_progress_bar
 			);
@@ -724,7 +732,8 @@ public abstract class HoudiniAsset : HoudiniControl
 			if (
 				isPrefabInstance() &&
 				!isInstantiatingPrefab() &&
-				prUpdatePrefabInstanceParmNames.Count > 0 )
+				prUpdatePrefabInstanceParmNames.Count > 0 &&
+				!is_duplication )
 			{
 				// Updating prefab instance after parameter change on prefab
 				// and save changes to preset
@@ -734,13 +743,14 @@ public abstract class HoudiniAsset : HoudiniControl
 			else if (
 				!isInstantiatingPrefab() &&
 				HoudiniHost.isAssetValid( prAssetId, prAssetValidationId ) &&
-				!isDuplicatingAsset() )
+				!is_duplication )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
 						false,	// unload_asset_first
 						true,	// serializatin_recovery_only
 						false,	// force_reconnect
+						false,	// is_duplication
 						true,	// cook_downstream_assets
 						true	// use_delay_for_progress_bar
 					);
@@ -749,7 +759,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			// is no installation because if they save the scene and load it
 			// in another Unity session where there is an installation of
 			// Houdini then the asset will no longer load.
-			else if ( HoudiniHost.isInstallationOk() )
+			else
 			{
 				// Loading Scene (no Houdini scene exists yet) or 
 				// instantiating a prefab or duplicating an existing
@@ -759,6 +769,7 @@ public abstract class HoudiniAsset : HoudiniControl
 						true,	// unload_asset_first
 						false,	// serializatin_recovery_only
 						true,	// force_reconnect
+						is_duplication,
 						true,	// cook_downstream_assets
 						false	// use_delay_for_progress_bar
 					);
@@ -909,6 +920,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				false,			// unload_asset_first
 				false,			// serializatin_recovery_only
 				false,			// force_reconnect
+				false,			// is_duplication
 				prCookingTriggersDownCooks,
 				true			// use_delay_for_progress_bar
 			);
@@ -928,6 +940,7 @@ public abstract class HoudiniAsset : HoudiniControl
 						true,	// unload_asset_first
 						false,	// serializatin_recovery_only
 						true,	// force_reconnect
+						false,  // is_duplication
 						prCookingTriggersDownCooks,	// cook_downstream_assets
 						true	// use_delay_for_progress_bar
 					);
@@ -939,6 +952,7 @@ public abstract class HoudiniAsset : HoudiniControl
 						false,	// unload_asset_first
 						false,	// serializatin_recovery_only
 						false,	// force_reconnect
+						false,	// is_duplication
 						prCookingTriggersDownCooks,	// cook_downstream_assets
 						true	// use_delay_for_progress_bar
 					);
@@ -947,6 +961,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	public virtual bool build( bool reload_asset, bool unload_asset_first,
 							   bool serialization_recovery_only,
 							   bool force_reconnect,
+							   bool is_duplication,
 							   bool cook_downstream_assets,
 							   bool use_delay_for_progress_bar )
 	{
@@ -1202,8 +1217,11 @@ public abstract class HoudiniAsset : HoudiniControl
 			
 				// Process dependent assets.
 				if ( cook_downstream_assets )
-					processDependentAssets( serialization_recovery_only, force_reconnect, 
-											use_delay_for_progress_bar );
+					processDependentAssets(
+						serialization_recovery_only,
+						force_reconnect,
+						is_duplication,
+						use_delay_for_progress_bar );
 			}
 
 			// This tells Unity that values have been overridden for this prefab instance 
@@ -1216,7 +1234,17 @@ public abstract class HoudiniAsset : HoudiniControl
 			// A bit of a hack (but not terrible). If we have presets for other child controls
 			// they set their presets by now so we need to rebuild with the new presets.
 			if ( reload_asset && !prPresetsMap.isEmpty() )
-				build( false, false, false, false, false, true );
+			{
+				build(
+					false,	// reload_asset
+					false,	// unload_asset_first
+					false,	// serializatin_recovery_only
+					false,	// force_reconnect
+					false,	// is_duplication
+					false,	// cook_downstream_assets
+					true	// use_delay_for_progress_bar
+				);
+			}
 		}
 		catch ( HoudiniErrorIgnorable ) {}
 		catch ( HoudiniErrorProgressCancelled error )
@@ -1890,6 +1918,7 @@ public abstract class HoudiniAsset : HoudiniControl
 					true,	// unload_asset_first
 					true,	// serializatin_recovery_only
 					false,	// force_reconnect
+					false,	// is_duplication
 					false,	// cook_downstream_assets
 					false	// use_delay_for_progress_bar
 				);
@@ -1905,6 +1934,7 @@ public abstract class HoudiniAsset : HoudiniControl
 					false,	// unload_asset_first
 					true,	// serializatin_recovery_only
 					false,	// force_reconnect
+					false,	// is_duplication
 					false,	// cook_downstream_assets
 					false	// use_delay_for_progress_bar
 				);
@@ -1913,8 +1943,11 @@ public abstract class HoudiniAsset : HoudiniControl
 #endif // UNITY_EDITOR
 	}
 
-	protected virtual void processDependentAssets( bool serialization_recovery_only, bool force_reconnect, 
-												   bool use_delay_for_progress_bar )
+	protected virtual void processDependentAssets(
+		bool serialization_recovery_only,
+		bool force_reconnect,
+		bool is_duplication,
+		bool use_delay_for_progress_bar )
 	{
 		bool need_rebuild_after_reconnect = false;
 		
@@ -1929,6 +1962,7 @@ public abstract class HoudiniAsset : HoudiniControl
 										false, // unload_asset_first
 										false, // serialization_recovery_only
 										false, // force_reconnect
+										false, // is_duplication
 										downstream_asset.prCookingTriggersDownCooks,
 										use_delay_for_progress_bar );
 				prEnableCooking = true;
@@ -1943,6 +1977,7 @@ public abstract class HoudiniAsset : HoudiniControl
 										false, // unload_asset_first
 										false, // serialization_recovery_only
 										false, // force_reconnect
+										false, // is_duplication
 										downstream_asset.prCookingTriggersDownCooks,
 										use_delay_for_progress_bar );
 				prEnableCooking = true;
@@ -1993,7 +2028,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 					if ( !asset )
 					{
-						addGeoAsGeoInput( new_obj, i );
+						addGeoAsGeoInput( new_obj, i, is_duplication );
 					}
 					else
 					{
@@ -2017,6 +2052,7 @@ public abstract class HoudiniAsset : HoudiniControl
 						false, // unload_asset_first
 						false, // serialization_recovery_only
 						false, // force_reconnect
+						false, // is_duplication
 						true,  // cook_downstream_assets
 						use_delay_for_progress_bar );
 		}
