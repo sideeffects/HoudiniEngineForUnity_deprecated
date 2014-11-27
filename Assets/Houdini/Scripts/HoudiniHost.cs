@@ -655,7 +655,7 @@ public static partial class HoudiniHost
 	public static int loadOTL( string path, bool split_geos_by_group, HoudiniProgressBar progress_bar ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( !initialize() )
+		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
 		int library_id = -1;
@@ -702,7 +702,7 @@ public static partial class HoudiniHost
 	public static void loadHip( string path ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( !initialize() )
+		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
 		HAPI_Result status_code = HAPI_LoadHIPFile( path, true );
@@ -732,7 +732,7 @@ public static partial class HoudiniHost
 	public static int createCurve()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( !initialize() )
+		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
 		int asset_id = -1;
@@ -748,7 +748,7 @@ public static partial class HoudiniHost
 	public static int createInputAsset( string name )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( !initialize() )
+		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
 		int asset_id = -1;
@@ -764,7 +764,7 @@ public static partial class HoudiniHost
 	public static bool destroyAsset( int asset_id ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( asset_id < 0 )
+		if ( asset_id < 0 || !isInstallationOk() )
 			return false;
 			
 		HAPI_Result result = HAPI_DestroyAsset( asset_id );
@@ -833,7 +833,7 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
-
+	
 	public static void repaint()
 	{
 		if ( myRepaintDelegate != null )
@@ -1002,7 +1002,10 @@ public static partial class HoudiniHost
 					string path = DragAndDrop.paths[ i ];
 					if ( isHoudiniAssetFile( path ) )
 					{
-						HoudiniAssetUtility.instantiateAsset( path, initial_asset_position );
+						if ( !isInstallationOk() )
+							displayHoudiniEngineInstallInfo();
+						else
+							HoudiniAssetUtility.instantiateAsset( path, initial_asset_position );
 					}
 				}
 			}

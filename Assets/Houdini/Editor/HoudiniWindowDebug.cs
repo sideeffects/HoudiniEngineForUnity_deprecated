@@ -57,6 +57,13 @@ public class HoudiniWindowDebug : EditorWindow
 		GUI.enabled = false;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
+		if ( !HoudiniHost.isInstallationOk() )
+		{
+			HoudiniGUI.help(
+				HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
+			GUI.enabled = false;
+		}
+
 		if ( GUILayout.Button( HoudiniGUIUtility.mySaveHoudiniSceneLabel ) )
 		{
 			HAPI_License license = HoudiniHost.getCurrentLicense();
@@ -90,24 +97,7 @@ public class HoudiniWindowDebug : EditorWindow
 
 		if ( HoudiniGUI.floatField( "global_time", "Global Time", ref myTime, null, ref myTime ) )
 		{
-			try
-			{
-				if ( !HoudiniSetPath.prIsPathSet )
-				{
-					HoudiniSetPath.setPath();
-					if ( !HoudiniSetPath.prIsPathSet )
-					{
-						Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
-						return;
-					}
-					HoudiniHost.initialize();
-				}
-				HoudiniHost.setTime( myTime );
-			}
-			catch ( HoudiniError error )
-			{
-				Debug.LogError( error.ToString() );
-			}
+			HoudiniHost.setTime( myTime );
 		}
 
 		HoudiniGUI.separator();
@@ -176,8 +166,8 @@ public class HoudiniWindowDebug : EditorWindow
 					DirectoryInfo dirContents = new DirectoryInfo( otlDir.myDirectoryPath );
 						
 					foreach ( FileInfo fi in dirContents.GetFiles() )
-					if ( fi.Extension == ".otl" )
-						genOTLEntry( fi );
+						if ( fi.Extension == ".otl" )
+							genOTLEntry( fi );
 				}
 			}
 		}
