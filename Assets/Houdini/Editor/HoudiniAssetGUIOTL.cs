@@ -289,8 +289,15 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		createToggleForProperty(
 			"generate_tangents", "Generate Tangents", "prGenerateTangents",
 			ref myUndoInfo.generateTangents,
-			() => myAssetOTL.build( true, false, false, true, myAsset.prCookingTriggersDownCooks, true ),
-			!HoudiniHost.isGenerateTangentsDefault() );
+			() => myAssetOTL.build(
+				true,	// reload_asset
+				false,	// unload_asset_first
+				false,	// serialization_recovery_only
+				true,	// force_reconnect
+				false,	// is_duplication
+				myAsset.prCookingTriggersDownCooks,
+				true	// use_delay_for_progress_bar
+			), !HoudiniHost.isGenerateTangentsDefault() );
 	}
 
 	private void generateCookingSettings()

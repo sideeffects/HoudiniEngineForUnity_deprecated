@@ -102,6 +102,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 							unload_asset_first,
 							false,	// serializatin_recovery_only
 							true,	// force_reconnect
+							false,	// is_duplication
 							prCookingTriggersDownCooks,
 							false	// use_delay_for_progress_bar
 						);
@@ -110,6 +111,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 	public override bool build( bool reload_asset, bool unload_asset_first,
 								bool serialization_recovery_only,
 								bool force_reconnect,
+								bool is_duplication,
 								bool cook_downstream_assets,
 								bool use_delay_for_progress_bar ) 
 	{
@@ -118,8 +120,14 @@ public class HoudiniAssetOTL : HoudiniAsset
 							 && ( !serialization_recovery_only || 
 								  isPrefab() );
 
-		bool base_built = base.build( reload_asset, unload_asset_first, serialization_recovery_only, 
-									  force_reconnect, cook_downstream_assets, use_delay_for_progress_bar );
+		bool base_built = base.build(
+			reload_asset,
+			unload_asset_first,
+			serialization_recovery_only,
+			force_reconnect,
+			is_duplication,
+			cook_downstream_assets,
+			use_delay_for_progress_bar );
 		if ( !base_built )
 			return false;
 
