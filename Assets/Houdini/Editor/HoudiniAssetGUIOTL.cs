@@ -47,6 +47,16 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 	{
 		base.OnInspectorGUI();
 
+		bool gui_enable = GUI.enabled;
+		
+		// We can only build or do anything if we can link to our libraries.
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		GUI.enabled = false;
+#else
+		if ( !HoudiniHost.isInstallationOk() )
+			GUI.enabled = false;
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+
 		if ( myAssetOTL.isPrefabInstance() )
 			myParentPrefabAsset = myAsset.getParentPrefabAsset();
 
@@ -104,6 +114,8 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				generatePaintToolGUI();
 		}
 #endif // !HAPI_PAINT_SUPPORT
+
+		GUI.enabled = gui_enable;
 	}
 
 	public override void OnSceneGUI()

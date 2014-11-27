@@ -36,50 +36,23 @@ public class HoudiniWindowSettings : EditorWindow
 			HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " " + HoudiniGUIUtility.mySettingsLabel );
 
 		window.autoRepaintOnSceneChange = true;
-
-		if ( !HoudiniSetPath.prIsPathSet )
-		{
-			HoudiniSetPath.setPath();
-			if ( !HoudiniSetPath.prIsPathSet )
-			{
-				Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
-				return;
-			}
-			HoudiniHost.initialize();
-		}
-		
 	}
 	
 	public void OnGUI() 
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( !myEnableDraw )
-			return;
-		try
-		{
-			if ( !HoudiniSetPath.prIsPathSet )
-			{
-				HoudiniSetPath.setPath();
-				if ( !HoudiniSetPath.prIsPathSet )
-				{
-					Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
-					return;
-				}
-				myEnableDraw = HoudiniHost.initialize();
-			}
-		}
-		catch ( HoudiniError error )
-		{
-			Debug.LogError( error.ToString() );
-		}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-
 		bool gui_enable = GUI.enabled;
 
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+
+		if ( !HoudiniHost.isInstallationOk() )
+		{
+			HoudiniGUI.help(
+				HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
+			GUI.enabled = false;
+		}
 
 		myUndoInfo = HoudiniHost.prHostUndoInfo;
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
@@ -813,7 +786,6 @@ public class HoudiniWindowSettings : EditorWindow
 		GUI.enabled = gui_enabled;
 	}
 
-	private static bool myEnableDraw = true;
 	private static int mySettingsTabSelection = 0;
 	private static Vector2 myScrollPosition;
 	private static bool myEnableAdvancedSettings = false;

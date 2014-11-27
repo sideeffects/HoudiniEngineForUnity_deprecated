@@ -574,7 +574,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public virtual void OnDestroy()
 	{
-		if ( prAssetId >= 0 && HoudiniHost.isRealDestroy()
+		if ( HoudiniHost.isInstallationOk() && prAssetId >= 0 && HoudiniHost.isRealDestroy()
 #if UNITY_EDITOR
 			&& !BuildPipeline.isBuildingPlayer
 #endif // UNITY_EDITOR
@@ -685,6 +685,9 @@ public abstract class HoudiniAsset : HoudiniControl
 	public virtual void OnEnable()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		if ( !HoudiniHost.isInstallationOk() )
+			return;
+
 #if UNITY_EDITOR
 		if ( BuildPipeline.isBuildingPlayer )
 			return;
@@ -742,7 +745,11 @@ public abstract class HoudiniAsset : HoudiniControl
 						true	// use_delay_for_progress_bar
 					);
 			}
-			else
+			// It's important we don't reset the prAssetId to -1 if there
+			// is no installation because if they save the scene and load it
+			// in another Unity session where there is an installation of
+			// Houdini then the asset will no longer load.
+			else if ( HoudiniHost.isInstallationOk() )
 			{
 				// Loading Scene (no Houdini scene exists yet) or 
 				// instantiating a prefab or duplicating an existing
@@ -949,11 +956,8 @@ public abstract class HoudiniAsset : HoudiniControl
 		#pragma warning disable 0162
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
-		if ( !HoudiniSetPath.prIsPathSet )
-		{
-			Debug.LogError( "Cannot build asset as Houdini dlls not found!" );
+		if ( !HoudiniHost.isInstallationOk() )
 			return false;
-		}
 
 		if ( !prEnableCooking )
 			return false;
@@ -1321,7 +1325,20 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public virtual void Update()
 	{
-		if ( !prPushUnityTransformToHoudini || prAssetId < 0
+		// The theory here is that we want to update the last local-to-world
+		// all the time, not just when we can actually send it over to
+		// Houdini. This prevents jumping when moving an asset while
+		// no Houini Engine installation is present, for example, saving the
+		// scene and then reloading the scene in a Unity session with a valid
+		// Houdini installation.
+		Matrix4x4 local_to_world = transform.localToWorldMatrix;
+		if ( local_to_world == myLastLocalToWorld )
+			return;
+		myLastLocalToWorld = local_to_world;
+
+		if ( !prPushUnityTransformToHoudini
+			|| !HoudiniHost.isInstallationOk()
+			|| prAssetId < 0
 #if UNITY_EDITOR
 			|| EditorApplication.isPlayingOrWillChangePlaymode
 #endif // UNITY_EDITOR
@@ -1330,11 +1347,6 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		try
 		{
-			Matrix4x4 local_to_world = transform.localToWorldMatrix;
-			if ( local_to_world == myLastLocalToWorld )
-				return;
-			myLastLocalToWorld = local_to_world;
-
 			pushAssetTransformToHoudini();
 			savePreset();
 

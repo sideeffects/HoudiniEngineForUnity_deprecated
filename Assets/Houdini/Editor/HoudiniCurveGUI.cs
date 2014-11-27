@@ -88,15 +88,17 @@ public class HoudiniCurveGUI : Editor
 		if ( myCurve == null )
 			return;
 
-		bool is_editable = myCurve.prEditable;
+		bool is_editable = myCurve.prEditable && HoudiniHost.isInstallationOk();
 
 		// We can only build or do anything if we can link to our libraries.
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		is_editable = false;
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
-		if ( !is_editable )
+		if ( !myCurve.prEditable )
 			HoudiniGUI.help( "This curve is not editable.", MessageType.Info );
+		else if ( !HoudiniHost.isInstallationOk() )
+			HoudiniGUI.help( HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		bool gui_enable = GUI.enabled;

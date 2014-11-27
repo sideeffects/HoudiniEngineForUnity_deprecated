@@ -31,6 +31,12 @@ public static partial class HoudiniHost
 {
 	public static string prLastInitializationError;
 
+	// This is different from isRuntimeInitialized() because it does not rely
+	// on the PATH variable being already set. While the setting of the PATH
+	// variable is done in HoudiniSetPath, it does not seem to fix any
+	// calls inside HoudiniHost. Only GameObjects loaded after HoudiniSetPath
+	// did its thing get the new PATH and when THEY call through HoudiniHost
+	// the HAPI calls properly link to the dll via the new PATH.
 	public static bool isInstallationOk()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -211,7 +217,7 @@ public static partial class HoudiniHost
 			HoudiniVersion.HOUDINI_MAJOR + "." +
 			HoudiniVersion.HOUDINI_MINOR + "." +
 			HoudiniVersion.HOUDINI_BUILD +
-			") and Houdini Engine (" +
+			") with Houdini Engine (" +
 			HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
 			HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
 			HoudiniVersion.HOUDINI_ENGINE_API + ") installation.";
