@@ -223,6 +223,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 
 	public void paint( RaycastHit hit_info, bool inverse )
 	{
+#if UNITY_EDITOR
 		if ( !myMesh || !myMeshCollider || !myTransform )
 			return;
 
@@ -249,6 +250,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 		refreshMesh();
 
 		myHasChanged = true;
+#endif // UNITY_EDITOR
 	}
 
 	public void updatePoint( int index, Vector3 position )

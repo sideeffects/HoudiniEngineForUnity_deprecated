@@ -70,10 +70,10 @@ public class JSONObject : Nullable {
 			str = str.Replace("\\", "");
 #endif
 			if(str.Length > 0) {
-				if(string.Compare(str, "true", true) == 0) {
+				if(string.Compare(str.ToLower(), "true") == 0) {
 					type = Type.BOOL;
 					b = true;
-				} else if(string.Compare(str, "false", true) == 0) {
+				} else if(string.Compare(str.ToLower(), "false") == 0) {
 					type = Type.BOOL;
 					b = false;
 				} else if(str == "null") {
