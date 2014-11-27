@@ -1013,21 +1013,6 @@ public static partial class HoudiniHost
 	}
 #endif // UNITY_EDITOR
 
-	private static string getAllFoldersInPath( string path )
-	{
-		string paths = "";
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( !Directory.Exists( path ) )
-			return "";
-
-		DirectoryInfo di = new DirectoryInfo( path );
-		foreach ( DirectoryInfo child_directory in di.GetDirectories() )
-			paths += ";" + getAllFoldersInPath( child_directory.FullName );
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-
-		return path + paths;
-	}
-
 	private static bool hasCallFailed( HAPI_Result code )
 	{
 		return ( (int) code > 0 );

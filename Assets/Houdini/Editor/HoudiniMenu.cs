@@ -30,6 +30,12 @@ public class HoudiniMenu : MonoBehaviour
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadAssetLabel, false, 0 ) ]
 	static private void createHAPIObject() 
 	{
+		if ( !HoudiniHost.isInstallationOk() )
+		{
+			HoudiniHost.displayHoudiniEngineInstallInfo();
+			return;
+		}
+
 		string asset_file_path = HoudiniGUIUtility.promptForOTLPath();
 		HoudiniAssetUtility.instantiateAsset( asset_file_path );
 	}
@@ -44,12 +50,27 @@ public class HoudiniMenu : MonoBehaviour
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
-	// Hidden intentionally for now.
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, false, 1 ) ]
 	static private void loadHipFile() 
 	{
+		if ( !HoudiniHost.isInstallationOk() )
+		{
+			HoudiniHost.displayHoudiniEngineInstallInfo();
+			return;
+		}
+
 		string hip_file_path = HoudiniGUIUtility.promptForHIPPath();
 		HoudiniAssetUtility.loadHipFile( hip_file_path );
+	}
+
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, true, 1 ) ]
+	static private bool validateLoadHipFile() 
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		return true;
+#else
+		return false;
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	// Hidden intentionally for now.
@@ -87,9 +108,23 @@ public class HoudiniMenu : MonoBehaviour
 
 	// -----------------------------------------------------------------------
 
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + "Installation Info", false, 70 ) ]
+	static private void about()
+	{
+		HoudiniHost.displayHoudiniEngineInstallInfo();
+	}
+
+	// -----------------------------------------------------------------------
+
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myConvertToInputAssetLabel, false, 100 ) ]
 	static private void convertToInputAsset()
 	{
+		if ( !HoudiniHost.isInstallationOk() )
+		{
+			HoudiniHost.displayHoudiniEngineInstallInfo();
+			return;
+		}
+
 		foreach( GameObject obj in Selection.gameObjects )
 		{
 			bool not_an_asset = ( obj.GetComponent< HoudiniAsset >() == null );
@@ -123,6 +158,12 @@ public class HoudiniMenu : MonoBehaviour
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, false, 101 ) ]
 	static private void createCurve()
 	{
+		if ( !HoudiniHost.isInstallationOk() )
+		{
+			HoudiniHost.displayHoudiniEngineInstallInfo();
+			return;
+		}
+
 		// Create game object.
 		GameObject game_object = new GameObject( "curve" );
 		
