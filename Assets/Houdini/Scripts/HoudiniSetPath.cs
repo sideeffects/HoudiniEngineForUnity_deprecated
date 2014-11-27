@@ -21,18 +21,18 @@ public class HoudiniSetPath
 	{
 		string houdini_app_path = "";
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
-		string hapi_path = System.Environment.GetEnvironmentVariable( "HAPI_PATH", 
-																		System.EnvironmentVariableTarget.Machine );
+		string hapi_path = System.Environment.GetEnvironmentVariable(
+			"HAPI_PATH", System.EnvironmentVariableTarget.Machine );
 		if ( hapi_path == null || hapi_path.Length == 0 )
-			hapi_path = System.Environment.GetEnvironmentVariable( "HAPI_PATH", 
-																	System.EnvironmentVariableTarget.User );
+			hapi_path = System.Environment.GetEnvironmentVariable(
+				"HAPI_PATH", System.EnvironmentVariableTarget.User );
 		if ( hapi_path == null || hapi_path.Length == 0 )
-			hapi_path = System.Environment.GetEnvironmentVariable( "HAPI_PATH", 
-																	System.EnvironmentVariableTarget.Process );
+			hapi_path = System.Environment.GetEnvironmentVariable(
+				"HAPI_PATH", System.EnvironmentVariableTarget.Process );
 			
 		if ( hapi_path != null && hapi_path.Length > 0 )
 		{
-			Debug.Log( "Using Custom Houdini Path: " + hapi_path );
+			//Debug.Log( "Using Custom Houdini Path: " + hapi_path );
 			houdini_app_path = hapi_path;
 		}
 		else
@@ -47,11 +47,12 @@ public class HoudiniSetPath
 				{
 					houdini_app_path = getAppPath( current_app_name );
 				}
-				catch ( HoudiniError )
+				catch ( HoudiniError error )
 				{
 					if ( current_app_name == "Houdini" )
 					{
-						throw; // No correct installed app found.
+						myLastError = error.ToString();
+						break;
 					}
 					else
 					{
@@ -62,48 +63,82 @@ public class HoudiniSetPath
 				break;
 			}
 		}
-#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#elif UNITY_STANDALONE_OSX
+		houdini_app_path = HoudiniVersion.HAPI_LIBRARY;
+#else
+		myLastError =
+			"Could not find the Houdini installation because this is an unsupported platform.";
+#endif
+
 
 		return houdini_app_path;
 	}
 
 	public static void setPath()
 	{
-		if ( prIsPathSet )
+		if ( myAttemptedPathSetting )
 			return;
-			
-		try
-		{
-#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
-			string houdini_app_path = getHoudiniPath();
-			string houdini_bin_path = houdini_app_path + "/bin";
+		myAttemptedPathSetting = true;
+		myIsPathSet = false;
 
-			string path = System.Environment.GetEnvironmentVariable( "PATH", 
-																		System.EnvironmentVariableTarget.Machine );
-			
-			if ( !path.Contains( houdini_bin_path ) )
-				if ( path != "" )
-					path = houdini_bin_path + ";" + path;
-				else
-					path = houdini_bin_path;
-			
-			System.Environment.SetEnvironmentVariable( "PATH", path, System.EnvironmentVariableTarget.Process );
-			Debug.Log( "DLL search path set to: " + path );
-			
-			prHoudiniPath = houdini_app_path;
-			myIsPathSet = true;
-#else
-			myIsPathSet = true;
-#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
-		}
-		catch ( HoudiniError error )
+		string houdini_app_path = getHoudiniPath();
+
+#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+		string paths = System.Environment.GetEnvironmentVariable(
+			"PATH", System.EnvironmentVariableTarget.Machine );
+		if ( houdini_app_path != "" && !paths.Contains( houdini_app_path + "/bin" ) )
 		{
-			Debug.LogError( error.ToString() );
+			string houdini_bin_path = houdini_app_path + "/bin";
+			if ( !paths.Contains( houdini_bin_path ) && houdini_bin_path != "" )
+				if ( paths != "" )
+					paths = houdini_bin_path + ";" + paths;
+				else
+					paths = houdini_bin_path;
+			System.Environment.SetEnvironmentVariable(
+				"PATH", paths, System.EnvironmentVariableTarget.Process );
 		}
+
+		bool found = false;
+		foreach( string path in paths.Split( ';' ) )
+		{
+			if ( !System.IO.Directory.Exists( path ) )
+				continue;
+
+			if ( System.IO.File.Exists( path + "/libHAPI.dll" ) )
+			{
+				prHoudiniPath = path;
+				found = true;
+				break;
+			}
+		}
+		if ( !found )
+		{
+			if ( houdini_app_path != "" )
+				myLastError =
+					"Could not find Houdini Engine dll in the PATH or at: " +
+					houdini_app_path;
+			else
+				myLastError =
+					"Could not find Houdini Engine dll in the PATH.";
+			return;
+		}
+#elif UNITY_STANDALONE_OSX
+		if ( !File.Exists( houdini_app_path ) )
+		{
+			myLastError =
+				"Could not find Houdini Engine dll at: " +
+				houdini_app_path;
+			return;
+		}
+		prHoudiniPath = houdini_app_path;
+#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+
+		myIsPathSet = true;
 	}
 		
 	public static bool prIsPathSet { get { return myIsPathSet; } private set {} }
 	public static string prHoudiniPath { get; private set; }
+	public static string prLastError { get { return myLastError; } private set {} }
 
 	private static string getAppPath( string app_name )
 	{
@@ -124,14 +159,19 @@ public class HoudiniSetPath
 
 		RegistryKey sesi_key = local_machine.OpenSubKey( "Software\\Side Effects Software\\" + app_name );
 		if ( sesi_key == null )
-			throw new HoudiniError( "No 32-bit " + app_name + " installation found!" );
+			throw new HoudiniError( "No " + app_name + " installation found in the registry!" );
 
-		string correct_version = HoudiniVersion.HOUDINI_MAJOR + "." + HoudiniVersion.HOUDINI_MINOR + "." +
-									HoudiniVersion.HOUDINI_BUILD;
+		string correct_version =
+			HoudiniVersion.HOUDINI_MAJOR + "." +
+			HoudiniVersion.HOUDINI_MINOR + "." +
+			HoudiniVersion.HOUDINI_BUILD;
 
 		// Note the extra 0 for the "minor-minor" version that's needed here.
-		string correct_version_key = HoudiniVersion.HOUDINI_MAJOR + "." + HoudiniVersion.HOUDINI_MINOR + 
-										".0." + HoudiniVersion.HOUDINI_BUILD;
+		string correct_version_key =
+			HoudiniVersion.HOUDINI_MAJOR + "." +
+			HoudiniVersion.HOUDINI_MINOR + "." +
+			"0" + "." +
+			HoudiniVersion.HOUDINI_BUILD;
 
 		string[] sesi_key_value_names = sesi_key.GetValueNames();
 		string matched_correct_version_key = correct_version_key;
@@ -146,17 +186,18 @@ public class HoudiniSetPath
 
 		app_path = (string) sesi_key.GetValue( matched_correct_version_key );
 		if ( app_path == null || app_path.Length == 0 )
-			throw new HoudiniError( "The correct version (" + correct_version + ") of " + app_name + 
-									" was not found on the system!" );
+			throw new HoudiniError(
+				"The correct version (" + correct_version + ") of " + app_name + 
+				" was not found in the registry!" );
 		else if ( app_path.EndsWith( "\\" ) || app_path.EndsWith( "/" ) )
 			app_path = app_path.Remove( app_path.Length - 1 );
 
-		Debug.Log( "Linked-To " + app_name + " Install Path: " + app_path );
+		//Debug.Log( "Linked-To " + app_name + " Install Path: " + app_path );
 #else
 		// TODO: Add support for other platforms (only whichever platforms the Unity Editor supports).
 
 		//#error "Your current platform is not yet fully supported. Binaries search path not set."
-		Debug.LogError( "Your current platform is not yet full support. Binaries search path not set." );
+		//Debug.LogError( "Your current platform is not yet full support. Binaries search path not set." );
 
 #endif // ( UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR ) )
 
@@ -164,5 +205,7 @@ public class HoudiniSetPath
 	}
 
 	private static bool myIsPathSet = false;
+	private static bool myAttemptedPathSetting = false;
+	private static string myLastError = "";
 
 }
