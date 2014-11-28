@@ -398,6 +398,9 @@ public static partial class HoudiniHost
 	public static bool isAssetValid( HAPI_AssetId asset_id, int asset_validation_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		if ( !isInstallationOk() )
+			return false;
+
 		int answer = 0;
 			
 		// No need to process return code because this function is guaranteed to 
@@ -409,7 +412,7 @@ public static partial class HoudiniHost
 		else
 			return false;
 #else
-		throw new HoudiniErrorUnsupportedPlatform();
+		return false;
 #endif
 	}
 
