@@ -139,6 +139,21 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 	protected override int buildCreateAsset( HoudiniProgressBar progress_bar )
 	{
+		// Try to find the otl if it has moved.
+#if UNITY_EDITOR
+		if ( !System.IO.File.Exists( prAssetPath ) )
+		{
+			string file_name = System.IO.Path.GetFileNameWithoutExtension( prAssetPath );
+			string[] guids = AssetDatabase.FindAssets( file_name );
+			if ( guids.Length == 0 )
+			{
+				throw new HoudiniError(
+					"Houdini asset file has moved from last location: " + prAssetPath );
+			}
+			prAssetPath = AssetDatabase.GUIDToAssetPath( guids[ 0 ] );
+		}
+#endif // UNITY_EDITOR
+
 		return HoudiniHost.loadOTL( prAssetPath, prSplitGeosByGroup, progress_bar );
 	}
 
