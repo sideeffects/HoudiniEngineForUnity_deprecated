@@ -123,7 +123,7 @@ public class HoudiniSetPath
 			return;
 		}
 #elif UNITY_STANDALONE_OSX
-		if ( !File.Exists( houdini_app_path ) )
+		if ( !System.IO.File.Exists( houdini_app_path ) )
 		{
 			myLastError =
 				"Could not find Houdini Engine dll at: " +
