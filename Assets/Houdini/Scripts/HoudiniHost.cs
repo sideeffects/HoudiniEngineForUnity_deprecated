@@ -181,9 +181,8 @@ public static partial class HoudiniHost
 
 		if ( !isRuntimeInitialized() )
 		{
-			prHoudiniSceneExists		= false;
-			prMidPlaymodeStateChange	= false;
-
+			prHoudiniSceneExists = false;
+			prMidPlaymodeStateChange = false;
 			initialize();
 		}
 
@@ -640,11 +639,6 @@ public static partial class HoudiniHost
 	// maps prefab path to asset id
 	public static Dictionary< string, int >	myCleanUpPrefabAssets;
 
-	public static bool hasScene() 
-	{
-		return prHoudiniSceneExists;
-	}
-		
 	public static void saveScene( string file_name )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )

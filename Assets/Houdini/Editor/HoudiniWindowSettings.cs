@@ -32,8 +32,8 @@ public class HoudiniWindowSettings : EditorWindow
 	public static void ShowWindow() 
 	{
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow window = EditorWindow.GetWindow< HoudiniWindowSettings >( false, 
-			HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " " + HoudiniGUIUtility.mySettingsLabel );
+		EditorWindow window = EditorWindow.GetWindow< HoudiniWindowSettings >(
+			false, HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " " + HoudiniGUIUtility.mySettingsLabel );
 
 		window.autoRepaintOnSceneChange = true;
 	}
@@ -45,14 +45,14 @@ public class HoudiniWindowSettings : EditorWindow
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-
+#else
 		if ( !HoudiniHost.isInstallationOk() )
 		{
 			HoudiniGUI.help(
 				HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
 			GUI.enabled = false;
 		}
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		myUndoInfo = HoudiniHost.prHostUndoInfo;
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );

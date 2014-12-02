@@ -49,7 +49,7 @@ public static partial class HoudiniHost
 	public static bool isRuntimeInitialized()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		if ( !HoudiniSetPath.prIsPathSet )
+		if ( !HoudiniSetPath.prIsPathSet || !prHoudiniSceneExists )
 			return false;
 		else
 		{
@@ -187,8 +187,14 @@ public static partial class HoudiniHost
 		}
 		else
 		{
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR )
 			installed_version_msg =
 				"Reason for Installation Detection Failure: " + prLastInitializationError;
+#else
+			installed_version_msg =
+				"Reason for Installation Detection Failure: Unsupported Platform\n" +
+				HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG;
+#endif // UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR )
 			dialog_title = "No Houdini Engine Installed";
 		}
 
@@ -201,13 +207,18 @@ public static partial class HoudiniHost
 			HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
 			HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
 			HoudiniVersion.HOUDINI_ENGINE_API + "\n" +
-			installed_version_msg + 
+			installed_version_msg +
+#if UNITY_EDITOR
 			"\n\n" +
 			"PATH Variable: \n" +
-			System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process );
+			System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process ) +
+#endif // UNITY_EDITOR
+			"";
 
 		Debug.Log( full_message );
+#if UNITY_EDITOR
 		EditorUtility.DisplayDialog( dialog_title, full_message, "Ok" );
+#endif // UNITY_EDITOR
 	}
 
 	public static string getMissingEngineInstallHelpString()

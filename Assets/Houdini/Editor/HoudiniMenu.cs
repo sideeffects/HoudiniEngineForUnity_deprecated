@@ -78,7 +78,7 @@ public class HoudiniMenu : MonoBehaviour
 	static private void saveHipFile() 
 	{
 		string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene.hip", "hip" );
-		if ( hip_file_path != "" && HoudiniHost.hasScene() )
+		if ( hip_file_path != "" )
 			HoudiniHost.saveScene( hip_file_path );
 		else
 			Debug.LogError( "Nothing to save." );
