@@ -81,9 +81,8 @@ public class HoudiniSetPath
 		myAttemptedPathSetting = true;
 		myIsPathSet = false;
 
-		string houdini_app_path = getHoudiniPath();
-
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+		string houdini_app_path = getHoudiniPath();
 		string paths = System.Environment.GetEnvironmentVariable(
 			"PATH", System.EnvironmentVariableTarget.Machine );
 		if ( houdini_app_path != "" && !paths.Contains( houdini_app_path + "/bin" ) )
@@ -122,7 +121,10 @@ public class HoudiniSetPath
 					"Could not find Houdini Engine dll in the PATH.";
 			return;
 		}
+		myIsPathSet = true;
+
 #elif UNITY_STANDALONE_OSX
+		string houdini_app_path = getHoudiniPath();
 		if ( !System.IO.File.Exists( houdini_app_path ) )
 		{
 			myLastError =
@@ -131,9 +133,9 @@ public class HoudiniSetPath
 			return;
 		}
 		prHoudiniPath = houdini_app_path;
-#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
-
 		myIsPathSet = true;
+
+#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 	}
 		
 	public static bool prIsPathSet { get { return myIsPathSet; } private set {} }

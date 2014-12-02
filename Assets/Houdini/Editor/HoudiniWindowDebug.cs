@@ -41,8 +41,8 @@ public class HoudiniWindowDebug : EditorWindow
 	public static void ShowWindow() 
 	{
 		// Show existing window instance. If one doesn't exist, make one.
-		EditorWindow.GetWindow< HoudiniWindowDebug >( false, HoudiniConstants.HAPI_PRODUCT_SHORT_NAME +
-													" " + HoudiniGUIUtility.myDebugLabel );
+		EditorWindow.GetWindow< HoudiniWindowDebug >(
+			false, HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " " + HoudiniGUIUtility.myDebugLabel );
 		
 		float time = HoudiniHost.getTime();
 		HoudiniWindowDebug.myTime = time;
@@ -55,14 +55,14 @@ public class HoudiniWindowDebug : EditorWindow
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-
+#else
 		if ( !HoudiniHost.isInstallationOk() )
 		{
 			HoudiniGUI.help(
 				HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
 			GUI.enabled = false;
 		}
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( GUILayout.Button( HoudiniGUIUtility.mySaveHoudiniSceneLabel ) )
 		{
@@ -76,7 +76,7 @@ public class HoudiniWindowDebug : EditorWindow
 			}
 
 			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene", ext );
-			if ( hip_file_path != "" && HoudiniHost.hasScene() )
+			if ( hip_file_path != "" )
 				HoudiniHost.saveScene( hip_file_path );
 		}
 		
