@@ -141,6 +141,9 @@ public class HoudiniAssetOTL : HoudiniAsset
 	{
 		// Try to find the otl if it has moved.
 #if UNITY_EDITOR
+#if UNITY_4_3 || UNITY_4_4 || UNITY_4_6
+		// Finding moved assets is not supported in Unity 4.4 and earlier versions.
+#else
 		if ( !System.IO.File.Exists( prAssetPath ) )
 		{
 			string file_name = System.IO.Path.GetFileNameWithoutExtension( prAssetPath );
@@ -152,6 +155,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 			}
 			prAssetPath = AssetDatabase.GUIDToAssetPath( guids[ 0 ] );
 		}
+#endif // UNITY_4_3 || UNITY_4_4
 #endif // UNITY_EDITOR
 
 		return HoudiniHost.loadOTL( prAssetPath, prSplitGeosByGroup, progress_bar );
