@@ -903,36 +903,39 @@ public static partial class HoudiniHost
 		try
 		{
 			prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
-				
+
 			// Find all prefabs created from Houdini assets and change the value of 
 			// prReloadPrefabOnPlaymodeChange so that when going into play mode the 
 			// asset will not be unloaded in the destructor and when selected
 			// serialization recovery will occur for the parameters
 			if ( prMidPlaymodeStateChange )
 			{
-				foreach ( string asset_path in AssetDatabase.GetAllAssetPaths() )
+				if ( isInstallationOk() )
 				{
-					if ( asset_path.EndsWith( ".prefab" ) )
+					foreach ( string asset_path in AssetDatabase.GetAllAssetPaths() )
 					{
-						GameObject prefab = AssetDatabase.LoadAssetAtPath( asset_path, typeof( GameObject ) ) as GameObject;
-						if ( prefab )
+						if ( asset_path.EndsWith( ".prefab" ) )
 						{
-							// Only need to do this if the prefab has been previously loaded.
-							HoudiniAsset prefab_asset = prefab.GetComponent< HoudiniAsset >();
-							if ( prefab_asset && 
-									isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
+							GameObject prefab = AssetDatabase.LoadAssetAtPath( asset_path, typeof( GameObject ) ) as GameObject;
+							if ( prefab )
 							{
-								prefab_asset.prReloadPrefabOnPlaymodeChange = true;
+								// Only need to do this if the prefab has been previously loaded.
+								HoudiniAsset prefab_asset = prefab.GetComponent< HoudiniAsset >();
+								if ( prefab_asset && 
+										isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
+								{
+									prefab_asset.prReloadPrefabOnPlaymodeChange = true;
+								}
 							}
 						}
 					}
+
+					setTime( 0.0f );
 				}
 
 				if ( myPlaymodeStateChangeDelegate != null )
 					myPlaymodeStateChangeDelegate();
 			}
-				
-			setTime( 0.0f );
 		}
 		catch ( System.Exception error )
 		{
