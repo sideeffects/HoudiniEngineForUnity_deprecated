@@ -71,6 +71,12 @@ public class HoudiniErrorInvalidArgument : HoudiniError
 	public HoudiniErrorInvalidArgument( string msg ) : base( msg ) {}
 }
 
+public class HoudiniErrorAssetDefOverride : HoudiniError
+{
+	public HoudiniErrorAssetDefOverride() : base( "Asset definition already loaded." ) {}
+	public HoudiniErrorAssetDefOverride( string msg ) : base( msg ) {}
+}
+
 public class HoudiniErrorNotFound : HoudiniErrorInvalidArgument
 {
 	public HoudiniErrorNotFound() : base( "Item not found." ) {}
@@ -645,22 +651,47 @@ public static partial class HoudiniHost
 		HAPI_SaveHIPFile( file_name );
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
-		
-	public static int loadOTL( string path, bool split_geos_by_group, HoudiniProgressBar progress_bar ) 
+
+	public static int loadOTL( string path, bool split_geos_by_group, HoudiniProgressBar progress_bar )
+	{
+		return loadOTL( path, split_geos_by_group, progress_bar, true );
+	}
+	public static int loadOTL(
+		string path, bool split_geos_by_group, HoudiniProgressBar progress_bar, bool allow_asset_def_overwrite ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
 		int library_id = -1;
+		HAPI_Result status_code;
 
 		// This can be used to test in-memory OTL loading.
 #if false
 		byte[] file = File.ReadAllBytes( path );
-		HAPI_Result status_code = HAPI_LoadAssetLibraryFromMemory( file, file.Length, out library_id );
+		status_code = HAPI_LoadAssetLibraryFromMemory(
+			file, file.Length, allow_asset_def_overwrite, out library_id );
 #else
-		HAPI_Result status_code = HAPI_LoadAssetLibraryFromFile( path, out library_id );
-#endif
+	#if UNITY_EDITOR
+		status_code = HAPI_LoadAssetLibraryFromFile(
+			path, allow_asset_def_overwrite, out library_id );
+
+		if ( status_code == HAPI_Result.HAPI_RESULT_ASSET_DEF_ALREADY_LOADED )
+		{
+			if ( EditorUtility.DisplayDialog(
+				"Houdini Asset Definition Overwriting",
+				"The asset library file being loaded: \n" + path + "\n" +
+				"contains asset defintions that have already been loaded before from " +
+				"another asset library file. \n\nWould you like to overwrite them?",
+				"Yes", "No" ) )
+			{
+				status_code = HAPI_LoadAssetLibraryFromFile( path, true, out library_id );
+			}
+		}
+	#else
+		status_code = HAPI_LoadAssetLibraryFromFile( path, true, out library_id );
+	#endif // UNITY_EDITOR
+#endif // HAPI_LoadAssetLibraryFromMemory
 		processStatusCode( status_code );
 
 		int asset_count = 0;
@@ -804,6 +835,8 @@ public static partial class HoudiniHost
 
 		if ( code == (int) HAPI_Result.HAPI_RESULT_INVALID_ARGUMENT )
 			throw new HoudiniErrorInvalidArgument( status_string );
+		else if ( code == (int) HAPI_Result.HAPI_RESULT_ASSET_DEF_ALREADY_LOADED )
+			throw new HoudiniErrorAssetDefOverride( status_string );
 		else
 			throw new HoudiniError( status_string );
 #else

@@ -166,12 +166,14 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result 
 	HAPI_LoadAssetLibraryFromFile(
 		string file_path,
+		[ MarshalAs( UnmanagedType.U1 ) ] bool allow_overwrite,
 		out HAPI_AssetLibraryId library_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result 
 	HAPI_LoadAssetLibraryFromMemory(
 		byte[] library_buffer, int library_buffer_size,
+		[ MarshalAs( UnmanagedType.U1 ) ] bool allow_overwrite,
 		out HAPI_AssetLibraryId library_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
