@@ -158,7 +158,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 #endif // UNITY_4_3 || UNITY_4_4
 #endif // UNITY_EDITOR
 
-		return HoudiniHost.loadOTL( prAssetPath, prSplitGeosByGroup, progress_bar );
+		return HoudiniHost.loadOTL( prAssetPath, prSplitGeosByGroup, progress_bar, false );
 	}
 
 	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )

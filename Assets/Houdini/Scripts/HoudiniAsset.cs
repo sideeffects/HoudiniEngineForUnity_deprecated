@@ -1044,7 +1044,8 @@ public abstract class HoudiniAsset : HoudiniControl
 							"Full Name: " + prAssetInfo.fullOpName + "\n" +
 							"Version: " + prAssetInfo.version + "\n" + 
 							"Unique Node Id: " + node_info.uniqueHoudiniNodeId + "\n" +
-							"Internal Node Path: " + node_info.internalNodePath + "\n" );
+							"Internal Node Path: " + node_info.internalNodePath + "\n" +
+							"Asset Library File: " + prAssetInfo.filePath + "\n" );
 				}
 				catch ( HoudiniError error )
 				{
