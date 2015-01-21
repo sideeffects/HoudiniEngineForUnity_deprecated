@@ -965,7 +965,12 @@ public class HoudiniAssetUtility
 					asset.prAssetId, part_control.prObjectId, part_control.prGeoId,
 					part_control.prPartId );
 			if ( !material_info.exists )
+			{
+				// Reset the material.
+				material = new Material( Shader.Find( "Houdini/SpecularVertexColor" ) );
+				materials[ m ] = material;
 				continue;
+			}
 
 			// Check if we actually need to update the material.
 			if ( !update_houdini_material && !material_info.hasChanged && material.mainTexture != null )
