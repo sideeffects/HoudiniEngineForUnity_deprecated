@@ -184,6 +184,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		if ( GUILayout.Button( "Bake" ) ) 
 		{
 			HoudiniProgressBar progress_bar = new HoudiniProgressBar();
+			progress_bar.prUseDelay = false;
 			myAsset.bakeAnimations(
 				myAsset.prBakeStartTime, 
 				myAsset.prBakeEndTime, 
