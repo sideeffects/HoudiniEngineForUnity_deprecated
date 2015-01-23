@@ -1396,7 +1396,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public void bakeAsset()
 	{
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		// Get/Create directory for the asset being baked.
 		string baked_asset_path = HoudiniConstants.HAPI_BAKED_ASSETS_PATH + "/" + prAssetName;
 
@@ -1610,7 +1610,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		// Destroy object we created because we don't need it anymore.
 		DestroyImmediate( new_object );
-#endif // UNITY_EDITOR
+#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 	
 	public void bakeAnimations( float start_time, 
