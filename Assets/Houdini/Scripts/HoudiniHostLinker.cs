@@ -208,11 +208,11 @@ public static partial class HoudiniHost
 			HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
 			HoudiniVersion.HOUDINI_ENGINE_API + "\n" +
 			installed_version_msg +
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 			"\n\n" +
 			"PATH Variable: \n" +
 			System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process ) +
-#endif // UNITY_EDITOR
+#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 			"";
 
 		Debug.Log( full_message );
