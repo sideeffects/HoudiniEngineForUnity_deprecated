@@ -470,7 +470,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 					( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
 
 		// Assign materials.
-		HoudiniAssetUtility.assignMaterial( this, prAsset, ( reload_asset || has_material_changed ) );
+		HoudiniAssetUtility.assignMaterial( this, prAsset, reload_asset );
 
 		// Assign unity tag.
 		assignUnityTag();
