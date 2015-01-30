@@ -190,8 +190,7 @@ public class HoudiniObjectControl : HoudiniControl
 			AnimationClip clip = curves.assignCurvesToClip();
 
 			if ( clip != null )
-			{				
-				
+			{
 				Animation anim_component = gameObject.GetComponent< Animation >();
 				if ( anim_component == null )
 				{
