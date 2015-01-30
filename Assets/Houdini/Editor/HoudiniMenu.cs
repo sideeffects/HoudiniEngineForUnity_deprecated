@@ -50,7 +50,8 @@ public class HoudiniMenu : MonoBehaviour
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
-	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, false, 1 ) ]
+	// Hidden intentionally for now.
+	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myLoadHipLabel, false, 1 ) ]
 	static private void loadHipFile() 
 	{
 		if ( !HoudiniHost.isInstallationOk() )
