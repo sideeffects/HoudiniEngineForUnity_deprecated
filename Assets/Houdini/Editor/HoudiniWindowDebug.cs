@@ -63,6 +63,20 @@ public class HoudiniWindowDebug : EditorWindow
 			GUI.enabled = false;
 		}
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		
+		if ( GUILayout.Button( HoudiniGUIUtility.myLoadAssetLabel ) )
+		{
+			string asset_file_path = HoudiniGUIUtility.promptForOTLPath();
+			HoudiniAssetUtility.instantiateAsset( asset_file_path );
+		}
+
+		if ( GUILayout.Button( HoudiniGUIUtility.myLoadHipLabel ) )
+		{
+			string hip_file_path = HoudiniGUIUtility.promptForHIPPath();
+			HoudiniAssetUtility.loadHipFile( hip_file_path );
+		}
+
+		HoudiniGUI.separator();
 
 		if ( GUILayout.Button( HoudiniGUIUtility.mySaveHoudiniSceneLabel ) )
 		{
@@ -78,12 +92,6 @@ public class HoudiniWindowDebug : EditorWindow
 			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene", ext );
 			if ( hip_file_path != "" )
 				HoudiniHost.saveScene( hip_file_path );
-		}
-		
-		if ( GUILayout.Button( HoudiniGUIUtility.myLoadAssetLabel ) )
-		{
-			string asset_file_path = HoudiniGUIUtility.promptForOTLPath();
-			HoudiniAssetUtility.instantiateAsset( asset_file_path );
 		}
 
 		HoudiniGUI.separator();
