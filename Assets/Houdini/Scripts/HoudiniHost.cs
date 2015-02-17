@@ -848,7 +848,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int code;
-		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_CALL_RESULT, out code );
+		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_COOK_RESULT, out code );
 
 		string status_string = getCookErrorMessage();
 
