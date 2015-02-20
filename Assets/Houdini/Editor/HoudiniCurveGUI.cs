@@ -173,9 +173,11 @@ public class HoudiniCurveGUI : Editor
 														handle_size,
 														Handles.RectangleCap );
 
-				Ray ray						= myTempCamera.ScreenPointToRay( mouse_position );
-				ray.origin					= myTempCamera.transform.position;
-				Vector3 intersection		= new Vector3();
+				Ray ray = myTempCamera.ScreenPointToRay( mouse_position );
+				if ( !myTempCamera.isOrthoGraphic )
+					ray.origin = myTempCamera.transform.position;
+
+				Vector3 intersection = new Vector3();
 
 				if ( myTarget != null && myTarget.GetComponent< Collider >() )
 				{
