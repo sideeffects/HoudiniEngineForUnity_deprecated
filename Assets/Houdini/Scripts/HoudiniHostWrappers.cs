@@ -994,7 +994,8 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int buffer_length = 0;
-		HAPI_Result status_code = HAPI_GetPresetBufLength( node_id, ref buffer_length );
+		HAPI_Result status_code = HAPI_GetPresetBufLength(
+			node_id, HAPI_PresetType.HAPI_PRESETTYPE_BINARY, null, ref buffer_length );
 		processStatusCode( status_code );
 
 		byte[] preset = new byte[ buffer_length ];
@@ -1020,7 +1021,8 @@ public static partial class HoudiniHost
 	public static void setPreset( HAPI_NodeId node_id, byte[] preset )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetPreset( node_id, preset, preset.Length );
+		HAPI_Result status_code = HAPI_SetPreset(
+			node_id, HAPI_PresetType.HAPI_PRESETTYPE_BINARY, null, preset, preset.Length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
