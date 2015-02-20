@@ -1031,6 +1031,7 @@ public class HoudiniAssetUtility
 					image_info.dataFormat = HAPI_ImageDataFormat.HAPI_IMAGE_DATA_INT8;
 					image_info.interleaved = true;
 					image_info.packing = HAPI_ImagePacking.HAPI_IMAGE_PACKING_RGBA;
+					image_info.gamma = (double) HoudiniHost.prGamma;
 
 					HoudiniHost.setImageInfo( material_info.assetId, material_info.id, ref image_info );
 
@@ -1069,6 +1070,9 @@ public class HoudiniAssetUtility
 					{
 						desired_file_format = HoudiniConstants.HAPI_PNG_FORMAT_NAME;
 					}
+
+					image_info.gamma = HoudiniHost.prGamma;
+					HoudiniHost.setImageInfo( material_info.assetId, material_info.id, ref image_info );
 
 					// Extract image to memory.
 					byte[] image_data = HoudiniHost.extractImageToMemory( 
