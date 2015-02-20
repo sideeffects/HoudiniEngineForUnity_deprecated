@@ -112,8 +112,6 @@ public static partial class HoudiniHost
 	private const string myDefaultUnityMaterialAttribName				= "unity_material";
 	private const string myDefaultUnitySubMaterialNameAttribName		= "unity_sub_material_name";
 	private const string myDefaultUnitySubMaterialIndexAttribName		= "unity_sub_material_index";
-	private const bool myDefaultDontCreateTextureFiles					= false;
-	private const bool myDefaultExtractTexturesInRawFormat				= false;
 
 	private const float myDefaultPinSize								= 1.0f;
 	private static Color myDefaultPinColour								= new Color( 0.7f, 0.0f, 0.0f, 1.0f );
@@ -125,7 +123,10 @@ public static partial class HoudiniHost
 
 	private const bool myDefaultEnablePointsAsParticles 				= true;
 
+	public const float myDefaultGamma									= 2.2f;
 	public const bool myDefaultGenerateTangents							= true;
+	private const bool myDefaultDontCreateTextureFiles					= false;
+	private const bool myDefaultExtractTexturesInRawFormat				= false;
 
 	public const bool myDefaultEnableCooking							= true;
 	public const bool myDefaultCookingTriggersDownCooks					= true;
@@ -200,8 +201,6 @@ public static partial class HoudiniHost
 		setString(	"HAPI_UnityMaterialAttribName", myDefaultUnityMaterialAttribName, true );
 		setString(	"HAPI_UnitySubMaterialNameAttribName", myDefaultUnitySubMaterialNameAttribName, true );
 		setString(	"HAPI_UnitySubMaterialIndexAttribName", myDefaultUnitySubMaterialIndexAttribName, true );
-		setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
-		setBool(	"HAPI_ExtractTexturesInRawFormat", myDefaultExtractTexturesInRawFormat, true );
 
 		setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 		setColour(	"HAPI_PinColour", myDefaultPinColour, true );
@@ -213,7 +212,10 @@ public static partial class HoudiniHost
 
 		setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
 
+		setFloat(	"HAPI_Gamma", myDefaultGamma, true );
 		setBool(	"HAPI_GenerateTangents", myDefaultGenerateTangents, true );
+		setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
+		setBool(	"HAPI_ExtractTexturesInRawFormat", myDefaultExtractTexturesInRawFormat, true );
 
 		setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
 		setBool(	"HAPI_CookingTriggersDownCooks", myDefaultCookingTriggersDownCooks, true );
@@ -285,12 +287,6 @@ public static partial class HoudiniHost
 	public static string prUnitySubMaterialIndexAttribName {
 											get { return getString( "HAPI_UnitySubMaterialIndexAttribName" ); }
 											set { setString( "HAPI_UnitySubMaterialIndexAttribName", value ); } }
-	public static bool prDontCreateTextureFiles {
-											get { return getBool( "HAPI_DontCreateTextureFiles" ); }
-											set { setBool( "HAPI_DontCreateTextureFiles", value ); } }
-	public static bool prExtractTexturesInRawFormat {
-											get { return getBool( "HAPI_ExtractTexturesInRawFormat" ); }
-											set { setBool( "HAPI_ExtractTexturesInRawFormat", value ); } }
 
 	public static float prPinSize {
 											get { return getFloat( "HAPI_PinSize" ); }
@@ -314,9 +310,18 @@ public static partial class HoudiniHost
 											get { return getBool( "HAPI_EnablePointsAsParticles" ); }
 											set { setBool( "HAPI_EnablePointsAsParticles", value ); } }
 
+	public static float prGamma {
+											get { return getFloat( "HAPI_Gamma" ); } 
+											set { setFloat( "HAPI_Gamma", value ); } }
 	public static bool prGenerateTangents {
 											get { return getBool( "HAPI_GenerateTangents" ); } 
 											set { setBool( "HAPI_GenerateTangents", value ); } }
+	public static bool prDontCreateTextureFiles {
+											get { return getBool( "HAPI_DontCreateTextureFiles" ); }
+											set { setBool( "HAPI_DontCreateTextureFiles", value ); } }
+	public static bool prExtractTexturesInRawFormat {
+											get { return getBool( "HAPI_ExtractTexturesInRawFormat" ); }
+											set { setBool( "HAPI_ExtractTexturesInRawFormat", value ); } }
 
 	public static bool prEnableCooking {
 #if UNITY_EDITOR
@@ -456,12 +461,6 @@ public static partial class HoudiniHost
 	public static bool isUnitySubMaterialIndexAttribNameDefault()
 											{ return	prUnitySubMaterialIndexAttribName ==
 														myDefaultUnitySubMaterialIndexAttribName; }
-	public static bool isDontCreateTextureFilesDefault()
-											{ return	prDontCreateTextureFiles ==
-														myDefaultDontCreateTextureFiles; }
-	public static bool isExtractTexturesInRawFormatDefault()
-											{ return	prExtractTexturesInRawFormat ==
-														myDefaultExtractTexturesInRawFormat; }
 
 	public static bool isPinSizeDefault()
 											{ return	prPinSize == 
@@ -481,9 +480,18 @@ public static partial class HoudiniHost
 											{ return	prAutoSelectAssetRootNode == 
 														myDefaultAutoSelectAssetRootNode; }
 
+	public static bool isGammaDefault()
+											{ return	Mathf.Approximately(
+															prGamma, myDefaultGamma ); }
 	public static bool isGenerateTangentsDefault()
 											{ return	prGenerateTangents ==
 														myDefaultGenerateTangents; }
+	public static bool isDontCreateTextureFilesDefault()
+											{ return	prDontCreateTextureFiles ==
+														myDefaultDontCreateTextureFiles; }
+	public static bool isExtractTexturesInRawFormatDefault()
+											{ return	prExtractTexturesInRawFormat ==
+														myDefaultExtractTexturesInRawFormat; }
 
 	public static bool isEnableCookingDefault()
 											{ return	prEnableCooking == 
@@ -582,8 +590,6 @@ public static partial class HoudiniHost
 		prUnityMaterialAttribName				= myDefaultUnityMaterialAttribName;
 		prUnitySubMaterialNameAttribName		= myDefaultUnitySubMaterialNameAttribName;
 		prUnitySubMaterialIndexAttribName		= myDefaultUnitySubMaterialIndexAttribName;
-		prDontCreateTextureFiles				= myDefaultDontCreateTextureFiles;
-		prExtractTexturesInRawFormat			= myDefaultExtractTexturesInRawFormat;
 
 		prPinSize 								= myDefaultPinSize;
 		prPinColour								= myDefaultPinColour;
@@ -595,7 +601,10 @@ public static partial class HoudiniHost
 
 		prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
 
+		prGamma									= myDefaultGamma;
 		prGenerateTangents						= myDefaultGenerateTangents;
+		prDontCreateTextureFiles				= myDefaultDontCreateTextureFiles;
+		prExtractTexturesInRawFormat			= myDefaultExtractTexturesInRawFormat;
 
 		prEnableCooking							= myDefaultEnableCooking;
 		prCookingTriggersDownCooks				= myDefaultCookingTriggersDownCooks;

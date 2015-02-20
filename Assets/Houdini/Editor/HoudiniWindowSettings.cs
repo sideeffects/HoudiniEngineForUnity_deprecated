@@ -190,6 +190,21 @@ public class HoudiniWindowSettings : EditorWindow
 
 	private static void generateMaterialSettings()
 	{
+		// Gamma
+		{
+			float value = HoudiniHost.prGamma;
+			bool changed = HoudiniGUI.floatField(
+				"gamma", "Gamma", ref value, 
+				myUndoInfo, ref myUndoInfo.gamma );
+			if ( changed )
+			{
+				HoudiniHost.prGamma = value;
+				HoudiniHost.repaint();
+			}
+		}
+
+		HoudiniGUI.separator();
+
 		// Generate Tangents
 		{
 			bool value = HoudiniHost.prGenerateTangents;

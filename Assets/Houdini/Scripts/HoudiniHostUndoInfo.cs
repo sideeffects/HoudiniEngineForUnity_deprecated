@@ -18,6 +18,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	public string unityMaterialAttribName;
 	public string unitySubMaterialNameAttribName;
 	public string unitySubMaterialIndexAttribName;
+	public float gamma;
 	public bool generateTangents;
 	public bool dontCreateTextureFiles;
 	public bool extractTexturesInRawFormat;
@@ -76,6 +77,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		unityMaterialAttribName 		= HoudiniHost.prUnityMaterialAttribName;
 		unitySubMaterialNameAttribName 	= HoudiniHost.prUnitySubMaterialNameAttribName;
 		unitySubMaterialIndexAttribName = HoudiniHost.prUnitySubMaterialIndexAttribName;
+		gamma							= HoudiniHost.prGamma;
 		generateTangents 				= HoudiniHost.prGenerateTangents;
 		dontCreateTextureFiles 			= HoudiniHost.prDontCreateTextureFiles;
 		extractTexturesInRawFormat 		= HoudiniHost.prExtractTexturesInRawFormat;

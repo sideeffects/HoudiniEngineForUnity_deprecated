@@ -1103,6 +1103,9 @@ public struct HAPI_ImageInfo
 
 	public HAPI_ImagePacking packing;
 
+	[ MarshalAs( UnmanagedType.R8 ) ]
+	public double gamma;
+
 	// Accessors
 	public string imageFileFormatName
 	{ get { return HoudiniHost.getString( imageFileFormatNameSH ); } private set {} }
