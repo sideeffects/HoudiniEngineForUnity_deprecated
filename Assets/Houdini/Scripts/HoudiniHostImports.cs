@@ -375,7 +375,11 @@ public static partial class HoudiniHost
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetPresetBufLength( HAPI_NodeId node_id, ref int buffer_length );
+	HAPI_GetPresetBufLength(
+		HAPI_NodeId node_id,
+		HAPI_PresetType preset_type,
+		string preset_name,
+		ref int buffer_length );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -383,7 +387,12 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_SetPreset( HAPI_NodeId node_id, byte[] preset, int buffer_length );
+	HAPI_SetPreset(
+		HAPI_NodeId node_id,
+		HAPI_PresetType preset_type,
+		string preset_name,
+		byte[] preset,
+		int buffer_length );
 		
 	// OBJECTS --------------------------------------------------------------------------------------------------
 		
