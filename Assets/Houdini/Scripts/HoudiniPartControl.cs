@@ -204,8 +204,11 @@ public class HoudiniPartControl : HoudiniGeoControl
 				// Get mesh.
 				try
 				{
-					HoudiniAssetUtility.getMesh( 
-						this, part_mesh, prAsset.prGenerateTangents && HoudiniHost.prGenerateTangents );
+					HoudiniAssetUtility.getMesh(
+						this, part_mesh,
+						prAsset.prGenerateUVs,
+						prAsset.prGenerateLightmapUV2s,
+						prAsset.prGenerateTangents && HoudiniHost.prGenerateTangents );
 				}
 				catch ( HoudiniErrorIgnorable ) {}
 				catch ( HoudiniError error )

@@ -124,6 +124,8 @@ public static partial class HoudiniHost
 	private const bool myDefaultEnablePointsAsParticles 				= true;
 
 	public const float myDefaultGamma									= 2.2f;
+	public const bool myDefaultGenerateUVs								= false;
+	public const bool myDefaultGenerateLightmapUV2s						= false;
 	public const bool myDefaultGenerateTangents							= true;
 	private const bool myDefaultDontCreateTextureFiles					= false;
 	private const bool myDefaultExtractTexturesInRawFormat				= false;
@@ -213,7 +215,8 @@ public static partial class HoudiniHost
 		setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
 
 		setFloat(	"HAPI_Gamma", myDefaultGamma, true );
-		setBool(	"HAPI_GenerateTangents", myDefaultGenerateTangents, true );
+		setBool(	"HAPI_GenerateUVs", myDefaultGenerateUVs, true );
+		setBool(	"HAPI_GenerateLightmapUV2s", myDefaultGenerateLightmapUV2s, true );
 		setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
 		setBool(	"HAPI_ExtractTexturesInRawFormat", myDefaultExtractTexturesInRawFormat, true );
 
@@ -313,6 +316,12 @@ public static partial class HoudiniHost
 	public static float prGamma {
 											get { return getFloat( "HAPI_Gamma" ); } 
 											set { setFloat( "HAPI_Gamma", value ); } }
+	public static bool prGenerateUVs {
+											get { return getBool( "HAPI_GenerateUVs" ); } 
+											set { setBool( "HAPI_GenerateUVs", value ); } }
+	public static bool prGenerateLightmapUV2s {
+											get { return getBool( "HAPI_GenerateLightmapUV2s" ); } 
+											set { setBool( "HAPI_GenerateLightmapUV2s", value ); } }
 	public static bool prGenerateTangents {
 											get { return getBool( "HAPI_GenerateTangents" ); } 
 											set { setBool( "HAPI_GenerateTangents", value ); } }
@@ -483,6 +492,12 @@ public static partial class HoudiniHost
 	public static bool isGammaDefault()
 											{ return	Mathf.Approximately(
 															prGamma, myDefaultGamma ); }
+	public static bool isGenerateUVsDefault()
+											{ return	prGenerateUVs ==
+														myDefaultGenerateUVs; }
+	public static bool isGenerateLightmapUV2sDefault()
+											{ return	prGenerateLightmapUV2s ==
+														myDefaultGenerateLightmapUV2s; }
 	public static bool isGenerateTangentsDefault()
 											{ return	prGenerateTangents ==
 														myDefaultGenerateTangents; }
@@ -602,6 +617,8 @@ public static partial class HoudiniHost
 		prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
 
 		prGamma									= myDefaultGamma;
+		prGenerateUVs							= myDefaultGenerateUVs;
+		prGenerateLightmapUV2s					= myDefaultGenerateLightmapUV2s;
 		prGenerateTangents						= myDefaultGenerateTangents;
 		prDontCreateTextureFiles				= myDefaultDontCreateTextureFiles;
 		prExtractTexturesInRawFormat			= myDefaultExtractTexturesInRawFormat;

@@ -244,6 +244,9 @@ public class HoudiniAssetUtility
 		Vector3[] vertices	= mesh.vertices;
 		Vector2[] uv		= mesh.uv;
 		Vector3[] normals	= mesh.normals;
+
+		if ( vertices == null || uv == null || normals == null )
+			return;
 	 
 		// Variable Definitions
 		int triangleCount	= triangles.Length;
@@ -1332,7 +1335,12 @@ public class HoudiniAssetUtility
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 
-	public static void getMesh( HoudiniPartControl part_control, Mesh mesh, bool generate_tangents )
+	public static void getMesh(
+		HoudiniPartControl part_control,
+		Mesh mesh,
+		bool generate_uvs,
+		bool generate_lightmap_uv2s,
+		bool generate_tangents )
 	{
 		int asset_id	= part_control.prAssetId;
 		int object_id	= part_control.prObjectId;
@@ -1592,24 +1600,44 @@ public class HoudiniAssetUtility
 			for ( int j = 0; j < 3; ++j )
 				triangles[ i * 3 + j ] = i * 3 + j;
 		
-		// Load into vertices and face into mesh.
-		mesh.vertices 	= vertices;
-		mesh.triangles 	= triangles;
-		mesh.uv 		= uvs;
+		// Set known mesh data.
+		mesh.vertices = vertices;
+		mesh.triangles = triangles;
+		mesh.normals = normals;
+
+		// Set mesh UVs.
+		if ( uv_attr_info.exists )
+			mesh.uv = uvs;
+		else if ( generate_uvs )
+			mesh.uv = Unwrapping.GeneratePerTriangleUV( mesh );
+
+		if ( uv2_attr_info.exists )
+		{
 #if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
-		if ( uv2_attr_info.exists )
-			mesh.uv1	= uv2s;
-		if ( uv3_attr_info.exists )
-			mesh.uv2	= uv3s;
+			mesh.uv1 = uv2s;
 #else
-		if ( uv2_attr_info.exists )
-			mesh.uv2	= uv2s;
+			mesh.uv2 = uv2s;
+#endif // UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
+		}
+		else if ( mesh.uv != null && mesh.uv.Length > 0 && generate_lightmap_uv2s )
+		{
+			UnwrapParam param;
+			UnwrapParam.SetDefaults( out param );
+			Unwrapping.GenerateSecondaryUVSet( mesh, param );
+		}
+
 		if ( uv3_attr_info.exists )
+		{
+#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
+			mesh.uv2 = uv3s;
+#else
 			mesh.uv3	= uv3s;
 #endif // UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
-		mesh.normals 	= normals;
+		}
+
+		// Set mesh tangents.
 		if ( generate_tangents )
-			mesh.tangents	= tangents;
+			mesh.tangents = tangents;
 
 #if !HAPI_PAINT_SUPPORT
 		// We don't want to set these if we're generating intermediate geo mesh because
@@ -1617,7 +1645,7 @@ public class HoudiniAssetUtility
 		if ( part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 #endif // !HAPI_PAINT_SUPPORT
 		{
-			mesh.colors		= colours;
+			mesh.colors = colours;
 		}
 
 		mesh.RecalculateBounds();
@@ -1625,7 +1653,7 @@ public class HoudiniAssetUtility
 		if ( !normal_attr_info.exists )
 			mesh.RecalculateNormals();
 
-		if ( generate_tangents && !tangent_attr_info.exists )
+		if ( mesh.uv != null && mesh.uv.Length > 0 && generate_tangents && !tangent_attr_info.exists )
 			calculateMeshTangents( mesh );
 
 		// Create the submeshes if needed.
