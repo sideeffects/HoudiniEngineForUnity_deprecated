@@ -1606,9 +1606,9 @@ public class HoudiniAssetUtility
 		mesh.normals = normals;
 
 		// Set mesh UVs.
-		if ( uv_attr_info.exists )
-			mesh.uv = uvs;
-		else if ( generate_uvs )
+		bool has_non_trivial_uvs = uv_attr_info.exists || generate_uvs;
+		mesh.uv = uvs; // Should assign, even if all-zero, to avoid warnings.
+		if ( generate_uvs )
 			mesh.uv = Unwrapping.GeneratePerTriangleUV( mesh );
 
 		if ( uv2_attr_info.exists )
@@ -1619,7 +1619,7 @@ public class HoudiniAssetUtility
 			mesh.uv2 = uv2s;
 #endif // UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
 		}
-		else if ( mesh.uv != null && mesh.uv.Length > 0 && generate_lightmap_uv2s )
+		else if ( has_non_trivial_uvs && generate_lightmap_uv2s )
 		{
 			UnwrapParam param;
 			UnwrapParam.SetDefaults( out param );
