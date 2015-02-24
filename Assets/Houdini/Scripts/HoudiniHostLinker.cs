@@ -181,7 +181,7 @@ public static partial class HoudiniHost
 				"Installed Houdini Engine Version: " +
 				houdini_engine_major + "." +
 				houdini_engine_minor + "." +
-				houdini_engine_api + "\n" +
+				houdini_engine_api + "\n\n" +
 				"Houdini Binaries Path: " + HoudiniSetPath.prHoudiniPath;
 			dialog_title = "Houdini Engine Installation Info";
 		}
@@ -198,6 +198,19 @@ public static partial class HoudiniHost
 			dialog_title = "No Houdini Engine Installed";
 		}
 
+		string license_info = "License Type Acquired: ";
+		HAPI_License houdini_license_type = (HAPI_License) getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_LICENSE );
+		switch ( houdini_license_type )
+		{
+			case HAPI_License.HAPI_LICENSE_NONE: license_info += "None"; break;
+			case HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE: license_info += "Houdini Engine"; break;
+			case HAPI_License.HAPI_LICENSE_HOUDINI: license_info += "Houdini (Escape)"; break;
+			case HAPI_License.HAPI_LICENSE_HOUDINI_FX: license_info += "Houdini FX"; break;
+			case HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE_INDIE: license_info += "Houdini Engine Indie"; break;
+			case HAPI_License.HAPI_LICENSE_HOUDINI_INDIE: license_info += "Houdini Indie"; break;
+			default: license_info += "Unknown"; break;
+		}
+
 		string full_message = 
 			"Required Houdini Version: " +
 			HoudiniVersion.HOUDINI_MAJOR + "." +
@@ -206,8 +219,10 @@ public static partial class HoudiniHost
 			"Required Houdini Engine Version: " +
 			HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
 			HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
-			HoudiniVersion.HOUDINI_ENGINE_API + "\n" +
+			HoudiniVersion.HOUDINI_ENGINE_API + "\n\n" +
 			installed_version_msg +
+			"\n\n" +
+			license_info +
 #if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 			"\n\n" +
 			"PATH Variable: \n" +
