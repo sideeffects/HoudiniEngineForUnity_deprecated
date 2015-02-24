@@ -239,7 +239,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
 				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv3 = prActiveAttribute.prFloatDataVec2;
-#endif
+#endif // UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
 		}
 		else
 			myMesh.colors = new Color[ myMesh.vertexCount ];
