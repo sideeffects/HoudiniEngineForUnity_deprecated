@@ -12,6 +12,8 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 	public HAPI_ShaderType materialShaderType;
 	public Vector2 renderResolution;
 	public bool showOnlyVertexColours;
+	public bool generateUVs;
+	public bool generateLightmapUV2s;
 	public bool generateTangents;
 
 	// Cook Settings
@@ -38,6 +40,8 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 		materialShaderType 				= asset.prMaterialShaderType;
 		renderResolution 				= asset.prRenderResolution;
 		showOnlyVertexColours 			= asset.prShowOnlyVertexColours;
+		generateUVs						= asset.prGenerateUVs;
+		generateLightmapUV2s			= asset.prGenerateLightmapUV2s;
 		generateTangents 				= asset.prGenerateTangents;
 		enableCooking 					= asset.prEnableCooking;
 		cookingTriggersDownCooks 		= asset.prCookingTriggersDownCooks;

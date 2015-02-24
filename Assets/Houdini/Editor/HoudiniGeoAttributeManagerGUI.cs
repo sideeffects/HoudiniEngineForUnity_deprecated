@@ -84,7 +84,7 @@ public class HoudiniGeoAttributeManagerGUI
 		return;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
-		if ( myManager == null )
+		if ( myManager == null || myManager.prMeshCollider == null )
 			return;
 
 		if ( prGeoMesh == null )
