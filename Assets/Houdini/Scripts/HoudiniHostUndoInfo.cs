@@ -19,6 +19,8 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	public string unitySubMaterialNameAttribName;
 	public string unitySubMaterialIndexAttribName;
 	public float gamma;
+	public bool generateUVs;
+	public bool generateLightmapUV2s;
 	public bool generateTangents;
 	public bool dontCreateTextureFiles;
 	public bool extractTexturesInRawFormat;

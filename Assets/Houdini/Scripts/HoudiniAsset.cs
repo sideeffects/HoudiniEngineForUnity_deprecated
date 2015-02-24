@@ -174,6 +174,10 @@ public abstract class HoudiniAsset : HoudiniControl
 															set { myRenderResolution = value; } }
 	public bool						prShowOnlyVertexColours{get { return myShowOnlyVertexColours; }
 															set { myShowOnlyVertexColours = value; } }
+	public bool						prGenerateUVs {			get { return myGenerateUVs; }
+															set { myGenerateUVs = value; } }
+	public bool						prGenerateLightmapUV2s {get { return myGenerateLightmapUV2s; }
+															set { myGenerateLightmapUV2s = value; } }
 	public bool						prGenerateTangents {	get { return (	myGenerateTangents && 
 																			HoudiniHost.isGenerateTangentsDefault() )
 																	|| (	HoudiniHost.prGenerateTangents &&
@@ -859,6 +863,8 @@ public abstract class HoudiniAsset : HoudiniControl
 		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
 		prRenderResolution				= new Vector2( 1000, 1000 );
 		prShowOnlyVertexColours			= false;
+		prGenerateUVs					= HoudiniHost.prGenerateUVs;
+		prGenerateLightmapUV2s			= HoudiniHost.prGenerateLightmapUV2s;
 		prGenerateTangents				= true;
 
 		prEnableCooking					= HoudiniHost.myDefaultEnableCooking;
@@ -2135,6 +2141,8 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
 	[SerializeField] private Vector2				myRenderResolution;
 	[SerializeField] private bool					myShowOnlyVertexColours;
+	[SerializeField] private bool					myGenerateUVs;
+	[SerializeField] private bool					myGenerateLightmapUV2s;
 	[SerializeField] private bool					myGenerateTangents;
 
 	[SerializeField] private bool					myEnableCooking;

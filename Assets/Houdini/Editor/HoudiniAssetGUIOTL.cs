@@ -71,7 +71,10 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			if ( !myAsset.isPrefab() )
 			{
 				if ( GUILayout.Button( "Rebuild" ) )
+				{
+					myGeoAttributeManagerGUI = null;
 					myAsset.buildAll();
+				}
 	
 				if ( GUILayout.Button( "Recook" ) )
 					myAsset.buildClientSide();
@@ -285,6 +288,34 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			"show_only_vertex_colours", "Show Only Vertex Colors", 
 			"prShowOnlyVertexColours", ref myUndoInfo.showOnlyVertexColours,
 			() => HoudiniAssetUtility.reApplyMaterials( myAsset ) );
+
+		// Generate UVs
+		createToggleForProperty(
+			"generate_uvs", "Generate UVs", "prGenerateUVs",
+			ref myUndoInfo.generateUVs,
+			() => myAssetOTL.build(
+				true,	// reload_asset
+				false,	// unload_asset_first
+				false,	// serialization_recovery_only
+				true,	// force_reconnect
+				false,	// is_duplication
+				myAsset.prCookingTriggersDownCooks,
+				true	// use_delay_for_progress_bar
+			), false );
+
+		// Generate Lightmap UV2s
+		createToggleForProperty(
+			"generate_lightmapuv2s", "Generate Lightmap UVs", "prGenerateLightmapUV2s",
+			ref myUndoInfo.generateLightmapUV2s,
+			() => myAssetOTL.build(
+				true,	// reload_asset
+				false,	// unload_asset_first
+				false,	// serialization_recovery_only
+				true,	// force_reconnect
+				false,	// is_duplication
+				myAsset.prCookingTriggersDownCooks,
+				true	// use_delay_for_progress_bar
+			), false );
 
 		// Generate Tangents
 		createToggleForProperty(
