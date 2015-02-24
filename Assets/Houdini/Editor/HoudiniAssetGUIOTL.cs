@@ -39,6 +39,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 
 		if ( myGeoAttributeManager && myAssetOTL.prActiveEditPaintGeo )
 		{
+			myGeoAttributeManager.changeMode( HoudiniGeoAttributeManager.Mode.NONE );
 			myGeoAttributeManagerGUI = null;
 		}
 	}

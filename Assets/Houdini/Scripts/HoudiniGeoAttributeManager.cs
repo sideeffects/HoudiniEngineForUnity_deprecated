@@ -77,6 +77,11 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 
 	public void reset()
 	{
+		if ( myMeshRenderer != null )
+			myMeshRenderer.enabled = false;
+		if ( myMeshCollider != null )
+			myMeshCollider.enabled = false;
+
 		// Please keep these in the same order and grouping as their declarations at the top.
 
 		myHasChanged = true;
@@ -110,6 +115,10 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 		myMeshCollider = mesh_collider;
 		myTransform = trans;
 
+		// Hide the mesh until being edited.
+		myMeshRenderer.enabled = false;
+		myMeshCollider.enabled = false;
+
 		if ( myMesh.colors == null )
 		{
 			Color[] colours = new Color[ myMesh.vertexCount ];
@@ -139,6 +148,10 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 		myMeshRenderer = mesh_renderer;
 		myMeshCollider = mesh_collider;
 		myTransform = trans;
+
+		// Hide the mesh until being edited.
+		myMeshRenderer.enabled = false;
+		myMeshCollider.enabled = false;
 
 		if ( myMesh.colors == null )
 		{
@@ -171,9 +184,10 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 				// control as the same key for this reason.
 				myMeshRenderer.sharedMaterial = prOriginalMaterial;
 
+				myMeshRenderer.enabled = false;
+
 				myMeshCollider.sharedMesh = myMesh;
 				myMeshCollider.enabled = false;
-				myMeshCollider.enabled = true;
 			}
 			else
 			{
@@ -182,6 +196,8 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 				// cause mode flickering. We had to treat left and right
 				// control as the same key for this reason.
 				myMeshRenderer.sharedMaterial = prEditableMaterial;
+
+				myMeshRenderer.enabled = true;
 
 				myMeshCollider.sharedMesh = myMesh;
 				myMeshCollider.enabled = false;
@@ -205,16 +221,24 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv = prActiveAttribute.prFloatDataVec2;
 
-			// Unity 4.x has mesh.uv, uv1, and uv2 while Unity 5.x has mesh.uv, uv2, and uv3. Sigh.
-#if false
-			else if ( prActiveAttribute.prName == "uv1" &&
+#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
+			else if ( prActiveAttribute.prName == HoudiniConstants.HAPI_ATTRIB_UV2 &&
 				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
 				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv1 = prActiveAttribute.prFloatDataVec2;
-			else if ( prActiveAttribute.prName == "uv2" &&
+			else if ( prActiveAttribute.prName == HoudiniConstants.HAPI_ATTRIB_UV3 &&
 				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
 				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
 				myMesh.uv2 = prActiveAttribute.prFloatDataVec2;
+#else
+			else if ( prActiveAttribute.prName == HoudiniConstants.HAPI_ATTRIB_UV2 &&
+				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
+				myMesh.uv2 = prActiveAttribute.prFloatDataVec2;
+			else if ( prActiveAttribute.prName == HoudiniConstants.HAPI_ATTRIB_UV3 &&
+				prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT &&
+				prActiveAttribute.prTupleSize == HoudiniConstants.HAPI_UV_VECTOR_SIZE )
+				myMesh.uv3 = prActiveAttribute.prFloatDataVec2;
 #endif
 		}
 		else
