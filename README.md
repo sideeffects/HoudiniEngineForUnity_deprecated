@@ -8,9 +8,6 @@ asset's parameters inside Unity, and use Unity geometries as an asset's inputs.
 Houdini's procedural engine will then "cook" the asset and the results will be
 available right inside Unity.
 
-The plug-in is currently released as a public preview. During the experimental
-testing period, the Unity plug-in will be available freely.
-
 The easiest way for artists to access the plug-in is to download the latest
 production build of 32-bit Houdini or the [FREE Houdini Apprentice Learning
 Edition](http://www.sidefx.com/index.php?option=com_download&task=apprentice&Itemid=208)
@@ -34,18 +31,14 @@ For support and reporting bugs:
 ## Supported Unity versions
 Currently, the supported Unity versions are:
 
-* 4.5
+* 4.6
 
 The plug-in is supported on Windows only for now.
 
 ## Installing from Source
 1. Fork this repository to your own Github account using the Fork button at the top.
 1. Clone the forked repository where you'd normally save your Unity projects.
-1. Download and install the correct build of 32-bit Houdini. You must have the exact build number and version as HOUDINI_MAJOR, HOUDINI_MINOR, and HOUDINI_BUILD int values in Assets/HAPI/Scripts/HAPI_Version.cs. You can get the correct build from: http://www.sidefx.com/index.php?option=com_download&Itemid=208 (you might need to wait for the build to finish and show up if you're updating to the very latest version of the plugin)
+1. Download and install the correct build of 32-bit Houdini. You must have the exact build number and version as HOUDINI_MAJOR, HOUDINI_MINOR, and HOUDINI_BUILD int values in Assets/Houdini/Scripts/HoudiniVersion.cs. You can get the correct build from: http://www.sidefx.com/index.php?option=com_download&Itemid=208 (you might need to wait for the build to finish and show up if you're updating to the very latest version of the plugin)
 1. Open Unity and open a new project by selecting the folder containing your cloned repository (the folder containing the Assets folder).
 1. Restart Unity.
-1. Open the console and ensure Houdini Engine loaded successfully by looking for an entry starting with "Linking Against Houdini Engine Version:". You should also see a menu at the top named _Houdini Engine_.
-1. You are now ready to load Houdini Digital Assets into Unity.
-
-
-
+1. Ensure Houdini Engine loaded successfully by going to the "Houdini Engine" top menu and selecting "Installation Info" and making sure all the versions match.
