@@ -174,7 +174,11 @@ public class HoudiniCurveGUI : Editor
 														Handles.RectangleCap );
 
 				Ray ray = myTempCamera.ScreenPointToRay( mouse_position );
+#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
 				if ( !myTempCamera.isOrthoGraphic )
+#else
+				if ( !myTempCamera.orthographic )
+#endif // UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
 					ray.origin = myTempCamera.transform.position;
 
 				Vector3 intersection = new Vector3();
