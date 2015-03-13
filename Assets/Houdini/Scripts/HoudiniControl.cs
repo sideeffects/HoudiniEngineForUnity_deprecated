@@ -86,7 +86,7 @@ public class HoudiniControl : MonoBehaviour
 	public virtual void reset()
 	{
 		// Please keep these in the same order and grouping as their declarations at the top.
-		
+
 		prAssetId = -1;
 		prNodeId = -1;
 		prObjectNodeId = -1;
