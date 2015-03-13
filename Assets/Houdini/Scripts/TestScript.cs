@@ -15,7 +15,7 @@ public class TestScript : MonoBehaviour
 	
 	TestScript()
 	{
-		Debug.Log( "TestScript: CONSTRUCTOR(1) - " + value );
+		//Debug.Log( "TestScript: CONSTRUCTOR(1) - " + value );
 		value = 1;
 		prArr = null;
 
@@ -24,7 +24,7 @@ public class TestScript : MonoBehaviour
 	
 	~TestScript()
 	{
-		Debug.Log( "TestScript: DESTRUCTOR - " + value );
+		//Debug.Log( "TestScript: DESTRUCTOR - " + value );
 		EditorApplication.playmodeStateChanged -= playmodeStateChanged;
 	}
 	

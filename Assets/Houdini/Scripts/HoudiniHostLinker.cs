@@ -161,6 +161,9 @@ public static partial class HoudiniHost
 
 	public static void displayHoudiniEngineInstallInfo()
 	{
+#if !UNITY_EDITOR
+		#pragma warning disable 0219
+#endif // !UNITY_EDITOR
 		string installed_version_msg = "";
 		string dialog_title = "";
 		if ( isInstallationOk() )
@@ -234,6 +237,10 @@ public static partial class HoudiniHost
 #if UNITY_EDITOR
 		EditorUtility.DisplayDialog( dialog_title, full_message, "Ok" );
 #endif // UNITY_EDITOR
+
+#if !UNITY_EDITOR
+		#pragma warning restore 0219
+#endif // !UNITY_EDITOR
 	}
 
 	public static string getMissingEngineInstallHelpString()

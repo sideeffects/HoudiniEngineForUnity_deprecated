@@ -205,56 +205,6 @@ public class HoudiniWindowSettings : EditorWindow
 
 		HoudiniGUI.separator();
 
-		// Generate UVs
-		{
-			bool value = HoudiniHost.prGenerateUVs;
-			bool changed = HoudiniGUI.toggle(
-				"generate_uvs", "Generate UVs", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.generateUVs );
-			if ( changed )
-			{
-				HoudiniHost.prGenerateUVs = value;
-				HoudiniHost.repaint();
-			}
-		}
-
-		// Generate Lightmap UV2s
-		{
-			bool value = HoudiniHost.prGenerateLightmapUV2s;
-			bool changed = HoudiniGUI.toggle(
-				"generate_lightmapuv2s", "Generate Lightmap UVs", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.generateLightmapUV2s );
-			if ( changed )
-			{
-				HoudiniHost.prGenerateLightmapUV2s = value;
-				HoudiniHost.repaint();
-			}
-		}
-
-		// Generate Tangents
-		{
-			bool value = HoudiniHost.prGenerateTangents;
-			bool changed = HoudiniGUI.toggle(
-				"generate_tangents", "Generate Tangents", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.generateTangents );
-			if ( changed )
-			{
-				HoudiniHost.prGenerateTangents = value;
-				HoudiniHost.repaint();
-
-				EditorUtility.DisplayDialog(
-					"Rebuilds Required",
-					"You will need to rebuild existing assets for tangents " +
-					"to be removed/generated.", 
-					"Ok" );
-			}
-		}
-
-		HoudiniGUI.separator();
-
 		// Don't Create Texture Files
 		{
 			bool value = HoudiniHost.prDontCreateTextureFiles;

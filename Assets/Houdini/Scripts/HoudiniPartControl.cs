@@ -208,7 +208,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 						this, part_mesh,
 						prAsset.prGenerateUVs,
 						prAsset.prGenerateLightmapUV2s,
-						prAsset.prGenerateTangents && HoudiniHost.prGenerateTangents );
+						prAsset.prGenerateTangents );
 				}
 				catch ( HoudiniErrorIgnorable ) {}
 				catch ( HoudiniError error )

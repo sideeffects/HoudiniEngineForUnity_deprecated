@@ -330,7 +330,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				false,	// is_duplication
 				myAsset.prCookingTriggersDownCooks,
 				true	// use_delay_for_progress_bar
-			), !HoudiniHost.isGenerateTangentsDefault() );
+			), false );
 	}
 
 	private void generateCookingSettings()
