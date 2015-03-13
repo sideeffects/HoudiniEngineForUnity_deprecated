@@ -1608,8 +1608,10 @@ public class HoudiniAssetUtility
 		// Set mesh UVs.
 		bool has_non_trivial_uvs = uv_attr_info.exists || generate_uvs;
 		mesh.uv = uvs; // Should assign, even if all-zero, to avoid warnings.
+#if UNITY_EDITOR
 		if ( generate_uvs )
 			mesh.uv = Unwrapping.GeneratePerTriangleUV( mesh );
+#endif // UNITY_EDITOR
 
 		if ( uv2_attr_info.exists )
 		{
@@ -1621,9 +1623,11 @@ public class HoudiniAssetUtility
 		}
 		else if ( has_non_trivial_uvs && generate_lightmap_uv2s )
 		{
+#if UNITY_EDITOR
 			UnwrapParam param;
 			UnwrapParam.SetDefaults( out param );
 			Unwrapping.GenerateSecondaryUVSet( mesh, param );
+#endif // UNITY_EDITOR
 		}
 
 		if ( uv3_attr_info.exists )

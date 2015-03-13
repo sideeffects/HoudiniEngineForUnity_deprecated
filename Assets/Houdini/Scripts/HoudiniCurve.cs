@@ -443,7 +443,6 @@ public class HoudiniCurve : MonoBehaviour
 	public void initDefaultParameters() 
 	{
 		// Set curve defaults.
-		// TODO: Make the defaults editable.
 		// TODO: Make generic update parm value functions.
 
 		try
