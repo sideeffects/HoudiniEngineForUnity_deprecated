@@ -2568,30 +2568,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static Vector3[] getCurveVertices(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		int start, int length )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		float[] raw_values = new float[ length ];
-		HAPI_Result status_code = HAPI_GetCurveVertices(
-			asset_id, object_id, geo_id, part_id, raw_values, start, length );
-		processStatusCode( status_code );
-
-		Vector3[] values = new Vector3[ length / HoudiniConstants.HAPI_CV_VECTOR_SIZE ];
-		for ( int i = 0; i < values.Length; ++i )
-		{
-			values[ i ].x = raw_values[ i * HoudiniConstants.HAPI_CV_VECTOR_SIZE + 0 ];
-			values[ i ].y = raw_values[ i * HoudiniConstants.HAPI_CV_VECTOR_SIZE + 1 ];
-			values[ i ].z = raw_values[ i * HoudiniConstants.HAPI_CV_VECTOR_SIZE + 2 ];
-		}
-
-		return values;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static int[] getCurveCounts(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		int start, int length )
