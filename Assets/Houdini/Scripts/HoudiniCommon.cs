@@ -653,7 +653,8 @@ public struct HAPI_CookOptions
 	/// the cook.
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool clearErrorsAndWarnings;
 
-
+	/// Decide whether to recursively cook all templated geos or not.
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool cookTemplatedGeos;
 }
 
 // NODES --------------------------------------------------------------------------------------------------------
