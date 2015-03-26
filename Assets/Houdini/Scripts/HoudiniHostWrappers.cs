@@ -454,6 +454,7 @@ public static partial class HoudiniHost
 		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
 		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
+		cook_options.cookTemplatedGeos = HoudiniHost.prImportTemplatedGeos;
 		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );
 		processStatusCode( status_code );
 #else
