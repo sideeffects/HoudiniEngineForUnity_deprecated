@@ -2152,14 +2152,59 @@ public static partial class HoudiniHost
 
 	// MATERIALS ------------------------------------------------------------------------------------------------
 
+	public static HAPI_MaterialInfo[] getMaterialsOnFaces(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfo(
+			asset_id, object_id, geo_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int[] material_ids = new int[ part_info.faceCount ];
+		status_code = HAPI_GetMaterialIdsOnFaces(
+			asset_id, object_id, geo_id, part_id, material_ids, 0, part_info.faceCount );
+		processStatusCode( status_code );
+
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		HAPI_MaterialInfo[] material_infos = new HAPI_MaterialInfo[ part_info.faceCount ];
+		for ( int m = 0; m < part_info.faceCount; ++m )
+		{
+			status_code = HAPI_GetMaterialInfo( asset_id, material_ids[ m ], out material_info );
+			processStatusCode( status_code );
+			material_infos[ m ] = material_info;
+		}
+
+		return material_infos;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static HAPI_MaterialInfo getMaterialOnPart(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if true
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
 		HAPI_Result status_code = HAPI_GetMaterialOnPart(
 			asset_id, object_id, geo_id, part_id, out material_info );
 		processStatusCode( status_code );
+#else
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfo(
+			asset_id, object_id, geo_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int[] material_ids = new int[ 1 ];
+		status_code = HAPI_GetMaterialIdsOnFaces(
+			asset_id, object_id, geo_id, part_id, material_ids, 0, 1 );
+		processStatusCode( status_code );
+
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		status_code = HAPI_GetMaterialInfo( asset_id, material_ids[ 0 ], out material_info );
+		processStatusCode( status_code );
+#endif
 		return material_info;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
