@@ -607,6 +607,9 @@ public struct HAPI_AssetInfo
 	public int transformInputCount;
 	public int geoInputCount;
 
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool haveObjectsChanged;
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool haveMaterialsChanged;
+
 	// Accessors
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
@@ -901,7 +904,7 @@ public struct HAPI_ObjectInfo
 
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool hasTransformChanged;
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool haveGeosChanged;
-		
+
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool isVisible;
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool isInstancer;
 
