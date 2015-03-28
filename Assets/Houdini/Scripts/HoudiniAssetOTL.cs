@@ -195,25 +195,11 @@ public class HoudiniAssetOTL : HoudiniAsset
 			progress_bar.incrementProgressBar();
 			try
 			{
-				if ( !prObjects[ object_index ].isInstancer )
+				if ( !prObjects[ object_index ].isInstancer && 
+						( reload_asset	|| prObjects[ object_index ].hasTransformChanged
+										|| prObjects[ object_index ].haveGeosChanged ) )
 				{
-					if ( reload_asset	|| prObjects[ object_index ].hasTransformChanged
-										|| prObjects[ object_index ].haveGeosChanged )
-					{
-						createObject( object_index, reload_asset );
-					}
-#if false
-					else
-					{
-						HoudiniPartControl[] part_controls =
-							gameObject.GetComponentsInChildren< HoudiniPartControl >();
-
-						foreach ( HoudiniPartControl part_control in part_controls )
-						{
-							HoudiniAssetUtility.assignMaterial( part_control, prAsset, false );
-						}
-					}
-#endif
+					createObject( object_index, reload_asset );
 				}
 			}
 			catch ( HoudiniError error )
