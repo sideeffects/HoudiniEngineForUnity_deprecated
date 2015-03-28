@@ -626,6 +626,7 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_GetMaterialIdsOnFaces(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		[ MarshalAs( UnmanagedType.U1 ) ] ref bool are_all_the_same,
 		[Out] HAPI_MaterialId[] material_ids,
 		int start, int length );
 
