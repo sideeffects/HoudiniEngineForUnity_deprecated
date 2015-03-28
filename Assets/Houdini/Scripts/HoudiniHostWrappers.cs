@@ -2161,9 +2161,11 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
+		bool are_all_the_same = false;
 		int[] material_ids = new int[ part_info.faceCount ];
 		status_code = HAPI_GetMaterialIdsOnFaces(
-			asset_id, object_id, geo_id, part_id, material_ids, 0, part_info.faceCount );
+			asset_id, object_id, geo_id, part_id,
+			ref are_all_the_same, material_ids, 0, part_info.faceCount );
 		processStatusCode( status_code );
 
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
@@ -2196,9 +2198,10 @@ public static partial class HoudiniHost
 			asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
+		bool are_all_the_same = false;
 		int[] material_ids = new int[ 1 ];
 		status_code = HAPI_GetMaterialIdsOnFaces(
-			asset_id, object_id, geo_id, part_id, material_ids, 0, 1 );
+			asset_id, object_id, geo_id, part_id, ref are_all_the_same, material_ids, 0, 1 );
 		processStatusCode( status_code );
 
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
