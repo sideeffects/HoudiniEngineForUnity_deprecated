@@ -34,6 +34,8 @@ public class HoudiniPartControl : HoudiniGeoControl
 														set { myPartId = value; } }
 	public string	prPartName {						get { return myPartName; }
 														set { myPartName = value; } }
+	public int		prMaterialId {						get { return myMaterialId; }
+														set { myMaterialId = value; } }
 	public int[]	prVertexList {						get { return myVertexList; }
 														set { myVertexList = value; } }
 
@@ -79,6 +81,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		
 		prPartId = -1;
 		prPartName = "part_name";
+		prMaterialId = -1;
 		prVertexList = new int[ 1 ];
 		myTransformChanged = false;
 
@@ -788,6 +791,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	[SerializeField] private int			myPartId;
 	[SerializeField] private string			myPartName;
+	[SerializeField] private int			myMaterialId;
 	[SerializeField] private int[]			myVertexList;
 	[SerializeField] private Matrix4x4		myLastLocalToWorld;
 	[SerializeField] private bool			myTransformChanged;
