@@ -972,7 +972,15 @@ public class HoudiniAssetUtility
 				// Reset the material.
 				material = new Material( Shader.Find( "Houdini/SpecularVertexColor" ) );
 				materials[ m ] = material;
+				part_control.prMaterialId = -1;
 				continue;
+			}
+
+			// TODO: Temporary hack until we switch to centralized material depo.
+			if ( part_control.prMaterialId != material_info.id )
+			{
+				material_info.hasChanged = true;
+				part_control.prMaterialId = material_info.id;
 			}
 
 			// Check if we actually need to update the material.
