@@ -284,10 +284,31 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetParmInfo(
+		HAPI_NodeId node_id,
+		HAPI_ParmId parm_id,
+		out HAPI_ParmInfo parm_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetParmIdFromName(
 		HAPI_NodeId node_id,
-		string name,
+		string parm_name,
 		out HAPI_ParmId parm_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetParmInfoFromName(
+		HAPI_NodeId node_id,
+		string parm_name,
+		out HAPI_ParmInfo parm_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetParmIntValue(
+		HAPI_NodeId node_id,
+		string parm_name,
+		int index, out int value );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -295,14 +316,30 @@ public static partial class HoudiniHost
 		HAPI_NodeId node_id,
 		[Out] int[] values,
 		int start, int length );
-		
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetParmFloatValue(
+		HAPI_NodeId node_id,
+		string parm_name,
+		int index, out float value );
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmFloatValues(
 		HAPI_NodeId node_id,
 		[Out] float[] values,
 		int start, int length );
-		
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetParmStringValue(
+		HAPI_NodeId node_id,
+		string parm_name,
+		int index,
+		[ MarshalAs( UnmanagedType.U1 ) ] bool evaluate,
+		out HAPI_StringHandle value );
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmStringValues(
@@ -317,14 +354,28 @@ public static partial class HoudiniHost
 		HAPI_NodeId node_id,
 		[Out] HAPI_ParmChoiceInfo[] parm_choices, 
 		int start, int length );
-		
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetParmIntValue(
+		HAPI_NodeId node_id,
+		string parm_name,
+		int index, int value );
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetParmIntValues(
 		HAPI_NodeId node_id,
 		int[] values,
 		int start, int length );
-		
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetParmFloatValue(
+		HAPI_NodeId node_id,
+		string parm_name,
+		int index, float value );
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_SetParmFloatValues(
