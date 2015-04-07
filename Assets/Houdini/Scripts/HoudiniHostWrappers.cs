@@ -95,9 +95,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get total number of nodes that need to cook in the current session.
-	/// </summary>
 	public static int getCookingTotalCount()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -110,12 +107,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get current number of nodes that have already cooked in the current session. Note that this is a 
-	/// 	very crude approximation of the cooking progress - it may never make it to 100% or it 
-	///		might spend another hour at 100%. Use HAPI_GetStatusString to get a better idea of progress if 
-	///		this number gets stuck.
-	/// </summary>
 	public static int getCookingCurrentCount()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -130,18 +121,6 @@ public static partial class HoudiniHost
 
 	// UTILITY --------------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Converts a transform to differing TRS order and Euler rotation order.
-	/// </summary>
-	/// <param name= "transform_in_out">
-	/// 	Used for both input and output.
-	/// </param>
-	/// <param name="rst_order">
-	/// 	The desired transform order of the output.
-	/// </param>
-	///	<param name="rot_order">
-	/// 	The desired rotation order of the output.
-	/// </param>
 	public static void convertTransform(
 		ref HAPI_TransformEuler transform_in_out,
 		HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order )
@@ -154,18 +133,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Converts a 4x4 matrix into its quaternion TRS form.
-	/// </summary>
-	/// <param name="mat">
-	/// 	A 4x4 matrix expressed in a 16 element float array.
-	/// </param>
-	/// <param name="rst_order">
-	/// 	The desired transform order of the output.
-	/// </param>
-	/// <return>
-	///		The converted <see cref="HAPI_Transform"/>.
-	/// </return>
 	public static HAPI_Transform convertMatrixToQuat( Matrix4x4 matrix, HAPI_RSTOrder rst_order )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -184,21 +151,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Converts a 4x4 matrix into its euler TRS form.
-	/// </summary>
-	/// <param name="mat">
-	/// 	A 4x4 matrix expressed in a 16 element float array.
-	/// </param>
-	/// <param name="rst_order">
-	/// 	The desired transform order of the output.
-	/// </param>
-	///	<param name="rot_order">
-	/// 	The desired rotation order of the output.
-	/// </param>
-	/// <return>
-	///		The converted <see cref="HAPI_TransformEuler"/>.
-	/// </return>
 	public static HAPI_TransformEuler convertMatrixToEuler(
 		Matrix4x4 matrix, HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order )
 	{
@@ -219,15 +171,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	///		Converts a <see cref="HAPI_Transform"/> into a 4x4 matrix.
-	/// </summary>
-	/// <param name="transform">
-	///		The <see cref="HAPI_Transform"/> that you wish to convert.
-	/// </param>
-	/// <returns>
-	///		The converted 4x4 matrix.
-	/// </returns>
 	public static Matrix4x4 convertTransformQuatToMatrix( HAPI_Transform transform )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -246,15 +189,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	///		Converts a <see cref="HAPI_TransformEuler"/> into a 4x4 matrix.
-	/// </summary>
-	/// <param name="transform">
-	///		The <see cref="HAPI_TransformEuler"/> that you wish to convert.
-	/// </param>
-	/// <returns>
-	///		The converted 4x4 matrix.
-	/// </returns>
 	public static Matrix4x4 convertTransformEulerToMatrix( HAPI_TransformEuler transform )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -277,15 +211,6 @@ public static partial class HoudiniHost
 
 	// NOTE: These are private as we want people to use the more abstract methods in HAPI_HostStrings.cs.
 
-	/// <summary>
-	/// 	Gives back the string length of the string with the given handle.
-	/// </summary>
-	/// <param name="string_handle">
-	/// 	Handle of the string to query.
-	/// </param>
-	/// <param name="buffer_length">
-	/// 	Buffer length of the queried string (including NULL terminator).
-	/// </param>
 	private static void getStringBufLength(
 		HAPI_StringHandle string_handle, out int buffer_length )
 	{
@@ -297,19 +222,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Gives back the string value of the string with the given handle.
-	/// </summary>
-	/// <param name="string_handle">
-	/// 	Handle of the string to query.
-	/// </param>
-	/// <param name="string_value">
-	/// 	Actual string value.
-	/// </param>
-	/// <param name="buffer_length">
-	/// 	Length of the string buffer (must match size of <paramref name="string_value" - 
-	/// 	so including NULL terminator).
-	/// </param>
 	private static void getString(
 		HAPI_StringHandle string_handle,
 		StringBuilder string_value,
@@ -325,12 +237,6 @@ public static partial class HoudiniHost
 
 	// TIME -----------------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Gets the global time of the scene. All API calls deal with this time to cook.
-	/// </summary>
-	/// <param name="time">
-	/// 	Time as a float in seconds.
-	/// </param>
 	public static float getTime()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -343,12 +249,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Sets the global time of the scene. All API calls will deal with this time to cook.
-	/// </summary>
-	/// <param name="time">
-	/// 	Time as a float in seconds.
-	/// </param>
 	public static void setTime( float time )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -383,18 +283,6 @@ public static partial class HoudiniHost
 
 	// ASSETS -------------------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Determine if your instance of the asset actually still exists inside the Houdini scene. 
-	/// 	This is what can be used to determine when the Houdini scene needs to be re-populated 
-	/// 	using the host application's instances of the assets.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="asset_validation_id">
-	///		The asset validation id that's found in the <see cref="HAPI_AssetInfo"/> struct 
-	///		returned by <see cref="HAPI_GetAssetInfo"/>.
-	/// </param>
 	public static bool isAssetValid( HAPI_AssetId asset_id, int asset_validation_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -428,12 +316,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get an asset_info struct.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
 	public static HAPI_AssetInfo getAssetInfo( HAPI_AssetId asset_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -462,9 +344,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	///		Interrupt a cook or load operation.
-	/// </summary>
 	public static void interrupt()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -475,21 +354,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get the transform of an asset to match the transform of the asset on the client side.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="rst_order">
-	/// 	The order of application of translation, rotation and scale.
-	/// </param>
-	///	<param name="rot_order">
-	/// 	The desired rotation order of the output.
-	/// </param>
-	/// <param name="transform">
-	/// 	The actual transform struct.
-	/// </param>
 	public static void getAssetTransform(
 		HAPI_AssetId asset_id, HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order,
 		out HAPI_TransformEuler transform )
@@ -502,15 +366,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set the transform of an asset to match the transform of the asset on the client side.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="transform">
-	/// 	The actual transform struct.
-	/// </param>
 	public static void setAssetTransform(
 		HAPI_AssetId asset_id, ref HAPI_TransformEuler transform )
 	{
@@ -522,21 +377,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get the name of an asset's input.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="input_idx">
-	/// 	Input index of the asset.
-	/// </param>
-	/// <param name="input_type">
-	/// 	Input type (<see cref="HAPI_InputType"/>).
-	/// </param>
-	/// <returns>
-	///		The input name.
-	/// </returns>
 	public static string getInputName(
 		HAPI_AssetId asset_id, int input_idx, HAPI_InputType input_type )
 	{
@@ -553,13 +393,6 @@ public static partial class HoudiniHost
 
 	// NODES ----------------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Get an node info struct.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
 	public static HAPI_NodeInfo getNodeInfo( HAPI_NodeId node_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -572,12 +405,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get an global nodes struct.
-	/// </summary>
-	/// <returns>
-	///		The struct containing the global nodes by node id.
-	/// </returns>
 	public static HAPI_GlobalNodes getGlobalNodes()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -592,22 +419,6 @@ public static partial class HoudiniHost
 
 	// PARAMETERS -----------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Fill an array of HAPI_ParmInfo structs with parameter information from the asset instance node.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id.
-	/// </param>
-	/// <param name="parm_infos">
-	/// 	Array of <see cref="HAPI_ParmInfo"/> at least the size of
-	/// 	<paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getParameters(
 		HAPI_NodeId node_id, [Out] HAPI_ParmInfo[] parm_infos,
 		int start, int length )
@@ -620,21 +431,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	All parameter APIs require a HAPI_ParmId but if you know the parameter you wish
-	/// 	to operate on by name than you can use this function to get its HAPI_ParmId.
-	/// 	If the parameter with the given name is not found the parameter id returned
-	/// 	will be -1.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id.
-	/// </param>
-	/// <param name="name">
-	/// 	The name of the parameter you wish to get the id for.
-	/// </param>
-	/// <returns>
-	///		The parameter id. -1 if parameter not found.
-	/// </returns>
 	public static HAPI_ParmId getParmIdFromName( HAPI_NodeId node_id, string name )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -647,24 +443,19 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Fill an array of parameter int values.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="values">
-	/// 	Array of ints at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - <paramref name="start"/>.
-	/// </param>
+	public static int getParmIntValue(
+		HAPI_NodeId node_id, string parm_name, int index )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int value = 0;
+		HAPI_Result status_code = HAPI_GetParmIntValue( node_id, parm_name, index, out value );
+		processStatusCode( status_code );
+		return value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getParmIntValues(
 		HAPI_NodeId node_id, [Out] int[] values,
 		int start, int length )
@@ -677,24 +468,19 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Fill an array of parameter float values.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="values">
-	/// 	Array of floats at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - <paramref name="start"/>.
-	/// </param>
+	public static float getParmFloatValue(
+		HAPI_NodeId node_id, string parm_name, int index )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		float value = 0.0f;
+		HAPI_Result status_code = HAPI_GetParmFloatValue( node_id, parm_name, index, out value );
+		processStatusCode( status_code );
+		return value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getParmFloatValues(
 		HAPI_NodeId node_id, [Out] float[] values,
 		int start, int length )
@@ -707,25 +493,23 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Fill an array of parameter string handles. These handles must be used in conjunction with
-	/// 	<see cref="HAPI_GetString"> to get the actual string values.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="values">
-	/// 	Array of ints at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmStringValueCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmStringValueCount"/> - <paramref name="start"/>.
-	/// </param>
+	public static string getParmStringValue(
+		HAPI_NodeId node_id, string parm_name, int index )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		// Can't turn this off yet. More testing is needed, especially for file paths.
+		const bool evaluate = true;
+
+		HAPI_StringHandle string_handle = 0;
+		HAPI_Result status_code = HAPI_GetParmStringValue(
+			node_id, parm_name, index, evaluate, out string_handle );
+		processStatusCode( status_code );
+		return getString( string_handle );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getParmStringValues(
 		HAPI_NodeId node_id, [Out] HAPI_StringHandle[] values,
 		int start, int length )
@@ -741,23 +525,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Fill an array of <see cref="HAPI_ParmChoiceInfo"/> structs with parameter choice list information
-	/// 	from the asset instance node.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="parm_choices">
-	/// 	Array of <see cref="HAPI_ParmChoiceInfo"/> exactly the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmChoiceCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.parmChoiceCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getParmChoiceLists(
 		HAPI_NodeId node_id, [Out] HAPI_ParmChoiceInfo[] parm_choices,
 		int start, int length )
@@ -770,24 +537,17 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set (push) an array of parameter int values.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="values">
-	/// 	Array of ints at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmIntValueCount"/> - <paramref name="start"/>.
-	/// </param>
+	public static void setParmIntValue(
+		HAPI_NodeId node_id, string parm_name, int index, int value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetParmIntValue( node_id, parm_name, index, value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void setParmIntValues(
 		HAPI_NodeId node_id, int[] values,
 		int start, int length )
@@ -800,24 +560,17 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set (push) an array of parameter float values.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="values">
-	/// 	Array of floats at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most
-	/// 	<see cref="HAPI_AssetInfo.parmFloatValueCount"/> - <paramref name="start"/>.
-	/// </param>
+	public static void setParmFloatValue(
+		HAPI_NodeId node_id, string parm_name, int index, float value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetParmFloatValue( node_id, parm_name, index, value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void setParmFloatValues(
 		HAPI_NodeId node_id, float[] values,
 		int start, int length )
@@ -830,23 +583,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set (push) a string value. We can only set a single value at a time because we want to avoid
-	/// 	fixed size string buffers.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="value">
-	/// 	The string value.
-	/// </param>
-	/// <param name="parm_id">
-	/// 	Parameter id of the parameter being updated.
-	/// </param>
-	/// <param name="index">
-	/// 	Index within the parameter's values tuple.
-	/// </param>
 	public static void setParmStringValue(
 		HAPI_NodeId node_id, string value,
 		HAPI_ParmId parm_id, int index )
@@ -859,22 +595,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Insert an instance of a multiparm after instance_position.
-	/// </summary>
-	///
-	/// <param name="node_id">
-	/// 	The node id given by either a HAPI_AssetInfo
-	/// 	struct or a HAPI_MaterialInfo struct
-	/// </param>
-	/// <param name="parm_id">
-	/// 	A parm id given by a HAPI_ParmInfo struct that
-	/// 	has type HAPI_PARMTYPE_MULTIPARMLIST
-	/// </param>
-	/// <param name="instance_position">
-	/// 	The new instance will be inserted one after this
-	/// 	instance_position. The first instance has position 1.
-	/// </param>
 	public static void insertMultiparmInstance(
 		HAPI_NodeId node_id, HAPI_ParmId parm_id,
 		int instance_position )
@@ -887,22 +607,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Remove the instance of a multiparm given by instance_position.
-	/// </summary>
-	///
-	/// <param name="node_id">
-	/// 	The node id given by either a HAPI_AssetInfo
-	/// 	struct or a HAPI_MaterialInfo struct
-	/// </param>
-	/// <param name="parm_id">
-	/// 	A parm id given by a HAPI_ParmInfo struct that
-	/// 	has type HAPI_PARMTYPE_MULTIPARMLIST
-	/// </param>
-	/// <param name="instance_position">
-	/// 	The new instance will be inserted one after this
-	/// 	instance_position. The first instance has position 1.
-	/// </param>
 	public static void removeMultiparmInstance(
 		HAPI_NodeId node_id, HAPI_ParmId parm_id,
 		int instance_position )
@@ -917,22 +621,6 @@ public static partial class HoudiniHost
 		
 	// HANDLES --------------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Fill an array of <see cref="HAPI_HandleInfo"/> structs with information about every exposed
-	/// 	user manipulation handle on the asset.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name ="handle_infos">
-	/// 	Array of <see cref="HAPI_HandleInfo"/> exactly the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.handleCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.handleCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getHandleInfo(
 		HAPI_AssetId asset_id,
 		[Out] HAPI_HandleInfo[] handle_infos,
@@ -946,25 +634,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Fill an array of <see cref="HAPI_HandleBindingInfo"/> structs with information about how each
-	/// 	handle parameter maps to each asset parameter.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="handle_index">
-	/// 	The index of the handle, from 0 to handleCount - 1 from the call to <see cref="HoudiniHost.loadOTLFile"/>
-	/// </param>
-	/// <param name ="handle_infos">
-	/// 	Array of <see cref="HAPI_HandleBindingInfo"/> exactly the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_HandleInfo.bindingsCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_HandleInfo.bindingsCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getHandleBindingInfo(
 		HAPI_AssetId asset_id,
 		int handle_index,
@@ -980,17 +649,7 @@ public static partial class HoudiniHost
 	}
 
 	// PRESETS --------------------------------------------------------------------------------------------------
-		
-	/// <summary>
-	/// 	Generates a preset for the given asset.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <returns>
-	///		The preset byte string.
-	/// </returns>
+
 	public static byte[] getPreset( HAPI_NodeId node_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -1009,16 +668,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Sets a particular asset to a given preset.
-	/// </summary>
-	/// <param name="node_id">
-	/// 	The node id given by either a <see cref="HAPI_AssetInfo"/> struct or 
-	/// 	a <see cref="HAPI_MaterialInfo"/> struct.
-	/// </param>
-	/// <param name="preset">
-	/// 	Buffer to hold the preset data.
-	/// </param>
 	public static void setPreset( HAPI_NodeId node_id, byte[] preset )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -1032,24 +681,6 @@ public static partial class HoudiniHost
 
 	// OBJECTS --------------------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object
-	/// 	in the scene that has a SOP network (is not a sub-network).
-	/// 	Note that this function will reset all the objects' <see cref="HAPI_ObjectInfo.haveGeosChanged"/>
-	/// 	flags to false after it returns the original flag values.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_infos">
-	/// 	Array of <see cref="HAPI_ObjectInfo"/> at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getObjects(
 		HAPI_AssetId asset_id,
 		[Out] HAPI_ObjectInfo[] object_infos,
@@ -1063,29 +694,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Fill an array of <see cref="HAPI_ObjectInfo"/> structs with information on each visible object
-	/// 	in the scene that has a SOP network (is not a sub-network).
-	/// 	Note that this function will reset all the objects' <see cref="HAPI_ObjectInfo.hasTransformChanged"/>
-	/// 	flags to false after it returns the original flag values.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="rst_order">
-	/// 	The order of application of translation, rotation and scale.
-	/// </param>
-	/// <param name="transforms">
-	/// 	Array of <see cref="HAPI_Transform"/> at least the size of
-	/// 	<paramref name="length"/>. The <see cref="HAPI_Transform.id"/> of each will be
-	/// 	set to the object id as given by <see cref="HoudiniHost.HAPI_GetObjects"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AssetInfo.objectCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getObjectTransforms(
 		HAPI_AssetId asset_id,
 		HAPI_RSTOrder rst_order,
@@ -1099,35 +707,7 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
-		
-	/// <summary>	
-	/// 	Fill an array of HAPI_Transform structs with the transforms
-	///		of each instance of this instancer object
-	/// </summary>
-	/// <param="asset_id">
-	///			The asset id returned by HAPI_LoadOTLFile().
-	/// </param>
-	/// <param="object_id">
-	///			The object id returned by HAPI_GetObjects().
-	/// </param>
-	/// <param name="geo_id">
-	///			The geometry id.
-	///	</param>
-	/// <param name="rstOrder">
-	///			The order of application of translation, rotation and scale.
-	/// </param>
-	/// <param="transforms">
-	///			Array of HAPI_Transform at least the size of
-	///			#length.
-	/// </param>
-	///	<param="start">
-	///			First index of range. Must be at least 0 and at 
-	///			most HAPI_GeoInfo::pointCount - 1.
-	/// </param>
-	/// <param="length">
-	///			Must be at least 0 and at most 
-	///			HAPI_GeoInfo::pointCount - #start.  
-	/// </param>
+
 	public static void getInstanceTransforms(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_RSTOrder rst_order, [Out] HAPI_Transform[] transforms,
@@ -1142,21 +722,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set the transform of an individual object. This is mostly used with marshaled 
-	/// 	geometry objects. Trying to modify the transform of an object belonging to an 
-	/// 	asset other than the special External Input Asset with object id 0 will most
-	/// 	likely fail, unless the transforms are exposed as editable via exposed parameters.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id returned by <see cref="HoudiniHost.HAPI_GetObjects"/>.
-	/// </param>
-	/// <param name="transform">
-	/// 	A <see cref="HAPI_TransformEuler"/> that stores the transform.
-	/// </param>
 	public static void setObjectTransform(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id,
 		ref HAPI_TransformEuler transform )
@@ -1171,23 +736,6 @@ public static partial class HoudiniHost
 		
 	// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Get the main geometry info struct (<see cref="HAPI_GeoInfo"/>).
-	/// 	Note that this function will reset all the geos' <see cref="HAPI_GeoInfo.hasGeoChanged"/>
-	/// 	flags to false after it returns the original flag values.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="geo_info">
-	/// 	<see cref="HAPI_GeoInfo"/> out parameter.
-	/// </param>
 	public static void getGeoInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		out HAPI_GeoInfo geo_info )
@@ -1200,24 +748,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get the part info struct (<see cref="HAPI_PartInfo"/>).
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="part_info">
-	/// 	<see cref="HAPI_PartInfo"/> out parameter.
-	/// </param>
 	public static void getPartInfo(	HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 									out HAPI_PartInfo part_info )
 	{
@@ -1229,31 +759,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get the array of faces where the nth integer in the array is the number of vertices
-	/// 	the nth face has.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="face_counts">
-	/// 	An integer array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getFaceCounts(		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 											[Out] int[] face_counts,
 											int start, int length )
@@ -1266,31 +771,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get array containing the vertex-point associations where the ith element in the array is
-	/// 	the point index the ith vertex associates with.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="vertex_list">
-	/// 	An integer array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getVertexList(		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 											[Out] int[] vertex_list,
 											int start, int length )
@@ -1303,31 +783,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get attribute information; fill a <see cref="HAPI_AttributeInfo"/>.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="owner">
-	/// 	Attribute owner.
-	/// </param>
-	/// <returns>
-	/// 	A filled <see cref="HAPI_AttributeInfo"/>. Check HAPI_AttributeInfo.exists to see if 
-	/// 	this attribute exists.
-	/// </returns>
 	public static HAPI_AttributeInfo getAttributeInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name, HAPI_AttributeOwner owner )
 	{
@@ -1341,27 +796,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get list of attribute names by attribute owner.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="owner"/>
-	/// 	The <see cref="HAPI_AttributeOwner"/> enum value specifying the owner of the attribute.
-	/// </param>
-	/// <returns>
-	/// 	List of attribute names.
-	/// </returns>
 	public static string[] getAttributeNames(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		HAPI_AttributeOwner owner )
@@ -1388,37 +822,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get attribute integer data.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="attr_info">
-	/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
-	/// 	like data type. Generally should be the same struct returned by 
-	/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
-	/// <param name="data">
-	/// 	An integer array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getAttributeIntData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1434,37 +837,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get attribute float data.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="attr_info">
-	/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
-	/// 	like data type. Generally should be the same struct returned by 
-	/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
-	/// <param name="data">
-	/// 	An float array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getAttributeFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1480,39 +852,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get attribute string data. Note that the string handles returned are only valid until the next 
-	/// 	time this function is called.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="attr_info">
-	/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
-	/// 	like data type. Generally should be the same struct returned by 
-	/// 	<see cref="HoudiniHost.getAttributeInfo"/>.
-	/// </param>
-	/// <param name="data">
-	/// 	An int (string handles) array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
-	/// </param>
 	public static void getAttributeStringData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1528,24 +867,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get list of group names by group type.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="group_type">
-	/// 	The group type.
-	/// </param>
-	/// <returns>
-	/// 	List of group names.
-	/// </returns>
 	public static string[] getGroupNames(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_GroupType group_type )
@@ -1572,27 +893,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get group membership.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="group_type">
-	/// 	The group type.
-	/// </param>
-	/// <returns>
-	/// 	List of group names.
-	/// </returns>
 	public static bool[] getGroupMembership(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		HAPI_GroupType group_type,
@@ -1626,21 +926,6 @@ public static partial class HoudiniHost
 
 	// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 
-	/// <summary>
-	/// 	Set the main geometry info struct (<see cref="HAPI_GeoInfo"/>).
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="geo_info">
-	/// 	<see cref="HAPI_GeoInfo"/> out parameter.
-	/// </param>
 	public static void setGeoInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		ref HAPI_GeoInfo geo_info )
@@ -1653,21 +938,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set the main part info struct (<see cref="HAPI_PartInfo"/>).
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_info">
-	/// 	<see cref="HAPI_PartInfo"/> out parameter.
-	/// </param>
 	public static void setPartInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		ref HAPI_PartInfo part_info )
@@ -1680,28 +950,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set the array of faces where the nth integer in the array is the number of vertices
-	/// 	the nth face has.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="face_counts">
-	/// 	An integer array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.faceCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void setFaceCounts(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		int[] face_counts,
@@ -1715,28 +963,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set array containing the vertex-point associations where the ith element in the array is
-	/// 	the point index the ith vertex associates with.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="vertex_list">
-	/// 	An integer array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_GeoInfo.vertexCount"/> - <paramref name="start"/>.
-	/// </param>
 	public static void setVertexList(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		int[] vertex_list,
@@ -1750,25 +976,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Add an attribute.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="attr_info">
-	/// 	<see cref="HAPI_AttributeInfo"/> used as input for owner type and as output for the rest of 
-	/// 	the information.
-	/// </param>
 	public static void addAttribute(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
 		ref HAPI_AttributeInfo attr_info )
@@ -1781,34 +988,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set attribute integer data.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="attr_info">
-	/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
-	/// 	like data type. Generally should be the same struct returned by 
-	/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
-	/// <param name="data">
-	/// 	An integer array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
-	/// </param>
 	public static void setAttributeIntData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1824,34 +1003,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set attribute float data.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="attr_info">
-	/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
-	/// 	like data type. Generally should be the same struct returned by 
-	/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
-	/// <param name="data">
-	/// 	An float array at least the size of <paramref name="length"/>.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
-	/// </param>
 	public static void setAttributeFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1867,34 +1018,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set attribute string data.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="name">
-	/// 	Attribute name.
-	/// </param>
-	/// <param name="attr_info">
-	/// 	<see cref="HAPI_AttributeInfo"/> used as input for tuple size. Also contains some sanity checks 
-	/// 	like data type. Generally should be the same struct returned by 
-	/// 	<see cref="HAPI_Host.getAttributeInfo"/>.
-	/// <param name="data">
-	/// 	A strings array at least the size of #length.
-	/// </param>
-	/// <param name="start">
-	/// 	First index of range. Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - 1.
-	/// </param>
-	/// <param name="length">
-	/// 	Must be at least 0 and at most <see cref="HAPI_AttributeInfo.count"/> - <paramref name="start"/>.
-	/// </param>
 	public static void setAttributeStringData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1910,24 +1033,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Add a group.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="group_type">
-	/// 	The group type.
-	/// </param>
-	/// <param name="group_name">
-	/// 	The group name.
-	/// </param>
 	public static void addGroup(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_GroupType group_type, string group_name )
@@ -1941,33 +1046,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set group membership.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
-	/// <param name="part_id">
-	/// 	The part id.
-	/// </param>
-	/// <param name="group_type">
-	/// 	The group type.
-	/// </param>
-	/// <param name="group_name">
-	/// 	The group name.
-	/// </param>
-	/// <param name="membership">
-	/// 	The group membership.
-	/// </param>
-	/// <param name="count">
-	/// 	The group owner element count.
-	/// </param>
 	public static void setGroupMembership(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_GroupType group_type,
@@ -1991,19 +1069,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Commit the current input geometry to the cook engine. Nodes that use this geometry node will 
-	/// 	re-cook using the input geometry given through the geometry setter API calls.
-	/// </summary>
-	/// <param name="asset_id">
-	/// 	The asset id.
-	/// </param>
-	/// <param name="object_id">
-	/// 	The object id.
-	/// </param>
-	/// <param name="geo_id">
-	/// 	The geometry id.
-	/// </param>
 	public static void commitGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2013,22 +1078,7 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
-		
-	/// <summary>	
-	/// 	Remove all changes that have been committed to this
-	///		geometry.  Only applies to geometry nodes that are
-	///		exposed edit nodes.
-	/// </summary>
-	/// <param name="asset_id">
-	///			The asset id returned by HAPI_LoadOTLFile().
-	/// </param>
-	/// <param name="object_id">
-	///			The object id returned by HAPI_GetObjects().
-	/// </param>
-	/// <param name="geo_id">
-	///			The geometry id.
-	/// </param>
-	/// 
+
 	public static void revertGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2041,27 +1091,6 @@ public static partial class HoudiniHost
 
 	// INTER-ASSET ----------------------------------------------------------------------------------------------
 
-	/// <summary>	Connect two assets of compatible types together.  For 
-	///		example we can connect two object level assets or
-	///		two sop level assets together.  Note this method does
-	///		not give you the fine grained control over the exact
-	///		piece of geometry to connect in the case of SOP assets,
-	///		it will connect the entire geometry from 1 SOP to another.
-	///		For fine grained control please use HAPI_ConnectAssetGeometry
-	///		which allows you to specify groups.
-	/// </summary>
-	///
-	/// <param name="asset_id_from">
-	///			The asset id of the source asset
-	/// </param>
-	/// <param name="asset_id_to">
-	///			The asset id of the destination asset
-	/// </param>
-	/// <param name="input_idx">
-	///			The index on the destination asset where the connection
-	///			should be made.
-	/// </param>		
-		
 	public static void connectAssetTransform( int asset_id_from, int asset_id_to, int input_idx )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2071,19 +1100,7 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
-		
-		
-	/// <summary> 
-	/// 	Break an existing connection on transforms
-	/// </summary>
-	/// <param name ="asset_id">
-	///			The asset id of the asset
-	/// </param>
-	/// <param name="input_idx">
-	///			The index on the asset where the connection
-	///			should be broken.
-	///	</param>
-		
+
 	public static void disconnectAssetTransform( HAPI_AssetId asset_id, int input_idx )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2094,28 +1111,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>	Connect the geometry of two assets together.  For 
-	///		example we can connect a particular piece of geometry from
-	///		an object level asset to a sop level asset or even another
-	///		object level asset.  This method gives you the fine grained 
-	///		control over the exact piece of geometry to connect by allowing
-	///		you to specify the exact object and group of the geometry you
-	///		are trying to connect.
-	/// </summary>
-	/// <param name="asset_id_from">
-	///			The asset id of the source asset
-	/// </param>
-	/// <param name="object_id_from">
-	///			The object within the asset that contains the geometry
-	///			to send.
-	/// </param>
-	/// <param name="asset_id_to">
-	///			The asset id of the destination asset
-	/// </param>
-	/// <param name="input_idx">
-	///			The index on the destination asset where the connection
-	///			should be made.
-	/// </param>		
 	public static void connectAssetGeometry(
 		HAPI_AssetId asset_id_from, HAPI_ObjectId object_id_from,
 		HAPI_AssetId asset_id_to, int input_idx )
@@ -2129,17 +1124,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Break an existing connection on geometry
-	/// </summary>
-	///
-	/// <param name ="asset_id">
-	///			The asset id of the asset
-	/// </param>
-	/// <param name="input_idx">
-	///			The index on the asset where the connection
-	///			should be broken.
-	///	</param>
 	public static void disconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2228,20 +1212,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Render the entire material to an image for later extraction. This process will use the 
-	/// 	shader specified to render the object assigned with the material you specified (by id) in
-	///		UV space, flattening the material into an image that can be later mapped back onto the object.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	/// <param name="shader_type">
-	///		The shader that will be used to bake this material.
-	/// </param>
 	public static void renderMaterialToImage( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ShaderType shader_type )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2252,21 +1222,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Render only a single texture to an image for later extraction. An example use of this method 
-	/// 	might be to render the diffuse, normal, and bump texture maps of a material to individual
-	///		texture files for use within the client application.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	/// <param name="parm_id">
-	///		This is the index in the parameter list of the material_id's node of the parameter 
-	///		containing the texture map file path.
-	/// </param>
 	public static void renderTextureToImage( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ParmId parm_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2277,12 +1232,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get the number of supported texture file formats.
-	/// </summary>
-	/// <returns>
-	///		The number of supported image file formats.
-	/// </returns>
 	public static int getSupportedImageFileFormatCount()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2295,12 +1244,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	///		Get the names, descriptions, and default extensions of all supported file formats.
-	/// </summary>
-	/// <returns>
-	///		An array of <see cref="HAPI_ImageFileFormat"/>.
-	/// </returns>
 	public static HAPI_ImageFileFormat[] getSupportedImageFileFormats()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2314,19 +1257,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get information about the image that was just rendered, like resolution and default file 
-	/// 	format. This information will be used when extracting planes to an image.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	/// <returns>
-	///		A <see cref="HAPI_ImageInfo"/> with the image's information.
-	/// </returns>
 	public static HAPI_ImageInfo getImageInfo( HAPI_AssetId asset_id, HAPI_MaterialId material_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2339,19 +1269,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Set image information like resolution and file format. This information will be used when 
-	/// 	extracting planes to an image.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	/// <param name="image_info">
-	///		A <see cref="HAPI_ImageInfo"/> with the new image information.
-	/// </param>
 	public static void setImageInfo(
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id, ref HAPI_ImageInfo image_info )
 	{
@@ -2363,18 +1280,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Get the names of the image planes of the just rendered image.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	/// <returns>
-	///		A list of image plane names.
-	/// </returns>
 	public static List< string > getImagePlanes( HAPI_AssetId asset_id, HAPI_MaterialId material_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2399,43 +1304,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Extract a rendered image to a file.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	/// <param name="image_file_format_name">
-	///		The image file format name you wish the image to be
-	///		extracted as. You can leave this parameter (null) to
-	///		get the image in the original format if it comes from
-	///		another texture file or in the default HAPI format,
-	///		which is HAPI_Constants.HAPI_DEFAULT_IMAGE_FORMAT_NAME, 
-	///		if the image is generated.
-	///
-	///		You can get some of the very common standard image
-	///		file format names from HAPI_Common.cs under the 
-	///		HAPI_Constants enum (ie. HAPI_PNG_FORMAT_NAME).
-	///
-	///		You can also get a list of all supported file formats
-	///		(and the exact names this parameter expects)
-	///		by using getSupportedImageFileFormats(). This
-	///		list will include custom file formats you created via
-	///		custom DSOs (see HDK docs about IMG_Format). You 
-	///		will get back a list of HAPI_ImageFileFormat(s). 
-	///		This parameter expects the HAPI_ImageFileFormat::name
-	///		of a given image file format.
-	/// </param>
-	/// <param name="image_planes">
-	///		The image planes you wish to extract into the file. Multiple image planes should be 
-	///		separated by spaces.
-	/// </param>
-	/// <param name="destination_folder_path">
-	///		The folder where the image file should be created.
-	/// </param>
 	public static string extractImageToFile( 
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id, string image_file_format_name, 
 		string image_planes, string destination_folder_path )
@@ -2455,43 +1323,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	/// <summary>
-	/// 	Extract a rendered image to memory.
-	/// </summary>
-	/// <param name="asset_id">
-	///		The asset id.
-	/// </param>
-	/// <param name="material_id">
-	///		The material id from a <see cref="HAPI_PartInfo"/> struct.
-	/// </param>
-	/// <param name="image_file_format_name">
-	///		The image file format name you wish the image to be
-	///		extracted as. You can leave this parameter (null) to
-	///		get the image in the original format if it comes from
-	///		another texture file or in the default HAPI format,
-	///		which is HAPI_Constants.HAPI_DEFAULT_IMAGE_FORMAT_NAME, 
-	///		if the image is generated.
-	///
-	///		You can get some of the very common standard image
-	///		file format names from HAPI_Common.cs under the 
-	///		HAPI_Constants enum (ie. HAPI_PNG_FORMAT_NAME).
-	///
-	///		You can also get a list of all supported file formats
-	///		(and the exact names this parameter expects)
-	///		by using getSupportedImageFileFormats(). This
-	///		list will include custom file formats you created via
-	///		custom DSOs (see HDK docs about IMG_Format). You 
-	///		will get back a list of HAPI_ImageFileFormat(s). 
-	///		This parameter expects the HAPI_ImageFileFormat::name
-	///		of a given image file format.
-	/// </param>
-	/// <param name="image_planes">
-	///		The image planes you wish to extract into the file. Multiple image planes should be 
-	///		separated by spaces.
-	/// </param>
-	/// <returns>
-	///		The byte stream with the extracted image binary data.
-	/// </returns>
 	public static byte[] extractImageToMemory( 
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id, string image_file_format_name, string image_planes )
 	{
