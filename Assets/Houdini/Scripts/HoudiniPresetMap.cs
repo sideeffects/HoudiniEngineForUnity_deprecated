@@ -31,4 +31,17 @@ public class HoudiniPresetMap : HoudiniMap< string, HoudiniPreset >
 		HoudiniPreset preset = base.get( key );
 		return preset.myPreset;
 	}
+
+	public HoudiniPresetMap clone()
+	{
+		HoudiniPresetMap preset_map = ScriptableObject.CreateInstance< HoudiniPresetMap >();
+		preset_map.name = name + "(Clone)";
+
+		foreach ( string key in myKeys )
+		{
+			preset_map.add( key, get( key ) );
+		}
+
+		return preset_map;
+	}
 }

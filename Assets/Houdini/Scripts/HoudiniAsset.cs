@@ -68,6 +68,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			if ( myAssetOTLUndoInfo == null )
 			{
 				myAssetOTLUndoInfo = ScriptableObject.CreateInstance< HoudiniAssetUndoInfo >();
+				myAssetOTLUndoInfo.name = prAssetName + "_UndoInfo";
 				myAssetOTLUndoInfo.initialize( this );
 			}
 			return myAssetOTLUndoInfo;
@@ -83,7 +84,10 @@ public abstract class HoudiniAsset : HoudiniControl
 		get 
 		{ 
 			if ( myPresetsMap == null )
+			{
 				myPresetsMap = ScriptableObject.CreateInstance< HoudiniPresetMap >();
+				myPresetsMap.name = prAssetName + "_PresetsMap";
+			}
 			return myPresetsMap;
 		}
 		private set { }
@@ -1100,7 +1104,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			prAssetHelp					= prAssetInfo.helpText;
 			prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
 			prTransformInputCount		= prAssetInfo.transformInputCount;
-			prGeoInputCount			= prAssetInfo.geoInputCount;
+			prGeoInputCount				= prAssetInfo.geoInputCount;
 
 #if UNITY_EDITOR
 			if ( isPrefab() )
@@ -1216,6 +1220,17 @@ public abstract class HoudiniAsset : HoudiniControl
 					HoudiniAssetUtility.getHoudiniTransformAndApply( prAssetId, prAssetName, transform );
 			
 				progress_bar.prMessage = "Loading and composing objects...";
+
+				// Destroy/copy non-copiable but still serialized member data.
+				if ( is_duplication )
+				{
+					myAssetOTLUndoInfo = null;
+					if ( myPresetsMap != null )
+					{
+						myPresetsMap = myPresetsMap.clone();
+						myPresetsMap.name = prAssetName + "_PresetMap";
+					}
+				}
 			
 				// Custom way to load objects (custom to each subclass).
 				buildCreateObjects( reload_asset, ref progress_bar );
