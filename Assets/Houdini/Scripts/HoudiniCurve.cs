@@ -443,27 +443,11 @@ public class HoudiniCurve : MonoBehaviour
 	public void initDefaultParameters() 
 	{
 		// Set curve defaults.
-		// TODO: Make generic update parm value functions.
 
 		try
 		{
-			HAPI_ParmInfo primitive_type_parm	= prParms.findParm( "type" );
-			HAPI_ParmInfo method_parm			= prParms.findParm( "method" );
-			int primitive_type_parm_default		= HoudiniHost.prCurvePrimitiveTypeDefault;
-			int method_parm_default				= HoudiniHost.prCurveMethodDefault;
-			int primitive_type_parm_int_values	= primitive_type_parm.intValuesIndex;
-			int method_parm_int_values			= method_parm.intValuesIndex;
-
-			prParms.prParmIntValues[ primitive_type_parm_int_values ]	= primitive_type_parm_default;
-			prParms.prParmIntValues[ method_parm_int_values ]			= method_parm_default;
-
-			int[] temp_int_values = new int[ 1 ];
-
-			temp_int_values[ 0 ] = primitive_type_parm_default;
-			HoudiniHost.setParmIntValues( prControl.prNodeId, temp_int_values, primitive_type_parm.intValuesIndex, 1 );
-
-			temp_int_values[ 0 ] = method_parm_default;
-			HoudiniHost.setParmIntValues( prControl.prNodeId, temp_int_values, method_parm.intValuesIndex, 1 );
+			HoudiniHost.setParmIntValue( prControl.prNodeId, "type", 0, HoudiniHost.prCurvePrimitiveTypeDefault );
+			HoudiniHost.setParmIntValue( prControl.prNodeId, "method", 0, HoudiniHost.prCurveMethodDefault );
 			
 			HoudiniHost.cookAsset(
 				prControl.prAsset.prAssetId,
