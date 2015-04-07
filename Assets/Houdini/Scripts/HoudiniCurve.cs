@@ -465,7 +465,10 @@ public class HoudiniCurve : MonoBehaviour
 			temp_int_values[ 0 ] = method_parm_default;
 			HoudiniHost.setParmIntValues( prControl.prNodeId, temp_int_values, method_parm.intValuesIndex, 1 );
 			
-			HoudiniHost.cookAsset( prControl.prAsset.prAssetId, prControl.prAsset.prSplitGeosByGroup );
+			HoudiniHost.cookAsset(
+				prControl.prAsset.prAssetId,
+				prControl.prAsset.prSplitGeosByGroup,
+				prControl.prAsset.prImportTemplatedGeos );
 		}
 		catch {}
 	}

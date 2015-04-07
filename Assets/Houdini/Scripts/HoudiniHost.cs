@@ -652,12 +652,15 @@ public static partial class HoudiniHost
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
-	public static int loadOTL( string path, bool split_geos_by_group, HoudiniProgressBar progress_bar )
+	public static int loadOTL(
+		string path, bool split_geos_by_group, bool import_templated_geos,
+		HoudiniProgressBar progress_bar )
 	{
-		return loadOTL( path, split_geos_by_group, progress_bar, true );
+		return loadOTL( path, split_geos_by_group, import_templated_geos, progress_bar, true );
 	}
 	public static int loadOTL(
-		string path, bool split_geos_by_group, HoudiniProgressBar progress_bar, bool allow_asset_def_overwrite ) 
+		string path, bool split_geos_by_group, bool import_templated_geos,
+		HoudiniProgressBar progress_bar, bool allow_asset_def_overwrite ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		if ( !isInstallationOk() )
@@ -715,7 +718,7 @@ public static partial class HoudiniHost
 		status_code = HAPI_InstantiateAsset( first_asset_name, cook_on_load, out asset_id );
 		processStatusCode( status_code );
 		progress_bar.statusCheckLoop();
-		cookAsset( asset_id, split_geos_by_group );
+		cookAsset( asset_id, split_geos_by_group, import_templated_geos );
 		progress_bar.statusCheckLoop();
 
 		return asset_id;
