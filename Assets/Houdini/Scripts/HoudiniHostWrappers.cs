@@ -446,7 +446,7 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void cookAsset( HAPI_AssetId asset_id, bool split_geos_by_group )
+	public static void cookAsset( HAPI_AssetId asset_id, bool split_geos_by_group, bool import_templated_geos )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_CookOptions cook_options = new HAPI_CookOptions();
@@ -454,7 +454,7 @@ public static partial class HoudiniHost
 		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
 		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
-		cook_options.cookTemplatedGeos = HoudiniHost.prImportTemplatedGeos;
+		cook_options.cookTemplatedGeos = import_templated_geos;
 		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );
 		processStatusCode( status_code );
 #else

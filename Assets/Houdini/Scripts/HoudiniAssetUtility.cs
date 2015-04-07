@@ -2232,7 +2232,8 @@ public class HoudiniAssetUtility
 				asset.prAssetPath = "";
 				
 				asset.prAssetId = asset_id;
-				HoudiniHost.cookAsset( asset_id, true );
+				HoudiniHost.cookAsset(
+					asset_id, HoudiniHost.prSplitGeosByGroup, HoudiniHost.prImportTemplatedGeos );
 				
 				bool build_result = asset.buildAll();
 				if ( build_result == false ) // Something is not right. Clean up.
