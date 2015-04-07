@@ -110,9 +110,19 @@ public class HoudiniGeoControl : HoudiniObjectControl
 
 		// Get Geo info.
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HoudiniHost.getGeoInfo( prAssetId, prObjectId, prGeoId, out geo_info );
+		try
+		{
+			// If templated geos are off this will error out for templated
+			// geos because they woudn't have cooked. But we still need to
+			// get the geo info to see that this is a templated geo and skip it.
+			HoudiniHost.getGeoInfo( prAssetId, prObjectId, prGeoId, out geo_info );
+		}
+		catch ( HoudiniErrorInvalidArgument ) {}
 
 		if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_INPUT )
+			return;
+
+		if ( geo_info.isTemplated && !prAsset.prImportTemplatedGeos && !geo_info.isEditable )
 			return;
 
 		if ( !reload_asset && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
