@@ -511,9 +511,10 @@ public class HoudiniCurve : MonoBehaviour
 					prControl.prAsset.prAssetName + "\nId: " + prControl.prAsset.prAssetId );
 			}
 		}
-		catch ( System.Exception error )
+		catch ( System.Exception )
 		{
-			Debug.Log( error.ToString() + "\nSource: " + error.Source );	
+			// There's no reason to worry the user about this useless error.
+			//Debug.Log( error.ToString() + "\nSource: " + error.Source );	
 		}
 #endif // UNITY_EDITOR
 	}
