@@ -187,7 +187,10 @@ public enum HAPI_Result
 	HAPI_RESULT_DISALLOWED_NC_LICENSE_FOUND			= 120,
 	HAPI_RESULT_DISALLOWED_NC_ASSET_WITH_C_LICENSE	= 130,
 	HAPI_RESULT_DISALLOWED_NC_ASSET_WITH_LC_LICENSE	= 140,
-	HAPI_RESULT_DISALLOWED_LC_ASSET_WITH_C_LICENSE	= 150
+	HAPI_RESULT_DISALLOWED_LC_ASSET_WITH_C_LICENSE	= 150,
+
+	HAPI_RESULT_ASSET_INVALID						= 200,
+	HAPI_RESULT_NODE_INVALID						= 210
 };
 
 public enum HAPI_State
@@ -668,6 +671,8 @@ public struct HAPI_NodeInfo
 	public HAPI_NodeId id;
 	public HAPI_AssetId assetId;
 	public HAPI_StringHandle nameSH;
+
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool isValid;
 
 	public int totalCookCount;
 
