@@ -84,7 +84,7 @@ public static partial class HoudiniHost
 			return "";
 
 		StringBuilder string_builder = new StringBuilder( buffer_size );
-		status_code = HAPI_GetStatusString( status_type, string_builder );
+		status_code = HAPI_GetStatusString( status_type, string_builder, buffer_size );
 		processStatusCode( status_code );
 
 		string string_value = string_builder.ToString();
