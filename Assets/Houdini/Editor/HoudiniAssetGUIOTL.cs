@@ -182,7 +182,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				myAsset.prBakeSamplesPerSecond = value;
 		}
 		
-		if ( GUILayout.Button( "Bake" ) ) 
+		if ( GUILayout.Button( "Bake Animation" ) ) 
 		{
 			HoudiniProgressBar progress_bar = new HoudiniProgressBar();
 			progress_bar.prUseDelay = false;
@@ -205,6 +205,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				myAssetOTL.prActiveEditPaintGeo = geo_control;
 				myGeoAttributeManager = geo_control.prGeoAttributeManager;
 				myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
+				refresh();
 			}
 		}
 	}
