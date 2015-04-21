@@ -110,14 +110,13 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Paint Tools
-#if !HAPI_PAINT_SUPPORT
+
 		if( !myAsset.isPrefab() )
 		{
 			myAsset.prShowPaintTools = HoudiniGUI.foldout( "Paint Tools", myAssetOTL.prShowPaintTools, true );
 			if ( myAsset.prShowPaintTools )
 				generatePaintToolGUI();
 		}
-#endif // !HAPI_PAINT_SUPPORT
 
 		GUI.enabled = gui_enable;
 	}
@@ -126,7 +125,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 	{
 		base.OnSceneGUI();
 
-#if !HAPI_PAINT_SUPPORT
 		if ( myGeoAttributeManagerGUI != null )
 		{
 			myGeoAttributeManagerGUI.OnSceneGUI();
@@ -143,7 +141,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				myAssetOTL.buildClientSide();
 			}
 		}
-#endif // !HAPI_PAINT_SUPPORT
 
 		handlesOnSceneGUI();
 	}
@@ -199,7 +196,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		}
 	}
 
-#if !HAPI_PAINT_SUPPORT
 	private void generatePaintToolGUI()
 	{
 		foreach ( HoudiniGeoControl geo_control in myAssetOTL.prEditPaintGeos )
@@ -212,7 +208,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			}
 		}
 	}
-#endif // !HAPI_PAINT_SUPPORT
 
 	private void generateViewSettings()
 	{

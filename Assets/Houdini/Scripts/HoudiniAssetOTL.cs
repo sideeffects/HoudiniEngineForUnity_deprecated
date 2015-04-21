@@ -234,7 +234,6 @@ public class HoudiniAssetOTL : HoudiniAsset
 		}
 
 		// Enumerate edit and paint geos.
-#if !HAPI_PAINT_SUPPORT
 		HoudiniGeoControl[] geo_controls = gameObject.GetComponentsInChildren< HoudiniGeoControl >();
 		myEditPaintGeos.Clear();
 		foreach ( HoudiniGeoControl geo_control in geo_controls )
@@ -245,7 +244,6 @@ public class HoudiniAssetOTL : HoudiniAsset
 				myEditPaintGeos.Add( geo_control );
 			}
 		}
-#endif // !HAPI_PAINT_SUPPORT
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

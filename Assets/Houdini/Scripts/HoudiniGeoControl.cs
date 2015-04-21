@@ -180,7 +180,6 @@ public class HoudiniGeoControl : HoudiniObjectControl
 					reload_asset, geo_info.hasGeoChanged, geo_info.hasMaterialChanged );
 
 			// Handle Edit/Paint Nodes
-#if !HAPI_PAINT_SUPPORT
 			if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 			{
 				// We are limited to using the first part, always.
@@ -274,7 +273,6 @@ public class HoudiniGeoControl : HoudiniObjectControl
 					}
 				}
 			}
-#endif // !HAPI_PAINT_SUPPORT
 
 			// Handle script attaching.
 			if ( reload_asset && geo_info.partCount > 0 )
