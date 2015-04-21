@@ -164,9 +164,12 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
 	{
-		// Reset paint nodes.
-		prEditPaintGeos = new List< HoudiniGeoControl >();
-		prActiveEditPaintGeo = null;
+		// Initialize (or leave alone!) the pain structs.
+		if ( prEditPaintGeos == null )
+		{
+			prEditPaintGeos = new List< HoudiniGeoControl >();
+			prActiveEditPaintGeo = null;
+		}
 
 		progress_bar.prMessage = "Loading handles...";
 
@@ -235,13 +238,13 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 		// Enumerate edit and paint geos.
 		HoudiniGeoControl[] geo_controls = gameObject.GetComponentsInChildren< HoudiniGeoControl >();
-		myEditPaintGeos.Clear();
+		prEditPaintGeos.Clear();
 		foreach ( HoudiniGeoControl geo_control in geo_controls )
 		{
 			if ( geo_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE
 				&& geo_control.GetType() == typeof( HoudiniGeoControl ) )
 			{
-				myEditPaintGeos.Add( geo_control );
+				prEditPaintGeos.Add( geo_control );
 			}
 		}
 	}
