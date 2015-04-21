@@ -1651,11 +1651,9 @@ public class HoudiniAssetUtility
 		if ( generate_tangents )
 			mesh.tangents = tangents;
 
-#if !HAPI_PAINT_SUPPORT
 		// We don't want to set these if we're generating intermediate geo mesh because
 		// we would overwrite the painted values.
 		if ( part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
-#endif // !HAPI_PAINT_SUPPORT
 		{
 			mesh.colors = colours;
 		}
@@ -1960,7 +1958,6 @@ public class HoudiniAssetUtility
 					}
 				}
 			}
-#if !HAPI_PAINT_SUPPORT
 			else
 			{
 				foreach ( HoudiniGeoAttribute attribute in attribute_manager.prAttributes )
@@ -1997,7 +1994,6 @@ public class HoudiniAssetUtility
 					}
 				}
 			}
-#endif // !HAPI_PAINT_SUPPORT
 		}
 
 		HoudiniHost.commitGeo( asset_id, object_id, geo_id );

@@ -240,7 +240,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 					getOrCreateComponent< MeshRenderer >();
 				}
 
-#if !HAPI_PAINT_SUPPORT
 				if ( myGeoControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 				{
 					MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
@@ -253,7 +252,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 					mesh_collider.enabled = false;
 					mesh_collider.enabled = true;
 				}
-#endif // !HAPI_PAINT_SUPPORT
 
 				// Add Mesh-to-Prefab component.
 				HoudiniMeshToPrefab mesh_saver = getOrCreateComponent< HoudiniMeshToPrefab >();
