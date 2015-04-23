@@ -108,16 +108,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				generateAssetBakeControls();
 		}
 
-		///////////////////////////////////////////////////////////////////////
-		// Draw Paint Tools
-
-		if( !myAsset.isPrefab() )
-		{
-			myAsset.prShowPaintTools = HoudiniGUI.foldout( "Paint Tools", myAssetOTL.prShowPaintTools, true );
-			if ( myAsset.prShowPaintTools )
-				generatePaintToolGUI();
-		}
-
 		GUI.enabled = gui_enable;
 	}
 
@@ -125,10 +115,59 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 	{
 		base.OnSceneGUI();
 
+		// If no active attribute manager is set yet, set it.
+		if ( myAssetOTL.prEditPaintGeos.Count > 0 && myGeoAttributeManagerGUI == null )
+		{
+			myGeoAttributeManager = myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager;
+			myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
+		}
+
+		// If we have an active attribute manager then go ahead and draw its Scene GUI.
 		if ( myGeoAttributeManagerGUI != null )
 		{
-			myGeoAttributeManagerGUI.OnSceneGUI();
-			if ( myGeoAttributeManager != null && myGeoAttributeManager.prHasChanged && myGeoAttributeManager.prLiveUpdates )
+			// First, get the current active paint geo index, then call the manager's
+			// OnSceneGUI function to draw the GUI and get back the new active paint
+			// geo index.
+			int current_active_edit_paint_geo_index =
+				myAssetOTL.prEditPaintGeos.FindIndex(
+					delegate ( HoudiniGeoControl g ) {
+						return g.prGeoName == myAssetOTL.prActiveEditPaintGeo.prGeoName; } );
+			int new_active_edit_paint_geo_index =
+				myGeoAttributeManagerGUI.OnSceneGUI(
+					"Intermediate Result",
+					current_active_edit_paint_geo_index,
+					myAssetOTL.prEditPaintGeos.ConvertAll< string >( x => x.prGeoName ).ToArray() );
+
+			// If the new active paint geo index is different than the old one we need to
+			// switch attribute managers.
+			if ( new_active_edit_paint_geo_index != current_active_edit_paint_geo_index )
+			{
+				// Save the current mode on the current attribute manager and restore
+				// its mode to NONE so that it properly hides its geometry.
+				HoudiniGeoAttributeManager.Mode current_mode =
+					myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager.prCurrentMode;
+				myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager.changeMode(
+					HoudiniGeoAttributeManager.Mode.NONE );
+
+				// Switch to the new attribute manager.
+				myAssetOTL.prActiveEditPaintGeo = myAssetOTL.prEditPaintGeos[ new_active_edit_paint_geo_index ];
+
+				// Change the new attribute manager's mode to the previous attribute manager's mode.
+				// This is important so that we have a smooth transition between attribute managers
+				// and so that the new attribute manager's geo is unhidden.
+				myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager.changeMode( current_mode );
+
+				// Update our local attribute manager pointer with the new attribute manager
+				// and create a new attribute manager GUI for it.
+				myGeoAttributeManager = myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager; 
+				myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
+			}
+
+			// If the value has changed (something was painted) and we have live updates enabled,
+			// apply the modification on the mesh itself and cook the asset.
+			if ( myGeoAttributeManager != null &&
+				myGeoAttributeManager.prHasChanged &&
+				myGeoAttributeManager.prLiveUpdates )
 			{
 				myGeoAttributeManager.prHasChanged = false;
 
@@ -193,20 +232,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				myAsset.gameObject,
 				progress_bar );
 			progress_bar.clearProgressBar();
-		}
-	}
-
-	private void generatePaintToolGUI()
-	{
-		foreach ( HoudiniGeoControl geo_control in myAssetOTL.prEditPaintGeos )
-		{
-			if ( HoudiniGUI.button( geo_control.prGeoName, geo_control.prGeoName ) )
-			{
-				myAssetOTL.prActiveEditPaintGeo = geo_control;
-				myGeoAttributeManager = geo_control.prGeoAttributeManager;
-				myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
-				refresh();
-			}
 		}
 	}
 

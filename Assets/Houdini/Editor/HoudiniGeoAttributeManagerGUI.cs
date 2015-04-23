@@ -79,16 +79,21 @@ public class HoudiniGeoAttributeManagerGUI
 	
 	public void OnSceneGUI() 
 	{
+		OnSceneGUI( "Input Geo", 0, new string[]{ myManager.prTransform.name } );
+	}
+
+	public int OnSceneGUI( string tool_name, int selected_node_index, string[] node_list ) 
+	{
 		// We can only build or do anything if we can link to our libraries.
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( myManager == null || myManager.prMeshCollider == null )
-			return;
+			return selected_node_index;
 
 		if ( prGeoMesh == null )
-			return;
+			return selected_node_index;
 
 		// First Remake and Draw Guide Geometry if necessary.
 		if ( mySelectionMesh == null )
@@ -115,7 +120,7 @@ public class HoudiniGeoAttributeManagerGUI
 			decideModes( ref current_event );
 
 		// Draw scene UI.
-		drawSceneUI();
+		selected_node_index = drawSceneUI( tool_name, selected_node_index, node_list );
 
 		if ( !current_event.alt && !( current_event.type == EventType.MouseDown && current_event.button == 1 ) )
 		{
@@ -444,6 +449,8 @@ public class HoudiniGeoAttributeManagerGUI
 			}
 		}
 
+		return selected_node_index;
+
 		// We can only build or do anything if we can link to our libraries.
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		#pragma warning restore 0162
@@ -716,9 +723,9 @@ public class HoudiniGeoAttributeManagerGUI
 		myManager.prModeChangeWait		= mode_change_wait;
 	}
 
-	private void drawToolSceneUI()
+	private void drawToolSceneUI( string tool_name )
 	{
-		string title_text = HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " Input Geo";
+		string title_text = HoudiniConstants.HAPI_PRODUCT_SHORT_NAME + " " + tool_name;
 		string paint_hotkey_string = HoudiniHost.prPaintingModeHotKey.ToString();
 		string edit_hotkey_string = HoudiniHost.prEditingPointsModeHotKey.ToString();
 		string help_text = "" + paint_hotkey_string + ": paint | " + 
@@ -856,7 +863,7 @@ public class HoudiniGeoAttributeManagerGUI
 			}
 		}
 
-		// Draw yellow mode lines around the Scene view.
+		// Draw mode lines around the Scene view.
 		if ( mySceneWindowHasFocus )
 		{
 			// Create texture.
@@ -894,9 +901,9 @@ public class HoudiniGeoAttributeManagerGUI
 		GUI.color = original_color;
 	}
 
-	private void drawPaintingSceneUI()
+	private int drawPaintingSceneUI( int selected_node_index, string[] node_list )
 	{
-		string title_text = "Painting";
+		string node_text = "Node:";
 		string attribute_text = "Attribute:";
 		string mode_text = "Mode:";
 		string value_text = "Value:";
@@ -915,7 +922,7 @@ public class HoudiniGeoAttributeManagerGUI
 		float line_height			= mySceneUILineHeight;
 		float line_padding			= mySceneUILinePadding;
 		float double_line_padding	= 2.0f * line_padding;
-		float dropdown_width		= 100.0f;
+		float dropdown_width		= 80.0f;
 		float field_width			= 50.0f;
 		float toggle_width			= 14.0f;
 
@@ -933,7 +940,7 @@ public class HoudiniGeoAttributeManagerGUI
 		float box_top				= border_total;
 
 		// Get text widths.
-		float title_text_width		= bold_text_style.CalcSize( new GUIContent( title_text ) ).x
+		float node_text_width		= bold_text_style.CalcSize( new GUIContent( node_text ) ).x
 									  + double_line_padding;
 		float attribute_text_width	= normal_text_style.CalcSize( new GUIContent( attribute_text ) ).x
 									  + double_line_padding;
@@ -946,13 +953,13 @@ public class HoudiniGeoAttributeManagerGUI
 		float liveup_text_width		= normal_text_style.CalcSize( new GUIContent( liveup_text ) ).x
 									  + double_line_padding;
 
-		float title_box_width		= title_text_width;
+		float node_box_width		= node_text_width + dropdown_width + line_padding;
 		float attribute_box_width	= attribute_text_width + dropdown_width + line_padding;
 		float mode_box_width		= mode_text_width + dropdown_width + line_padding;
 		float rate_box_width		= rate_text_width + field_width + line_padding;
 		float liveup_box_width		= liveup_text_width + toggle_width + line_padding;
 		float value_box_width		= scene_width
-									  - title_box_width - border_padding
+									  - node_box_width - border_padding
 									  - attribute_box_width - border_padding
 									  - rate_box_width - border_padding
 									  - liveup_box_width - border_padding
@@ -960,8 +967,9 @@ public class HoudiniGeoAttributeManagerGUI
 									  - border_total - border_total;
 		float value_fields_width	= value_box_width - value_text_width;
 		
-		float title_box_right		= border_total;
-		float attribute_box_right	= border_total + title_box_width + border_padding;
+		float node_box_right		= border_total;
+		float node_dropdown_right	= node_box_right + node_text_width;
+		float attribute_box_right	= border_total + node_box_width + border_padding;
 		float attribute_dropdown_right = attribute_box_right + attribute_text_width;
 		float mode_box_right		= attribute_box_right + attribute_box_width + border_padding;
 		float mode_dropdown_right	= mode_box_right + mode_text_width;
@@ -981,7 +989,8 @@ public class HoudiniGeoAttributeManagerGUI
 		box_texture.Apply();
 
 		// Set up rectangles for the boxes.
-		Rect title_box_rect				= new Rect( title_box_right, box_top, title_box_width, box_height );
+		Rect node_box_rect				= new Rect( node_box_right, box_top, node_box_width, box_height );
+		Rect node_dropdown_rect			= new Rect( node_dropdown_right, box_top, dropdown_width, box_height );
 		Rect attribute_box_rect			= new Rect( attribute_box_right, box_top, attribute_box_width, box_height );
 		Rect attribute_dropdown_rect	= new Rect( attribute_dropdown_right, box_top, dropdown_width, box_height );
 		Rect mode_box_rect				= new Rect( mode_box_right, box_top, mode_box_width, box_height );
@@ -994,15 +1003,18 @@ public class HoudiniGeoAttributeManagerGUI
 		Rect liveup_toggle_rect			= new Rect( liveup_toggle_right, box_top, liveup_text_width + toggle_width, box_height );
 
 		// Label boxes.
-		Rect title_text_rect = new Rect( title_box_right + line_padding, box_top, 
-										 title_text_width - double_line_padding, box_height - double_line_padding );
-		Rect attribute_text_rect = new Rect( attribute_box_right + line_padding, box_top, 
+		Rect node_text_rect	 = new Rect( node_box_right + line_padding, box_top,
+										 node_text_width - double_line_padding,
+										 box_height - double_line_padding );
+		Rect attribute_text_rect = new Rect( attribute_box_right + line_padding, box_top,
 											 attribute_text_width - double_line_padding,
 											 box_height - double_line_padding );
 		Rect mode_text_rect  = new Rect( mode_box_right + line_padding, box_top, 
-										 mode_text_width - double_line_padding, box_height - double_line_padding );
+										 mode_text_width - double_line_padding,
+										 box_height - double_line_padding );
 		Rect value_text_rect = new Rect( value_box_right + line_padding, box_top, 
-										 value_text_width - double_line_padding, box_height - double_line_padding );
+										 value_text_width - double_line_padding,
+										 box_height - double_line_padding );
 
 		// Start Drawing --------------------------------------------------------------------------------------------
 		Handles.BeginGUI();
@@ -1010,7 +1022,7 @@ public class HoudiniGeoAttributeManagerGUI
 
 		// Draw the background boxes for the Scene UI.
 		GUI.color = box_color;
-		GUI.DrawTexture( title_box_rect, box_texture, ScaleMode.StretchToFill );
+		GUI.DrawTexture( node_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( attribute_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( mode_box_rect, box_texture, ScaleMode.StretchToFill );
 		GUI.DrawTexture( value_box_rect, box_texture, ScaleMode.StretchToFill );
@@ -1019,7 +1031,7 @@ public class HoudiniGeoAttributeManagerGUI
 
 		// Draw the labels for the mesh and the help.
 		GUI.color = text_color;
-		GUI.Label( title_text_rect, title_text, bold_text_style );
+		GUI.Label( node_text_rect, node_text, normal_text_style );
 		GUI.Label( attribute_text_rect, attribute_text, normal_text_style );
 		GUI.Label( mode_text_rect, mode_text, normal_text_style );
 		GUI.Label( value_text_rect, value_text, normal_text_style );
@@ -1040,6 +1052,17 @@ public class HoudiniGeoAttributeManagerGUI
 		GUI.SetNextControlName( myPaintValuesFieldName + "LIVE_UPDATES" );
 		myManager.prLiveUpdates = EditorGUI.ToggleLeft(
 			liveup_toggle_rect, liveup_text, myManager.prLiveUpdates );
+
+		// Draw node dropdown.
+		{
+			int[] node_indicies = new int[ node_list.Length ];
+			for ( int i = 0; i < node_list.Length; ++i )
+				node_indicies[ i ] = i;
+
+			GUI.SetNextControlName( myPaintValuesFieldName + "NODE" );
+			selected_node_index = EditorGUI.IntPopup(
+				node_dropdown_rect, "", selected_node_index, node_list, node_indicies );
+		}
 
 		// Draw attribute dropdown.
 		{
@@ -1087,7 +1110,7 @@ public class HoudiniGeoAttributeManagerGUI
 				string[] mode_labels = new string[ mode_count ];
 				mode_labels[ 0 ] = "Color (First 3 Components)";
 				for ( int i = 1; i < mode_count; ++i )
-					mode_labels[ i ] = "Component " + i + " Only (Grayscale)";
+					mode_labels[ i ] = "Comp. " + i + " Only (Grayscale)";
 
 				GUI.SetNextControlName( myPaintValuesFieldName + "DRAW_MODE" );
 				int new_paint_mode = EditorGUI.IntPopup(
@@ -1188,13 +1211,16 @@ public class HoudiniGeoAttributeManagerGUI
 	
 		// Restore GUI colour.
 		GUI.color = original_color;
+
+		return selected_node_index;
 	}
 
-	private void drawSceneUI()
+	private int drawSceneUI( string tool_name, int selected_node_index, string[] node_list )
 	{
-		drawToolSceneUI();
+		drawToolSceneUI( tool_name );
 		if ( myManager.prEditable && myManager.prIsPaintingPoints )
-			drawPaintingSceneUI();
+			selected_node_index = drawPaintingSceneUI( selected_node_index, node_list );
+		return selected_node_index;
 	}
 
 	public static bool mySceneWindowHasFocus {
