@@ -247,6 +247,8 @@ public class HoudiniAssetOTL : HoudiniAsset
 				prEditPaintGeos.Add( geo_control );
 			}
 		}
+		if ( prEditPaintGeos.Count > 0 && prActiveEditPaintGeo == null )
+			prActiveEditPaintGeo = prEditPaintGeos[ 0 ];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
