@@ -90,7 +90,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			}
 			return myPresetsMap;
 		}
-		private set { }
+		private set {}
 	}
 
 	// Inputs -------------------------------------------------------------------------------------------------------
@@ -130,7 +130,23 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myGameObjects = value; } }
 	public HAPI_Transform[] 		prObjectTransforms {			get { return myObjectTransforms; } 
 																	set { myObjectTransforms = value; } }
-	
+
+	// Geos --------------------------------------------------------------------------------------------------------
+
+	public HoudiniGeoAttributeManagerMap prGeoAttributeManagerMap
+	{
+		get 
+		{ 
+			if ( myGeoAttributeManagerMap == null )
+			{
+				myGeoAttributeManagerMap = ScriptableObject.CreateInstance< HoudiniGeoAttributeManagerMap >();
+				myGeoAttributeManagerMap.name = prAssetName + "_GeoAttributeManagerMap";
+			}
+			return myGeoAttributeManagerMap;
+		}
+		private set {}
+	}
+
 	// Baking ------------------------------------------------------------------------------------------------------
 
 	public float					prBakeStartTime {				get { return myBakeStartTime; }
@@ -839,6 +855,10 @@ public abstract class HoudiniAsset : HoudiniControl
 		
 		prGameObjects 					= new GameObject[ 0 ];
 		prObjectTransforms 				= new HAPI_Transform[ 0 ];
+
+		// Geos -----------------------------------------------------------------------------------------------------
+
+		prGeoAttributeManagerMap		= null;
 		
 		// Baking ---------------------------------------------------------------------------------------------------
 		
@@ -1213,6 +1233,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			HoudiniAssetUtility.getArray2Id( prAssetId, HAPI_RSTOrder.HAPI_SRT, HoudiniHost.getObjectTransforms, 
 					 			 prObjectTransforms, prObjectCount );
 			
+			bool objects_need_recook = false;
 			if ( !serialization_recovery_only )
 			{
 				// Set asset's transform.
@@ -1225,6 +1246,11 @@ public abstract class HoudiniAsset : HoudiniControl
 				if ( is_duplication )
 				{
 					myAssetOTLUndoInfo = null;
+					if ( myGeoAttributeManagerMap != null )
+					{
+						myGeoAttributeManagerMap = myGeoAttributeManagerMap.clone();
+						myGeoAttributeManagerMap.name = prAssetName + "_GeoAttributeManagerMap";
+					}
 					if ( myPresetsMap != null )
 					{
 						myPresetsMap = myPresetsMap.clone();
@@ -1233,7 +1259,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				}
 			
 				// Custom way to load objects (custom to each subclass).
-				buildCreateObjects( reload_asset, ref progress_bar );
+				objects_need_recook = buildCreateObjects( reload_asset, ref progress_bar );
 			
 				// Process dependent assets.
 				if ( cook_downstream_assets )
@@ -1253,7 +1279,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 			// A bit of a hack (but not terrible). If we have presets for other child controls
 			// they set their presets by now so we need to rebuild with the new presets.
-			if ( reload_asset && !prPresetsMap.isEmpty() )
+			if ( objects_need_recook )
 			{
 				build(
 					false,	// reload_asset
@@ -1867,7 +1893,8 @@ public abstract class HoudiniAsset : HoudiniControl
 	protected virtual void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar ) {}
 
 	// Inherited classes should override this with however they wish to load objects in the prObjects array.
-	protected abstract void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar );
+	// Returns whether or not the objects require a recook.
+	protected abstract bool buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar );
 
 	// -------------------------------------------------------------------------------------------------------------
 	
@@ -2129,7 +2156,11 @@ public abstract class HoudiniAsset : HoudiniControl
 
 					 private HAPI_ObjectInfo[] 		myObjects;
 					 private HAPI_Transform[] 		myObjectTransforms;
-	
+
+	// Geos ---------------------------------------------------------------------------------------------------------
+
+	[SerializeField] private HoudiniGeoAttributeManagerMap myGeoAttributeManagerMap;
+
 	// Baking -------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private float 					myBakeStartTime;
@@ -2172,7 +2203,6 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private List< string >			myTransInputNames;
 	[SerializeField] private List< string >			myGeoInputNames;
 
-	
 	// Private Temporary Data
 	[SerializeField] protected Matrix4x4			myLastLocalToWorld;
 	

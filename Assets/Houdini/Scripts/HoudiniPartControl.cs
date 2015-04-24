@@ -464,14 +464,19 @@ public class HoudiniPartControl : HoudiniGeoControl
 		}
 
 		// Refresh enabled flags.
-		if ( gameObject.GetComponent< MeshCollider >() )
-			gameObject.GetComponent< MeshCollider >().enabled = 
-				prObjectVisible && 
-					( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
-		if ( gameObject.GetComponent< MeshRenderer >() )
-			gameObject.GetComponent< MeshRenderer >().enabled = 
-				prObjectVisible && 
-					( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
+		{
+			bool is_visible = prObjectVisible;
+			is_visible &= ( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
+			if ( prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE &&
+				myGeoControl.prGeoAttributeManager != null )
+				is_visible &=
+					myGeoControl.prGeoAttributeManager.prCurrentMode != HoudiniGeoAttributeManager.Mode.NONE;
+
+			if ( gameObject.GetComponent< MeshCollider >() )
+				gameObject.GetComponent< MeshCollider >().enabled = is_visible;
+			if ( gameObject.GetComponent< MeshRenderer >() )
+				gameObject.GetComponent< MeshRenderer >().enabled = is_visible;
+		}
 
 		// Assign materials.
 		HoudiniAssetUtility.assignMaterial( this, prAsset, reload_asset );

@@ -351,6 +351,22 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 		refreshMesh();
 	}
 
+	public bool hasAttribute( string name )
+	{
+		for ( int i = 0; i < myAttributes.Count; ++i )
+			if ( myAttributes[ i ].prName == name )
+				return true;
+		return false;
+	}
+
+	public HoudiniGeoAttribute getAttribute( string name )
+	{
+		for ( int i = 0; i < myAttributes.Count; ++i )
+			if ( myAttributes[ i ].prName == name )
+				return myAttributes[ i ];
+		return null;
+	}
+
 	private void addAttribute( HoudiniGeoAttribute new_attribute )
 	{
 		myAttributes.Add( new_attribute );
@@ -382,6 +398,59 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 		}
 
 		return temp_name;
+	}
+
+	public bool syncAttributes( int asset_id, int object_id, int geo_id, int part_id, Mesh mesh )
+	{
+		bool needs_recook = false;
+
+		// Fetch all point attributes.
+		string[] point_attribute_names = HoudiniHost.getAttributeNames(
+			asset_id, object_id, geo_id, part_id, HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
+
+		foreach ( string point_attribute_name in point_attribute_names )
+		{
+			if ( point_attribute_name == "P" )
+				continue;
+
+			HAPI_AttributeInfo point_attribute_info = HoudiniHost.getAttributeInfo(
+				asset_id, object_id, geo_id, part_id, point_attribute_name,
+				HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
+
+			HoudiniGeoAttribute attribute = null;
+
+			// If we already have an attribute with the same name, sync it with
+			// the attribute in Houdini - trying to salvage any data even if the 
+			// attribute storage type, tuple size, or mesh point count has changed.
+			if ( hasAttribute( point_attribute_name ) )
+			{
+				attribute = getAttribute( point_attribute_name );
+			}
+			else // Attribute not found.
+			{
+				HoudiniGeoAttribute.Type geo_attribute_type = HoudiniGeoAttribute.Type.UNDEFINED;
+				switch ( point_attribute_info.storage )
+				{
+					case HAPI_StorageType.HAPI_STORAGETYPE_INT:
+						geo_attribute_type = HoudiniGeoAttribute.Type.INT; break;
+					case HAPI_StorageType.HAPI_STORAGETYPE_FLOAT:
+						geo_attribute_type = HoudiniGeoAttribute.Type.FLOAT; break;
+					case HAPI_StorageType.HAPI_STORAGETYPE_STRING:
+						geo_attribute_type = HoudiniGeoAttribute.Type.STRING; break;
+				}
+
+				attribute = createAttribute( point_attribute_name );
+				attribute.init(
+					mesh, point_attribute_name, geo_attribute_type,
+					point_attribute_info.tupleSize );
+				attribute.prOriginalAttributeOwner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+			}
+
+			// Sync the values of the Unity attribute with the Houdini attribute.
+			needs_recook |= attribute.sync( asset_id, object_id, geo_id, part_id, mesh, point_attribute_info );
+		}
+
+		return needs_recook;
 	}
 
 	[SerializeField] private bool			myHasChanged;
