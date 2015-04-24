@@ -37,7 +37,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 	{
 		base.OnDisable();
 
-		if ( myGeoAttributeManager && myAssetOTL.prActiveEditPaintGeo )
+		if ( myGeoAttributeManager != null && myAssetOTL.prActiveAttributeManager != null )
 		{
 			myGeoAttributeManager.changeMode( HoudiniGeoAttributeManager.Mode.NONE );
 			myGeoAttributeManagerGUI = null;
@@ -118,7 +118,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		// If no active attribute manager is set yet, set it.
 		if ( myAssetOTL.prEditPaintGeos.Count > 0 && myGeoAttributeManagerGUI == null )
 		{
-			myGeoAttributeManager = myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager;
+			myGeoAttributeManager = myAssetOTL.prActiveAttributeManager;
 			myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
 		}
 
@@ -131,7 +131,8 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			int current_active_edit_paint_geo_index =
 				myAssetOTL.prEditPaintGeos.FindIndex(
 					delegate ( HoudiniGeoControl g ) {
-						return g.prGeoName == myAssetOTL.prActiveEditPaintGeo.prGeoName; } );
+						return System.Object.ReferenceEquals(
+							g.prGeoAttributeManager, myAssetOTL.prActiveAttributeManager ); } );
 			int new_active_edit_paint_geo_index =
 				myGeoAttributeManagerGUI.OnSceneGUI(
 					"Intermediate Result",
@@ -145,21 +146,22 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				// Save the current mode on the current attribute manager and restore
 				// its mode to NONE so that it properly hides its geometry.
 				HoudiniGeoAttributeManager.Mode current_mode =
-					myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager.prCurrentMode;
-				myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager.changeMode(
+					myAssetOTL.prActiveAttributeManager.prCurrentMode;
+				myAssetOTL.prActiveAttributeManager.changeMode(
 					HoudiniGeoAttributeManager.Mode.NONE );
 
 				// Switch to the new attribute manager.
-				myAssetOTL.prActiveEditPaintGeo = myAssetOTL.prEditPaintGeos[ new_active_edit_paint_geo_index ];
+				myAssetOTL.prActiveAttributeManager =
+					myAssetOTL.prEditPaintGeos[ new_active_edit_paint_geo_index ].prGeoAttributeManager;
 
 				// Change the new attribute manager's mode to the previous attribute manager's mode.
 				// This is important so that we have a smooth transition between attribute managers
 				// and so that the new attribute manager's geo is unhidden.
-				myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager.changeMode( current_mode );
+				myAssetOTL.prActiveAttributeManager.changeMode( current_mode );
 
 				// Update our local attribute manager pointer with the new attribute manager
 				// and create a new attribute manager GUI for it.
-				myGeoAttributeManager = myAssetOTL.prActiveEditPaintGeo.prGeoAttributeManager; 
+				myGeoAttributeManager = myAssetOTL.prActiveAttributeManager; 
 				myGeoAttributeManagerGUI = new HoudiniGeoAttributeManagerGUI( myGeoAttributeManager );
 			}
 
@@ -172,7 +174,10 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				myGeoAttributeManager.prHasChanged = false;
 
 				HoudiniPartControl part_control =
-					myAssetOTL.prActiveEditPaintGeo.prParts[ 0 ].GetComponent< HoudiniPartControl >();
+					myAssetOTL
+						.prEditPaintGeos[ new_active_edit_paint_geo_index ]
+						.prParts[ 0 ]
+						.GetComponent< HoudiniPartControl >();
 				Mesh mesh = part_control.GetComponent< MeshFilter >().sharedMesh;
 				HoudiniAssetUtility.setMesh(
 					part_control.prAssetId, part_control.prObjectId, part_control.prGeoId,

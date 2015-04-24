@@ -33,12 +33,13 @@ public class HoudiniAssetOTL : HoudiniAsset
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Asset.reset().
 	
-	public string prAssetPath {							get { return myAssetPath; } 
-														set { myAssetPath = value; } }
-	public HoudiniGeoControl prActiveEditPaintGeo {		get { return myActiveEditPaintGeo; }
-														set { myActiveEditPaintGeo = value; } }
-	public List< HoudiniGeoControl > prEditPaintGeos {	get { return myEditPaintGeos; }
-														set { myEditPaintGeos = value; } }
+	public string prAssetPath {									get { return myAssetPath; } 
+																set { myAssetPath = value; } }
+
+	public HoudiniGeoAttributeManager prActiveAttributeManager {get { return myActiveAttributeManager; }
+																set { myActiveAttributeManager = value; } }
+	public List< HoudiniGeoControl > prEditPaintGeos {			get { return myEditPaintGeos; }
+																set { myEditPaintGeos = value; } }
 	public HAPI_HandleInfo[] prHandleInfos { get; set; }
 	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
 	
@@ -69,7 +70,8 @@ public class HoudiniAssetOTL : HoudiniAsset
 		// Please keep these in the same order and grouping as their declarations at the top.
 
 		prAssetPath					= "";
-		prActiveEditPaintGeo		= null;
+
+		prActiveAttributeManager	= null;
 		prEditPaintGeos				= new List< HoudiniGeoControl >();
 
 		prHandleInfos 				= new HAPI_HandleInfo[ 0 ];
@@ -168,7 +170,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 		if ( prEditPaintGeos == null )
 		{
 			prEditPaintGeos = new List< HoudiniGeoControl >();
-			prActiveEditPaintGeo = null;
+			prActiveAttributeManager = null;
 		}
 
 		progress_bar.prMessage = "Loading handles...";
@@ -192,8 +194,10 @@ public class HoudiniAssetOTL : HoudiniAsset
 		}
 	}
 
-	protected override void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar )
+	protected override bool buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar )
 	{
+		bool needs_recook = false;
+
 		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
 		{
 			progress_bar.incrementProgressBar();
@@ -203,7 +207,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 						( reload_asset	|| prObjects[ object_index ].hasTransformChanged
 										|| prObjects[ object_index ].haveGeosChanged ) )
 				{
-					createObject( object_index, reload_asset );
+					needs_recook |= createObject( object_index, reload_asset );
 				}
 			}
 			catch ( HoudiniError error )
@@ -223,7 +227,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 				{
 					if ( object_info.objectToInstanceId >= 0 && 
 							prGameObjects[ object_info.objectToInstanceId ] == null )
-						createObject( object_info.objectToInstanceId, reload_asset );
+						needs_recook |= createObject( object_info.objectToInstanceId, reload_asset );
 						
 					if( reload_asset || object_info.haveGeosChanged )
 						instanceObjects( object_index, progress_bar );
@@ -247,8 +251,10 @@ public class HoudiniAssetOTL : HoudiniAsset
 				prEditPaintGeos.Add( geo_control );
 			}
 		}
-		if ( prEditPaintGeos.Count > 0 && prActiveEditPaintGeo == null )
-			prActiveEditPaintGeo = prEditPaintGeos[ 0 ];
+		if ( prEditPaintGeos.Count > 0 && prActiveAttributeManager == null )
+			prActiveAttributeManager = prEditPaintGeos[ 0 ].prGeoAttributeManager;
+
+		return needs_recook;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,8 +293,9 @@ public class HoudiniAssetOTL : HoudiniAsset
 		instancer.instanceObjects( progress_bar );
 	}
 
-	private void createObject( int object_id, bool reload_asset )
+	private bool createObject( int object_id, bool reload_asset )
 	{
+		bool needs_recook = false;
 		HoudiniObjectControl object_control = null;
 		HAPI_ObjectInfo object_info = prObjects[ object_id ];
 		
@@ -311,7 +318,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 		
 		try
 		{
-			object_control.refresh( reload_asset, object_info );
+			needs_recook |= object_control.refresh( reload_asset, object_info );
 
 			if ( reload_asset || object_info.hasTransformChanged )
 			{
@@ -328,12 +335,15 @@ public class HoudiniAssetOTL : HoudiniAsset
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;
 		}
+
+		return needs_recook;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Data
 	
 	[SerializeField] private string myAssetPath;
-	[SerializeField] private HoudiniGeoControl myActiveEditPaintGeo;
+
+	[SerializeField] private HoudiniGeoAttributeManager myActiveAttributeManager;
 	[SerializeField] private List< HoudiniGeoControl > myEditPaintGeos;
 }

@@ -79,8 +79,10 @@ public class HoudiniObjectControl : HoudiniControl
 		return base.getFullControlNameAndPath() + "/" + prObjectName;
 	}
 
-	public void refresh( bool reload_asset, HAPI_ObjectInfo object_info )
+	public bool refresh( bool reload_asset, HAPI_ObjectInfo object_info )
 	{
+		bool needs_recook = false;
+
 		if ( reload_asset )
 		{
 			for ( int i = 0; i < myGeos.Count; ++i )
@@ -103,8 +105,10 @@ public class HoudiniObjectControl : HoudiniControl
 
 			// Refresh all geos.
 			for ( int i = 0; i < myGeos.Count; ++i )
-				myGeos[ i ].GetComponent< HoudiniGeoControl >().refresh( reload_asset );
+				needs_recook |= myGeos[ i ].GetComponent< HoudiniGeoControl >().refresh( reload_asset );
 		}
+
+		return needs_recook;
 	}
 
 	public void beginBakeAnimation()
