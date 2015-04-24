@@ -98,12 +98,14 @@ public class HoudiniGeoControl : HoudiniObjectControl
 		return base.getFullControlNameAndPath() + "/" + prGeoName;
 	}
 
-	public void refresh( bool reload_asset )
+	public bool refresh( bool reload_asset )
 	{
+		bool needs_recook = false;
+
 		if ( prObjectControl == null )
 		{
 			Debug.LogError( "Why is my object control null on a refresh?" );
-			return;
+			return needs_recook;
 		}
 
 		GameObject geo_node = gameObject;
@@ -120,13 +122,13 @@ public class HoudiniGeoControl : HoudiniObjectControl
 		catch ( HoudiniErrorInvalidArgument ) {}
 
 		if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_INPUT )
-			return;
+			return needs_recook;
 
 		if ( geo_info.isTemplated && !prAsset.prImportTemplatedGeos && !geo_info.isEditable )
-			return;
+			return needs_recook;
 
 		if ( !reload_asset && !geo_info.hasGeoChanged && !geo_info.hasMaterialChanged )
-			return;
+			return needs_recook;
 
 		if ( reload_asset || geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
@@ -151,12 +153,13 @@ public class HoudiniGeoControl : HoudiniObjectControl
 					!myObjectControl.prAsset.prImportTemplatedGeos && 
 					geo_info.isTemplated ) )
 		{
-			return;
+			return needs_recook;
 		}
 
 		if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
 			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
+			needs_recook = true;
 		}
 		else
 		{
@@ -182,95 +185,45 @@ public class HoudiniGeoControl : HoudiniObjectControl
 			// Handle Edit/Paint Nodes
 			if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 			{
+				// Currently, we only support painting on the first part.
+				const int part_id = 0;
+
+				GameObject part_gameobject = myParts[ part_id ];
+				HoudiniPartControl part_control = part_gameobject.GetComponent< HoudiniPartControl >();
+				MeshFilter mesh_filter = part_control.getOrCreateComponent< MeshFilter >();
+				MeshRenderer mesh_renderer = part_control.getOrCreateComponent< MeshRenderer >();
+				MeshCollider mesh_collider = part_control.getOrCreateComponent< MeshCollider >();
+				Mesh mesh = mesh_filter.sharedMesh;
+
 				// We are limited to using the first part, always.
 				if ( myGeoAttributeManager == null && myParts.Count > 0 )
 				{
-					const int part_id = 0;
-
-					GameObject part_gameobject = myParts[ part_id ];
-					HoudiniPartControl part_control = part_gameobject.GetComponent< HoudiniPartControl >();
-					MeshFilter mesh_filter = part_control.getOrCreateComponent< MeshFilter >();
-					MeshRenderer mesh_renderer = part_control.getOrCreateComponent< MeshRenderer >();
-					MeshCollider mesh_collider = part_control.getOrCreateComponent< MeshCollider >();
-					Mesh mesh = mesh_filter.sharedMesh;
-
-					myGeoAttributeManager = ScriptableObject.CreateInstance< HoudiniGeoAttributeManager >();
-					myGeoAttributeManager.init( mesh, mesh_renderer, mesh_collider, part_gameobject.transform );
-
-					// Fetch all point attributes.
-					string[] point_attribute_names = HoudiniHost.getAttributeNames(
-						prAssetId, prObjectId, prGeoId, part_id, HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
-
-					foreach ( string point_attribute_name in point_attribute_names )
+					if ( prAsset.prGeoAttributeManagerMap.contains( getFullControlNameAndPath() ) )
 					{
-						if ( point_attribute_name == "P" )
-							continue;
-
-						HAPI_AttributeInfo point_attribute_info = HoudiniHost.getAttributeInfo(
-							prAssetId, prObjectId, prGeoId, part_id, point_attribute_name,
-							HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
-
-						if ( point_attribute_info.storage == HAPI_StorageType.HAPI_STORAGETYPE_INT )
-						{
-							int[] data = new int[ 0 ];
-							HoudiniAssetUtility.getAttribute(
-								prAssetId, prObjectId, prGeoId, part_id,
-								point_attribute_name, 
-								ref point_attribute_info,
-								ref data,
-								HoudiniHost.getAttributeIntData );
-							HoudiniGeoAttribute attribute =
-								myGeoAttributeManager.createAttribute( point_attribute_name );
-							attribute.init(
-								mesh, point_attribute_name, HoudiniGeoAttribute.Type.INT,
-								point_attribute_info.tupleSize );
-							attribute.prOriginalAttributeOwner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
-
-							if ( data.Length != attribute.prIntData.Length )
-								Debug.LogError( "Size mis-match in paint tools." );
-							else
-								for ( int i = 0; i < data.Length; ++i )
-									attribute.prIntData[ i ] = data[ i ];
-						}
-						else if ( point_attribute_info.storage == HAPI_StorageType.HAPI_STORAGETYPE_FLOAT )
-						{
-							int tuple_size = point_attribute_info.tupleSize;
-							float[] data = new float[ 0 ];
-							HoudiniAssetUtility.getAttribute(
-								prAssetId, prObjectId, prGeoId, part_id,
-								point_attribute_name, 
-								ref point_attribute_info,
-								ref data,
-								HoudiniHost.getAttributeFloatData );
-							HoudiniGeoAttribute attribute =
-								myGeoAttributeManager.createAttribute( point_attribute_name );
-							attribute.init(
-								mesh, point_attribute_name, HoudiniGeoAttribute.Type.FLOAT,
-								tuple_size );
-							attribute.prOriginalAttributeOwner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
-
-							// Get Vertex list.
-							HAPI_PartInfo part_info = new HAPI_PartInfo();
-							HoudiniHost.getPartInfo(
-								prAssetId, prObjectId, prGeoId, part_id, out part_info );
-							int[] vertex_list = new int[ part_info.vertexCount ];
-							HoudiniAssetUtility.getArray4Id(
-								prAssetId, prObjectId, prGeoId, part_id, HoudiniHost.getVertexList, 
-								vertex_list, part_info.vertexCount );
-
-							if ( part_info.vertexCount * tuple_size != attribute.prFloatData.Length )
-								Debug.LogError( "Size mis-match in paint tools." );
-							else
-								for ( int i = 0; i < part_info.vertexCount; ++i )
-									for ( int tuple = 0; tuple < tuple_size; ++tuple )
-										attribute.prFloatData[ i * tuple_size + tuple ] =
-											data[ vertex_list[ i ] * tuple_size + tuple ];
-						}
-						else if ( point_attribute_info.storage == HAPI_StorageType.HAPI_STORAGETYPE_STRING )
-						{
-
-						}
+						myGeoAttributeManager = prAsset.prGeoAttributeManagerMap.get( getFullControlNameAndPath() );
+						myGeoAttributeManager.reInit( mesh, mesh_renderer, mesh_collider, part_gameobject.transform );
 					}
+					else
+					{
+						myGeoAttributeManager = ScriptableObject.CreateInstance< HoudiniGeoAttributeManager >();
+						myGeoAttributeManager.init( mesh, mesh_renderer, mesh_collider, part_gameobject.transform );
+						prAsset.prGeoAttributeManagerMap.add( getFullControlNameAndPath(), myGeoAttributeManager );
+					}
+
+					// Sync the attributes and see if we need a recook.
+					if ( myGeoAttributeManager.syncAttributes( prAssetId, prObjectId, prGeoId, part_id, mesh ) )
+					{
+						HoudiniAssetUtility.setMesh(
+							prAssetId, prObjectId, prGeoId,
+							ref mesh, part_control, myGeoAttributeManager );
+						needs_recook = true;
+					}
+				}
+				else
+				{
+					// Just sync the attributes but don't recook. Setting needs_recook to true here would
+					// cause infinite cooking.
+					myGeoAttributeManager.syncAttributes( prAssetId, prObjectId, prGeoId, part_id, mesh );
 				}
 			}
 
@@ -294,6 +247,8 @@ public class HoudiniGeoControl : HoudiniObjectControl
 				}
 			}
 		}
+
+		return needs_recook;
 	}
 
 	public override void onParmChange()

@@ -121,7 +121,7 @@ public class HoudiniAssetCurve : HoudiniAsset
 		prCurve.initDefaultParameters();
 	}
 
-	protected override void buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar )
+	protected override bool buildCreateObjects( bool reload_asset, ref HoudiniProgressBar progress_bar )
 	{
 		try
 		{
@@ -134,6 +134,8 @@ public class HoudiniAssetCurve : HoudiniAsset
 			// Per-object errors are not re-thrown so that the rest of the asset has a chance to load.
 			//Debug.LogWarning( error.ToString() );
 		}
+
+		return false;
 	}
 
 }

@@ -221,6 +221,39 @@ public class HoudiniGeoAttribute : ScriptableObject
 			myType = new_type;
 		}
 	}
+	public HAPI_StorageType prStorageType
+	{
+		get
+		{
+			switch ( myType )
+			{
+				case Type.BOOL: return HAPI_StorageType.HAPI_STORAGETYPE_INT;
+				case Type.INT: return HAPI_StorageType.HAPI_STORAGETYPE_INT;
+				case Type.FLOAT: return HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
+				case Type.STRING: return HAPI_StorageType.HAPI_STORAGETYPE_STRING;
+				default: return HAPI_StorageType.HAPI_STORAGETYPE_INVALID;
+			}
+		}
+		set
+		{
+			switch ( value )
+			{
+				case HAPI_StorageType.HAPI_STORAGETYPE_INT:
+				{
+					// We don't want to turn a bool type into an int type
+					// just because HAPI doesn't recognize bool types.
+					if ( myType == Type.BOOL || myType == Type.INT )
+						return;
+					else
+						prType = Type.INT;
+					break;
+				}
+				case HAPI_StorageType.HAPI_STORAGETYPE_FLOAT: prType = Type.FLOAT; break;
+				case HAPI_StorageType.HAPI_STORAGETYPE_STRING: prType = Type.STRING; break;
+				default: break;
+			}
+		}
+	}
 	public HAPI_AttributeOwner prOriginalAttributeOwner
 	{
 		get { return myOriginalAttributeOwner; }
@@ -392,16 +425,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 			HAPI_AttributeInfo attr_info = new HAPI_AttributeInfo( prName );
 			attr_info.exists = true;
 			attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX;
-
-			if ( myType == Type.BOOL || myType == Type.INT )
-				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_INT;
-			else if ( myType == Type.FLOAT )
-				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
-			else if ( myType == Type.STRING )
-				attr_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_STRING;
-			else
-				throw new HoudiniErrorInvalidArgument( "Invalid geo attribute type." );
-
+			attr_info.storage = prStorageType;
 			attr_info.count = myVertexCount;
 			attr_info.tupleSize = myTupleSize;
 			return attr_info;
@@ -425,6 +449,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 		myOriginalAttributeOwner = HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX;
 		myTupleSize = 1;
 		myVertexCount = 0;
+		myInitializedVertexCount = 0;
 
 		myPaintMode = (int) SpecialPaintMode.COLOUR;
 
@@ -560,6 +585,95 @@ public class HoudiniGeoAttribute : ScriptableObject
 		}
 	}
 
+	public bool sync(
+		int asset_id, int object_id, int geo_id, int part_id,
+		Mesh mesh, HAPI_AttributeInfo attribute_info )
+	{
+		int tuple_size = attribute_info.tupleSize;
+
+		prStorageType = attribute_info.storage;
+		prTupleSize = tuple_size;
+		myVertexCount = mesh.vertexCount;
+
+		Type type = prType;
+
+		if ( myInitializedVertexCount != mesh.vertexCount )
+		{
+			int new_size = mesh.vertexCount * tuple_size;
+			if ( type == Type.BOOL || type == Type.INT )
+				System.Array.Resize< int >( ref myIntData, new_size );
+			else if ( type == Type.FLOAT )
+				System.Array.Resize< float >( ref myFloatData, new_size );
+			else if ( type == Type.STRING )
+				System.Array.Resize< string >( ref myStringData, new_size );
+		}
+
+		if ( myInitializedVertexCount < mesh.vertexCount )
+		{
+			// Get Vertex list.
+			HAPI_PartInfo part_info = new HAPI_PartInfo();
+			HoudiniHost.getPartInfo(
+				asset_id, object_id, geo_id, part_id, out part_info );
+			int[] vertex_list = new int[ part_info.vertexCount ];
+			HoudiniAssetUtility.getArray4Id(
+				asset_id, object_id, geo_id, part_id, HoudiniHost.getVertexList, 
+				vertex_list, part_info.vertexCount );
+
+			if ( type == Type.BOOL || type == Type.INT )
+			{
+				int[] data = new int[ 0 ];
+				HoudiniAssetUtility.getAttribute(
+					asset_id, object_id, geo_id, part_id,
+					myName, 
+					ref attribute_info,
+					ref data,
+					HoudiniHost.getAttributeIntData );
+
+				for ( int i = myInitializedVertexCount; i < part_info.vertexCount; ++i )
+					for ( int tuple = 0; tuple < tuple_size; ++tuple )
+						prIntData[ i * tuple_size + tuple ] =
+							data[ vertex_list[ i ] * tuple_size + tuple ];
+			}
+			else if ( type == Type.FLOAT )
+			{
+				float[] data = new float[ 0 ];
+				HoudiniAssetUtility.getAttribute(
+					asset_id, object_id, geo_id, part_id,
+					myName, 
+					ref attribute_info,
+					ref data,
+					HoudiniHost.getAttributeFloatData );
+
+				for ( int i = myInitializedVertexCount; i < part_info.vertexCount; ++i )
+					for ( int tuple = 0; tuple < tuple_size; ++tuple )
+						prFloatData[ i * tuple_size + tuple ] =
+							data[ vertex_list[ i ] * tuple_size + tuple ];
+			}
+			else if ( type == Type.STRING )
+			{
+				int[] data = new int[ 0 ];
+				HoudiniAssetUtility.getAttribute(
+					asset_id, object_id, geo_id, part_id,
+					myName, 
+					ref attribute_info,
+					ref data,
+					HoudiniHost.getAttributeStringData );
+
+				for ( int i = myInitializedVertexCount; i < part_info.vertexCount; ++i )
+					for ( int tuple = 0; tuple < tuple_size; ++tuple )
+						prStringData[ i * tuple_size + tuple ] =
+							HoudiniHost.getString( data[ vertex_list[ i ] * tuple_size + tuple ] );
+			}
+		}
+
+		// If some of the data was already 
+		bool needs_recook = myInitializedVertexCount > 0;
+
+		myInitializedVertexCount = mesh.vertexCount;
+
+		return needs_recook;
+	}
+
 	// -----------------------------------------------------------------------
 	// Representation
 
@@ -693,6 +807,9 @@ public class HoudiniGeoAttribute : ScriptableObject
 		if ( vertex_index <= 0 || vertex_index >= myVertexCount )
 			return; // TODO: Throw error.
 
+		// If we start writing to our data we assume our data is initialized.
+		myInitializedVertexCount = myVertexCount;
+
 		int start_comp_index = 0;
 		int end_comp_index = myTupleSize;
 
@@ -778,6 +895,9 @@ public class HoudiniGeoAttribute : ScriptableObject
 
 	public void fill()
 	{
+		// If we start writing to our data we assume our data is initialized.
+		myInitializedVertexCount = myVertexCount;
+
 		if ( myVertexCount > 0 )
 			if ( myType == Type.BOOL || myType == Type.INT )
 				for ( int i = 0; i < myVertexCount; ++i )
@@ -802,6 +922,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 	[SerializeField] private HAPI_AttributeOwner myOriginalAttributeOwner;
 	[SerializeField] private int myTupleSize;
 	[SerializeField] private int myVertexCount;
+	[SerializeField] private int myInitializedVertexCount;
 
 	[SerializeField] private int myPaintMode;
 
