@@ -162,6 +162,25 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 		}
 	}
 
+	public HoudiniGeoAttributeManager copy()
+	{
+		HoudiniGeoAttributeManager new_manager =
+			ScriptableObject.CreateInstance< HoudiniGeoAttributeManager >();
+
+		// It's ok to init the new manager with the mesh, mesh renderer, and mesh
+		// collider of the old manager because these things will be overwritten
+		// on next cook. I think.
+		new_manager.init( myMesh, myMeshRenderer, myMeshCollider, myTransform );
+
+		for ( int i = 0; i < myAttributes.Count; ++i )
+		{
+			HoudiniGeoAttribute new_attribute = myAttributes[ i ].copy();
+			new_manager.addAttribute( new_attribute );
+		}
+
+		return new_manager;
+	}
+
 	public void changeMode( Mode new_mode )
 	{
 		if ( new_mode != myCurrentMode )
