@@ -69,6 +69,7 @@ public class HoudiniObjectControl : HoudiniControl
 		prAssetId		= asset_id;
 		prNodeId		= node_id;
 		prAsset			= asset;
+		prObjectNodeId	= node_id;
 		prObjectId		= object_id;
 		prObjectName	= object_name;
 		prObjectVisible = object_visible;
@@ -76,7 +77,17 @@ public class HoudiniObjectControl : HoudiniControl
 
 	public override string getFullControlNameAndPath()
 	{
-		return base.getFullControlNameAndPath() + "/" + prObjectName;
+		string name = prObjectName;
+
+		// This is necessary so we return consistent paths regardless of the 
+		// name of the asset node which can be named differently for different
+		// instantiations of the asset (ie geo1, geo2, etc.)
+		if ( prAsset.prNodeId == prObjectNodeId )
+		{
+			name = prAsset.prAssetOpName;
+		}
+
+		return base.getFullControlNameAndPath() + "/" + name;
 	}
 
 	public bool refresh( bool reload_asset, HAPI_ObjectInfo object_info )
