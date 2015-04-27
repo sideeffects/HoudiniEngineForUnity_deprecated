@@ -674,6 +674,57 @@ public class HoudiniGeoAttribute : ScriptableObject
 		return needs_recook;
 	}
 
+	public HoudiniGeoAttribute copy()
+	{
+		HoudiniGeoAttribute new_attribute =
+			ScriptableObject.CreateInstance< HoudiniGeoAttribute >();
+
+		new_attribute.reset();
+
+		new_attribute.myName = myName;
+
+		new_attribute.myType = myType;
+		new_attribute.myOriginalAttributeOwner = myOriginalAttributeOwner;
+		new_attribute.myTupleSize = myTupleSize;
+		new_attribute.myVertexCount = myVertexCount;
+		new_attribute.myInitializedVertexCount = myInitializedVertexCount;
+
+		new_attribute.myPaintMode = myPaintMode;
+
+		if ( myType == Type.INT || myType == Type.BOOL )
+		{
+			new_attribute.myIntPaintValue = new int[ myIntPaintValue.Length ];
+			myIntPaintValue.CopyTo( new_attribute.myIntPaintValue, 0 );
+
+			new_attribute.myIntMin = myIntMin;
+			new_attribute.myIntMax = myIntMax;
+
+			new_attribute.myIntData = new int[ myIntData.Length ];
+			myIntData.CopyTo( new_attribute.myIntData, 0 );
+		}
+		else if ( myType == Type.FLOAT )
+		{
+			new_attribute.myFloatPaintValue = new float[ myFloatPaintValue.Length ];
+			myFloatPaintValue.CopyTo( new_attribute.myFloatPaintValue, 0 );
+
+			new_attribute.myFloatMin = myFloatMin;
+			new_attribute.myFloatMax = myFloatMax;
+
+			new_attribute.myFloatData = new float[ myFloatData.Length ];
+			myFloatData.CopyTo( new_attribute.myFloatData, 0 );
+		}
+		else if ( myType == Type.STRING )
+		{
+			new_attribute.myStringPaintValue = new string[ myStringPaintValue.Length ];
+			myStringPaintValue.CopyTo( new_attribute.myStringPaintValue, 0 );
+
+			new_attribute.myStringData = new string[ myStringData.Length ];
+			myStringData.CopyTo( new_attribute.myStringData, 0 );
+		}
+
+		return new_attribute;
+	}
+
 	// -----------------------------------------------------------------------
 	// Representation
 

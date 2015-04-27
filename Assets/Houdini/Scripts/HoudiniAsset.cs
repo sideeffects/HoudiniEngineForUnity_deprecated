@@ -52,6 +52,8 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myAssetValidationId = value; } }
  	public string					prAssetName {					get { return myAssetName; }
 																	set { myAssetName = value; } }
+	public string					prAssetOpName {					get { return myAssetOpName; }
+																	set { myAssetOpName = value; } }
 	public string					prAssetHelp {					get { return myAssetHelp; }
 																	set { myAssetHelp = value; } }
 	public AssetType				prAssetType {					get { return myAssetType; }
@@ -822,6 +824,7 @@ public abstract class HoudiniAsset : HoudiniControl
 		prPreset 						= null;
 		prAssetValidationId				= -1;
 		prAssetName						= "ASSET_NAME";
+		prAssetOpName					= "ASSET_OP_NAME";
 		prAssetHelp						= "ASSET_HELP";
 		prAssetType						= AssetType.TYPE_INVALID;
 		prHAPIAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
@@ -1121,6 +1124,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			prHandleCount 				= prAssetInfo.handleCount;
 
 			prAssetName					= prAssetInfo.name;
+			prAssetOpName				= prAssetInfo.fullOpName;
 			prAssetHelp					= prAssetInfo.helpText;
 			prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
 			prTransformInputCount		= prAssetInfo.transformInputCount;
@@ -1220,7 +1224,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				progress_bar.displayProgressBar();
 				updateParameters( progress_bar );
 			}
-			
+
 			// Create local object info caches (transforms need to be stored in a parallel array).
 			if ( prObjects == null || prObjects.Length != prObjectCount )
 				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
@@ -1232,7 +1236,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			HoudiniAssetUtility.getArray1Id( prAssetId, HoudiniHost.getObjects, prObjects, prObjectCount );
 			HoudiniAssetUtility.getArray2Id( prAssetId, HAPI_RSTOrder.HAPI_SRT, HoudiniHost.getObjectTransforms, 
 					 			 prObjectTransforms, prObjectCount );
-			
+
 			bool objects_need_recook = false;
 			if ( !serialization_recovery_only )
 			{
@@ -1248,7 +1252,7 @@ public abstract class HoudiniAsset : HoudiniControl
 					myAssetOTLUndoInfo = null;
 					if ( myGeoAttributeManagerMap != null )
 					{
-						myGeoAttributeManagerMap = myGeoAttributeManagerMap.clone();
+						myGeoAttributeManagerMap = myGeoAttributeManagerMap.copy();
 						myGeoAttributeManagerMap.name = prAssetName + "_GeoAttributeManagerMap";
 					}
 					if ( myPresetsMap != null )
@@ -1497,6 +1501,10 @@ public abstract class HoudiniAsset : HoudiniControl
 		foreach ( HoudiniPartControl part_control in new_object.GetComponentsInChildren< HoudiniPartControl >() )
 		{
 			if ( part_control.prObjectControl.GetComponent< HoudiniInstance >() )
+				continue;
+
+			// We don't want to bake any intermediate meshes.
+			if ( part_control.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 				continue;
 
 			// Bake meshes.
@@ -2123,6 +2131,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private byte[]					myPreset;
 	[SerializeField] private int					myAssetValidationId;
 	[SerializeField] private string					myAssetName;
+	[SerializeField] private string					myAssetOpName;
 	[SerializeField] private string					myAssetHelp;
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
