@@ -75,7 +75,7 @@ public class HoudiniObjectControl : HoudiniControl
 		prObjectVisible = object_visible;
 	}
 
-	public override string getFullControlNameAndPath()
+	public override string getRelativePath()
 	{
 		string name = prObjectName;
 
@@ -87,7 +87,21 @@ public class HoudiniObjectControl : HoudiniControl
 			name = prAsset.prAssetOpName;
 		}
 
-		return base.getFullControlNameAndPath() + "/" + name;
+		return base.getRelativePath() + "/" + name;
+	}
+
+	public override string getAbsolutePath()
+	{
+		string asset_name = "";
+
+		// If this object is NOT the asset node, we want to include the
+		// asset node name in the path.
+		if ( prAsset.prNodeId != prObjectNodeId )
+		{
+			asset_name = prAsset.prAssetName + "/";
+		}
+
+		return base.getAbsolutePath() + "/" + asset_name + prObjectName;
 	}
 
 	public bool refresh( bool reload_asset, HAPI_ObjectInfo object_info )

@@ -116,7 +116,7 @@ public class HoudiniAssetCurve : HoudiniAsset
 		return HoudiniHost.createCurve();
 	}
 
-	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
+	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar, bool is_duplication )
 	{
 		prCurve.initDefaultParameters();
 	}

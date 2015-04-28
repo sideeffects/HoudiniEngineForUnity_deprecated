@@ -164,12 +164,16 @@ public class HoudiniAssetOTL : HoudiniAsset
 			prAssetPath, prSplitGeosByGroup, prImportTemplatedGeos, progress_bar, false );
 	}
 
-	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
+	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar, bool is_duplication )
 	{
 		// Initialize (or leave alone!) the pain structs.
 		if ( prEditPaintGeos == null )
 		{
 			prEditPaintGeos = new List< HoudiniGeoControl >();
+			prActiveAttributeManager = null;
+		}
+		else if ( is_duplication )
+		{
 			prActiveAttributeManager = null;
 		}
 

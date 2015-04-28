@@ -131,9 +131,14 @@ public class HoudiniPartControl : HoudiniGeoControl
 		prPartName		= part_name;
 	}
 
-	public override string getFullControlNameAndPath()
+	public override string getRelativePath()
 	{
-		return base.getFullControlNameAndPath() + "/" + prPartName;
+		return base.getRelativePath() + "/" + prPartName;
+	}
+
+	public override string getAbsolutePath()
+	{
+		return base.getAbsolutePath() + "/" + prPartName;
 	}
 
 	public void refresh( bool reload_asset, bool has_geo_changed, bool has_material_changed )
@@ -196,11 +201,12 @@ public class HoudiniPartControl : HoudiniGeoControl
 				MeshFilter mesh_filter = getOrCreateComponent< MeshFilter >();
 
 				// Get or create mesh.
-				Mesh part_mesh 				= mesh_filter.sharedMesh;
+				Mesh part_mesh = mesh_filter.sharedMesh;
 				if ( part_mesh == null ) 
 				{
-					mesh_filter.mesh 		= new Mesh();
-					part_mesh 				= mesh_filter.sharedMesh;
+					mesh_filter.mesh = new Mesh();
+					part_mesh = mesh_filter.sharedMesh;
+					part_mesh.name = getAbsolutePath() + "/Mesh";
 				}
 				part_mesh.Clear();
 		
