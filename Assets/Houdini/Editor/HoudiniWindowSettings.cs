@@ -421,6 +421,102 @@ public class HoudiniWindowSettings : EditorWindow
 			}
 		}
 
+		// Painting Node Switch Hot Key
+		{
+			KeyCode value = HoudiniHost.prPaintingNodeSwitchHotKey;
+			string[] labels = 
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.Select( v => v.ToString() )
+					.ToArray();
+			KeyCode[] values =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.ToArray();
+			bool changed = HoudiniGUI.dropdown(
+				"painting_node_switch_hot_key", "Node Switch Key",
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.paintingNodeSwitchHotKey );
+
+			if ( changed )
+			{
+				HoudiniHost.prPaintingNodeSwitchHotKey = (KeyCode) value;
+				HoudiniHost.repaint();
+			}
+		}
+
+		// Painting Attribute Switch Hot Key
+		{
+			KeyCode value = HoudiniHost.prPaintingAttributeSwitchHotKey;
+			string[] labels = 
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.Select( v => v.ToString() )
+					.ToArray();
+			KeyCode[] values =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.ToArray();
+			bool changed = HoudiniGUI.dropdown(
+				"painting_attribute_switch_hot_key", "Attr. Switch Key",
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.paintingAttributeSwitchHotKey );
+
+			if ( changed )
+			{
+				HoudiniHost.prPaintingAttributeSwitchHotKey = (KeyCode) value;
+				HoudiniHost.repaint();
+			}
+		}
+
+		// Painting Value Change Hot Key
+		{
+			KeyCode value = HoudiniHost.prPaintingValueChangeHotKey;
+			string[] labels = 
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.Select( v => v.ToString() )
+					.ToArray();
+			KeyCode[] values =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.ToArray();
+			bool changed = HoudiniGUI.dropdown(
+				"painting_value_change_hot_key", "Value Change Key",
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.paintingValueChangeHotKey );
+
+			if ( changed )
+			{
+				HoudiniHost.prPaintingValueChangeHotKey = (KeyCode) value;
+				HoudiniHost.repaint();
+			}
+		}
+
+		// Painting Falloff Change Hot Key
+		{
+			KeyCode value = HoudiniHost.prPaintingFalloffChangeHotKey;
+			string[] labels = 
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.Select( v => v.ToString() )
+					.ToArray();
+			KeyCode[] values =
+				System.Enum.GetValues( typeof( KeyCode ) )
+					.Cast< KeyCode >()
+					.ToArray();
+			bool changed = HoudiniGUI.dropdown(
+				"painting_falloff_change_hot_key", "Falloff Change Key",
+				ref value, labels, values, myUndoInfo,
+				ref myUndoInfo.paintingFalloffChangeHotKey );
+
+			if ( changed )
+			{
+				HoudiniHost.prPaintingFalloffChangeHotKey = (KeyCode) value;
+				HoudiniHost.repaint();
+			}
+		}
+
 		HoudiniGUI.separator();
 
 		// Adding Points Mode Hot Key
