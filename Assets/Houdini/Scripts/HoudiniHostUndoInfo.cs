@@ -36,6 +36,10 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	public float paintBrushRate;
 	public KeyCode paintingModeHotKey;
 	public Color paintingModeColour;
+	public KeyCode paintingNodeSwitchHotKey;
+	public KeyCode paintingAttributeSwitchHotKey;
+	public KeyCode paintingValueChangeHotKey;
+	public KeyCode paintingFalloffChangeHotKey;
 	public KeyCode addingPointsModeHotKey;
 	public Color addingPointsModeColour;
 	public KeyCode editingPointsModeHotKey;
@@ -94,6 +98,10 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		paintBrushRate					= HoudiniHost.prPaintBrushRate;
 		paintingModeHotKey 				= HoudiniHost.prPaintingModeHotKey;
 		paintingModeColour 				= HoudiniHost.prPaintingModeColour;
+		paintingNodeSwitchHotKey		= HoudiniHost.prPaintingNodeSwitchHotKey;
+		paintingAttributeSwitchHotKey	= HoudiniHost.prPaintingAttributeSwitchHotKey;
+		paintingValueChangeHotKey		= HoudiniHost.prPaintingValueChangeHotKey;
+		paintingFalloffChangeHotKey		= HoudiniHost.prPaintingFalloffChangeHotKey;
 		addingPointsModeHotKey 			= HoudiniHost.prAddingPointsModeHotKey;
 		addingPointsModeColour 			= HoudiniHost.prAddingPointsModeColour;
 		editingPointsModeHotKey 		= HoudiniHost.prEditingPointsModeHotKey;

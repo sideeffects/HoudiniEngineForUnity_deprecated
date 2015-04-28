@@ -30,23 +30,26 @@ public class HoudiniGeoAttributeManagerGUI
 	
 	public HoudiniGeoAttributeManagerGUI( HoudiniGeoAttributeManager manager ) 
 	{
-		myManager				= manager;
+		myManager					= manager;
 
-		myForceInspectorRedraw	= false;
+		myForceInspectorRedraw		= false;
 
-		myIsMouseDown			= false;
-		myMouseKey				= 0;
-		myCurrentlyPressedKey	= KeyCode.None;
-		myFirstMousePosition	= new Vector3();
+		myIsMouseDown				= false;
+		myMouseKey					= 0;
+		myCurrentlyPressedKey		= KeyCode.None;
+		myCurrentlyPressedSecondKey	= KeyCode.None;
+		myCurrentlyPressedModeKey	= KeyCode.None;
 
-		mySelectionArea			= new Rect();
-		mySelectionMeshColours	= null;
-		mySelectionMesh			= null;
-		mySelectionMaterial		= null;
-		mySelectedPoints		= new List< int >();
-		mySelectedPointsMask	= new List< bool >();
+		myFirstMousePosition		= new Vector3();
 
-		myLastMode				= HoudiniGeoAttributeManager.Mode.NONE;
+		mySelectionArea				= new Rect();
+		mySelectionMeshColours		= null;
+		mySelectionMesh				= null;
+		mySelectionMaterial			= null;
+		mySelectedPoints			= new List< int >();
+		mySelectedPointsMask		= new List< bool >();
+
+		myLastMode					= HoudiniGeoAttributeManager.Mode.NONE;
 
 		HoudiniHost.myRepaintDelegate += this.refresh;
 		HoudiniHost.myDeselectionDelegate += this.deselect;
@@ -102,8 +105,8 @@ public class HoudiniGeoAttributeManagerGUI
 		if ( !myTempCamera && Camera.current )
 			myTempCamera = Camera.current;
 
-		Event current_event 		= Event.current;
-		Vector3 mouse_position		= getMousePosition( ref current_event );
+		Event current_event = Event.current;
+		Vector3 mouse_position = getMousePosition( ref current_event );
 
 		// Determine key state.
 		getKeyState( current_event );
@@ -126,12 +129,69 @@ public class HoudiniGeoAttributeManagerGUI
 		{
 			if ( myManager.prIsPaintingPoints )
 			{
-				if (
+				// Switch nodes or attributes via shortcut keys.
+				if ( areKeysTheSame( myCurrentlyPressedSecondKey, HoudiniHost.prPaintingNodeSwitchHotKey ) &&
+					areKeysTheSame( myCurrentlyPressedModeKey, HoudiniHost.prPaintingModeHotKey ) )
+				{
+					selected_node_index = ( selected_node_index + 1 ) % node_list.Length;
+					myCurrentlyPressedSecondKey = KeyCode.None;
+					myCurrentlyPressedKey = KeyCode.None;
+					return selected_node_index;
+				}
+				if ( areKeysTheSame( myCurrentlyPressedSecondKey, HoudiniHost.prPaintingAttributeSwitchHotKey ) &&
+					areKeysTheSame( myCurrentlyPressedModeKey, HoudiniHost.prPaintingModeHotKey ) )
+				{
+					int selected_attribute_index = 0;
+					for ( int i = 0; i < myManager.prAttributes.Count; ++i )
+						if ( myManager.prAttributes[ i ].prName == myManager.prActiveAttribute.prName )
+							selected_attribute_index = i;
+
+					selected_attribute_index = ( selected_attribute_index + 1 ) % myManager.prAttributes.Count;
+
+					string selected_attribute_name = myManager.prAttributes[ selected_attribute_index ].prName;
+					myManager.setActiveAttribute( selected_attribute_name );
+
+					myCurrentlyPressedSecondKey = KeyCode.None;
+					myCurrentlyPressedKey = KeyCode.None;
+					return selected_node_index;
+				}
+				if ( areKeysTheSame( myCurrentlyPressedSecondKey, HoudiniHost.prPaintingValueChangeHotKey ) &&
+					areKeysTheSame( myCurrentlyPressedModeKey, HoudiniHost.prPaintingModeHotKey ) &&
+					current_event.type == EventType.ScrollWheel )
+				{
+					for ( int i = 0; i < myManager.prActiveAttribute.prTupleSize; ++i )
+					{
+						if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.BOOL
+							|| myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.INT )
+							myManager.prActiveAttribute.prIntPaintValue[ i ] = Mathf.Clamp(
+								myManager.prActiveAttribute.prIntPaintValue[ i ] +
+									(int) ( -current_event.delta.y * ( HoudiniHost.prPaintBrushRate + 1.0f ) ),
+								myManager.prActiveAttribute.prIntMin,
+								myManager.prActiveAttribute.prIntMax );
+						else if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT )
+							myManager.prActiveAttribute.prFloatPaintValue[ i ] = Mathf.Clamp(
+								myManager.prActiveAttribute.prFloatPaintValue[ i ] +
+									-current_event.delta.y * HoudiniHost.prPaintBrushRate,
+								myManager.prActiveAttribute.prFloatMin,
+								myManager.prActiveAttribute.prFloatMax );
+						else if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.STRING )
+						{
+							// Makes no sense to change the string paint value via hotkey so do nothing.
+						}
+					}
+					current_event.Use();
+
+					myCurrentlyPressedSecondKey = KeyCode.None;
+					myCurrentlyPressedKey = KeyCode.None;
+					return selected_node_index;
+				}
+
+				if ( myManager.prModeChangeWait ||
 					( myCurrentlyPressedKey != myMayaBrushResizeKey &&
 						myCurrentlyPressedKey != myHoudiniBrushResizeKey ) ||
 					( current_event.type == EventType.MouseDown ) &&
 						( myCurrentlyPressedKey == myMayaBrushResizeKey ||
-							myCurrentlyPressedKey == myMayaBrushResizeKey ) )
+							myCurrentlyPressedKey == myHoudiniBrushResizeKey ) )
 				{
 					myFirstMousePosition = mouse_position;
 				}
@@ -160,7 +220,7 @@ public class HoudiniGeoAttributeManagerGUI
 				MeshCollider mesh_collider  = myManager.prMeshCollider;
 				RaycastHit hit_info;
 				mesh_collider.Raycast( ray, out hit_info, myIntersectionRayLength );
-				 
+
 				if ( hit_info.collider )
 				{
 					// Draw paint brush.
@@ -173,7 +233,7 @@ public class HoudiniGeoAttributeManagerGUI
 
 					// Consume scroll-wheel event.
 					if ( current_event.type == EventType.ScrollWheel
-						&& areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prPaintingModeHotKey ) )
+						&& areKeysTheSame( myCurrentlyPressedModeKey, HoudiniHost.prPaintingModeHotKey ) )
 					{
 						myManager.prBrushRadius += current_event.delta.y * myMouseWheelBrushSizeMultiplier;
 						current_event.Use();
@@ -186,8 +246,9 @@ public class HoudiniGeoAttributeManagerGUI
 						else if ( current_event.keyCode == myPhotoshopBrushGrowKey )
 							myManager.prBrushRadius += myMouseWheelBrushSizeMultiplier;
 
-					if ( myCurrentlyPressedKey == myMayaBrushResizeKey || 
-						myCurrentlyPressedKey == myHoudiniBrushResizeKey )
+					if ( !myManager.prModeChangeWait &&
+						( myCurrentlyPressedKey == myMayaBrushResizeKey || 
+						myCurrentlyPressedKey == myHoudiniBrushResizeKey ) )
 					{
 						EditorGUIUtility.AddCursorRect( myTempCamera.pixelRect, MouseCursor.ResizeHorizontal );
 						if ( current_event.type == EventType.MouseDrag )
@@ -470,22 +531,60 @@ public class HoudiniGeoAttributeManagerGUI
 		return mouse_position;
 	}
 
+	private bool isModeKey( KeyCode key )
+	{
+		if ( key == HoudiniHost.prPaintingModeHotKey || key == HoudiniHost.prEditingPointsModeHotKey )
+			return true;
+		return false;
+	}
+
+	private void pressKey( KeyCode key )
+	{
+		if ( isModeKey( key ) )
+			myCurrentlyPressedModeKey = key;
+		else
+			myCurrentlyPressedSecondKey = key;
+
+		myCurrentlyPressedKey = key;
+	}
+
+	private void depressKey( KeyCode key )
+	{
+		if ( isModeKey( key ) )
+			myCurrentlyPressedModeKey = KeyCode.None;
+		else
+			myCurrentlyPressedSecondKey = KeyCode.None;
+
+		myCurrentlyPressedKey = KeyCode.None;
+	}
+
 	private void getKeyState( Event current_event )
 	{
 		// So, for some odd reason, it is possible (and highly likely) to get a the
 		// EventType.KeyDown event triggerd but with a keyCode of KeyCode.None. Lovely.
 		if ( current_event.type == EventType.KeyDown && current_event.keyCode != KeyCode.None )
-			myCurrentlyPressedKey = current_event.keyCode;
+		{
+			pressKey( current_event.keyCode );
+		}
 		else if ( current_event.control )
-			myCurrentlyPressedKey = KeyCode.LeftControl;
+		{
+			pressKey( KeyCode.LeftControl );
+		}
 		else if ( current_event.shift )
-			myCurrentlyPressedKey = KeyCode.LeftShift;
+		{
+			pressKey( KeyCode.LeftShift );
+		}
 		else if ( current_event.type == EventType.KeyUp || current_event.type == EventType.Ignore )
+		{
 			// I have to also interpret the Ignore event as the mouse up event because that's all I
 			// get if the use lets go of the mouse button while over a different Unity window...
+			depressKey( current_event.keyCode );
+		}
+		else if ( myCurrentlyPressedModeKey == KeyCode.LeftShift && !current_event.shift )
+		{
+			myCurrentlyPressedModeKey = KeyCode.None;
 			myCurrentlyPressedKey = KeyCode.None;
-		else if ( myCurrentlyPressedKey == KeyCode.LeftShift && !current_event.shift )
-			myCurrentlyPressedKey = KeyCode.None;
+		}
 	}
 
 	private void clearSelection()
@@ -643,8 +742,8 @@ public class HoudiniGeoAttributeManagerGUI
 			return;
 		}
 
-		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prPaintingModeHotKey );
-		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedKey, HoudiniHost.prEditingPointsModeHotKey );
+		bool paint_mode_key			= areKeysTheSame( myCurrentlyPressedModeKey, HoudiniHost.prPaintingModeHotKey );
+		bool edit_points_mode_key	= areKeysTheSame( myCurrentlyPressedModeKey, HoudiniHost.prEditingPointsModeHotKey );
 
 		bool paint_mode				= myManager.prIsPaintingPoints;
 		bool edit_points_mode		= myManager.prIsEditingPoints;
@@ -699,8 +798,8 @@ public class HoudiniGeoAttributeManagerGUI
 		}
 
 		// Check if ENTER or ESC was pressed so we can exit the mode.
-		if ( myCurrentlyPressedKey == KeyCode.Escape || 
-			( myCurrentlyPressedKey == KeyCode.Return &&
+		if ( myCurrentlyPressedSecondKey == KeyCode.Escape || 
+			( myCurrentlyPressedSecondKey == KeyCode.Return &&
 				!GUI.GetNameOfFocusedControl().StartsWith( myPaintValuesFieldName ) ) )
 		{
 			paint_mode				= false;
@@ -847,8 +946,8 @@ public class HoudiniGeoAttributeManagerGUI
 			// whos key is being held down...
 			GUI.enabled = 
 				!mySceneWindowHasFocus ||
-				( ( myCurrentlyPressedKey != HoudiniHost.prPaintingModeHotKey ) &&
-				  ( myCurrentlyPressedKey != HoudiniHost.prEditingPointsModeHotKey ) );
+				( ( myCurrentlyPressedModeKey != HoudiniHost.prPaintingModeHotKey ) &&
+				  ( myCurrentlyPressedModeKey != HoudiniHost.prEditingPointsModeHotKey ) );
 			HoudiniGeoAttributeManager.Mode last_mode = myManager.prCurrentMode;
 			myManager.prCurrentMode = (HoudiniGeoAttributeManager.Mode) GUI.Toolbar( mode_text_rect, (int) last_mode, modes );
 			if ( last_mode != myManager.prCurrentMode )
@@ -1256,6 +1355,8 @@ public class HoudiniGeoAttributeManagerGUI
 	private bool				myIsMouseDown;
 	private int					myMouseKey;
 	private KeyCode				myCurrentlyPressedKey;
+	private KeyCode				myCurrentlyPressedSecondKey;
+	private KeyCode				myCurrentlyPressedModeKey;
 
 	private const KeyCode		myMayaBrushResizeKey				= KeyCode.B;
 	private const KeyCode		myHoudiniBrushResizeKey				= KeyCode.LeftShift;
@@ -1275,7 +1376,7 @@ public class HoudiniGeoAttributeManagerGUI
 	private const float			mySceneUIBrightningFactor			= 0.2f;
 
 	private Vector3				myFirstMousePosition;
-	private const float			myMouseWheelBrushSizeMultiplier		= 0.01f;
+	private const float			myMouseWheelBrushSizeMultiplier		= 0.05f;
 	private const float			myBigButtonHandleSizeMultiplier		= 1000000.0f;
 	private const float			myIntersectionRayLength				= 5000.0f;
 

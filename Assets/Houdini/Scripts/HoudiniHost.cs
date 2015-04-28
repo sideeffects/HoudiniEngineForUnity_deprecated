@@ -140,6 +140,10 @@ public static partial class HoudiniHost
 	private const float myDefaultPaintBrushRate							= 0.2f; // Should be between zero and one.
 	private const KeyCode myDefaultPaintingModeHotKey					= KeyCode.LeftShift;
 	private static Color myDefaultPaintingModeColour					= new Color( 0.7f, 0.9f, 0.7f, 1.0f );
+	private const KeyCode myDefaultPaintingNodeSwitchHotKey				= KeyCode.Q;
+	private const KeyCode myDefaultPaintingAttributeSwitchHotKey		= KeyCode.W;
+	private const KeyCode myDefaultPaintingValueChangeHotKey			= KeyCode.E;
+	private const KeyCode myDefaultPaintingFalloffChangeHotKey			= KeyCode.R;
 
 	private const KeyCode myDefaultAddingPointsModeHotKey				= KeyCode.LeftShift;
 	private static Color myDefaultAddingPointsModeColour				= Color.yellow;
@@ -228,6 +232,10 @@ public static partial class HoudiniHost
 		setFloat(	"HAPI_PaintBrushRate", myDefaultPaintBrushRate, true );
 		setKeyCode( "HAPI_PaintingHotKey", myDefaultPaintingModeHotKey, true );
 		setColour(	"HAPI_PaintingModeColour", myDefaultPaintingModeColour, true );
+		setKeyCode( "HAPI_PaintingNodeSwitchHotKey", myDefaultPaintingNodeSwitchHotKey, true );
+		setKeyCode( "HAPI_PaintingAttributeSwitchHotKey", myDefaultPaintingAttributeSwitchHotKey, true );
+		setKeyCode( "HAPI_PaintingValueChangeHotKey", myDefaultPaintingValueChangeHotKey, true );
+		setKeyCode( "HAPI_PaintingFalloffChangeHotKey", myDefaultPaintingFalloffChangeHotKey, true );
 
 		setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 		setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
@@ -365,6 +373,34 @@ public static partial class HoudiniHost
 	public static Color prPaintingModeColour {
 											get { return getColour( "HAPI_PaintingModeColour" ); }
 											set { setColour( "HAPI_PaintingModeColour", value ); } }
+	public static KeyCode prPaintingNodeSwitchHotKey {
+											get { KeyCode key = getKeyCode( "HAPI_PaintingNodeSwitchHotKey" );
+													if ( key == KeyCode.None ) {
+														key = myDefaultPaintingNodeSwitchHotKey;
+														setKeyCode( "HAPI_PaintingNodeSwitchHotKey", key ); }
+													return key; }
+											set { setKeyCode( "HAPI_PaintingNodeSwitchHotKey", value ); } }
+	public static KeyCode prPaintingAttributeSwitchHotKey {
+											get { KeyCode key = getKeyCode( "HAPI_PaintingAttributeSwitchHotKey" );
+													if ( key == KeyCode.None ) {
+														key = myDefaultPaintingAttributeSwitchHotKey;
+														setKeyCode( "HAPI_PaintingAttributeSwitchHotKey", key ); }
+													return key; }
+											set { setKeyCode( "HAPI_PaintingAttributeSwitchHotKey", value ); } }
+	public static KeyCode prPaintingValueChangeHotKey {
+											get { KeyCode key = getKeyCode( "HAPI_PaintingValueChangeHotKey" );
+													if ( key == KeyCode.None ) {
+														key = myDefaultPaintingValueChangeHotKey;
+														setKeyCode( "HAPI_PaintingValueChangeHotKey", key ); }
+													return key; }
+											set { setKeyCode( "HAPI_PaintingValueChangeHotKey", value ); } }
+	public static KeyCode prPaintingFalloffChangeHotKey {
+											get { KeyCode key = getKeyCode( "HAPI_PaintingFalloffChangeHotKey" );
+													if ( key == KeyCode.None ) {
+														key = myDefaultPaintingFalloffChangeHotKey;
+														setKeyCode( "HAPI_PaintingFalloffChangeHotKey", key ); }
+													return key; }
+											set { setKeyCode( "HAPI_PaintingFalloffChangeHotKey", value ); } }
 
 	public static KeyCode prAddingPointsModeHotKey {
 											get { KeyCode key = getKeyCode( "HAPI_AddingPointsModeHotKey" );
@@ -520,6 +556,18 @@ public static partial class HoudiniHost
 	public static bool isPaintingModeColourDefault()
 											{ return	prPaintingModeColour == 
 														myDefaultPaintingModeColour; }
+	public static bool isPaintingNodeSwitchHotKeyDefault()
+											{ return	prPaintingNodeSwitchHotKey == 
+														myDefaultPaintingNodeSwitchHotKey; }
+	public static bool isPaintingAttributeSwitchHotKeyDefault()
+											{ return	prPaintingAttributeSwitchHotKey == 
+														myDefaultPaintingAttributeSwitchHotKey; }
+	public static bool isPaintingValueChangeHotKeyDefault()
+											{ return	prPaintingValueChangeHotKey == 
+														myDefaultPaintingValueChangeHotKey; }
+	public static bool isPaintingFalloffChangeHotKeyDefault()
+											{ return	prPaintingFalloffChangeHotKey == 
+														myDefaultPaintingFalloffChangeHotKey; }
 
 	public static bool isAddingPointsModeHotKeyDefault()
 											{ return	prAddingPointsModeHotKey == 
@@ -610,6 +658,10 @@ public static partial class HoudiniHost
 		prPaintBrushRate						= myDefaultPaintBrushRate;
 		prPaintingModeHotKey					= myDefaultPaintingModeHotKey;
 		prPaintingModeColour					= myDefaultPaintingModeColour;
+		prPaintingNodeSwitchHotKey				= myDefaultPaintingNodeSwitchHotKey;
+		prPaintingAttributeSwitchHotKey			= myDefaultPaintingAttributeSwitchHotKey;
+		prPaintingValueChangeHotKey				= myDefaultPaintingValueChangeHotKey;
+		prPaintingFalloffChangeHotKey			= myDefaultPaintingFalloffChangeHotKey;
 
 		prAddingPointsModeHotKey				= myDefaultAddingPointsModeHotKey;
 		prAddingPointsModeColour				= myDefaultAddingPointsModeColour;
