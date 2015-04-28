@@ -101,7 +101,12 @@ public class HoudiniControl : MonoBehaviour
 		prAsset		= control.prAsset;
 	}
 
-	public virtual string getFullControlNameAndPath()
+	public virtual string getRelativePath()
+	{
+		return "CONTROL";
+	}
+
+	public virtual string getAbsolutePath()
 	{
 		return "CONTROL";
 	}

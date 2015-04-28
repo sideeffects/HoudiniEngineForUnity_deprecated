@@ -93,9 +93,14 @@ public class HoudiniGeoControl : HoudiniObjectControl
 		prIsDisplay		= display;
 	}
 
-	public override string getFullControlNameAndPath()
+	public override string getRelativePath()
 	{
-		return base.getFullControlNameAndPath() + "/" + prGeoName;
+		return base.getRelativePath() + "/" + prGeoName;
+	}
+
+	public override string getAbsolutePath()
+	{
+		return base.getAbsolutePath() + "/" + prGeoName;
 	}
 
 	public bool refresh( bool reload_asset )
@@ -198,16 +203,18 @@ public class HoudiniGeoControl : HoudiniObjectControl
 				// We are limited to using the first part, always.
 				if ( myGeoAttributeManager == null && myParts.Count > 0 )
 				{
-					if ( prAsset.prGeoAttributeManagerMap.contains( getFullControlNameAndPath() ) )
+					if ( prAsset.prGeoAttributeManagerMap.contains( getRelativePath() ) )
 					{
-						myGeoAttributeManager = prAsset.prGeoAttributeManagerMap.get( getFullControlNameAndPath() );
+						myGeoAttributeManager = prAsset.prGeoAttributeManagerMap.get( getRelativePath() );
+						myGeoAttributeManager.name = getAbsolutePath() + "/GeoAttributeManager";
 						myGeoAttributeManager.reInit( mesh, mesh_renderer, mesh_collider, part_gameobject.transform );
 					}
 					else
 					{
 						myGeoAttributeManager = ScriptableObject.CreateInstance< HoudiniGeoAttributeManager >();
+						myGeoAttributeManager.name = getAbsolutePath() + "/GeoAttributeManager";
 						myGeoAttributeManager.init( mesh, mesh_renderer, mesh_collider, part_gameobject.transform );
-						prAsset.prGeoAttributeManagerMap.add( getFullControlNameAndPath(), myGeoAttributeManager );
+						prAsset.prGeoAttributeManagerMap.add( getRelativePath(), myGeoAttributeManager );
 					}
 
 					// Sync the attributes and see if we need a recook.
@@ -276,7 +283,7 @@ public class HoudiniGeoControl : HoudiniObjectControl
 			// To keep things consistent with Unity workflow, we should not save parameter changes
 			// while in Play mode.
 			if ( !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode )
-				prAsset.prPresetsMap.set( getFullControlNameAndPath(), HoudiniHost.getPreset( prNodeId ) );
+				prAsset.prPresetsMap.set( getRelativePath(), HoudiniHost.getPreset( prNodeId ) );
 #endif // UNITY_EDITOR
 		}
 	}
@@ -290,10 +297,10 @@ public class HoudiniGeoControl : HoudiniObjectControl
 		{
 			prParms.prEditable = editable;
 			
-			if ( prAsset.prPresetsMap.contains( getFullControlNameAndPath() ) )
+			if ( prAsset.prPresetsMap.contains( getRelativePath() ) )
 			{
 				HoudiniPresetMap map = prAsset.prPresetsMap;
-				byte[] preset = map.get( getFullControlNameAndPath() );
+				byte[] preset = map.get( getRelativePath() );
 				HoudiniHost.setPreset( prNodeId, preset );
 
 				// Unfortunately, we need to build everything again because we just changed
