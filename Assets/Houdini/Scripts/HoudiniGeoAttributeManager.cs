@@ -467,6 +467,10 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 
 			// Sync the values of the Unity attribute with the Houdini attribute.
 			needs_recook |= attribute.sync( asset_id, object_id, geo_id, part_id, mesh, point_attribute_info );
+
+			// If the sync updated the values from the asset we need to refresh our mesh.
+			if ( needs_recook )
+				refreshMesh();
 		}
 
 		return needs_recook;
