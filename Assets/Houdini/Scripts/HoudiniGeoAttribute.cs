@@ -542,46 +542,66 @@ public class HoudiniGeoAttribute : ScriptableObject
 			return; // Throw error.
 
 		reset();
+
 		myName = name;
 		myType = type;
 		myTupleSize = tuple_size;
 		myVertexCount = mesh.vertexCount;
+
+		// Set the paint mode to be color of it makes sense given the tuple size.
+		// Otherwise, just set it to the first component.
+		if ( myTupleSize != 3 && myTupleSize != 4 )
+			myPaintMode = (int) SpecialPaintMode.MAX;
+
+		int data_size = mesh.vertexCount * tuple_size;
 
 		if ( type == Type.BOOL || type == Type.INT )
 		{
 			myIntPaintValue = new int[ tuple_size ];
 			myIntMin = myDefaultIntMin;
 			myIntMax = myDefaultIntMax;
-			myIntData = new int[ mesh.vertexCount * tuple_size ];
+			myIntData = new int[ data_size ];
 
-			for ( int i = 0; i < tuple_size; ++i )
-				if ( type == Type.BOOL )
-				{
-					// These are hard coded because...well, BOOLs.
+			if ( type == Type.BOOL )
+			{
+				// These are hard coded because...well, BOOLs.
+				myIntMin = 0;
+				myIntMax = 1;
+
+				for ( int i = 0; i < tuple_size; ++i )
 					myIntPaintValue[ i ] = 1;
-					myIntMin = 0;
-					myIntMax = 1;
-				}
-				else if ( type == Type.INT )
+				for ( int i = 0; i < data_size; ++i )
+					myIntData[ i ] = myIntMin;
+			}
+			else if ( type == Type.INT )
+			{
+				for ( int i = 0; i < tuple_size; ++i )
 					myIntPaintValue[ i ] = myDefaultIntPaintValue;
+				for ( int i = 0; i < data_size; ++i )
+					myIntData[ i ] = myDefaultIntMin;
+			}
 		}
 		else if ( type == Type.FLOAT )
 		{
 			myFloatPaintValue = new float[ tuple_size ];
 			myFloatMin = myDefaultFloatMin;
 			myFloatMax = myDefaultFloatMax;
-			myFloatData = new float[ mesh.vertexCount * tuple_size ];
+			myFloatData = new float[ data_size ];
 
 			for ( int i = 0; i < tuple_size; ++i )
 				myFloatPaintValue[ i ] = myDefaultFloatPaintValue;
+			for ( int i = 0; i < data_size; ++i )
+				myFloatData[ i ] = myDefaultFloatMin;
 		}
 		else if ( type == Type.STRING )
 		{
 			myStringPaintValue = new string[ tuple_size ];
-			myStringData = new string[ mesh.vertexCount * tuple_size ];
+			myStringData = new string[ data_size ];
 
 			for ( int i = 0; i < tuple_size; ++i )
 				myStringPaintValue[ i ] = myDefaultStringPaintValue;
+			for ( int i = 0; i < data_size; ++i )
+				myStringData[ i ] = myDefaultStringPaintValue;
 		}
 	}
 
