@@ -1216,7 +1216,7 @@ public abstract class HoudiniAsset : HoudiniControl
 					parms.getParameterValues();
 
 				// Custom work during a full build (custom to each subclass).
-				buildFullBuildCustomWork( ref progress_bar );
+				buildFullBuildCustomWork( ref progress_bar, is_duplication );
 			}
 			
 			if ( !reload_asset && !serialization_recovery_only )
@@ -1898,7 +1898,10 @@ public abstract class HoudiniAsset : HoudiniControl
 	protected abstract int buildCreateAsset( HoudiniProgressBar progress_bar );
 
 	// Inherited classes should override this for work they need done during the full build step only. (Optional)
-	protected virtual void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar ) {}
+	protected virtual void buildFullBuildCustomWork(
+		ref HoudiniProgressBar progress_bar,
+		bool is_duplication )
+	{}
 
 	// Inherited classes should override this with however they wish to load objects in the prObjects array.
 	// Returns whether or not the objects require a recook.

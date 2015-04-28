@@ -139,7 +139,7 @@ public class HoudiniAssetInput : HoudiniAsset
 		return HoudiniHost.createInputAsset( transform.name );
 	}
 
-	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar )
+	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar, bool is_duplication )
 	{
 		cloneMesh();
 
