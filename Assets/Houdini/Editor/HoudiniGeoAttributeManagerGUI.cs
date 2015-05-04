@@ -89,7 +89,7 @@ public class HoudiniGeoAttributeManagerGUI
 	{
 		// We can only build or do anything if we can link to our libraries.
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		return;
+		return selected_node_index;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( myManager == null || myManager.prMeshCollider == null )
