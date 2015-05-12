@@ -342,6 +342,14 @@ public enum HAPI_CurveType
 	HAPI_CURVETYPE_MAX
 }
 
+public enum HAPI_VolumeType
+{
+	HAPI_VOLUMETYPE_INVALID = -1,
+	HAPI_VOLUMETYPE_HOUDINI,
+	HAPI_VOLUMETYPE_VDB,
+	HAPI_VOLUMETYPE_MAX
+}
+
 public enum HAPI_StorageType
 {
 	HAPI_STORAGETYPE_INVALID = -1,
@@ -1162,6 +1170,8 @@ public struct HAPI_VolumeInfo
 {
 	public HAPI_StringHandle nameSH;
 
+	public HAPI_VolumeType type;
+
 	// Each voxel is identified with an index. The indices will range between:
 	// [ ( minX, minY, minZ ), ( minX+xLength, minY+yLength, minZ+zLength ) )
 	public int xLength; 
@@ -1173,6 +1183,7 @@ public struct HAPI_VolumeInfo
 
 	// Number of values per voxel.
 	public int tupleSize;
+
 	public HAPI_StorageType storage;
 
 	// The dimensions of each tile.
