@@ -821,14 +821,16 @@ public static partial class HoudiniHost
 	HAPI_GetVolumeTileFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile,
-		[Out] float[] values );
+		[Out] float[] values,
+		int length );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetVolumeTileIntData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile,
-		[Out] int[] values );
+		[Out] int[] values,
+		int length );
 
 	// CURVES ---------------------------------------------------------------------------------------------------
 
