@@ -1147,16 +1147,16 @@ public struct HAPI_Keyframe
 		outTangent = out_tangent;
 	}
 		
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float time;
 		
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float value;
 		
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float inTangent;
 		
-	[ MarshalAs( UnmanagedType.R4) ]
+	[ MarshalAs( UnmanagedType.R4 ) ]
 	public float outTangent;
 	
 }
@@ -1174,7 +1174,7 @@ public struct HAPI_VolumeInfo
 
 	// Each voxel is identified with an index. The indices will range between:
 	// [ ( minX, minY, minZ ), ( minX+xLength, minY+yLength, minZ+zLength ) )
-	public int xLength; 
+	public int xLength;
 	public int yLength;
 	public int zLength;
 	public int minX;

@@ -76,15 +76,15 @@ public static partial class HoudiniHost
 	public static string getStatusString( HAPI_StatusType status_type, HAPI_StatusVerbosity verbosity )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		int buffer_size = 0;
-		HAPI_Result status_code = HAPI_GetStatusStringBufLength( status_type, verbosity, out buffer_size );
+		int buffer_length = 0;
+		HAPI_Result status_code = HAPI_GetStatusStringBufLength( status_type, verbosity, out buffer_length );
 		processStatusCode( status_code );
 
-		if ( buffer_size <= 0 )
+		if ( buffer_length <= 0 )
 			return "";
 
-		StringBuilder string_builder = new StringBuilder( buffer_size );
-		status_code = HAPI_GetStatusString( status_type, string_builder, buffer_size );
+		StringBuilder string_builder = new StringBuilder( buffer_length );
+		status_code = HAPI_GetStatusString( status_type, string_builder, buffer_length );
 		processStatusCode( status_code );
 
 		string string_value = string_builder.ToString();
@@ -1396,7 +1396,7 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void  getFirstVolumeTile(
+	public static void getFirstVolumeTile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile )
 	{
@@ -1408,7 +1408,7 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void  getNextVolumeTile(
+	public static void getNextVolumeTile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo next )
 	{
@@ -1420,7 +1420,7 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void  getVolumeTileFloatData (
+	public static void getVolumeTileFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile, [Out] float[] values )
 	{
