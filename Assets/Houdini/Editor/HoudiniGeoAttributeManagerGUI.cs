@@ -33,6 +33,7 @@ public class HoudiniGeoAttributeManagerGUI
 		myManager					= manager;
 
 		myForceInspectorRedraw		= false;
+		myShowMinMax				= false;
 
 		myIsMouseDown				= false;
 		myMouseKey					= 0;
@@ -1036,6 +1037,7 @@ public class HoudiniGeoAttributeManagerGUI
 		bold_text_style.fontSize	= (int) line_height - mySceneUIFontSizeFromLineHeightMod;
 		
 		float box_height			= line_height;
+		float expanded_box_height	= myShowMinMax ? box_height + line_padding + box_height : box_height;
 		float box_top				= border_total;
 
 		// Get text widths.
@@ -1064,7 +1066,6 @@ public class HoudiniGeoAttributeManagerGUI
 									  - liveup_box_width - border_padding
 									  - mode_box_width - border_padding
 									  - border_total - border_total;
-		float value_fields_width	= value_box_width - value_text_width;
 		
 		float node_box_right		= border_total;
 		float node_dropdown_right	= node_box_right + node_text_width;
@@ -1073,7 +1074,6 @@ public class HoudiniGeoAttributeManagerGUI
 		float mode_box_right		= attribute_box_right + attribute_box_width + border_padding;
 		float mode_dropdown_right	= mode_box_right + mode_text_width;
 		float value_box_right		= mode_box_right + mode_box_width + border_padding;
-		float value_fields_right	= value_box_right + value_text_width;
 		float rate_box_right		= value_box_right + value_box_width + border_padding;
 		float rate_field_right		= rate_box_right;
 		float liveup_box_right		= rate_box_right + rate_box_width + border_padding;
@@ -1094,8 +1094,7 @@ public class HoudiniGeoAttributeManagerGUI
 		Rect attribute_dropdown_rect	= new Rect( attribute_dropdown_right, box_top, dropdown_width, box_height );
 		Rect mode_box_rect				= new Rect( mode_box_right, box_top, mode_box_width, box_height );
 		Rect mode_dropdown_rect			= new Rect( mode_dropdown_right, box_top, dropdown_width, box_height );
-		Rect value_box_rect				= new Rect( value_box_right, box_top, value_box_width, box_height );
-		Rect value_fields_rect			= new Rect( value_fields_right, box_top, value_fields_width, box_height );
+		Rect value_box_rect				= new Rect( value_box_right, box_top, value_box_width, expanded_box_height );
 		Rect rate_box_rect				= new Rect( rate_box_right, box_top, rate_box_width, box_height );
 		Rect rate_field_rect			= new Rect( rate_field_right, box_top, rate_text_width + field_width, box_height );
 		Rect liveup_box_rect			= new Rect( liveup_box_right, box_top, liveup_box_width, box_height );
@@ -1110,9 +1109,6 @@ public class HoudiniGeoAttributeManagerGUI
 											 box_height - double_line_padding );
 		Rect mode_text_rect  = new Rect( mode_box_right + line_padding, box_top, 
 										 mode_text_width - double_line_padding,
-										 box_height - double_line_padding );
-		Rect value_text_rect = new Rect( value_box_right + line_padding, box_top, 
-										 value_text_width - double_line_padding,
 										 box_height - double_line_padding );
 
 		// Start Drawing --------------------------------------------------------------------------------------------
@@ -1133,7 +1129,6 @@ public class HoudiniGeoAttributeManagerGUI
 		GUI.Label( node_text_rect, node_text, normal_text_style );
 		GUI.Label( attribute_text_rect, attribute_text, normal_text_style );
 		GUI.Label( mode_text_rect, mode_text, normal_text_style );
-		GUI.Label( value_text_rect, value_text, normal_text_style );
 
 		// Set controls colours.
 		Color control_color		= box_color;
@@ -1226,12 +1221,14 @@ public class HoudiniGeoAttributeManagerGUI
 		{
 			if ( myManager.prActiveAttribute == null )
 			{
-				GUI.Label( value_fields_rect, "N/A", normal_text_style );
+				GUI.Label( value_box_rect, value_text + "N/A", normal_text_style );
 			}
 			else
 			{
-				GUILayout.BeginArea( value_fields_rect );
+				GUILayout.BeginArea( value_box_rect );
 				GUILayout.BeginHorizontal();
+
+				EditorGUILayout.LabelField( value_text, GUILayout.Width( value_text_width ) );
 
 				int drawn_field_start_index = 0;
 
@@ -1247,7 +1244,8 @@ public class HoudiniGeoAttributeManagerGUI
 							? myManager.prActiveAttribute.prFloatPaintValue[ 3 ] : 1.0f );
 					GUI.SetNextControlName( myPaintValuesFieldName + "COLOR" );
 					Color new_colour = EditorGUILayout.ColorField(
-						old_colour, GUILayout.MinWidth( 120 ), GUILayout.MaxWidth( 240 ) );
+						"", old_colour,
+						GUILayout.MinWidth( 120 ), GUILayout.MaxWidth( 240 ) );
 					if ( new_colour != old_colour )
 					{
 						myManager.prActiveAttribute.prFloatPaintValue[ 0 ] = new_colour[ 0 ];
@@ -1265,19 +1263,23 @@ public class HoudiniGeoAttributeManagerGUI
 					GUI.SetNextControlName( myPaintValuesFieldName + i );
 					if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.BOOL
 						|| myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.INT )
+					{
 						myManager.prActiveAttribute.prIntPaintValue[ i ] = Mathf.Clamp(
 							EditorGUILayout.IntField(
 								"", myManager.prActiveAttribute.prIntPaintValue[ i ],
 								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) ),
 							myManager.prActiveAttribute.prIntMin,
 							myManager.prActiveAttribute.prIntMax );
+					}
 					else if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT )
+					{
 						myManager.prActiveAttribute.prFloatPaintValue[ i ] = Mathf.Clamp(
 							EditorGUILayout.FloatField(
 								"", myManager.prActiveAttribute.prFloatPaintValue[ i ],
 								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) ),
 							myManager.prActiveAttribute.prFloatMin,
 							myManager.prActiveAttribute.prFloatMax );
+					}
 					else if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.STRING )
 					{
 						string new_value = EditorGUILayout.TextField(
@@ -1299,7 +1301,60 @@ public class HoudiniGeoAttributeManagerGUI
 					myManager.prHasChanged = true;
 				}
 
+				{ // Show min/max button.
+					string min_max_button_label = "+";
+					if ( myShowMinMax )
+						min_max_button_label = "-";
+					GUIStyle label_style = new GUIStyle( EditorStyles.toolbar );
+					label_style.fontStyle = FontStyle.Bold;
+					label_style.fontSize = 14;
+					label_style.fixedHeight = line_height;
+					if ( GUILayout.Button(
+							min_max_button_label, label_style,
+							GUILayout.Width( 22 ),
+							GUILayout.Height( line_height ) ) )
+						myShowMinMax = !myShowMinMax;
+				}
+
 				GUILayout.EndHorizontal();
+
+				if ( myShowMinMax )
+				{
+					float old_label_width = EditorGUIUtility.labelWidth;
+					EditorGUIUtility.labelWidth = 30;
+					GUILayout.BeginHorizontal();
+					if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.INT )
+					{
+						GUI.SetNextControlName( myPaintValuesFieldName + "MIN" );
+						myManager.prActiveAttribute.prIntMin =
+							EditorGUILayout.IntField(
+								"Min:", myManager.prActiveAttribute.prIntMin,
+								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+
+						GUI.SetNextControlName( myPaintValuesFieldName + "MAX" );
+						myManager.prActiveAttribute.prIntMax =
+							EditorGUILayout.IntField(
+								"Max:", myManager.prActiveAttribute.prIntMax,
+								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+					}
+					else if ( myManager.prActiveAttribute.prType == HoudiniGeoAttribute.Type.FLOAT )
+					{
+						GUI.SetNextControlName( myPaintValuesFieldName + "MIN" );
+						myManager.prActiveAttribute.prFloatMin =
+							EditorGUILayout.FloatField(
+								"Min:", myManager.prActiveAttribute.prFloatMin,
+								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+
+						GUI.SetNextControlName( myPaintValuesFieldName + "MAX" );
+						myManager.prActiveAttribute.prFloatMax =
+							EditorGUILayout.FloatField(
+								"Max:", myManager.prActiveAttribute.prFloatMax,
+								GUILayout.MinWidth( 20 ), GUILayout.MaxWidth( 120 ) );
+					}
+					GUILayout.EndHorizontal();
+					EditorGUIUtility.labelWidth = old_label_width;
+				}
+
 				GUILayout.EndArea();
 			}
 		}
@@ -1347,6 +1402,7 @@ public class HoudiniGeoAttributeManagerGUI
 	private HoudiniGeoAttributeManager myManager;
 
 	private bool				myForceInspectorRedraw;
+	private bool				myShowMinMax;
 
 	private const float			myActiveBorderWidth = 5.0f;
 	private const float			myInactiveBorderWidth = 2.0f;
