@@ -799,11 +799,11 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_CheckForNewAssets( ref asset_count );
 		processStatusCode( status_code );
 
-		int[] asset_ids = new int[ asset_count ];
-		status_code = HAPI_GetNewAssetIds( asset_ids );
+		int[] asset_ids_array = new int[ asset_count ];
+		status_code = HAPI_GetNewAssetIds( asset_ids_array, asset_count );
 		processStatusCode( status_code );
 
-		return asset_ids;
+		return asset_ids_array;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
