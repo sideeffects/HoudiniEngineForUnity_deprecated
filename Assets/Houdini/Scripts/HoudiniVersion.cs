@@ -28,23 +28,23 @@ public struct HoudiniVersion
 {
 	public const int HOUDINI_MAJOR			= 14;
 	public const int HOUDINI_MINOR			= 5;
-	public const int HOUDINI_BUILD			= 113;
+	public const int HOUDINI_BUILD			= 120;
 	public const int HOUDINI_PATCH			= 0;
 
 	public const int ORIG_HOUDINI_MAJOR		= 14;
 	public const int ORIG_HOUDINI_MINOR		= 5;
-	public const int ORIG_HOUDINI_BUILD		= 113;
+	public const int ORIG_HOUDINI_BUILD		= 120;
 	public const int ORIG_HOUDINI_PATCH		= 0;
 
 	public const int HOUDINI_ENGINE_MAJOR	= 1;
 	public const int HOUDINI_ENGINE_MINOR	= 10;
 	
-	public const int HOUDINI_ENGINE_API		= 4;
+	public const int HOUDINI_ENGINE_API		= 5;
 	
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 	public const string HAPI_LIBRARY		= "libHAPI";
 #elif UNITY_STANDALONE_OSX
-	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/14.5.113/Houdini";
+	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/14.5.120/Houdini";
 #else
 	public const string HAPI_LIBRARY		= "libHAPI"; // Cannot be empty but its ok if not found.
 #endif
