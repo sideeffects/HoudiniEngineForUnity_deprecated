@@ -227,7 +227,7 @@ public class HoudiniMenu : MonoBehaviour
 			new_part.vertexCount = 3;
 			new_part.pointCount = 3;
 			new_part.faceCount = 2;
-			new_part.isCurve = true;
+			new_part.type = HAPI_PartType.HAPI_PARTTYPE_CURVE;
 			HoudiniHost.setPartInfo( curve1, 0, 0, ref new_part );
 
 			HAPI_AttributeInfo attrib_info = new HAPI_AttributeInfo( "P" );
@@ -281,7 +281,7 @@ public class HoudiniMenu : MonoBehaviour
 		new_part.vertexCount = 3;
 		new_part.pointCount = 3;
 		new_part.faceCount = 1;
-		new_part.isCurve = false;
+		new_part.type = HAPI_PartType.HAPI_PARTTYPE_MESH;
 		HoudiniHost.setPartInfo( asset_id, 0, 0, ref new_part );
 
 		HAPI_AttributeInfo attrib_info = new HAPI_AttributeInfo( "P" );

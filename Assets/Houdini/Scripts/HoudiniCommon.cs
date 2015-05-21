@@ -368,7 +368,16 @@ public enum HAPI_GeoType
 	HAPI_GEOTYPE_CURVE,
 	HAPI_GEOTYPE_MAX
 };
-	
+
+public enum HAPI_PartType
+{
+	HAPI_PARTTYPE_INVALID = -1,
+	HAPI_PARTTYPE_MESH,
+	HAPI_PARTTYPE_CURVE,
+	HAPI_PARTTYPE_VOLUME,
+	HAPI_PARTTYPE_MAX
+};
+
 public enum HAPI_InputType
 {
 	HAPI_INPUT_INVALID = -1,
@@ -1023,7 +1032,8 @@ public struct HAPI_PartInfo
 
 	public HAPI_PartId id;
 	private HAPI_StringHandle nameSH;
-		
+	public HAPI_PartType type;
+
 	public int faceCount;
 	public int vertexCount;
 	public int pointCount;
@@ -1032,12 +1042,6 @@ public struct HAPI_PartInfo
 	public int faceAttributeCount;
 	public int vertexAttributeCount;
 	public int detailAttributeCount;
-
-	[ MarshalAs( UnmanagedType.U1 ) ]
-	public bool hasVolume;
-
-	[ MarshalAs( UnmanagedType.U1 ) ]
-	public bool isCurve;
 
 	// Accessors
 	public string name

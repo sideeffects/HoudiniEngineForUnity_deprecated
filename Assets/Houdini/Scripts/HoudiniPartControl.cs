@@ -355,7 +355,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 				particle_emitter.particles = particles;
 			}
 			
-			if ( part_info.hasVolume )
+			if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_VOLUME )
 			{
 				// Clear previous volume tiles.
 				destroyChildren( part_node.transform );
