@@ -136,6 +136,8 @@ public static partial class HoudiniHost
 				cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 				cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 				cook_options.cookTemplatedGeos = HoudiniHost.prImportTemplatedGeos;
+				cook_options.packedPrimInstancingMode =
+					HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
 
 				// Initialize.
 				status_code = HAPI_Initialize( otls_path, dsos_path, ref cook_options, true, -1 );

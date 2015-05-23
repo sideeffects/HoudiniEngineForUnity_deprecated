@@ -337,6 +337,8 @@ public static partial class HoudiniHost
 		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 		cook_options.cookTemplatedGeos = import_templated_geos;
+		cook_options.packedPrimInstancingMode =
+			HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
 		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );
 		processStatusCode( status_code );
 #else
@@ -919,6 +921,57 @@ public static partial class HoudiniHost
 			membership_bools[ i ] = membership[ i ] > 0;
 
 		return membership_bools;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_PartId[] getInstancedPartIds(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int count = part_info.instancedPartCount;
+
+		HAPI_PartId[] part_ids = new HAPI_PartId[ count ];
+
+		if ( count > 0 )
+		{
+			status_code = HAPI_GetInstancedPartIds(
+				asset_id, object_id, geo_id, part_id, part_ids, count );
+			processStatusCode( status_code );
+		}
+
+		return part_ids;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_Transform[] getInstancerPartTransforms(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		HAPI_RSTOrder rst_order )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int count = part_info.instanceCount;
+
+		HAPI_Transform[] transforms = new HAPI_Transform[ count ];
+
+		if ( count > 0 )
+		{
+			status_code = HAPI_GetInstancerPartTransforms(
+				asset_id, object_id, geo_id, part_id, rst_order, transforms, count );
+			processStatusCode( status_code );
+		}
+
+		return transforms;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif

@@ -209,6 +209,14 @@ public enum HAPI_State
 	HAPI_STATE_MAX_READY_STATE = HAPI_STATE_READY_WITH_COOK_ERRORS
 };
 
+public enum HAPI_PackedPrimInstancingMode
+{
+	HAPI_PACKEDPRIM_INSTANCING_MODE_INVALID = -1,
+	HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED,
+	HAPI_PACKEDPRIM_INSTANCING_MODE_HIERARCHY,
+	HAPI_PACKEDPRIM_INSTANCING_MODE_MAX
+};
+
 public enum HAPI_Permissions
 {
 	HAPI_PERMISSIONS_NON_APPLICABLE,
@@ -375,6 +383,7 @@ public enum HAPI_PartType
 	HAPI_PARTTYPE_MESH,
 	HAPI_PARTTYPE_CURVE,
 	HAPI_PARTTYPE_VOLUME,
+	HAPI_PARTTYPE_INSTANCER,
 	HAPI_PARTTYPE_MAX
 };
 
@@ -680,6 +689,9 @@ public struct HAPI_CookOptions
 
 	/// Decide whether to recursively cook all templated geos or not.
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool cookTemplatedGeos;
+
+	/// Choose how you want the cook to handle packed primitives.
+	public HAPI_PackedPrimInstancingMode packedPrimInstancingMode;
 }
 
 // NODES --------------------------------------------------------------------------------------------------------
@@ -1043,6 +1055,10 @@ public struct HAPI_PartInfo
 	public int vertexAttributeCount;
 	public int detailAttributeCount;
 
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool isInstanced;
+	public int instancedPartCount;
+	public int instanceCount;
+
 	// Accessors
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
@@ -1061,8 +1077,7 @@ public struct HAPI_AttributeInfo
 		tupleSize 		= 0;
 	}
 		
-	[ MarshalAs( UnmanagedType.U1 ) ]
-	public bool exists;
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool exists;
 		
 	public HAPI_AttributeOwner owner;
 	public HAPI_StorageType storage;

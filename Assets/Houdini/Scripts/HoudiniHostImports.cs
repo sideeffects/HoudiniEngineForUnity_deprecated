@@ -566,6 +566,21 @@ public static partial class HoudiniHost
 		[Out] int[] membership_array,
 		int start, int length );
 
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetInstancedPartIds(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		[Out] HAPI_PartId[] instanced_parts_array,
+		int count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetInstancerPartTransforms(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		HAPI_RSTOrder rst_order,
+		[Out] HAPI_Transform[] instanced_parts_array,
+		int count );
+
 	// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
