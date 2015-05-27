@@ -634,6 +634,7 @@ public struct HAPI_AssetInfo
 
 	public int objectCount;
 	public int handleCount;
+	public int editableNodeNetworkCount;
 
 	public int transformInputCount;
 	public int geoInputCount;
@@ -715,6 +716,11 @@ public struct HAPI_NodeInfo
 	public int parmFloatValueCount;
 	public int parmStringValueCount;
 	public int parmChoiceCount;
+
+	public int childNodeCount;
+	public int inputCount;
+
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool createdPostAssetLoad;
 
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }

@@ -276,6 +276,40 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_GetGlobalNodes( out HAPI_GlobalNodes global_nodes );
 
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetEditableNodeNetworks(
+		HAPI_AssetId asset_id,
+		[Out] HAPI_NodeId[] node_networks_array,
+		int count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetNodeNetworkChildren( 
+		HAPI_NodeId network_node_id,
+		[Out] HAPI_NodeId[] child_node_ids_array,
+		int count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_CreateNode( HAPI_NodeId parent_node_id, string operator_name, out HAPI_NodeId new_node_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_DeleteNode( HAPI_NodeId node_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_ConnectNodeInput( HAPI_NodeId node_id, int input_index, HAPI_NodeId node_id_to_connect );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_DisconnectNodeInput( HAPI_NodeId node_id, int input_index );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_QueryNodeInput( HAPI_NodeId node_to_query, int input_index, out HAPI_NodeId connected_node_id );
+
 	// PARAMETERS -----------------------------------------------------------------------------------------------
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]

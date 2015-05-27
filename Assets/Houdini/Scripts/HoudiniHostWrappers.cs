@@ -419,6 +419,100 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_NodeId[] getEditableNodeNetworks( HAPI_AssetId asset_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
+		HAPI_Result status_code = HAPI_GetAssetInfo( asset_id, ref asset_info );
+		processStatusCode( status_code );
+
+		HAPI_NodeId[] networks = new HAPI_NodeId[ asset_info.editableNodeNetworkCount ];
+		status_code = HAPI_GetEditableNodeNetworks(
+			asset_id, networks, asset_info.editableNodeNetworkCount );
+		processStatusCode( status_code );
+
+		return networks;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_NodeId[] getNodeNetworkChildren( HAPI_NodeId network_node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_NodeInfo node_info = new HAPI_NodeInfo();
+		HAPI_Result status_code = HAPI_GetNodeInfo( network_node_id, ref node_info );
+		processStatusCode( status_code );
+
+		HAPI_NodeId[] children = new HAPI_NodeId[ node_info.childNodeCount ];
+		status_code = HAPI_GetNodeNetworkChildren(
+			network_node_id, children, node_info.childNodeCount );
+		processStatusCode( status_code );
+
+		return children;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_NodeId new_node_id;
+		HAPI_Result status_code = HAPI_CreateNode( parent_node_id, operator_name, out new_node_id );
+		processStatusCode( status_code );
+
+		return new_node_id;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void deleteNode( HAPI_NodeId node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_DeleteNode( node_id );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void connectNodeInput(
+		HAPI_NodeId node_id, int input_index, HAPI_NodeId node_id_to_connect )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_ConnectNodeInput(
+			node_id, input_index, node_id_to_connect );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void disconnectNodeInput( HAPI_NodeId node_id, int input_index )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_DisconnectNodeInput( node_id, input_index );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_NodeId queryNodeInput( HAPI_NodeId node_id, int input_index )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_NodeId connected_node_id;
+		HAPI_Result status_code = HAPI_QueryNodeInput( node_id, input_index, out connected_node_id );
+		processStatusCode( status_code );
+
+		return connected_node_id;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	// PARAMETERS -----------------------------------------------------------------------------------------------
 
 	public static void getParameters(
