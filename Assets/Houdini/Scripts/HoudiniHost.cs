@@ -697,10 +697,10 @@ public static partial class HoudiniHost
 	// maps prefab path to asset id
 	public static Dictionary< string, int >	myCleanUpPrefabAssets;
 
-	public static void saveScene( string file_name )
+	public static void saveScene( string file_name, bool lock_nodes )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_SaveHIPFile( file_name );
+		HAPI_SaveHIPFile( file_name, lock_nodes );
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 

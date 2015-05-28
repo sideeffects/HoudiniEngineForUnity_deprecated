@@ -264,7 +264,7 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_SaveHIPFile( string file_name );
+	HAPI_SaveHIPFile( string file_name, [ MarshalAs( UnmanagedType.U1 ) ] bool lock_nodes );
 
 	// NODES ----------------------------------------------------------------------------------------------------
 

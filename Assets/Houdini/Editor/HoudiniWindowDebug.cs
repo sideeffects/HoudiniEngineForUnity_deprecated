@@ -46,6 +46,7 @@ public class HoudiniWindowDebug : EditorWindow
 		
 		float time = HoudiniHost.getTime();
 		HoudiniWindowDebug.myTime = time;
+		HoudiniWindowDebug.myLockNodesOnHipSave = false;
 	}
 	
 	public void OnGUI() 
@@ -91,7 +92,13 @@ public class HoudiniWindowDebug : EditorWindow
 
 			string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene", ext );
 			if ( hip_file_path != "" )
-				HoudiniHost.saveScene( hip_file_path );
+				HoudiniHost.saveScene( hip_file_path, myLockNodesOnHipSave );
+		}
+		{
+			bool undo_value = myLockNodesOnHipSave;
+			HoudiniGUI.toggle(
+				"lock_nodes", "Lock Nodes On Scene Save",
+				ref myLockNodesOnHipSave, null, ref undo_value );
 		}
 
 		HoudiniGUI.separator();
@@ -218,6 +225,8 @@ public class HoudiniWindowDebug : EditorWindow
 	private static GUILayoutOption 	myLineHeightGUI 		= GUILayout.Height( myLineHeight );
 	private static Vector2 			myScrollPosition;
 	private static float			myTime;
+
+	private static bool myLockNodesOnHipSave;
 
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning restore 0414
