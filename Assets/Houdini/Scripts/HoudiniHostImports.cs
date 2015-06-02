@@ -79,8 +79,8 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_GetStatusString(
 		HAPI_StatusType status_code,
-		StringBuilder buffer,
-		int buffer_length );
+		StringBuilder string_value,
+		int length );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
