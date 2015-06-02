@@ -1573,7 +1573,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetVolumeTileFloatData(
-			asset_id, object_id, geo_id, part_id, ref tile, values, values.Length );
+			asset_id, object_id, geo_id, part_id, 0.0f, ref tile, values, values.Length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();

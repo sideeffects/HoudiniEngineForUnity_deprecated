@@ -877,7 +877,7 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_GetVolumeTileFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		ref HAPI_VolumeTileInfo tile,
+		float fill_value, ref HAPI_VolumeTileInfo tile,
 		[Out] float[] values_array,
 		int length );
 
@@ -893,7 +893,7 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_GetVolumeTileIntData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		ref HAPI_VolumeTileInfo tile,
+		int fill_value, ref HAPI_VolumeTileInfo tile,
 		[Out] int[] values_array,
 		int length );
 
