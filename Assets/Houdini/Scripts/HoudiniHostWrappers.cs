@@ -1035,7 +1035,7 @@ public static partial class HoudiniHost
 		if ( count > 0 )
 		{
 			status_code = HAPI_GetInstancedPartIds(
-				asset_id, object_id, geo_id, part_id, part_ids, count );
+				asset_id, object_id, geo_id, part_id, part_ids, 0, count );
 			processStatusCode( status_code );
 		}
 
@@ -1061,7 +1061,7 @@ public static partial class HoudiniHost
 		if ( count > 0 )
 		{
 			status_code = HAPI_GetInstancerPartTransforms(
-				asset_id, object_id, geo_id, part_id, rst_order, transforms, count );
+				asset_id, object_id, geo_id, part_id, rst_order, transforms, 0, count );
 			processStatusCode( status_code );
 		}
 
