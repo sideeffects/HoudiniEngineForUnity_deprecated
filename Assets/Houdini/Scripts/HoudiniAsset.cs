@@ -279,13 +279,7 @@ public abstract class HoudiniAsset : HoudiniControl
 		if ( prEnableLogging )
 			Debug.Log( "HoudiniAsset destroyed - Instance Id:" + GetInstanceID() );
 	}
-	
-	public virtual void Awake()
-	{
-		DontDestroyOnLoad( gameObject );
-	}
 
-	
 	public int findObjectByName( string object_name )
 	{
 		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
