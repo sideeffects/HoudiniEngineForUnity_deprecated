@@ -170,6 +170,10 @@ public static partial class HoudiniHost
 
 	private static HoudiniHostUndoInfo myHostUndoInfo;
 
+	// Global Session -------------------------------------------------------------------------------------------
+
+	public static HAPI_Session mySession;
+
 	// Global Settings Initializations --------------------------------------------------------------------------
 
 	static HoudiniHost()
@@ -188,6 +192,10 @@ public static partial class HoudiniHost
 		EditorApplication.hierarchyWindowItemOnGUI += hierarchyWindowItemOnGUI;
 		SceneView.onSceneGUIDelegate			+= onSceneGUIDelegate;
 #endif // UNITY_EDITOR
+
+		// Initialize the global session.
+		mySession.type = HAPI_SessionType.HAPI_SESSION_INPROCESS;
+		mySession.id = 0;
 
 		if ( !isRuntimeInitialized() )
 		{
@@ -700,7 +708,7 @@ public static partial class HoudiniHost
 	public static void saveScene( string file_name, bool lock_nodes )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_SaveHIPFile( file_name, lock_nodes );
+		HAPI_SaveHIPFile( ref mySession, file_name, lock_nodes );
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
@@ -729,7 +737,7 @@ public static partial class HoudiniHost
 #else
 	#if UNITY_EDITOR
 		status_code = HAPI_LoadAssetLibraryFromFile(
-			path, allow_asset_def_overwrite, out library_id );
+			ref mySession, path, allow_asset_def_overwrite, out library_id );
 
 		if ( status_code == HAPI_Result.HAPI_RESULT_ASSET_DEF_ALREADY_LOADED )
 		{
@@ -740,7 +748,7 @@ public static partial class HoudiniHost
 				"another asset library file. \n\nWould you like to overwrite them?",
 				"Yes", "No" ) )
 			{
-				status_code = HAPI_LoadAssetLibraryFromFile( path, true, out library_id );
+				status_code = HAPI_LoadAssetLibraryFromFile( ref mySession, path, true, out library_id );
 			}
 		}
 	#else
@@ -750,11 +758,11 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 
 		int asset_count = 0;
-		status_code = HAPI_GetAvailableAssetCount( library_id, out asset_count );
+		status_code = HAPI_GetAvailableAssetCount( ref mySession, library_id, out asset_count );
 		processStatusCode( status_code );
 
 		int[] asset_names_sh = new int[ asset_count ];
-		status_code = HAPI_GetAvailableAssets( library_id, asset_names_sh, asset_count );
+		status_code = HAPI_GetAvailableAssets( ref mySession, library_id, asset_names_sh, asset_count );
 		processStatusCode( status_code );
 
 		string[] asset_names = new string[ asset_count ];
@@ -767,7 +775,7 @@ public static partial class HoudiniHost
 		int asset_id = -1;
 		string first_asset_name = asset_names[ 0 ];
 		bool cook_on_load = false;
-		status_code = HAPI_InstantiateAsset( first_asset_name, cook_on_load, out asset_id );
+		status_code = HAPI_InstantiateAsset( ref mySession, first_asset_name, cook_on_load, out asset_id );
 		processStatusCode( status_code );
 		progress_bar.statusCheckLoop();
 		cookAsset( asset_id, split_geos_by_group, import_templated_geos );
@@ -785,7 +793,7 @@ public static partial class HoudiniHost
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
-		HAPI_Result status_code = HAPI_LoadHIPFile( path, true );
+		HAPI_Result status_code = HAPI_LoadHIPFile( ref mySession, path, true );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -796,11 +804,11 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int asset_count = 0;
-		HAPI_Result status_code = HAPI_CheckForNewAssets( ref asset_count );
+		HAPI_Result status_code = HAPI_CheckForNewAssets( ref mySession, ref asset_count );
 		processStatusCode( status_code );
 
 		int[] asset_ids_array = new int[ asset_count ];
-		status_code = HAPI_GetNewAssetIds( asset_ids_array, asset_count );
+		status_code = HAPI_GetNewAssetIds( ref mySession, asset_ids_array, asset_count );
 		processStatusCode( status_code );
 
 		return asset_ids_array;
@@ -816,7 +824,7 @@ public static partial class HoudiniHost
 			throw new HoudiniError( "DLL Not Found." );
 
 		int asset_id = -1;
-		HAPI_Result status_code = HAPI_CreateCurve( out asset_id );
+		HAPI_Result status_code = HAPI_CreateCurve( ref mySession, out asset_id );
 		processStatusCode( status_code );
 
 		return asset_id;
@@ -832,7 +840,7 @@ public static partial class HoudiniHost
 			throw new HoudiniError( "DLL Not Found." );
 
 		int asset_id = -1;
-		HAPI_Result status_code = HAPI_CreateInputAsset( out asset_id, name );
+		HAPI_Result status_code = HAPI_CreateInputAsset( ref mySession, out asset_id, name );
 		processStatusCode( status_code );
 
 		return asset_id;
@@ -847,7 +855,7 @@ public static partial class HoudiniHost
 		if ( asset_id < 0 || !isInstallationOk() )
 			return false;
 			
-		HAPI_Result result = HAPI_DestroyAsset( asset_id );
+		HAPI_Result result = HAPI_DestroyAsset( ref mySession, asset_id );
 			
 		processStatusCode( result );
 			
@@ -884,7 +892,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int code;
-		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_CALL_RESULT, out code );
+		HAPI_GetStatus( ref mySession, HAPI_StatusType.HAPI_STATUS_CALL_RESULT, out code );
 
 		string status_string = getCallErrorMessage();
 
@@ -903,7 +911,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int code;
-		HAPI_GetStatus( HAPI_StatusType.HAPI_STATUS_COOK_RESULT, out code );
+		HAPI_GetStatus( ref mySession, HAPI_StatusType.HAPI_STATUS_COOK_RESULT, out code );
 
 		string status_string = getCookErrorMessage();
 

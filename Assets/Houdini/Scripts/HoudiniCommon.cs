@@ -20,6 +20,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 
 // Typedefs
+using HAPI_SessionId = System.Int32;
 using HAPI_StringHandle = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
@@ -193,6 +194,16 @@ public enum HAPI_Result
 	HAPI_RESULT_NODE_INVALID						= 210,
 
 	HAPI_RESULT_USER_INTERRUPTED					= 300
+};
+
+public enum HAPI_SessionType
+{
+	HAPI_SESSION_INPROCESS = 100,
+	HAPI_SESSION_SHARED_MEMORY = 200,
+	HAPI_SESSION_THRIFT = 300,
+	HAPI_SESSION_CUSTOM1 = 400,
+	HAPI_SESSION_CUSTOM2 = 500,
+	HAPI_SESSION_CUSTOM3 = 600
 };
 
 public enum HAPI_State
@@ -581,6 +592,20 @@ public struct HAPI_TransformEuler
 	public HAPI_XYZOrder rotationOrder;
 	public HAPI_RSTOrder rstOrder;
 }
+
+// SESSIONS -----------------------------------------------------------------------------------------------------
+
+[ StructLayout( LayoutKind.Sequential ) ]
+public struct HAPI_Session
+{
+    /// The type of session detemines the which implementation will be
+    /// used to communicate with the Houdini Engine library.
+    public HAPI_SessionType type;
+
+    /// Some session types support multiple simultanous sessions. This means
+    /// that each session needs to have a unique identified.
+    public HAPI_SessionId id;
+};
 
 // TIME ---------------------------------------------------------------------------------------------------------
 

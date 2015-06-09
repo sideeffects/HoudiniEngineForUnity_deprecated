@@ -41,7 +41,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int value;
-		HAPI_Result status_code = HAPI_GetEnvInt( HAPI_EnvIntType.HAPI_ENVINT_LICENSE, out value );
+		HAPI_Result status_code = HAPI_GetEnvInt( ref mySession, HAPI_EnvIntType.HAPI_ENVINT_LICENSE, out value );
 		processStatusCode( status_code );
 		return (HAPI_License) value;
 #else
@@ -53,7 +53,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int value;
-		HAPI_Result status_code = HAPI_GetEnvInt( int_type, out value );
+		HAPI_Result status_code = HAPI_GetEnvInt( ref mySession, int_type, out value );
 		processStatusCode( status_code );
 		return value;
 #else
@@ -65,7 +65,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int status;
-		HAPI_Result status_code = HAPI_GetStatus( status_type, out status );
+		HAPI_Result status_code = HAPI_GetStatus( ref mySession, status_type, out status );
 		processStatusCode( status_code );
 		return status;
 #else
@@ -77,14 +77,14 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int buffer_length = 0;
-		HAPI_Result status_code = HAPI_GetStatusStringBufLength( status_type, verbosity, out buffer_length );
+		HAPI_Result status_code = HAPI_GetStatusStringBufLength( ref mySession, status_type, verbosity, out buffer_length );
 		processStatusCode( status_code );
 
 		if ( buffer_length <= 0 )
 			return "";
 
 		StringBuilder string_builder = new StringBuilder( buffer_length );
-		status_code = HAPI_GetStatusString( status_type, string_builder, buffer_length );
+		status_code = HAPI_GetStatusString( ref mySession, status_type, string_builder, buffer_length );
 		processStatusCode( status_code );
 
 		string string_value = string_builder.ToString();
@@ -99,7 +99,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int count = 0;
-		HAPI_Result status_code = HAPI_GetCookingTotalCount( out count );
+		HAPI_Result status_code = HAPI_GetCookingTotalCount( ref mySession, out count );
 		processStatusCode( status_code );
 		return count;
 #else
@@ -111,7 +111,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int count = 0;
-		HAPI_Result status_code = HAPI_GetCookingCurrentCount( out count );
+		HAPI_Result status_code = HAPI_GetCookingCurrentCount( ref mySession, out count );
 		processStatusCode( status_code );
 		return count;
 #else
@@ -126,7 +126,7 @@ public static partial class HoudiniHost
 		HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_ConvertTransform( ref transform_in_out, rst_order, rot_order );
+		HAPI_Result status_code = HAPI_ConvertTransform( ref mySession, ref transform_in_out, rst_order, rot_order );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -142,7 +142,7 @@ public static partial class HoudiniHost
 		for ( int i = 0; i < 16; ++i )
 			raw_matrix[ i ] = matrix[ i ];
 
-		HAPI_Result status_code = HAPI_ConvertMatrixToQuat( raw_matrix, rst_order, ref transform );
+		HAPI_Result status_code = HAPI_ConvertMatrixToQuat( ref mySession, raw_matrix, rst_order, ref transform );
 		processStatusCode( status_code );
 
 		return transform;
@@ -162,7 +162,7 @@ public static partial class HoudiniHost
 			raw_matrix[ i ] = matrix[ i ];
 
 		HAPI_Result status_code = HAPI_ConvertMatrixToEuler(
-			raw_matrix, rst_order, rot_order, ref transform );
+			ref mySession, raw_matrix, rst_order, rot_order, ref transform );
 		processStatusCode( status_code );
 
 		return transform;
@@ -175,7 +175,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		float[] raw_matrix = new float[ 16 ];
-		HAPI_Result status_code = HAPI_ConvertTransformQuatToMatrix( ref transform, raw_matrix );
+		HAPI_Result status_code = HAPI_ConvertTransformQuatToMatrix( ref mySession, ref transform, raw_matrix );
 		processStatusCode( status_code );
 
 		Matrix4x4 output = new Matrix4x4();
@@ -193,7 +193,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		float[] raw_matrix = new float[ 16 ];
-		HAPI_Result status_code = HAPI_ConvertTransformEulerToMatrix( ref transform, raw_matrix );
+		HAPI_Result status_code = HAPI_ConvertTransformEulerToMatrix( ref mySession, ref transform, raw_matrix );
 		processStatusCode( status_code );
 
 		Matrix4x4 output = new Matrix4x4();
@@ -215,7 +215,7 @@ public static partial class HoudiniHost
 		HAPI_StringHandle string_handle, out int buffer_length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetStringBufLength( string_handle, out buffer_length );
+		HAPI_Result status_code = HAPI_GetStringBufLength( ref mySession, string_handle, out buffer_length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -228,7 +228,7 @@ public static partial class HoudiniHost
 		int buffer_length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetString( string_handle, string_value, buffer_length );
+		HAPI_Result status_code = HAPI_GetString( ref mySession, string_handle, string_value, buffer_length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -241,7 +241,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		float time;
-		HAPI_Result status_code = HAPI_GetTime( out time );
+		HAPI_Result status_code = HAPI_GetTime( ref mySession, out time );
 		processStatusCode( status_code );
 		return time;
 #else
@@ -252,7 +252,7 @@ public static partial class HoudiniHost
 	public static void setTime( float time )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetTime( time );
+		HAPI_Result status_code = HAPI_SetTime( ref mySession, time );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -263,7 +263,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_TimelineOptions timeline_options = new HAPI_TimelineOptions();
-		HAPI_Result status_code = HAPI_GetTimelineOptions( ref timeline_options );
+		HAPI_Result status_code = HAPI_GetTimelineOptions( ref mySession, ref timeline_options );
 		processStatusCode( status_code );
 		return timeline_options;
 #else
@@ -274,7 +274,7 @@ public static partial class HoudiniHost
 	public static void setTimelineOptions( HAPI_TimelineOptions timeline_options )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetTimelineOptions( ref timeline_options );
+		HAPI_Result status_code = HAPI_SetTimelineOptions( ref mySession, ref timeline_options );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -293,7 +293,7 @@ public static partial class HoudiniHost
 			
 		// No need to process return code because this function is guaranteed to 
 		// always return HAPI_STATUS_SUCCESS.
-		HAPI_IsAssetValid( asset_id, asset_validation_id, out answer );
+		HAPI_IsAssetValid( ref mySession, asset_id, asset_validation_id, out answer );
 			
 		if ( answer > 0 )
 			return true;
@@ -308,7 +308,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_AssetId asset_id = 0;
-		HAPI_Result status_code = HAPI_InstantiateAsset( asset_name, cook_on_load, out asset_id );
+		HAPI_Result status_code = HAPI_InstantiateAsset( ref mySession, asset_name, cook_on_load, out asset_id );
 		processStatusCode( status_code );
 		return asset_id;
 #else
@@ -320,7 +320,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-		HAPI_Result status_code = HAPI_GetAssetInfo( asset_id, ref asset_info );
+		HAPI_Result status_code = HAPI_GetAssetInfo( ref mySession, asset_id, ref asset_info );
 		processStatusCode( status_code );
 		return asset_info;
 #else
@@ -339,7 +339,7 @@ public static partial class HoudiniHost
 		cook_options.cookTemplatedGeos = import_templated_geos;
 		cook_options.packedPrimInstancingMode =
 			HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
-		HAPI_Result status_code = HAPI_CookAsset( asset_id, ref cook_options );
+		HAPI_Result status_code = HAPI_CookAsset( ref mySession, asset_id, ref cook_options );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -349,7 +349,7 @@ public static partial class HoudiniHost
 	public static void interrupt()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_Interrupt();
+		HAPI_Result status_code = HAPI_Interrupt( ref mySession );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -361,7 +361,7 @@ public static partial class HoudiniHost
 		out HAPI_TransformEuler transform )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetAssetTransform( asset_id, rst_order, rot_order, out transform );
+		HAPI_Result status_code = HAPI_GetAssetTransform( ref mySession, asset_id, rst_order, rot_order, out transform );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -372,7 +372,7 @@ public static partial class HoudiniHost
 		HAPI_AssetId asset_id, ref HAPI_TransformEuler transform )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetAssetTransform( asset_id, ref transform );
+		HAPI_Result status_code = HAPI_SetAssetTransform( ref mySession, asset_id, ref transform );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -384,7 +384,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_StringHandle name_sh = 0;
-		HAPI_Result status_code = HAPI_GetInputName( asset_id, input_idx, (int) input_type, out name_sh );
+		HAPI_Result status_code = HAPI_GetInputName( ref mySession, asset_id, input_idx, (int) input_type, out name_sh );
 		processStatusCode( status_code );
 		string name = getString( name_sh );
 		return name;
@@ -399,7 +399,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_NodeInfo node_info = new HAPI_NodeInfo();
-		HAPI_Result status_code = HAPI_GetNodeInfo( node_id, ref node_info );
+		HAPI_Result status_code = HAPI_GetNodeInfo( ref mySession, node_id, ref node_info );
 		processStatusCode( status_code );
 		return node_info;
 #else
@@ -411,7 +411,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_GlobalNodes global_nodes = new HAPI_GlobalNodes();
-		HAPI_Result status_code = HAPI_GetGlobalNodes( out global_nodes );
+		HAPI_Result status_code = HAPI_GetGlobalNodes( ref mySession, out global_nodes );
 		processStatusCode( status_code );
 		return global_nodes;
 #else
@@ -423,12 +423,12 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-		HAPI_Result status_code = HAPI_GetAssetInfo( asset_id, ref asset_info );
+		HAPI_Result status_code = HAPI_GetAssetInfo( ref mySession, asset_id, ref asset_info );
 		processStatusCode( status_code );
 
 		HAPI_NodeId[] networks = new HAPI_NodeId[ asset_info.editableNodeNetworkCount ];
 		status_code = HAPI_GetEditableNodeNetworks(
-			asset_id, networks, asset_info.editableNodeNetworkCount );
+			ref mySession, asset_id, networks, asset_info.editableNodeNetworkCount );
 		processStatusCode( status_code );
 
 		return networks;
@@ -441,12 +441,12 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_NodeInfo node_info = new HAPI_NodeInfo();
-		HAPI_Result status_code = HAPI_GetNodeInfo( network_node_id, ref node_info );
+		HAPI_Result status_code = HAPI_GetNodeInfo( ref mySession, network_node_id, ref node_info );
 		processStatusCode( status_code );
 
 		HAPI_NodeId[] children = new HAPI_NodeId[ node_info.childNodeCount ];
 		status_code = HAPI_GetNodeNetworkChildren(
-			network_node_id, children, node_info.childNodeCount );
+			ref mySession, network_node_id, children, node_info.childNodeCount );
 		processStatusCode( status_code );
 
 		return children;
@@ -459,7 +459,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_NodeId new_node_id;
-		HAPI_Result status_code = HAPI_CreateNode( parent_node_id, operator_name, out new_node_id );
+		HAPI_Result status_code = HAPI_CreateNode( ref mySession, parent_node_id, operator_name, out new_node_id );
 		processStatusCode( status_code );
 
 		return new_node_id;
@@ -471,7 +471,7 @@ public static partial class HoudiniHost
 	public static void deleteNode( HAPI_NodeId node_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_DeleteNode( node_id );
+		HAPI_Result status_code = HAPI_DeleteNode( ref mySession, node_id );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -483,7 +483,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_ConnectNodeInput(
-			node_id, input_index, node_id_to_connect );
+			ref mySession, node_id, input_index, node_id_to_connect );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -493,7 +493,7 @@ public static partial class HoudiniHost
 	public static void disconnectNodeInput( HAPI_NodeId node_id, int input_index )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_DisconnectNodeInput( node_id, input_index );
+		HAPI_Result status_code = HAPI_DisconnectNodeInput( ref mySession, node_id, input_index );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -504,7 +504,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_NodeId connected_node_id;
-		HAPI_Result status_code = HAPI_QueryNodeInput( node_id, input_index, out connected_node_id );
+		HAPI_Result status_code = HAPI_QueryNodeInput( ref mySession, node_id, input_index, out connected_node_id );
 		processStatusCode( status_code );
 
 		return connected_node_id;
@@ -520,7 +520,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetParameters( node_id, parm_infos, start, length );
+		HAPI_Result status_code = HAPI_GetParameters( ref mySession, node_id, parm_infos, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -531,7 +531,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_ParmId parm_id = -1;
-		HAPI_Result status_code = HAPI_GetParmIdFromName( node_id, name, out parm_id );
+		HAPI_Result status_code = HAPI_GetParmIdFromName( ref mySession, node_id, name, out parm_id );
 		processStatusCode( status_code );
 		return parm_id;
 #else
@@ -544,7 +544,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int value = 0;
-		HAPI_Result status_code = HAPI_GetParmIntValue( node_id, parm_name, index, out value );
+		HAPI_Result status_code = HAPI_GetParmIntValue( ref mySession, node_id, parm_name, index, out value );
 		processStatusCode( status_code );
 		return value;
 #else
@@ -557,7 +557,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetParmIntValues( node_id, values, start, length );
+		HAPI_Result status_code = HAPI_GetParmIntValues( ref mySession, node_id, values, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -569,7 +569,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		float value = 0.0f;
-		HAPI_Result status_code = HAPI_GetParmFloatValue( node_id, parm_name, index, out value );
+		HAPI_Result status_code = HAPI_GetParmFloatValue( ref mySession, node_id, parm_name, index, out value );
 		processStatusCode( status_code );
 		return value;
 #else
@@ -582,7 +582,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetParmFloatValues( node_id, values, start, length );
+		HAPI_Result status_code = HAPI_GetParmFloatValues( ref mySession, node_id, values, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -598,7 +598,7 @@ public static partial class HoudiniHost
 
 		HAPI_StringHandle string_handle = 0;
 		HAPI_Result status_code = HAPI_GetParmStringValue(
-			node_id, parm_name, index, evaluate, out string_handle );
+			ref mySession, node_id, parm_name, index, evaluate, out string_handle );
 		processStatusCode( status_code );
 		return getString( string_handle );
 #else
@@ -614,7 +614,7 @@ public static partial class HoudiniHost
 		// Can't turn this off yet. More testing is needed, especially for file paths.
 		const bool evaluate = true;
 
-		HAPI_Result status_code = HAPI_GetParmStringValues( node_id, evaluate, values, start, length );
+		HAPI_Result status_code = HAPI_GetParmStringValues( ref mySession, node_id, evaluate, values, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -626,7 +626,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetParmChoiceLists( node_id, parm_choices, start, length );
+		HAPI_Result status_code = HAPI_GetParmChoiceLists( ref mySession, node_id, parm_choices, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -637,7 +637,7 @@ public static partial class HoudiniHost
 		HAPI_NodeId node_id, string parm_name, int index, int value )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetParmIntValue( node_id, parm_name, index, value );
+		HAPI_Result status_code = HAPI_SetParmIntValue( ref mySession, node_id, parm_name, index, value );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -649,7 +649,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetParmIntValues( node_id, values, start, length );
+		HAPI_Result status_code = HAPI_SetParmIntValues( ref mySession, node_id, values, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -660,7 +660,7 @@ public static partial class HoudiniHost
 		HAPI_NodeId node_id, string parm_name, int index, float value )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetParmFloatValue( node_id, parm_name, index, value );
+		HAPI_Result status_code = HAPI_SetParmFloatValue( ref mySession, node_id, parm_name, index, value );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -672,7 +672,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetParmFloatValues( node_id, values, start, length );
+		HAPI_Result status_code = HAPI_SetParmFloatValues( ref mySession, node_id, values, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -684,7 +684,7 @@ public static partial class HoudiniHost
 		HAPI_ParmId parm_id, int index )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetParmStringValue( node_id, value, parm_id, index );
+		HAPI_Result status_code = HAPI_SetParmStringValue( ref mySession, node_id, value, parm_id, index );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -696,7 +696,7 @@ public static partial class HoudiniHost
 		int instance_position )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_InsertMultiparmInstance( node_id, parm_id, instance_position );
+		HAPI_Result status_code = HAPI_InsertMultiparmInstance( ref mySession, node_id, parm_id, instance_position );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -708,7 +708,7 @@ public static partial class HoudiniHost
 		int instance_position )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_RemoveMultiparmInstance( node_id, parm_id, instance_position );
+		HAPI_Result status_code = HAPI_RemoveMultiparmInstance( ref mySession, node_id, parm_id, instance_position );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -723,7 +723,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetHandleInfo( asset_id, handle_infos, start, length );
+		HAPI_Result status_code = HAPI_GetHandleInfo( ref mySession, asset_id, handle_infos, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -737,7 +737,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetHandleBindingInfo( asset_id, handle_index, handle_infos, start, length );
+		HAPI_Result status_code = HAPI_GetHandleBindingInfo( ref mySession, asset_id, handle_index, handle_infos, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -751,11 +751,11 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int buffer_length = 0;
 		HAPI_Result status_code = HAPI_GetPresetBufLength(
-			node_id, HAPI_PresetType.HAPI_PRESETTYPE_BINARY, null, ref buffer_length );
+			ref mySession, node_id, HAPI_PresetType.HAPI_PRESETTYPE_BINARY, null, ref buffer_length );
 		processStatusCode( status_code );
 
 		byte[] preset = new byte[ buffer_length ];
-		status_code = HAPI_GetPreset( node_id, preset, buffer_length );
+		status_code = HAPI_GetPreset( ref mySession, node_id, preset, buffer_length );
 		processStatusCode( status_code );
 
 		return preset;
@@ -768,7 +768,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_SetPreset(
-			node_id, HAPI_PresetType.HAPI_PRESETTYPE_BINARY, null, preset, preset.Length );
+			ref mySession, node_id, HAPI_PresetType.HAPI_PRESETTYPE_BINARY, null, preset, preset.Length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -783,7 +783,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetObjects( asset_id, object_infos, start, length );
+		HAPI_Result status_code = HAPI_GetObjects( ref mySession, asset_id, object_infos, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -797,7 +797,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetObjectTransforms( asset_id, rst_order, transforms, start, length );
+		HAPI_Result status_code = HAPI_GetObjectTransforms( ref mySession, asset_id, rst_order, transforms, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -811,7 +811,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetInstanceTransforms(
-			asset_id, object_id, geo_id, rst_order, transforms, start, length );
+			ref mySession, asset_id, object_id, geo_id, rst_order, transforms, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -823,7 +823,7 @@ public static partial class HoudiniHost
 		ref HAPI_TransformEuler transform )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetObjectTransform( asset_id, object_id, ref transform );
+		HAPI_Result status_code = HAPI_SetObjectTransform( ref mySession, asset_id, object_id, ref transform );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -837,42 +837,45 @@ public static partial class HoudiniHost
 		out HAPI_GeoInfo geo_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetGeoInfo( asset_id, object_id, geo_id, out geo_info );
+		HAPI_Result status_code = HAPI_GetGeoInfo( ref mySession, asset_id, object_id, geo_id, out geo_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
-	public static void getPartInfo(	HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-									out HAPI_PartInfo part_info )
+	public static void getPartInfo(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		out HAPI_PartInfo part_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		HAPI_Result status_code = HAPI_GetPartInfo( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
-	public static void getFaceCounts(		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-											[Out] int[] face_counts,
-											int start, int length )
+	public static void getFaceCounts(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		[Out] int[] face_counts,
+		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetFaceCounts( asset_id, object_id, geo_id, part_id, face_counts, start, length );
+		HAPI_Result status_code = HAPI_GetFaceCounts( ref mySession, asset_id, object_id, geo_id, part_id, face_counts, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
-	public static void getVertexList(		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-											[Out] int[] vertex_list,
-											int start, int length )
+	public static void getVertexList(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		[Out] int[] vertex_list,
+		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetVertexList( asset_id, object_id, geo_id, part_id, vertex_list, start, length );
+		HAPI_Result status_code = HAPI_GetVertexList( ref mySession, asset_id, object_id, geo_id, part_id, vertex_list, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -884,7 +887,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_AttributeInfo info = new HAPI_AttributeInfo();
-		HAPI_Result status_code = HAPI_GetAttributeInfo( asset_id, object_id, geo_id, part_id, name, owner, ref info );
+		HAPI_Result status_code = HAPI_GetAttributeInfo( ref mySession, asset_id, object_id, geo_id, part_id, name, owner, ref info );
 		processStatusCode( status_code );
 		return info;
 #else
@@ -898,14 +901,14 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		HAPI_Result status_code = HAPI_GetPartInfo( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
 		int count = part_info.getAttributeCountByOwner( owner );
 
 		int[] names = new int[ count ];
 		status_code = HAPI_GetAttributeNames(
-			asset_id, object_id, geo_id, part_id, owner, names, count );
+			ref mySession, asset_id, object_id, geo_id, part_id, owner, names, count );
 		processStatusCode( status_code );
 
 		string[] name_strings = new string[ count ];
@@ -925,8 +928,9 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetAttributeIntData( asset_id, object_id, geo_id, part_id, name, 
-													ref attr_info, data, start, length );
+		HAPI_Result status_code = HAPI_GetAttributeIntData(
+			ref mySession, asset_id, object_id, geo_id, part_id, name, 
+			ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -941,7 +945,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetAttributeFloatData(
-			asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
+			ref mySession, asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -956,7 +960,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetAttributeStringData(
-			asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
+			ref mySession, asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -969,14 +973,14 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Result status_code = HAPI_GetGeoInfo( asset_id, object_id, geo_id, out geo_info );
+		HAPI_Result status_code = HAPI_GetGeoInfo( ref mySession, asset_id, object_id, geo_id, out geo_info );
 		processStatusCode( status_code );
 
 		int count = geo_info.getGroupCountByType( group_type );
 
 		int[] names = new int[ count ];
 		status_code = HAPI_GetGroupNames(
-			asset_id, object_id, geo_id, group_type, names, count );
+			ref mySession, asset_id, object_id, geo_id, group_type, names, count );
 		processStatusCode( status_code );
 
 		string[] name_strings = new string[ count ];
@@ -996,7 +1000,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		HAPI_Result status_code = HAPI_GetPartInfo( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
 		int count = part_info.getElementCountByGroupType( group_type );
@@ -1006,7 +1010,7 @@ public static partial class HoudiniHost
 		if ( count > 0 )
 		{
 			status_code = HAPI_GetGroupMembership(
-				asset_id, object_id, geo_id, part_id, group_type, group_name, membership, 0, count );
+				ref mySession, asset_id, object_id, geo_id, part_id, group_type, group_name, membership, 0, count );
 			processStatusCode( status_code );
 		}
 
@@ -1025,7 +1029,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		HAPI_Result status_code = HAPI_GetPartInfo( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
 		int count = part_info.instancedPartCount;
@@ -1035,7 +1039,7 @@ public static partial class HoudiniHost
 		if ( count > 0 )
 		{
 			status_code = HAPI_GetInstancedPartIds(
-				asset_id, object_id, geo_id, part_id, part_ids, 0, count );
+				ref mySession, asset_id, object_id, geo_id, part_id, part_ids, 0, count );
 			processStatusCode( status_code );
 		}
 
@@ -1051,7 +1055,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		HAPI_Result status_code = HAPI_GetPartInfo( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
 		int count = part_info.instanceCount;
@@ -1061,7 +1065,7 @@ public static partial class HoudiniHost
 		if ( count > 0 )
 		{
 			status_code = HAPI_GetInstancerPartTransforms(
-				asset_id, object_id, geo_id, part_id, rst_order, transforms, 0, count );
+				ref mySession, asset_id, object_id, geo_id, part_id, rst_order, transforms, 0, count );
 			processStatusCode( status_code );
 		}
 
@@ -1078,7 +1082,7 @@ public static partial class HoudiniHost
 		ref HAPI_GeoInfo geo_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetGeoInfo( asset_id, object_id, geo_id, ref geo_info );
+		HAPI_Result status_code = HAPI_SetGeoInfo( ref mySession, asset_id, object_id, geo_id, ref geo_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1090,7 +1094,7 @@ public static partial class HoudiniHost
 		ref HAPI_PartInfo part_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetPartInfo( asset_id, object_id, geo_id, ref part_info );
+		HAPI_Result status_code = HAPI_SetPartInfo( ref mySession, asset_id, object_id, geo_id, ref part_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1103,7 +1107,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetFaceCounts( asset_id, object_id, geo_id, face_counts, start, length );
+		HAPI_Result status_code = HAPI_SetFaceCounts( ref mySession, asset_id, object_id, geo_id, face_counts, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1116,7 +1120,7 @@ public static partial class HoudiniHost
 		int start, int length )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetVertexList( asset_id, object_id, geo_id, vertex_list, start, length );
+		HAPI_Result status_code = HAPI_SetVertexList( ref mySession, asset_id, object_id, geo_id, vertex_list, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1128,7 +1132,7 @@ public static partial class HoudiniHost
 		ref HAPI_AttributeInfo attr_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_AddAttribute( asset_id, object_id, geo_id, name, ref attr_info );
+		HAPI_Result status_code = HAPI_AddAttribute( ref mySession, asset_id, object_id, geo_id, name, ref attr_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1143,7 +1147,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_SetAttributeIntData(
-			asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
+			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1158,7 +1162,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_SetAttributeFloatData(
-			asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
+			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1173,7 +1177,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_SetAttributeStringData(
-			asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
+			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1186,7 +1190,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_AddGroup(
-			asset_id, object_id, geo_id, group_type, group_name );
+			ref mySession, asset_id, object_id, geo_id, group_type, group_name );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1209,7 +1213,7 @@ public static partial class HoudiniHost
 			membership_int[ i ] = membership[ i ] ? 1 : 0;
 
 		HAPI_Result status_code = HAPI_SetGroupMembership(
-			asset_id, object_id, geo_id, group_type, group_name, membership_int, 0, count );
+			ref mySession, asset_id, object_id, geo_id, group_type, group_name, membership_int, 0, count );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1219,7 +1223,7 @@ public static partial class HoudiniHost
 	public static void commitGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_CommitGeo( asset_id, object_id, geo_id );
+		HAPI_Result status_code = HAPI_CommitGeo( ref mySession, asset_id, object_id, geo_id );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1229,7 +1233,7 @@ public static partial class HoudiniHost
 	public static void revertGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_RevertGeo( asset_id, object_id, geo_id );
+		HAPI_Result status_code = HAPI_RevertGeo( ref mySession, asset_id, object_id, geo_id );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1241,7 +1245,7 @@ public static partial class HoudiniHost
 	public static void connectAssetTransform( int asset_id_from, int asset_id_to, int input_idx )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_ConnectAssetTransform( asset_id_from, asset_id_to, input_idx );
+		HAPI_Result status_code = HAPI_ConnectAssetTransform( ref mySession, asset_id_from, asset_id_to, input_idx );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1251,7 +1255,7 @@ public static partial class HoudiniHost
 	public static void disconnectAssetTransform( HAPI_AssetId asset_id, int input_idx )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_DisconnectAssetTransform( asset_id, input_idx );
+		HAPI_Result status_code = HAPI_DisconnectAssetTransform( ref mySession, asset_id, input_idx );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1264,7 +1268,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_ConnectAssetGeometry(
-			asset_id_from, object_id_from, asset_id_to, input_idx );
+			ref mySession, asset_id_from, object_id_from, asset_id_to, input_idx );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1274,7 +1278,7 @@ public static partial class HoudiniHost
 	public static void disconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_DisconnectAssetGeometry( asset_id, input_idx );
+		HAPI_Result status_code = HAPI_DisconnectAssetGeometry( ref mySession, asset_id, input_idx );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1289,13 +1293,13 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HAPI_Result status_code = HAPI_GetPartInfo(
-			asset_id, object_id, geo_id, part_id, out part_info );
+			ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
 		bool are_all_the_same = false;
 		int[] material_ids = new int[ part_info.faceCount ];
 		status_code = HAPI_GetMaterialIdsOnFaces(
-			asset_id, object_id, geo_id, part_id,
+			ref mySession, asset_id, object_id, geo_id, part_id,
 			ref are_all_the_same, material_ids, 0, part_info.faceCount );
 		processStatusCode( status_code );
 
@@ -1303,7 +1307,7 @@ public static partial class HoudiniHost
 		HAPI_MaterialInfo[] material_infos = new HAPI_MaterialInfo[ part_info.faceCount ];
 		for ( int m = 0; m < part_info.faceCount; ++m )
 		{
-			status_code = HAPI_GetMaterialInfo( asset_id, material_ids[ m ], out material_info );
+			status_code = HAPI_GetMaterialInfo( ref mySession, asset_id, material_ids[ m ], out material_info );
 			processStatusCode( status_code );
 			material_infos[ m ] = material_info;
 		}
@@ -1321,7 +1325,7 @@ public static partial class HoudiniHost
 #if true
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
 		HAPI_Result status_code = HAPI_GetMaterialOnPart(
-			asset_id, object_id, geo_id, part_id, out material_info );
+			ref mySession, asset_id, object_id, geo_id, part_id, out material_info );
 		processStatusCode( status_code );
 #else
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
@@ -1351,7 +1355,7 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
 		HAPI_Result status_code = HAPI_GetMaterialOnGroup(
-			asset_id, object_id, geo_id, group_name, out material_info );
+			ref mySession, asset_id, object_id, geo_id, group_name, out material_info );
 		processStatusCode( status_code );
 		return material_info;
 #else
@@ -1362,7 +1366,7 @@ public static partial class HoudiniHost
 	public static void renderMaterialToImage( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ShaderType shader_type )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_RenderMaterialToImage( asset_id, material_id, shader_type );
+		HAPI_Result status_code = HAPI_RenderMaterialToImage( ref mySession, asset_id, material_id, shader_type );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1372,7 +1376,7 @@ public static partial class HoudiniHost
 	public static void renderTextureToImage( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ParmId parm_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_RenderTextureToImage( asset_id, material_id, parm_id );
+		HAPI_Result status_code = HAPI_RenderTextureToImage( ref mySession, asset_id, material_id, parm_id );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1383,7 +1387,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int format_count = 0;
-		HAPI_Result status_code = HAPI_GetSupportedImageFileFormatCount( out format_count );
+		HAPI_Result status_code = HAPI_GetSupportedImageFileFormatCount( ref mySession, out format_count );
 		processStatusCode( status_code );
 		return format_count;
 #else
@@ -1396,7 +1400,7 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int format_count = getSupportedImageFileFormatCount();
 		HAPI_ImageFileFormat[] formats = new HAPI_ImageFileFormat[ format_count ];
-		HAPI_Result status_code = HAPI_GetSupportedImageFileFormats( formats, format_count );
+		HAPI_Result status_code = HAPI_GetSupportedImageFileFormats( ref mySession, formats, format_count );
 		processStatusCode( status_code );
 		return formats;
 #else
@@ -1408,7 +1412,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_ImageInfo image_info = new HAPI_ImageInfo();
-		HAPI_Result status_code = HAPI_GetImageInfo( asset_id, material_id, out image_info );
+		HAPI_Result status_code = HAPI_GetImageInfo( ref mySession, asset_id, material_id, out image_info );
 		processStatusCode( status_code );
 		return image_info;
 #else
@@ -1420,7 +1424,7 @@ public static partial class HoudiniHost
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id, ref HAPI_ImageInfo image_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetImageInfo( asset_id, material_id, ref image_info );
+		HAPI_Result status_code = HAPI_SetImageInfo( ref mySession, asset_id, material_id, ref image_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1433,12 +1437,12 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = (int) HAPI_Result.HAPI_RESULT_SUCCESS;
 
 		int image_plane_count = 0;
-		status_code = HAPI_GetImagePlaneCount( asset_id, material_id, out image_plane_count );
+		status_code = HAPI_GetImagePlaneCount( ref mySession, asset_id, material_id, out image_plane_count );
 		processStatusCode( status_code );
 
 		int[] image_plane_names_array = new int[ image_plane_count ];
 		status_code = HAPI_GetImagePlanes( 
-			asset_id, material_id, image_plane_names_array, image_plane_count );
+			ref mySession, asset_id, material_id, image_plane_names_array, image_plane_count );
 		processStatusCode( status_code );
 
 		List< string > image_plane_names = new List< string >( image_plane_count );
@@ -1459,7 +1463,7 @@ public static partial class HoudiniHost
 		int destination_file_path_sh = 0;
 
 		HAPI_Result status_code = HAPI_ExtractImageToFile( 
-			asset_id, material_id, image_file_format_name, image_planes, 
+			ref mySession, asset_id, material_id, image_file_format_name, image_planes, 
 			destination_folder_path, null, out destination_file_path_sh );
 		processStatusCode( status_code );
 			
@@ -1477,11 +1481,11 @@ public static partial class HoudiniHost
 		int buffer_size = 0;
 
 		HAPI_Result status_code = HAPI_ExtractImageToMemory( 
-			asset_id, material_id, image_file_format_name, image_planes, out buffer_size );
+			ref mySession, asset_id, material_id, image_file_format_name, image_planes, out buffer_size );
 		processStatusCode( status_code );
 
 		byte[] buffer = new byte[ buffer_size ];
-		status_code = HAPI_GetImageMemoryBuffer( asset_id, material_id, buffer, buffer_size );
+		status_code = HAPI_GetImageMemoryBuffer( ref mySession, asset_id, material_id, buffer, buffer_size );
 		processStatusCode( status_code );
 
 		return buffer;
@@ -1499,7 +1503,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_SetAnimCurve(
-			node_id, parm_id, parm_index, curve_keyframes, keyframe_count );
+			ref mySession, node_id, parm_id, parm_index, curve_keyframes, keyframe_count );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1512,7 +1516,8 @@ public static partial class HoudiniHost
 		int keyframe_count )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetTransformAnimCurve( node_id, transform_component, curve_keyframes, keyframe_count );
+		HAPI_Result status_code = HAPI_SetTransformAnimCurve(
+			ref mySession, node_id, transform_component, curve_keyframes, keyframe_count );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1522,7 +1527,7 @@ public static partial class HoudiniHost
 	public static void resetSimulation( HAPI_AssetId asset_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_ResetSimulation( asset_id );
+		HAPI_Result status_code = HAPI_ResetSimulation( ref mySession, asset_id );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1536,7 +1541,7 @@ public static partial class HoudiniHost
 		ref HAPI_VolumeInfo volume_info )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetVolumeInfo( asset_id, object_id, geo_id, part_id, ref volume_info );
+		HAPI_Result status_code = HAPI_GetVolumeInfo( ref mySession, asset_id, object_id, geo_id, part_id, ref volume_info );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1548,7 +1553,7 @@ public static partial class HoudiniHost
 		ref HAPI_VolumeTileInfo tile )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetFirstVolumeTile( asset_id, object_id, geo_id, part_id, ref tile );
+		HAPI_Result status_code = HAPI_GetFirstVolumeTile( ref mySession, asset_id, object_id, geo_id, part_id, ref tile );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1560,7 +1565,7 @@ public static partial class HoudiniHost
 		ref HAPI_VolumeTileInfo next )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_GetNextVolumeTile( asset_id, object_id, geo_id, part_id, ref next );
+		HAPI_Result status_code = HAPI_GetNextVolumeTile( ref mySession, asset_id, object_id, geo_id, part_id, ref next );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1573,7 +1578,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetVolumeTileFloatData(
-			asset_id, object_id, geo_id, part_id, 0.0f, ref tile, values, values.Length );
+			ref mySession, asset_id, object_id, geo_id, part_id, 0.0f, ref tile, values, values.Length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1588,7 +1593,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_CurveInfo curve_info = new HAPI_CurveInfo();
-		HAPI_Result status_code = HAPI_GetCurveInfo( asset_id, object_id, geo_id, part_id, ref curve_info );
+		HAPI_Result status_code = HAPI_GetCurveInfo( ref mySession, asset_id, object_id, geo_id, part_id, ref curve_info );
 		processStatusCode( status_code );
 		return curve_info;
 #else
@@ -1603,7 +1608,7 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int[] counts = new int[ length ];
 		HAPI_Result status_code = HAPI_GetCurveCounts(
-			asset_id, object_id, geo_id, part_id, counts, start, length );
+			ref mySession, asset_id, object_id, geo_id, part_id, counts, start, length );
 		processStatusCode( status_code );
 		return counts;
 #else
@@ -1618,7 +1623,7 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int[] orders = new int[ length ];
 		HAPI_Result status_code = HAPI_GetCurveOrders(
-			asset_id, object_id, geo_id, part_id, orders, start, length );
+			ref mySession, asset_id, object_id, geo_id, part_id, orders, start, length );
 		processStatusCode( status_code );
 		return orders;
 #else
@@ -1633,7 +1638,7 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		float[] knots = new float[ length ];
 		HAPI_Result status_code = HAPI_GetCurveKnots(
-			asset_id, object_id, geo_id, part_id, knots, start, length );
+			ref mySession, asset_id, object_id, geo_id, part_id, knots, start, length );
 		processStatusCode( status_code );
 		return knots;
 #else
@@ -1649,7 +1654,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_SaveGeoToFile(
-			asset_id, object_id, geo_id, file_name );
+			ref mySession, asset_id, object_id, geo_id, file_name );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1662,7 +1667,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_LoadGeoFromFile(
-			asset_id, object_id, geo_id, file_name );
+			ref mySession, asset_id, object_id, geo_id, file_name );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1676,12 +1681,12 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int size;
 		HAPI_Result status_code = HAPI_GetGeoSize(
-			asset_id, object_id, geo_id, format, out size );
+			ref mySession, asset_id, object_id, geo_id, format, out size );
 		processStatusCode( status_code );
 
 		byte[] memory = new byte[ size ];
 		status_code = HAPI_SaveGeoToMemory(
-			asset_id, object_id, geo_id, memory, size );
+			ref mySession, asset_id, object_id, geo_id, memory, size );
 		processStatusCode( status_code );
 
 		return memory;
@@ -1696,7 +1701,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_LoadGeoFromMemory(
-			asset_id, object_id, geo_id, format, buffer, buffer.Length );
+			ref mySession, asset_id, object_id, geo_id, format, buffer, buffer.Length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
