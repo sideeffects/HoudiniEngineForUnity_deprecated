@@ -48,7 +48,6 @@ public class HoudiniCurveGUI : Editor
 
 		mySelectionArea			= new Rect();
 		mySelectionMeshColours	= null;
-		mySelectionMesh			= null;
 		mySelectionMaterial		= null;
 		mySelectedPoints		= new List< int >();
 		mySelectedPointsMask	= new List< bool >();
@@ -126,7 +125,7 @@ public class HoudiniCurveGUI : Editor
 		HoudiniHost.preDrawSetup();
 
 		// First Remake and Draw Guide Geometry if necessary.
-		if ( mySelectionMesh == null )
+		if ( mySelectionMeshColours == null )
 			buildGuideGeometry();
 		
 		if ( !myTempCamera && Camera.current )
@@ -466,54 +465,47 @@ public class HoudiniCurveGUI : Editor
 		}
 
 		// Selection Mesh Draws
-		if ( mySelectionMaterial != null && mySelectionMesh != null )
+		if ( mySelectionMaterial != null )
 		{
 			mySelectionMaterial.SetFloat( "_PointSize", HoudiniHost.prGuidePointSize );
 			mySelectionMaterial.SetColor( "_Color", HoudiniHost.prGuideWireframeColour );
 			if ( mySelectionMaterial.SetPass( 0 ) )
 			{
 				// TODO: Clean this up!
-				if ( PlayerSettings.useDirect3D11 )
+				Camera tempCamera = Camera.current;
+				float s = HoudiniHost.prGuidePointSize / 2.0f;
+				float w = tempCamera.pixelWidth;
+				float h = tempCamera.pixelHeight;
+
+				GL.PushMatrix();
+				GL.Begin( GL.QUADS );
+				GL.LoadOrtho();
+
+				for ( int i = 0; i < myCurve.prPoints.Count; ++i )
 				{
-					Camera tempCamera = Camera.current;
-					float s = HoudiniHost.prGuidePointSize / 2.0f;
-					float w = tempCamera.pixelWidth;
-					float h = tempCamera.pixelHeight;
+					Vector3 p = myCurve.prPoints[ i ];
+					p = myCurve.transform.TransformPoint( p );
 
-					GL.PushMatrix();
-					GL.Begin( GL.QUADS );
-					GL.LoadOrtho();
+					p = tempCamera.WorldToScreenPoint( p );
 
-					for ( int i = 0; i < myCurve.prPoints.Count; ++i )
-					{
-						Vector3 p = myCurve.prPoints[ i ];
-						p = myCurve.transform.TransformPoint( p );
+					if ( p.x < 0.0f || p.x > w )
+						continue;
+					if ( p.y < 0.0f || p.y > h )
+						continue;
+					if ( p.z < 0.0f )
+						continue;
 
-						p = tempCamera.WorldToScreenPoint( p );
+					p.z = 0.0f;
 
-						if ( p.x < 0.0f || p.x > w )
-							continue;
-						if ( p.y < 0.0f || p.y > h )
-							continue;
-						if ( p.z < 0.0f )
-							continue;
-
-						p.z = 0.0f;
-
-						GL.Color( mySelectionMeshColours[ i ] );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
-					}
-
-					GL.End();
-					GL.PopMatrix();
+					GL.Color( mySelectionMeshColours[ i ] );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
 				}
-				else
-				{
-					Graphics.DrawMeshNow( mySelectionMesh, myCurve.transform.localToWorldMatrix );
-				}
+
+				GL.End();
+				GL.PopMatrix();
 			}
 
 			mySelectionMaterial.SetFloat( "_PointSize", HoudiniHost.prGuidePointSize - myGuideBorderSize );
@@ -521,47 +513,41 @@ public class HoudiniCurveGUI : Editor
 			if ( mySelectionMaterial.SetPass( 1 ) )
 			{
 				// TODO: Clean this up!
-				if ( PlayerSettings.useDirect3D11 )
+
+				Camera tempCamera = Camera.current;
+				float s = ( HoudiniHost.prGuidePointSize - myGuideBorderSize ) / 2.0f;
+				float w = tempCamera.pixelWidth;
+				float h = tempCamera.pixelHeight;
+
+				GL.PushMatrix();
+				GL.Begin( GL.QUADS );
+				GL.LoadOrtho();
+
+				for ( int i = 0; i < myCurve.prPoints.Count; ++i )
 				{
-					Camera tempCamera = Camera.current;
-					float s = ( HoudiniHost.prGuidePointSize - myGuideBorderSize ) / 2.0f;
-					float w = tempCamera.pixelWidth;
-					float h = tempCamera.pixelHeight;
+					Vector3 p = myCurve.prPoints[ i ];
+					p = myCurve.transform.TransformPoint( p );
 
-					GL.PushMatrix();
-					GL.Begin( GL.QUADS );
-					GL.LoadOrtho();
+					p = tempCamera.WorldToScreenPoint( p );
 
-					for ( int i = 0; i < myCurve.prPoints.Count; ++i )
-					{
-						Vector3 p = myCurve.prPoints[ i ];
-						p = myCurve.transform.TransformPoint( p );
+					if ( p.x < 0.0f || p.x > w )
+						continue;
+					if ( p.y < 0.0f || p.y > h )
+						continue;
+					if ( p.z < 0.0f )
+						continue;
 
-						p = tempCamera.WorldToScreenPoint( p );
+					p.z = 0.0f;
 
-						if ( p.x < 0.0f || p.x > w )
-							continue;
-						if ( p.y < 0.0f || p.y > h )
-							continue;
-						if ( p.z < 0.0f )
-							continue;
-
-						p.z = 0.0f;
-
-						GL.Color( mySelectionMeshColours[ i ] );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
-					}
-
-					GL.End();
-					GL.PopMatrix();
+					GL.Color( mySelectionMeshColours[ i ] );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
 				}
-				else
-				{
-					Graphics.DrawMeshNow( mySelectionMesh, myCurve.transform.localToWorldMatrix );
-				}
+
+				GL.End();
+				GL.PopMatrix();
 			}
 		}
 
@@ -679,9 +665,6 @@ public class HoudiniCurveGUI : Editor
 			mySelectionMaterial.shader.hideFlags	= HideFlags.HideAndDontSave;
 		}
 
-		mySelectionMesh								= new Mesh();
-		mySelectionMesh.hideFlags					= HideFlags.HideAndDontSave;
-
 		// Check if we need to resize the selection mask.
 		while ( mySelectedPointsMask.Count < myCurve.prPoints.Count )
 			mySelectedPointsMask.Add( false );
@@ -716,10 +699,6 @@ public class HoudiniCurveGUI : Editor
 					mySelectionMeshColours[ i ] = HoudiniHost.prUnselectedGuideWireframeColour;
 			}
 		}
-
-		mySelectionMesh.vertices	= selection_vertices;
-		mySelectionMesh.colors		= mySelectionMeshColours;
-		mySelectionMesh.SetIndices( selection_indices, MeshTopology.Points, 0 );
 
 		// Build Connection Mesh ------------------------------------------------------------------------------------
 
@@ -1117,7 +1096,6 @@ public class HoudiniCurveGUI : Editor
 
 	private Rect				mySelectionArea;
 	private Color[]				mySelectionMeshColours;
-	private Mesh				mySelectionMesh;
 	private Material			mySelectionMaterial;
 
 	[SerializeField] 
