@@ -419,47 +419,41 @@ public class HoudiniGeoAttributeManagerGUI
 			if ( mySelectionMaterial.SetPass( 0 ) )
 			{
 				// TODO: Clean this up!
-				if ( PlayerSettings.useDirect3D11 )
+
+				Camera tempCamera = Camera.current;
+				float s = ( HoudiniHost.prGuidePointSize ) / 2.0f;
+				float w = tempCamera.pixelWidth;
+				float h = tempCamera.pixelHeight;
+
+				GL.PushMatrix();
+				GL.Begin( GL.QUADS );
+				GL.LoadOrtho();
+
+				for ( int i = 0; i < mySelectionMesh.vertexCount; ++i )
 				{
-					Camera tempCamera = Camera.current;
-					float s = ( HoudiniHost.prGuidePointSize ) / 2.0f;
-					float w = tempCamera.pixelWidth;
-					float h = tempCamera.pixelHeight;
+					Vector3 p = mySelectionMesh.vertices[ i ];
+					p = myManager.prTransform.TransformPoint( p );
 
-					GL.PushMatrix();
-					GL.Begin( GL.QUADS );
-					GL.LoadOrtho();
+					p = tempCamera.WorldToScreenPoint( p );
 
-					for ( int i = 0; i < mySelectionMesh.vertexCount; ++i )
-					{
-						Vector3 p = mySelectionMesh.vertices[ i ];
-						p = myManager.prTransform.TransformPoint( p );
+					if ( p.x < 0.0f || p.x > w )
+						continue;
+					if ( p.y < 0.0f || p.y > h )
+						continue;
+					if ( p.z < 0.0f )
+						continue;
 
-						p = tempCamera.WorldToScreenPoint( p );
+					p.z = 0.0f;
 
-						if ( p.x < 0.0f || p.x > w )
-							continue;
-						if ( p.y < 0.0f || p.y > h )
-							continue;
-						if ( p.z < 0.0f )
-							continue;
-
-						p.z = 0.0f;
-
-						GL.Color( mySelectionMeshColours[ i ] );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
-					}
-
-					GL.End();
-					GL.PopMatrix();
+					GL.Color( mySelectionMeshColours[ i ] );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
 				}
-				else
-				{
-					Graphics.DrawMeshNow( mySelectionMesh, myManager.prTransform.localToWorldMatrix );
-				}
+
+				GL.End();
+				GL.PopMatrix();
 			}
 
 			mySelectionMaterial.SetFloat( "_PointSize", HoudiniHost.prGuidePointSize - myGuideBorderSize );
@@ -467,47 +461,41 @@ public class HoudiniGeoAttributeManagerGUI
 			if ( mySelectionMaterial.SetPass( 1 ) )
 			{
 				// TODO: Clean this up!
-				if ( PlayerSettings.useDirect3D11 )
+
+				Camera tempCamera = Camera.current;
+				float s = ( HoudiniHost.prGuidePointSize - myGuideBorderSize ) / 2.0f;
+				float w = tempCamera.pixelWidth;
+				float h = tempCamera.pixelHeight;
+
+				GL.PushMatrix();
+				GL.Begin( GL.QUADS );
+				GL.LoadOrtho();
+
+				for ( int i = 0; i < mySelectionMesh.vertexCount; ++i )
 				{
-					Camera tempCamera = Camera.current;
-					float s = ( HoudiniHost.prGuidePointSize - myGuideBorderSize ) / 2.0f;
-					float w = tempCamera.pixelWidth;
-					float h = tempCamera.pixelHeight;
+					Vector3 p = mySelectionMesh.vertices[ i ];
+					p = myManager.prTransform.TransformPoint( p );
 
-					GL.PushMatrix();
-					GL.Begin( GL.QUADS );
-					GL.LoadOrtho();
+					p = tempCamera.WorldToScreenPoint( p );
 
-					for ( int i = 0; i < mySelectionMesh.vertexCount; ++i )
-					{
-						Vector3 p = mySelectionMesh.vertices[ i ];
-						p = myManager.prTransform.TransformPoint( p );
+					if ( p.x < 0.0f || p.x > w )
+						continue;
+					if ( p.y < 0.0f || p.y > h )
+						continue;
+					if ( p.z < 0.0f )
+						continue;
 
-						p = tempCamera.WorldToScreenPoint( p );
+					p.z = 0.0f;
 
-						if ( p.x < 0.0f || p.x > w )
-							continue;
-						if ( p.y < 0.0f || p.y > h )
-							continue;
-						if ( p.z < 0.0f )
-							continue;
-
-						p.z = 0.0f;
-
-						GL.Color( mySelectionMeshColours[ i ] );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
-						GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
-						GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
-					}
-
-					GL.End();
-					GL.PopMatrix();
+					GL.Color( mySelectionMeshColours[ i ] );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y + s ) / h, p.z );
+					GL.Vertex3( ( p.x + s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y - s ) / h, p.z );
+					GL.Vertex3( ( p.x - s ) / w, ( p.y + s ) / h, p.z );
 				}
-				else
-				{
-					Graphics.DrawMeshNow( mySelectionMesh, myManager.prTransform.localToWorldMatrix );
-				}
+
+				GL.End();
+				GL.PopMatrix();
 			}
 		}
 
