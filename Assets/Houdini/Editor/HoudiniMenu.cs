@@ -204,19 +204,17 @@ public class HoudiniMenu : MonoBehaviour
 	// -----------------------------------------------------------------------
 	// Debug Menus (Hidden by Default)
 
-	/*[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/TEst", false, 1000 ) ]
+	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/TEst", false, 1000 ) ]
 	static private void blah2()
 	{
-		int input = HoudiniHost.createInputAsset( "in" );
-		HoudiniHost.loadGeoFromFile( input, 0, 0, "foo.geo" );
-		HoudiniHost.cookAsset( input, false );
-		Debug.Log( "ATTRIBS" );
-			HoudiniAssetUtility.printAllAttributeNames( input, 0, 0, 1 );
-		Debug.Log( "GROUPS" );
-			HoudiniAssetUtility.printAllGroups( input, 0, 0, 1 );
-		Debug.Log( "DONE" );
-		Debug.Log( "" );
-	}*/
+		HAPI_AssetInfo asset_info = HoudiniHost.getAssetInfo( 0 );
+		int parm_id = HoudiniHost.getParmIdFromName( asset_info.nodeId, "group" );
+
+		HAPI_ParmInfo parm_info = HoudiniHost.getParmInfo( asset_info.nodeId, parm_id );
+
+		Debug.Log( parm_info.type );
+		Debug.Log( parm_info.choiceCount );
+	}
 
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Two Curves and a Merge", false, 1000 ) ]
 	static private void blah()
