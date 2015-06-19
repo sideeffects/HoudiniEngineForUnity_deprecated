@@ -478,6 +478,16 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void renameNode( HAPI_NodeId node_id, string new_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_RenameNode( ref mySession, node_id, new_name );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void connectNodeInput(
 		HAPI_NodeId node_id, int input_index, HAPI_NodeId node_id_to_connect )
 	{
