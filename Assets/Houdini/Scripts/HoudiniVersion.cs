@@ -31,15 +31,10 @@ public struct HoudiniVersion
 	public const int HOUDINI_BUILD			= 152;
 	public const int HOUDINI_PATCH			= 0;
 
-	public const int ORIG_HOUDINI_MAJOR		= 14;
-	public const int ORIG_HOUDINI_MINOR		= 5;
-	public const int ORIG_HOUDINI_BUILD		= 152;
-	public const int ORIG_HOUDINI_PATCH		= 0;
-
 	public const int HOUDINI_ENGINE_MAJOR	= 2;
 	public const int HOUDINI_ENGINE_MINOR	= 0;
 	
-	public const int HOUDINI_ENGINE_API		= 3;
+	public const int HOUDINI_ENGINE_API		= 4;
 	
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 	public const string HAPI_LIBRARY		= "libHAPI";
