@@ -297,6 +297,15 @@ public enum HAPI_ParmType
 	HAPI_PARMTYPE_NONVALUE_END		= HAPI_PARMTYPE_SEPARATOR
 }
 
+public enum HAPI_ChoiceListType
+{
+	HAPI_CHOICELISTTYPE_NONE,
+	HAPI_CHOICELISTTYPE_NORMAL,
+	HAPI_CHOICELISTTYPE_MINI,
+	HAPI_CHOICELISTTYPE_REPLACE,
+	HAPI_CHOICELISTTYPE_TOGGLE
+};
+
 public enum HAPI_PresetType
 {
 	HAPI_PRESETTYPE_INVALID = -1,
@@ -815,6 +824,8 @@ public struct HAPI_ParmInfo
 	public HAPI_Permissions permissions;
 
 	public int size; // Tuple Size
+
+	HAPI_ChoiceListType choiceListType;
 	public int choiceCount;
 
 	// Note that folders are not real parameters in Houdini so they do not
