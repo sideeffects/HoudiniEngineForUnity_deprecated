@@ -90,6 +90,12 @@ public static partial class HoudiniHost
 			HAPI_Result status_code;
 			try
 			{
+				//EditorUtility.DisplayDialog( "Blah", "Foo", "Ok" );
+
+				// Create the session.
+				//status_code = HAPI_CreateThriftNamedPipeSession( out mySession, "HoudiniEngineUnityPipe" );
+				//processStatusCode( status_code );
+
 				string otls_path = getAllFoldersInPath( Application.dataPath + "/OTLs/Scanned" );
 				string dsos_path = getAllFoldersInPath( Application.dataPath + "/DSOs" );
 
