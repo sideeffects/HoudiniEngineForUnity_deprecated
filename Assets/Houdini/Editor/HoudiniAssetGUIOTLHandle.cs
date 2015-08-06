@@ -182,7 +182,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 					xform.rstOrder = rstOrder;
 				}
 				
-				HoudiniHost.convertTransform( ref xform, HAPI_RSTOrder.HAPI_SRT, HAPI_XYZOrder.HAPI_ZXY );
+				xform = HoudiniHost.convertTransform( xform, HAPI_RSTOrder.HAPI_SRT, HAPI_XYZOrder.HAPI_ZXY );
 				
 				// Axis and Rotation conversions:
 				// Note that Houdini's X axis points in the opposite direction that Unity's does.  Also, Houdini's 
@@ -256,7 +256,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 							xform.position[ 1 ] = new_position[ 1 ];
 							xform.position[ 2 ] = new_position[ 2 ];
 							
-							HoudiniHost.convertTransform( ref xform, rstOrder, xyzOrder );
+							xform = HoudiniHost.convertTransform( xform, rstOrder, xyzOrder );
 							new_position.x 		= xform.position[ 0 ];
 							new_position.y 		= xform.position[ 1 ];
 							new_position.z 		= xform.position[ 2 ];
@@ -329,7 +329,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 						xform.rotationOrder = HAPI_XYZOrder.HAPI_ZXY;
 						xform.rstOrder = HAPI_RSTOrder.HAPI_SRT;
 						
-						HoudiniHost.convertTransform( ref xform, rstOrder, xyzOrder );
+						xform = HoudiniHost.convertTransform( xform, rstOrder, xyzOrder );
 						
 						parm_float_values[ parm_info.floatValuesIndex + 0 ] = xform.rotationEuler[ 0 ];
 						// the - in the y & z coordinate is to convert back to "Houdini" coordinates
@@ -339,8 +339,8 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 						float[] temp_float_values = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
 						for ( int pp = 0; pp < HoudiniConstants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
-													  parm_info.size );
+						HoudiniHost.setParmFloatValues(
+							node_id, temp_float_values, parm_info.floatValuesIndex, parm_info.size );
 
 						myAsset.savePreset();
 					} // if changed

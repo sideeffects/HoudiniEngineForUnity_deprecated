@@ -151,13 +151,16 @@ public static partial class HoudiniHost
 
 	// UTILITY --------------------------------------------------------------------------------------------------
 
-	public static void convertTransform(
-		ref HAPI_TransformEuler transform_in_out,
+	public static HAPI_TransformEuler convertTransform(
+		HAPI_TransformEuler transform,
 		HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_ConvertTransform( ref mySession, ref transform_in_out, rst_order, rot_order );
+		HAPI_TransformEuler transform_out = new HAPI_TransformEuler();
+		HAPI_Result status_code = HAPI_ConvertTransform(
+			ref mySession, ref transform, rst_order, rot_order, out transform_out );
 		processStatusCode( status_code );
+		return transform_out;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif

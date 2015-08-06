@@ -47,7 +47,17 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_StartThriftSocketServer(
+			bool auto_close, int port, float timeout_ms, out int process_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_CreateThriftSocketSession( out HAPI_Session session, string host_name, int port );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_StartThriftNamedPipeServer(
+			bool auto_close, string pipe_name, float timeout_ms, out int process_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -121,8 +131,10 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_ConvertTransform(
 		ref HAPI_Session session,
-		ref HAPI_TransformEuler transform_in_out,
-		HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order );
+		ref HAPI_TransformEuler transform_in,
+		HAPI_RSTOrder rst_order,
+		HAPI_XYZOrder rot_order,
+		out HAPI_TransformEuler transform_out );
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
