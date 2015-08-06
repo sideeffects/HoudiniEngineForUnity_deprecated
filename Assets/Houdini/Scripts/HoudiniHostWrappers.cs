@@ -95,6 +95,36 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static string getStatusStringNoExceptions( HAPI_StatusType status_type, HAPI_StatusVerbosity verbosity )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int buffer_length = 0;
+		HAPI_Result status_code = HAPI_GetStatusStringBufLength( ref mySession, status_type, verbosity, out buffer_length );
+		if ( status_code != HAPI_Result.HAPI_RESULT_SUCCESS )
+		{
+			return "Status string getter failed. Likely the session is invalid.";
+		}
+
+		if ( buffer_length <= 0 )
+			return "";
+
+		StringBuilder string_builder = new StringBuilder( buffer_length );
+		status_code = HAPI_GetStatusString( ref mySession, status_type, string_builder, buffer_length );
+		if ( status_code != HAPI_Result.HAPI_RESULT_SUCCESS )
+		{
+			return "Status string getter failed. Likely the session is invalid.";
+		}
+		else
+		{
+			string string_value = string_builder.ToString();
+			
+			return string_value;
+		}
+#else
+		return "Unsupported platform!";
+#endif
+	}
+
 	public static int getCookingTotalCount()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )

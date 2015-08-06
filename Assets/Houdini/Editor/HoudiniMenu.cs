@@ -207,13 +207,22 @@ public class HoudiniMenu : MonoBehaviour
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/TEst", false, 1000 ) ]
 	static private void blah2()
 	{
-		HAPI_AssetInfo asset_info = HoudiniHost.getAssetInfo( 0 );
-		int parm_id = HoudiniHost.getParmIdFromName( asset_info.nodeId, "group" );
+		HoudiniDataFile.reset();
+		HoudiniDataFile.initialize();
 
-		HAPI_ParmInfo parm_info = HoudiniHost.getParmInfo( asset_info.nodeId, parm_id );
+		HoudiniDataFile.load();
 
-		Debug.Log( parm_info.type );
-		Debug.Log( parm_info.choiceCount );
+		HoudiniDataFile.setInt( "Int", 12 );
+		HoudiniDataFile.setFloat( "Float", 12.0f );
+		HoudiniDataFile.setString( "String", "string" );
+		HoudiniDataFile.setInt( "Int", 13 );
+
+		HoudiniDataFile.save();
+		HoudiniDataFile.load();
+
+		Debug.Log( "Int: " + HoudiniDataFile.getInt( "Int", 9 ) );
+		Debug.Log( "Float: " + HoudiniDataFile.getFloat( "Float", 9.0f ) );
+		Debug.Log( "String: " + HoudiniDataFile.getString( "String", "blah" ) );
 	}
 
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Two Curves and a Merge", false, 1000 ) ]

@@ -170,63 +170,72 @@ public static partial class HoudiniHost
 
 	private static HoudiniHostUndoInfo myHostUndoInfo;
 
-	// Global Session -------------------------------------------------------------------------------------------
-
-	public static HAPI_Session mySession;
-
 	// Global Settings Initializations --------------------------------------------------------------------------
 
 	static HoudiniHost()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		initializeHost();
+	}
+
+	public static bool initializeHost()
+	{
+		#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		// During the batch creation of our .unitypackage file we don't want to actually
 		// initialize  We use this environment variable to inhibit initialization.
 		string no_init = System.Environment.GetEnvironmentVariable( "HAPI_UNITY_NO_INIT" );
 		if ( no_init != null )
-			return;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-
-#if UNITY_EDITOR
+			return false;
+		#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		
+		#if UNITY_EDITOR
 		EditorApplication.update				+= update;
 		EditorApplication.playmodeStateChanged	+= playmodeStateChanged;
 		EditorApplication.hierarchyWindowItemOnGUI += hierarchyWindowItemOnGUI;
 		SceneView.onSceneGUIDelegate			+= onSceneGUIDelegate;
-#endif // UNITY_EDITOR
-
+		#endif // UNITY_EDITOR
+		
+		// Initialize the data file.
+		HoudiniDataFile.initialize();
+		
 		// Initialize the global session.
 		mySession.type = HAPI_SessionType.HAPI_SESSION_INPROCESS;
 		mySession.id = 0;
-
+		
 		if ( !isRuntimeInitialized() )
 		{
 			prHoudiniSceneExists = false;
 			prMidPlaymodeStateChange = false;
-			initialize();
+			if ( !initialize() )
+				return false;
 		}
-
+		else
+		{
+			initializeSession();
+		}
+		
 		// Preferences
-
+		
 		setString(	"HAPI_CollisionGroupName", myDefaultCollisionGroupName, true );
 		setString(	"HAPI_RenderedCollisionGroupName", myDefaultRenderedCollisionGroupName, true );
-
+		
 		setString(	"HAPI_UnityMaterialAttribName", myDefaultUnityMaterialAttribName, true );
 		setString(	"HAPI_UnitySubMaterialNameAttribName", myDefaultUnitySubMaterialNameAttribName, true );
 		setString(	"HAPI_UnitySubMaterialIndexAttribName", myDefaultUnitySubMaterialIndexAttribName, true );
-
+		
 		setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 		setColour(	"HAPI_PinColour", myDefaultPinColour, true );
 		setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
-
+		
 		setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
-			
+		
 		setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
-
+		
 		setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
-
+		
 		setFloat(	"HAPI_Gamma", myDefaultGamma, true );
 		setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
 		setBool(	"HAPI_ExtractTexturesInRawFormat", myDefaultExtractTexturesInRawFormat, true );
-
+		
 		setBool(	"HAPI_EnableCooking", myDefaultEnableCooking, true );
 		setBool(	"HAPI_CookingTriggersDownCooks", myDefaultCookingTriggersDownCooks, true );
 		setBool(	"HAPI_PlaymodePerFrameCooking", myDefaultPlaymodePerFrameCooking, true );
@@ -234,9 +243,9 @@ public static partial class HoudiniHost
 		setBool(	"HAPI_TransformChangeTriggersCooks", myDefaultTransformChangeTriggersCooks, true );
 		setBool(	"HAPI_ImportTemplatedGeos", myDefaultImportTemplatedGeos, true );
 		setBool(	"HAPI_SplitGeosByGroup", myDefaultSplitGeosByGroup, true );
-
+		
 		setString(	"HAPI_UnityTagAttribName", myDefaultUnityTagAttribName, true );
-
+		
 		setFloat(	"HAPI_PaintBrushRate", myDefaultPaintBrushRate, true );
 		setKeyCode( "HAPI_PaintingHotKey", myDefaultPaintingModeHotKey, true );
 		setColour(	"HAPI_PaintingModeColour", myDefaultPaintingModeColour, true );
@@ -244,33 +253,35 @@ public static partial class HoudiniHost
 		setKeyCode( "HAPI_PaintingAttributeSwitchHotKey", myDefaultPaintingAttributeSwitchHotKey, true );
 		setKeyCode( "HAPI_PaintingValueChangeHotKey", myDefaultPaintingValueChangeHotKey, true );
 		setKeyCode( "HAPI_PaintingFalloffChangeHotKey", myDefaultPaintingFalloffChangeHotKey, true );
-
+		
 		setKeyCode( "HAPI_AddingPointsHotKey", myDefaultAddingPointsModeHotKey, true );
 		setColour(	"HAPI_AddingPointsModeColour", myDefaultAddingPointsModeColour, true );
-
+		
 		setKeyCode( "HAPI_EditingPointsHotKey", myDefaultEditingPointsModeHotKey, true );
 		setColour(	"HAPI_EditingPointsModeColour", myDefaultEditingPointsModeColour, true );
-			
+		
 		setColour(	"HAPI_WireframeColour", myDefaultWireframeColour, true );
 		setColour(	"HAPI_GuideWireframeColour", myDefaultGuideWireframeColour, true );
 		setColour(	"HAPI_UnselectableGuideWireframeColour", myDefaultUnselectableGuideWireframeColour, true );
 		setColour(	"HAPI_UnselectedGuideWireframeColour", myDefaultUnselectedGuideWireframeColour, true );
 		setColour(	"HAPI_SelectedGuideWireframeColour", myDefaultSelectedGuideWireframeColour, true );
-
+		
 		setFloat(	"HAPI_GuidePointSize", myDefaultGuidePointSize, true );
 		setFloat(	"HAPI_MinDistanceForPointSelection", myDefaultMinDistanceForPointSelection, true );
 		setFloat(	"HAPI_GuideMinDistanceForMidPointInsertion", myDefaultGuideMinDistanceForMidPointInsertion, true );
-
+		
 		setBool(	"HAPI_CreateGroupsFromBoolAttributes", myDefaultCreateGroupsFromBoolAttributes, true );
-
+		
 		setInt(		"HAPI_CurvePrimitiveTypeDefault", myDefaultCurvePrimitiveTypeDefault, true );
 		setInt(		"HAPI_CurveMethodDefault", myDefaultCurveMethodDefault, true );
-
+		
 		myRepaintDelegate			= null;
 		myDeselectionDelegate		= null;
 		mySelectionTarget			= null;
-
+		
 		myCleanUpPrefabAssets		= new Dictionary< string, int >();
+
+		return true;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,8 +290,8 @@ public static partial class HoudiniHost
 	// Global Settings Properties -------------------------------------------------------------------------------
 
 	public static bool prHoudiniSceneExists {
-											get { return getBool( "HAPI_HoudiniSceneExists" ); } 
-											private set { setBool( "HAPI_HoudiniSceneExists", value ); } }
+											get { return HoudiniDataFile.getBool( "HoudiniSceneExists", false ); } 
+											private set { HoudiniDataFile.setBool( "HoudiniSceneExists", value ); } }
 	public static bool prMidPlaymodeStateChange {	
 											get { return getBool( "HAPI_MidPlaymodeStateChange" ); } 
 											private set { setBool( "HAPI_MidPlaymodeStateChange", value ); } }
@@ -876,14 +887,20 @@ public static partial class HoudiniHost
 
 	public static string getCallErrorMessage()
 	{
-		return getStatusString(
+		// It is important that we use the NoExceptions version of getStatusString because
+		// getStatusString() will also call throwCallError() if it fails which then
+		// ends up calling itself and...stack overflow. :)
+		return getStatusStringNoExceptions(
 			HAPI_StatusType.HAPI_STATUS_CALL_RESULT,
 			HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_WARNINGS );
 	}
 
 	public static string getCookErrorMessage()
 	{
-		return getStatusString(
+		// It is important that we use the NoExceptions version of getStatusString because
+		// getStatusString() will also call throwCallError() if it fails which then
+		// ends up calling itself and...stack overflow. :)
+		return getStatusStringNoExceptions(
 			HAPI_StatusType.HAPI_STATUS_COOK_RESULT,
 			HAPI_StatusVerbosity.HAPI_STATUSVERBOSITY_WARNINGS );
 	}

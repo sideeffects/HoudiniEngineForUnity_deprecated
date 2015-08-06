@@ -85,17 +85,15 @@ public static partial class HoudiniHost
 			return false;
 		}
 
+		// The session partial class decided what to do regarding prHoudiniSceneExists.
+		if ( !initializeSession() )
+			return false;
+
 		if ( !prHoudiniSceneExists )
 		{
 			HAPI_Result status_code;
 			try
 			{
-				//EditorUtility.DisplayDialog( "Blah", "Foo", "Ok" );
-
-				// Create the session.
-				//status_code = HAPI_CreateThriftNamedPipeSession( out mySession, "HoudiniEngineUnityPipe" );
-				//processStatusCode( status_code );
-
 				string otls_path = getAllFoldersInPath( Application.dataPath + "/OTLs/Scanned" );
 				string dsos_path = getAllFoldersInPath( Application.dataPath + "/DSOs" );
 
@@ -194,7 +192,11 @@ public static partial class HoudiniHost
 				houdini_engine_major + "." +
 				houdini_engine_minor + "." +
 				houdini_engine_api + "\n\n" +
-				"Houdini Binaries Path: " + HoudiniSetPath.prHoudiniPath;
+				"Houdini Binaries Path: " + HoudiniSetPath.prHoudiniPath + "\n\n" +
+				"Houdini RPC Server Executable: " + prServerExecutablePath + "\n" +
+				"Houdini RPC Server Process ID: " + prProcessID.ToString() + "\n" +
+				"Houdini RPC Client Module: " + prLibraryPath + "\n" +
+				"Houdini RPC Pipe Name: " + prPipeName;
 			dialog_title = "Houdini Engine Installation Info";
 		}
 		else
@@ -223,6 +225,15 @@ public static partial class HoudiniHost
 			default: license_info += "Unknown"; break;
 		}
 
+		string path_var = "";
+#if UNITY_EDITOR
+		path_var = System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process );
+#if UNITY_EDITOR_WIN
+		path_var = path_var.Replace( ";", "\n" );
+#elif UNITY_EDITOR_OSX
+		path_var = path_var.Replace( ":", "\n" );
+#endif // UNITY_EDITOR_WIN
+#endif // UNITY_EDITOR
 		string full_message = 
 			"Required Houdini Version: " +
 			HoudiniVersion.HOUDINI_MAJOR + "." +
@@ -238,7 +249,7 @@ public static partial class HoudiniHost
 #if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 			"\n\n" +
 			"PATH Variable: \n" +
-			System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process ) +
+			path_var +
 #endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 			"";
 
