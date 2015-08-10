@@ -38,6 +38,11 @@ public static partial class HoudiniHost
 		prLibraryPath = HoudiniVersion.HAPI_LIBRARY;
 #endif // UNITY_EDITOR_WIN
 
+#if UNITY_STANDALONE_OSX // TODO: Add support HARS on OSX.
+		mySession.id = 0;
+		mySession.type = HAPI_SessionType.HAPI_SESSION_INPROCESS;
+		return true;
+#else
 		if ( !prHoudiniSceneExists )
 		{
 			if ( !startProcess( prServerExecutablePath, prPipeName ) )
@@ -52,6 +57,7 @@ public static partial class HoudiniHost
 			mySession.type = HAPI_SessionType.HAPI_SESSION_THRIFT;
 			return true;
 		}
+#endif // UNITY_STANDALONE_OSX
 	}
 	
 	private static bool startProcess( string server_executable_path, string pipe_name )
