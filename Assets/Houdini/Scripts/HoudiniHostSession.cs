@@ -30,11 +30,13 @@ public static partial class HoudiniHost
 		prPipeName = System.Text.RegularExpressions.Regex.Replace( Application.dataPath, "[^\\w\\._]", "__" );
 #if UNITY_EDITOR_WIN
 		prServerExecutableName = "HARS.exe";
-#else
-		prServerExecutableName = "HARS";
-#endif
 		prServerExecutablePath = HoudiniSetPath.prHoudiniPath + "/" + prServerExecutableName;
 		prLibraryPath = HoudiniSetPath.prHoudiniPath + "/" + HoudiniVersion.HAPI_LIBRARY;
+#else
+		prServerExecutableName = "HARS";
+		prServerExecutablePath = HoudiniVersion.HAPI_SERVER;
+		prLibraryPath = HoudiniVersion.HAPI_LIBRARY;
+#endif // UNITY_EDITOR_WIN
 
 		if ( !prHoudiniSceneExists )
 		{
