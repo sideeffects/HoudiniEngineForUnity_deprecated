@@ -37,20 +37,31 @@ public struct HoudiniVersion
 	public const int HOUDINI_ENGINE_API		= 8;
 	
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
-#if UNITY_EDITOR_64
-	public const string HAPI_LIBRARY		= "libHARC";
-#else
-	public const string HAPI_LIBRARY		= "libHARC32";
-#endif // UNITY_EDITOR_64
+
 	public const string HAPI_SERVER			= "HARS.exe";
+	#if UNITY_EDITOR_64
+		public const string HAPI_LIBRARY	= "libHARC";
+	#else
+		public const string HAPI_LIBRARY	= "libHARC32";
+	#endif // UNITY_EDITOR_64
+
 #elif UNITY_STANDALONE_OSX
-#if UNITY_EDITOR_64
-	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Libraries/" + "libHARC.dylib";
-#else
-	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Libraries/" + "libHARC32.dylib";
-#endif // UNITY_EDITOR_64
+
+	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Libraries/" + "libHAPI.dylib";
 	public const string HAPI_SERVER			= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Resources/bin/" + "HARS";
+	
+	// TODO: Add support HARS on OSX.
+	/*
+	#if UNITY_EDITOR_64
+		public const string HAPI_LIBRARY	= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Libraries/" + "libHARC.dylib";
+	#else
+		public const string HAPI_LIBRARY	= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Libraries/" + "libHARC32.dylib";
+	#endif // UNITY_EDITOR_64
+	*/
+
 #else
+
 	public const string HAPI_LIBRARY		= "libHAPI"; // Cannot be empty but its ok if not found.
+
 #endif
 };
