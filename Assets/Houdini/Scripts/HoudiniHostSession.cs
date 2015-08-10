@@ -97,6 +97,7 @@ public static partial class HoudiniHost
 
 	private static bool getSession( out HAPI_Session session, string pipe_name )
 	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_CreateThriftNamedPipeSession( out session, prPipeName );
 		if ( status_code != HAPI_Result.HAPI_RESULT_SUCCESS )
 		{
@@ -107,6 +108,10 @@ public static partial class HoudiniHost
 			return false;
 		}
 		prSessionID = session.id;
+#else
+		session.id = 0;
+		session.type = HAPI_SessionType.HAPI_SESSION_INPROCESS;
+#endif // UNITY_EDITOR
 		return true;
 	}
 }

@@ -203,7 +203,6 @@ public static partial class HoudiniHost
 		
 		if ( !isRuntimeInitialized() )
 		{
-			prHoudiniSceneExists = false;
 			prMidPlaymodeStateChange = false;
 			if ( !initialize() )
 				return false;
@@ -763,7 +762,7 @@ public static partial class HoudiniHost
 			}
 		}
 	#else
-		status_code = HAPI_LoadAssetLibraryFromFile( path, true, out library_id );
+		status_code = HAPI_LoadAssetLibraryFromFile( ref mySession, path, true, out library_id );
 	#endif // UNITY_EDITOR
 #endif // HAPI_LoadAssetLibraryFromMemory
 		processStatusCode( status_code );

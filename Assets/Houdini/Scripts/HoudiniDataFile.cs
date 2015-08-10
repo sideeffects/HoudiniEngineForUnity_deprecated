@@ -31,6 +31,10 @@ public static class HoudiniDataFile
 			FileStream file = File.Create( myDataFilePath );
 			file.Close();
 		}
+		else
+		{
+			load();
+		}
 
 		myIsInitialized = true;
 	}
@@ -51,9 +55,6 @@ public static class HoudiniDataFile
 
 	public static void load()
 	{
-		if ( !myIsInitialized )
-			return;
-
 		myData.Clear();
 		StreamReader reader = new StreamReader( myDataFilePath );
 		while ( true )
