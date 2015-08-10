@@ -42,12 +42,14 @@ public struct HoudiniVersion
 #else
 	public const string HAPI_LIBRARY		= "libHARC32";
 #endif // UNITY_EDITOR_64
+	public const string HAPI_SERVER			= "HARS.exe";
 #elif UNITY_STANDALONE_OSX
 #if UNITY_EDITOR_64
 	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Libraries/" + "libHARC.dylib";
 #else
 	public const string HAPI_LIBRARY		= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Libraries/" + "libHARC32.dylib";
 #endif // UNITY_EDITOR_64
+	public const string HAPI_SERVER			= "/Library/Frameworks/Houdini.framework/Versions/15.0.200/Resources/bin/" + "HARS";
 #else
 	public const string HAPI_LIBRARY		= "libHAPI"; // Cannot be empty but its ok if not found.
 #endif
