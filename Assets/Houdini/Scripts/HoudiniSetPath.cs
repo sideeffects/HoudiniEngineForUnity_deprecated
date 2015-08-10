@@ -3,9 +3,12 @@ using UnityEngine;
 using UnityEditor;
 #endif // UNITY_EDITOR
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR_WIN
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Win32;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR_WIN
 
 #if UNITY_EDITOR
 [ InitializeOnLoad ]
@@ -17,10 +20,85 @@ public class HoudiniSetPath
 		setPath();
 	}
 
+#if UNITY_EDITOR_WIN
+	public enum RegSAM
+	{
+		QueryValue = 0x0001,
+		SetValue = 0x0002,
+		CreateSubKey = 0x0004,
+		EnumerateSubKeys = 0x0008,
+		Notify = 0x0010,
+		CreateLink = 0x0020,
+		WOW64_32Key = 0x0200,
+		WOW64_64Key = 0x0100,
+		WOW64_Res = 0x0300,
+		Read = 0x00020019,
+		Write = 0x00020006,
+		Execute = 0x00020019,
+		AllAccess = 0x000f003f
+	}
+	
+	public static UIntPtr HKEY_LOCAL_MACHINE = new UIntPtr( 0x80000002u );
+	public static UIntPtr HKEY_CURRENT_USER = new UIntPtr( 0x80000001u );
+
+	[DllImport("Advapi32.dll")]
+	static extern uint RegOpenKeyEx(
+		UIntPtr hKey,
+		string lpSubKey,
+		uint ulOptions,
+		int samDesired,
+		out int phkResult);
+
+	[DllImport("advapi32.dll", EntryPoint = "RegQueryValueEx")]
+	public static extern int RegQueryValueEx(
+		int hKey,
+		string lpValueName,
+		int lpReserved,
+		ref uint lpType,
+		System.Text.StringBuilder lpData,
+		ref uint lpcbData );
+
+	[DllImport("Advapi32.dll")]
+	static extern uint RegCloseKey( int hKey );
+
+	static public string getRegKeyValue_x64( UIntPtr root_key, String key_name, String inPropertyName )
+	{
+		return getRegKeyValue( root_key, key_name, RegSAM.WOW64_64Key, inPropertyName);
+	}
+
+	static public string getRegKeyValue_x86( UIntPtr root_key, String key_name, String inPropertyName )
+	{
+		return getRegKeyValue( root_key, key_name, RegSAM.WOW64_32Key, inPropertyName);
+	}
+
+	static public string getRegKeyValue( UIntPtr root_key, String key_name, RegSAM is32or64key, String inPropertyName)
+	{
+		int phkResult = 0;
+
+		try
+		{
+			uint lResult = RegOpenKeyEx( root_key, key_name, 0, (int) RegSAM.QueryValue | (int) is32or64key, out phkResult );
+			if ( lResult != 0 )
+				return null;
+			uint lpType = 0;
+			uint lpcbData = 1024;
+			StringBuilder value_buffer = new StringBuilder( 1024 );
+			RegQueryValueEx( phkResult, inPropertyName, 0, ref lpType, value_buffer, ref lpcbData );
+			string value = value_buffer.ToString();
+			return value;
+		}
+		finally
+		{
+			if ( phkResult != 0 )
+				RegCloseKey( phkResult );
+		}
+	}
+#endif // UNITY_EDITOR_WIN
+
 	public static string getHoudiniPath()
 	{
 		string houdini_app_path = "";
-#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_EDITOR_WIN
 		string hapi_path = System.Environment.GetEnvironmentVariable(
 			"HAPI_PATH", System.EnvironmentVariableTarget.Machine );
 		if ( hapi_path == null || hapi_path.Length == 0 )
@@ -63,7 +141,7 @@ public class HoudiniSetPath
 				break;
 			}
 		}
-#elif UNITY_STANDALONE_OSX
+#elif UNITY_EDITOR_OSX
 		houdini_app_path = HoudiniVersion.HAPI_LIBRARY;
 #else
 		myLastError =
@@ -81,7 +159,7 @@ public class HoudiniSetPath
 		myAttemptedPathSetting = true;
 		myIsPathSet = false;
 
-#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_EDITOR_WIN
 		string houdini_app_path = getHoudiniPath();
 		string paths = System.Environment.GetEnvironmentVariable(
 			"PATH", System.EnvironmentVariableTarget.Machine );
@@ -103,7 +181,7 @@ public class HoudiniSetPath
 			if ( !System.IO.Directory.Exists( path ) )
 				continue;
 
-			if ( System.IO.File.Exists( path + "/libHAPI.dll" ) )
+			if ( System.IO.File.Exists( path + "/" + HoudiniVersion.HAPI_LIBRARY + ".dll" ) )
 			{
 				prHoudiniPath = path;
 				found = true;
@@ -123,7 +201,7 @@ public class HoudiniSetPath
 		}
 		myIsPathSet = true;
 
-#elif UNITY_STANDALONE_OSX
+#elif UNITY_EDITOR_OSX
 		string houdini_app_path = getHoudiniPath();
 		if ( !System.IO.File.Exists( houdini_app_path ) )
 		{
@@ -135,7 +213,7 @@ public class HoudiniSetPath
 		prHoudiniPath = houdini_app_path;
 		myIsPathSet = true;
 
-#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#endif
 	}
 		
 	public static bool prIsPathSet { get { return myIsPathSet; } private set {} }
@@ -151,17 +229,11 @@ public class HoudiniSetPath
 			return app_path;
 #endif // UNITY_EDITOR
 
-#if ( UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR_WIN
 		// For Windows, we look at the registry entries made by the Houdini installer. We look for the 
 		// "active version" key which gives us the most recently installed Houdini version. Using the
 		// active version we find the registry made by that particular installer and find the install
 		// path.
-
-		RegistryKey local_machine = Registry.LocalMachine;
-
-		RegistryKey sesi_key = local_machine.OpenSubKey( "Software\\Side Effects Software\\" + app_name );
-		if ( sesi_key == null )
-			throw new HoudiniError( "No " + app_name + " installation found in the registry!" );
 
 		string correct_version =
 			HoudiniVersion.HOUDINI_MAJOR + "." +
@@ -175,19 +247,9 @@ public class HoudiniSetPath
 			"0" + "." +
 			HoudiniVersion.HOUDINI_BUILD;
 
-		string[] sesi_key_value_names = sesi_key.GetValueNames();
-		string matched_correct_version_key = correct_version_key;
-		foreach ( string value_name in sesi_key_value_names )
-		{
-			if ( value_name.StartsWith( correct_version_key ) )
-			{
-				matched_correct_version_key = value_name;
-				break;
-			}
-		}
+		app_path = getRegKeyValue_x64( HKEY_LOCAL_MACHINE, "SOFTWARE\\Side Effects Software\\" + app_name, correct_version_key );
 
-		app_path = (string) sesi_key.GetValue( matched_correct_version_key );
-		if ( app_path == null || app_path.Length == 0 )
+		if ( app_path == null || app_path.Length == 0 ) 
 			throw new HoudiniError(
 				"The correct version (" + correct_version + ") of " + app_name + 
 				" was not found in the registry!" );
@@ -201,7 +263,7 @@ public class HoudiniSetPath
 		//#error "Your current platform is not yet fully supported. Binaries search path not set."
 		//Debug.LogError( "Your current platform is not yet full support. Binaries search path not set." );
 
-#endif // ( UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR_WIN
 
 		return app_path;
 	}
