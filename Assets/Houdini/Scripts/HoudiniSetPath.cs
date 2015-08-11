@@ -247,6 +247,15 @@ public class HoudiniSetPath
 			"0" + "." +
 			HoudiniVersion.HOUDINI_BUILD;
 
+		// HOUDINI_PATCH is a const variable, hence the 'unreachable code' warning.
+		// However, it's a const variable in HoudiniVersion.cs which is a generated
+		// file and could have the value be non-zero for certain builds, like
+		// stub builds.
+#pragma warning disable 162
+		if ( HoudiniVersion.HOUDINI_PATCH != 0 )
+			correct_version_key += "." + HoudiniVersion.HOUDINI_PATCH;
+#pragma warning restore 162
+
 		app_path = getRegKeyValue_x64( HKEY_LOCAL_MACHINE, "SOFTWARE\\Side Effects Software\\" + app_name, correct_version_key );
 
 		if ( app_path == null || app_path.Length == 0 ) 
