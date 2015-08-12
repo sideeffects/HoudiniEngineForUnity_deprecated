@@ -48,7 +48,7 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_StartThriftSocketServer(
-			bool auto_close, int port, float timeout_ms, out int process_id );
+		bool auto_close, int port, float timeout_ms, out int process_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -57,7 +57,7 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_StartThriftNamedPipeServer(
-			bool auto_close, string pipe_name, float timeout_ms, out int process_id );
+		bool auto_close, string pipe_name, float timeout_ms, out int process_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -70,6 +70,10 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_CreateCustomSession( HAPI_SessionType session_type, byte[] session_info, out HAPI_Session session );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_CloseSession( ref HAPI_Session session );
 
 	// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------
 
@@ -113,7 +117,7 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_GetStatusString(
 		ref HAPI_Session session,
-		HAPI_StatusType status_code,
+		HAPI_StatusType status_type,
 		StringBuilder string_value,
 		int length );
 
