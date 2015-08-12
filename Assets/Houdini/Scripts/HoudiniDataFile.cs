@@ -9,7 +9,6 @@ using UnityEditor;
 #endif
 public static class HoudiniDataFile
 {
-	private static bool myIsInitialized;
 	private static string myDataFileName;
 	private static string myDataFolderPath;
 	private static string myDataFilePath;
@@ -19,7 +18,7 @@ public static class HoudiniDataFile
 	public static void initialize()
 	{
 		myDataFileName = "HoudiniSessionData.txt";
-		myDataFolderPath = Application.dataPath + "/../Temp";
+		myDataFolderPath = Application.dataPath + "/../HoudiniTemp";
 		myDataFilePath = myDataFolderPath + "/" + myDataFileName;
 		myData = new Dictionary< string, string >();
 
@@ -33,16 +32,23 @@ public static class HoudiniDataFile
 		}
 		else
 		{
-			load();
-		}
+			System.Diagnostics.Process current_process = System.Diagnostics.Process.GetCurrentProcess();
+			if ( getInt( "CurrentProcessId", -1 ) != current_process.Id )
+				reset();
 
-		myIsInitialized = true;
+			setInt( "CurrentProcessId", current_process.Id ); 
+		}
 	}
 
 	public static void reset()
 	{
-		if ( myIsInitialized && File.Exists( myDataFilePath ) )
+		myData.Clear();
+		if ( File.Exists( myDataFilePath ) )
+		{
 			File.Delete( myDataFilePath );
+			FileStream file = File.Create( myDataFilePath );
+			file.Close();
+		}
 	}
 
 	public static bool doesFileExist()
@@ -56,6 +62,10 @@ public static class HoudiniDataFile
 	public static void load()
 	{
 		myData.Clear();
+
+		if ( !doesFileExist() )
+			return;
+
 		StreamReader reader = new StreamReader( myDataFilePath );
 		while ( true )
 		{
@@ -75,7 +85,7 @@ public static class HoudiniDataFile
 
 	public static void save()
 	{
-		if ( !myIsInitialized )
+		if ( !doesFileExist() )
 			return;
 
 		StreamWriter writer = new StreamWriter( myDataFilePath, false );

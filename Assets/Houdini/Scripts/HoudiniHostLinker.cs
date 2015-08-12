@@ -55,7 +55,7 @@ public static partial class HoudiniHost
 		{
 			try
 			{
-				processStatusCode( (HAPI_Result) HAPI_IsInitialized( ref mySession ) );
+				processStatusCode( HAPI_IsInitialized( ref mySession ) );
 				return true;
 			}
 			catch
