@@ -807,6 +807,7 @@ public struct HAPI_ParmInfo
 	// of this parm. The parent parm is something like a folder.
 	public HAPI_ParmId id;
 	public HAPI_ParmId parentId;
+	public int childIndex;
 
 	public HAPI_ParmType type;
 	public HAPI_StringHandle typeInfoSH;
