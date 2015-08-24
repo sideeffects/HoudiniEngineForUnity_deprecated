@@ -85,11 +85,13 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_Initialize(
 		ref HAPI_Session session,
-		string otl_search_path,
-		string dso_search_path,
 		ref HAPI_CookOptions cook_options,
 		[ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
-		int cooking_thread_stack_size );
+		int cooking_thread_stack_size,
+		string otl_search_path,
+		string dso_search_path,
+		string image_dso_search_path,
+		string audio_dso_search_path );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
