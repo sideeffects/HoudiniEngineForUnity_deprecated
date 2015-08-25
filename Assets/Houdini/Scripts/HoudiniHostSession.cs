@@ -58,24 +58,17 @@ public static partial class HoudiniHost
 	{
 		try
 		{
-			System.Diagnostics.Process process = new System.Diagnostics.Process();
-			
-			// Stop the process from opening a new window.
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.CreateNoWindow = true;
-			
-			// Setup executable and parameters.
-			process.StartInfo.FileName = server_executable_path;
-			process.StartInfo.Arguments = "--named-pipe " + pipe_name + " --auto-close";
-			
-			// Go.
-			process.Start();
+			int process_id = 0;
+			HAPI_Result result = HAPI_StartThriftNamedPipeServer( true, pipe_name, 2000.0f, out process_id );
+			if ( result != HAPI_Result.HAPI_RESULT_SUCCESS )
+			{
+				prLastInitializationError =
+					"Could not start the RPC server process.\n" +
+					"Make sure " + prServerExecutablePath + " exists.";
+				return false;
+			}
 
-			// Wait for the process to start.
-			System.Threading.Thread.Sleep( 1000 );
-
-			prProcessID = process.Id;
+			prProcessID = process_id;
 		
 			return true;
 		}
@@ -83,8 +76,7 @@ public static partial class HoudiniHost
 		{
 			prLastInitializationError =
 				"Could not start the RPC server process because: " + e.Message + "\n" +
-				"Make sure " + prServerExecutablePath + " exists and try to re-initialize again from: \n" +
-				"Houdini Engine > Debug Window > Reinitialize";
+				"Make sure " + prServerExecutablePath + " exists.";
 			return false;
 		}
 	}
@@ -97,8 +89,7 @@ public static partial class HoudiniHost
 		{
 			prLastInitializationError =
 				"Could not create the RPC pipe session.\n" +
-				"Make sure " + prServerExecutablePath + " exists and try to re-initialize again from: \n" +
-				"Houdini Engine > Debug Window > Reinitialize";
+				"Make sure " + prServerExecutablePath + " exists.";
 			return false;
 		}
 		prSessionID = session.id;
