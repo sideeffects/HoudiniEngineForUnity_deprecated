@@ -211,6 +211,15 @@ public class HoudiniSetPath
 			return;
 		}
 		prHoudiniPath = houdini_app_path;
+
+		// Set the path so that HARS executable is found.
+		// TODO: Remove this when the HAPI_StartServer... functions get the path parameter.
+		string paths = System.Environment.GetEnvironmentVariable(
+			"PATH", System.EnvironmentVariableTarget.Machine );
+		paths = HoudiniVersion.HAPI_SERVER.Replace( "/HARS", "" ) + ":" + paths;
+		System.Environment.SetEnvironmentVariable(
+			"PATH", paths, System.EnvironmentVariableTarget.Process );
+
 		myIsPathSet = true;
 
 #endif
