@@ -18,9 +18,9 @@ public static partial class HoudiniHost
 	public static string prServerExecutablePath;
 	public static string prLibraryPath;
 
-	public static int prSessionID {
-		get { return HoudiniDataFile.getInt( "ServerSessionID", -1 ); } 
-		private set { HoudiniDataFile.setInt( "ServerSessionID", value ); } }
+	public static long prSessionID {
+		get { return HoudiniDataFile.getLong( "ServerSessionID", -1 ); } 
+		private set { HoudiniDataFile.setLong( "ServerSessionID", value ); } }
 	public static int prProcessID {
 		get { return HoudiniDataFile.getInt( "ServerProcessID", -1 ); } 
 		private set { HoudiniDataFile.setInt( "ServerProcessID", value ); } }

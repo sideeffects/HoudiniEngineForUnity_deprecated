@@ -114,6 +114,20 @@ public static class HoudiniDataFile
 	{
 		setString( name, value.ToString() );
 	}
+
+	public static long getLong( string name, long default_value )
+	{
+		string str_value = getString( name, default_value.ToString() );
+		long value = default_value;
+		if ( long.TryParse( str_value, out value ) )
+			return value;
+		else
+			return default_value;
+	}
+	public static void setLong( string name, long value )
+	{
+		setString( name, value.ToString() );
+	}
 	
 	public static bool getBool( string name, bool default_value )
 	{

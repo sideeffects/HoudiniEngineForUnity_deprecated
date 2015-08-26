@@ -20,7 +20,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 
 // Typedefs
-using HAPI_SessionId = System.Int32;
+using HAPI_SessionId = System.Int64;
 using HAPI_StringHandle = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
