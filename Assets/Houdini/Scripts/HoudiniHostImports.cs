@@ -73,6 +73,10 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_IsSessionValid( ref HAPI_Session session );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_CloseSession( ref HAPI_Session session );
 
 	// INITIALIZATION / CLEANUP ---------------------------------------------------------------------------------
