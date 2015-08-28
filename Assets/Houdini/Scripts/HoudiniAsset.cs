@@ -1065,12 +1065,12 @@ public abstract class HoudiniAsset : HoudiniControl
 					
 					if ( reload_asset )
 						Debug.Log( 
-							"Asset Loaded - ID: " + prAssetInfo.id + "\n" +
-							"Full Name: " + prAssetInfo.fullOpName + "\n" +
-							"Version: " + prAssetInfo.version + "\n" + 
-							"Unique Node Id: " + node_info.uniqueHoudiniNodeId + "\n" +
-							"Internal Node Path: " + node_info.internalNodePath + "\n" +
-							"Asset Library File: " + prAssetInfo.filePath + "\n" );
+							"Houdini Engine: Asset Loaded - ID: " + prAssetInfo.id + "\n" +
+							"    Full Name: " + prAssetInfo.fullOpName + "\n" +
+							"    Version: " + prAssetInfo.version + "\n" + 
+							"    Unique Node Id: " + node_info.uniqueHoudiniNodeId + "\n" +
+							"    Internal Node Path: " + node_info.internalNodePath + "\n" +
+							"    Asset Library File: " + prAssetInfo.filePath + "\n" );
 				}
 				catch ( HoudiniError error )
 				{

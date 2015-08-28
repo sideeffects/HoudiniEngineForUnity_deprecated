@@ -50,6 +50,12 @@ public static partial class HoudiniHost
 			// Try to restore from data file.
 			mySession.id = prSessionID;
 			mySession.type = HAPI_SessionType.HAPI_SESSION_THRIFT;
+#if UNITY_EDITOR
+			Debug.Log(
+				"Houdini Engine: Recovering RPC session info from file.\n" +
+				"    Datafile Path: " + HoudiniDataFile.prDataFilePath + "\n" +
+				"    Session Id: " + prSessionID );
+#endif // UNITY_EDITOR
 			return true;
 		}
 	}
@@ -58,6 +64,12 @@ public static partial class HoudiniHost
 	{
 		try
 		{
+#if UNITY_EDITOR
+			Debug.Log(
+				"Houdini Engine: Starting HARS process.\n" +
+				"    Executable: " + prServerExecutablePath + "\n" +
+				"    Pipe Name: " + pipe_name );
+#endif // UNITY_EDITOR
 			int process_id = 0;
 			HAPI_Result result = HAPI_StartThriftNamedPipeServer( true, pipe_name, 2000.0f, out process_id );
 			if ( result != HAPI_Result.HAPI_RESULT_SUCCESS )

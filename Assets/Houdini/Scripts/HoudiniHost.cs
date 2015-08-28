@@ -172,46 +172,22 @@ public static partial class HoudiniHost
 
 	// Global Settings Initializations --------------------------------------------------------------------------
 
+	// This is to keep track whether we actually initialized Houdini Engine in this session/state/runtime of C#.
+	private static bool myCurrentCSharpSessionInitialized = false;
+
 	static HoudiniHost()
 	{
-		initializeHost();
-	}
+		// Initialize the global session.
+		mySession.type = HAPI_SessionType.HAPI_SESSION_INPROCESS;
+		mySession.id = 0;
 
-	public static bool initializeHost()
-	{
-		#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		// During the batch creation of our .unitypackage file we don't want to actually
-		// initialize  We use this environment variable to inhibit initialization.
-		string no_init = System.Environment.GetEnvironmentVariable( "HAPI_UNITY_NO_INIT" );
-		if ( no_init != null )
-			return false;
-		#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		EditorApplication.update				+= update;
 		EditorApplication.playmodeStateChanged	+= playmodeStateChanged;
 		EditorApplication.hierarchyWindowItemOnGUI += hierarchyWindowItemOnGUI;
 		SceneView.onSceneGUIDelegate			+= onSceneGUIDelegate;
-		#endif // UNITY_EDITOR
-		
-		// Initialize the data file.
-		HoudiniDataFile.initialize();
-		
-		// Initialize the global session.
-		mySession.type = HAPI_SessionType.HAPI_SESSION_INPROCESS;
-		mySession.id = 0;
-		
-		if ( !isRuntimeInitialized() )
-		{
-			prMidPlaymodeStateChange = false;
-			if ( !initialize() )
-				return false;
-		}
-		else
-		{
-			initializeSession();
-		}
-		
+#endif // UNITY_EDITOR
+
 		// Preferences
 		
 		setString(	"HAPI_CollisionGroupName", myDefaultCollisionGroupName, true );
@@ -279,6 +255,29 @@ public static partial class HoudiniHost
 		mySelectionTarget			= null;
 		
 		myCleanUpPrefabAssets		= new Dictionary< string, int >();
+	}
+
+	public static bool initializeHost()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		// During the batch creation of our .unitypackage file we don't want to actually
+		// initialize  We use this environment variable to inhibit initialization.
+		string no_init = System.Environment.GetEnvironmentVariable( "HAPI_UNITY_NO_INIT" );
+		if ( no_init != null )
+			return false;
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+
+		if ( isRuntimeInitialized() )
+		{
+			// Just make sure the session is properly initialized.
+			return initializeSession();
+		}
+		else
+		{
+			prMidPlaymodeStateChange = false;
+			if ( !initialize() )
+				return false;
+		}
 
 		return true;
 	}

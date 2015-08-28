@@ -14,9 +14,14 @@ public static class HoudiniDataFile
 	private static string myDataFilePath;
 	private static Dictionary< string, string > myData;
 
+	public static string prDataFilePath { get { return myDataFilePath; } private set {} }
+
 	//static HoudiniDataFile()
-	public static void initialize()
+	private static void initialize()
 	{
+		if ( myData != null )
+			return;
+
 		myDataFileName = "HoudiniSessionData.txt";
 		myDataFolderPath = Application.dataPath + "/../HoudiniTemp";
 		myDataFilePath = myDataFolderPath + "/" + myDataFileName;
@@ -27,14 +32,35 @@ public static class HoudiniDataFile
 
 		if ( !File.Exists( myDataFilePath ) )
 		{
+#if UNITY_EDITOR
+			Debug.Log(
+				"Houdini Engine: State datafile doesn't exist. Creating it.\n" +
+				"Datafile Path: " + myDataFilePath );
+#endif // UNITY_EDITOR
 			FileStream file = File.Create( myDataFilePath );
 			file.Close();
 		}
 		else
 		{
+#if UNITY_EDITOR
+			Debug.Log(
+				"Houdini Engine: State datafile exists.\n" +
+				"    Datafile Path: " + myDataFilePath );
+#endif // UNITY_EDITOR
 			System.Diagnostics.Process current_process = System.Diagnostics.Process.GetCurrentProcess();
-			if ( getInt( "CurrentProcessId", -1 ) != current_process.Id )
+			int new_process_id = current_process.Id;
+			int old_process_id = getInt( "CurrentProcessId", -1 );
+			if ( old_process_id != new_process_id )
+			{
+#if UNITY_EDITOR
+				Debug.Log(
+					"Houdini Engine: New instance of Unity detected - we have a new process id.\n" +
+					"    Datafile Path: " + myDataFilePath + "\n" +
+					"    Old Process Id: " + old_process_id + "\n" +
+					"    New Process Id: " + new_process_id );
+#endif // UNITY_EDITOR
 				reset();
+			}
 
 			setInt( "CurrentProcessId", current_process.Id ); 
 		}
@@ -42,6 +68,9 @@ public static class HoudiniDataFile
 
 	public static void reset()
 	{
+		if ( myData == null )
+			initialize();
+
 		myData.Clear();
 		if ( File.Exists( myDataFilePath ) )
 		{
@@ -61,6 +90,9 @@ public static class HoudiniDataFile
 
 	public static void load()
 	{
+		if ( myData == null )
+			initialize();
+
 		myData.Clear();
 
 		if ( !doesFileExist() )
@@ -85,6 +117,9 @@ public static class HoudiniDataFile
 
 	public static void save()
 	{
+		if ( myData == null )
+			initialize();
+
 		if ( !doesFileExist() )
 			return;
 

@@ -40,7 +40,7 @@ public static partial class HoudiniHost
 	public static bool isInstallationOk()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		return prHoudiniSceneExists;
+		return ( prHoudiniSceneExists && myCurrentCSharpSessionInitialized ) || initializeHost();
 #else
 		return false;
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -162,6 +162,11 @@ public static partial class HoudiniHost
 
 			prHoudiniSceneExists = true;
 		}
+
+		// This is used in isInstallationOk() to determine whether we need to 
+		// recover the session information from the data file or not. It basically
+		// just means that the current C# state is aware of the Houdini session.
+		myCurrentCSharpSessionInitialized = true;
 
 		return true;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )

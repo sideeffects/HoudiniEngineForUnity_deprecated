@@ -208,7 +208,6 @@ public class HoudiniMenu : MonoBehaviour
 	static private void blah2()
 	{
 		HoudiniDataFile.reset();
-		HoudiniDataFile.initialize();
 
 		HoudiniDataFile.load();
 
