@@ -521,10 +521,17 @@ public enum HAPI_EnvIntType
 	// every time the Houdini Engine version is bumped.
 	HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API = 220,
 
-	/// License Type. See ::HAPI_License.
-	HAPI_ENVINT_LICENSE = 300,
-
 	HAPI_ENVINT_MAX,
+};
+
+public enum HAPI_SessionEnvIntType
+{
+	HAPI_SESSIONENVINT_INVALID = -1,
+
+	/// License Type. See ::HAPI_License.
+	HAPI_SESSIONENVINT_LICENSE = 100,
+
+	HAPI_SESSIONENVINT_MAX,
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

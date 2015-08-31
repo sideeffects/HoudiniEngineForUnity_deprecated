@@ -105,7 +105,11 @@ public static partial class HoudiniHost
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetEnvInt( ref HAPI_Session session, HAPI_EnvIntType int_type, out int value );
+	HAPI_GetEnvInt( HAPI_EnvIntType int_type, out int value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetSessionEnvInt( ref HAPI_Session session, HAPI_SessionEnvIntType int_type, out int value );
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

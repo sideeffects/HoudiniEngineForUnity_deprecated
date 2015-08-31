@@ -41,7 +41,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int value;
-		HAPI_Result status_code = HAPI_GetEnvInt( ref mySession, HAPI_EnvIntType.HAPI_ENVINT_LICENSE, out value );
+		HAPI_Result status_code = HAPI_GetSessionEnvInt( ref mySession, HAPI_SessionEnvIntType.HAPI_SESSIONENVINT_LICENSE, out value );
 		processStatusCode( status_code );
 		return (HAPI_License) value;
 #else
@@ -53,7 +53,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int value;
-		HAPI_Result status_code = HAPI_GetEnvInt( ref mySession, int_type, out value );
+		HAPI_Result status_code = HAPI_GetEnvInt( int_type, out value );
 		processStatusCode( status_code );
 		return value;
 #else

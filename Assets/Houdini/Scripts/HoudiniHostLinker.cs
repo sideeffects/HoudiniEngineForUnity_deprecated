@@ -85,6 +85,31 @@ public static partial class HoudiniHost
 			return false;
 		}
 
+		if ( !prHoudiniSceneExists )
+		{
+			// Check version match.
+			int houdini_engine_major = getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR );
+			int houdini_engine_minor = getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR );
+			int houdini_engine_api = getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API );
+
+			// Make sure we are linking against the expected Houdini Engine API version.
+			// Note: We don't need to be so strict as to require the BUILD to match.
+			if ( houdini_engine_major != HoudiniVersion.HOUDINI_ENGINE_MAJOR ||
+					houdini_engine_minor != HoudiniVersion.HOUDINI_ENGINE_MINOR ||
+					houdini_engine_api != HoudiniVersion.HOUDINI_ENGINE_API )
+			{
+				prLastInitializationError =
+					"Houdini Engine version mis-match. Expected " +
+					HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
+					HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
+					HoudiniVersion.HOUDINI_ENGINE_API + ". Got " +
+					houdini_engine_major + "." +
+					houdini_engine_minor + "." +
+					houdini_engine_api + ".";
+				return false;
+			}
+		}
+
 		// The session partial class decided what to do regarding prHoudiniSceneExists.
 		if ( !initializeSession() )
 			return false;
@@ -96,43 +121,6 @@ public static partial class HoudiniHost
 			{
 				string otls_path = getAllFoldersInPath( Application.dataPath + "/OTLs/Scanned" );
 				string dsos_path = getAllFoldersInPath( Application.dataPath + "/DSOs" );
-
-				// Check version match.
-				int houdini_engine_major 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MAJOR );
-				int houdini_engine_minor 	= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_MINOR );
-				int houdini_engine_api 		= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_ENGINE_API );
-
-				/*
-				Debug.Log(  "Running Houdini Engine Unity Plugin Version: " +
-							HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." + 
-							HoudiniVersion.HOUDINI_ENGINE_MINOR +
-							", API: " + HoudiniVersion.HOUDINI_ENGINE_API );
-					
-				Debug.Log(  "Linking Against Houdini Engine Version: " + 
-							houdini_engine_major + "." + houdini_engine_minor +
-							", API: " + houdini_engine_api );
-					
-				Debug.Log(  "Underlying Houdini Core Version: " + 
-							houdini_major + "." + houdini_minor + "." + houdini_build
-							+ ( houdini_patch > 0 ? "." + houdini_patch : "" ) );
-				*/
-
-				// Make sure we are linking against the expected Houdini Engine API version.
-				// Note: We don't need to be so strict as to require the BUILD to match.
-				if ( houdini_engine_major != HoudiniVersion.HOUDINI_ENGINE_MAJOR ||
-						houdini_engine_minor != HoudiniVersion.HOUDINI_ENGINE_MINOR ||
-						houdini_engine_api != HoudiniVersion.HOUDINI_ENGINE_API )
-				{
-					prLastInitializationError =
-						"Houdini Engine version mis-match. Expected " +
-						HoudiniVersion.HOUDINI_ENGINE_MAJOR + "." +
-						HoudiniVersion.HOUDINI_ENGINE_MINOR + "." +
-						HoudiniVersion.HOUDINI_ENGINE_API + ". Got " +
-						houdini_engine_major + "." +
-						houdini_engine_minor + "." +
-						houdini_engine_api + ".";
-					return false;
-				}
 
 				HAPI_CookOptions cook_options = new HAPI_CookOptions();
 				cook_options.splitGeosByGroup = prSplitGeosByGroup;
@@ -179,6 +167,7 @@ public static partial class HoudiniHost
 #endif // !UNITY_EDITOR
 		string installed_version_msg = "";
 		string dialog_title = "";
+		string license_info = "License Type Acquired: ";
 		if ( isInstallationOk() )
 		{
 			int houdini_major 			= getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_VERSION_HOUDINI_MAJOR );
@@ -204,6 +193,18 @@ public static partial class HoudiniHost
 				"Houdini RPC Client Module: " + prLibraryPath + "\n" +
 				"Houdini RPC Pipe Name: " + prPipeName;
 			dialog_title = "Houdini Engine Installation Info";
+			
+			HAPI_License houdini_license_type = getCurrentLicense();
+			switch ( houdini_license_type )
+			{
+				case HAPI_License.HAPI_LICENSE_NONE: license_info += "None"; break;
+				case HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE: license_info += "Houdini Engine"; break;
+				case HAPI_License.HAPI_LICENSE_HOUDINI: license_info += "Houdini (Escape)"; break;
+				case HAPI_License.HAPI_LICENSE_HOUDINI_FX: license_info += "Houdini FX"; break;
+				case HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE_INDIE: license_info += "Houdini Engine Indie"; break;
+				case HAPI_License.HAPI_LICENSE_HOUDINI_INDIE: license_info += "Houdini Indie"; break;
+				default: license_info += "Unknown"; break;
+			}
 		}
 		else
 		{
@@ -216,19 +217,7 @@ public static partial class HoudiniHost
 				HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG;
 #endif // UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR )
 			dialog_title = "No Houdini Engine Installed";
-		}
-
-		string license_info = "License Type Acquired: ";
-		HAPI_License houdini_license_type = (HAPI_License) getEnvInt( HAPI_EnvIntType.HAPI_ENVINT_LICENSE );
-		switch ( houdini_license_type )
-		{
-			case HAPI_License.HAPI_LICENSE_NONE: license_info += "None"; break;
-			case HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE: license_info += "Houdini Engine"; break;
-			case HAPI_License.HAPI_LICENSE_HOUDINI: license_info += "Houdini (Escape)"; break;
-			case HAPI_License.HAPI_LICENSE_HOUDINI_FX: license_info += "Houdini FX"; break;
-			case HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE_INDIE: license_info += "Houdini Engine Indie"; break;
-			case HAPI_License.HAPI_LICENSE_HOUDINI_INDIE: license_info += "Houdini Indie"; break;
-			default: license_info += "Unknown"; break;
+			license_info += "Unknown";
 		}
 
 		string path_var = "";
