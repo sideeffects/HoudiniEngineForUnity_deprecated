@@ -913,13 +913,6 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_RenderMaterialToImage(
-		ref HAPI_Session session,
-		HAPI_AssetId asset_id, HAPI_MaterialId material_id,
-		HAPI_ShaderType shader_type );
-
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
 	HAPI_RenderTextureToImage(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id, HAPI_MaterialId material_id,

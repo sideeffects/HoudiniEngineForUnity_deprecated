@@ -190,10 +190,6 @@ public abstract class HoudiniAsset : HoudiniControl
 																!HoudiniHost.isAutoSelectAssetRootNodeDefault() ); } 
 												set { myAutoSelectAssetRootNode = value; } }
 
-	public HAPI_ShaderType			prMaterialShaderType {	get { return myMaterialShaderType; }
-															set { myMaterialShaderType = value; } }
-	public Vector2					prRenderResolution {	get { return myRenderResolution; }
-															set { myRenderResolution = value; } }
 	public bool						prShowOnlyVertexColours{get { return myShowOnlyVertexColours; }
 															set { myShowOnlyVertexColours = value; } }
 	public bool						prGenerateUVs {			get { return myGenerateUVs; }
@@ -878,8 +874,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		prShowPinnedInstances			= true;
 		prAutoSelectAssetRootNode 		= HoudiniHost.myDefaultAutoSelectAssetRootNode;
 
-		prMaterialShaderType			= HAPI_ShaderType.HAPI_SHADER_OPENGL;
-		prRenderResolution				= new Vector2( 1000, 1000 );
 		prShowOnlyVertexColours			= false;
 
 		prGenerateUVs					= false;
@@ -2188,8 +2182,6 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private bool					myShowPinnedInstances;
 	[SerializeField] private bool					myAutoSelectAssetRootNode;
 
-	[SerializeField] private HAPI_ShaderType		myMaterialShaderType;
-	[SerializeField] private Vector2				myRenderResolution;
 	[SerializeField] private bool					myShowOnlyVertexColours;
 	[SerializeField] private bool					myGenerateUVs;
 	[SerializeField] private bool					myGenerateLightmapUV2s;

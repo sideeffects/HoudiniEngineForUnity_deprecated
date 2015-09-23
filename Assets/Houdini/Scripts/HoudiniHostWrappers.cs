@@ -1418,16 +1418,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void renderMaterialToImage( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ShaderType shader_type )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_RenderMaterialToImage( ref mySession, asset_id, material_id, shader_type );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static void renderTextureToImage( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ParmId parm_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
