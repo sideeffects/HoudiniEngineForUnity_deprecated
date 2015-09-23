@@ -266,50 +266,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			HoudiniAssetUtility.reApplyMaterials( myAsset );
 		}
 
-		// Material Shader Type
-		{
-			HAPI_ShaderType value = myAsset.prMaterialShaderType;
-			bool is_bold = myParentPrefabAsset && myParentPrefabAsset.prMaterialShaderType != value;
-			string[] labels = { "OpenGL", "Houdini Mantra Renderer" };
-			HAPI_ShaderType[] values = { HAPI_ShaderType.HAPI_SHADER_OPENGL, HAPI_ShaderType.HAPI_SHADER_MANTRA };
-			bool changed = HoudiniGUI.dropdown(
-				"material_renderer", "Material Renderer", ref value, 
-				is_bold, labels, values, myUndoInfo, 
-				ref myUndoInfo.materialShaderType );
-			if ( changed )
-			{
-				myAsset.prMaterialShaderType = (HAPI_ShaderType) value;
-				HoudiniAssetUtility.reApplyMaterials( myAsset );
-			}
-		}
-
-		// Render Resolution
-		{
-			bool delay_build = false;
-			int[] values 			= new int[ 2 ];
-			values[ 0 ] 			= (int) myAsset.prRenderResolution[ 0 ];
-			values[ 1 ] 			= (int) myAsset.prRenderResolution[ 1 ];
-			int[] undo_values 		= new int[ 2 ];
-			undo_values[ 0 ] 		= (int) myUndoInfo.renderResolution[ 0 ];
-			undo_values[ 1 ] 		= (int) myUndoInfo.renderResolution[ 1 ];
-			HoudiniGUIParm gui_parm 	= new HoudiniGUIParm( "render_resolution", "Render Resolution", 2 );
-
-			gui_parm.isBold =
-				myParentPrefabAsset && 
-				(int) myParentPrefabAsset.prRenderResolution[ 0 ] != values[ 0 ] &&
-				(int) myParentPrefabAsset.prRenderResolution[ 1 ] != values[ 1 ];
-
-			bool changed = HoudiniGUI.intField(
-				ref gui_parm, ref delay_build, ref values, 
-				myUndoInfo, ref undo_values );
-			if ( changed )
-			{
-				Vector2 new_resolution = new Vector2( (float) values[ 0 ], (float) values[ 1 ] );
-				myAsset.prRenderResolution = new_resolution;
-				myUndoInfo.renderResolution = new_resolution;
-			}
-		}
-
 		// Show Vertex Colours
 		createToggleForProperty(
 			"show_only_vertex_colours", "Show Only Vertex Colors", 

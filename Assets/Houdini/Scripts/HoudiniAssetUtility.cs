@@ -829,28 +829,6 @@ public class HoudiniAssetUtility
 		return new Color( values[ 0 ], values[ 1 ], values[ 2 ], values[ 3 ] );
 	}
 
-	public static void setRenderResolution( Vector2 resolution )
-	{
-		HAPI_GlobalNodes global_nodes = HoudiniHost.getGlobalNodes();
-
-		HAPI_NodeInfo node_info	= HoudiniHost.getNodeInfo( global_nodes.defaultCamera );
-
-		// Get all parameters.
-		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
-		getArray1Id( global_nodes.defaultCamera, HoudiniHost.getParameters, parms, node_info.parmCount );
-
-		int parm_id = findParm( ref parms, "res" );
-		if ( parm_id < 0 )
-			return;
-
-		int values_index = parms[ parm_id ].intValuesIndex;
-		int[] values = new int[ 2 ];
-		values[ 0 ] = (int) resolution.x;
-		values[ 1 ] = (int) resolution.y;
-
-		HoudiniHost.setParmIntValues( global_nodes.defaultCamera, values, values_index, 2 );
-	}
-
 	// TEXTURES -----------------------------------------------------------------------------------------------------
 	
 	public static void reApplyMaterials( HoudiniAsset asset )
@@ -1002,8 +980,6 @@ public class HoudiniAssetUtility
 				else
 					material.shader = Shader.Find( "Houdini/SpecularVertexColor" );
 	
-				setRenderResolution( asset.prRenderResolution );
-	
 				// Before assigning material, make sure that if the asset is a prefab instance, all 
 				// modifications are saved before assignHoudiniMaterial is called because ImportAsset may 
 				// be called within this function which will cause OnEnable to be called on all prefab 
@@ -1016,7 +992,7 @@ public class HoudiniAssetUtility
 				string folder_path =
 					HoudiniConstants.HAPI_TEXTURES_PATH + "/" + part_control.prAsset.prAssetName;
 				assignHoudiniMaterial(
-					ref material, material_info, folder_path, asset.prMaterialShaderType );
+					ref material, material_info, folder_path );
 			}
 
 			materials[ m ] = material;
@@ -1140,77 +1116,42 @@ public class HoudiniAssetUtility
 	}
 
 	public static void assignHoudiniMaterial( 
-		ref Material material, HAPI_MaterialInfo material_info, string folder_path, HAPI_ShaderType shader_type )
+		ref Material material, HAPI_MaterialInfo material_info, string folder_path )
 	{
 		// Get all parameters.
 		HAPI_NodeInfo node_info	= HoudiniHost.getNodeInfo( material_info.nodeId );
 		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ node_info.parmCount ];
 		getArray1Id( material_info.nodeId, HoudiniHost.getParameters, parms, node_info.parmCount );
-
-		if ( shader_type == HAPI_ShaderType.HAPI_SHADER_OPENGL )
+		
+		// Extract diffuse map file from material.
+		int diffuse_map_parm_id = findParm( ref parms, "ogl_tex1" );
+		if ( diffuse_map_parm_id < 0 )
+			diffuse_map_parm_id = findParm( ref parms, "baseColorMap" );
+		if ( diffuse_map_parm_id < 0 )
+			diffuse_map_parm_id = findParm( ref parms, "map" );
+		if ( diffuse_map_parm_id >= 0 )
 		{
-			// Extract diffuse map file from material.
-			int diffuse_map_parm_id = findParm( ref parms, "ogl_tex1" );
-			if ( diffuse_map_parm_id < 0 )
-				diffuse_map_parm_id = findParm( ref parms, "baseColorMap" );
-			if ( diffuse_map_parm_id < 0 )
-				diffuse_map_parm_id = findParm( ref parms, "map" );
-			if ( diffuse_map_parm_id >= 0 )
-			{
-				try
-				{
-					HoudiniHost.renderTextureToImage( 
-						material_info.assetId, material_info.id, diffuse_map_parm_id );
-
-					material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" );
-					material.SetTexture( 
-						"_NormalMap", extractHoudiniImageToTexture( material_info, folder_path, "N" ) );
-				}
-				catch ( HoudiniError ) {}
-			}
-			
-			// Assign shader properties.
-
-			material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
-
-			Color diffuse_colour = getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
-			diffuse_colour.a = getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
-			material.SetColor( "_Color", diffuse_colour );
-
-			material.SetColor( "_SpecColor", getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
-
-		}
-		else if ( shader_type == HAPI_ShaderType.HAPI_SHADER_MANTRA )
-		{
-			// Render the material to image.
-			HoudiniProgressBar progress_bar = new HoudiniProgressBar();
-			progress_bar.prTitle		= "Rendering Material using Houdini Mantra";
-			progress_bar.prMessage		= "Rendering...";
-			progress_bar.prStartTime	= System.DateTime.Now;
-			progress_bar.prUseDelay		= false;
-			progress_bar.displayProgressBar();
 			try
 			{
-				HoudiniHost.renderMaterialToImage( 
-					material_info.assetId, material_info.id, HAPI_ShaderType.HAPI_SHADER_MANTRA );
+				HoudiniHost.renderTextureToImage( 
+					material_info.assetId, material_info.id, diffuse_map_parm_id );
 
-				// Extract and assign textures.
-				material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" ); 
-				material.SetTexture( "_NormalMap", extractHoudiniImageToTexture( material_info, folder_path, "N" ) );
+				material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" );
+				material.SetTexture( 
+					"_NormalMap", extractHoudiniImageToTexture( material_info, folder_path, "N" ) );
 			}
 			catch ( HoudiniError ) {}
-			progress_bar.clearProgressBar();
-
-			// Assign shader properties.
-
-			material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
-
-			Color diffuse_colour = getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
-			diffuse_colour.a = getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
-			material.SetColor( "_Color", diffuse_colour );
-
-			material.SetColor( "_SpecColor", getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
 		}
+			
+		// Assign shader properties.
+
+		material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
+
+		Color diffuse_colour = getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
+		diffuse_colour.a = getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
+		material.SetColor( "_Color", diffuse_colour );
+
+		material.SetColor( "_SpecColor", getParmColour3Value( material_info.nodeId, "ogl_spec", Color.black ) );
 	}
 
 	public static Material getUnityMaterial( string material_path, int index, HoudiniPartControl part_control )

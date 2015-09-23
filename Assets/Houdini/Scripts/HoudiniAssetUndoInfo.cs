@@ -9,8 +9,6 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 	public bool autoSelectAssetRootNode;
 
 	// Material Settings
-	public HAPI_ShaderType materialShaderType;
-	public Vector2 renderResolution;
 	public bool showOnlyVertexColours;
 	public bool generateUVs;
 	public bool generateLightmapUV2s;
@@ -37,8 +35,6 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 		isGeoVisible 					= asset.prIsGeoVisible;
 		showPinnedInstances 			= asset.prShowPinnedInstances;
 		autoSelectAssetRootNode 		= asset.prAutoSelectAssetRootNode;
-		materialShaderType 				= asset.prMaterialShaderType;
-		renderResolution 				= asset.prRenderResolution;
 		showOnlyVertexColours 			= asset.prShowOnlyVertexColours;
 		generateUVs						= asset.prGenerateUVs;
 		generateLightmapUV2s			= asset.prGenerateLightmapUV2s;

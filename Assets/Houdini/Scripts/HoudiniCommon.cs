@@ -464,14 +464,6 @@ public enum HAPI_XYZOrder
 	HAPI_ZYX
 }
 
-public enum HAPI_ShaderType
-{
-	HAPI_SHADER_INVALID = -1,
-	HAPI_SHADER_OPENGL,
-	HAPI_SHADER_MANTRA,
-	HAPI_SHADER_MAX
-};
-
 public enum HAPI_ImageDataFormat
 {
 	HAPI_IMAGE_DATA_UNKNOWN = -1,
