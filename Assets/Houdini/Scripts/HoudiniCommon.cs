@@ -752,16 +752,8 @@ public struct HAPI_NodeInfo
 	{ get { return HoudiniHost.getString( internalNodePathSH ); } private set {} }
 }
 
-[ StructLayout( LayoutKind.Sequential ) ]
-public struct HAPI_GlobalNodes 
-{
-	public HAPI_NodeId defaultCamera;
-	public HAPI_NodeId defaultLight;
-	public HAPI_NodeId mantraRenderer;
-}
-
 // PARAMETERS ---------------------------------------------------------------------------------------------------
-	
+
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_ParmInfo
 {

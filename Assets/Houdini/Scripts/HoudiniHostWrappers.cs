@@ -440,18 +440,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static HAPI_GlobalNodes getGlobalNodes()
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_GlobalNodes global_nodes = new HAPI_GlobalNodes();
-		HAPI_Result status_code = HAPI_GetGlobalNodes( ref mySession, out global_nodes );
-		processStatusCode( status_code );
-		return global_nodes;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static HAPI_NodeId[] getEditableNodeNetworks( HAPI_AssetId asset_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
