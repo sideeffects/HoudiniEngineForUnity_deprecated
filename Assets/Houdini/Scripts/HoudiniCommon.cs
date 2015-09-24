@@ -451,7 +451,9 @@ public enum HAPI_RSTOrder
 	HAPI_RTS,
 	HAPI_RST,
 	HAPI_STR,
-	HAPI_SRT
+	HAPI_SRT,
+
+	HAPI_RSTORDER_DEFAULT = HAPI_SRT
 }
 	
 public enum HAPI_XYZOrder
@@ -461,7 +463,9 @@ public enum HAPI_XYZOrder
 	HAPI_YXZ,
 	HAPI_YZX,
 	HAPI_ZXY,
-	HAPI_ZYX
+	HAPI_ZYX,
+
+	HAPI_XYZORDER_DEFAULT = HAPI_XYZ
 }
 
 public enum HAPI_ImageDataFormat
