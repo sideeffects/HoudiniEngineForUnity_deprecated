@@ -48,7 +48,8 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_StartThriftSocketServer(
-		bool auto_close, int port, float timeout_ms, out int process_id );
+		[ MarshalAs( UnmanagedType.U4 ) ] HAPI_StartServerFlagsEnum flags,
+		int port, float timeout_ms, out int process_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -57,7 +58,8 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_StartThriftNamedPipeServer(
-		bool auto_close, string pipe_name, float timeout_ms, out int process_id );
+		[ MarshalAs( UnmanagedType.U4 ) ] HAPI_StartServerFlagsEnum flags,
+		string pipe_name, float timeout_ms, out int process_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

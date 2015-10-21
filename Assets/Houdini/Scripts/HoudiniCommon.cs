@@ -16,13 +16,12 @@
  */
 
 using UnityEngine;
-using System.Collections;
+using System;
 using System.Runtime.InteropServices;
 
 // Typedefs
 using HAPI_SessionId = System.Int64;
 using HAPI_StringHandle = System.Int32;
-using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
 using HAPI_ParmId = System.Int32;
@@ -528,6 +527,13 @@ public enum HAPI_SessionEnvIntType
 	HAPI_SESSIONENVINT_LICENSE = 100,
 
 	HAPI_SESSIONENVINT_MAX,
+};
+
+[ Flags ]
+public enum HAPI_StartServerFlagsEnum
+{
+	HAPI_START_SERVER_AUTO_CLOSE = 1,
+	HAPI_START_SERVER_THREADED = 2
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

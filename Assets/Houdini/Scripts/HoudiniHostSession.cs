@@ -71,7 +71,9 @@ public static partial class HoudiniHost
 				"    Pipe Name: " + pipe_name );
 #endif // UNITY_EDITOR
 			int process_id = 0;
-			HAPI_Result result = HAPI_StartThriftNamedPipeServer( true, pipe_name, 2000.0f, out process_id );
+			HAPI_Result result = HAPI_StartThriftNamedPipeServer(
+				HAPI_StartServerFlagsEnum.HAPI_START_SERVER_AUTO_CLOSE,
+				pipe_name, 2000.0f, out process_id );
 			if ( result != HAPI_Result.HAPI_RESULT_SUCCESS )
 			{
 				prLastInitializationError =
