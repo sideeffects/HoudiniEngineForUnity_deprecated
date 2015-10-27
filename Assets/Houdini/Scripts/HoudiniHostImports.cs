@@ -94,6 +94,7 @@ public static partial class HoudiniHost
 		ref HAPI_CookOptions cook_options,
 		[ MarshalAs( UnmanagedType.U1 ) ] bool use_cooking_thread,
 		int cooking_thread_stack_size,
+		string houdini_environment_files,
 		string otl_search_path,
 		string dso_search_path,
 		string image_dso_search_path,
