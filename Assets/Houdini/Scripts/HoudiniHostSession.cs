@@ -18,12 +18,21 @@ public static partial class HoudiniHost
 	public static string prServerExecutablePath;
 	public static string prLibraryPath;
 
+#if UNITY_EDITOR
 	public static long prSessionID {
 		get { return HoudiniDataFile.getLong( "ServerSessionID", -1 ); } 
 		private set { HoudiniDataFile.setLong( "ServerSessionID", value ); } }
 	public static int prProcessID {
 		get { return HoudiniDataFile.getInt( "ServerProcessID", -1 ); } 
 		private set { HoudiniDataFile.setInt( "ServerProcessID", value ); } }
+#else
+	public static long prSessionID {
+		get { return 0; }
+		private set {} }
+	public static int prProcessID {
+		get { return 0; }
+		private set {} }
+#endif // UNITY_EDITOR
 
 	private static bool initializeSession()
 	{
