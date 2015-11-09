@@ -95,6 +95,28 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static string getNodeCookResult( HAPI_NodeId node_id, HAPI_StatusVerbosity verbosity )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int buffer_length = 0;
+		HAPI_Result status_code = HAPI_ComposeNodeCookResult( ref mySession, node_id, verbosity, out buffer_length );
+		processStatusCode( status_code );
+
+		if ( buffer_length <= 0 )
+			return "";
+
+		StringBuilder string_builder = new StringBuilder( buffer_length );
+		status_code = HAPI_GetComposedNodeCookResult( ref mySession, string_builder, buffer_length );
+		processStatusCode( status_code );
+
+		string string_value = string_builder.ToString();
+
+		return string_value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static string getStatusStringNoExceptions( HAPI_StatusType status_type, HAPI_StatusVerbosity verbosity )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )

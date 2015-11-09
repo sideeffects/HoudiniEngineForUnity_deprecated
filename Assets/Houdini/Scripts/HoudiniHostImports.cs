@@ -105,7 +105,7 @@ public static partial class HoudiniHost
 	HAPI_Cleanup( ref HAPI_Session session );
 
 	// DIAGNOSTICS ----------------------------------------------------------------------------------------------
-		
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetEnvInt( HAPI_EnvIntType int_type, out int value );
@@ -113,7 +113,7 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetSessionEnvInt( ref HAPI_Session session, HAPI_SessionEnvIntType int_type, out int value );
-		
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetStatus( ref HAPI_Session session, HAPI_StatusType status_code, out int status );
@@ -131,6 +131,21 @@ public static partial class HoudiniHost
 	HAPI_GetStatusString(
 		ref HAPI_Session session,
 		HAPI_StatusType status_type,
+		StringBuilder string_value,
+		int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_ComposeNodeCookResult(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		HAPI_StatusVerbosity verbosity,
+		out int buffer_size );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetComposedNodeCookResult(
+		ref HAPI_Session session,
 		StringBuilder string_value,
 		int length );
 
