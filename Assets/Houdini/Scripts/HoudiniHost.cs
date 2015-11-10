@@ -742,7 +742,7 @@ public static partial class HoudiniHost
 #if false
 		byte[] file = File.ReadAllBytes( path );
 		status_code = HAPI_LoadAssetLibraryFromMemory(
-			file, file.Length, allow_asset_def_overwrite, out library_id );
+			ref mySession, file, file.Length, true, out library_id );
 #else
 	#if UNITY_EDITOR
 		status_code = HAPI_LoadAssetLibraryFromFile(
