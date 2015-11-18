@@ -969,7 +969,7 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetPartInfo( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
 		processStatusCode( status_code );
 
-		int count = part_info.getAttributeCountByOwner( owner );
+		int count = part_info.attributeCounts[ (int) owner ];
 
 		int[] names = new int[ count ];
 		status_code = HAPI_GetAttributeNames(

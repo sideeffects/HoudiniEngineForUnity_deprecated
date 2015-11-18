@@ -1065,18 +1065,6 @@ public struct HAPI_PartInfo
 		}
 	}
 
-	public int getAttributeCountByOwner( HAPI_AttributeOwner owner )
-	{
-		switch ( owner )
-		{
-			case HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX: return vertexAttributeCount;
-			case HAPI_AttributeOwner.HAPI_ATTROWNER_POINT: return pointAttributeCount;
-			case HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM: return faceAttributeCount;
-			case HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL: return detailAttributeCount;
-			default: return 0;
-		}
-	}
-
 	public HAPI_PartId id;
 	private HAPI_StringHandle nameSH;
 	public HAPI_PartType type;
@@ -1085,10 +1073,10 @@ public struct HAPI_PartInfo
 	public int vertexCount;
 	public int pointCount;
 
-	public int pointAttributeCount;
-	public int faceAttributeCount;
-	public int vertexAttributeCount;
-	public int detailAttributeCount;
+	[ MarshalAs( UnmanagedType.ByValArray,
+		SizeConst = (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX, 
+		ArraySubType = UnmanagedType.I4 ) ]
+	public int[] attributeCounts;
 
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool isInstanced;
 	public int instancedPartCount;
@@ -1097,6 +1085,18 @@ public struct HAPI_PartInfo
 	// Accessors
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
+	public int pointAttributeCount
+	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT ]; }
+		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT ] = value; } }
+	public int primitiveAttributeCount
+	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM ]; }
+		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM ] = value; } }
+	public int vertexAttributeCount
+	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX ]; }
+		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX ] = value; } }
+	public int detailAttributeCount
+	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL ]; }
+		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL ] = value; } }
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]

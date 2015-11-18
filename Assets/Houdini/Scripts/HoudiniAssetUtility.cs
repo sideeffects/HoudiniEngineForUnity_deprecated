@@ -1790,10 +1790,10 @@ public class HoudiniAssetUtility
 			part_info.pointCount = pointCount + 1;
 		}
 		
-		part_info.pointAttributeCount 	= 1;
-		part_info.vertexAttributeCount 	= 0;
-		part_info.faceAttributeCount 	= 0;
-		part_info.detailAttributeCount 	= 0;
+		part_info.pointAttributeCount 		= 1;
+		part_info.vertexAttributeCount 		= 0;
+		part_info.primitiveAttributeCount 	= 0;
+		part_info.detailAttributeCount 		= 0;
 
 		if ( uvs != null )
 			part_info.pointAttributeCount++;
