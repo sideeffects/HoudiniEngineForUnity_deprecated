@@ -37,7 +37,7 @@ public class HoudiniSetPath
 		Execute = 0x00020019,
 		AllAccess = 0x000f003f
 	}
-	
+
 	public static UIntPtr HKEY_LOCAL_MACHINE = new UIntPtr( 0x80000002u );
 	public static UIntPtr HKEY_CURRENT_USER = new UIntPtr( 0x80000001u );
 
@@ -99,7 +99,10 @@ public class HoudiniSetPath
 	{
 		string houdini_app_path = "";
 #if UNITY_EDITOR_WIN
-		string hapi_path = System.Environment.GetEnvironmentVariable(
+
+		string hapi_path = "";
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		hapi_path = System.Environment.GetEnvironmentVariable(
 			"HAPI_PATH", System.EnvironmentVariableTarget.Machine );
 		if ( hapi_path == null || hapi_path.Length == 0 )
 			hapi_path = System.Environment.GetEnvironmentVariable(
@@ -107,7 +110,8 @@ public class HoudiniSetPath
 		if ( hapi_path == null || hapi_path.Length == 0 )
 			hapi_path = System.Environment.GetEnvironmentVariable(
 				"HAPI_PATH", System.EnvironmentVariableTarget.Process );
-			
+#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+
 		if ( hapi_path != null && hapi_path.Length > 0 )
 		{
 			//Debug.Log( "Using Custom Houdini Path: " + hapi_path );
@@ -117,7 +121,7 @@ public class HoudiniSetPath
 		{
 			// HAPI_PATH variable not set therefore we must find another way to detect an installation of
 			// Houdini. This step is platform dependant hence the #if's.
-				
+
 			string current_app_name = "Houdini Engine";
 			while ( true )
 			{
@@ -158,6 +162,7 @@ public class HoudiniSetPath
 			return;
 		myAttemptedPathSetting = true;
 		myIsPathSet = false;
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 #if UNITY_EDITOR_WIN
 		string houdini_app_path = getHoudiniPath();
@@ -221,10 +226,11 @@ public class HoudiniSetPath
 			"PATH", paths, System.EnvironmentVariableTarget.Process );
 
 		myIsPathSet = true;
-
 #endif
+
+#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
-		
+
 	public static bool prIsPathSet { get { return myIsPathSet; } private set {} }
 	public static string prHoudiniPath { get; private set; }
 	public static string prLastError { get { return myLastError; } private set {} }
@@ -232,14 +238,14 @@ public class HoudiniSetPath
 	private static string getAppPath( string app_name )
 	{
 		string app_path = "";
-			
+
 #if UNITY_EDITOR
 		if ( BuildPipeline.isBuildingPlayer )
 			return app_path;
 #endif // UNITY_EDITOR
 
 #if UNITY_EDITOR_WIN
-		// For Windows, we look at the registry entries made by the Houdini installer. We look for the 
+		// For Windows, we look at the registry entries made by the Houdini installer. We look for the
 		// "active version" key which gives us the most recently installed Houdini version. Using the
 		// active version we find the registry made by that particular installer and find the install
 		// path.
@@ -267,9 +273,9 @@ public class HoudiniSetPath
 
 		app_path = getRegKeyValue_x64( HKEY_LOCAL_MACHINE, "SOFTWARE\\Side Effects Software\\" + app_name, correct_version_key );
 
-		if ( app_path == null || app_path.Length == 0 ) 
+		if ( app_path == null || app_path.Length == 0 )
 			throw new HoudiniError(
-				"The correct version (" + correct_version + ") of " + app_name + 
+				"The correct version (" + correct_version + ") of " + app_name +
 				" was not found in the registry!" );
 		else if ( app_path.EndsWith( "\\" ) || app_path.EndsWith( "/" ) )
 			app_path = app_path.Remove( app_path.Length - 1 );

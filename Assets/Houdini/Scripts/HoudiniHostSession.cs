@@ -12,7 +12,7 @@ using System.IO;
 public static partial class HoudiniHost
 {
 	public static HAPI_Session mySession;
-	
+
 	public static string prPipeName;
 	public static string prServerExecutableName;
 	public static string prServerExecutablePath;
@@ -20,10 +20,10 @@ public static partial class HoudiniHost
 
 #if UNITY_EDITOR
 	public static long prSessionID {
-		get { return HoudiniDataFile.getLong( "ServerSessionID", -1 ); } 
+		get { return HoudiniDataFile.getLong( "ServerSessionID", -1 ); }
 		private set { HoudiniDataFile.setLong( "ServerSessionID", value ); } }
 	public static int prProcessID {
-		get { return HoudiniDataFile.getInt( "ServerProcessID", -1 ); } 
+		get { return HoudiniDataFile.getInt( "ServerProcessID", -1 ); }
 		private set { HoudiniDataFile.setInt( "ServerProcessID", value ); } }
 #else
 	public static long prSessionID {
@@ -51,7 +51,7 @@ public static partial class HoudiniHost
 		{
 			if ( !startProcess( prServerExecutablePath, prPipeName ) )
 				return false;
-			
+
 			return getSession( out mySession, prPipeName );
 		}
 		else
@@ -68,9 +68,10 @@ public static partial class HoudiniHost
 			return true;
 		}
 	}
-	
+
 	private static bool startProcess( string server_executable_path, string pipe_name )
 	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		try
 		{
 #if UNITY_EDITOR
@@ -90,7 +91,7 @@ public static partial class HoudiniHost
 			}
 
 			prProcessID = process_id;
-		
+
 			return true;
 		}
 		catch ( System.Exception e )
@@ -100,6 +101,9 @@ public static partial class HoudiniHost
 				"Make sure " + prServerExecutablePath + " exists.";
 			return false;
 		}
+#else
+		return false;
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	private static bool getSession( out HAPI_Session session, string pipe_name )
