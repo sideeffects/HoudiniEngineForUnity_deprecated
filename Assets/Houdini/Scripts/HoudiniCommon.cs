@@ -77,6 +77,7 @@ public struct HoudiniConstants
 
 	public const int HAPI_POSITION_VECTOR_SIZE			= 3;
 	public const int HAPI_SCALE_VECTOR_SIZE				= 3;
+	public const int HAPI_SHEAR_VECTOR_SIZE				= 3;
 	public const int HAPI_NORMAL_VECTOR_SIZE			= 3;
 	public const int HAPI_QUATERNION_VECTOR_SIZE		= 4;
 	public const int HAPI_EULER_VECTOR_SIZE				= 3;
@@ -542,60 +543,82 @@ public enum HAPI_StartServerFlagsEnum
 // GENERICS -----------------------------------------------------------------------------------------------------
 
 [ StructLayout( LayoutKind.Sequential ) ]
-public struct HAPI_Transform 
+public struct HAPI_Transform
 {
 	public HAPI_Transform( bool initialize_fields )
 	{
-		position			= new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
-		rotationQuaternion	= new float[ HoudiniConstants.HAPI_QUATERNION_VECTOR_SIZE ];
-		scale				= new float[ HoudiniConstants.HAPI_SCALE_VECTOR_SIZE ];
-		rstOrder			= HAPI_RSTOrder.HAPI_SRT;
+		position = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+		rotationQuaternion = new float[ HoudiniConstants.HAPI_QUATERNION_VECTOR_SIZE ];
+		scale = new float[ HoudiniConstants.HAPI_SCALE_VECTOR_SIZE ];
+		shear = new float[ HoudiniConstants.HAPI_SHEAR_VECTOR_SIZE ];
+
+		rstOrder = HAPI_RSTOrder.HAPI_SRT;
 	}
-		
-	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE, 
-					ArraySubType = UnmanagedType.R4 ) ]
+
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
 	public float[] position;
-				
-	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HoudiniConstants.HAPI_QUATERNION_VECTOR_SIZE, 
-					ArraySubType = UnmanagedType.R4 ) ]
+
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_QUATERNION_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
 	public float[] rotationQuaternion;
 		
-	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HoudiniConstants.HAPI_SCALE_VECTOR_SIZE, 
-					ArraySubType = UnmanagedType.R4 ) ]
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_SCALE_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
 	public float[] scale;
+
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_SHEAR_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
+	public float[] shear;
 
 	public HAPI_RSTOrder rstOrder;
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]
-public struct HAPI_TransformEuler 
+public struct HAPI_TransformEuler
 {
 	public HAPI_TransformEuler( bool initialize_fields )
 	{
-		position 		= new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
-		rotationEuler 	= new float[ HoudiniConstants.HAPI_EULER_VECTOR_SIZE ];
-		scale 			= new float[ HoudiniConstants.HAPI_SCALE_VECTOR_SIZE ];
-		rotationOrder 	= 0;
-		rstOrder 		= 0;
+		position = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+		rotationEuler = new float[ HoudiniConstants.HAPI_EULER_VECTOR_SIZE ];
+		scale = new float[ HoudiniConstants.HAPI_SCALE_VECTOR_SIZE ];
+		shear = new float[ HoudiniConstants.HAPI_SHEAR_VECTOR_SIZE ];
+
+		rotationOrder = 0;
+		rstOrder = 0;
 	}
 
-	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE, 
-					ArraySubType = UnmanagedType.R4 ) ]
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
 	public float[] position;
 
-	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HoudiniConstants.HAPI_EULER_VECTOR_SIZE, 
-					ArraySubType = UnmanagedType.R4 ) ]
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_EULER_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
 	public float[] rotationEuler;
 
-	[ MarshalAs( UnmanagedType.ByValArray, 
-					SizeConst = HoudiniConstants.HAPI_SCALE_VECTOR_SIZE, 
-					ArraySubType = UnmanagedType.R4 ) ]
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_SCALE_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
 	public float[] scale;
+
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_SHEAR_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
+	public float[] shear;
 
 	public HAPI_XYZOrder rotationOrder;
 	public HAPI_RSTOrder rstOrder;
