@@ -11,9 +11,9 @@
  *		416-504-9876
  *
  * COMMENTS:
- * 		Contains HAPI_Host which is a singleton class that maintains the singleton Houdini scene and 
+ * 		Contains HAPI_Host which is a singleton class that maintains the singleton Houdini scene and
  * 		all access to the Houdini runtime.
- * 
+ *
  */
 
 using UnityEngine;
@@ -71,6 +71,9 @@ public static partial class HoudiniHost
 	public static bool initialize()
 	{
 #if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		// Getting rid of warning abiout unused variable.
+		bool tempFlag = myCurrentCSharpSessionInitialized;
+		myCurrentCSharpSessionInitialized = tempFlag;
 		return false;
 #else
 		// During the batch creation of our .unitypackage file we don't want to actually
@@ -151,7 +154,7 @@ public static partial class HoudiniHost
 			prHoudiniSceneExists = true;
 		}
 
-		// This is used in isInstallationOk() to determine whether we need to 
+		// This is used in isInstallationOk() to determine whether we need to
 		// recover the session information from the data file or not. It basically
 		// just means that the current C# state is aware of the Houdini session.
 		myCurrentCSharpSessionInitialized = true;
@@ -181,7 +184,7 @@ public static partial class HoudiniHost
 				"Installed Houdini Version: " +
 				houdini_major + "." +
 				houdini_minor + "." +
-				houdini_build + 
+				houdini_build +
 				( houdini_patch > 0 ? "." + houdini_patch : "" ) + "\n" +
 				"Installed Houdini Engine Version: " +
 				houdini_engine_major + "." +
@@ -193,7 +196,7 @@ public static partial class HoudiniHost
 				"Houdini RPC Client Module: " + prLibraryPath + "\n" +
 				"Houdini RPC Pipe Name: " + prPipeName;
 			dialog_title = "Houdini Engine Installation Info";
-			
+
 			HAPI_License houdini_license_type = getCurrentLicense();
 			switch ( houdini_license_type )
 			{
@@ -220,16 +223,16 @@ public static partial class HoudiniHost
 			license_info += "Unknown";
 		}
 
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		string path_var = "";
-#if UNITY_EDITOR
 		path_var = System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process );
 #if UNITY_EDITOR_WIN
 		path_var = path_var.Replace( ";", "\n" );
 #elif UNITY_EDITOR_OSX
 		path_var = path_var.Replace( ":", "\n" );
 #endif // UNITY_EDITOR_WIN
-#endif // UNITY_EDITOR
-		string full_message = 
+#endif // UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
+		string full_message =
 			"Required Houdini Version: " +
 			HoudiniVersion.HOUDINI_MAJOR + "." +
 			HoudiniVersion.HOUDINI_MINOR + "." +
