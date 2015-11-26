@@ -99,6 +99,11 @@ public struct HoudiniConstants
 	public const string HAPI_ATTRIB_TANGENT				= "tangentu";
 	public const string HAPI_ATTRIB_COLOR				= "Cd";
 
+	// HAPI-Sepcific Attribute Names
+	public const string HAPI_ATTRIB_BOX_CENTER			= "__box_center";
+	public const string HAPI_ATTRIB_BOX_SIZE			= "__box_size";
+	public const string HAPI_ATTRIB_BOX_ROTATION		= "__box_rotation";
+
 	public const string HAPI_UNGROUPED_GROUP_NAME		= "__ungrouped_group";
 
 	// Common image file format names (to use with the material extract APIs).
@@ -407,6 +412,7 @@ public enum HAPI_PartType
 	HAPI_PARTTYPE_CURVE,
 	HAPI_PARTTYPE_VOLUME,
 	HAPI_PARTTYPE_INSTANCER,
+	HAPI_PARTTYPE_BOX,
 	HAPI_PARTTYPE_MAX
 };
 
@@ -750,6 +756,10 @@ public struct HAPI_CookOptions
 
 	/// Choose how you want the cook to handle packed primitives.
 	public HAPI_PackedPrimInstancingMode packedPrimInstancingMode;
+
+	/// Choose which special part types should be handled. Unhandled special
+	/// part types will just be refined to ::HAPI_PARTTYPE_MESH.
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool handleBoxPartTypes;
 }
 
 // NODES --------------------------------------------------------------------------------------------------------
