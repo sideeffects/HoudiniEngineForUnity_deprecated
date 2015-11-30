@@ -36,6 +36,7 @@ public static partial class HoudiniHost
 
 	private static bool initializeSession()
 	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		prPipeName = System.Text.RegularExpressions.Regex.Replace( Application.dataPath, "[^\\w\\._]", "__" );
 #if UNITY_EDITOR_WIN
 		prServerExecutableName = "HARS.exe";
@@ -67,6 +68,9 @@ public static partial class HoudiniHost
 #endif // UNITY_EDITOR
 			return true;
 		}
+#else
+		return false;
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	private static bool startProcess( string server_executable_path, string pipe_name )
