@@ -1171,6 +1171,15 @@ public static partial class HoudiniHost
 		float[] knots_array,
 		int start, int length );
 
+	// BASIC PRIMITIVES -----------------------------------------------------------------------------------------
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetBoxInfo(
+		ref HAPI_Session session,
+		HAPI_NodeId geo_node_id, HAPI_PartId part_id,
+		ref HAPI_BoxInfo box_info );
+
 	// CACHING --------------------------------------------------------------------------------------------------
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]

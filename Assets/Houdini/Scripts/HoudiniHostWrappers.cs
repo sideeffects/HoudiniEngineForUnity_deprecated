@@ -1703,6 +1703,22 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	// BASIC PRIMITIVES -----------------------------------------------------------------------------------------
+
+	public static HAPI_BoxInfo
+	getBoxInfo( HAPI_NodeId geo_node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_BoxInfo box_info = new HAPI_BoxInfo( true );
+		HAPI_Result status_code = HAPI_GetBoxInfo(
+			ref mySession, geo_node_id, part_id, ref box_info );
+		processStatusCode( status_code );
+		return box_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	// CACHING --------------------------------------------------------------------------------------------------
 
 	public static void saveGeoToFile(

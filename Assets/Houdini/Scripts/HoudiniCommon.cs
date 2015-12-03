@@ -1320,3 +1320,34 @@ public struct HAPI_CurveInfo
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool hasKnots;
 };
+
+// BASIC PRIMITIVES ---------------------------------------------------------------------------------------------
+
+[ StructLayout( LayoutKind.Sequential ) ]
+public struct HAPI_BoxInfo
+{
+	public HAPI_BoxInfo( bool initialize_fields )
+	{
+		center = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+		size = new float[ HoudiniConstants.HAPI_SCALE_VECTOR_SIZE ];
+		rotation = new float[ HoudiniConstants.HAPI_EULER_VECTOR_SIZE ];
+	}
+
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
+	public float[] center;
+
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_SCALE_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
+	public float[] size;
+		
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_EULER_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
+	public float[] rotation;
+}
