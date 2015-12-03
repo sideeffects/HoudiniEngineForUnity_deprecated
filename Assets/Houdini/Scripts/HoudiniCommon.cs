@@ -316,6 +316,27 @@ public enum HAPI_PresetType
 	HAPI_PRESETTYPE_MAX
 };
 
+public enum HAPI_NodeType
+{
+	HAPI_NODETYPE_INVALID = -1,
+	HAPI_NODETYPE_OBJ = 0,
+	HAPI_NODETYPE_SOP,
+	HAPI_NODETYPE_POPNET,
+	HAPI_NODETYPE_POP,
+	HAPI_NODETYPE_CHOPNET,
+	HAPI_NODETYPE_CHOP,
+	HAPI_NODETYPE_ROP,
+	HAPI_NODETYPE_SHOP,
+	HAPI_NODETYPE_COP2,
+	HAPI_NODETYPE_COPNET,
+	HAPI_NODETYPE_VOP,
+	HAPI_NODETYPE_VOPNET,
+	HAPI_NODETYPE_DOP,
+	HAPI_NODETYPE_MGR,
+	HAPI_NODETYPE_DIR,
+	HAPI_NODETYPE_MAX
+};
+
 public enum HAPI_AssetType
 {
 	HAPI_ASSETTYPE_INVALID = -1,
@@ -765,6 +786,7 @@ public struct HAPI_NodeInfo
 	public HAPI_NodeId id;
 	public HAPI_AssetId assetId;
 	public HAPI_StringHandle nameSH;
+	public HAPI_NodeType type;
 
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool isValid;
 
