@@ -133,7 +133,7 @@ public static partial class HoudiniHost
 				cook_options.cookTemplatedGeos = HoudiniHost.prImportTemplatedGeos;
 				cook_options.packedPrimInstancingMode =
 					HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
-				cook_options.handleBoxPartTypes = false;
+				cook_options.handleBoxPartTypes = true;
 
 				// Initialize.
 				status_code = HAPI_Initialize(

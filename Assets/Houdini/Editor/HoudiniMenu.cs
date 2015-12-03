@@ -207,21 +207,14 @@ public class HoudiniMenu : MonoBehaviour
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/TEst", false, 1000 ) ]
 	static private void blah2()
 	{
-		HoudiniDataFile.reset();
-
-		HoudiniDataFile.load();
-
-		HoudiniDataFile.setInt( "Int", 12 );
-		HoudiniDataFile.setFloat( "Float", 12.0f );
-		HoudiniDataFile.setString( "String", "string" );
-		HoudiniDataFile.setInt( "Int", 13 );
-
-		HoudiniDataFile.save();
-		HoudiniDataFile.load();
-
-		Debug.Log( "Int: " + HoudiniDataFile.getInt( "Int", 9 ) );
-		Debug.Log( "Float: " + HoudiniDataFile.getFloat( "Float", 9.0f ) );
-		Debug.Log( "String: " + HoudiniDataFile.getString( "String", "blah" ) );
+		GameObject parent = null;
+		for ( int i = 0; i < 10; i++ )
+		{
+			GameObject ob = new GameObject( "ob" + i );
+			if ( parent )
+				ob.transform.parent = parent.transform;
+			parent = ob;
+		}
 	}
 
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Two Curves and a Merge", false, 1000 ) ]

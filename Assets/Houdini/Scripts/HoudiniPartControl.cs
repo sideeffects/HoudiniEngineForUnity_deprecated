@@ -103,6 +103,12 @@ public class HoudiniPartControl : HoudiniGeoControl
 		myLastLocalToWorld = transform.localToWorldMatrix;
 	}
 
+	public virtual void OnDestroy()
+	{
+		if ( myBoxCollider )
+			HoudiniAssetUtility.destroyGameObject( myBoxCollider );
+	}
+
 	public void selectParent()
 	{
 #if UNITY_EDITOR
@@ -354,7 +360,47 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 				particle_emitter.particles = particles;
 			}
-			
+
+			// Create the box collider if one exists.
+			if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_BOX )
+			{
+				if ( !myBoxCollider )
+				{
+					myBoxCollider = new GameObject( part_info.name + "_box_collider_" + prGeoControl.prNodeId );
+					myBoxCollider.transform.parent = prGeoControl.gameObject.transform;
+					//myBoxCollider.isStatic = gameObject.isStatic;
+
+					// Need to reset position here because the assignment above will massage the child's
+					// position in order to be in the same place it was in the global namespace.
+					myBoxCollider.transform.localPosition = new Vector3();
+					myBoxCollider.transform.localRotation = new Quaternion();
+					myBoxCollider.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
+
+					myBoxCollider.AddComponent< BoxCollider >();
+				}
+
+				HAPI_BoxInfo box_info = HoudiniHost.getBoxInfo( prGeoControl.prNodeId, part_info.id );
+				BoxCollider box_collider = myBoxCollider.GetComponent< BoxCollider >();
+				box_collider.center = new Vector3(
+					-box_info.center[ 0 ],
+					box_info.center[ 1 ],
+					box_info.center[ 2 ] );
+				box_collider.size = new Vector3(
+					box_info.size[ 0 ] * 2,
+					box_info.size[ 1 ] * 2,
+					box_info.size[ 2 ] * 2 );
+
+				box_collider.transform.rotation = Quaternion.Euler(
+					box_info.rotation[ 2 ],
+					-box_info.rotation[ 1 ],
+					-box_info.rotation[ 0 ] );
+			}
+			else if ( myBoxCollider )
+			{
+				HoudiniAssetUtility.destroyGameObject( myBoxCollider );
+				myBoxCollider = null;
+			}
+
 			if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_VOLUME )
 			{
 				// Clear previous volume tiles.
@@ -814,6 +860,8 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	[SerializeField] private bool			myShowIntermediateResultControls;
 	[SerializeField] private bool			myShowInfo;
+
+	[SerializeField] private GameObject		myBoxCollider;
 
 	[SerializeField] private HoudiniGeoControl myGeoControl;
 }

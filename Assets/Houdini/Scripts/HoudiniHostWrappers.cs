@@ -394,7 +394,7 @@ public static partial class HoudiniHost
 		cook_options.cookTemplatedGeos = import_templated_geos;
 		cook_options.packedPrimInstancingMode =
 			HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
-		cook_options.handleBoxPartTypes = false;
+		cook_options.handleBoxPartTypes = true;
 
 		HAPI_Result status_code = HAPI_CookAsset( ref mySession, asset_id, ref cook_options );
 		processStatusCode( status_code );
