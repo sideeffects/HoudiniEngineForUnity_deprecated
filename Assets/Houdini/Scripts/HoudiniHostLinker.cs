@@ -125,15 +125,7 @@ public static partial class HoudiniHost
 				string otls_path = getAllFoldersInPath( Application.dataPath + "/OTLs/Scanned" );
 				string dsos_path = getAllFoldersInPath( Application.dataPath + "/DSOs" );
 
-				HAPI_CookOptions cook_options = new HAPI_CookOptions();
-				cook_options.splitGeosByGroup = prSplitGeosByGroup;
-				cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-				cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
-				cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
-				cook_options.cookTemplatedGeos = HoudiniHost.prImportTemplatedGeos;
-				cook_options.packedPrimInstancingMode =
-					HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
-				cook_options.handleBoxPartTypes = true;
+				HAPI_CookOptions cook_options = getCookOptions();
 
 				// Initialize.
 				status_code = HAPI_Initialize(

@@ -874,6 +874,24 @@ public static partial class HoudiniHost
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
+	public static HAPI_CookOptions getCookOptions( bool split_geos_by_group, bool import_templated_geos )
+	{
+		HAPI_CookOptions cook_options = new HAPI_CookOptions();
+		cook_options.splitGeosByGroup = split_geos_by_group;
+		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
+		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
+		cook_options.cookTemplatedGeos = import_templated_geos;
+		cook_options.packedPrimInstancingMode =
+			HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
+		cook_options.handleBoxPartTypes = true;
+		return cook_options;
+	}
+	public static HAPI_CookOptions getCookOptions()
+	{
+		return getCookOptions( prSplitGeosByGroup, prImportTemplatedGeos );
+	}
+
 	public static bool isRealDestroy()
 	{
 #if UNITY_EDITOR
