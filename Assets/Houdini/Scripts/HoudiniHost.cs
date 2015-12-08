@@ -121,8 +121,6 @@ public static partial class HoudiniHost
 
 	public const bool myDefaultAutoSelectAssetRootNode					= true;
 
-	private const bool myDefaultEnablePointsAsParticles 				= true;
-
 	public const float myDefaultGamma									= 2.2f;
 	private const bool myDefaultDontCreateTextureFiles					= false;
 	private const bool myDefaultExtractTexturesInRawFormat				= false;
@@ -204,8 +202,6 @@ public static partial class HoudiniHost
 		setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
 		
 		setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
-		
-		setBool( 	"HAPI_EnablePointsAsParticles", myDefaultEnablePointsAsParticles, true );
 		
 		setFloat(	"HAPI_Gamma", myDefaultGamma, true );
 		setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
@@ -328,10 +324,6 @@ public static partial class HoudiniHost
 	public static bool prAutoSelectAssetRootNode {
 											get { return getBool( "HAPI_AutoSelectAssetRootNode" ); } 
 											set { setBool( "HAPI_AutoSelectAssetRootNode", value ); } }
-
-	public static bool prEnablePointsAsParticles {
-											get { return getBool( "HAPI_EnablePointsAsParticles" ); }
-											set { setBool( "HAPI_EnablePointsAsParticles", value ); } }
 
 	public static float prGamma {
 											get { return getFloat( "HAPI_Gamma" ); } 
@@ -655,8 +647,6 @@ public static partial class HoudiniHost
 		prEnableSupportWarnings					= myDefaultEnableSupportWarnings;
 
 		prAutoSelectAssetRootNode				= myDefaultAutoSelectAssetRootNode;
-
-		prEnablePointsAsParticles 			    = myDefaultEnablePointsAsParticles;
 
 		prGamma									= myDefaultGamma;
 		prDontCreateTextureFiles				= myDefaultDontCreateTextureFiles;

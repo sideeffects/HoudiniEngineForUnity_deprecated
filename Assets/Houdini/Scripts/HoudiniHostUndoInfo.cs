@@ -74,7 +74,6 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		autoPinInstances 				= HoudiniHost.prAutoPinInstances;
 		enableSupportWarnings 			= HoudiniHost.prEnableSupportWarnings;
 		autoSelectAssetRootNode 		= HoudiniHost.prAutoSelectAssetRootNode;
-		enablePointsAsParticles 		= HoudiniHost.prEnablePointsAsParticles;
 		
 		// Set material settings.
 		unityMaterialAttribName 		= HoudiniHost.prUnityMaterialAttribName;

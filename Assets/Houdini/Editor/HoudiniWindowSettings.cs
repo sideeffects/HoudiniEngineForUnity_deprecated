@@ -170,22 +170,6 @@ public class HoudiniWindowSettings : EditorWindow
 				HoudiniHost.repaint();
 			}
 		}
-
-		HoudiniGUI.separator();
-
-		// Enable particles
-		{
-			bool value = HoudiniHost.prEnablePointsAsParticles;
-			bool changed = HoudiniGUI.toggle(
-				"enable_points_as_particles",
-				"Create Points as Particles", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.enablePointsAsParticles );
-			if ( changed )
-			{
-				HoudiniHost.prEnablePointsAsParticles = value;
-			}
-		}
 	}
 
 	private static void generateMaterialSettings()
