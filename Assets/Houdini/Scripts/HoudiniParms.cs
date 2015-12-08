@@ -173,8 +173,10 @@ public class HoudiniParms : MonoBehaviour
 		myValuesEqualToHoudini = false;
 	}
 
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public virtual void Update()
 	{}
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	// -------------------------------------------------------------------------------------------------------------
 

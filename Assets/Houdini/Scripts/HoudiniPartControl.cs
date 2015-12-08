@@ -567,9 +567,9 @@ public class HoudiniPartControl : HoudiniGeoControl
 		mesh_filter.sharedMesh.SetIndices( indices, MeshTopology.Points, 0 );
 	}
 
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public virtual void Update()
 	{
-		
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
 		
 		if ( local_to_world == myLastLocalToWorld )
@@ -578,6 +578,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		myLastLocalToWorld = local_to_world;
 		myTransformChanged = true;
 	}
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
@@ -840,9 +841,13 @@ public class HoudiniPartControl : HoudiniGeoControl
 			}
 		}
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
+
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#pragma warning disable 0414
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	[SerializeField] private int			myPartId;
 	[SerializeField] private string			myPartName;
@@ -864,4 +869,8 @@ public class HoudiniPartControl : HoudiniGeoControl
 	[SerializeField] private GameObject		myBoxCollider;
 
 	[SerializeField] private HoudiniGeoControl myGeoControl;
+
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#pragma warning restore 0414
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 }
