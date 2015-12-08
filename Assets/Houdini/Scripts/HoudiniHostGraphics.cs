@@ -55,6 +55,10 @@ public static partial class HoudiniHost
 			glEnable( GL_VERTEX_PROGRAM_POINT_SIZE );
 	}
 #else
-	public static void preDrawSetup() {}
+	public static void preDrawSetup()
+	{
+		// This is purely to avoid the unused variable warning. Sigh indeed.
+		myIsOpenGL = !!myIsOpenGL;
+	}
 #endif
 }

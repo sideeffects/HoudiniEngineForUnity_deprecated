@@ -1398,6 +1398,10 @@ public abstract class HoudiniAsset : HoudiniControl
 		// scene and then reloading the scene in a Unity session with a valid
 		// Houdini installation.
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		return;
+		#pragma warning disable 0162
+#endif
 		if ( local_to_world == myLastLocalToWorld )
 			return;
 		myLastLocalToWorld = local_to_world;
@@ -1429,6 +1433,10 @@ public abstract class HoudiniAsset : HoudiniControl
 		{
 			Debug.LogError( err.ToString() );
 		}
+
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		#pragma warning restore 0162
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	public void bakeAsset()
