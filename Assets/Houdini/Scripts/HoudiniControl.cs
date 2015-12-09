@@ -113,6 +113,11 @@ public class HoudiniControl : MonoBehaviour
 
 	public virtual void onParmChange() {}
 
+	public bool hasComponent< T >() where T : Component
+	{
+		return GetComponent< T >() != null;
+	}
+
 	public T getOrCreateComponent< T >() where T : Component
 	{
 		return getOrCreateComponent< T >( gameObject );
@@ -125,6 +130,17 @@ public class HoudiniControl : MonoBehaviour
 		return component;
 	}
 
+	public void removeComponent< T >() where T : Component
+	{
+		removeComponent< T >( gameObject );
+	}
+	static public void removeComponent< T >( GameObject game_object ) where T : Component
+	{
+		T component = game_object.GetComponent< T >();
+		if ( component != null )
+			DestroyImmediate( component );
+	}
+
 	public void removeComponentsFromChildren< T >() where T : Component
 	{
 		removeComponentsFromChildren< T >( gameObject );
@@ -134,12 +150,28 @@ public class HoudiniControl : MonoBehaviour
 		foreach ( T comp in game_object.GetComponentsInChildren< T >() )
 			DestroyImmediate( comp );
 	}
+
+	public void destoryChildrenWithComponent< T >() where T : Component
+	{
+		destoryChildrenWithComponent< T >( gameObject.transform );
+	}
+	static public void destoryChildrenWithComponent< T >( Transform trans ) where T : Component
+	{
+		List< GameObject > children = new List< GameObject >();
+
+		foreach ( Transform child in trans )
+			children.Add( child.gameObject );
+		
+		foreach ( GameObject child in children )
+			if ( child.GetComponent< T >() != null )
+				HoudiniAssetUtility.destroyGameObject( child );
+	}
 	
 	public void destroyChildren()
 	{
 		destroyChildren( gameObject.transform );
 	}
-	static public void destroyChildren( Transform trans ) 
+	static public void destroyChildren( Transform trans )
 	{
 		List< GameObject > children = new List< GameObject >();
 		

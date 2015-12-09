@@ -1284,7 +1284,7 @@ public class HoudiniAssetUtility
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 
-	public static void getMesh(
+	public static bool getMesh(
 		HoudiniPartControl part_control,
 		Mesh mesh,
 		bool generate_uvs,
@@ -1608,6 +1608,7 @@ public class HoudiniAssetUtility
 			calculateMeshTangents( mesh );
 
 		// Create the submeshes if needed.
+		bool has_visible_geometry = false;
 		if ( !part_control.prAsset.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0 )
 		{
 			string[] groups = HoudiniHost.getGroupNames(
@@ -1616,7 +1617,8 @@ public class HoudiniAssetUtility
 			// Destroy any existing colliders.
 			MeshCollider[] old_colliders = part_control.gameObject.GetComponents< MeshCollider >();
 			foreach ( MeshCollider collider in old_colliders )
-				GameObject.DestroyImmediate( collider );
+				Object.DestroyImmediate( collider );
+			part_control.destoryChildrenWithComponent< BoxCollider >();
 
 			mesh.subMeshCount = 0;
 			for ( int g = 0; g < groups.Length; ++g )
@@ -1658,25 +1660,71 @@ public class HoudiniAssetUtility
 				if ( group.Contains( HoudiniHost.prRenderedCollisionGroupName ) ||
 					group.Contains( HoudiniHost.prCollisionGroupName ) )
 				{
-					MeshCollider new_collider = part_control.gameObject.AddComponent< MeshCollider >();
-					Mesh collision_mesh = new Mesh();
-					collision_mesh.vertices = vertices;
-					collision_mesh.triangles = group_triangles;
-					collision_mesh.normals = normals;
-					collision_mesh.RecalculateBounds();
-					new_collider.sharedMesh = collision_mesh;
-					new_collider.enabled = false;
-					new_collider.enabled = true;
+					// If a box and wholly contained inside the group.
+					if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_BOX
+						&& membership_count == part_info.faceCount )
+					{
+						GameObject box_collider_obj =
+							new GameObject( part_info.name + "_box_collider_" + part_control.prGeoControl.prNodeId );
+						box_collider_obj.transform.SetParent( part_control.gameObject.transform );
+						box_collider_obj.isStatic = part_control.gameObject.isStatic;
+
+						// Need to reset position here because the assignment above will massage the child's
+						// position in order to be in the same place it was in the global namespace.
+						box_collider_obj.transform.localPosition = new Vector3();
+						box_collider_obj.transform.localRotation = new Quaternion();
+						box_collider_obj.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
+
+						box_collider_obj.AddComponent< BoxCollider >();
+
+						HAPI_BoxInfo box_info = HoudiniHost.getBoxInfo( part_control.prGeoControl.prNodeId, part_info.id );
+						BoxCollider box_collider = box_collider_obj.GetComponent< BoxCollider >();
+						box_collider.center = new Vector3(
+							-box_info.center[ 0 ],
+							box_info.center[ 1 ],
+							box_info.center[ 2 ] );
+						box_collider.size = new Vector3(
+							box_info.size[ 0 ] * 2,
+							box_info.size[ 1 ] * 2,
+							box_info.size[ 2 ] * 2 );
+
+						box_collider.transform.rotation = Quaternion.Euler(
+							box_info.rotation[ 2 ],
+							-box_info.rotation[ 1 ],
+							-box_info.rotation[ 0 ] );
+
+						box_collider.enabled = false;
+						box_collider.enabled = true;
+					}
+					else // HAPI_PARTTYPE_MESH
+					{
+						MeshCollider new_collider = part_control.gameObject.AddComponent< MeshCollider >();
+						Mesh collision_mesh = new Mesh();
+						collision_mesh.vertices = vertices;
+						collision_mesh.triangles = group_triangles;
+						collision_mesh.normals = normals;
+						collision_mesh.RecalculateBounds();
+						new_collider.sharedMesh = collision_mesh;
+						new_collider.enabled = false;
+						new_collider.enabled = true;
+					}
 				}
-				
+
 				if ( group.Contains( HoudiniHost.prRenderedCollisionGroupName )
 					|| !group.Contains( HoudiniHost.prCollisionGroupName ) )
 				{
 					mesh.subMeshCount++;
 					mesh.SetTriangles( group_triangles, g );
+					has_visible_geometry = true;
 				}
-			}
+			} // For each group.
+		} // If not splitting by group and have at least one group.
+		else if ( !part_control.prAsset.prSplitGeosByGroup )
+		{
+			has_visible_geometry = true;
 		}
+
+		return  has_visible_geometry;
 	}
 
 	private static void setMeshPointAttribute(

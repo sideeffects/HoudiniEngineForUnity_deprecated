@@ -105,8 +105,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	public virtual void OnDestroy()
 	{
-		if ( myBoxCollider )
-			HoudiniAssetUtility.destroyGameObject( myBoxCollider );
+		destoryChildrenWithComponent< BoxCollider >();
 	}
 
 	public void selectParent()
@@ -155,11 +154,15 @@ public class HoudiniPartControl : HoudiniGeoControl
 			return;
 		}
 
+		// Clean up first.
+		destoryChildrenWithComponent< BoxCollider >();
+
 		GameObject part_node = gameObject;
 
 		// Get Part info.
 		HAPI_PartInfo part_info = new HAPI_PartInfo();
 		HoudiniHost.getPartInfo( prAssetId, prObjectId, prGeoId, prPartId, out part_info );
+		myPartType = part_info.type;
 
 		bool is_empty = part_info.vertexCount <= 0 && part_info.pointCount <= 0;
 		bool is_mesh = ( part_info.vertexCount > 0 );
@@ -217,9 +220,10 @@ public class HoudiniPartControl : HoudiniGeoControl
 				part_mesh.Clear();
 		
 				// Get mesh.
+				bool has_visible_geometry = false;
 				try
 				{
-					HoudiniAssetUtility.getMesh(
+					has_visible_geometry = HoudiniAssetUtility.getMesh(
 						this, part_mesh,
 						prAsset.prGenerateUVs,
 						prAsset.prGenerateLightmapUV2s,
@@ -234,35 +238,63 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 				// Add collider if group name matches. (Should be added after the mesh is set so that it
 				// picks up the mesh automagically)
-				if ( part_info.name.Contains( HoudiniHost.prRenderedCollisionGroupName ) )
+				if ( prAsset.prSplitGeosByGroup )
 				{
-					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
-					getOrCreateComponent< MeshRenderer >();
-					mesh_collider.enabled = false;
-					mesh_collider.enabled = true;
+					if ( part_info.name.Contains( HoudiniHost.prRenderedCollisionGroupName ) )
+					{
+						// Create the box collider if one exists.
+						if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_BOX )
+						{
+							createBoxCollider( part_info );
+						}
+						else
+						{
+							MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
+							mesh_collider.enabled = false;
+							mesh_collider.enabled = true;
+						}
+
+						getOrCreateComponent< MeshRenderer >();
+					}
+					else if ( part_info.name.Contains( HoudiniHost.prCollisionGroupName ) )
+					{
+						// Create the box collider if one exists.
+						if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_BOX )
+						{
+							createBoxCollider( part_info );
+						}
+						else
+						{
+							MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
+							mesh_collider.enabled = false;
+							mesh_collider.enabled = true;
+						}
+					}
+					else
+					{
+						getOrCreateComponent< MeshRenderer >();
+					}
 				}
-				else if ( part_info.name.Contains( HoudiniHost.prCollisionGroupName ) )
-				{
-					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
-					mesh_collider.enabled = false;
-					mesh_collider.enabled = true;
-				}
-				else
+				else if ( !prAsset.prSplitGeosByGroup && has_visible_geometry )
 				{
 					getOrCreateComponent< MeshRenderer >();
 				}
 
-				if ( myGeoControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
+				// TODO: Intermediate mesh editing currently not supported when not splitting by group.
+				if ( prAsset.prSplitGeosByGroup )
 				{
-					MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
-					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
-					if ( myGeoControl.prGeoAttributeManager )
+					if ( myGeoControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 					{
-						myGeoControl.prGeoAttributeManager.reInit(
-							part_mesh, mesh_renderer, mesh_collider, transform );
+						MeshRenderer mesh_renderer = getOrCreateComponent< MeshRenderer >();
+						MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
+						if ( myGeoControl.prGeoAttributeManager )
+						{
+							myGeoControl.prGeoAttributeManager.reInit(
+								part_mesh, mesh_renderer, mesh_collider, transform );
+						}
+						mesh_collider.enabled = false;
+						mesh_collider.enabled = true;
 					}
-					mesh_collider.enabled = false;
-					mesh_collider.enabled = true;
 				}
 
 				// Add Mesh-to-Prefab component.
@@ -271,46 +303,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 				mesh_saver.prMeshName = prAsset.prAssetName + "_" + part_node.name;
 			}
 
-			// Create the box collider if one exists.
-			if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_BOX )
-			{
-				if ( !myBoxCollider )
-				{
-					myBoxCollider = new GameObject( part_info.name + "_box_collider_" + prGeoControl.prNodeId );
-					myBoxCollider.transform.parent = prGeoControl.gameObject.transform;
-					//myBoxCollider.isStatic = gameObject.isStatic;
-
-					// Need to reset position here because the assignment above will massage the child's
-					// position in order to be in the same place it was in the global namespace.
-					myBoxCollider.transform.localPosition = new Vector3();
-					myBoxCollider.transform.localRotation = new Quaternion();
-					myBoxCollider.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
-
-					myBoxCollider.AddComponent< BoxCollider >();
-				}
-
-				HAPI_BoxInfo box_info = HoudiniHost.getBoxInfo( prGeoControl.prNodeId, part_info.id );
-				BoxCollider box_collider = myBoxCollider.GetComponent< BoxCollider >();
-				box_collider.center = new Vector3(
-					-box_info.center[ 0 ],
-					box_info.center[ 1 ],
-					box_info.center[ 2 ] );
-				box_collider.size = new Vector3(
-					box_info.size[ 0 ] * 2,
-					box_info.size[ 1 ] * 2,
-					box_info.size[ 2 ] * 2 );
-
-				box_collider.transform.rotation = Quaternion.Euler(
-					box_info.rotation[ 2 ],
-					-box_info.rotation[ 1 ],
-					-box_info.rotation[ 0 ] );
-			}
-			else if ( myBoxCollider )
-			{
-				HoudiniAssetUtility.destroyGameObject( myBoxCollider );
-				myBoxCollider = null;
-			}
-
+			/*
 			if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_VOLUME )
 			{
 				// Clear previous volume tiles.
@@ -423,6 +416,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 				part_node.transform.localPosition = Vector3.zero;
 				part_node.transform.localRotation = Quaternion.identity;
 			}
+			*/
 		}
 
 		// Refresh enabled flags.
@@ -445,6 +439,43 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 		// Assign unity tag.
 		assignUnityTag();
+	}
+
+	public void createBoxCollider( HAPI_PartInfo part_info )
+	{
+		GameObject box_collider_obj =
+			new GameObject( part_info.name + "_box_collider_" + prGeoControl.prNodeId );
+		box_collider_obj.transform.SetParent( gameObject.transform );
+		box_collider_obj.isStatic = gameObject.isStatic;
+
+		// Need to reset position here because the assignment above will massage the child's
+		// position in order to be in the same place it was in the global namespace.
+		box_collider_obj.transform.localPosition = new Vector3();
+		box_collider_obj.transform.localRotation = new Quaternion();
+		box_collider_obj.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
+
+		box_collider_obj.AddComponent< BoxCollider >();
+
+		HAPI_BoxInfo box_info = HoudiniHost.getBoxInfo( prGeoControl.prNodeId, part_info.id );
+		BoxCollider box_collider = box_collider_obj.GetComponent< BoxCollider >();
+		box_collider.center = new Vector3(
+			-box_info.center[ 0 ],
+			box_info.center[ 1 ],
+			box_info.center[ 2 ] );
+		box_collider.size = new Vector3(
+			box_info.size[ 0 ] * 2,
+			box_info.size[ 1 ] * 2,
+			box_info.size[ 2 ] * 2 );
+
+		box_collider.transform.rotation = Quaternion.Euler(
+			box_info.rotation[ 2 ],
+			-box_info.rotation[ 1 ],
+			-box_info.rotation[ 0 ] );
+
+		box_collider.enabled = false;
+		box_collider.enabled = true;
+
+		removeComponent< MeshCollider >();
 	}
 
 	public void createVolumeTilesObject(
@@ -761,6 +792,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	[SerializeField] private int			myPartId;
 	[SerializeField] private string			myPartName;
+	[SerializeField] private HAPI_PartType	myPartType;
 	[SerializeField] private int			myMaterialId;
 	[SerializeField] private int[]			myVertexList;
 	[SerializeField] private Matrix4x4		myLastLocalToWorld;
@@ -775,8 +807,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	[SerializeField] private bool			myShowIntermediateResultControls;
 	[SerializeField] private bool			myShowInfo;
-
-	[SerializeField] private GameObject		myBoxCollider;
 
 	[SerializeField] private HoudiniGeoControl myGeoControl;
 
