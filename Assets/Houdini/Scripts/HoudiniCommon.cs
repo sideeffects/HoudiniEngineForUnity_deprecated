@@ -429,6 +429,7 @@ public enum HAPI_PartType
 	HAPI_PARTTYPE_VOLUME,
 	HAPI_PARTTYPE_INSTANCER,
 	HAPI_PARTTYPE_BOX,
+	HAPI_PARTTYPE_SPHERE,
 	HAPI_PARTTYPE_MAX
 };
 
@@ -776,6 +777,7 @@ public struct HAPI_CookOptions
 	/// Choose which special part types should be handled. Unhandled special
 	/// part types will just be refined to ::HAPI_PARTTYPE_MESH.
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool handleBoxPartTypes;
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool handleSpherePartTypes;
 }
 
 // NODES --------------------------------------------------------------------------------------------------------
@@ -1372,4 +1374,23 @@ public struct HAPI_BoxInfo
 		SizeConst = HoudiniConstants.HAPI_EULER_VECTOR_SIZE,
 		ArraySubType = UnmanagedType.R4 ) ]
 	public float[] rotation;
+}
+
+[ StructLayout( LayoutKind.Sequential ) ]
+public struct HAPI_SphereInfo
+{
+	public HAPI_SphereInfo( bool initialize_fields )
+	{
+		center = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
+		radius = 0.0f;
+	}
+
+	[ MarshalAs(
+		UnmanagedType.ByValArray,
+		SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE,
+		ArraySubType = UnmanagedType.R4 ) ]
+	public float[] center;
+
+	[ MarshalAs( UnmanagedType.R4 ) ]
+	public float radius;
 }

@@ -1180,6 +1180,13 @@ public static partial class HoudiniHost
 		HAPI_NodeId geo_node_id, HAPI_PartId part_id,
 		ref HAPI_BoxInfo box_info );
 
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetSphereInfo(
+		ref HAPI_Session session,
+		HAPI_NodeId geo_node_id, HAPI_PartId part_id,
+		ref HAPI_SphereInfo sphere_info );
+
 	// CACHING --------------------------------------------------------------------------------------------------
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]

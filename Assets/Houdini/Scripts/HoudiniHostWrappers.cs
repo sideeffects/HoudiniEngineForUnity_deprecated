@@ -1711,6 +1711,20 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_SphereInfo
+	getSphereInfo( HAPI_NodeId geo_node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_SphereInfo sphere_info = new HAPI_SphereInfo( true );
+		HAPI_Result status_code = HAPI_GetSphereInfo(
+			ref mySession, geo_node_id, part_id, ref sphere_info );
+		processStatusCode( status_code );
+		return sphere_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	// CACHING --------------------------------------------------------------------------------------------------
 
 	public static void saveGeoToFile(
