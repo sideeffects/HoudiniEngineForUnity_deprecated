@@ -48,22 +48,28 @@ public static partial class HoudiniHost
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_StartThriftSocketServer(
-		[ MarshalAs( UnmanagedType.U4 ) ] HAPI_StartServerFlagsEnum flags,
-		int port, float timeout_ms, out int process_id );
+		ref HAPI_ThriftServerOptions options,
+		int port,
+		out int process_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_CreateThriftSocketSession( out HAPI_Session session, string host_name, int port );
+	HAPI_CreateThriftSocketSession(
+		out HAPI_Session session, string host_name, int port,
+		HAPI_ThriftTransportType transport_type );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_StartThriftNamedPipeServer(
-		[ MarshalAs( UnmanagedType.U4 ) ] HAPI_StartServerFlagsEnum flags,
-		string pipe_name, float timeout_ms, out int process_id );
+		ref HAPI_ThriftServerOptions options,
+		string pipe_name,
+		out int process_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_CreateThriftNamedPipeSession( out HAPI_Session session, string pipe_name );
+	HAPI_CreateThriftNamedPipeSession(
+		out HAPI_Session session, string pipe_name,
+		HAPI_ThriftTransportType transport_type );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

@@ -553,11 +553,40 @@ public enum HAPI_SessionEnvIntType
 	HAPI_SESSIONENVINT_MAX,
 };
 
-[ Flags ]
-public enum HAPI_StartServerFlagsEnum
+public enum HAPI_ThriftServerType
 {
-	HAPI_START_SERVER_AUTO_CLOSE = 1,
-	HAPI_START_SERVER_THREADED = 2
+	/// A simple server that supports a single client connection. If a client
+	/// is connected to the server and another client tries to connect,
+	/// then the second client will block until the first connection is closed.
+	/// Search for ::apache::thrift::server::TSimpleServer
+	HAPI_THRIFT_SERVER_SIMPLE,
+
+	/// A threaded server that supports multiple concurrent client connections.
+	/// Search for ::apache::thrift::server::TThreadedServer
+	HAPI_THRIFT_SERVER_THREADED,
+
+	/// A non-blocking server that supports multiple concurrent client
+	/// connections.
+	/// Search for ::apache::thrift::server::TNonblockingServer
+	/// Requires ::HAPI_THRIFT_TRANSPORT_FRAMED when creating a session.
+	HAPI_THRIFT_SERVER_NONBLOCKING,
+
+	HAPI_THRIFT_SERVER_MAX
+};
+
+public enum HAPI_ThriftTransportType
+{
+	/// Buffers the underlying socket or pipe I/O for performance.
+	/// Search for ::apache::thrift::transport::TBufferedTransport
+	HAPI_THRIFT_TRANSPORT_BUFFERED,
+
+	/// Frames every RPC message so that multiple messages don't intermingle
+	/// on the wire. Required for connecting to non-blocking servers (see
+	/// ::HAPI_THRIFT_SERVER_NONBLOCKING).
+	/// Search for ::apache::thrift::transport::TFramedTransport
+	HAPI_THRIFT_TRANSPORT_FRAMED,
+
+	HAPI_THRIFT_TRANSPORT_MAX
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -652,13 +681,32 @@ public struct HAPI_TransformEuler
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_Session
 {
-    /// The type of session detemines the which implementation will be
-    /// used to communicate with the Houdini Engine library.
-    public HAPI_SessionType type;
+	/// The type of session detemines the which implementation will be
+	/// used to communicate with the Houdini Engine library.
+	public HAPI_SessionType type;
 
-    /// Some session types support multiple simultanous sessions. This means
-    /// that each session needs to have a unique identified.
-    public HAPI_SessionId id;
+	/// Some session types support multiple simultanous sessions. This means
+	/// that each session needs to have a unique identified.
+	public HAPI_SessionId id;
+};
+
+/// Options to configure a Thrift server being started from HARC.
+public struct HAPI_ThriftServerOptions
+{
+	/// Close the server automatically when all clients disconnect from it.
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool autoClose;
+
+	/// The type of the server.
+	public HAPI_ThriftServerType serverType;
+
+	/// The type of the transport.
+	public HAPI_ThriftTransportType transportType;
+
+	/// Timeout in milliseconds for waiting on the server to
+	/// signal that it's ready to serve. If the server fails
+	/// to signal within this time interval, the start server call fails
+	/// and the server process is terminated.
+	[ MarshalAs( UnmanagedType.R4 ) ] public float timeoutMs;
 };
 
 // TIME ---------------------------------------------------------------------------------------------------------

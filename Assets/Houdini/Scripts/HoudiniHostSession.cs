@@ -85,9 +85,15 @@ public static partial class HoudiniHost
 				"    Pipe Name: " + pipe_name );
 #endif // UNITY_EDITOR
 			int process_id = 0;
+			HAPI_ThriftServerOptions server_options = new HAPI_ThriftServerOptions();
+			server_options.autoClose = true;
+			server_options.serverType = HAPI_ThriftServerType.HAPI_THRIFT_SERVER_SIMPLE;
+			server_options.timeoutMs = 2000.0f;
+			server_options.transportType = HAPI_ThriftTransportType.HAPI_THRIFT_TRANSPORT_BUFFERED;
 			HAPI_Result result = HAPI_StartThriftNamedPipeServer(
-				HAPI_StartServerFlagsEnum.HAPI_START_SERVER_AUTO_CLOSE,
-				pipe_name, 2000.0f, out process_id );
+				ref server_options,
+				pipe_name,
+				out process_id );
 			if ( result != HAPI_Result.HAPI_RESULT_SUCCESS )
 			{
 				prLastInitializationError =
@@ -115,7 +121,8 @@ public static partial class HoudiniHost
 	private static bool getSession( out HAPI_Session session, string pipe_name )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_CreateThriftNamedPipeSession( out session, prPipeName );
+		HAPI_Result status_code = HAPI_CreateThriftNamedPipeSession(
+			out session, prPipeName, HAPI_ThriftTransportType.HAPI_THRIFT_TRANSPORT_BUFFERED );
 		if ( status_code != HAPI_Result.HAPI_RESULT_SUCCESS )
 		{
 			prLastInitializationError =
