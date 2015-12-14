@@ -156,6 +156,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 		// Clean up first.
 		destoryChildrenWithComponent< BoxCollider >();
+		destoryChildrenWithComponent< SphereCollider >();
 
 		GameObject part_node = gameObject;
 
@@ -247,6 +248,10 @@ public class HoudiniPartControl : HoudiniGeoControl
 						{
 							createBoxCollider( part_info );
 						}
+						else if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_SPHERE )
+						{
+							createSphereCollider( part_info );
+						}
 						else
 						{
 							MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
@@ -262,6 +267,10 @@ public class HoudiniPartControl : HoudiniGeoControl
 						if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_BOX )
 						{
 							createBoxCollider( part_info );
+						}
+						else if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_SPHERE )
+						{
+							createSphereCollider( part_info );
 						}
 						else
 						{
@@ -469,6 +478,35 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 		box_collider.enabled = false;
 		box_collider.enabled = true;
+
+		removeComponent< MeshCollider >();
+	}
+
+	public void createSphereCollider( HAPI_PartInfo part_info )
+	{
+		GameObject sphere_collider_obj =
+			new GameObject( part_info.name + "_sphere_collider_" + prGeoControl.prNodeId );
+		sphere_collider_obj.transform.SetParent( gameObject.transform );
+		sphere_collider_obj.isStatic = gameObject.isStatic;
+
+		// Need to reset position here because the assignment above will massage the child's
+		// position in order to be in the same place it was in the global namespace.
+		sphere_collider_obj.transform.localPosition = new Vector3();
+		sphere_collider_obj.transform.localRotation = new Quaternion();
+		sphere_collider_obj.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
+
+		sphere_collider_obj.AddComponent< SphereCollider >();
+
+		HAPI_SphereInfo sphere_info = HoudiniHost.getSphereInfo( prGeoControl.prNodeId, part_info.id );
+		SphereCollider sphere_collider = sphere_collider_obj.GetComponent< SphereCollider >();
+		sphere_collider.center = new Vector3(
+			-sphere_info.center[ 0 ],
+			sphere_info.center[ 1 ],
+			sphere_info.center[ 2 ] );
+		sphere_collider.radius = sphere_info.radius;
+
+		sphere_collider.enabled = false;
+		sphere_collider.enabled = true;
 
 		removeComponent< MeshCollider >();
 	}

@@ -1677,7 +1677,8 @@ public class HoudiniAssetUtility
 
 						box_collider_obj.AddComponent< BoxCollider >();
 
-						HAPI_BoxInfo box_info = HoudiniHost.getBoxInfo( part_control.prGeoControl.prNodeId, part_info.id );
+						HAPI_BoxInfo box_info =
+							HoudiniHost.getBoxInfo( part_control.prGeoControl.prNodeId, part_info.id );
 						BoxCollider box_collider = box_collider_obj.GetComponent< BoxCollider >();
 						box_collider.center = new Vector3(
 							-box_info.center[ 0 ],
@@ -1695,6 +1696,34 @@ public class HoudiniAssetUtility
 
 						box_collider.enabled = false;
 						box_collider.enabled = true;
+					}
+					if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_SPHERE
+						&& membership_count == part_info.faceCount )
+					{
+						GameObject sphere_collider_obj =
+							new GameObject( part_info.name + "_sphere_collider_" + part_control.prGeoControl.prNodeId );
+						sphere_collider_obj.transform.SetParent( part_control.gameObject.transform );
+						sphere_collider_obj.isStatic = part_control.gameObject.isStatic;
+
+						// Need to reset position here because the assignment above will massage the child's
+						// position in order to be in the same place it was in the global namespace.
+						sphere_collider_obj.transform.localPosition = new Vector3();
+						sphere_collider_obj.transform.localRotation = new Quaternion();
+						sphere_collider_obj.transform.localScale = new Vector3( 1.0f, 1.0f, 1.0f );
+
+						sphere_collider_obj.AddComponent< BoxCollider >();
+
+						HAPI_SphereInfo sphere_info =
+							HoudiniHost.getSphereInfo( part_control.prGeoControl.prNodeId, part_info.id );
+						SphereCollider sphere_collider = sphere_collider_obj.GetComponent< SphereCollider >();
+						sphere_collider.center = new Vector3(
+							-sphere_info.center[ 0 ],
+							sphere_info.center[ 1 ],
+							sphere_info.center[ 2 ] );
+						sphere_collider.radius = sphere_info.radius;
+
+						sphere_collider.enabled = false;
+						sphere_collider.enabled = true;
 					}
 					else // HAPI_PARTTYPE_MESH
 					{

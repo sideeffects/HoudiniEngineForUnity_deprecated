@@ -875,6 +875,7 @@ public static partial class HoudiniHost
 		cook_options.packedPrimInstancingMode =
 			HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
 		cook_options.handleBoxPartTypes = true;
+		cook_options.handleSpherePartTypes = true;
 		return cook_options;
 	}
 	public static HAPI_CookOptions getCookOptions()
