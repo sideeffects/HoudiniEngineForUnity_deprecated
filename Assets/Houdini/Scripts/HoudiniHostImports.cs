@@ -715,6 +715,7 @@ public static partial class HoudiniHost
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		string name,
 		ref HAPI_AttributeInfo attr_info,
+		int stride,
 		[Out] int[] data,
 		int start, int length );
 		
@@ -725,6 +726,7 @@ public static partial class HoudiniHost
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		string name,
 		ref HAPI_AttributeInfo attr_info,
+		int stride,
 		[Out] float[] data_array,
 		int start, int length );
 		

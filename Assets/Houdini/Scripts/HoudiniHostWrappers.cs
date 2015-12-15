@@ -988,8 +988,8 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetAttributeIntData(
-			ref mySession, asset_id, object_id, geo_id, part_id, name, 
-			ref attr_info, data, start, length );
+			ref mySession, asset_id, object_id, geo_id, part_id, name,
+			ref attr_info, -1, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1004,7 +1004,8 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetAttributeFloatData(
-			ref mySession, asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
+			ref mySession, asset_id, object_id, geo_id, part_id, name,
+			ref attr_info, -1, data, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
