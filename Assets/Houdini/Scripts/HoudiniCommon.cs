@@ -1183,20 +1183,21 @@ public struct HAPI_PartInfo
 	public int instanceCount;
 
 	// Accessors
+	public void init() { if ( attributeCounts == null ) attributeCounts  = new int[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX ]; }
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
 	public int pointAttributeCount
-	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT ]; }
-		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT ] = value; } }
+	{	get { init(); return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT ]; }
+		set { init(); attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_POINT ] = value; } }
 	public int primitiveAttributeCount
-	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM ]; }
-		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM ] = value; } }
+	{	get { init(); return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM ]; }
+		set { init(); attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM ] = value; } }
 	public int vertexAttributeCount
-	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX ]; }
-		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX ] = value; } }
+	{	get { init(); return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX ]; }
+		set { init(); attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX ] = value; } }
 	public int detailAttributeCount
-	{	get { return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL ]; }
-		set { attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL ] = value; } }
+	{	get { init(); return attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL ]; }
+		set { init(); attributeCounts[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL ] = value; } }
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]
