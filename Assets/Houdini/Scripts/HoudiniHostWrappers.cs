@@ -383,6 +383,11 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void cookAsset( HAPI_AssetId asset_id )
+	{
+		cookAsset( asset_id, prSplitGeosByGroup, prImportTemplatedGeos );
+	}
+
 	public static void cookAsset( HAPI_AssetId asset_id, bool split_geos_by_group, bool import_templated_geos )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
