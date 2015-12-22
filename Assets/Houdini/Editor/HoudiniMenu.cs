@@ -173,13 +173,18 @@ public class HoudiniMenu : MonoBehaviour
 		
 		asset.prAssetSubType = HAPI_AssetSubType.HAPI_ASSETSUBTYPE_DEFAULT;
 		
-		// Do first build.
-		bool build_result = asset.buildAll();
+		// Do a test build to see if things are ok.
+		bool build_result = asset.buildClientSide();
 		if ( !build_result ) // Something is not right. Clean up and die.
 		{
 			DestroyImmediate( game_object );
 			return;
 		}
+
+		// Select the new houdini asset.
+		GameObject[] selection = new GameObject[ 1 ];
+		selection[ 0 ] = game_object;
+		Selection.objects = selection;
 	}
 
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateMergerAsset, true, 101 ) ]
