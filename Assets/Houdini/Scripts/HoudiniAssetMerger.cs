@@ -12,9 +12,13 @@ public class HoudiniAssetMerger : HoudiniAsset
 	public bool prShowInputSelection {
 		get { return myShowInputSelection; }
 		set { myShowInputSelection = value; } }
-
+	
 	public GameObject prInputObject { get { return myInputObject; } set { myInputObject = value; } }
+
+	public bool prUseLayerMask { get { return myUseLayerMask; } set { myUseLayerMask = value; } }
 	public LayerMask prLayerMask { get { return myLayerMask; } set { myLayerMask = value; } }
+
+	public bool prUseTag { get { return myUseTag; } set { myUseTag = value; } }
 	public string prTag { get { return myTag; } set { myTag = value; } }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,6 +40,10 @@ public class HoudiniAssetMerger : HoudiniAsset
 		base.reset();
 		
 		myShowInputSelection = true;
+
+		myUseLayerMask = false;
+
+		myUseTag = false;
 		myTag = "";
 
 		myInputs = new List< GameObject >();
@@ -73,7 +81,7 @@ public class HoudiniAssetMerger : HoudiniAsset
 		}
 
 		// Add by layer.
-		if ( myLayerMask > 0 )
+		if ( prUseLayerMask && myLayerMask > 0 )
 		{
 			if ( myInputs.Count == 0 )
 			{
@@ -89,7 +97,7 @@ public class HoudiniAssetMerger : HoudiniAsset
 		}
 
 		// Add by tag.
-		if ( myTag != "" && myTag != "Untagged" )
+		if ( prUseTag && myTag != "" && myTag != "Untagged" )
 		{
 			if ( myInputs.Count == 0 )
 			{
@@ -172,7 +180,11 @@ public class HoudiniAssetMerger : HoudiniAsset
 	[SerializeField] private bool myShowInputSelection;
 
 	[SerializeField] private GameObject myInputObject;
+
+	[SerializeField] private bool myUseLayerMask;
 	[SerializeField] private LayerMask myLayerMask;
+
+	[SerializeField] private bool myUseTag;
 	[SerializeField] private string myTag;
 
 	[SerializeField] private List< GameObject > myInputs;
