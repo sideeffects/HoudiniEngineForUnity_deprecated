@@ -156,7 +156,43 @@ public class HoudiniMenu : MonoBehaviour
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
-	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, false, 101 ) ]
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateMergerAsset, false, 101 ) ]
+	static private void createMergerAsset()
+	{
+		if ( !HoudiniHost.isInstallationOk() )
+		{
+			HoudiniHost.displayHoudiniEngineInstallInfo();
+			return;
+		}
+
+		// Create game object.
+		GameObject game_object = new GameObject( "HoudiniMergerAsset" );
+
+		// Add HAPI Object Control script component.
+		HoudiniAssetMerger asset = game_object.AddComponent< HoudiniAssetMerger >();
+		
+		asset.prAssetSubType = HAPI_AssetSubType.HAPI_ASSETSUBTYPE_DEFAULT;
+		
+		// Do first build.
+		bool build_result = asset.buildAll();
+		if ( !build_result ) // Something is not right. Clean up and die.
+		{
+			DestroyImmediate( game_object );
+			return;
+		}
+	}
+
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateMergerAsset, true, 101 ) ]
+	static private bool validateCreateMergerAsset()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		return true;
+#else
+		return false;
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+	}
+
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, false, 102 ) ]
 	static private void createCurve()
 	{
 		if ( !HoudiniHost.isInstallationOk() )
@@ -191,7 +227,7 @@ public class HoudiniMenu : MonoBehaviour
 		Selection.objects 		= selection;
 	}
 
-	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, true, 101 ) ]
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myCreateCurveLabel, true, 102 ) ]
 	static private bool validateCreateCurve()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )

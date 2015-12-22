@@ -570,7 +570,11 @@ public abstract class HoudiniAsset : HoudiniControl
 			prUpStreamGeoInputAssetIds[ index ] = -1;
 			myUpStreamGeoInputAssetValidationIds[ index ] = -1;
 		}
-		catch ( HoudiniError error )
+		catch ( HoudiniError )
+		{
+			// Do nothing. It's usally that we we already disconnected.
+		}
+		catch ( Exception error )
 		{
 			Debug.LogError( error.ToString() );
 		}

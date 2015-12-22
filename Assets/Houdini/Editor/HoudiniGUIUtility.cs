@@ -120,6 +120,7 @@ public class HoudiniGUIUtility : Editor
 	public const string myLaunchOrboltPage			= "Get Assets";
 	public const string myRevertAllSettingsLabel	= "Revert All Settings";
 	public const string myConvertToInputAssetLabel	= "Convert to Input Asset";
+	public const string myCreateMergerAsset			= "Create Merger Asset";
 	public const string myCreateCurveLabel			= "Create Curve";
 	public const string myDefaultPrefabLabel 		= "Houdini Asset";
 	public const string myDebugLabel				= "Debug";
