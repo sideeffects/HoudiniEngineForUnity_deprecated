@@ -910,6 +910,102 @@ public class HoudiniGUI : Editor
 		
 		return changed;
 	}
+
+	public static bool layerField(
+		string name, string label, ref LayerMask layer )
+	{
+		HoudiniGUIParm gui_parm = new HoudiniGUIParm( name, label );
+		return layerField( ref gui_parm, ref layer );
+	}
+	public static bool layerField(
+		ref HoudiniGUIParm parm, ref LayerMask layer )
+	{
+		bool join_last = false; bool no_label_toggle_last = false;
+		return layerField( ref parm, ref layer, ref join_last, ref no_label_toggle_last );
+	}
+	public static bool layerField(
+		ref HoudiniGUIParm parm, ref LayerMask layer,
+		ref bool join_last, ref bool no_label_toggle_last )
+	{
+		initializeConstants();
+		disableGUI( parm.disabled );
+		
+		bool changed = false;
+		int parm_size = parm.size;
+		
+		// Decide whether to join with the previous parameter on the same line or not.
+		if ( !join_last )
+			EditorGUILayout.BeginHorizontal();
+		
+		label( ref parm, ref join_last, ref no_label_toggle_last );
+		
+		LayerMask old_layer = layer;
+		LayerMask new_layer = EditorGUILayout.LayerField( old_layer );
+		
+		if ( new_layer != old_layer )
+		{
+			layer = new_layer;
+			changed |= true;
+		}
+		
+		// Decide whether to join with the next parameter on the same line or not
+		// but also save our status for the next parameter.
+		join_last = ( parm.joinNext && parm_size <= 1 );
+		if ( !parm.joinNext || parm_size > 1 )
+			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
+		
+		return changed;
+	}
+
+	public static bool tagField(
+		string name, string label, ref string tag )
+	{
+		HoudiniGUIParm gui_parm = new HoudiniGUIParm( name, label );
+		return tagField( ref gui_parm, ref tag );
+	}
+	public static bool tagField(
+		ref HoudiniGUIParm parm, ref string tag )
+	{
+		bool join_last = false; bool no_label_toggle_last = false;
+		return tagField( ref parm, ref tag, ref join_last, ref no_label_toggle_last );
+	}
+	public static bool tagField(
+		ref HoudiniGUIParm parm, ref string tag,
+		ref bool join_last, ref bool no_label_toggle_last )
+	{
+		initializeConstants();
+		disableGUI( parm.disabled );
+		
+		bool changed = false;
+		int parm_size = parm.size;
+		
+		// Decide whether to join with the previous parameter on the same line or not.
+		if ( !join_last )
+			EditorGUILayout.BeginHorizontal();
+		
+		label( ref parm, ref join_last, ref no_label_toggle_last );
+		
+		string old_tag = tag;
+		string new_tag = EditorGUILayout.TagField( old_tag );
+		
+		if ( new_tag != old_tag )
+		{
+			tag = new_tag;
+			changed |= true;
+		}
+		
+		// Decide whether to join with the next parameter on the same line or not
+		// but also save our status for the next parameter.
+		join_last = ( parm.joinNext && parm_size <= 1 );
+		if ( !parm.joinNext || parm_size > 1 )
+			EditorGUILayout.EndHorizontal();
+
+		restoreGUIEnable();
+		
+		return changed;
+	}
 	
 	public static bool fileOpenField(
 		string name, string label,
@@ -1087,7 +1183,19 @@ public class HoudiniGUI : Editor
 	{
 		return toggle( name, label, false, ref value, undo_info, ref undo_value );
 	}
-	
+	public static bool toggle(
+		ref HoudiniGUIParm parm, ref bool value )
+	{
+		int[] values = new int[ 1 ];
+		values[ 0 ] = ( value ? 1 : 0 );
+		int[] undo_values = new int[ 1 ];
+		undo_values[ 0 ] = values[ 0 ];
+
+		bool result = toggle( ref parm, ref values, null, ref undo_values );
+
+		value = ( values[ 0 ] == 1 ?  true : false );
+		return result;
+	}
 	public static bool toggle(
 		string name, string label, bool is_bold, ref bool value,
 		Object undo_info, ref bool undo_value )
@@ -1098,7 +1206,9 @@ public class HoudiniGUI : Editor
 		values[ 0 ] = ( value ? 1 : 0 );
 		int[] undo_values = new int[ 1 ];
 		undo_values[ 0 ] = ( undo_value ? 1 : 0 );
+
 		bool result = toggle( ref gui_parm, ref values, undo_info, ref undo_values );
+
 		value = ( values[ 0 ] == 1 ?  true : false );
 		undo_value = ( undo_values[ 0 ] == 1 ? true : false );
 		return result;
