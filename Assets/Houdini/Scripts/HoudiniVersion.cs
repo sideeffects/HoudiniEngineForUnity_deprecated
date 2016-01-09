@@ -28,13 +28,13 @@ public struct HoudiniVersion
 {
 	public const int HOUDINI_MAJOR			= 15;
 	public const int HOUDINI_MINOR			= 5;
-	public const int HOUDINI_BUILD			= 103;
+	public const int HOUDINI_BUILD			= 121;
 	public const int HOUDINI_PATCH			= 0;
 
 	public const int HOUDINI_ENGINE_MAJOR	= 2;
 	public const int HOUDINI_ENGINE_MINOR	= 1;
 	
-	public const int HOUDINI_ENGINE_API		= 12;
+	public const int HOUDINI_ENGINE_API		= 13;
 	
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 
@@ -47,11 +47,11 @@ public struct HoudiniVersion
 
 #elif UNITY_STANDALONE_OSX
 
-	public const string HAPI_SERVER			= "/Library/Frameworks/Houdini.framework/Versions/15.5.103/Resources/bin/" + "HARS";
+	public const string HAPI_SERVER			= "/Library/Frameworks/Houdini.framework/Versions/15.5.121/Resources/bin/" + "HARS";
 	#if UNITY_EDITOR_64
-		public const string HAPI_LIBRARY	= "/Library/Frameworks/Houdini.framework/Versions/15.5.103/Libraries/" + "libHARC.dylib";
+		public const string HAPI_LIBRARY	= "/Library/Frameworks/Houdini.framework/Versions/15.5.121/Libraries/" + "libHARC.dylib";
 	#else
-		public const string HAPI_LIBRARY	= "/Library/Frameworks/Houdini.framework/Versions/15.5.103/Libraries/" + "libHARC32.dylib";
+		public const string HAPI_LIBRARY	= "/Library/Frameworks/Houdini.framework/Versions/15.5.121/Libraries/" + "libHARC32.dylib";
 	#endif // UNITY_EDITOR_64
 
 #else
