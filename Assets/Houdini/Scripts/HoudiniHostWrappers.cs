@@ -438,7 +438,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_StringHandle name_sh = 0;
-		HAPI_Result status_code = HAPI_GetInputName( ref mySession, asset_id, input_idx, (int) input_type, out name_sh );
+		HAPI_Result status_code = HAPI_GetInputName( ref mySession, asset_id, input_idx, input_type, out name_sh );
 		processStatusCode( status_code );
 		string name = getString( name_sh );
 		return name;

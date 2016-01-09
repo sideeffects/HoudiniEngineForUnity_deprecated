@@ -342,7 +342,8 @@ public static partial class HoudiniHost
 	HAPI_GetInputName(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id,
-		int input_idx, int input_type,
+		int input_idx,
+		HAPI_InputType input_type,
 		out HAPI_StringHandle name );
 
 	// HIP FILES ------------------------------------------------------------------------------------------------
