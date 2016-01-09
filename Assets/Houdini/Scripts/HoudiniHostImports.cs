@@ -757,6 +757,7 @@ public static partial class HoudiniHost
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		HAPI_GroupType group_type,
 		string group_name,
+		[ MarshalAs( UnmanagedType.U1 ) ] ref bool membership_array_all_equal,
 		[Out] int[] membership_array,
 		int start, int length );
 

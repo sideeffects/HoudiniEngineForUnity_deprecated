@@ -1074,8 +1074,12 @@ public static partial class HoudiniHost
 
 		if ( count > 0 )
 		{
+			bool membership_array_all_equal = false;
 			status_code = HAPI_GetGroupMembership(
-				ref mySession, asset_id, object_id, geo_id, part_id, group_type, group_name, membership, 0, count );
+				ref mySession, asset_id, object_id, geo_id, part_id,
+				group_type, group_name, 
+				ref membership_array_all_equal,
+				membership, 0, count );
 			processStatusCode( status_code );
 		}
 
