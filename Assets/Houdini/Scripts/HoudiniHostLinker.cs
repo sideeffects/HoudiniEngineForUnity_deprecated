@@ -134,7 +134,7 @@ public static partial class HoudiniHost
 					processStatusCode( status_code );
 
 				// Set client name.
-				setServerEnvString( "HAPI_CLIENT_NAME", "unity" );
+				setServerEnvString( HoudiniConstants.HAPI_ENV_CLIENT_NAME, "unity" );
 			}
 			catch ( HoudiniError error )
 			{

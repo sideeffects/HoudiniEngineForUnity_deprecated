@@ -98,6 +98,7 @@ public struct HoudiniConstants
 	public const string HAPI_ATTRIB_NORMAL				= "N";
 	public const string HAPI_ATTRIB_TANGENT				= "tangentu";
 	public const string HAPI_ATTRIB_COLOR				= "Cd";
+	public const string HAPI_ATTRIB_NAME				= "name";
 
 	public const string HAPI_UNGROUPED_GROUP_NAME		= "__ungrouped_group";
 
@@ -120,6 +121,11 @@ public struct HoudiniConstants
 
 	/// Name of subnet OBJ node containing the global nodes.
 	public const string HAPI_GLOBAL_NODES_NODE_NAME		= "GlobalNodes";
+
+	/// Environment variables.
+	public const string HAPI_ENV_HIP					= "HIP";
+	public const string HAPI_ENV_JOB					= "JOB";
+	public const string HAPI_ENV_CLIENT_NAME			= "HAPI_CLIENT_NAME";
 
 	public const string HAPI_UNSUPPORTED_PLATFORM_MSG   =
 		"Houdini Plugin for Unity currently only supports the Standalone Windows and Mac OSX platforms in Editor.\n" +
