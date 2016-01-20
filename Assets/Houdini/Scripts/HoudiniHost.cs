@@ -780,6 +780,19 @@ public static partial class HoudiniHost
 		cookAsset( asset_id, split_geos_by_group, import_templated_geos );
 		progress_bar.statusCheckLoop();
 
+		// Check for undefined asset definitions.
+#if UNITY_EDITOR
+		HAPI_AssetInfo asset_info = getAssetInfo( asset_id );
+		int has_undef_assets = checkForSpecificErrors(
+			asset_info.nodeId, (int) HAPI_ErrorCode.HAPI_ERRORCODE_ASSET_DEF_NOT_FOUND );
+		if ( has_undef_assets > 0 )
+			EditorUtility.DisplayDialog(
+				"Asset Contains Missing Sub-asset Definitions",
+				"There are undefined nodes. This is due to not being able to find specific " +
+				"asset definitions. Go to Asset Cook Log in the Inspector to see which " +
+				"asset definitions are missing.", "Ok" );
+#endif // UNITY_EDITOR
+
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();

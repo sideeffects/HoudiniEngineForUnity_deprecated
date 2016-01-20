@@ -1003,9 +1003,9 @@ public abstract class HoudiniAsset : HoudiniControl
 		if ( isPrefabInstance() )
 			processParentPrefab();
 
-		HoudiniProgressBar progress_bar	= new HoudiniProgressBar();
-		progress_bar.prUseDelay			= use_delay_for_progress_bar;
-		progress_bar.prAsset			= this;
+		HoudiniProgressBar progress_bar = new HoudiniProgressBar();
+		progress_bar.prUseDelay = use_delay_for_progress_bar;
+		progress_bar.prAsset = this;
 
 		try
 		{
