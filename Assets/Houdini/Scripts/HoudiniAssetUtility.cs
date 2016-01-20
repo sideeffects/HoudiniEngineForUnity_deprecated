@@ -1988,7 +1988,7 @@ public class HoudiniAssetUtility
 
 	public static void attachScript( GameObject obj, string attach_script )
 	{
-		JSONObject json_object = new JSONObject( attach_script );
+		Houdini.JSONObject json_object = new Houdini.JSONObject( attach_script );
 		Dictionary< string, string > dictionary = json_object.ToDictionary();
 		
 		if ( !dictionary.ContainsKey( "script" ) )
