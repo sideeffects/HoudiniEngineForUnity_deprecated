@@ -1126,7 +1126,8 @@ public class HoudiniGeoAttributeManagerGUI
 		GUI.color				= control_color;
 
 		// Draw rate field.
-		EditorGUIUtility.LookLikeControls( rate_text_width, field_width );
+		EditorGUIUtility.labelWidth = rate_text_width;
+		EditorGUIUtility.fieldWidth = field_width;
 		GUI.SetNextControlName( myPaintValuesFieldName + "RATE" );
 		HoudiniHost.prPaintBrushRate = EditorGUI.FloatField( rate_field_rect, rate_text, HoudiniHost.prPaintBrushRate );
 
