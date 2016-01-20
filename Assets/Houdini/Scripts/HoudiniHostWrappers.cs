@@ -24,6 +24,7 @@ using System.Text;
 
 // Typedefs (copy these from HAPI_Common.cs)
 using HAPI_StringHandle = System.Int32;
+using HAPI_ErrorCodeBits = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
@@ -135,6 +136,21 @@ public static partial class HoudiniHost
 		string string_value = string_builder.ToString();
 			
 		return string_value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_ErrorCodeBits checkForSpecificErrors(
+		HAPI_NodeId node_id, HAPI_ErrorCodeBits errors_to_look_for )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_ErrorCodeBits errors_found;
+		HAPI_Result status_code = HAPI_CheckForSpecificErrors(
+			ref mySession, node_id, errors_to_look_for, out errors_found );
+		processStatusCode( status_code );
+
+		return errors_found;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif

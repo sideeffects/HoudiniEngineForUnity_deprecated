@@ -204,6 +204,13 @@ public enum HAPI_Result
 	HAPI_RESULT_INVALID_SESSION						= 400
 };
 
+[ Flags ]
+public enum HAPI_ErrorCode
+{
+	HAPI_ERRORCODE_ASSET_DEF_NOT_FOUND				= 1 << 0,
+	HAPI_ERRORCODE_PYTHON_NODE_ERROR				= 1 << 1
+};
+
 public enum HAPI_SessionType
 {
 	HAPI_SESSION_INPROCESS,

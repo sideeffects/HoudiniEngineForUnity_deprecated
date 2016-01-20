@@ -23,6 +23,7 @@ using System.Text;
 
 // Typedefs (copy these from HAPI_Common.cs)
 using HAPI_StringHandle = System.Int32;
+using HAPI_ErrorCodeBits = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
@@ -170,6 +171,14 @@ public static partial class HoudiniHost
 		ref HAPI_Session session,
 		StringBuilder string_value,
 		int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_CheckForSpecificErrors(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		HAPI_ErrorCodeBits errors_to_look_for,
+		out HAPI_ErrorCodeBits errors_found );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
