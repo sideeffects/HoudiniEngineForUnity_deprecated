@@ -32,9 +32,7 @@ For support and reporting bugs:
 Currently, the supported Unity versions are:
 
 * 4.6
-* 5.1
-
-The plug-in works with the 64-bit/32-bit Windows Unity Editor, but only the 64-bit Max OS X Unity 5+ Editor.
+* 5.3
 
 ## Installing from Source
 1. Fork this repository to your own Github account using the Fork button at the top.
