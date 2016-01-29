@@ -77,69 +77,68 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 					Debug.LogError( "No parm int/float values yet handles exist?" );
 					continue;
 				}
-					
-				if ( myTranslateParmId == -1 ||
-					 myRotateParmId == -1 ||
-					 myScaleParmId == -1 ||
-					 myRstOrderParmId == -1 ||
-					 myXyzOrderParmId == -1 )
+
+				int translate_parm_id = -1;
+				int rotate_parm_id = -1;
+				int scale_parm_id = -1;
+				int rst_order_parm_id = -1;
+				int xyz_order_parm_id = -1;
+
+				foreach ( HAPI_HandleBindingInfo bindingInfo in bindingInfos )
 				{
-					foreach ( HAPI_HandleBindingInfo bindingInfo in bindingInfos )
-					{
-						string parm_name = bindingInfo.handleParmName;
-						if ( parm_name == "tx" )
-							myTranslateParmId = bindingInfo.assetParmId;
+					string parm_name = bindingInfo.handleParmName;
+					if ( parm_name == "tx" )
+						translate_parm_id = bindingInfo.assetParmId;
 							
-						else if ( parm_name == "rx" )
-							myRotateParmId = bindingInfo.assetParmId;
+					else if ( parm_name == "rx" )
+						rotate_parm_id = bindingInfo.assetParmId;
 							
-						else if ( parm_name == "sx" )
-							myScaleParmId = bindingInfo.assetParmId;
+					else if ( parm_name == "sx" )
+						scale_parm_id = bindingInfo.assetParmId;
 						
-						else if ( parm_name == "trs_order" )
-							myRstOrderParmId = bindingInfo.assetParmId;
+					else if ( parm_name == "trs_order" )
+						rst_order_parm_id = bindingInfo.assetParmId;
 						
-						else if ( parm_name == "xyz_order" )
-							myXyzOrderParmId = bindingInfo.assetParmId;
-					}
+					else if ( parm_name == "xyz_order" )
+						xyz_order_parm_id = bindingInfo.assetParmId;
 				}
 				
-				if ( myTranslateParmId >= 0 )
+				if ( translate_parm_id >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myTranslateParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( translate_parm_id );
 					
 					tx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					ty = parm_float_values[ parm_info.floatValuesIndex + 1 ];
 					tz = parm_float_values[ parm_info.floatValuesIndex + 2 ];
 				}
 				
-				if ( myRotateParmId >= 0 )
+				if ( rotate_parm_id >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myRotateParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( rotate_parm_id );
 					
 					rx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					ry = parm_float_values[ parm_info.floatValuesIndex + 1 ];
 					rz = parm_float_values[ parm_info.floatValuesIndex + 2 ];
 				}
 				
-				if ( myScaleParmId >= 0 )
+				if ( scale_parm_id >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myScaleParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( scale_parm_id );
 					
 					sx = parm_float_values[ parm_info.floatValuesIndex + 0 ];
 					sy = parm_float_values[ parm_info.floatValuesIndex + 1 ];
 					sz = parm_float_values[ parm_info.floatValuesIndex + 2 ];
 				}
 				
-				if ( myRstOrderParmId >= 0 )
+				if ( rst_order_parm_id >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myRstOrderParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( rst_order_parm_id );
 					rstOrder = (HAPI_RSTOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}
 				
-				if ( myXyzOrderParmId >= 0 )
+				if ( xyz_order_parm_id >= 0 )
 				{
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myXyzOrderParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( xyz_order_parm_id );
 					xyzOrder = (HAPI_XYZOrder) parm_int_values[ parm_info.intValuesIndex ];
 				}				
 				
@@ -211,10 +210,10 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				
 				if ( myManipMode == XformManipMode.Translate )
 				{
-					if ( myTranslateParmId < 0 )
+					if ( translate_parm_id < 0 )
 						continue;
 
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myTranslateParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( translate_parm_id );
 
 					if ( parm_info.invisible )
 						continue;
@@ -278,10 +277,10 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				}
 				else if ( myManipMode == XformManipMode.Rotate )
 				{
-					if ( myRotateParmId < 0 )
+					if ( rotate_parm_id < 0 )
 						continue;
 
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myRotateParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( rotate_parm_id );
 
 					if ( parm_info.invisible )
 						continue;
@@ -347,10 +346,10 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 				}
 				else if ( myManipMode == XformManipMode.Scale )
 				{
-					if ( myScaleParmId < 0 )
+					if ( scale_parm_id < 0 )
 						continue;
 
-					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( myScaleParmId );
+					HAPI_ParmInfo parm_info = myAssetOTL.prParms.findParm( scale_parm_id );
 
 					if ( parm_info.invisible )
 						continue;
@@ -391,8 +390,9 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 						float[] temp_float_values = new float[ HoudiniConstants.HAPI_POSITION_VECTOR_SIZE ];
 						for ( int pp = 0; pp < HoudiniConstants.HAPI_POSITION_VECTOR_SIZE; ++pp )
 							temp_float_values[ pp ] = parm_float_values[ parm_info.floatValuesIndex + pp ];
-						HoudiniHost.setParmFloatValues( node_id, temp_float_values, parm_info.floatValuesIndex, 
-													  parm_info.size );
+						HoudiniHost.setParmFloatValues(
+							node_id, temp_float_values, parm_info.floatValuesIndex,
+							parm_info.size );
 
 						myAsset.savePreset();
 					} // if changed
@@ -406,7 +406,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
-	
+
 	private void drawPinnedInstances()
 	{
 		HoudiniInstancer instancer = myAsset.gameObject.GetComponentInChildren< HoudiniInstancer >();
@@ -415,21 +415,15 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		
 		instancer.drawAllPins();
 	}
-	
+
 	private enum XformManipMode 
 	{
 		Translate = 0,
 		Rotate,
 		Scale
 	}
-	
-	private XformManipMode myManipMode 	= XformManipMode.Translate;
 
-	private bool myOpInProgress			= false;
-	
-	private int myTranslateParmId 		= -1;
-	private int myRotateParmId 			= -1;
-	private int myScaleParmId 			= -1;
-	private int myRstOrderParmId 		= -1;
-	private int myXyzOrderParmId 		= -1;
+	private XformManipMode myManipMode = XformManipMode.Translate;
+
+	private bool myOpInProgress = false;
 }
