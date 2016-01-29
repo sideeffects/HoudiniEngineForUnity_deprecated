@@ -184,7 +184,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 		// Get exposed handle information.
 		prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
 		HoudiniAssetUtility.getArray1Id( prAssetId, HoudiniHost.getHandleInfo, prHandleInfos, prHandleCount );
-				
+
 		// Get handles.
 		prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
 		for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
@@ -193,8 +193,9 @@ public class HoudiniAssetOTL : HoudiniAsset
 			HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
 
 			HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
-			HoudiniAssetUtility.getArray2Id( prAssetId, handle_index, HoudiniHost.getHandleBindingInfo, 
-								 	binding_infos, handle_info.bindingsCount );
+			HoudiniAssetUtility.getArray2Id(
+				prAssetId, handle_index, HoudiniHost.getHandleBindingInfo, 
+				binding_infos, handle_info.bindingsCount );
 
 			prHandleBindingInfos.Add( binding_infos );
 		}
