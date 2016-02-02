@@ -164,8 +164,8 @@ public abstract class HoudiniAsset : HoudiniControl
 	
 	public bool 					prShowHoudiniControls {			get { return myShowHoudiniControls; } 
 																	set { myShowHoudiniControls = value; } }
-	public bool						prShowCookLog {					get { return myCookLog; }
-																	set { myCookLog = value; } }
+	public bool						prShowCookLog {					get { return myShowCookLog; }
+																	set { myShowCookLog = value; } }
 	public bool 					prShowHelp {					get { return myShowHelp; } 
 																	set { myShowHelp = value; } }
 	public bool 					prShowAssetSettings {			get { return myShowAssetSettings; } 
@@ -256,6 +256,10 @@ public abstract class HoudiniAsset : HoudiniControl
 															set { myReloadPrefabOnPlaymodeChange = value; } }
 	public List< string > prUpdatePrefabInstanceParmNames {	get { return myUpdatePrefabInstanceParmNames; }
 															set { myUpdatePrefabInstanceParmNames = value; } }
+
+	// Hooks --------------------------------------------------------------------------------------------------------
+
+	public HoudiniApiAssetHook[] prAssetHooks { get { return GetComponents< HoudiniApiAssetHook >(); } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -1003,9 +1007,13 @@ public abstract class HoudiniAsset : HoudiniControl
 		if ( isPrefabInstance() )
 			processParentPrefab();
 
-		HoudiniProgressBar progress_bar	= new HoudiniProgressBar();
-		progress_bar.prUseDelay			= use_delay_for_progress_bar;
-		progress_bar.prAsset			= this;
+		// Run post-cook hook.
+		foreach ( var asset_hook in prAssetHooks )
+			asset_hook.preCook( this );
+
+		HoudiniProgressBar progress_bar = new HoudiniProgressBar();
+		progress_bar.prUseDelay = use_delay_for_progress_bar;
+		progress_bar.prAsset = this;
 
 		try
 		{
@@ -1118,7 +1126,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			prAssetName					= prAssetInfo.name;
 			prAssetOpName				= prAssetInfo.fullOpName;
 			prAssetHelp					= prAssetInfo.helpText;
-			prHAPIAssetType				= (HAPI_AssetType) prAssetInfo.type;
+			prHAPIAssetType				= prAssetInfo.type;
 			prTransformInputCount		= prAssetInfo.transformInputCount;
 			prGeoInputCount				= prAssetInfo.geoInputCount;
 
@@ -1314,6 +1322,10 @@ public abstract class HoudiniAsset : HoudiniControl
 			progress_bar.clearProgressBar();
 
 			myProgressBarJustUsed = false;
+
+			// Run post-cook hook.
+			foreach ( var asset_hook in prAssetHooks )
+				asset_hook.postCook( this );
 		}
 
 		// We can only build or do anything if we can link to our libraries.
@@ -2133,7 +2145,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private AssetType				myAssetType;
 	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
 	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
-	
+
 	// Inputs -------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private int 					myTransformInputCount;
@@ -2176,7 +2188,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	// GUI ----------------------------------------------------------------------------------------------------------
 	
 	[SerializeField] private bool 					myShowHoudiniControls;
-	[SerializeField] private bool					myCookLog;
+	[SerializeField] private bool					myShowCookLog;
 	[SerializeField] private bool					myShowHelp;
 	[SerializeField] private bool 					myShowAssetSettings;
 	[SerializeField] private bool 					myShowBakeOptions;
