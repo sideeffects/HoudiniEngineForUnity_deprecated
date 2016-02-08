@@ -1226,6 +1226,33 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetActiveCacheCount( ref HAPI_Session session, out int active_cache_count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetActiveCacheNames(
+		ref HAPI_Session session,
+		[Out] HAPI_StringHandle[] cache_names_array,
+		int active_cache_count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetCacheProperty(
+		ref HAPI_Session session,
+		string cache_name,
+		HAPI_CacheProperty cache_property,
+		out int property_value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetCacheProperty(
+		ref HAPI_Session session,
+		string cache_name,
+		HAPI_CacheProperty cache_property,
+		int property_value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_SaveGeoToFile(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,

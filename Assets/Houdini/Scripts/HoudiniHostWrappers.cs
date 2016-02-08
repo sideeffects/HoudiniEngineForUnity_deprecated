@@ -1798,6 +1798,56 @@ public static partial class HoudiniHost
 
 	// CACHING --------------------------------------------------------------------------------------------------
 
+	public static string[] getActiveCacheNames()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int cache_count = 0;
+		HAPI_Result status_code = HAPI_GetActiveCacheCount(
+			ref mySession, out cache_count );
+		processStatusCode( status_code );
+
+		int[] cache_names = new int[ cache_count ];
+		status_code = HAPI_GetActiveCacheNames(
+			ref mySession, cache_names, cache_count );
+		processStatusCode( status_code );
+
+		string[] name_strings = new string[ cache_count ];
+		for ( int i = 0; i < cache_count; ++i )
+			name_strings[ i ] = getString( cache_names[ i ] );
+
+		return name_strings;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static int getCacheProperty(
+		string cache_name, HAPI_CacheProperty cache_property )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int property_value = 0;
+		HAPI_Result status_code = HAPI_GetCacheProperty(
+			ref mySession, cache_name, cache_property, out property_value );
+		processStatusCode( status_code );
+
+		return property_value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setCacheProperty(
+		string cache_name, HAPI_CacheProperty cache_property, int property_value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetCacheProperty(
+			ref mySession, cache_name, cache_property, property_value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void saveGeoToFile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
 		string file_name )

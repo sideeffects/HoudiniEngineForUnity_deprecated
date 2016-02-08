@@ -127,8 +127,19 @@ public struct HoudiniConstants
 	public const string HAPI_ENV_JOB					= "JOB";
 	public const string HAPI_ENV_CLIENT_NAME			= "HAPI_CLIENT_NAME";
 
+	/// Common cache names. You can see these same cache names in the
+	/// Cache Manager window in Houdini (Windows > Cache Manager).
+	public const string HAPI_CACHE_COP_COOK				= "COP Cook Cache";
+	public const string HAPI_CACHE_COP_FLIPBOOK			= "COP Flipbook Cache";
+	public const string HAPI_CACHE_IMAGE				= "Image Cache";
+	public const string HAPI_CACHE_OBJ					= "Object Transform Cache";
+	public const string HAPI_CACHE_GL_TEXTURE			= "OpenGL Texture Cache";
+	public const string HAPI_CACHE_GL_VERTEX			= "OpenGL Vertex Cache";
+	public const string HAPI_CACHE_SOP					= "SOP Cache";
+	public const string HAPI_CACHE_VEX					= "VEX File Cache";
+
 	public const string HAPI_UNSUPPORTED_PLATFORM_MSG   =
-		"Houdini Plugin for Unity currently only supports the Standalone Windows and Mac OSX platforms in Editor.\n" +
+		"Houdini Plugin for Unity currently only supports the Standalone Windows and Mac OS X platforms in Editor.\n" +
 		"\n" +
 		"To switch to the Standalone Windows platform go to File > Build Settings... and under 'Platform' " +
 		"choose 'PC, Mac & Linux Standalone' and click 'Switch Platform'. Afterwards, on the right hand side, " +
@@ -601,6 +612,36 @@ public enum HAPI_ThriftTransportType
 	HAPI_THRIFT_TRANSPORT_FRAMED,
 
 	HAPI_THRIFT_TRANSPORT_MAX
+};
+
+public enum HAPI_CacheProperty
+{
+    /// Current memory usage in MB. Setting this to 0 invokes
+    /// a cache clear.
+    HAPI_CACHEPROP_CURRENT,
+
+    HAPI_CACHEPROP_HAS_MIN, // True if it actually has a minimum size.
+    HAPI_CACHEPROP_MIN, // Min cache memory limit in MB.
+    HAPI_CACHEPROP_HAS_MAX, // True if it actually has a maximum size.
+    HAPI_CACHEPROP_MAX, // Max cache memory limit in MB.
+
+    /// How aggressive to cull memory. This only works for:
+    ///     - ::HAPI_CACHE_COP_COOK where:
+    ///         0   ->  Never reduce inactive cache.
+    ///         1   ->  Always reduce inactive cache.
+    ///     - ::HAPI_CACHE_OBJ where:
+    ///         0   ->  Never enforce the max memory limit.
+    ///         1   ->  Always enforce the max memory limit.
+    ///     - ::HAPI_CACHE_SOP where:
+    ///         0   ->  When to Unload = Never
+    ///                 When to Limit Max Memory = Never
+    ///         1-2 ->  When to Unload = Based on Flag
+    ///                 When to Limit Max Memory = Never
+    ///         3-4 ->  When to Unload = Based on Flag
+    ///                 When to Limit Max Memory = Always
+    ///         5   ->  When to Unload = Always
+    ///                 When to Limit Max Memory = Always
+    HAPI_CACHEPROP_CULL_LEVEL,
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
