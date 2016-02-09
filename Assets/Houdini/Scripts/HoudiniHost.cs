@@ -270,7 +270,13 @@ public static partial class HoudiniHost
 		}
 		else
 		{
-			prMidPlaymodeStateChange = false;
+			// It's important here to reset prMidPlaymodeStateChange to the playmode state,
+			// not just reset it to false. This is because this part will be called DURING
+			// a playmode change because myCurrentCSharpSessionInitialized will be
+			// invalidated at that point.
+			prMidPlaymodeStateChange = EditorApplication.isPlayingOrWillChangePlaymode;
+
+			// Call HAPI_Initialize() if needed.
 			if ( !initialize() )
 				return false;
 		}
@@ -899,7 +905,10 @@ public static partial class HoudiniHost
 	public static bool isRealDestroy()
 	{
 #if UNITY_EDITOR
-		return !EditorApplication.isPlayingOrWillChangePlaymode && !prMidPlaymodeStateChange;
+		bool is_playing_or_will_change_playmode = !EditorApplication.isPlayingOrWillChangePlaymode;
+		bool is_mid_playmode_state_change = prMidPlaymodeStateChange;
+		bool answer = !is_playing_or_will_change_playmode && !is_mid_playmode_state_change;
+		return answer;
 #else
 		return true;
 #endif // UNITY_EDITOR
