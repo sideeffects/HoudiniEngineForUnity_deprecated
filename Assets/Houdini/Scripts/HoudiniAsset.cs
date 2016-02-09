@@ -719,10 +719,15 @@ public abstract class HoudiniAsset : HoudiniControl
 			return;
 #endif // UNITY_EDITOR
 
+		bool is_duplication = isDuplicatingAsset();
+		bool is_reverting_prefab_instance = isRevertingPrefabInstance();
+		bool is_prefab_instance = isPrefabInstance();
+		bool is_instantiating_prefab = isInstantiatingPrefab();
+
 		// If this is being called because changes are being applied
 		// to the prefab of this instance do nothing
 #if UNITY_EDITOR
-		if ( isPrefabInstance() )
+		if ( is_prefab_instance )
 		{
 			HoudiniAsset prefab_asset = getParentPrefabAsset();
 			if ( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
@@ -730,13 +735,11 @@ public abstract class HoudiniAsset : HoudiniControl
 		}
 #endif // UNITY_EDITOR
 
-		bool is_duplication = isDuplicatingAsset();
-
 		// If this asset is a prefab instance that is being reverted 
 		// reload the asset in order to restore it's asset id and 
 		// asset validation id from the backup and to load the preset
 		// from the prefab
-		if( isRevertingPrefabInstance() )
+		if( is_reverting_prefab_instance )
 		{
 			build(
 				true,	// reload_asset
@@ -748,12 +751,17 @@ public abstract class HoudiniAsset : HoudiniControl
 				false	// use_delay_for_progress_bar
 			);
 		}
-		else if ( prAssetId >= 0 || isInstantiatingPrefab() )
+		else if ( prAssetId >= 0 || is_instantiating_prefab )
 		{
+			bool is_asset_valid =
+				HoudiniHost.isAssetValid( prAssetId, prAssetValidationId );
+			bool update_prefab_parms =
+				prUpdatePrefabInstanceParmNames.Count > 0;
+
 			if (
-				isPrefabInstance() &&
-				!isInstantiatingPrefab() &&
-				prUpdatePrefabInstanceParmNames.Count > 0 &&
+				is_prefab_instance &&
+				!is_instantiating_prefab &&
+				update_prefab_parms &&
 				!is_duplication )
 			{
 				// Updating prefab instance after parameter change on prefab
@@ -762,8 +770,8 @@ public abstract class HoudiniAsset : HoudiniControl
 				savePreset();
 			}
 			else if (
-				!isInstantiatingPrefab() &&
-				HoudiniHost.isAssetValid( prAssetId, prAssetValidationId ) &&
+				!is_instantiating_prefab &&
+				is_asset_valid &&
 				!is_duplication )
 			{
 				// Reloading asset after mode change or script-reload.
