@@ -290,8 +290,12 @@ public class HoudiniGeoAttribute : ScriptableObject
 						new_paint_value[ i ] = myDefaultIntPaintValue;
 
 				for ( int i = 0; i < myVertexCount; ++i )
+				{
 					for ( int j = 0; j < min_tuple_size; ++j )
 						new_data[ i * new_tuple_size + j ] = myIntData[ i * myTupleSize + j ];
+					for ( int j = min_tuple_size; j < new_tuple_size; ++j )
+						new_data[ i * new_tuple_size + j ] = new_paint_value[ j ];
+				}
 
 				myIntPaintValue = new_paint_value;
 				myIntData = new_data;
@@ -310,8 +314,12 @@ public class HoudiniGeoAttribute : ScriptableObject
 					new_paint_value[ i ] = myDefaultFloatPaintValue;
 
 				for ( int i = 0; i < myVertexCount; ++i )
+				{
 					for ( int j = 0; j < min_tuple_size; ++j )
 						new_data[ i * new_tuple_size + j ] = myFloatData[ i * myTupleSize + j ];
+					for ( int j = min_tuple_size; j < new_tuple_size; ++j )
+						new_data[ i * new_tuple_size + j ] = new_paint_value[ j ];
+				}
 
 				myFloatPaintValue = new_paint_value;
 				myFloatData = new_data;
@@ -330,8 +338,12 @@ public class HoudiniGeoAttribute : ScriptableObject
 					new_paint_value[ i ] = myDefaultStringPaintValue;
 
 				for ( int i = 0; i < myVertexCount; ++i )
+				{
 					for ( int j = 0; j < min_tuple_size; ++j )
 						new_data[ i * new_tuple_size + j ] = myStringData[ i * myTupleSize + j ];
+					for ( int j = min_tuple_size; j < new_tuple_size; ++j )
+						new_data[ i * new_tuple_size + j ] = new_paint_value[ j ];
+				}
 
 				myStringPaintValue = new_paint_value;
 				myStringData = new_data;
