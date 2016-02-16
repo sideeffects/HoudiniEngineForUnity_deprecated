@@ -886,9 +886,10 @@ public struct HAPI_CookOptions
 // NODES --------------------------------------------------------------------------------------------------------
 
 [ StructLayout( LayoutKind.Sequential ) ]
-public struct HAPI_NodeInfo 
+public struct HAPI_NodeInfo
 {
 	public HAPI_NodeId id;
+	public HAPI_NodeId parentId;
 	public HAPI_AssetId assetId;
 	public HAPI_StringHandle nameSH;
 	public HAPI_NodeType type;
