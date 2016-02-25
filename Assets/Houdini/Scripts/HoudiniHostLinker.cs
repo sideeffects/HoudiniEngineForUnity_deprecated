@@ -145,6 +145,9 @@ public static partial class HoudiniHost
 					ref mySession, ref cook_options, true, -1, otls_path, dsos_path, dsos_path, dsos_path );
 				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
+
+				// Set client name.
+				setServerEnvString( "HAPI_CLIENT_NAME", "unity" );
 			}
 			catch ( HoudiniError error )
 			{
