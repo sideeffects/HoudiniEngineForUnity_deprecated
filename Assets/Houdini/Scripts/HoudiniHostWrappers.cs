@@ -61,6 +61,51 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static int getServerEnvInt( string variable_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int value;
+		HAPI_Result status_code = HAPI_GetServerEnvInt( ref mySession, variable_name, out value );
+		processStatusCode( status_code );
+		return value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static string getServerEnvString( string variable_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_StringHandle value;
+		HAPI_Result status_code = HAPI_GetServerEnvString( ref mySession, variable_name, out value );
+		processStatusCode( status_code );
+		string str_value = getString( value );
+		return str_value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setServerEnvInt( string variable_name, int value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetServerEnvInt( ref mySession, variable_name, value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setServerEnvString( string variable_name, string value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetServerEnvString( ref mySession, variable_name, value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static int getStatus( HAPI_StatusType status_type )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
