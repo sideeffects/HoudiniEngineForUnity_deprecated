@@ -175,6 +175,9 @@ public static partial class HoudiniHost
 	// This is to keep track whether we actually initialized Houdini Engine in this session/state/runtime of C#.
 	private static bool myCurrentCSharpSessionInitialized = false;
 
+	// License Type
+	private static HAPI_License myCurrentHoudiniLicense = HAPI_License.HAPI_LICENSE_NONE;
+
 	static HoudiniHost()
 	{
 		// Initialize the global session.
