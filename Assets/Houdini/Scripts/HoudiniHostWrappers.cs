@@ -40,11 +40,15 @@ public static partial class HoudiniHost
 
 	public static HAPI_License getCurrentLicense()
 	{
+		if ( myCurrentHoudiniLicense != HAPI_License.HAPI_LICENSE_NONE )
+			return myCurrentHoudiniLicense;
+
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int value;
 		HAPI_Result status_code = HAPI_GetSessionEnvInt( ref mySession, HAPI_SessionEnvIntType.HAPI_SESSIONENVINT_LICENSE, out value );
 		processStatusCode( status_code );
-		return (HAPI_License) value;
+		myCurrentHoudiniLicense = (HAPI_License) value;
+		return myCurrentHoudiniLicense;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif

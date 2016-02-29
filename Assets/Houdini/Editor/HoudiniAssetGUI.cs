@@ -27,7 +27,7 @@ public class HoudiniAssetGUI : Editor
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
 	
-	public virtual void OnEnable() 
+	public virtual void OnEnable()
 	{
 		myAsset 			= target as HoudiniAsset;
 		myUndoInfo			= myAsset.prAssetUndoInfo;
@@ -100,7 +100,7 @@ public class HoudiniAssetGUI : Editor
 			HoudiniHost.mySelectionTarget = null;
 	}
 
-	public override void OnInspectorGUI() 
+	public override void OnInspectorGUI()
 	{
 		bool gui_enable = GUI.enabled;
 
@@ -120,6 +120,10 @@ public class HoudiniAssetGUI : Editor
 		{
 			myDelayBuild	= false;
 			myParmChanges	= false;
+
+			///////////////////////////////////////////////////////////////////////
+			// Draw License/Logo Thingy
+			drawLicenseLogo();
 
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
@@ -255,6 +259,43 @@ public class HoudiniAssetGUI : Editor
 		return changed;
 	}
 
+	protected void drawLicenseLogo()
+	{
+		if ( HoudiniHost.getCurrentLicense() != HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE_INDIE )
+			return;
+
+		HoudiniGUI.separator();
+
+		int skin = EditorPrefs.GetInt( "UserSkin" );
+		bool is_light_skin = skin == 0;
+
+#if false
+		if ( myDarkSkinLogo == null && is_dark_skin )
+			myDarkSkinLogo = Resources.Load< Texture2D >( "hEngine_white_color" );
+		if ( myLightSkinLogo == null && is_light_skin )
+			myLightSkinLogo = Resources.Load< Texture2D >( "hEngine_black_color" );
+		Texture2D logo = ( is_light_skin ? myLightSkinLogo : myDarkSkinLogo );
+
+		float pane_width = (float) Screen.width - 60;
+		float ratio = Mathf.Min( 0.2f, pane_width / logo.width );
+
+		GUIStyle image_style = new GUIStyle( GUI.skin.label );
+		image_style.normal.background = logo;
+		image_style.imagePosition = ImagePosition.ImageAbove;
+		EditorGUILayout.LabelField(
+			"", image_style,
+			GUILayout.Height( logo.height * ratio ),
+			GUILayout.Width( logo.width * ratio ) );
+#endif
+
+		GUIStyle label_style = new GUIStyle( GUI.skin.label );
+		label_style.fontStyle = FontStyle.Bold;
+		label_style.normal.textColor = is_light_skin ? Color.red : Color.yellow;
+		EditorGUILayout.LabelField( "Houdini Engine Indie - Limited Commercial", label_style );
+
+		HoudiniGUI.separator();
+	}
+
 	protected void drawHelpBox( string text )
 	{
 		float width = (float) Screen.width - 60;
@@ -382,4 +423,9 @@ public class HoudiniAssetGUI : Editor
 	protected HoudiniAsset myParentPrefabAsset;
 
 	private const int		myInputFormatDropdownWidth = 62;
+
+#if false
+	private static Texture2D myLightSkinLogo = null;
+	private static Texture2D myDarkSkinLogo = null;
+#endif
 }
