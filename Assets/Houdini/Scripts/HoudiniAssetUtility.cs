@@ -1004,6 +1004,11 @@ public class HoudiniAssetUtility
 	public static Texture2D extractHoudiniImageToTexture( 
 		HAPI_MaterialInfo material_info, string folder_path, string image_planes )
 	{
+		return extractHoudiniImageToTexture( material_info, folder_path, image_planes, false );
+	}
+	public static Texture2D extractHoudiniImageToTexture( 
+		HAPI_MaterialInfo material_info, string folder_path, string image_planes, bool is_normal )
+	{
 		Texture2D result = null;
 		try
 		{
@@ -1097,6 +1102,13 @@ public class HoudiniAssetUtility
 				string relative_file_path = texture_file_path.Replace(
 					Application.dataPath, "Assets" );
 
+				// Set import settings.
+				TextureImporter importer = AssetImporter.GetAtPath( relative_file_path ) as TextureImporter;
+				if ( importer )
+				{
+					importer.convertToNormalmap = is_normal;
+				}
+
 				// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
 				// understands paths relative to the project folder.
 				AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
@@ -1133,16 +1145,29 @@ public class HoudiniAssetUtility
 		{
 			try
 			{
-				HoudiniHost.renderTextureToImage( 
+				HoudiniHost.renderTextureToImage(
 					material_info.assetId, material_info.id, diffuse_map_parm_id );
 
 				material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" );
-				material.SetTexture( 
-					"_NormalMap", extractHoudiniImageToTexture( material_info, folder_path, "N" ) );
 			}
 			catch ( HoudiniError ) {}
 		}
-			
+
+		// Extract normal map file from material.
+		int normal_map_parm_id = findParm( ref parms, "ogl_normalmap" ); 
+		if ( normal_map_parm_id >= 0 )
+		{
+			try
+			{
+				HoudiniHost.renderTextureToImage(
+					material_info.assetId, material_info.id, normal_map_parm_id );
+
+				material.SetTexture(
+					"_BumpMap", extractHoudiniImageToTexture( material_info, folder_path, "C A", true ) );
+			}
+			catch ( HoudiniError ) {}
+		}
+
 		// Assign shader properties.
 
 		material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
