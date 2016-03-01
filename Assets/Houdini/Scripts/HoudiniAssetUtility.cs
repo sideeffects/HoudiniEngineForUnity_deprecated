@@ -1175,7 +1175,10 @@ public class HoudiniAssetUtility
 
 		// Assign shader properties.
 
-		material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
+		// Shininess cannot go to 0.0f as that makes for very hard shadows. Not even the Unity
+		// UI lets you set Shininess to 0. We need to clamp it slighly off zero.
+		material.SetFloat( "_Shininess",
+			Mathf.Max( 0.03f, 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) ) );
 
 		Color diffuse_colour = getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
 		diffuse_colour.a = getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
