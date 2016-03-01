@@ -1104,10 +1104,15 @@ public class HoudiniAssetUtility
 
 				// Set import settings.
 				TextureImporter importer = AssetImporter.GetAtPath( relative_file_path ) as TextureImporter;
-				if ( importer )
+				if ( !importer )
 				{
-					importer.convertToNormalmap = is_normal;
+					// If this is the first time the texture is being imported, the importer won't find
+					// it. We must import the asset first, then setup the importer, and then import
+					// the asset again.
+					AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+					importer = AssetImporter.GetAtPath( relative_file_path ) as TextureImporter;
 				}
+				importer.convertToNormalmap = is_normal;
 
 				// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
 				// understands paths relative to the project folder.
