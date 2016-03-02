@@ -1373,7 +1373,7 @@ public class HoudiniAssetUtility
 			if ( !material && filepath.StartsWith( Application.dataPath ) )
 			{
 				string relative_path = filepath.Replace( Application.dataPath, "Assets" );
-				Debug.Log( "Using material already in Unity: " + relative_path );
+				//Debug.Log( "Using material already in Unity: " + relative_path );
 				AssetDatabase.ImportAsset( relative_path, ImportAssetOptions.Default );
 				material = (Material) AssetDatabase.LoadAssetAtPath( relative_path, typeof( Material ) );
 			}
@@ -1386,7 +1386,7 @@ public class HoudiniAssetUtility
 			// over so let's used the copied one.
 			if ( !material && File.Exists( substance_copied_file_abs_path ) )
 			{
-				Debug.Log( "Using already copied material: " + substance_copied_file_relative_path );
+				//Debug.Log( "Using already copied material: " + substance_copied_file_relative_path );
 				AssetDatabase.ImportAsset( substance_copied_file_relative_path, ImportAssetOptions.Default );
 				material = (Material) AssetDatabase.LoadAssetAtPath( substance_copied_file_relative_path, typeof( Material ) );
 			}
@@ -1394,7 +1394,7 @@ public class HoudiniAssetUtility
 			// The substance file is not within the current Unity project. We need to copy it over.
 			if ( !material )
 			{
-				Debug.Log( "Copying material from: " + filepath + "\nto: " + substance_copied_file_abs_path );
+				//Debug.Log( "Copying material from: " + filepath + "\nto: " + substance_copied_file_abs_path );
 				if ( !File.Exists( filepath ) )
 					Debug.LogError( "Houdini: Could not find substance material file: " + filepath );
 				else
@@ -1432,7 +1432,7 @@ public class HoudiniAssetUtility
 
 		if ( !procedural_material )
 		{
-			Debug.Log( "Creating new " + main_prototype + " sub_substance for " + asset_name );
+			//Debug.Log( "Creating new " + main_prototype + " sub_substance for " + asset_name );
 			string new_instance_name = substance_importer.InstantiateMaterial( main_prototype );
 			substance_importer.SaveAndReimport();
 
@@ -1441,7 +1441,7 @@ public class HoudiniAssetUtility
 
 			if ( procedural_material )
 			{
-				Debug.Log( "Renaming to: " + substance_instance_name );
+				//Debug.Log( "Renaming to: " + substance_instance_name );
 				substance_importer.RenameMaterial( procedural_material, substance_instance_name );
 				substance_importer.SaveAndReimport();
 
@@ -1455,7 +1455,7 @@ public class HoudiniAssetUtility
 		// If our fancy material creation above failed, just chose the first instance.
 		if ( !procedural_material )
 		{
-			Debug.Log( "No pure substance instance found!" );
+			//Debug.Log( "No pure substance instance found!" );
 			procedural_material = procedural_materials[ 0 ];
 		}
 
