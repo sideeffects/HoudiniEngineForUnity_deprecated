@@ -58,6 +58,22 @@ public class HoudiniGUIUtility : Editor
 		return new_path;
 	}
 
+	public static void saveHoudiniScene( bool lock_nodes )
+	{
+		HAPI_License license = HoudiniHost.getCurrentLicense();
+		string ext = "hip";
+
+		if ( license == HAPI_License.HAPI_LICENSE_HOUDINI_ENGINE_INDIE
+			|| license == HAPI_License.HAPI_LICENSE_HOUDINI_INDIE )
+		{
+			ext = "hiplc";
+		}
+
+		string hip_file_path = EditorUtility.SaveFilePanel( "Save HIP File", "", "hscene", ext );
+		if ( hip_file_path != "" )
+			HoudiniHost.saveScene( hip_file_path, lock_nodes );
+	}
+
 	public static float closestDistanceBetweenLineAndLineSegment( Vector3 line_p0, Vector3 line_p1, Ray ray, out Vector3 out_point )
 	{
 		float SMALL_NUM = 0.0000001f;
