@@ -115,6 +115,25 @@ public class HoudiniMenu : MonoBehaviour
 		HoudiniHost.displayHoudiniEngineInstallInfo();
 	}
 
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Debug/" + "Open Scene in Houdini", false, 71 ) ]
+	static private void openSceneInHoudini()
+	{
+		string path_to_hip = Application.temporaryCachePath + "/hscene.hip";
+		string path_to_houdini = HoudiniSetPath.prHoudiniPath + "/houdini";
+
+		HoudiniHost.saveScene( path_to_hip, false );
+		var houdini = new System.Diagnostics.Process();
+		houdini.StartInfo.FileName = path_to_houdini;
+		houdini.StartInfo.Arguments = path_to_hip;
+		houdini.Start();
+	}
+
+	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Debug/" + "Save Houdini Scene (.hip)", false, 72 ) ]
+	static private void saveHoudiniScene()
+	{
+		HoudiniGUIUtility.saveHoudiniScene( false );
+	}
+
 	// -----------------------------------------------------------------------
 
 	[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/" + HoudiniGUIUtility.myConvertToInputAssetLabel, false, 100 ) ]
