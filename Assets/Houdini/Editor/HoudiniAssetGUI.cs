@@ -123,7 +123,9 @@ public class HoudiniAssetGUI : Editor
 
 			///////////////////////////////////////////////////////////////////////
 			// Draw License/Logo Thingy
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 			drawLicenseLogo();
+#endif
 
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
