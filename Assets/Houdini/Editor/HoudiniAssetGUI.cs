@@ -293,7 +293,7 @@ public class HoudiniAssetGUI : Editor
 		GUIStyle label_style = new GUIStyle( GUI.skin.label );
 		label_style.fontStyle = FontStyle.Bold;
 		label_style.normal.textColor = is_light_skin ? Color.red : Color.yellow;
-		EditorGUILayout.LabelField( "Houdini Engine Indie - Limited Commercial", label_style );
+		EditorGUILayout.LabelField( "Houdini Engine Indie - For Limited Commercial Use Only", label_style );
 
 		HoudiniGUI.separator();
 	}
