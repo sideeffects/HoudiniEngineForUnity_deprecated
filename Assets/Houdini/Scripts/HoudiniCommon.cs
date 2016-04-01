@@ -21,6 +21,7 @@ using System.Runtime.InteropServices;
 
 // Typedefs
 using HAPI_SessionId = System.Int64;
+using HAPI_Int64 = System.Int64;
 using HAPI_StringHandle = System.Int32;
 using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
@@ -432,7 +433,9 @@ public enum HAPI_StorageType
 {
 	HAPI_STORAGETYPE_INVALID = -1,
 	HAPI_STORAGETYPE_INT,
+	HAPI_STORAGETYPE_INT64,
 	HAPI_STORAGETYPE_FLOAT,
+	HAPI_STORAGETYPE_FLOAT64,
 	HAPI_STORAGETYPE_STRING,
 	HAPI_STORAGETYPE_MAX
 }

@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Text;
 
 // Typedefs (copy these from HAPI_Common.cs)
+using HAPI_Int64 = System.Int64;
 using HAPI_StringHandle = System.Int32;
 using HAPI_ErrorCodeBits = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
@@ -744,6 +745,17 @@ public static partial class HoudiniHost
 		int stride,
 		[Out] int[] data,
 		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetAttributeInt64Data(
+		ref HAPI_Session session,
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		int stride,
+		[Out] HAPI_Int64[] data,
+		int start, int length );
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -754,6 +766,17 @@ public static partial class HoudiniHost
 		ref HAPI_AttributeInfo attr_info,
 		int stride,
 		[Out] float[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetAttributeFloat64Data(
+		ref HAPI_Session session,
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		int stride,
+		[Out] double[] data_array,
 		int start, int length );
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
@@ -855,12 +878,32 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_SetAttributeInt64Data(
+		ref HAPI_Session session,
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		HAPI_Int64[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_SetAttributeFloatData(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		string name,
 		ref HAPI_AttributeInfo attr_info,
 		float[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetAttributeFloat64Data(
+		ref HAPI_Session session,
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		double[] data_array,
 		int start, int length );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]

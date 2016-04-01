@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Text;
 
 // Typedefs (copy these from HAPI_Common.cs)
+using HAPI_Int64 = System.Int64;
 using HAPI_StringHandle = System.Int32;
 using HAPI_ErrorCodeBits = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
@@ -1066,6 +1067,22 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void getAttributeInt64Data(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		[Out] HAPI_Int64[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_GetAttributeInt64Data(
+			ref mySession, asset_id, object_id, geo_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getAttributeFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1074,6 +1091,22 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_GetAttributeFloatData(
+			ref mySession, asset_id, object_id, geo_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getAttributeFloat64Data(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		[Out] double[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_GetAttributeFloat64Data(
 			ref mySession, asset_id, object_id, geo_id, part_id, name,
 			ref attr_info, -1, data, start, length );
 		processStatusCode( status_code );
@@ -1288,6 +1321,21 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void setAttributeInt64Data(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		HAPI_Int64[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetAttributeInt64Data(
+			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void setAttributeFloatData(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1296,6 +1344,21 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Result status_code = HAPI_SetAttributeFloatData(
+			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setAttributeFloat64Data(
+		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		double[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetAttributeFloat64Data(
 			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
 		processStatusCode( status_code );
 #else
