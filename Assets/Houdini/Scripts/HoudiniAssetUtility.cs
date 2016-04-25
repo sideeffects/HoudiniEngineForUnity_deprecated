@@ -1332,6 +1332,7 @@ public class HoudiniAssetUtility
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public static Material getSubstanceMaterial( HAPI_MaterialInfo material_info, HoudiniPartControl part_control )
 	{
+#if UNITY_EDITOR
 		if ( !material_info.exists )
 			return null;
 
@@ -1518,6 +1519,9 @@ public class HoudiniAssetUtility
 		material = procedural_material;
 
 		return material;
+#else
+		return null;
+#endif // UNITY_EDITOR
 	}
 
 	public static Material getSubstanceMaterialOnGroup( HoudiniPartControl part_control, string group_name )
