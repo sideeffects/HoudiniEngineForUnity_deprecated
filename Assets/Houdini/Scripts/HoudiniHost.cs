@@ -274,11 +274,13 @@ public static partial class HoudiniHost
 		else
 		{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR
 			// It's important here to reset prMidPlaymodeStateChange to the playmode state,
 			// not just reset it to false. This is because this part will be called DURING
 			// a playmode change because myCurrentCSharpSessionInitialized will be
 			// invalidated at that point.
 			prMidPlaymodeStateChange = EditorApplication.isPlayingOrWillChangePlaymode;
+#endif // UNITY_EDITOR
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 			// Call HAPI_Initialize() if needed.
