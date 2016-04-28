@@ -405,6 +405,13 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetManagerNodeId(
+		ref HAPI_Session session,
+		HAPI_NodeType node_type,
+		out HAPI_NodeId node_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetEditableNodeNetworks(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id,
