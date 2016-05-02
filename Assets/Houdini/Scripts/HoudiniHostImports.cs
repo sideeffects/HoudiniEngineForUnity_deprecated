@@ -432,6 +432,7 @@ public static partial class HoudiniHost
 		ref HAPI_Session session,
 		HAPI_NodeId parent_node_id,
 		string operator_name,
+		string node_label,
 		out HAPI_NodeId new_node_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
