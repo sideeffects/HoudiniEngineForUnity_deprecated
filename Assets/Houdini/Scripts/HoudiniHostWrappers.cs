@@ -563,17 +563,17 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name )
+	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name, bool cook_on_creation )
 	{
-		return createNode( parent_node_id, operator_name, operator_name );
+		return createNode( parent_node_id, operator_name, cook_on_creation, operator_name );
 	}
 
-	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name, string node_label )
+	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name, bool cook_on_creation, string node_label )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_NodeId new_node_id;
 		HAPI_Result status_code = HAPI_CreateNode(
-			ref mySession, parent_node_id, operator_name, node_label, out new_node_id );
+			ref mySession, parent_node_id, operator_name, node_label, cook_on_creation, out new_node_id );
 		processStatusCode( status_code );
 
 		return new_node_id;

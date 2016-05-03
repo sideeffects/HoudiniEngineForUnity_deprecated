@@ -433,6 +433,7 @@ public static partial class HoudiniHost
 		HAPI_NodeId parent_node_id,
 		string operator_name,
 		string node_label,
+		[ MarshalAs( UnmanagedType.U1 ) ] bool cook_on_creation,
 		out HAPI_NodeId new_node_id );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
