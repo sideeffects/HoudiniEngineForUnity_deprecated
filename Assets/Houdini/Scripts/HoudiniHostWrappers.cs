@@ -582,6 +582,20 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void cookNode( HAPI_NodeId node_id, bool split_geos_by_group, bool import_templated_geos )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_CookOptions cook_options = getCookOptions( split_geos_by_group, import_templated_geos );
+
+		HAPI_NodeId new_node_id;
+		HAPI_Result status_code = HAPI_CookNode(
+			ref mySession, node_id, ref cook_options );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void deleteNode( HAPI_NodeId node_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
