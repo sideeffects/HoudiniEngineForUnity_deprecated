@@ -28,6 +28,7 @@ using HAPI_ErrorCodeBits = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
+using HAPI_NodeFlagsBits = System.Int32;
 using HAPI_ParmId = System.Int32;
 using HAPI_ObjectId = System.Int32;
 using HAPI_GeoId = System.Int32;
@@ -409,6 +410,24 @@ public static partial class HoudiniHost
 		ref HAPI_Session session,
 		HAPI_NodeType node_type,
 		out HAPI_NodeId node_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_ComposeChildNodeList(
+		ref HAPI_Session session,
+		HAPI_NodeId parent_node_id,
+		HAPI_NodeType node_type_filter,
+		HAPI_NodeFlagsBits node_flags_filter,
+		[ MarshalAs( UnmanagedType.U1 ) ] bool recursive,
+		out int count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetComposedChildNodeList(
+		ref HAPI_Session session,
+		HAPI_NodeId parent_node_id,
+		[Out] HAPI_NodeId[] child_node_ids_array,
+		int count );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

@@ -26,9 +26,9 @@ using System.Text;
 using HAPI_Int64 = System.Int64;
 using HAPI_StringHandle = System.Int32;
 using HAPI_ErrorCodeBits = System.Int32;
-using HAPI_AssetLibraryId = System.Int32;
 using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
+using HAPI_NodeFlagsBits = System.Int32;
 using HAPI_ParmId = System.Int32;
 using HAPI_ObjectId = System.Int32;
 using HAPI_GeoId = System.Int32;
@@ -527,6 +527,42 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_NodeId getManagerNodeId( HAPI_NodeType node_type )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_NodeId node_id = -1;
+		HAPI_Result status_code = HAPI_GetManagerNodeId( ref mySession, node_type, out node_id );
+		processStatusCode( status_code );
+		return node_id;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_NodeId[] getChildNodeList(
+		HAPI_NodeId parent_node_id,
+		HAPI_NodeType node_type_filter,
+		HAPI_NodeFlagsBits node_flags_filter, 
+		bool recursive )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int count = -1;
+		HAPI_Result status_code = HAPI_ComposeChildNodeList(
+			ref mySession, parent_node_id, node_type_filter,
+			node_flags_filter, recursive, out count );
+		processStatusCode( status_code );
+
+		HAPI_NodeId[] child_node_ids = new HAPI_NodeId[ count ];
+		status_code = HAPI_GetComposedChildNodeList(
+			ref mySession, parent_node_id, child_node_ids, count );
+		processStatusCode( status_code );
+
+		return child_node_ids;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static HAPI_NodeId[] getEditableNodeNetworks( HAPI_AssetId asset_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -586,8 +622,6 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_CookOptions cook_options = getCookOptions( split_geos_by_group, import_templated_geos );
-
-		HAPI_NodeId new_node_id;
 		HAPI_Result status_code = HAPI_CookNode(
 			ref mySession, node_id, ref cook_options );
 		processStatusCode( status_code );
