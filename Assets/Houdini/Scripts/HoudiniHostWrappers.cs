@@ -564,42 +564,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static HAPI_NodeId[] getEditableNodeNetworks( HAPI_AssetId asset_id )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-		HAPI_Result status_code = HAPI_GetAssetInfo( ref mySession, asset_id, ref asset_info );
-		processStatusCode( status_code );
-
-		HAPI_NodeId[] networks = new HAPI_NodeId[ asset_info.editableNodeNetworkCount ];
-		status_code = HAPI_GetEditableNodeNetworks(
-			ref mySession, asset_id, networks, asset_info.editableNodeNetworkCount );
-		processStatusCode( status_code );
-
-		return networks;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_NodeId[] getNodeNetworkChildren( HAPI_NodeId network_node_id )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_NodeInfo node_info = new HAPI_NodeInfo();
-		HAPI_Result status_code = HAPI_GetNodeInfo( ref mySession, network_node_id, ref node_info );
-		processStatusCode( status_code );
-
-		HAPI_NodeId[] children = new HAPI_NodeId[ node_info.childNodeCount ];
-		status_code = HAPI_GetNodeNetworkChildren(
-			ref mySession, network_node_id, children, node_info.childNodeCount );
-		processStatusCode( status_code );
-
-		return children;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name, bool cook_on_creation )
 	{
 		return createNode( parent_node_id, operator_name, cook_on_creation, operator_name );

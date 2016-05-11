@@ -787,7 +787,6 @@ public struct HAPI_AssetInfo
 
 	public int objectCount;
 	public int handleCount;
-	public int editableNodeNetworkCount;
 
 	public int transformInputCount;
 	public int geoInputCount;

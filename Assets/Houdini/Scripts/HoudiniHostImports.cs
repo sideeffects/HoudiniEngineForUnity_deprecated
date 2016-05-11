@@ -432,22 +432,6 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetEditableNodeNetworks(
-		ref HAPI_Session session,
-		HAPI_AssetId asset_id,
-		[Out] HAPI_NodeId[] node_networks_array,
-		int count );
-
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
-	HAPI_GetNodeNetworkChildren(
-		ref HAPI_Session session,
-		HAPI_NodeId network_node_id,
-		[Out] HAPI_NodeId[] child_node_ids_array,
-		int count );
-
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
 	HAPI_CreateNode(
 		ref HAPI_Session session,
 		HAPI_NodeId parent_node_id,
