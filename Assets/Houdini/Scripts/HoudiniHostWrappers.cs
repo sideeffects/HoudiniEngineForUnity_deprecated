@@ -926,6 +926,18 @@ public static partial class HoudiniHost
 
 	// OBJECTS --------------------------------------------------------------------------------------------------
 
+	public static HAPI_ObjectInfo getObjectInfo( HAPI_NodeId node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_ObjectInfo object_info;
+		HAPI_Result status_code = HAPI_GetObjectInfo( ref mySession, node_id, out object_info );
+		processStatusCode( status_code );
+		return object_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getObjects(
 		HAPI_AssetId asset_id,
 		[Out] HAPI_ObjectInfo[] object_infos,
