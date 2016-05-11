@@ -34,7 +34,7 @@ public struct HoudiniVersion
 	public const int HOUDINI_ENGINE_MAJOR	= 3;
 	public const int HOUDINI_ENGINE_MINOR	= 0;
 	
-	public const int HOUDINI_ENGINE_API		= 5;
+	public const int HOUDINI_ENGINE_API		= 6;
 	
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 
