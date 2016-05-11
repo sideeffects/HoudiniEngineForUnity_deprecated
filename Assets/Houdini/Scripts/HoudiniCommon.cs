@@ -361,6 +361,7 @@ public enum HAPI_NodeType
 [ Flags ]
 public enum HAPI_NodeFlags
 {
+	HAPI_NODEFLAGS_ALL			= 0,
 	HAPI_NODEFLAGS_DISPLAY		= 1 << 0,
 	HAPI_NODEFLAGS_RENDER		= 1 << 1,
 	HAPI_NODEFLAGS_TEMPLATED	= 1 << 2,
