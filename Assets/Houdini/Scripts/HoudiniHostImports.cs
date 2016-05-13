@@ -680,6 +680,21 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_ComposeObjectList(
+		ref HAPI_Session session,
+		HAPI_NodeId parent_node_id,
+		out int object_count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetComposedObjectList(
+		ref HAPI_Session session,
+		HAPI_NodeId parent_node_id,
+		[Out] HAPI_ObjectInfo[] object_infos_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetObjects(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id,

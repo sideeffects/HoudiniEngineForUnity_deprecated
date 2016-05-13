@@ -140,7 +140,7 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 
 		string string_value = string_builder.ToString();
-			
+
 		return string_value;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -206,7 +206,7 @@ public static partial class HoudiniHost
 		else
 		{
 			string string_value = string_builder.ToString();
-			
+
 			return string_value;
 		}
 #else
@@ -933,6 +933,25 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetObjectInfo( ref mySession, node_id, out object_info );
 		processStatusCode( status_code );
 		return object_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_ObjectInfo[] getObjectInfos( HAPI_NodeId node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int object_count = 0;
+		HAPI_Result status_code = HAPI_ComposeObjectList(
+			ref mySession, node_id, out object_count );
+		processStatusCode( status_code );
+
+		HAPI_ObjectInfo[] object_infos = new HAPI_ObjectInfo[ object_count ];
+		status_code = HAPI_GetComposedObjectList(
+			ref mySession, node_id, object_infos, 0, object_count );
+		processStatusCode( status_code );
+
+		return object_infos;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
