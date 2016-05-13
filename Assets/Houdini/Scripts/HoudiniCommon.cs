@@ -346,8 +346,8 @@ public enum HAPI_PresetType
 [ Flags ]
 public enum HAPI_NodeType
 {
-	HAPI_NODETYPE_INVALID	= -1,
-	HAPI_NODETYPE_ALL		= 0,
+	HAPI_NODETYPE_ANY		= -1,
+	HAPI_NODETYPE_NONE		= 0,
 	HAPI_NODETYPE_OBJ		= 1 << 0,
 	HAPI_NODETYPE_SOP		= 1 << 1,
 	HAPI_NODETYPE_POP		= 1 << 2,
@@ -362,7 +362,8 @@ public enum HAPI_NodeType
 [ Flags ]
 public enum HAPI_NodeFlags
 {
-	HAPI_NODEFLAGS_ALL			= 0,
+	HAPI_NODEFLAGS_ANY			= -1,
+	HAPI_NODEFLAGS_NONE			= 0,
 	HAPI_NODEFLAGS_DISPLAY		= 1 << 0,
 	HAPI_NODEFLAGS_RENDER		= 1 << 1,
 	HAPI_NODEFLAGS_TEMPLATED	= 1 << 2,
