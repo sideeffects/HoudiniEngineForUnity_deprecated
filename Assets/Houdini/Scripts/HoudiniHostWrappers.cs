@@ -1036,6 +1036,18 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_PartInfo getPartInfoOnNode( HAPI_NodeId node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info;
+		HAPI_Result status_code = HAPI_GetPartInfoOnNode( ref mySession, node_id, part_id, out part_info );
+		processStatusCode( status_code );
+		return part_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getPartInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		out HAPI_PartInfo part_info )
