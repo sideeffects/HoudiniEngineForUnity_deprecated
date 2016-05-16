@@ -680,6 +680,14 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetObjectTransform(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		HAPI_RSTOrder rst_order,
+		out HAPI_Transform transform );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_ComposeObjectList(
 		ref HAPI_Session session,
 		HAPI_NodeId parent_node_id,
@@ -691,6 +699,15 @@ public static partial class HoudiniHost
 		ref HAPI_Session session,
 		HAPI_NodeId parent_node_id,
 		[Out] HAPI_ObjectInfo[] object_infos_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetComposedObjectTransforms(
+		ref HAPI_Session session,
+		HAPI_NodeId parent_node_id,
+		HAPI_RSTOrder rst_order,
+		[Out] HAPI_Transform[] transform_array,
 		int start, int length );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
@@ -718,6 +735,13 @@ public static partial class HoudiniHost
 		HAPI_RSTOrder rst_order,
 		[Out] HAPI_Transform[] transforms_array,
 		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetObjectTransformOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		ref HAPI_TransformEuler transform );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

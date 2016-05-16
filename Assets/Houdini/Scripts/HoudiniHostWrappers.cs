@@ -938,6 +938,18 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_Transform getObjectTransform( HAPI_NodeId node_id, HAPI_RSTOrder rst_order )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Transform transform;
+		HAPI_Result status_code = HAPI_GetObjectTransform( ref mySession, node_id, rst_order, out transform );
+		processStatusCode( status_code );
+		return transform;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static HAPI_ObjectInfo[] getObjectInfos( HAPI_NodeId node_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -952,6 +964,25 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 
 		return object_infos;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_Transform[] getObjectTransforms( HAPI_NodeId node_id, HAPI_RSTOrder rst_order )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int object_count = 0;
+		HAPI_Result status_code = HAPI_ComposeObjectList(
+			ref mySession, node_id, out object_count );
+		processStatusCode( status_code );
+
+		HAPI_Transform[] transforms = new HAPI_Transform[ object_count ];
+		status_code = HAPI_GetComposedObjectTransforms(
+			ref mySession, node_id, rst_order, transforms, 0, object_count );
+		processStatusCode( status_code );
+
+		return transforms;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -998,6 +1029,18 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void setObjectTransformOnNode(
+		HAPI_NodeId node_id,
+		ref HAPI_TransformEuler transform )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetObjectTransformOnNode( ref mySession, node_id, ref transform );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void setObjectTransform(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id,
 		ref HAPI_TransformEuler transform )
@@ -1016,7 +1059,7 @@ public static partial class HoudiniHost
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_GeoInfo geo_info;
-		HAPI_Result status_code = HAPI_GetGeoInfoOnNode( ref mySession, node_id out geo_info );
+		HAPI_Result status_code = HAPI_GetGeoInfoOnNode( ref mySession, node_id, out geo_info );
 		processStatusCode( status_code );
 		return geo_info;
 #else
