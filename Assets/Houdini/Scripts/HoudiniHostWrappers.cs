@@ -1012,6 +1012,18 @@ public static partial class HoudiniHost
 		
 	// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 
+	public static HAPI_GeoInfo getGeoInfoOnNode( HAPI_NodeId node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_GeoInfo geo_info;
+		HAPI_Result status_code = HAPI_GetGeoInfoOnNode( ref mySession, node_id out geo_info );
+		processStatusCode( status_code );
+		return geo_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getGeoInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		out HAPI_GeoInfo geo_info )
