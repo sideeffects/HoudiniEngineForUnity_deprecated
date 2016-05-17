@@ -1091,6 +1091,272 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static int[] getFaceCounts(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int[] face_counts = new int[ length ];
+		HAPI_Result status_code = HAPI_GetFaceCountsOnNode( ref mySession, node_id, part_id, face_counts, start, length );
+		processStatusCode( status_code );
+		return face_counts;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static int[] getVertexList(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int[] vertex_list = new int[ length ];
+		HAPI_Result status_code = HAPI_GetVertexListOnNode( ref mySession, node_id, part_id, vertex_list, start, length );
+		processStatusCode( status_code );
+		return vertex_list;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_AttributeInfo getAttributeInfo(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name, HAPI_AttributeOwner owner )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_AttributeInfo info = new HAPI_AttributeInfo();
+		HAPI_Result status_code = HAPI_GetAttributeInfoOnNode( ref mySession, node_id, part_id, name, owner, ref info );
+		processStatusCode( status_code );
+		return info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static string[] getAttributeNames(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		HAPI_AttributeOwner owner )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfoOnNode( ref mySession, node_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int count = part_info.attributeCounts[ (int) owner ];
+
+		int[] names = new int[ count ];
+		status_code = HAPI_GetAttributeNamesOnNode(
+			ref mySession, node_id, part_id, owner, names, count );
+		processStatusCode( status_code );
+
+		string[] name_strings = new string[ count ];
+		for ( int i = 0; i < count; ++i )
+			name_strings[ i ] = getString( names[ i ] );
+
+		return name_strings;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static int[] getAttributeIntData(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int[] data = new int[ length * attr_info.tupleSize ];
+		HAPI_Result status_code = HAPI_GetAttributeIntDataOnNode(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+		return data;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_Int64[] getAttributeInt64Data(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Int64[] data = new HAPI_Int64[ length * attr_info.tupleSize ];
+		HAPI_Result status_code = HAPI_GetAttributeInt64DataOnNode(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+		return data;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static float[] getAttributeFloatData(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		float[] data = new float[ length * attr_info.tupleSize ];
+		HAPI_Result status_code = HAPI_GetAttributeFloatDataOnNode(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+		return data;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static double[] getAttributeFloat64Data(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		double[] data = new double[ length * attr_info.tupleSize ];
+		HAPI_Result status_code = HAPI_GetAttributeFloat64DataOnNode(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+		return data;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static string[] getAttributeStringData(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int[] data = new int[ length * attr_info.tupleSize ];
+		HAPI_Result status_code = HAPI_GetAttributeStringDataOnNode(
+			ref mySession, node_id, part_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+		
+		string[] strings = new string[ length * attr_info.tupleSize ];
+		for ( int i = 0; i < strings.Length; ++i )
+			strings[ i ] = getString( data[ i ] );
+
+		return strings;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static string[] getGroupNames( HAPI_NodeId node_id, HAPI_GroupType group_type )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
+		HAPI_Result status_code = HAPI_GetGeoInfoOnNode( ref mySession, node_id, out geo_info );
+		processStatusCode( status_code );
+
+		int count = geo_info.getGroupCountByType( group_type );
+
+		int[] names = new int[ count ];
+		status_code = HAPI_GetGroupNamesOnNode(
+			ref mySession, node_id, group_type, names, count );
+		processStatusCode( status_code );
+
+		string[] name_strings = new string[ count ];
+		for ( int i = 0; i < count; ++i )
+			name_strings[ i ] = getString( names[ i ] );
+
+		return name_strings;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static bool[] getGroupMembership(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		HAPI_GroupType group_type,
+		string group_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfoOnNode( ref mySession, node_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int count = part_info.getElementCountByGroupType( group_type );
+
+		int[] membership = new int[ count ];
+
+		if ( count > 0 )
+		{
+			bool membership_array_all_equal = false;
+			status_code = HAPI_GetGroupMembershipOnNode(
+				ref mySession, node_id, part_id,
+				group_type, group_name, 
+				ref membership_array_all_equal,
+				membership, 0, count );
+			processStatusCode( status_code );
+		}
+
+		bool[] membership_bools = new bool[ count ];
+		for ( int i = 0; i < count; ++i )
+			membership_bools[ i ] = membership[ i ] > 0;
+
+		return membership_bools;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_PartId[] getInstancedPartIds(
+		HAPI_NodeId node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfoOnNode( ref mySession, node_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int count = part_info.instancedPartCount;
+
+		HAPI_PartId[] part_ids = new HAPI_PartId[ count ];
+
+		if ( count > 0 )
+		{
+			status_code = HAPI_GetInstancedPartIdsOnNode(
+				ref mySession, node_id, part_id, part_ids, 0, count );
+			processStatusCode( status_code );
+		}
+
+		return part_ids;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_Transform[] getInstancerPartTransforms(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		HAPI_RSTOrder rst_order )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfoOnNode( ref mySession, node_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		int count = part_info.instanceCount;
+
+		HAPI_Transform[] transforms = new HAPI_Transform[ count ];
+
+		if ( count > 0 )
+		{
+			status_code = HAPI_GetInstancerPartTransformsOnNode(
+				ref mySession, node_id, part_id, rst_order, transforms, 0, count );
+			processStatusCode( status_code );
+		}
+
+		return transforms;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getPartInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		out HAPI_PartInfo part_info )
