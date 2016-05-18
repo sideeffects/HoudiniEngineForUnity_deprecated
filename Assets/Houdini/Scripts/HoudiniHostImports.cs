@@ -442,6 +442,13 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_CreateInputNode(
+		ref HAPI_Session session,
+		out HAPI_NodeId node_id,
+		string name );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_CookNode(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,

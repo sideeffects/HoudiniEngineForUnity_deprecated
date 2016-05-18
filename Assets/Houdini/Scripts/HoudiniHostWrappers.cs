@@ -583,6 +583,18 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_NodeId createInputNode( string name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_NodeId node_id = -1;
+		HAPI_Result status_code = HAPI_CreateInputNode( ref mySession, out node_id, name );
+		processStatusCode( status_code );
+		return node_id;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void cookNode( HAPI_NodeId node_id, bool split_geos_by_group, bool import_templated_geos )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
