@@ -1039,6 +1039,117 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_SetPartInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		ref HAPI_PartInfo part_info );
+		
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetFaceCountsOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int[] face_counts_array,
+		int start, int length );
+		
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetVertexListOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int[] vertex_list_array,
+		int start, int length );
+		
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_AddAttributeOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info );
+		
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetAttributeIntDataOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		int[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetAttributeInt64DataOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		HAPI_Int64[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetAttributeFloatDataOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		float[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetAttributeFloat64DataOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		double[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetAttributeStringDataOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		string[] data_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_AddGroupOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		HAPI_GroupType group_type,
+		string group_name );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetGroupMembershipOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		HAPI_GroupType group_type,
+		string group_name,
+		[Out] int[] membership_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_CommitGeoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id );
+		
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_RevertGeoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_SetPartInfo(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,

@@ -1640,6 +1640,193 @@ public static partial class HoudiniHost
 	// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 
 	public static void setPartInfo(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		ref HAPI_PartInfo part_info )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetPartInfoOnNode( ref mySession, node_id, part_id, ref part_info );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setFaceCounts(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int[] face_counts,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetFaceCountsOnNode( ref mySession, node_id, part_id, face_counts, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setVertexList(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int[] vertex_list,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetVertexListOnNode( ref mySession, node_id, part_id, vertex_list, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void addAttribute(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_AddAttributeOnNode( ref mySession, node_id, part_id, name, ref attr_info );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setAttributeIntData(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		int[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetAttributeIntDataOnNode(
+			ref mySession, node_id, part_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setAttributeInt64Data(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		HAPI_Int64[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetAttributeInt64DataOnNode(
+			ref mySession, node_id, part_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setAttributeFloatData(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		float[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetAttributeFloatDataOnNode(
+			ref mySession, node_id, part_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setAttributeFloat64Data(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		double[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetAttributeFloat64DataOnNode(
+			ref mySession, node_id, part_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setAttributeStringData(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		string name,
+		ref HAPI_AttributeInfo attr_info,
+		string[] data,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetAttributeStringDataOnNode(
+			ref mySession, node_id, part_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void addGroup(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		HAPI_GroupType group_type, string group_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_AddGroupOnNode(
+			ref mySession, node_id, part_id, group_type, group_name );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setGroupMembership(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		HAPI_GroupType group_type,
+		string group_name,
+		bool[] membership,
+		int count )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		if ( count != membership.Length )
+			throw new HoudiniErrorInvalidArgument( "Membership array not same size as count argument!" );
+
+		int[] membership_int = new int[ count ];
+		for ( int i = 0; i < count; ++i )
+			membership_int[ i ] = membership[ i ] ? 1 : 0;
+
+		HAPI_Result status_code = HAPI_SetGroupMembershipOnNode(
+			ref mySession, node_id, part_id, group_type, group_name, membership_int, 0, count );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void commitGeo( HAPI_NodeId node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_CommitGeoOnNode( ref mySession, node_id );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void revertGeo( HAPI_NodeId node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_RevertGeoOnNode( ref mySession, node_id );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setPartInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		ref HAPI_PartInfo part_info )
 	{
