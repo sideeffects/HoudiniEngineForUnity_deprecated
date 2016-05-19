@@ -1639,18 +1639,6 @@ public static partial class HoudiniHost
 
 	// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
 
-	public static void setGeoInfo(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		ref HAPI_GeoInfo geo_info )
-	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_Result status_code = HAPI_SetGeoInfo( ref mySession, asset_id, object_id, geo_id, ref geo_info );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static void setPartInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		ref HAPI_PartInfo part_info )

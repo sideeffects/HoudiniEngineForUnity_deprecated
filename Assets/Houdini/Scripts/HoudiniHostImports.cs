@@ -1036,13 +1036,6 @@ public static partial class HoudiniHost
 		int start, int length );
 
 	// GEOMETRY SETTERS -----------------------------------------------------------------------------------------
-		
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
-	HAPI_SetGeoInfo(
-		ref HAPI_Session session,
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		ref HAPI_GeoInfo geo_info );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

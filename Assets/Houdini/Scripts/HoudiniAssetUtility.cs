@@ -2139,7 +2139,6 @@ public class HoudiniAssetUtility
 		if ( normals != null )
 			part_info.pointAttributeCount++;
 
-		HoudiniHost.setGeoInfo( asset_id, object_id, geo_id, ref geo_info );
 		HoudiniHost.setPartInfo( asset_id, object_id, geo_id, ref part_info );
 
 		// Set Face counts.
