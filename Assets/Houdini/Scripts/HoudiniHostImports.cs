@@ -698,6 +698,7 @@ public static partial class HoudiniHost
 	HAPI_ComposeObjectList(
 		ref HAPI_Session session,
 		HAPI_NodeId parent_node_id,
+		string categories,
 		out int object_count );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
