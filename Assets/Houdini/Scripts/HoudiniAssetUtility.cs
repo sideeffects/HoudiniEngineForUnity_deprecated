@@ -2134,9 +2134,9 @@ public class HoudiniAssetUtility
 		part_info.primitiveAttributeCount 	= 0;
 		part_info.detailAttributeCount 		= 0;
 
-		if ( uvs != null )
+		if ( uvs != null && uvs.Length > 0 )
 			part_info.pointAttributeCount++;
-		if ( normals != null )
+		if ( normals != null && normals.Length > 0 )
 			part_info.pointAttributeCount++;
 
 		HoudiniHost.setPartInfo( asset_id, object_id, geo_id, ref part_info );
@@ -2168,18 +2168,20 @@ public class HoudiniAssetUtility
 			HoudiniConstants.HAPI_ATTRIB_NORMAL, 3, normals,
 			setting_raw_mesh, true, part_info, part_control );
 
-		Vector3[] uvs3 = new Vector3[ uvs.Length ];
-		for ( int ii = 0; ii < uvs.Length; ii++ )
+		if ( uvs != null && uvs.Length > 0 )
 		{
-			uvs3[ ii ][ 0 ] = uvs[ ii ][ 0 ];
-			uvs3[ ii ][ 1 ] = uvs[ ii ][ 1 ];
-			uvs3[ ii ][ 2 ] = 0;
+			Vector3[] uvs3 = new Vector3[ uvs.Length ];
+			for ( int ii = 0; ii < uvs.Length; ii++ )
+			{
+				uvs3[ ii ][ 0 ] = uvs[ ii ][ 0 ];
+				uvs3[ ii ][ 1 ] = uvs[ ii ][ 1 ];
+				uvs3[ ii ][ 2 ] = 0;
+			}
+			setMeshPointAttribute( 
+				asset_id, object_id, geo_id, 
+				HoudiniConstants.HAPI_ATTRIB_UV, 3, uvs3,
+				setting_raw_mesh, false, part_info, part_control );
 		}
-
-		setMeshPointAttribute( 
-			asset_id, object_id, geo_id, 
-			HoudiniConstants.HAPI_ATTRIB_UV, 3, uvs3,
-			setting_raw_mesh, false, part_info, part_control );
 
 		// Add and set additional attributes.
 		if ( attribute_manager )
