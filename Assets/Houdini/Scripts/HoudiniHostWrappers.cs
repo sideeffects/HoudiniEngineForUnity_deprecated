@@ -986,7 +986,7 @@ public static partial class HoudiniHost
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int object_count = 0;
 		HAPI_Result status_code = HAPI_ComposeObjectList(
-			ref mySession, node_id, out object_count );
+			ref mySession, node_id, "", out object_count );
 		processStatusCode( status_code );
 
 		HAPI_Transform[] transforms = new HAPI_Transform[ object_count ];
