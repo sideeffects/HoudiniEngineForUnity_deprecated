@@ -426,7 +426,7 @@ public class HoudiniParmsGUI : Editor
 		}
 		///////////////////////////////////////////////////////////////////////
 		// File Path Field
-		else if ( parm.isFilePath() )
+		else if ( parm.isPath() )
 		{
 			string[] path = myParms.getParmStrings( parm );
 
@@ -462,7 +462,7 @@ public class HoudiniParmsGUI : Editor
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Node Path Field
-		else if ( parm.isNodePath() )
+		else if ( parm.isNode() )
 		{
 			bool gui_enable = GUI.enabled;
 			GUI.enabled = false; // This is not yet supported.
