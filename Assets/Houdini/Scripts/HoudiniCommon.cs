@@ -1012,6 +1012,9 @@ public struct HAPI_ParmInfo
 	public int stringValuesIndex;
 	public int choiceIndex;
 
+	HAPI_NodeType inputNodeType;
+	HAPI_NodeFlags inputNodeFlag;
+
 	[ MarshalAs( UnmanagedType.U1 ) ]
 	public bool isChildOfMultiParm;
 
