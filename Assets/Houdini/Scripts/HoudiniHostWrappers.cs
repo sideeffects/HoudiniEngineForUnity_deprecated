@@ -782,6 +782,19 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_NodeId getParmNodeValue(
+		HAPI_NodeId node_id, string parm_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_NodeId value = -1;
+		HAPI_Result status_code = HAPI_GetParmNodeValue( ref mySession, node_id, parm_name, out value );
+		processStatusCode( status_code );
+		return value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getParmChoiceLists(
 		HAPI_NodeId node_id, [Out] HAPI_ParmChoiceInfo[] parm_choices,
 		int start, int length )

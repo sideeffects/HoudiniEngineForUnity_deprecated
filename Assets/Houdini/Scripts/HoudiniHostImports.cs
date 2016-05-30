@@ -479,7 +479,7 @@ public static partial class HoudiniHost
 		out HAPI_NodeId connected_node_id );
 
 	// PARAMETERS -----------------------------------------------------------------------------------------------
-		
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParameters(
@@ -562,7 +562,15 @@ public static partial class HoudiniHost
 		[ MarshalAs( UnmanagedType.U1 ) ] bool evaluate,
 		[Out] HAPI_StringHandle[] values_array,
 		int start, int length );
-		
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetParmNodeValue(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		string parm_name,
+		out HAPI_NodeId value );
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetParmChoiceLists(
