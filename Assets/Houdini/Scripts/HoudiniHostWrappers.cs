@@ -865,6 +865,17 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void setParmNodeValue(
+		HAPI_NodeId node_id, string parm_name, HAPI_NodeId value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetParmNodeValue( ref mySession, node_id, parm_name, value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void insertMultiparmInstance(
 		HAPI_NodeId node_id, HAPI_ParmId parm_id,
 		int instance_position )
