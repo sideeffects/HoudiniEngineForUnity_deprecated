@@ -40,7 +40,13 @@ public static partial class HoudiniHost
 	public static bool isInstallationOk()
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		return ( prHoudiniSceneExists && myCurrentCSharpSessionInitialized ) || initializeHost();
+		bool houdini_scene_exists = prHoudiniSceneExists;
+		bool current_csharp_session_init = myCurrentCSharpSessionInitialized;
+		if ( houdini_scene_exists && current_csharp_session_init )
+			return true;
+		
+		bool host_initialized = initializeHost();
+		return host_initialized;
 #else
 		return false;
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -139,6 +145,9 @@ public static partial class HoudiniHost
 					ref mySession, ref cook_options, true, -1, otls_path, dsos_path, dsos_path, dsos_path );
 				if ( status_code != HAPI_Result.HAPI_RESULT_ALREADY_INITIALIZED )
 					processStatusCode( status_code );
+
+				// Set client name.
+				setServerEnvString( "HAPI_CLIENT_NAME", "unity" );
 			}
 			catch ( HoudiniError error )
 			{

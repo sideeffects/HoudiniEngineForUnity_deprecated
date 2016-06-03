@@ -39,11 +39,15 @@ public static partial class HoudiniHost
 
 	public static HAPI_License getCurrentLicense()
 	{
+		if ( myCurrentHoudiniLicense != HAPI_License.HAPI_LICENSE_NONE )
+			return myCurrentHoudiniLicense;
+
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 		int value;
 		HAPI_Result status_code = HAPI_GetSessionEnvInt( ref mySession, HAPI_SessionEnvIntType.HAPI_SESSIONENVINT_LICENSE, out value );
 		processStatusCode( status_code );
-		return (HAPI_License) value;
+		myCurrentHoudiniLicense = (HAPI_License) value;
+		return myCurrentHoudiniLicense;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -56,6 +60,51 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetEnvInt( int_type, out value );
 		processStatusCode( status_code );
 		return value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static int getServerEnvInt( string variable_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int value;
+		HAPI_Result status_code = HAPI_GetServerEnvInt( ref mySession, variable_name, out value );
+		processStatusCode( status_code );
+		return value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static string getServerEnvString( string variable_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_StringHandle value;
+		HAPI_Result status_code = HAPI_GetServerEnvString( ref mySession, variable_name, out value );
+		processStatusCode( status_code );
+		string str_value = getString( value );
+		return str_value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setServerEnvInt( string variable_name, int value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetServerEnvInt( ref mySession, variable_name, value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setServerEnvString( string variable_name, string value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetServerEnvString( ref mySession, variable_name, value );
+		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -1685,6 +1734,56 @@ public static partial class HoudiniHost
 	}
 
 	// CACHING --------------------------------------------------------------------------------------------------
+
+	public static string[] getActiveCacheNames()
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int cache_count = 0;
+		HAPI_Result status_code = HAPI_GetActiveCacheCount(
+			ref mySession, out cache_count );
+		processStatusCode( status_code );
+
+		int[] cache_names = new int[ cache_count ];
+		status_code = HAPI_GetActiveCacheNames(
+			ref mySession, cache_names, cache_count );
+		processStatusCode( status_code );
+
+		string[] name_strings = new string[ cache_count ];
+		for ( int i = 0; i < cache_count; ++i )
+			name_strings[ i ] = getString( cache_names[ i ] );
+
+		return name_strings;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static int getCacheProperty(
+		string cache_name, HAPI_CacheProperty cache_property )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int property_value = 0;
+		HAPI_Result status_code = HAPI_GetCacheProperty(
+			ref mySession, cache_name, cache_property, out property_value );
+		processStatusCode( status_code );
+
+		return property_value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setCacheProperty(
+		string cache_name, HAPI_CacheProperty cache_property, int property_value )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetCacheProperty(
+			ref mySession, cache_name, cache_property, property_value );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
 
 	public static void saveGeoToFile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 

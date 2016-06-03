@@ -121,8 +121,19 @@ public struct HoudiniConstants
 	/// Name of subnet OBJ node containing the global nodes.
 	public const string HAPI_GLOBAL_NODES_NODE_NAME		= "GlobalNodes";
 
+	/// Common cache names. You can see these same cache names in the
+	/// Cache Manager window in Houdini (Windows > Cache Manager).
+	public const string HAPI_CACHE_COP_COOK				= "COP Cook Cache";
+	public const string HAPI_CACHE_COP_FLIPBOOK			= "COP Flipbook Cache";
+	public const string HAPI_CACHE_IMAGE				= "Image Cache";
+	public const string HAPI_CACHE_OBJ					= "Object Transform Cache";
+	public const string HAPI_CACHE_GL_TEXTURE			= "OpenGL Texture Cache";
+	public const string HAPI_CACHE_GL_VERTEX			= "OpenGL Vertex Cache";
+	public const string HAPI_CACHE_SOP					= "SOP Cache";
+	public const string HAPI_CACHE_VEX					= "VEX File Cache";
+
 	public const string HAPI_UNSUPPORTED_PLATFORM_MSG   =
-		"Houdini Plugin for Unity currently only supports the Standalone Windows and Mac OSX platforms in Editor.\n" +
+		"Houdini Plugin for Unity currently only supports the Standalone Windows and Mac OS X platforms in Editor.\n" +
 		"\n" +
 		"To switch to the Standalone Windows platform go to File > Build Settings... and under 'Platform' " +
 		"choose 'PC, Mac & Linux Standalone' and click 'Switch Platform'. Afterwards, on the right hand side, " +
@@ -172,30 +183,31 @@ public enum HAPI_StatusVerbosity
 
 public enum HAPI_Result 
 {
-	HAPI_RESULT_SUCCESS								= 0,
-	HAPI_RESULT_FAILURE								= 1,
-	HAPI_RESULT_ALREADY_INITIALIZED					= 2,
-	HAPI_RESULT_NOT_INITIALIZED						= 3,
-	HAPI_RESULT_CANT_LOADFILE						= 4,
-	HAPI_RESULT_PARM_SET_FAILED						= 5,
-	HAPI_RESULT_INVALID_ARGUMENT					= 6,
-	HAPI_RESULT_CANT_LOAD_GEO						= 7,
-	HAPI_RESULT_CANT_GENERATE_PRESET				= 8,
-	HAPI_RESULT_CANT_LOAD_PRESET					= 9,
-	HAPI_RESULT_ASSET_DEF_ALREADY_LOADED			= 10,
+	HAPI_RESULT_SUCCESS									= 0,
+	HAPI_RESULT_FAILURE									= 1,
+	HAPI_RESULT_ALREADY_INITIALIZED						= 2,
+	HAPI_RESULT_NOT_INITIALIZED							= 3,
+	HAPI_RESULT_CANT_LOADFILE							= 4,
+	HAPI_RESULT_PARM_SET_FAILED							= 5,
+	HAPI_RESULT_INVALID_ARGUMENT						= 6,
+	HAPI_RESULT_CANT_LOAD_GEO							= 7,
+	HAPI_RESULT_CANT_GENERATE_PRESET					= 8,
+	HAPI_RESULT_CANT_LOAD_PRESET						= 9,
+	HAPI_RESULT_ASSET_DEF_ALREADY_LOADED				= 10,
 
-	HAPI_RESULT_NO_LICENSE_FOUND					= 110,
-	HAPI_RESULT_DISALLOWED_NC_LICENSE_FOUND			= 120,
-	HAPI_RESULT_DISALLOWED_NC_ASSET_WITH_C_LICENSE	= 130,
-	HAPI_RESULT_DISALLOWED_NC_ASSET_WITH_LC_LICENSE	= 140,
-	HAPI_RESULT_DISALLOWED_LC_ASSET_WITH_C_LICENSE	= 150,
+	HAPI_RESULT_NO_LICENSE_FOUND						= 110,
+	HAPI_RESULT_DISALLOWED_NC_LICENSE_FOUND				= 120,
+	HAPI_RESULT_DISALLOWED_NC_ASSET_WITH_C_LICENSE		= 130,
+	HAPI_RESULT_DISALLOWED_NC_ASSET_WITH_LC_LICENSE		= 140,
+	HAPI_RESULT_DISALLOWED_LC_ASSET_WITH_C_LICENSE		= 150,
+	HAPI_RESULT_DISALLOWED_HENGINEINDIE_W_3PARTY_PLUGIN = 160,
 
-	HAPI_RESULT_ASSET_INVALID						= 200,
-	HAPI_RESULT_NODE_INVALID						= 210,
+	HAPI_RESULT_ASSET_INVALID							= 200,
+	HAPI_RESULT_NODE_INVALID							= 210,
 
-	HAPI_RESULT_USER_INTERRUPTED					= 300,
+	HAPI_RESULT_USER_INTERRUPTED						= 300,
 
-	HAPI_RESULT_INVALID_SESSION						= 400
+	HAPI_RESULT_INVALID_SESSION							= 400
 };
 
 public enum HAPI_SessionType
@@ -528,6 +540,36 @@ public enum HAPI_SessionEnvIntType
 	HAPI_SESSIONENVINT_LICENSE = 100,
 
 	HAPI_SESSIONENVINT_MAX,
+};
+
+public enum HAPI_CacheProperty
+{
+    /// Current memory usage in MB. Setting this to 0 invokes
+    /// a cache clear.
+    HAPI_CACHEPROP_CURRENT,
+
+    HAPI_CACHEPROP_HAS_MIN, // True if it actually has a minimum size.
+    HAPI_CACHEPROP_MIN, // Min cache memory limit in MB.
+    HAPI_CACHEPROP_HAS_MAX, // True if it actually has a maximum size.
+    HAPI_CACHEPROP_MAX, // Max cache memory limit in MB.
+
+    /// How aggressive to cull memory. This only works for:
+    ///     - ::HAPI_CACHE_COP_COOK where:
+    ///         0   ->  Never reduce inactive cache.
+    ///         1   ->  Always reduce inactive cache.
+    ///     - ::HAPI_CACHE_OBJ where:
+    ///         0   ->  Never enforce the max memory limit.
+    ///         1   ->  Always enforce the max memory limit.
+    ///     - ::HAPI_CACHE_SOP where:
+    ///         0   ->  When to Unload = Never
+    ///                 When to Limit Max Memory = Never
+    ///         1-2 ->  When to Unload = Based on Flag
+    ///                 When to Limit Max Memory = Never
+    ///         3-4 ->  When to Unload = Based on Flag
+    ///                 When to Limit Max Memory = Always
+    ///         5   ->  When to Unload = Always
+    ///                 When to Limit Max Memory = Always
+    HAPI_CACHEPROP_CULL_LEVEL,
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

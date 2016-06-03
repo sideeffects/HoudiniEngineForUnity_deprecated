@@ -927,6 +927,20 @@ public class HoudiniAssetUtility
 				continue;
 			}
 
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+			// Next, check for Substance material in Houdini. If this is a Unity material
+			// we can skip the rest of the loop body.
+			if ( has_multiple_materials )
+				material = getSubstanceMaterialOnGroup( part_control, groups[ m ] );
+			else
+				material = getSubstanceMaterialOnPart( part_control );
+			if ( material != null )
+			{
+				materials[ m ] = material;
+				continue;
+			}
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+
 			// Get the material from the shared materials list or create it if it doesn't exist.
 			if ( materials[ m ] != null )
 				material = materials[ m ];
@@ -1003,6 +1017,11 @@ public class HoudiniAssetUtility
 
 	public static Texture2D extractHoudiniImageToTexture( 
 		HAPI_MaterialInfo material_info, string folder_path, string image_planes )
+	{
+		return extractHoudiniImageToTexture( material_info, folder_path, image_planes, false );
+	}
+	public static Texture2D extractHoudiniImageToTexture( 
+		HAPI_MaterialInfo material_info, string folder_path, string image_planes, bool is_normal )
 	{
 		Texture2D result = null;
 		try
@@ -1097,6 +1116,18 @@ public class HoudiniAssetUtility
 				string relative_file_path = texture_file_path.Replace(
 					Application.dataPath, "Assets" );
 
+				// Set import settings.
+				TextureImporter importer = AssetImporter.GetAtPath( relative_file_path ) as TextureImporter;
+				if ( !importer )
+				{
+					// If this is the first time the texture is being imported, the importer won't find
+					// it. We must import the asset first, then setup the importer, and then import
+					// the asset again.
+					AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
+					importer = AssetImporter.GetAtPath( relative_file_path ) as TextureImporter;
+				}
+				importer.normalmap = is_normal;
+
 				// Load the texture and assign it to the material. Note that LoadAssetAtPath only 
 				// understands paths relative to the project folder.
 				AssetDatabase.ImportAsset( relative_file_path, ImportAssetOptions.Default );
@@ -1133,19 +1164,35 @@ public class HoudiniAssetUtility
 		{
 			try
 			{
-				HoudiniHost.renderTextureToImage( 
+				HoudiniHost.renderTextureToImage(
 					material_info.assetId, material_info.id, diffuse_map_parm_id );
 
 				material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" );
-				material.SetTexture( 
-					"_NormalMap", extractHoudiniImageToTexture( material_info, folder_path, "N" ) );
 			}
 			catch ( HoudiniError ) {}
 		}
-			
+
+		// Extract normal map file from material.
+		int normal_map_parm_id = findParm( ref parms, "ogl_normalmap" ); 
+		if ( normal_map_parm_id >= 0 )
+		{
+			try
+			{
+				HoudiniHost.renderTextureToImage(
+					material_info.assetId, material_info.id, normal_map_parm_id );
+
+				material.SetTexture(
+					"_BumpMap", extractHoudiniImageToTexture( material_info, folder_path, "C A", true ) );
+			}
+			catch ( HoudiniError ) {}
+		}
+
 		// Assign shader properties.
 
-		material.SetFloat( "_Shininess", 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) );
+		// Shininess cannot go to 0.0f as that makes for very hard shadows. Not even the Unity
+		// UI lets you set Shininess to 0. We need to clamp it slighly off zero.
+		material.SetFloat( "_Shininess",
+			Mathf.Max( 0.03f, 1.0f - getParmFloatValue( material_info.nodeId, "ogl_rough", 0.0f ) ) );
 
 		Color diffuse_colour = getParmColour3Value( material_info.nodeId, "ogl_diff", Color.white );
 		diffuse_colour.a = getParmFloatValue( material_info.nodeId, "ogl_alpha", 1.0f );
@@ -1281,6 +1328,221 @@ public class HoudiniAssetUtility
 
 		return getUnityMaterial( material_path, 0, part_control );
 	}
+
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+	public static Material getSubstanceMaterial( HAPI_MaterialInfo material_info, HoudiniPartControl part_control )
+	{
+#if UNITY_EDITOR
+		if ( !material_info.exists )
+			return null;
+
+		// Get the material SHOP parameters.
+		HAPI_NodeInfo material_node_info	= HoudiniHost.getNodeInfo( material_info.nodeId );
+		HAPI_ParmInfo[] parms = new HAPI_ParmInfo[ material_node_info.parmCount ];
+		getArray1Id( material_info.nodeId, HoudiniHost.getParameters, parms, material_node_info.parmCount );
+
+		// See if this is the Substance SHOP. For now, we look at the first label parameter.
+		bool is_substance_material = false;
+		int substance_heading_id = findParm( ref parms, "fileheading" );
+		if ( substance_heading_id >= 0 )
+		{
+			string heading_name = parms[ substance_heading_id ].label;
+			is_substance_material = heading_name == "Substance";
+		}
+		if ( !is_substance_material )
+			return null;
+
+		// Get true asset name. Need to do this because this code might run before the asset
+		// in Unity has the proper name.
+		var asset_node_info = HoudiniHost.getNodeInfo( part_control.prAsset.prNodeId );
+		string asset_name = asset_node_info.name;
+
+		// Get the substance file path from the SHOP.
+		string filepath = HoudiniHost.getParmStringValue( material_info.nodeId, "filename", 0 );
+		string filename = Path.GetFileName( filepath );
+		string filename_noext = Path.GetFileNameWithoutExtension( filepath );
+
+		// Try loading the material in various ways.
+		Material material = null;
+		{
+			material = (Material) Resources.Load( filename_noext, typeof( Material ) );
+			if ( material )
+			{
+				string full_path = AssetDatabase.GetAssetPath( material );
+				AssetDatabase.ImportAsset( full_path, ImportAssetOptions.Default );
+				material = (Material) AssetDatabase.LoadAssetAtPath( full_path, typeof( Material ) );
+			}
+
+			// The substance file is already within this Unity Project so let's use that one.
+			if ( !material && filepath.StartsWith( Application.dataPath ) )
+			{
+				string relative_path = filepath.Replace( Application.dataPath, "Assets" );
+				//Debug.Log( "Using material already in Unity: " + relative_path );
+				AssetDatabase.ImportAsset( relative_path, ImportAssetOptions.Default );
+				material = (Material) AssetDatabase.LoadAssetAtPath( relative_path, typeof( Material ) );
+			}
+
+			string substance_copied_file_dir = HoudiniConstants.HAPI_TEXTURES_PATH + "/" + asset_name;
+			string substance_copied_file_abs_path = substance_copied_file_dir + "/" + filename;
+			string substance_copied_file_relative_path = "Assets/Textures/" + asset_name + "/" + filename;
+
+			// The substance file was not originally in this Unity project but was already copied
+			// over so let's used the copied one.
+			if ( !material && File.Exists( substance_copied_file_abs_path ) )
+			{
+				//Debug.Log( "Using already copied material: " + substance_copied_file_relative_path );
+				AssetDatabase.ImportAsset( substance_copied_file_relative_path, ImportAssetOptions.Default );
+				material = (Material) AssetDatabase.LoadAssetAtPath( substance_copied_file_relative_path, typeof( Material ) );
+			}
+
+			// The substance file is not within the current Unity project. We need to copy it over.
+			if ( !material )
+			{
+				//Debug.Log( "Copying material from: " + filepath + "\nto: " + substance_copied_file_abs_path );
+				if ( !File.Exists( filepath ) )
+					Debug.LogError( "Houdini: Could not find substance material file: " + filepath );
+				else
+				{
+					// Create Textures directory if it doesn't exist.
+					if ( !Directory.Exists( substance_copied_file_dir ) )
+						Directory.CreateDirectory( substance_copied_file_dir );
+
+					// Copy the Substance file into the Unity project.
+					File.Copy( filepath, substance_copied_file_abs_path );
+
+					// Try to import the asset.
+					AssetDatabase.ImportAsset( substance_copied_file_relative_path, ImportAssetOptions.Default );
+					material = (Material) AssetDatabase.LoadAssetAtPath( substance_copied_file_relative_path, typeof( Material ) );
+				}
+			}
+		}
+		if ( !material )
+			return null;
+
+		// Try Substance import.
+		string abs_path = AssetDatabase.GetAssetPath( material );
+		SubstanceImporter substance_importer = AssetImporter.GetAtPath( abs_path ) as SubstanceImporter;
+		if ( !substance_importer )
+			return null;
+
+		// Get proptotype names (defaults) from which to instantiate new materials from.
+		var prototype_names = substance_importer.GetPrototypeNames();
+		string main_prototype = prototype_names[ 0 ];
+		string substance_instance_name = main_prototype + "_" + asset_name + "_" + material_node_info.name;
+
+		ProceduralMaterial[] procedural_materials = substance_importer.GetMaterials();
+		ProceduralMaterial procedural_material =
+			System.Array.Find( procedural_materials, m => m.name == substance_instance_name );
+
+		if ( !procedural_material )
+		{
+			//Debug.Log( "Creating new " + main_prototype + " sub_substance for " + asset_name );
+			string new_instance_name = substance_importer.InstantiateMaterial( main_prototype );
+			substance_importer.SaveAndReimport();
+
+			procedural_materials = substance_importer.GetMaterials();
+			procedural_material = System.Array.Find( procedural_materials, m => m.name == new_instance_name );
+
+			if ( procedural_material )
+			{
+				//Debug.Log( "Renaming to: " + substance_instance_name );
+				substance_importer.RenameMaterial( procedural_material, substance_instance_name );
+				substance_importer.SaveAndReimport();
+
+				// Must find the material AGAIN.
+				procedural_materials = substance_importer.GetMaterials();
+				procedural_material =
+					System.Array.Find( procedural_materials, m => m.name == substance_instance_name );
+			}
+		}
+
+		// If our fancy material creation above failed, just chose the first instance.
+		if ( !procedural_material )
+		{
+			//Debug.Log( "No pure substance instance found!" );
+			procedural_material = procedural_materials[ 0 ];
+		}
+
+		// Need to build a dictionary where the label of each procedural property is the key.
+		// This is because Houdini gives us the UIDs of each property and the labels while
+		// Unity has the label but has a friendly-looking property name which is not the UID.
+		// All we have to match the two worlds is the label.
+		var properties = procedural_material.GetProceduralPropertyDescriptions();
+		var prop_dict = new Dictionary< string, string >();
+		foreach ( var property in properties )
+			prop_dict.Add( property.label, property.name );
+
+		foreach ( var parm in parms )
+		{
+			if ( !parm.name.StartsWith( "_substanceInput" ) )
+				continue;
+
+			if ( !prop_dict.ContainsKey( parm.label ) )
+				continue;
+
+			//string substance_parm_id_str = System.Text.RegularExpressions.Regex.Replace( parm.name, "[^0-9]", "" );
+			//Debug.Log( substance_parm_id_str );
+			//int substance_parm_id = int.Parse( System.Text.RegularExpressions.Regex.Replace( parm.name, "[^0-9]", "" ) );
+
+			if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_INT )
+			{
+				int value = HoudiniHost.getParmIntValue( material_info.nodeId, parm.name, 0 );
+				//Debug.Log( "Set parm " + parm.name + " (" + parm.label + ") to " + value + " on " + prop_dict[ parm.label ] );
+				procedural_material.SetProceduralFloat( prop_dict[ parm.label ], (float) value );
+			}
+
+			if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_FLOAT )
+			{
+				float value = HoudiniHost.getParmFloatValue( material_info.nodeId, parm.name, 0 );
+				//Debug.Log( "Set parm " + parm.name + " (" + parm.label + ") to " + value + " on " + prop_dict[ parm.label ] );
+				procedural_material.SetProceduralFloat( prop_dict[ parm.label ], value );
+			}
+
+			if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_COLOR )
+			{
+				Color value = new Color(
+					HoudiniHost.getParmFloatValue( material_info.nodeId, parm.name, 0 ),
+					HoudiniHost.getParmFloatValue( material_info.nodeId, parm.name, 1 ),
+					HoudiniHost.getParmFloatValue( material_info.nodeId, parm.name, 2 ) );
+				if ( parm.size == 4 )
+					value.a = HoudiniHost.getParmFloatValue( material_info.nodeId, parm.name, 3 );
+				else
+					value.a = 1.0f;
+				//Debug.Log( "Set parm " + parm.name + " (" + parm.label + ") to " + value + " on " + prop_dict[ parm.label ] );
+				procedural_material.SetProceduralColor( prop_dict[ parm.label ], value );
+			}
+		}
+
+		// Need to rebuild textures for the procedural property changes to take affect.
+		procedural_material.RebuildTexturesImmediately();
+
+		material = procedural_material;
+
+		return material;
+#else
+		return null;
+#endif // UNITY_EDITOR
+	}
+
+	public static Material getSubstanceMaterialOnGroup( HoudiniPartControl part_control, string group_name )
+	{
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		material_info = HoudiniHost.getMaterialOnGroup(
+			part_control.prAssetId, part_control.prObjectId, part_control.prGeoId, group_name );
+
+		return getSubstanceMaterial( material_info, part_control );
+	}
+
+	public static Material getSubstanceMaterialOnPart( HoudiniPartControl part_control )
+	{
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		material_info = HoudiniHost.getMaterialOnPart(
+			part_control.prAssetId, part_control.prObjectId, part_control.prGeoId,
+			part_control.prPartId );
+
+		return getSubstanceMaterial( material_info, part_control );
+	}
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 
@@ -1795,9 +2057,9 @@ public class HoudiniAssetUtility
 		part_info.faceAttributeCount 	= 0;
 		part_info.detailAttributeCount 	= 0;
 
-		if ( uvs != null )
+		if ( uvs != null && uvs.Length > 0 )
 			part_info.pointAttributeCount++;
-		if ( normals != null )
+		if ( normals != null && normals.Length > 0 )
 			part_info.pointAttributeCount++;
 
 		HoudiniHost.setGeoInfo( asset_id, object_id, geo_id, ref geo_info );
@@ -1830,18 +2092,20 @@ public class HoudiniAssetUtility
 			HoudiniConstants.HAPI_ATTRIB_NORMAL, 3, normals,
 			setting_raw_mesh, true, part_info, part_control );
 
-		Vector3[] uvs3 = new Vector3[ uvs.Length ];
-		for ( int ii = 0; ii < uvs.Length; ii++ )
+		if ( uvs != null && uvs.Length > 0 )
 		{
-			uvs3[ ii ][ 0 ] = uvs[ ii ][ 0 ];
-			uvs3[ ii ][ 1 ] = uvs[ ii ][ 1 ];
-			uvs3[ ii ][ 2 ] = 0;
+			Vector3[] uvs3 = new Vector3[ uvs.Length ];
+			for ( int ii = 0; ii < uvs.Length; ii++ )
+			{
+				uvs3[ ii ][ 0 ] = uvs[ ii ][ 0 ];
+				uvs3[ ii ][ 1 ] = uvs[ ii ][ 1 ];
+				uvs3[ ii ][ 2 ] = 0;
+			}
+			setMeshPointAttribute( 
+				asset_id, object_id, geo_id, 
+				HoudiniConstants.HAPI_ATTRIB_UV, 3, uvs3,
+				setting_raw_mesh, false, part_info, part_control );
 		}
-
-		setMeshPointAttribute( 
-			asset_id, object_id, geo_id, 
-			HoudiniConstants.HAPI_ATTRIB_UV, 3, uvs3,
-			setting_raw_mesh, false, part_info, part_control );
 
 		// Add and set additional attributes.
 		if ( attribute_manager )

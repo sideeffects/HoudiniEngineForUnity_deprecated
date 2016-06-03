@@ -113,6 +113,22 @@ public static partial class HoudiniHost
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetServerEnvInt( ref HAPI_Session session, string variable_name, out int value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetServerEnvString( ref HAPI_Session session, string variable_name, out HAPI_StringHandle value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetServerEnvInt( ref HAPI_Session session, string variable_name, int value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetServerEnvString( ref HAPI_Session session, string variable_name, string value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetStatus( ref HAPI_Session session, HAPI_StatusType status_code, out int status );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
@@ -1154,6 +1170,33 @@ public static partial class HoudiniHost
 		int start, int length );
 
 	// CACHING --------------------------------------------------------------------------------------------------
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetActiveCacheCount( ref HAPI_Session session, out int active_cache_count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetActiveCacheNames(
+		ref HAPI_Session session,
+		[Out] HAPI_StringHandle[] cache_names_array,
+		int active_cache_count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetCacheProperty(
+		ref HAPI_Session session,
+		string cache_name,
+		HAPI_CacheProperty cache_property,
+		out int property_value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetCacheProperty(
+		ref HAPI_Session session,
+		string cache_name,
+		HAPI_CacheProperty cache_property,
+		int property_value );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

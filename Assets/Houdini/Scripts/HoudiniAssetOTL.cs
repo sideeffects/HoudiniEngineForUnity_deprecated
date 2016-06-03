@@ -157,7 +157,12 @@ public class HoudiniAssetOTL : HoudiniAsset
 				throw new HoudiniError(
 					"Houdini asset file has moved from last location: " + prAssetPath );
 			}
-			prAssetPath = AssetDatabase.GUIDToAssetPath( guids[ 0 ] );
+			string new_path = AssetDatabase.GUIDToAssetPath( guids[ 0 ] );
+			if ( new_path != null && new_path != "" )
+			{
+				Debug.Log( "Changing asset path for " + name + " to: " + new_path );
+				prAssetPath = new_path;
+			}
 		}
 #endif // UNITY_4_3 || UNITY_4_4
 #endif // UNITY_EDITOR
@@ -184,7 +189,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 		// Get exposed handle information.
 		prHandleInfos = new HAPI_HandleInfo[ prHandleCount ];
 		HoudiniAssetUtility.getArray1Id( prAssetId, HoudiniHost.getHandleInfo, prHandleInfos, prHandleCount );
-				
+
 		// Get handles.
 		prHandleBindingInfos = new List< HAPI_HandleBindingInfo[] >( prHandleCount );
 		for ( int handle_index = 0; handle_index < prHandleCount; ++handle_index )
@@ -193,8 +198,9 @@ public class HoudiniAssetOTL : HoudiniAsset
 			HAPI_HandleInfo handle_info = prHandleInfos[ handle_index ];
 
 			HAPI_HandleBindingInfo[] binding_infos = new HAPI_HandleBindingInfo[ handle_info.bindingsCount ];
-			HoudiniAssetUtility.getArray2Id( prAssetId, handle_index, HoudiniHost.getHandleBindingInfo, 
-								 	binding_infos, handle_info.bindingsCount );
+			HoudiniAssetUtility.getArray2Id(
+				prAssetId, handle_index, HoudiniHost.getHandleBindingInfo, 
+				binding_infos, handle_info.bindingsCount );
 
 			prHandleBindingInfos.Add( binding_infos );
 		}

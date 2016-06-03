@@ -175,6 +175,9 @@ public static partial class HoudiniHost
 	// This is to keep track whether we actually initialized Houdini Engine in this session/state/runtime of C#.
 	private static bool myCurrentCSharpSessionInitialized = false;
 
+	// License Type
+	private static HAPI_License myCurrentHoudiniLicense = HAPI_License.HAPI_LICENSE_NONE;
+
 	static HoudiniHost()
 	{
 		// Initialize the global session.
@@ -274,7 +277,17 @@ public static partial class HoudiniHost
 		}
 		else
 		{
-			prMidPlaymodeStateChange = false;
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR
+			// It's important here to reset prMidPlaymodeStateChange to the playmode state,
+			// not just reset it to false. This is because this part will be called DURING
+			// a playmode change because myCurrentCSharpSessionInitialized will be
+			// invalidated at that point.
+			prMidPlaymodeStateChange = EditorApplication.isPlayingOrWillChangePlaymode;
+#endif // UNITY_EDITOR
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+
+			// Call HAPI_Initialize() if needed.
 			if ( !initialize() )
 				return false;
 		}
@@ -877,7 +890,10 @@ public static partial class HoudiniHost
 	public static bool isRealDestroy()
 	{
 #if UNITY_EDITOR
-		return !EditorApplication.isPlayingOrWillChangePlaymode && !prMidPlaymodeStateChange;
+		bool is_playing_or_will_change_playmode = !EditorApplication.isPlayingOrWillChangePlaymode;
+		bool is_mid_playmode_state_change = prMidPlaymodeStateChange;
+		bool answer = !is_playing_or_will_change_playmode && !is_mid_playmode_state_change;
+		return answer;
 #else
 		return true;
 #endif // UNITY_EDITOR
