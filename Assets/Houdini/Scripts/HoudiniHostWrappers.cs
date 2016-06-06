@@ -2317,6 +2317,56 @@ public static partial class HoudiniHost
 
 	// VOLUMES --------------------------------------------------------------------------------------------------
 
+	public static HAPI_VolumeInfo getVolumeInfo( HAPI_NodeId node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_VolumeInfo volume_info = new HAPI_VolumeInfo();
+		HAPI_Result status_code = HAPI_GetVolumeInfoOnNode( ref mySession, node_id, part_id, ref volume_info );
+		processStatusCode( status_code );
+		return volume_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_VolumeTileInfo getFirstVolumeTile( HAPI_NodeId node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_VolumeTileInfo tile = new HAPI_VolumeTileInfo();
+		HAPI_Result status_code = HAPI_GetFirstVolumeTileOnNode( ref mySession, node_id, part_id, ref tile );
+		processStatusCode( status_code );
+		return tile;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_VolumeTileInfo getNextVolumeTile(
+		HAPI_NodeId node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_VolumeTileInfo next = new HAPI_VolumeTileInfo();
+		HAPI_Result status_code = HAPI_GetNextVolumeTileOnNode( ref mySession, node_id, part_id, ref next );
+		processStatusCode( status_code );
+		return next;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getVolumeTileFloatData(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		ref HAPI_VolumeTileInfo tile, [Out] float[] values )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_GetVolumeTileFloatDataOnNode(
+			ref mySession, node_id, part_id, 0.0f, ref tile, values, values.Length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getVolumeInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeInfo volume_info )
