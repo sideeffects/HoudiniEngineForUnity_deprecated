@@ -2418,6 +2418,63 @@ public static partial class HoudiniHost
 
 	// CURVES ---------------------------------------------------------------------------------------------------
 
+	public static HAPI_CurveInfo getCurveInfo( HAPI_NodeId node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_CurveInfo curve_info = new HAPI_CurveInfo();
+		HAPI_Result status_code = HAPI_GetCurveInfoOnNode( ref mySession, node_id, part_id, ref curve_info );
+		processStatusCode( status_code );
+		return curve_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static int[] getCurveCounts(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int[] counts = new int[ length ];
+		HAPI_Result status_code = HAPI_GetCurveCountsOnNode(
+			ref mySession, node_id, part_id, counts, start, length );
+		processStatusCode( status_code );
+		return counts;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static int[] getCurveOrders(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int[] orders = new int[ length ];
+		HAPI_Result status_code = HAPI_GetCurveOrdersOnNode(
+			ref mySession, node_id, part_id, orders, start, length );
+		processStatusCode( status_code );
+		return orders;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static float[] getCurveKnots(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		float[] knots = new float[ length ];
+		HAPI_Result status_code = HAPI_GetCurveKnotsOnNode(
+			ref mySession, node_id, part_id, knots, start, length );
+		processStatusCode( status_code );
+		return knots;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static HAPI_CurveInfo getCurveInfo(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
 		ref HAPI_VolumeInfo volume_info )

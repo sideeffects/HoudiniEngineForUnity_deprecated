@@ -1601,6 +1601,68 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetCurveInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		ref HAPI_CurveInfo curve_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetCurveCountsOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		[Out] int[] counts_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetCurveOrdersOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		[Out] int[] orders_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetCurveKnotsOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		[Out] float[] knots_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetCurveInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		ref HAPI_CurveInfo curve_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetCurveCountsOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int[] counts_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetCurveOrdersOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		int[] orders_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetCurveKnotsOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		float[] knots_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetCurveInfo(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
