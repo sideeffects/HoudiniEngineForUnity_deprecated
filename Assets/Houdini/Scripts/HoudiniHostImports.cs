@@ -1770,6 +1770,41 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_SaveGeoToFileOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		string file_name );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_LoadGeoFromFileOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		string file_name );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetGeoSizeOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		string format, out int size );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SaveGeoToMemoryOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		[Out] byte[] buffer, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_LoadGeoFromMemoryOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		string format, byte[] buffer, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_SaveGeoToFile(
 		ref HAPI_Session session,
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,

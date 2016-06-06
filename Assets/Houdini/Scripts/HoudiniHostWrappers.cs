@@ -2617,6 +2617,66 @@ public static partial class HoudiniHost
 	}
 
 	public static void saveGeoToFile(
+		HAPI_NodeId node_id, 
+		string file_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SaveGeoToFileOnNode(
+			ref mySession, node_id, file_name );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void loadGeoFromFile(
+		HAPI_NodeId node_id, 
+		string file_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_LoadGeoFromFileOnNode(
+			ref mySession, node_id, file_name );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static byte[] saveGeoToMemory(
+		HAPI_NodeId node_id, 
+		string format )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int size;
+		HAPI_Result status_code = HAPI_GetGeoSizeOnNode(
+			ref mySession, node_id, format, out size );
+		processStatusCode( status_code );
+
+		byte[] memory = new byte[ size ];
+		status_code = HAPI_SaveGeoToMemoryOnNode(
+			ref mySession, node_id, memory, size );
+		processStatusCode( status_code );
+
+		return memory;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void loadGeoFromMemory(
+		HAPI_NodeId node_id,
+		string format, byte[] buffer )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_LoadGeoFromMemoryOnNode(
+			ref mySession, node_id, format, buffer, buffer.Length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void saveGeoToFile(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
 		string file_name )
 	{
