@@ -134,6 +134,7 @@ public static partial class HoudiniHost
 	public const bool myDefaultTransformChangeTriggersCooks				= false;
 	public const bool myDefaultImportTemplatedGeos						= false;
 	public const bool myDefaultSplitGeosByGroup							= true;
+	public const bool myDefaultSplitPointsByVertexAttributes			= true;
 
 	private const string myDefaultUnityTagAttribName					= "unity_tag";
 
@@ -221,7 +222,8 @@ public static partial class HoudiniHost
 		setBool(	"HAPI_TransformChangeTriggersCooks", myDefaultTransformChangeTriggersCooks, true );
 		setBool(	"HAPI_ImportTemplatedGeos", myDefaultImportTemplatedGeos, true );
 		setBool(	"HAPI_SplitGeosByGroup", myDefaultSplitGeosByGroup, true );
-		
+		setBool(	"HAPI_SplitPointsByVertexAttributes", myDefaultSplitPointsByVertexAttributes, true );
+
 		setString(	"HAPI_UnityTagAttribName", myDefaultUnityTagAttribName, true );
 		
 		setFloat(	"HAPI_PaintBrushRate", myDefaultPaintBrushRate, true );
@@ -383,6 +385,9 @@ public static partial class HoudiniHost
 	public static bool prSplitGeosByGroup {
 											get { return getBool( "HAPI_SplitGeosByGroup" ); }
 											set { setBool( "HAPI_SplitGeosByGroup", value ); } }
+	public static bool prSplitPointsByVertexAttributes {
+											get { return getBool( "HAPI_SplitPointsByVertexAttributes" ); }
+											set { setBool( "HAPI_SplitPointsByVertexAttributes", value ); } }
 
 	public static string prUnityTagAttribName {
 											get { return getString( "HAPI_UnityTagAttribName" ); }
@@ -572,6 +577,9 @@ public static partial class HoudiniHost
 	public static bool isSplitGeosByGroupDefault()
 											{ return	prSplitGeosByGroup ==
 														myDefaultSplitGeosByGroup; }
+	public static bool isSplitPointsByVertexAttributesDefault()
+											{ return	prSplitPointsByVertexAttributes ==
+														myDefaultSplitPointsByVertexAttributes; }
 
 	public static bool isUnityTagAttribNameDefault()
 											{ return	prUnityTagAttribName ==
@@ -682,6 +690,7 @@ public static partial class HoudiniHost
 		prTransformChangeTriggersCooks			= myDefaultTransformChangeTriggersCooks;
 		prImportTemplatedGeos					= myDefaultImportTemplatedGeos;
 		prSplitGeosByGroup						= myDefaultSplitGeosByGroup;
+		prSplitPointsByVertexAttributes 		= myDefaultSplitPointsByVertexAttributes;
 
 		prUnityTagAttribName					= myDefaultUnityTagAttribName;
 
@@ -735,13 +744,19 @@ public static partial class HoudiniHost
 	}
 
 	public static int loadOTL(
-		string path, bool split_geos_by_group, bool import_templated_geos,
+		string path, bool split_geos_by_group, bool split_points_by_vertex_attributes, bool import_templated_geos,
 		HoudiniProgressBar progress_bar )
 	{
-		return loadOTL( path, split_geos_by_group, import_templated_geos, progress_bar, true );
+		return loadOTL(
+			path,
+			split_geos_by_group,
+			split_points_by_vertex_attributes,
+			import_templated_geos,
+			progress_bar,
+			true );
 	}
 	public static int loadOTL(
-		string path, bool split_geos_by_group, bool import_templated_geos,
+		string path, bool split_geos_by_group, bool split_points_by_vertex_attributes, bool import_templated_geos,
 		HoudiniProgressBar progress_bar, bool allow_asset_def_overwrite ) 
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -800,7 +815,7 @@ public static partial class HoudiniHost
 		status_code = HAPI_InstantiateAsset( ref mySession, first_asset_name, cook_on_load, out asset_id );
 		processStatusCode( status_code );
 		progress_bar.statusCheckLoop();
-		cookAsset( asset_id, split_geos_by_group, import_templated_geos );
+		cookAsset( asset_id, split_geos_by_group, split_points_by_vertex_attributes, import_templated_geos );
 		progress_bar.statusCheckLoop();
 
 		return asset_id;
@@ -885,6 +900,25 @@ public static partial class HoudiniHost
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+	}
+
+	public static HAPI_CookOptions getCookOptions(
+		bool split_geos_by_group, bool split_points_by_vertex_attributes, bool import_templated_geos )
+	{
+		HAPI_CookOptions cook_options = new HAPI_CookOptions();
+		cook_options.splitGeosByGroup = split_geos_by_group;
+		cook_options.maxVerticesPerPrimitive = HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
+		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
+		cook_options.cookTemplatedGeos = import_templated_geos;
+		cook_options.clearErrorsAndWarnings = split_points_by_vertex_attributes;
+		cook_options.packedPrimInstancingMode =
+			HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
+		return cook_options;
+	}
+	public static HAPI_CookOptions getCookOptions()
+	{
+		return getCookOptions( prSplitGeosByGroup, prSplitPointsByVertexAttributes, prImportTemplatedGeos );
 	}
 
 	public static bool isRealDestroy()

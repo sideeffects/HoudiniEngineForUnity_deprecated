@@ -237,6 +237,8 @@ public abstract class HoudiniAsset : HoudiniControl
 														? mySplitGeosByGroup
 														: HoudiniHost.prSplitGeosByGroup; } 
 												set { mySplitGeosByGroup = value; } }
+	public bool prSplitPointsByVertexAttribute { get { return HoudiniHost.prSplitPointsByVertexAttributes; }
+												private set { } }
 
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
 																	set { myEnableLogging = value; } }
@@ -1403,7 +1405,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		prParms.setChangedParametersIntoHost();
 
-		HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup, prImportTemplatedGeos );
+		HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup, prSplitPointsByVertexAttribute, prImportTemplatedGeos );
 		progress_bar.statusCheckLoop();
 
 		myProgressBarJustUsed = true;
@@ -1725,7 +1727,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			{
 				HoudiniHost.setTime( curr_time );
 				
-				HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup, prImportTemplatedGeos );
+				HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup, prSplitPointsByVertexAttribute, prImportTemplatedGeos );
 				
 				HAPI_State state = HAPI_State.HAPI_STATE_STARTING_LOAD;
 					
@@ -1816,7 +1818,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			if ( myPreset != null && myPreset.Length > 0 )
 			{
 				HoudiniHost.setPreset( prNodeId, myPreset );
-				HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup, prImportTemplatedGeos );
+				HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup, prSplitPointsByVertexAttribute, prImportTemplatedGeos );
 			}
 		}
 		catch ( HoudiniError error )

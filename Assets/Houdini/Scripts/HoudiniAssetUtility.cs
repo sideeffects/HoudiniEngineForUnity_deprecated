@@ -1631,25 +1631,34 @@ public class HoudiniAssetUtility
 					  ref tangent_attr_info, ref tangent_attr, HoudiniHost.getAttributeFloatData );
 		
 		// Save properties.
-		part_control.prVertexList			= vertex_list;
+		part_control.prVertexList = vertex_list;
+
+		// Depending on whether we split points by vertices, our Unity-vertex count will
+		// depending either the Houdini-vertex count or Houdini point-count.
+		bool point_split = HoudiniHost.prSplitPointsByVertexAttributes;
+		int true_vertex_count = part_info.vertexCount;
+		if ( point_split )
+			true_vertex_count = part_info.pointCount;
 		
 		// Create Unity-specific data objects.
-		Vector3[] vertices 	= new Vector3[ 	part_info.vertexCount ];
-		int[] triangles 	= new int[ 		part_info.faceCount * 3 ];
-		Vector2[] uvs 		= new Vector2[ 	part_info.vertexCount ];
-		Vector2[] uv2s		= new Vector2[  part_info.vertexCount ];
-		Vector2[] uv3s		= new Vector2[  part_info.vertexCount ];
-		Vector3[] normals 	= new Vector3[ 	part_info.vertexCount ];
-		Color[] colours		= new Color[	part_info.vertexCount ];
-		Vector4[] tangents	= generate_tangents ? new Vector4[ part_info.vertexCount ] : null;
+		Vector3[] vertices 	= new Vector3[ 	true_vertex_count ];
+		Vector2[] uvs 		= new Vector2[ 	true_vertex_count ];
+		Vector2[] uv2s		= new Vector2[  true_vertex_count ];
+		Vector2[] uv3s		= new Vector2[  true_vertex_count ];
+		Vector3[] normals 	= new Vector3[ 	true_vertex_count ];
+		Color[] colours		= new Color[	true_vertex_count ];
+		Vector4[] tangents	= generate_tangents ? new Vector4[ true_vertex_count ] : null;
 		
 		// Fill Unity-specific data objects with data from the runtime.
-		for ( int i = 0; i < part_info.vertexCount; ++i ) 
+		for ( int i = 0; i < true_vertex_count; ++i ) 
 		{
 			// Fill position information.
 			for ( int j = 0; j < 3; ++j )
 			{
-				vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
+				if ( point_split )
+					vertices[ i ][ j ] = pos_attr[ i * 3 + j ];
+				else
+					vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
 				// Flip the x coordinate.
 				if ( j == 0 )
 					vertices[ i ][ j ] *= -1;
@@ -1659,7 +1668,9 @@ public class HoudiniAssetUtility
 			if ( uv_attr_info.exists )
 			{
 				// If the UVs are per vertex just query directly into the UV array we filled above.
-				if ( uv_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				// This is also the case if we did a point-split by vertex attributes as all the
+				// vertex attributes should now be point attributes.
+				if ( uv_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || point_split )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
 				
@@ -1672,7 +1683,7 @@ public class HoudiniAssetUtility
 			if ( uv2_attr_info.exists )
 			{
 				// If the UVs are per vertex just query directly into the UV array we filled above.
-				if ( uv2_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( uv2_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || point_split )
 					for ( int j = 0; j < 2; ++j )
 						uv2s[ i ][ j ] = uv2_attr[ i * 2 + j ];
 				
@@ -1685,7 +1696,7 @@ public class HoudiniAssetUtility
 			if ( uv3_attr_info.exists )
 			{
 				// If the UVs are per vertex just query directly into the UV array we filled above.
-				if ( uv3_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( uv3_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || point_split )
 					for ( int j = 0; j < 2; ++j )
 						uv3s[ i ][ j ] = uv3_attr[ i * 2 + j ];
 				
@@ -1699,8 +1710,10 @@ public class HoudiniAssetUtility
 			// Fill normals.
 			if ( normal_attr_info.exists )
 			{
+				bool point_owner = normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+
 				// If the normals are per vertex just query directly into the normals array we filled above.
-				if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
 					for ( int j = 0; j < 3; ++j )
 					{
 						normals[ i ][ j ] = normal_attr[ i * 3 + j ];
@@ -1712,7 +1725,7 @@ public class HoudiniAssetUtility
 				
 				// If the normals are per point use the vertex list array point indicies to query into
 				// the normal array we filled above.
-				else if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+				else if ( point_owner )
 					for ( int j = 0; j < 3; ++j )
 					{
 						normals[ i ][ j ] = normal_attr[ vertex_list[ i ] * 3 + j ];
@@ -1723,16 +1736,16 @@ public class HoudiniAssetUtility
 				
 				// If the normals are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
-				else if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
-					for ( int j = 0; j < 3; ++j )
-					{
-						int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-						normals[ i ][ j ] 
-							= normal_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j ];
-						// Flip the x coordinate.
-						if ( j == 0 )
-							normals[ i ][ j ] *= -1;
-					}
+				//else if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				//	for ( int j = 0; j < 3; ++j )
+				//	{
+				//		int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+				//		normals[ i ][ j ] 
+				//			= normal_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j ];
+				//		// Flip the x coordinate.
+				//		if ( j == 0 )
+				//			normals[ i ][ j ] *= -1;
+				//	}
 			}
 
 			// Fill tangents.
@@ -1741,7 +1754,7 @@ public class HoudiniAssetUtility
 				int tuple_size = tangent_attr_info.tupleSize;
 
 				// If the tangents are per vertex just query directly into the tangents array we filled above.
-				if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || point_split )
 					for ( int j = 0; j < tuple_size; ++j )
 					{
 						tangents[ i ][ j ] = tangent_attr[ i * tuple_size + j ];
@@ -1764,16 +1777,16 @@ public class HoudiniAssetUtility
 				
 				// If the tangents are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
-				else if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
-					for ( int j = 0; j < tuple_size; ++j )
-					{
-						int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-						tangents[ i ][ j ] 
-							= tangent_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE * tuple_size + j ];
-						// Flip the x coordinate.
-						if ( j == 0 )
-							tangents[ i ][ j ] *= -1;
-					}
+				//else if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				//	for ( int j = 0; j < tuple_size; ++j )
+				//	{
+				//		int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+				//		tangents[ i ][ j ] 
+				//			= tangent_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE * tuple_size + j ];
+				//		// Flip the x coordinate.
+				//		if ( j == 0 )
+				//			tangents[ i ][ j ] *= -1;
+				//	}
 			}
 
 			// Fill colours.
@@ -1785,7 +1798,7 @@ public class HoudiniAssetUtility
 				part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 			{
 				// If the colours are per vertex just query directly into the normals array we filled above.
-				if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX )
+				if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || point_split )
 					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
 						colours[ i ][ j ] = colour_attr[ i * colour_attr_info.tupleSize + j ];
 				
@@ -1797,20 +1810,32 @@ public class HoudiniAssetUtility
 				
 				// If the colours are per face divide the vertex index by the number of vertices per face
 				// which should always be HAPI_MAX_VERTICES_PER_FACE.
-				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
-				{
-					int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
-						colours[ i ][ j ] 
-							= colour_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j ];
-				}
+				//else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				//{
+				//	int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+				//	for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
+				//		colours[ i ][ j ] 
+				//			= colour_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j ];
+				//}
 			}
 		}
-		
-		for ( int i = 0; i < part_info.faceCount; ++i ) 
-			for ( int j = 0; j < 3; ++j )
-				triangles[ i * 3 + j ] = i * 3 + j;
-		
+
+		int[] triangles;
+		if ( point_split )
+		{
+			triangles = vertex_list;
+			for ( int i = 0; i < part_info.faceCount; ++i )
+				for ( int j = 0; j < 3; ++j )
+					triangles[ i * 3 + j ] = vertex_list[ i * 3 + j ];
+		}
+		else
+		{
+			triangles = new int[ part_info.faceCount * 3 ];
+			for ( int i = 0; i < part_info.faceCount; ++i )
+				for ( int j = 0; j < 3; ++j )
+					triangles[ i * 3 + j ] = i * 3 + j;
+		}
+
 		// Set known mesh data.
 		mesh.vertices = vertices;
 		mesh.triangles = triangles;
@@ -2434,7 +2459,10 @@ public class HoudiniAssetUtility
 				
 				asset.prAssetId = asset_id;
 				HoudiniHost.cookAsset(
-					asset_id, HoudiniHost.prSplitGeosByGroup, HoudiniHost.prImportTemplatedGeos );
+					asset_id,
+					HoudiniHost.prSplitGeosByGroup,
+					HoudiniHost.prSplitPointsByVertexAttributes,
+					HoudiniHost.prImportTemplatedGeos );
 				
 				bool build_result = asset.buildAll();
 				if ( build_result == false ) // Something is not right. Clean up.

@@ -30,6 +30,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	public bool transformChangeTriggersCooks;
 	public bool importTemplatedGeos;
 	public bool splitGeosByGroup;
+	public bool splitPointsByVertexAttributes;
 	
 	// Geometry Settings
 	public string unityTagAttribName;
@@ -75,7 +76,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		enableSupportWarnings 			= HoudiniHost.prEnableSupportWarnings;
 		autoSelectAssetRootNode 		= HoudiniHost.prAutoSelectAssetRootNode;
 		enablePointsAsParticles 		= HoudiniHost.prEnablePointsAsParticles;
-		
+
 		// Set material settings.
 		unityMaterialAttribName 		= HoudiniHost.prUnityMaterialAttribName;
 		unitySubMaterialNameAttribName 	= HoudiniHost.prUnitySubMaterialNameAttribName;
@@ -83,7 +84,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		gamma							= HoudiniHost.prGamma;
 		dontCreateTextureFiles 			= HoudiniHost.prDontCreateTextureFiles;
 		extractTexturesInRawFormat 		= HoudiniHost.prExtractTexturesInRawFormat;
-		
+
 		// Set cooking settings.
 		enableCooking 					= HoudiniHost.prEnableCooking;
 		cookingTriggersDownCooks 		= HoudiniHost.prCookingTriggersDownCooks;
@@ -92,7 +93,8 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		transformChangeTriggersCooks 	= HoudiniHost.prTransformChangeTriggersCooks;
 		importTemplatedGeos 			= HoudiniHost.prImportTemplatedGeos;
 		splitGeosByGroup				= HoudiniHost.prSplitGeosByGroup;
-		
+		splitPointsByVertexAttributes	= HoudiniHost.prSplitPointsByVertexAttributes;
+
 		// Set geometry settings.
 		unityTagAttribName 				= HoudiniHost.prUnityTagAttribName;
 		paintBrushRate					= HoudiniHost.prPaintBrushRate;
@@ -114,7 +116,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		guidePointSize 					= HoudiniHost.prGuidePointSize;
 		minDistanceForPointSelection 	= HoudiniHost.prMinDistanceForPointSelection;
 		guideMinDistanceForMidPointInsertion = HoudiniHost.prGuideMinDistanceForMidPointInsertion;
-		
+
 		// Set curve settings.
 		curvePrimitiveTypeDefault		= HoudiniHost.prCurvePrimitiveTypeDefault;
 		curveMethodDefault				= HoudiniHost.prCurveMethodDefault;
