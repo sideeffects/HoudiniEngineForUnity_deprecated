@@ -168,7 +168,8 @@ public class HoudiniAssetOTL : HoudiniAsset
 #endif // UNITY_EDITOR
 
 		return HoudiniHost.loadOTL(
-			prAssetPath, prSplitGeosByGroup, prImportTemplatedGeos, progress_bar, false );
+			prAssetPath, prSplitGeosByGroup, prSplitPointsByVertexAttribute,
+			prImportTemplatedGeos, progress_bar, false );
 	}
 
 	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar, bool is_duplication )

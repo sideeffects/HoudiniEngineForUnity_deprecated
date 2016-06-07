@@ -327,14 +327,18 @@ public class HoudiniMenu : MonoBehaviour
 		int[] value_arr = new int[ 1 ];
 		value_arr[ 0 ] = 2;
 		HoudiniHost.setParmIntValues( convert_info.nodeId, value_arr, convert_to_parm_id, 1 );
-		HoudiniHost.cookAsset( convert, true, false );
+		HoudiniHost.cookAsset( convert, true, true, false );
 	}
 
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Simple Input Geo", false, 1000 ) ]
-	static private void createSimpleInputGeo() 
+	static private void createSimpleInputGeo()
 	{
 		int asset_id = HoudiniHost.createInputAsset( "simple_input_geo_test" );
-		HoudiniHost.cookAsset( asset_id, HoudiniHost.prSplitGeosByGroup, HoudiniHost.prImportTemplatedGeos );
+		HoudiniHost.cookAsset(
+			asset_id,
+			HoudiniHost.prSplitGeosByGroup,
+			HoudiniHost.prSplitPointsByVertexAttributes,
+			HoudiniHost.prImportTemplatedGeos );
 
 		HAPI_PartInfo new_part = new HAPI_PartInfo();
 		new_part.vertexCount = 3;

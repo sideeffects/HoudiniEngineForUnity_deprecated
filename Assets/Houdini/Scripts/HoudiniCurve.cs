@@ -452,6 +452,7 @@ public class HoudiniCurve : MonoBehaviour
 			HoudiniHost.cookAsset(
 				prControl.prAsset.prAssetId,
 				prControl.prAsset.prSplitGeosByGroup,
+				prControl.prAsset.prSplitPointsByVertexAttribute,
 				prControl.prAsset.prImportTemplatedGeos );
 		}
 		catch {}

@@ -344,6 +344,26 @@ public class HoudiniWindowSettings : EditorWindow
 					"Ok" );
 			}
 		}
+
+		// Split Points by Vertex Attributes
+		{
+			bool value = HoudiniHost.prSplitPointsByVertexAttributes;
+			bool changed = HoudiniGUI.toggle(
+				"split_points_by_vertex_attributes",
+				"Split Points by Vertex Attributes",
+				ref value, myUndoInfo,
+				ref myUndoInfo.splitGeosByGroup );
+			if ( changed )
+			{
+				HoudiniHost.prSplitPointsByVertexAttributes = value;
+				HoudiniHost.repaint();
+			
+				EditorUtility.DisplayDialog(
+					"Rebuild Required",
+					"This change will take affect only after a full asset rebuild.",
+					"Ok" );
+			}
+		}
 	}
 
 	private static void generateGeometrySettings()

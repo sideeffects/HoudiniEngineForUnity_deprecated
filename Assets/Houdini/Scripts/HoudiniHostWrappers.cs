@@ -452,13 +452,15 @@ public static partial class HoudiniHost
 
 	public static void cookAsset( HAPI_AssetId asset_id )
 	{
-		cookAsset( asset_id, prSplitGeosByGroup, prImportTemplatedGeos );
+		cookAsset( asset_id, prSplitGeosByGroup, prSplitPointsByVertexAttributes, prImportTemplatedGeos );
 	}
 
-	public static void cookAsset( HAPI_AssetId asset_id, bool split_geos_by_group, bool import_templated_geos )
+	public static void cookAsset(
+		HAPI_AssetId asset_id, bool split_geos_by_group, bool split_points_by_vertex_attribute, bool import_templated_geos )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_CookOptions cook_options = getCookOptions( split_geos_by_group, import_templated_geos );
+		HAPI_CookOptions cook_options =
+			getCookOptions( split_geos_by_group, split_points_by_vertex_attribute, import_templated_geos );
 
 		HAPI_Result status_code = HAPI_CookAsset( ref mySession, asset_id, ref cook_options );
 		processStatusCode( status_code );
@@ -595,10 +597,15 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void cookNode( HAPI_NodeId node_id, bool split_geos_by_group, bool import_templated_geos )
+	public static void cookNode(
+		HAPI_NodeId node_id,
+		bool split_geos_by_group,
+		bool split_points_by_vertex_attributes,
+		bool import_templated_geos )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
-		HAPI_CookOptions cook_options = getCookOptions( split_geos_by_group, import_templated_geos );
+		HAPI_CookOptions cook_options =
+			getCookOptions( split_geos_by_group, split_points_by_vertex_attributes, import_templated_geos );
 		HAPI_Result status_code = HAPI_CookNode(
 			ref mySession, node_id, ref cook_options );
 		processStatusCode( status_code );
