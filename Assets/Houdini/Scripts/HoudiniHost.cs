@@ -914,7 +914,7 @@ public static partial class HoudiniHost
 		cook_options.refineCurveToLinear = HoudiniConstants.HAPI_CURVE_REFINE_TO_LINEAR;
 		cook_options.curveRefineLOD = HoudiniConstants.HAPI_CURVE_LOD;
 		cook_options.cookTemplatedGeos = import_templated_geos;
-		cook_options.clearErrorsAndWarnings = split_points_by_vertex_attributes;
+		cook_options.splitPointsByVertexAttributes = split_points_by_vertex_attributes;
 		cook_options.packedPrimInstancingMode =
 			HAPI_PackedPrimInstancingMode.HAPI_PACKEDPRIM_INSTANCING_MODE_DISABLED;
 		cook_options.handleBoxPartTypes = true;
