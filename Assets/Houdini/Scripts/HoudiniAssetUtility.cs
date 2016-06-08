@@ -1359,11 +1359,13 @@ public class HoudiniAssetUtility
 
 		// Get the substance file path from the SHOP.
 		string filepath = HoudiniHost.getParmStringValue( material_info.nodeId, "filename", 0 );
+		filepath = filepath.Replace( "?", "/" ); // Needed for Path.GetFileName() to extract correctly.
 		string filename = Path.GetFileName( filepath );
 		string filename_noext = Path.GetFileNameWithoutExtension( filepath );
 
 		// Try loading the material in various ways.
 		Material material = null;
+		if ( filename != "" )
 		{
 			material = (Material) Resources.Load( filename_noext, typeof( Material ) );
 			if ( material )
@@ -1398,22 +1400,17 @@ public class HoudiniAssetUtility
 			// The substance file is not within the current Unity project. We need to copy it over.
 			if ( !material )
 			{
-				//Debug.Log( "Copying material from: " + filepath + "\nto: " + substance_copied_file_abs_path );
-				if ( !File.Exists( filepath ) )
-					Debug.LogError( "Houdini: Could not find substance material file: " + filepath );
-				else
-				{
-					// Create Textures directory if it doesn't exist.
-					if ( !Directory.Exists( substance_copied_file_dir ) )
-						Directory.CreateDirectory( substance_copied_file_dir );
+				// Create Textures directory if it doesn't exist.
+				if ( !Directory.Exists( substance_copied_file_dir ) )
+					Directory.CreateDirectory( substance_copied_file_dir );
 
-					// Copy the Substance file into the Unity project.
-					File.Copy( filepath, substance_copied_file_abs_path );
+				// Copy the Substance file into the Unity project.
+				HoudiniHost.getParmFile( material_info.nodeId, "filename", substance_copied_file_dir, filename );
 
-					// Try to import the asset.
-					AssetDatabase.ImportAsset( substance_copied_file_relative_path, ImportAssetOptions.Default );
-					material = (Material) AssetDatabase.LoadAssetAtPath( substance_copied_file_relative_path, typeof( Material ) );
-				}
+				// Try to import the asset.
+				AssetDatabase.ImportAsset( substance_copied_file_relative_path, ImportAssetOptions.Default );
+				material = (Material) AssetDatabase.LoadAssetAtPath(
+					substance_copied_file_relative_path, typeof( Material ) );
 			}
 		}
 		if ( !material )
