@@ -505,6 +505,15 @@ public static partial class HoudiniHost
 		
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetParmFile(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		string parm_name,
+		string destination_directory,
+		string destination_file_name );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetParmChoiceLists(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,
