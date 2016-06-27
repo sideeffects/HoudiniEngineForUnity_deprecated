@@ -58,9 +58,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			GUI.enabled = false;
 #endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 
-		if ( myAssetOTL.isPrefabInstance() )
-			myParentPrefabAsset = myAsset.getParentPrefabAsset();
-
 		///////////////////////////////////////////////////////////////////////
 		// Draw Game Object Controls
 		
@@ -69,20 +66,17 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			= HoudiniGUI.foldout( "Houdini Controls", myAsset.prShowHoudiniControls, true );
 		if ( myAsset.prShowHoudiniControls )
 		{
-			if ( !myAsset.isPrefab() )
+			if ( GUILayout.Button( "Rebuild" ) )
 			{
-				if ( GUILayout.Button( "Rebuild" ) )
-				{
-					myGeoAttributeManagerGUI = null;
-					myAsset.buildAll();
-				}
-	
-				if ( GUILayout.Button( "Recook" ) )
-					myAsset.buildClientSide();
-
-				if ( GUILayout.Button( "Bake" ) )
-					myAsset.bakeAsset();
+				myGeoAttributeManagerGUI = null;
+				myAsset.buildAll();
 			}
+	
+			if ( GUILayout.Button( "Recook" ) )
+				myAsset.buildClientSide();
+
+			if ( GUILayout.Button( "Bake" ) )
+				myAsset.bakeAsset();
 		}
 
 		// Draw Help Pane
@@ -100,13 +94,10 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 
 		///////////////////////////////////////////////////////////////////////
 		// Draw Baking Controls
-		
-		if( !myAsset.isPrefab() )
-		{
-			myAsset.prShowBakeOptions = HoudiniGUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
-			if ( myAsset.prShowBakeOptions )
-				generateAssetBakeControls();
-		}
+
+		myAsset.prShowBakeOptions = HoudiniGUI.foldout( "Bake Animations", myAssetOTL.prShowBakeOptions, true );
+		if ( myAsset.prShowBakeOptions )
+			generateAssetBakeControls();
 
 		GUI.enabled = gui_enable;
 	}

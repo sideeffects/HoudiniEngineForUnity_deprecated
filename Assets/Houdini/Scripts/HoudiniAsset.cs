@@ -248,17 +248,6 @@ public abstract class HoudiniAsset : HoudiniControl
 	public List< string >			prGeoInputNames {				get { return myGeoInputNames; }
 																	set { myGeoInputNames = value; } }
 
-	// Prefabs ------------------------------------------------------------------------------------------------------
-	
-	public int prBackupAssetId {							get { return myBackupAssetId; }
-															set { myBackupAssetId = value; } }
-	public int prBackupAssetValidationId {					get { return myBackupAssetValidationId; }
-															set { myBackupAssetValidationId = value; } }
-	public bool prReloadPrefabOnPlaymodeChange {			get { return myReloadPrefabOnPlaymodeChange; }
-															set { myReloadPrefabOnPlaymodeChange = value; } }
-	public List< string > prUpdatePrefabInstanceParmNames {	get { return myUpdatePrefabInstanceParmNames; }
-															set { myUpdatePrefabInstanceParmNames = value; } }
-
 	// Hooks --------------------------------------------------------------------------------------------------------
 
 	public HoudiniApiAssetHook[] prAssetHooks { get { return GetComponents< HoudiniApiAssetHook >(); } }
@@ -660,41 +649,6 @@ public abstract class HoudiniAsset : HoudiniControl
 	}
 	
 	// Methods for determining where OnEnable is being called from -------------------------------
-	
-	public bool isRevertingPrefabInstance()
-	{
-		return (
-			isPrefabInstance() && 
-			prAssetId != prBackupAssetId &&
-			HoudiniHost.isAssetValid( prBackupAssetId, prBackupAssetValidationId ) );
-	}
-	
-	public bool isInstantiatingPrefab()
-	{
-#if UNITY_EDITOR
-		if ( isPrefabInstance() && prBackupAssetId < 0 )
-		{
-			HoudiniAsset prefab_asset = getParentPrefabAsset();
-			if ( prefab_asset )
-			{
-				return prAssetId == prefab_asset.prAssetId;
-			}
-		}
-#endif // UNITY_EDITOR
-		return false;
-	}
-	
-	public bool isApplyingChangesToPrefab()
-	{
-#if UNITY_EDITOR
-		return (
-			isPrefab() && 
-			prAssetId != prBackupAssetId && 
-			HoudiniHost.isAssetValid( prAssetId, prAssetValidationId ) );
-#else
-		return false;
-#endif // UNITY_EDITOR
-	}
 
 	public bool isDuplicatingAsset()
 	{
@@ -722,59 +676,13 @@ public abstract class HoudiniAsset : HoudiniControl
 #endif // UNITY_EDITOR
 
 		bool is_duplication = isDuplicatingAsset();
-		bool is_reverting_prefab_instance = isRevertingPrefabInstance();
-		bool is_prefab_instance = isPrefabInstance();
-		bool is_instantiating_prefab = isInstantiatingPrefab();
 
-		// If this is being called because changes are being applied
-		// to the prefab of this instance do nothing
-#if UNITY_EDITOR
-		if ( is_prefab_instance )
-		{
-			HoudiniAsset prefab_asset = getParentPrefabAsset();
-			if ( prefab_asset && prefab_asset.isApplyingChangesToPrefab() )
-				return;
-		}
-#endif // UNITY_EDITOR
-
-		// If this asset is a prefab instance that is being reverted 
-		// reload the asset in order to restore it's asset id and 
-		// asset validation id from the backup and to load the preset
-		// from the prefab
-		if( is_reverting_prefab_instance )
-		{
-			build(
-				true,	// reload_asset
-				false,	// unload_asset_first
-				false,	// serializatin_recovery_only
-				true,	// force_reconnect
-				false,	// is_duplication
-				false,	// cook_downstream_assets
-				false	// use_delay_for_progress_bar
-			);
-		}
-		else if ( prAssetId >= 0 || is_instantiating_prefab )
+		if ( prAssetId >= 0 )
 		{
 			bool is_asset_valid =
 				HoudiniHost.isAssetValid( prAssetId, prAssetValidationId );
-			bool update_prefab_parms =
-				prUpdatePrefabInstanceParmNames.Count > 0;
 
-			if (
-				is_prefab_instance &&
-				!is_instantiating_prefab &&
-				update_prefab_parms &&
-				!is_duplication )
-			{
-				// Updating prefab instance after parameter change on prefab
-				// and save changes to preset
-				buildClientSide();
-				savePreset();
-			}
-			else if (
-				!is_instantiating_prefab &&
-				is_asset_valid &&
-				!is_duplication )
+			if ( is_asset_valid && !is_duplication )
 			{
 				// Reloading asset after mode change or script-reload.
 				build(	false,	// reload_asset
@@ -792,9 +700,8 @@ public abstract class HoudiniAsset : HoudiniControl
 			// Houdini then the asset will no longer load.
 			else
 			{
-				// Loading Scene (no Houdini scene exists yet) or 
-				// instantiating a prefab or duplicating an existing
-				// asset
+				// Loading Scene (no Houdini scene exists yet) or
+				// duplicating an existing asset.
 				prAssetId = -1;
 				build(	true,	// reload_asset
 						true,	// unload_asset_first
@@ -913,55 +820,21 @@ public abstract class HoudiniAsset : HoudiniControl
 		prGeoInputNames					= new List< string >();
 		
 		myProgressBarJustUsed 			= false;
-		
-		// Prefabs ------------------------------------------------------------------------------------------------------
-		
-		prBackupAssetId					= -1;
-		prBackupAssetValidationId		= -1;
-		prReloadPrefabOnPlaymodeChange 	= false;
-		prUpdatePrefabInstanceParmNames	= new List< string >();
 	}
 	
 	public override void onParmChange()
 	{
 		base.onParmChange();
 
-		if ( isPrefab() )
-		{
-			if ( prParms.prLastChangedParmId != HoudiniConstants.HAPI_INVALID_PARM_ID )
-			{
-				HAPI_ParmInfo parm_info = prParms.findParm( prParms.prLastChangedParmId );
-				prUpdatePrefabInstanceParmNames.Add( parm_info.name );
-			}
-			
-			HoudiniProgressBar progress_bar = new HoudiniProgressBar();
-			try 
-			{
-				// only need to update parameters for prefab
-				updateParameters( progress_bar );
-			}
-			catch {}
-			finally 
-			{
-				progress_bar.clearProgressBar();
-			}
-
-#if UNITY_EDITOR
-			EditorUtility.SetDirty( this );
-#endif // UNITY_EDITOR
-		}
-		else
-		{
-			build(
-				false,			// reload_asset
-				false,			// unload_asset_first
-				false,			// serializatin_recovery_only
-				false,			// force_reconnect
-				false,			// is_duplication
-				prCookingTriggersDownCooks,
-				true			// use_delay_for_progress_bar
-			);
-		}
+		build(
+			false,			// reload_asset
+			false,			// unload_asset_first
+			false,			// serializatin_recovery_only
+			false,			// force_reconnect
+			false,			// is_duplication
+			prCookingTriggersDownCooks,
+			true			// use_delay_for_progress_bar
+		);
 
 		// To keep things consistent with Unity workflow, we should not save parameter changes
 		// while in Play mode.
@@ -1014,9 +887,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		if ( !prEnableCooking )
 			return false;
 
-		if ( isPrefabInstance() )
-			processParentPrefab();
-
 		// Run post-cook hook.
 		foreach ( var asset_hook in prAssetHooks )
 			asset_hook.preCook( this );
@@ -1028,18 +898,9 @@ public abstract class HoudiniAsset : HoudiniControl
 		try
 		{
 			progress_bar.prStartTime = System.DateTime.Now;
-			
+
 			bool is_first_time_build = false;
-			
-			// restore asset id and asset validation id from the backup whenever
-			// reverting a prefab instance
-			bool is_reverting_prefab_instance = isRevertingPrefabInstance();
-			if ( is_reverting_prefab_instance )
-			{
-				prAssetId = prBackupAssetId;
-				prAssetValidationId = prBackupAssetValidationId;
-			}
-			
+
 			if ( reload_asset ) 
 			{	
 				if ( unload_asset_first )
@@ -1125,9 +986,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			// More imporantly, structs are not serialized and therefore putting them into their own
 			// variables is required in order to maintain state between serialization cycles.
 			prAssetId 					= prAssetInfo.id;
-			prBackupAssetId				= prAssetId;
 			prAssetValidationId			= prAssetInfo.validationId;
-			prBackupAssetValidationId 	= prAssetValidationId;
 			prNodeId					= prAssetInfo.nodeId;
 			prObjectNodeId				= prAssetInfo.objectNodeId;
 			prObjectCount 				= prAssetInfo.objectCount;
@@ -1140,16 +999,8 @@ public abstract class HoudiniAsset : HoudiniControl
 			prTransformInputCount		= prAssetInfo.transformInputCount;
 			prGeoInputCount				= prAssetInfo.geoInputCount;
 
-#if UNITY_EDITOR
-			if ( isPrefab() )
-			{
-				string prefab_path = AssetDatabase.GetAssetPath( GetInstanceID() );
-				HoudiniHost.myCleanUpPrefabAssets[ prefab_path ] = prAssetId;
-			}
-#endif // UNITY_EDITOR
-
 			// Try to load presets.
-			if ( ( reload_asset && ( unload_asset_first || is_reverting_prefab_instance ) )
+			if ( ( reload_asset && unload_asset_first )
 #if UNITY_EDITOR
 				// Only load presets during serialization recovery if we really need to.
 				// The only such case is when we made changes DURING playmode and Unity
@@ -1171,33 +1022,26 @@ public abstract class HoudiniAsset : HoudiniControl
 				
 				// Transform may not have been saved as part of the presets so we have to rely 
 				// on the serialized value.
-				if ( myLastLocalToWorld != Matrix4x4.zero && !isPrefab() )
+				if ( myLastLocalToWorld != Matrix4x4.zero )
 				{
-					// If this is a prefab instance being reverted we don't want to use the 
-					// serialized value so don't change transform. 
-					if ( !is_reverting_prefab_instance )
+					Matrix4x4 world_to_local = Matrix4x4.identity;
+					if ( transform.parent )
+						world_to_local = transform.parent.worldToLocalMatrix;
+					Matrix4x4 local = myLastLocalToWorld * world_to_local;
+
+					transform.localPosition = HoudiniAssetUtility.getPosition( local );
+					transform.localRotation = HoudiniAssetUtility.getQuaternion( local );
+
+					Vector3 scale = HoudiniAssetUtility.getScale( local );
+					if ( !( Mathf.Approximately( 0.0f, scale.x )
+						&& Mathf.Approximately( 0.0f, scale.y )
+						&& Mathf.Approximately( 0.0f, scale.z ) ) )
 					{
-						Matrix4x4 world_to_local = Matrix4x4.identity;
-						if ( transform.parent )
-							world_to_local = transform.parent.worldToLocalMatrix;
-						Matrix4x4 local = myLastLocalToWorld * world_to_local;
-
-						transform.localPosition = HoudiniAssetUtility.getPosition( local );
-						transform.localRotation = HoudiniAssetUtility.getQuaternion( local );
-
-						Vector3 scale = HoudiniAssetUtility.getScale( local );
-						if ( !( Mathf.Approximately( 0.0f, scale.x )
-							&& Mathf.Approximately( 0.0f, scale.y )
-							&& Mathf.Approximately( 0.0f, scale.z ) ) )
-						{
-							transform.localScale = HoudiniAssetUtility.getScale( local );
-						}
+						transform.localScale = HoudiniAssetUtility.getScale( local );
 					}
 					
 					if ( prPushUnityTransformToHoudini )
-					{
 						pushAssetTransformToHoudini();
-					}
 				}
 			}
 
@@ -1284,13 +1128,6 @@ public abstract class HoudiniAsset : HoudiniControl
 						use_delay_for_progress_bar );
 			}
 
-			// This tells Unity that values have been overridden for this prefab instance 
-			// (eg. asset id, validation id, node id, etc). 
-#if UNITY_EDITOR
-			if ( isPrefabInstance() )
-				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
-#endif // UNITY_EDITOR
-
 			// A bit of a hack (but not terrible). If we have presets for other child controls
 			// they set their presets by now so we need to rebuild with the new presets.
 			if ( objects_need_recook )
@@ -1348,61 +1185,6 @@ public abstract class HoudiniAsset : HoudiniControl
 	
 	public void updateParameters( HoudiniProgressBar progress_bar )
 	{
-		// Update prefab instance after parameter change on prefab if needed
-#if UNITY_EDITOR
-		if ( isPrefabInstance() && prUpdatePrefabInstanceParmNames.Count > 0 )
-		{
-			HoudiniAsset prefab_asset = getParentPrefabAsset();
-
-			foreach ( string parm_name in prUpdatePrefabInstanceParmNames )
-			{
-				try
-				{
-					HAPI_ParmInfo parm_info = prParms.findParm( parm_name );
-				
-					// Do not apply changes from prefab in the following cases: 
-					// Case 1: Parameter on prefab that has been changed is a
-					// transform parameter
-					// Case 2: Parameter on prefab that has been changed has been
-					// overridden on this asset
-					// Otherwise set the parameter change for this prefab
-					if ( parm_name != "r" && 
-						parm_name != "s" &&
-						parm_name != "t" &&
-						!prParms.isParmOverridden( parm_info.id ) )
-					{
-						// if the parameter is a string we need to manually
-						// get the string value from the prefab because the
-						// parameter strings are stored in a dictionary which
-						// is not serialized so the value isn't overridden 
-						// automatically by the prefab value as it is done
-						// with float and int parameters
-						if ( parm_info.isString() && prefab_asset )
-						{
-							HAPI_ParmInfo prefab_parm_info = prefab_asset.prParms.findParm( parm_name );
-							string[] values = prefab_asset.prParms.getParmStrings( prefab_parm_info );
-
-							prParms.setParmStrings( parm_info, values );
-						}
-
-						prParms.setChangedParameterIntoHost( parm_info.id );
-					}
-				}
-				catch {}
-			}
-
-			prUpdatePrefabInstanceParmNames.Clear();
-
-			// Need to set prUpdatePrefabInstanceParmName back to empty on prefab if
-			// it hasn't been already. We do not set prefab to be dirty so that other
-			// prefab instances that still need this value will not be affected.
-			if ( prefab_asset && prefab_asset.prUpdatePrefabInstanceParmNames.Count > 0 )
-			{
-				prefab_asset.prUpdatePrefabInstanceParmNames.Clear();
-			}
-		}
-#endif // UNITY_EDITOR
-
 		prParms.setChangedParametersIntoHost();
 
 		HoudiniHost.cookAsset( prAssetId, prSplitGeosByGroup, prSplitPointsByVertexAttribute, prImportTemplatedGeos );
@@ -1836,11 +1618,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		try
 		{
 			myPreset = HoudiniHost.getPreset( prNodeId );
-
-			// This tells Unity that values have been overridden for this 
-			// prefab instance (in this case the preset).
-			if ( isPrefabInstance() )
-				PrefabUtility.RecordPrefabInstancePropertyModifications( this );
 		}
 		catch {} // Just catch them here but don't report them because we would just get a huge stream of errors.
 #endif // UNITY_EDITOR
@@ -1850,18 +1627,6 @@ public abstract class HoudiniAsset : HoudiniControl
 	{
 		return HoudiniHost.isAssetValid( prAssetId, prAssetInfo.validationId );
 	}
-
-#if UNITY_EDITOR
-	public HoudiniAsset getParentPrefabAsset()
-	{
-		GameObject prefab = PrefabUtility.GetPrefabParent( gameObject ) as GameObject;
-		if ( prefab )
-		{
-			return prefab.GetComponent< HoudiniAsset >();
-		}
-		return null;
-	}
-#endif // UNITY_EDITOR
 
 	public void applyGeoVisibilityToParts()
 	{
@@ -1974,46 +1739,6 @@ public abstract class HoudiniAsset : HoudiniControl
 				geo_input_name = "Geometry Input #" + ( i + 1 );
 			prGeoInputNames.Add( geo_input_name );
 		}
-	}
-
-	protected void processParentPrefab()
-	{
-#if UNITY_EDITOR
-		HoudiniAsset prefab_asset = getParentPrefabAsset();
-		if ( prefab_asset )
-		{
-			// if prefab has not been built yet then build it
-			if ( !HoudiniHost.isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
-			{
-				prefab_asset.prAssetId = -1;
-				prefab_asset.build(
-					true,	// reload_asset
-					true,	// unload_asset_first
-					true,	// serializatin_recovery_only
-					false,	// force_reconnect
-					false,	// is_duplication
-					false,	// cook_downstream_assets
-					false	// use_delay_for_progress_bar
-				);
-				EditorUtility.SetDirty( prefab_asset );
-			}
-			// if prefab has not been reloaded after play mode change yet then 
-			// reload it to get its parameters back
-			else if ( prefab_asset.prReloadPrefabOnPlaymodeChange )
-			{
-				prefab_asset.prReloadPrefabOnPlaymodeChange = false;
-				prefab_asset.build(
-					false,	// reload_asset
-					false,	// unload_asset_first
-					true,	// serializatin_recovery_only
-					false,	// force_reconnect
-					false,	// is_duplication
-					false,	// cook_downstream_assets
-					false	// use_delay_for_progress_bar
-				);
-			}
-		}
-#endif // UNITY_EDITOR
 	}
 
 	protected virtual void processDependentAssets(
@@ -2230,13 +1955,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	// Private Temporary Data
 	[SerializeField] protected Matrix4x4			myLastLocalToWorld;
-	
-	// Prefabs ------------------------------------------------------------------------------------------------------
-	
-	private int myBackupAssetId;
-	private int myBackupAssetValidationId;
-	private bool myReloadPrefabOnPlaymodeChange;
-	[SerializeField] private List< string > myUpdatePrefabInstanceParmNames;
+
 	[SerializeField] private HoudiniAssetUndoInfo	myAssetOTLUndoInfo;
 
 }

@@ -31,27 +31,22 @@ public partial class HoudiniInstancerManagerGUI: Editor
 	{
 		myInstanceManager = target as HoudiniInstancerManager;
 
-		myAssetOTL 			= myInstanceManager.gameObject.GetComponent< HoudiniAssetOTL >();
+		myAssetOTL = myInstanceManager.gameObject.GetComponent< HoudiniAssetOTL >();
 	}
-	
-	public override void OnInspectorGUI() 
+
+	public override void OnInspectorGUI()
 	{
-
 		HoudiniInstancer[] instancers = myAssetOTL.gameObject.GetComponentsInChildren< HoudiniInstancer >();
-		if( !myAssetOTL.isPrefab() && instancers.Length > 0 )
-		{
-
+		if ( instancers.Length > 0 )
 			generateAssetInstanceControls();
-		}
 
 		Event current_event = Event.current;
-		
+
 		if (
-			current_event.type == EventType.ValidateCommand && 
+			current_event.type == EventType.ValidateCommand &&
 			current_event.commandName == "UndoRedoPerformed" )
 		{
-			
-			foreach( HoudiniInstancer instancer in instancers )
+			foreach ( HoudiniInstancer instancer in instancers )
 			{
 				HoudiniProgressBar progress_bar = new HoudiniProgressBar();
 				instancer.instanceObjects( progress_bar );
@@ -61,8 +56,6 @@ public partial class HoudiniInstancerManagerGUI: Editor
 			Repaint();
 		}
 	}
-	
-
 
 	private void generateAssetInstanceControls()
 	{

@@ -60,14 +60,11 @@ public class HoudiniAssetGUIInput : HoudiniAssetGUI
 			= HoudiniGUI.foldout( "Houdini Controls", myAssetInput.prShowHoudiniControls, true );
 		if ( myAssetInput.prShowHoudiniControls ) 
 		{
-			if ( !myAssetInput.isPrefab() )
-			{
-				if ( GUILayout.Button( "Rebuild" ) ) 
-					myAssetInput.buildAll();
+			if ( GUILayout.Button( "Rebuild" ) ) 
+				myAssetInput.buildAll();
 	
-				if ( GUILayout.Button( "Recook" ) )
-					myAssetInput.buildClientSide();
-			}
+			if ( GUILayout.Button( "Recook" ) )
+				myAssetInput.buildClientSide();
 		}
 
 		// Draw Help Pane

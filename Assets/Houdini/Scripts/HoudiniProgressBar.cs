@@ -168,12 +168,7 @@ public class HoudiniProgressBar
 
 		string title = prTitle;
 		if ( prAsset != null && prAsset.prAssetName != "ASSET_NAME" )
-		{
-			if ( prAsset.isPrefab() )
-				title = "Building Houdini Asset Prefab: " + prAsset.prAssetName;
-			else
-				title = "Building Houdini Asset: " + prAsset.prAssetName;
-		}
+			title = "Building Houdini Asset: " + prAsset.prAssetName;
 
 		bool result = !EditorUtility.DisplayCancelableProgressBar( 
 								title, message, Mathf.InverseLerp( 0, prTotal, prCurrentValue ) );

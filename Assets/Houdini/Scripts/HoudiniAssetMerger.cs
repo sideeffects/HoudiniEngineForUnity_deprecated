@@ -130,7 +130,7 @@ public class HoudiniAssetMerger : HoudiniAsset
 			last_input_count--;
 		}
 
-		unload_asset_first = unload_asset_first && ( !serialization_recovery_only || isPrefab() );
+		unload_asset_first = unload_asset_first && !serialization_recovery_only;
 
 		bool base_built = base.build(
 			reload_asset,

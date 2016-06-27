@@ -92,7 +92,7 @@ public class HoudiniAssetCurve : HoudiniAsset
 								bool cook_downstream_assets,
 								bool use_delay_for_progress_bar ) 
 	{
-		unload_asset_first = unload_asset_first && ( !serialization_recovery_only || isPrefab() );
+		unload_asset_first = unload_asset_first && !serialization_recovery_only;
 
 		bool base_built = base.build(
 			reload_asset,

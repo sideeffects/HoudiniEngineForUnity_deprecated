@@ -251,11 +251,9 @@ public static partial class HoudiniHost
 		setInt(		"HAPI_CurvePrimitiveTypeDefault", myDefaultCurvePrimitiveTypeDefault, true );
 		setInt(		"HAPI_CurveMethodDefault", myDefaultCurveMethodDefault, true );
 		
-		myRepaintDelegate			= null;
-		myDeselectionDelegate		= null;
-		mySelectionTarget			= null;
-		
-		myCleanUpPrefabAssets		= new Dictionary< string, int >();
+		myRepaintDelegate = null;
+		myDeselectionDelegate = null;
+		mySelectionTarget = null;
 	}
 
 	public static bool initializeHost()
@@ -723,9 +721,6 @@ public static partial class HoudiniHost
 
 	public static GameObject				mySelectionTarget;
 
-	// maps prefab path to asset id
-	public static Dictionary< string, int >	myCleanUpPrefabAssets;
-
 	public static void saveScene( string file_name, bool lock_nodes )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -1070,34 +1065,10 @@ public static partial class HoudiniHost
 		{
 			prMidPlaymodeStateChange = !prMidPlaymodeStateChange;
 
-			// Find all prefabs created from Houdini assets and change the value of 
-			// prReloadPrefabOnPlaymodeChange so that when going into play mode the 
-			// asset will not be unloaded in the destructor and when selected
-			// serialization recovery will occur for the parameters
 			if ( prMidPlaymodeStateChange )
 			{
 				if ( isInstallationOk() )
-				{
-					foreach ( string asset_path in AssetDatabase.GetAllAssetPaths() )
-					{
-						if ( asset_path.EndsWith( ".prefab" ) )
-						{
-							GameObject prefab = AssetDatabase.LoadAssetAtPath( asset_path, typeof( GameObject ) ) as GameObject;
-							if ( prefab )
-							{
-								// Only need to do this if the prefab has been previously loaded.
-								HoudiniAsset prefab_asset = prefab.GetComponent< HoudiniAsset >();
-								if ( prefab_asset && 
-										isAssetValid( prefab_asset.prAssetId, prefab_asset.prAssetValidationId ) )
-								{
-									prefab_asset.prReloadPrefabOnPlaymodeChange = true;
-								}
-							}
-						}
-					}
-
 					setTime( 0.0f );
-				}
 
 				if ( myPlaymodeStateChangeDelegate != null )
 					myPlaymodeStateChangeDelegate();
@@ -1105,7 +1076,7 @@ public static partial class HoudiniHost
 		}
 		catch ( System.Exception error )
 		{
-			Debug.Log( error.ToString() + "\nSource: " + error.Source );	
+			Debug.Log( error.ToString() + "\nSource: " + error.Source );
 		}
 #endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
