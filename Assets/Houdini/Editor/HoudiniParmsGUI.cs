@@ -172,8 +172,7 @@ public class HoudiniParmsGUI : Editor
 	{
 		HoudiniParmsUndoInfo undo_info =
 			ScriptableObject.Instantiate( myParms.prParmsUndoInfo ) as HoudiniParmsUndoInfo;
-		bool update_prefab_instance = myAsset.isPrefab() && myParms.gameObject.GetComponent< HoudiniAsset >() != null;
-						
+
 		// First find all multiparms and add/remove instances as necessary.
 		foreach ( HAPI_ParmInfo parm in myParms.prParms )
 		{
@@ -200,11 +199,6 @@ public class HoudiniParmsGUI : Editor
 
 				myParms.getParameterValues();
 				myParmChanges = true;
-
-				if ( update_prefab_instance )
-				{
-					myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-				}
 			}
 		}
 
@@ -233,11 +227,6 @@ public class HoudiniParmsGUI : Editor
 					HoudiniHost.setParmIntValues(
 						myParms.prControl.prNodeId, values, 
 						parm.intValuesIndex, parm.size );
-
-					if ( update_prefab_instance )
-					{
-						myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-					}
 				}
 			}
 			else if ( parm.isFloat() )
@@ -259,11 +248,6 @@ public class HoudiniParmsGUI : Editor
 					HoudiniHost.setParmFloatValues(
 						myParms.prControl.prNodeId, values, 
 						parm.floatValuesIndex, parm.size );
-
-					if ( update_prefab_instance )
-					{
-						myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-					}
 				}
 			}
 			else if ( parm.isString() )
@@ -284,11 +268,6 @@ public class HoudiniParmsGUI : Editor
 						HoudiniHost.setParmStringValue(
 							myParms.prControl.prNodeId, 
 							new_string_value, parm.id, i );
-
-						if ( update_prefab_instance )
-						{
-							myAsset.prUpdatePrefabInstanceParmNames.Add( parm.name );
-						}
 					}
 				}
 			} // By type of parm.
@@ -312,10 +291,6 @@ public class HoudiniParmsGUI : Editor
 		float[] parm_float_values	= myParms.prParmFloatValues;
 
 		HoudiniGUIParm gui_parm 	= new HoudiniGUIParm( parm );
-
-		// Overridden parameters should not be bold in play mode.
-		gui_parm.isBold				= myParms.isParmOverridden( parm.id ) && 
-									  !EditorApplication.isPlayingOrWillChangePlaymode;
 
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter

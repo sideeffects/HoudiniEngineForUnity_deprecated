@@ -204,10 +204,6 @@ public class HoudiniAssetUtility
 		// Set that asset path.
 		asset.prAssetPath = file_path;
 		
-		// Save as a prefab.
-		//Object prefab = PrefabUtility.CreateEmptyPrefab( "Assets/" + myDefaultPrefabLabel + ".prefab" );
-		//PrefabUtility.ReplacePrefab( game_object, prefab, ReplacePrefabOptions.ConnectToPrefab );
-		
 		// Do first build.
 		bool build_result = asset.buildAll();
 		if ( build_result == false ) // Something is not right. Clean up.
@@ -993,15 +989,6 @@ public class HoudiniAssetUtility
 					material.shader = Shader.Find( "Houdini/AlphaSpecularVertexColor" );
 				else
 					material.shader = Shader.Find( "Houdini/SpecularVertexColor" );
-	
-				// Before assigning material, make sure that if the asset is a prefab instance, all 
-				// modifications are saved before assignHoudiniMaterial is called because ImportAsset may 
-				// be called within this function which will cause OnEnable to be called on all prefab 
-				// instances if the prefab is dirty.
-#if UNITY_EDITOR
-				if ( asset.isPrefabInstance() )
-					PrefabUtility.RecordPrefabInstancePropertyModifications( asset );
-#endif // UNITY_EDITOR
 
 				string folder_path =
 					HoudiniConstants.HAPI_TEXTURES_PATH + "/" + part_control.prAsset.prAssetName;

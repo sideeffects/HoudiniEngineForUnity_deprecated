@@ -41,44 +41,6 @@ public class HoudiniAssetGUI : Editor
 		HoudiniHost.myRepaintDelegate += this.refresh;
 		HoudiniHost.myDeselectionDelegate += this.deselect;
 		HoudiniHost.mySelectionTarget = myAsset.gameObject;
-		
-		// If selection is a prefab build it ( parameters only ) to allow 
-		// editing of parameters. Only need to build once, the first time
-		// it is selected.
-		if ( myAsset.isPrefab() )
-		{
-			// Reloading prefab after play mode change since OnEnable
-			// never gets called for prefab. This only needs to be done
-			// if prefab has already been built.
-			if ( myAsset.prReloadPrefabOnPlaymodeChange &&
-				 HoudiniHost.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
-			{
-				myAsset.prReloadPrefabOnPlaymodeChange = false;
-				myAsset.build(	false,	// reload_asset
-								false,	// unload_asset_first
-								true,	// serializatin_recovery_only
-								false,	// force_reconnect
-								false,	// is_duplication
-								false,	// cook_downstream_assets
-								false	// use_delay_for_progress_bar
-					 		 );
-			}
-			else if (
-				myAsset.prAssetId != myAsset.prBackupAssetId ||
-				!HoudiniHost.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) )
-			{
-				myAsset.prAssetId = -1;
-				myAsset.build( true,	// reload_asset
-							   true,	// unload_asset_first
-							   true,	// serializatin_recovery_only
-							   false,	// force_reconnect
-							   false,	// is_duplication
-							   false,	// cook_downstream_assets
-							   false	// use_delay_for_progress_bar
-					 		 );
-				EditorUtility.SetDirty( myAsset );
-			}
-		}
 	}
 
 	public virtual void OnDisable()
@@ -132,8 +94,7 @@ public class HoudiniAssetGUI : Editor
 
 			if ( HoudiniHost.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) &&
 				( myAsset.prTransformInputCount > 0 || myAsset.prGeoInputCount > 0 ) &&
-				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE &&
-				 !myAsset.isPrefab() )
+				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
 			{
 				myAsset.prShowInputControls = HoudiniGUI.foldout( "Inputs", myAsset.prShowInputControls, true );
 			
@@ -390,8 +351,7 @@ public class HoudiniAssetGUI : Editor
 				label += local_overwrite_message;
 
 			bool value = ( bool ) property.GetValue( myAsset, null );
-			bool is_bold = myParentPrefabAsset && ( bool ) property.GetValue( myParentPrefabAsset, null ) != value;
-			bool changed = HoudiniGUI.toggle( name, label, is_bold, ref value, myUndoInfo, ref undo_info_value );
+			bool changed = HoudiniGUI.toggle( name, label, false, ref value, myUndoInfo, ref undo_info_value );
 
 			if ( changed )
 			{

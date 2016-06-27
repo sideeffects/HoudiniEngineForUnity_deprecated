@@ -198,15 +198,6 @@ public class HoudiniParms : MonoBehaviour
 
 		throw new HoudiniErrorNotFound( "Parameter with the name " + name + " does not exist!" );
 	}
-	
-	public bool isParmOverridden( int parm_id )
-	{
-		if ( myOverriddenParmsMap.ContainsKey( parm_id ) )
-		{
-			return myOverriddenParmsMap[ parm_id ];
-		}
-		return false;
-	}
 
 	public void cacheStringsFromHost()
 	{
@@ -371,92 +362,6 @@ public class HoudiniParms : MonoBehaviour
 
 			myParmsUndoInfo.parmNames.Add( parm.name );
 		}
-
-#if UNITY_EDITOR
-		// Set which parameter values have been overridden (only needed for a prefab instance)
-		if ( prControl && prControl.isPrefabInstance() && gameObject.GetComponent< HoudiniAsset >() != null )
-		{
-			HoudiniAsset prefab_asset = prControl.prAsset.getParentPrefabAsset();
-			if ( prefab_asset && prefab_asset.prParms != null && 
-				prefab_asset.prParms.prParms != null && 
-				!prefab_asset.isApplyingChangesToPrefab() )
-			{
-				// loop through parameter values and determine which ones have been
-				// overridden (ie. changed from corresponding parameter value on prefab)
-				for ( int i = 0; i < prParms.Length; ++i )
-				{
-					myOverriddenParmsMap[ prParms[ i ].id ] = !isParmSameInPrefab( prParms[ i ].id, prefab_asset.prParms );
-				}
-			}
-
-			// This tells Unity that parameter values have been overridden for this prefab instance
-			PrefabUtility.RecordPrefabInstancePropertyModifications( this );
-		}
-#endif // UNITY_EDITOR
-	}
-	
-	// Checks if the parameter with the given id parm_id represents the same parameter 
-	// with the same value in this set of parameters and another set of parameters parmsB.
-	public bool isParmSameInPrefab( int parm_id, HoudiniParms parmsB )
-	{
-		HAPI_ParmInfo parm_infoA = findParm( parm_id );
-		HAPI_ParmInfo parm_infoB = parmsB.findParm( parm_id );
-		
-		if ( parm_infoA.GetType() != parm_infoB.GetType() ||
-			 parm_infoA.size != parm_infoB.size ||
-			 parm_infoA.name != parm_infoB.name || 
-			 parm_infoA.label != parm_infoB.label )
-		{
-			Debug.LogError( "Parameter structure is different from prefab" );
-			return false;
-		}
-		
-		// only need to check type and size of one because already checked that
-		// parameter infos have  type and size
-		if ( parm_infoA.isFloat() )
-		{
-			for ( int ii = 0; ii < parm_infoA.size; ii++ )
-			{
-				float valueA = prParmFloatValues[ parm_infoA.floatValuesIndex + ii ];
-				float valueB = parmsB.prParmFloatValues[ parm_infoB.floatValuesIndex + ii ];
-				if ( valueA != valueB )
-				{
-					return false;
-				}
-			}
-		}
-		else if ( parm_infoB.isInt() )
-		{
-			for ( int ii = 0; ii < parm_infoA.size; ii++ )
-			{
-				int valueA = prParmIntValues[ parm_infoA.intValuesIndex + ii ];
-				int valueB = parmsB.prParmIntValues[ parm_infoB.intValuesIndex + ii ];
-				if ( valueA != valueB )
-				{
-					return false;
-				}
-			}
-		}
-		else if ( parm_infoB.isString() )
-		{
-			string[] valuesA = getParmStrings( parm_infoA );
-			string[] valuesB = parmsB.getParmStrings( parm_infoB );
-			
-			if ( valuesA.Length != valuesB.Length )
-			{
-				return false;
-			}
-			
-			for ( int ii = 0; ii < valuesA.Length; ii++ )
-			{
-				if ( valuesA[ ii ] != valuesB[ ii ] )
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
 	}
 
 	public void removeMultiparmInstances( HAPI_ParmInfo multiparm, int num_instances )
@@ -589,12 +494,6 @@ public class HoudiniParms : MonoBehaviour
 	// A mapping from parm id to the parm's string values
 	private Dictionary< int, string[] >  			myParmStrings = new Dictionary< int, string[] >();
 	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary< int, HAPI_ParmInfo >();
-
-	// A mapping from parm id to a boolean indicating whether the value 
-	// of the parameter with that id has been changed from the value of 
-	// the same parameter in the associated prefab. These values are only 
-	// used if these parameters are the parameters of a prefab instance.
-	private Dictionary< int, bool > 				myOverriddenParmsMap = new Dictionary< int, bool >();
 
 	private HAPI_ParmInfo 							myMultiparmInstancePos;
 	private bool 									myToInsertInstance = false;

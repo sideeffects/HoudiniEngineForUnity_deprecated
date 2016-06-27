@@ -65,14 +65,6 @@ public class HoudiniControl : MonoBehaviour
 		private set {}
 	}
 
-#if UNITY_EDITOR
-	public bool isPrefab() 			{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.Prefab; }
-	public bool isPrefabInstance()	{ return PrefabUtility.GetPrefabType( gameObject ) == PrefabType.PrefabInstance; }
-#else
-	public bool isPrefab()			{ return false; }
-	public bool isPrefabInstance()	{ return false; }
-#endif // UNITY_EDITOR
-
 	public HoudiniControl() 
 	{
 		reset();

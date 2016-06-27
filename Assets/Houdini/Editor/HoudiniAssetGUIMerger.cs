@@ -85,11 +85,8 @@ public class HoudiniAssetGUIMerger : HoudiniAssetGUI
 			HoudiniGUI.foldout( "Houdini Controls", myAssetMerger.prShowHoudiniControls, true );
 		if ( myAssetMerger.prShowHoudiniControls ) 
 		{
-			if ( !myAssetMerger.isPrefab() )
-			{
-				if ( GUILayout.Button( "Recook" ) )
-					myAssetMerger.buildClientSide();
-			}
+			if ( GUILayout.Button( "Recook" ) )
+				myAssetMerger.buildClientSide();
 		}
 
 		GUI.enabled = gui_enable;

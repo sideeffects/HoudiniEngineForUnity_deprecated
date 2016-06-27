@@ -121,8 +121,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 	{
 		unload_asset_first = unload_asset_first 
 							 && prAssetType == HoudiniAsset.AssetType.TYPE_OTL 
-							 && ( !serialization_recovery_only || 
-								  isPrefab() );
+							 && !serialization_recovery_only;
 
 		bool base_built = base.build(
 			reload_asset,

@@ -44,13 +44,6 @@ public class HoudiniGUIUtility : Editor
 		return new_path;
 	}
 	
-	public static string promptForPrefabPath( string old_path )
-	{		
-		// Prompt for the absolute path to the .otl file to use.
-		string new_path = EditorUtility.OpenFilePanel( "Choose Prefab", old_path, "prefab" );
-		return new_path;
-	}
-	
 	public static string promptForFileInputPath( string old_path )
 	{		
 		// Prompt for the absolute path to the .otl file to use.
