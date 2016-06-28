@@ -1447,7 +1447,6 @@ public abstract class HoudiniAsset : HoudiniControl
 		// Note: If you move or edit this list please update the wiki reminder about this list
 		// on the Runtime wiki page.
 		removeComponentsFromChildren< HoudiniCurve >( new_object );
-		removeComponentsFromChildren< HoudiniMeshToPrefab >( new_object );
 		removeComponentsFromChildren< HoudiniInstancerManager >( new_object );
 		removeComponentsFromChildren< HoudiniInstancer >( new_object );
 		removeComponentsFromChildren< HoudiniInstance >( new_object );

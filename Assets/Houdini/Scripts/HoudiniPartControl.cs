@@ -258,11 +258,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 					mesh_collider.enabled = false;
 					mesh_collider.enabled = true;
 				}
-
-				// Add Mesh-to-Prefab component.
-				HoudiniMeshToPrefab mesh_saver = getOrCreateComponent< HoudiniMeshToPrefab >();
-				mesh_saver.prGameObject = part_node;
-				mesh_saver.prMeshName = prAsset.prAssetName + "_" + part_node.name;
 			}
 			else if ( HoudiniHost.prEnablePointsAsParticles && part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
 			{
