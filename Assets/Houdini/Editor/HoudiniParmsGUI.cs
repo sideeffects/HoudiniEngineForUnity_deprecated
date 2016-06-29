@@ -79,7 +79,7 @@ public class HoudiniParmsGUI : Editor
 			{
 				string changed_parm_name = "Parameter Change";
 				if ( myParms.prLastChangedParmId != HoudiniConstants.HAPI_INVALID_PARM_ID )
-					changed_parm_name = myParms.findParm( myParms.prLastChangedParmId ).label;
+					changed_parm_name = myParms.findParmStrings( myParms.prLastChangedParmId ).label;
 
 				Undo.RecordObject( myParms.prParmsUndoInfo, changed_parm_name );
 			}
@@ -284,13 +284,14 @@ public class HoudiniParmsGUI : Editor
 
 		bool changed 				= false;
 		
-		HAPI_ParmInfo[] parms 		= myParms.prParms;
-		HAPI_ParmInfo parm			= parms[ index ];
+		HAPI_ParmInfo[] parms = myParms.prParms;
+		HAPI_ParmInfo parm = parms[ index ];
+		HAPI_ParmInfoStrings parm_strings = myParms.prParmInfoStrings[ index ];
 
 		int[] parm_int_values		= myParms.prParmIntValues;
 		float[] parm_float_values	= myParms.prParmFloatValues;
 
-		HoudiniGUIParm gui_parm 	= new HoudiniGUIParm( parm );
+		HoudiniGUIParm gui_parm 	= new HoudiniGUIParm( parm, parm_strings );
 
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter
@@ -306,7 +307,7 @@ public class HoudiniParmsGUI : Editor
 			{
 				// Draw popup (menu) field.
 				List< string > 	labels = new List< string >();
-				List< int>		values = new List< int >();
+				List< int >		values = new List< int >();
 				
 				// Go through our choices.
 				for ( int i = 0; i < parm.choiceCount; ++i )
@@ -318,7 +319,7 @@ public class HoudiniParmsGUI : Editor
 										+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
 										+ "Choice count: " + parm.choiceCount );
 					
-					labels.Add( myParms.prParmChoiceLists[ parm.choiceIndex + i ].label );
+					labels.Add( myParms.prParmChoiceInfoStrings[ parm.choiceIndex + i ].label );
 					values.Add( i );
 				}
 				
@@ -366,8 +367,8 @@ public class HoudiniParmsGUI : Editor
 							+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
 							+ "Choice count: " + parm.choiceCount );
 					
-					labels.Add( myParms.prParmChoiceLists[ parm.choiceIndex + i ].label );
-					values.Add( myParms.prParmChoiceLists[ parm.choiceIndex + i ].value );
+					labels.Add( myParms.prParmChoiceInfoStrings[ parm.choiceIndex + i ].label );
+					values.Add( myParms.prParmChoiceInfoStrings[ parm.choiceIndex + i ].value );
 				}
 				
 				string[] values_temp = myParms.getParmStrings( parm );
@@ -492,7 +493,7 @@ public class HoudiniParmsGUI : Editor
 							+ "Choice index: " + ( parm.choiceIndex + i ) + ", "
 							+ "Choice count: " + parm.choiceCount );
 					
-					labels.Add( myParms.prParmChoiceLists[ parm.choiceIndex + i ].label );
+					labels.Add( myParms.prParmChoiceInfoStrings[ parm.choiceIndex + i ].label );
 					values.Add( i );
 				}
 				
@@ -540,6 +541,7 @@ public class HoudiniParmsGUI : Editor
 		bool changed 					= false;
 		int current_index 				= 0;
 		HAPI_ParmInfo[] parms 			= myParms.prParms;
+		HAPI_ParmInfoStrings[] parm_strings = myParms.prParmInfoStrings;
 				
 		bool join_last 					= false;
 		bool no_label_toggle_last 		= false;
@@ -658,9 +660,9 @@ public class HoudiniParmsGUI : Editor
 					else
 						has_visible_folders = true;
 					
-					tab_ids.Add( 		parms[ current_index ].id );
-					tab_labels.Add( 	parms[ current_index ].label );
-					tab_sizes.Add( 		parms[ current_index ].size );
+					tab_ids.Add( parms[ current_index ].id );
+					tab_labels.Add( parm_strings[ current_index ].label );
+					tab_sizes.Add( parms[ current_index ].size );
 				}
 				current_index--; // We decrement the current_index as we incremented one too many in the for loop.
 				
@@ -685,8 +687,8 @@ public class HoudiniParmsGUI : Editor
 					
 					// Push only the selected folder info to the parent stacks since for this depth and this folder
 					// list only the parameters of the selected folder need to be generated.
-					parent_id_stack.Push( 		tab_ids[ selected_folder ] );
-					parent_count_stack.Push( 	tab_sizes[ selected_folder ] );
+					parent_id_stack.Push( tab_ids[ selected_folder ] );
+					parent_count_stack.Push( tab_sizes[ selected_folder ] );
 				}
 				current_index++;
 			}

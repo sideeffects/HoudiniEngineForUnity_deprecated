@@ -282,9 +282,12 @@ public class HoudiniCurve : MonoBehaviour
 			parm += prPoints[ i ][ 2 ];
 			parm += " ";
 		}
-		
+
+		if ( prControl.prAssetId < 0 )
+			prControl.prAsset.buildAll();
+
 		HoudiniHost.setParmStringValue( prControl.prNodeId, parm, 2, 0 );
-		
+
 		prControl.prAsset.buildClientSide();
 		prControl.prAsset.savePreset();
 		prParms.getParameterValues();
@@ -299,7 +302,7 @@ public class HoudiniCurve : MonoBehaviour
 			HAPI_ParmInfo coords_parm_info = prParms.findParm( "coords" );
 
 			string point_list = 
-				HoudiniHost.getString( prParms.prParmStringValues[ coords_parm_info.stringValuesIndex ] );
+				HoudiniHost.getString( prParms.prParmStringHandles[ coords_parm_info.stringValuesIndex ] );
 
 			if ( point_list == null )
 				return;

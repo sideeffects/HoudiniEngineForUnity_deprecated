@@ -53,19 +53,19 @@ public struct HoudiniGUIParm
 		isBold 			= false;
 	}
 	
-	public HoudiniGUIParm( HAPI_ParmInfo info )
+	public HoudiniGUIParm( HAPI_ParmInfo info, HAPI_ParmInfoStrings strings )
 	{
 		id				= info.id;
 
 		type			= info.type;
-		typeInfo		= info.typeInfo;
+		typeInfo		= strings.typeInfo;
 
 		size 			= info.size;
 		choiceCount 	= info.choiceCount;
 		width			= -1;
 		
-		name 			= info.name;
-		label 			= info.label;
+		name 			= strings.name;
+		label 			= strings.label;
 		labelExtraWidth = 0;
 		
 		hasMin 			= info.hasMin;

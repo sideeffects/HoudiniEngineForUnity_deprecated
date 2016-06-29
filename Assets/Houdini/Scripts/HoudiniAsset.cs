@@ -698,19 +698,23 @@ public abstract class HoudiniAsset : HoudiniControl
 			// is no installation because if they save the scene and load it
 			// in another Unity session where there is an installation of
 			// Houdini then the asset will no longer load.
+			else if ( is_duplication )
+			{
+				prAssetId = -1;
+				build(
+					true,	// reload_asset
+					true,	// unload_asset_first
+					false,	// serializatin_recovery_only
+					true,	// force_reconnect
+					is_duplication,
+					true,	// cook_downstream_assets
+					false	// use_delay_for_progress_bar
+				);
+			}
 			else
 			{
-				// Loading Scene (no Houdini scene exists yet) or
-				// duplicating an existing asset.
+				// Loading Scene (no Houdini scene exists yet).
 				prAssetId = -1;
-				build(	true,	// reload_asset
-						true,	// unload_asset_first
-						false,	// serializatin_recovery_only
-						true,	// force_reconnect
-						is_duplication,
-						true,	// cook_downstream_assets
-						false	// use_delay_for_progress_bar
-					);
 			}
 		}
 #endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -826,15 +830,18 @@ public abstract class HoudiniAsset : HoudiniControl
 	{
 		base.onParmChange();
 
-		build(
-			false,			// reload_asset
-			false,			// unload_asset_first
-			false,			// serializatin_recovery_only
-			false,			// force_reconnect
-			false,			// is_duplication
-			prCookingTriggersDownCooks,
-			true			// use_delay_for_progress_bar
-		);
+		if ( prAssetId >= 0 )
+			buildClientSide();
+		else
+			build(
+				true,	// reload_asset
+				true,	// unload_asset_first
+				false,	// serializatin_recovery_only
+				true,	// force_reconnect
+				false,	// is_duplication
+				true,	// cook_downstream_assets
+				false	// use_delay_for_progress_bar
+			);
 
 		// To keep things consistent with Unity workflow, we should not save parameter changes
 		// while in Play mode.
@@ -1755,7 +1762,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			{
 				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
-					downstream_asset.OnEnable();
+					downstream_asset.onParmChange();
 				downstream_asset.build( false, // reload_asset
 										false, // unload_asset_first
 										false, // serialization_recovery_only
@@ -1770,7 +1777,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			{
 				prEnableCooking = false;
 				if ( !downstream_asset.isAssetValid() )
-					downstream_asset.OnEnable();
+					downstream_asset.onParmChange();
 				downstream_asset.build( false, // reload_asset
 										false, // unload_asset_first
 										false, // serialization_recovery_only
