@@ -21,6 +21,7 @@ using UnityEditor;
 using System;
 using System.Runtime.InteropServices;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 
 // Typedefs
@@ -28,7 +29,7 @@ using HAPI_StringHandle = System.Int32;
 using HAPI_NodeId = System.Int32;
 
 [ RequireComponent( typeof( HoudiniControl ) ) ]
-public class HoudiniParms : MonoBehaviour
+public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 {
 	public enum AssetType
 	{
@@ -64,21 +65,24 @@ public class HoudiniParms : MonoBehaviour
 	public int						prParmChoiceCount {				get { return myprParmChoiceCount; } 
 																	set { myprParmChoiceCount = value; } }
 
-	public HAPI_ParmInfo[] 			prParms {						get { return myParms; } 
+	public HAPI_ParmInfo[]		 	prParms {						get { return myParms; } 
 																	set { myParms = value; } }
 	public int[]					prParmIntValues {				get { return myParmIntValues; } 
 																	set { myParmIntValues = value; } }
 	public float[]					prParmFloatValues {				get { return myParmFloatValues; } 
 																	set { myParmFloatValues = value; } }
-	public HAPI_StringHandle[]		prParmStringValues {			get { return myParmStringValues; }
-																	set { myParmStringValues = value; } }
+	public HAPI_StringHandle[]		prParmStringHandles {			get { return myParmStringHandles; }
+																	set { myParmStringHandles = value; } }
 	public HAPI_ParmChoiceInfo[]	prParmChoiceLists {				get { return myParmChoiceLists; } 
 																	set { myParmChoiceLists = value; } }
+
+	public HAPI_ParmInfoStrings[]	prParmInfoStrings {				get { return myParmInfoStrings; } }
+	public HAPI_ParmChoiceInfoStrings[] prParmChoiceInfoStrings {	get { return myParmChoiceInfoStrings; } }
 
 	public int						prLastChangedParmId {			get { return myLastChangedParmId; } 
 																	set { myLastChangedParmId = value; } }
 
-	public HoudiniParmsUndoInfo 		prParmsUndoInfo {				get { return myParmsUndoInfo; }
+	public HoudiniParmsUndoInfo 	prParmsUndoInfo {				get { return myParmsUndoInfo; }
 																	private set { } }
 
 	public List< int > 				prFolderListSelections {		get { return myFolderListSelections; } 
@@ -117,13 +121,17 @@ public class HoudiniParms : MonoBehaviour
 	// This will retrieve the cached copy of the string
 	public string[] getParmStrings( HAPI_ParmInfo parm )
 	{
-		return myParmStrings[ parm.id ];
+		string[] strings = new string[ parm.size ];
+		for ( int i = 0; i < parm.size; ++i )
+			strings[ i ] = myParmStringValues[ parm.stringValuesIndex + i ];
+		return strings;
 	}
 
 	// Set into dictionary to later be set into the host
 	public void setParmStrings( HAPI_ParmInfo parm, string[] strings )
 	{
-		myParmStrings[ parm.id ] = strings;
+		for ( int i = 0; i < parm.size; ++i )
+			myParmStringValues[ parm.stringValuesIndex + i ] = strings[ i ];
 	}
 	
 	public virtual void OnDestroy()
@@ -133,6 +141,16 @@ public class HoudiniParms : MonoBehaviour
 
 	public virtual void OnEnable()
 	{}
+
+	public void OnBeforeSerialize()
+	{
+		//Debug.Log( "OnBeforeSerialize()" + myParmStrings.Length );
+	}
+
+	public void OnAfterDeserialize()
+	{
+		//Debug.Log( "OnAfterDeserialization()" + myParmStrings.Length );
+	}
 	
 	public void reset()
 	{
@@ -152,11 +170,16 @@ public class HoudiniParms : MonoBehaviour
 		prParmStringValueCount 			= 0;
 		prParmChoiceCount 				= 0;
 
-		prParms 						= null;
+		prParms 						= new HAPI_ParmInfo[ 0 ];
 		prParmIntValues 				= new int[ 0 ];
 		prParmFloatValues 				= new float[ 0 ];
-		prParmStringValues 				= new HAPI_StringHandle[ 0 ];
+		prParmStringHandles 			= new HAPI_StringHandle[ 0 ];
 		prParmChoiceLists 				= new HAPI_ParmChoiceInfo[ 0 ];
+
+		myParmInfoStrings				= new HAPI_ParmInfoStrings[ 0 ];
+		myParmChoiceInfoStrings			= new HAPI_ParmChoiceInfoStrings[ 0 ];
+
+		myParmStringValues				= new string[ 0 ];
 
 		prLastChangedParmId 			= -1;
 
@@ -182,7 +205,18 @@ public class HoudiniParms : MonoBehaviour
 
 	public virtual HAPI_ParmInfo findParm( int id )
 	{
-		return myParmMap[ id ];
+		for ( int i = 0; i < myParms.Length; ++i )
+			if ( myParms[ i ].id == id )
+				return myParms[ i ];
+		throw new HoudiniErrorNotFound( "Parm info not found by parm id." );
+	}
+
+	public virtual HAPI_ParmInfoStrings findParmStrings( int id )
+	{
+		for ( int i = 0; i < myParms.Length; ++i )
+			if ( myParms[ i ].id == id )
+				return myParmInfoStrings[ i ];
+		throw new HoudiniErrorNotFound( "Parm info strings not found by parm id." );
 	}
 
 	public virtual HAPI_ParmInfo findParm( string name )
@@ -204,21 +238,31 @@ public class HoudiniParms : MonoBehaviour
 		myParmsUndoInfo.parmStringValues = new string[ prParmStringValueCount ];
 
 		// For each string parameter, cache the string from the host
-		foreach ( HAPI_ParmInfo parm in prParms )
+		for ( int i = 0; i < prParms.Length; ++i )
 		{
+			HAPI_ParmInfo parm = prParms[ i ];
+
+			// Cache the strings in the parm info struct.
+			myParmInfoStrings[ i ].cacheStrings( parm );
+
 			if ( parm.isString() )
 			{
-				myParmStrings[ parm.id ] = new string[ parm.size ];
+				string[] strings = new string[ parm.size ];
 				for ( int p = 0; p < parm.size; ++p )
 				{
 					int values_index = parm.stringValuesIndex + p;
-					string string_value = HoudiniHost.getString( prParmStringValues[ values_index ] );
+					string string_value = HoudiniHost.getString( prParmStringHandles[ values_index ] );
 
-					myParmStrings[ parm.id ][ p ] = string_value;
+					strings[ p ] = string_value;
 					myParmsUndoInfo.parmStringValues[ values_index ] = string_value;
 				}
+				setParmStrings( parm, strings );
 			}
 		}
+
+		// Cache the choice list strings.
+		for ( int i = 0; i < myParmChoiceLists.Length; ++i )
+			myParmChoiceInfoStrings[ i ].cacheStrings( myParmChoiceLists[ i ] );
 	}
 
 	public bool areValuesEqualToHoudini()
@@ -268,10 +312,10 @@ public class HoudiniParms : MonoBehaviour
 		int[] houdini_string_values = new int[ prParmStringValueCount ];
 		HoudiniAssetUtility.getArray1Id( 
 			prControl.prNodeId, HoudiniHost.getParmStringValues, houdini_string_values, prParmStringValueCount );
-		if ( prParmStringValues.Length != houdini_string_values.Length )
+		if ( prParmStringHandles.Length != houdini_string_values.Length )
 			return false;
 		for ( int i = 0; i < prParmStringValueCount; ++i )
-			if ( !HoudiniHost.getString( prParmStringValues[ i ] ).Equals(
+			if ( !HoudiniHost.getString( prParmStringHandles[ i ] ).Equals(
 				HoudiniHost.getString( houdini_string_values[ i ] ) ) )
 				return false;
 
@@ -307,6 +351,7 @@ public class HoudiniParms : MonoBehaviour
 
 		// Get all parameters.
 		prParms = new HAPI_ParmInfo[ prParmCount ];
+		myParmInfoStrings = new HAPI_ParmInfoStrings[ prParmCount ];
 		HoudiniAssetUtility.getArray1Id( prControl.prNodeId, HoudiniHost.getParameters, prParms, prParmCount );
 
 		// Get parameter int values.
@@ -326,18 +371,16 @@ public class HoudiniParms : MonoBehaviour
 		Array.Copy( prParmFloatValues, myParmsUndoInfo.parmFloatValues, prParmFloatValueCount );
 
 		// Get parameter string (handle) values.
-		prParmStringValues = new int[ prParmStringValueCount ];
+		prParmStringHandles = new int[ prParmStringValueCount ];
+		myParmStringValues = new string[ prParmStringValueCount ];
 		HoudiniAssetUtility.getArray1Id( 
-			prControl.prNodeId, HoudiniHost.getParmStringValues, prParmStringValues, prParmStringValueCount );
+			prControl.prNodeId, HoudiniHost.getParmStringValues, prParmStringHandles, prParmStringValueCount );
 
 		// Get parameter choice lists.
 		prParmChoiceLists = new HAPI_ParmChoiceInfo[ prParmChoiceCount ];
+		myParmChoiceInfoStrings = new HAPI_ParmChoiceInfoStrings[ prParmChoiceCount ];
 		HoudiniAssetUtility.getArray1Id( 
 			prControl.prNodeId, HoudiniHost.getParmChoiceLists, prParmChoiceLists, prParmChoiceCount );
-
-		// Build the map of parm id -> parm
-		for ( int i = 0; i < prParms.Length; ++i )
-			myParmMap[ prParms[ i ].id ] = prParms[ i ];
 
 		cacheStringsFromHost();
 
@@ -435,7 +478,7 @@ public class HoudiniParms : MonoBehaviour
 		if ( id == -1 )
 			return;
 
-		HAPI_ParmInfo parm = myParmMap[ id ];
+		HAPI_ParmInfo parm = findParm( id );
 		if ( (HAPI_ParmType) parm.type == HAPI_ParmType.HAPI_PARMTYPE_MULTIPARMLIST )
 		{
 			int[] values = new int[ 1 ];
@@ -463,8 +506,9 @@ public class HoudiniParms : MonoBehaviour
 		}
 		else if ( parm.isString() )
 		{
-			for ( int p = 0; p < myParmStrings[ parm.id ].Length; ++p )
-				HoudiniHost.setParmStringValue( prControl.prNodeId, myParmStrings[ parm.id ][ p ], parm.id, p );
+			string[] strings = getParmStrings( parm );
+			for ( int p = 0; p < parm.size; ++p )
+				HoudiniHost.setParmStringValue( prControl.prNodeId, strings[ p ], parm.id, p );
 		}
 	}
 	
@@ -485,15 +529,16 @@ public class HoudiniParms : MonoBehaviour
 	[SerializeField] private int					myprParmStringValueCoun;
 	[SerializeField] private int					myprParmChoiceCount;
 	
-	[SerializeField] private HAPI_ParmInfo[]  		myParms;
+	[SerializeField] private HAPI_ParmInfo[]		myParms;
 	[SerializeField] private int[]					myParmIntValues;
 	[SerializeField] private float[]				myParmFloatValues;
-	[SerializeField] private HAPI_StringHandle[]	myParmStringValues;
+	[SerializeField] private HAPI_StringHandle[]	myParmStringHandles;
 	[SerializeField] private HAPI_ParmChoiceInfo[]	myParmChoiceLists;
+	
+	[SerializeField] private HAPI_ParmInfoStrings[] myParmInfoStrings;
+	[SerializeField] private HAPI_ParmChoiceInfoStrings[] myParmChoiceInfoStrings;
 
-	// A mapping from parm id to the parm's string values
-	private Dictionary< int, string[] >  			myParmStrings = new Dictionary< int, string[] >();
-	private Dictionary< int, HAPI_ParmInfo >		myParmMap = new Dictionary< int, HAPI_ParmInfo >();
+	[SerializeField] private string[]				myParmStringValues;
 
 	private HAPI_ParmInfo 							myMultiparmInstancePos;
 	private bool 									myToInsertInstance = false;
@@ -501,7 +546,7 @@ public class HoudiniParms : MonoBehaviour
 
 	[SerializeField] private int					myLastChangedParmId;
 
-	[SerializeField] private HoudiniParmsUndoInfo		myParmsUndoInfo;
+	[SerializeField] private HoudiniParmsUndoInfo	myParmsUndoInfo;
 
 	// Indices of the currently selected folders in the Inspector.
 	// A 1:1 mapping with myFolderListSelectionIds.

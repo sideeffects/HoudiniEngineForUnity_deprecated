@@ -69,14 +69,12 @@ public class HoudiniAssetAccessor
 
 	public string[] getParameters()
 	{
-		HAPI_ParmInfo[] parm_infos = myAssetParms.prParms;
+		var parm_infos = myAssetParms.prParms;
 		string[] names = new string[ parm_infos.Length ];
-		
+
 		for ( int i = 0; i < parm_infos.Length; i++ )
-		{
 			names[ i ] = parm_infos[ i ].name;
-		}
-		
+
 		return names;
 	}
 

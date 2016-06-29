@@ -16,6 +16,7 @@
  */
 
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Runtime.InteropServices;
 
@@ -800,6 +801,7 @@ public struct HAPI_NodeInfo
 
 // PARAMETERS ---------------------------------------------------------------------------------------------------
 
+[ Serializable ]
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_ParmInfo
 {
@@ -951,7 +953,28 @@ public struct HAPI_ParmInfo
 	public string help
 	{ get { return HoudiniHost.getString( helpSH ); } private set {} }
 }
-	
+
+// Used for caching HAPI_ParmInfo strings.
+[ Serializable ]
+public struct HAPI_ParmInfoStrings
+{
+	public void cacheStrings( HAPI_ParmInfo parm_info )
+	{
+		typeInfo = parm_info.typeInfo;
+		name = parm_info.name;
+		label = parm_info.label;
+		templateName = parm_info.templateName;
+		help = parm_info.help;
+	}
+
+	public string typeInfo;
+	public string name;
+	public string label;
+	public string templateName;
+	public string help;
+}
+
+[ Serializable ]
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_ParmChoiceInfo
 {
@@ -965,9 +988,24 @@ public struct HAPI_ParmChoiceInfo
 	public string value
 	{ get { return HoudiniHost.getString( valueSH ); } private set {} }
 }
-	
+
+// Used for caching HAPI_ParmChoiceInfo strings.
+[ Serializable ]
+public struct HAPI_ParmChoiceInfoStrings
+{
+	public void cacheStrings( HAPI_ParmChoiceInfo choice_info )
+	{
+		label = choice_info.label;
+		value = choice_info.value;
+	}
+
+	public string label;
+	public string value;
+}
+
 // HANDLES ------------------------------------------------------------------------------------------------------
-	
+
+[ Serializable ]
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_HandleInfo
 {
@@ -983,7 +1021,7 @@ public struct HAPI_HandleInfo
 	{ get { return HoudiniHost.getString( typeNameSH ); } private set {} }
 }
 
-	
+[ Serializable ]
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_HandleBindingInfo
 {
@@ -1000,7 +1038,8 @@ public struct HAPI_HandleBindingInfo
 };
 	
 // OBJECTS ------------------------------------------------------------------------------------------------------
-	
+
+[ Serializable ]
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_ObjectInfo 
 {
