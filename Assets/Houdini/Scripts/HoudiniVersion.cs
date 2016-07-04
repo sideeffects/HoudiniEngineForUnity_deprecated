@@ -54,6 +54,11 @@ public struct HoudiniVersion
 		public const string HAPI_LIBRARY	= "/Library/Frameworks/Houdini.framework/Versions/15.5.528/Libraries/" + "libHARC32.dylib";
 	#endif // UNITY_EDITOR_64
 
+#elif UNITY_STANDALONE_LINUX
+
+	public const string HAPI_SERVER			= "/opt/hfs15.5.528/dsolib/" + "HARS";
+	public const string HAPI_LIBRARY		= "/opt/hfs15.5.528/bin/" + "libHARC.so";
+
 #else
 
 	public const string HAPI_LIBRARY		= "libHAPI"; // Cannot be empty but its ok if not found.
