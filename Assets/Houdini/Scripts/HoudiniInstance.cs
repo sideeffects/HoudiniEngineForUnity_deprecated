@@ -56,7 +56,7 @@ public class HoudiniInstance : MonoBehaviour
 		myLastLocalToWorld = transform.localToWorldMatrix;
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public virtual void Update()
 	{
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
@@ -67,7 +67,7 @@ public class HoudiniInstance : MonoBehaviour
 		myLastLocalToWorld = local_to_world;
 		myTransformChanged = true;
 	}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
@@ -76,9 +76,9 @@ public class HoudiniInstance : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 #pragma warning disable 0414
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	[SerializeField] private int			myInstancePointNumber;
 	[SerializeField] private GameObject		myObjectToInstantiate;
@@ -86,8 +86,8 @@ public class HoudiniInstance : MonoBehaviour
 	[SerializeField] private bool			myTransformChanged;
 	[SerializeField] private HoudiniInstancer myInstancer;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 #pragma warning restore 0414
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 }

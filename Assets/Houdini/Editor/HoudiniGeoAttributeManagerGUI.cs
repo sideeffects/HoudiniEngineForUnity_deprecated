@@ -4,10 +4,10 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 #pragma warning disable 0162 // Unreachable Code
 #pragma warning disable 0414 // Initialized but unused Private Member Variable
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 public class HoudiniGeoAttributeManagerGUI
 {
@@ -89,9 +89,9 @@ public class HoudiniGeoAttributeManagerGUI
 	public int OnSceneGUI( string tool_name, int selected_node_index, string[] node_list ) 
 	{
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return selected_node_index;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( myManager == null || myManager.prMeshCollider == null )
 			return selected_node_index;
@@ -502,9 +502,9 @@ public class HoudiniGeoAttributeManagerGUI
 		return selected_node_index;
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		#pragma warning restore 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1440,8 +1440,8 @@ public class HoudiniGeoAttributeManagerGUI
 	private HoudiniGeoAttributeManager.Mode myLastMode;
 }
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 #pragma warning restore 0162 // Unreachable Code
 #pragma warning restore 0414 // Initialized but unused Private Member Variable
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 

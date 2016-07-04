@@ -81,7 +81,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 		prAssetType = asset_type;
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public override void Update()
 	{
 		base.Update();
@@ -96,7 +96,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 			buildClientSide();
 		}
 	}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	public override bool buildAll()
 	{

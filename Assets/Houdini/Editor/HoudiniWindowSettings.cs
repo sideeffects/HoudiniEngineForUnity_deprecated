@@ -22,9 +22,9 @@ using System.Linq;
 
 public class HoudiniWindowSettings : EditorWindow 
 {
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning disable 0414
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -42,7 +42,7 @@ public class HoudiniWindowSettings : EditorWindow
 	{
 		bool gui_enable = GUI.enabled;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #else
@@ -52,7 +52,7 @@ public class HoudiniWindowSettings : EditorWindow
 				HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
 			GUI.enabled = false;
 		}
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		myUndoInfo = HoudiniHost.prHostUndoInfo;
 		myScrollPosition = GUILayout.BeginScrollView( myScrollPosition );
@@ -900,7 +900,7 @@ public class HoudiniWindowSettings : EditorWindow
 	private static bool myEnableAdvancedSettings = false;
 	private static HoudiniHostUndoInfo myUndoInfo;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning restore 0414
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 }

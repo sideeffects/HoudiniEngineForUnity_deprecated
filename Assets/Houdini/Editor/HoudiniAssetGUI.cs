@@ -67,7 +67,7 @@ public class HoudiniAssetGUI : Editor
 		bool gui_enable = GUI.enabled;
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #else
@@ -76,7 +76,7 @@ public class HoudiniAssetGUI : Editor
 			HoudiniGUI.help( HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
 			GUI.enabled = false;
 		}
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		try
 		{
@@ -85,7 +85,7 @@ public class HoudiniAssetGUI : Editor
 
 			///////////////////////////////////////////////////////////////////////
 			// Draw License/Logo Thingy
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 			drawLicenseLogo();
 #endif
 
