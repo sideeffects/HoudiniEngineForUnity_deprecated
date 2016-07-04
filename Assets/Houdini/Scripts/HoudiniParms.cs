@@ -196,10 +196,10 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 		myValuesEqualToHoudini = false;
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public virtual void Update()
 	{}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	// -------------------------------------------------------------------------------------------------------------
 

@@ -666,7 +666,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public virtual void OnEnable()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		if ( !HoudiniHost.isInstallationOk() )
 			return;
 
@@ -717,7 +717,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				prAssetId = -1;
 			}
 		}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	public virtual void OnDisable()
@@ -883,10 +883,10 @@ public abstract class HoudiniAsset : HoudiniControl
 							   bool use_delay_for_progress_bar )
 	{
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return false;
 		#pragma warning disable 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( !HoudiniHost.isInstallationOk() )
 			return false;
@@ -1183,9 +1183,9 @@ public abstract class HoudiniAsset : HoudiniControl
 		}
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		#pragma warning restore 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		
 		return true;
 	}
@@ -1204,7 +1204,7 @@ public abstract class HoudiniAsset : HoudiniControl
 		prParms.getParameterValues();
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public virtual void Update()
 	{
 		// The theory here is that we want to update the last local-to-world
@@ -1246,11 +1246,11 @@ public abstract class HoudiniAsset : HoudiniControl
 			Debug.LogError( err.ToString() );
 		}
 	}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	public void bakeAsset()
 	{
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		// Get/Create directory for the asset being baked.
 		string baked_asset_path = HoudiniConstants.HAPI_BAKED_ASSETS_PATH + "/" + prAssetName;
 
@@ -1467,7 +1467,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		// Destroy object we created because we don't need it anymore.
 		DestroyImmediate( new_object );
-#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 	
 	public void bakeAnimations( float start_time, 

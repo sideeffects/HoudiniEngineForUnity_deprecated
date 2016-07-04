@@ -24,9 +24,9 @@ using System.Collections.Generic;
 [ CustomEditor( typeof( HoudiniCurve ) ) ]
 public class HoudiniCurveGUI : Editor 
 {
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning disable 0414
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -90,7 +90,7 @@ public class HoudiniCurveGUI : Editor
 		bool is_editable = myCurve.prEditable && HoudiniHost.isInstallationOk();
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		is_editable = false;
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
@@ -98,7 +98,7 @@ public class HoudiniCurveGUI : Editor
 			HoudiniGUI.help( "This curve is not editable.", MessageType.Info );
 		else if ( !HoudiniHost.isInstallationOk() )
 			HoudiniGUI.help( HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
@@ -113,10 +113,10 @@ public class HoudiniCurveGUI : Editor
 	public void OnSceneGUI() 
 	{
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		return;
 		#pragma warning disable 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		if ( myCurve == null )
 			return;
@@ -551,9 +551,9 @@ public class HoudiniCurveGUI : Editor
 			}
 		}
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		#pragma warning restore 0162
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1108,7 +1108,7 @@ public class HoudiniCurveGUI : Editor
 
 	private HoudiniCurve.Mode myLastMode;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning restore 0414
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 }

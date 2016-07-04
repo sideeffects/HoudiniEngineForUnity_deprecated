@@ -42,7 +42,7 @@ using HAPI_MaterialId = System.Int32;
 /// </summary>
 public static partial class HoudiniHost
 {
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	// SESSIONS -------------------------------------------------------------------------------------------------
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
@@ -1847,6 +1847,6 @@ public static partial class HoudiniHost
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		string format, byte[] buffer, int length );
 
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 }
 

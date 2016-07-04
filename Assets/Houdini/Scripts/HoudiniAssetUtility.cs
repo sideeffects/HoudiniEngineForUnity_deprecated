@@ -923,7 +923,7 @@ public class HoudiniAssetUtility
 				continue;
 			}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 			// Next, check for Substance material in Houdini. If this is a Unity material
 			// we can skip the rest of the loop body.
 			if ( has_multiple_materials )
@@ -935,7 +935,7 @@ public class HoudiniAssetUtility
 				materials[ m ] = material;
 				continue;
 			}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 			// Get the material from the shared materials list or create it if it doesn't exist.
 			if ( materials[ m ] != null )
@@ -1316,7 +1316,7 @@ public class HoudiniAssetUtility
 		return getUnityMaterial( material_path, 0, part_control );
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	public static Material getSubstanceMaterial( HAPI_MaterialInfo material_info, HoudiniPartControl part_control )
 	{
 #if UNITY_EDITOR
@@ -1526,7 +1526,7 @@ public class HoudiniAssetUtility
 
 		return getSubstanceMaterial( material_info, part_control );
 	}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	
 	// GEOMETRY MARSHALLING -----------------------------------------------------------------------------------------
 

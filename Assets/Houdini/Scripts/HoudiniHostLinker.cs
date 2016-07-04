@@ -39,7 +39,7 @@ public static partial class HoudiniHost
 	// the HAPI calls properly link to the dll via the new PATH.
 	public static bool isInstallationOk()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		bool houdini_scene_exists = prHoudiniSceneExists;
 		bool current_csharp_session_init = myCurrentCSharpSessionInitialized;
 		if ( houdini_scene_exists && current_csharp_session_init )
@@ -49,12 +49,12 @@ public static partial class HoudiniHost
 		return host_initialized;
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	public static bool isRuntimeInitialized()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		if ( !HoudiniSetPath.prIsPathSet || !prHoudiniSceneExists )
 			return false;
 		else
@@ -71,12 +71,12 @@ public static partial class HoudiniHost
 		}
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	public static bool initialize()
 	{
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		// Getting rid of warning abiout unused variable.
 		bool tempFlag = myCurrentCSharpSessionInitialized;
 		myCurrentCSharpSessionInitialized = tempFlag;
@@ -162,7 +162,7 @@ public static partial class HoudiniHost
 		myCurrentCSharpSessionInitialized = true;
 
 		return true;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	}
 
 	public static void displayHoudiniEngineInstallInfo()
@@ -213,19 +213,19 @@ public static partial class HoudiniHost
 		}
 		else
 		{
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR )
 			installed_version_msg =
 				"Reason for Installation Detection Failure: " + prLastInitializationError;
 #else
 			installed_version_msg =
 				"Reason for Installation Detection Failure: Unsupported Platform\n" +
 				HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG;
-#endif // UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR )
+#endif // UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR )
 			dialog_title = "No Houdini Engine Installed";
 			license_info += "Unknown";
 		}
 
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		string path_var = "";
 		path_var = System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process );
 #if UNITY_EDITOR_WIN
@@ -246,11 +246,11 @@ public static partial class HoudiniHost
 			installed_version_msg +
 			"\n\n" +
 			license_info +
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 			"\n\n" +
 			"PATH Variable: \n" +
 			path_var +
-#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 			"";
 
 		Debug.Log( full_message );
@@ -279,14 +279,14 @@ public static partial class HoudiniHost
 	private static string getAllFoldersInPath( string path )
 	{
 		string paths = "";
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		if ( !Directory.Exists( path ) )
 			return "";
 
 		DirectoryInfo di = new DirectoryInfo( path );
 		foreach ( DirectoryInfo child_directory in di.GetDirectories() )
 			paths += ";" + getAllFoldersInPath( child_directory.FullName );
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		return path + paths;
 	}

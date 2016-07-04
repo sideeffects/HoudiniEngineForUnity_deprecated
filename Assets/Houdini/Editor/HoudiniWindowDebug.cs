@@ -23,10 +23,10 @@ using System.IO;
 
 public class HoudiniWindowDebug : EditorWindow 
 {
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning disable 0414
 	#pragma warning disable 0649
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public
@@ -53,7 +53,7 @@ public class HoudiniWindowDebug : EditorWindow
 	{
 		bool gui_enable = GUI.enabled;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #else
@@ -63,7 +63,7 @@ public class HoudiniWindowDebug : EditorWindow
 				HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
 			GUI.enabled = false;
 		}
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		
 		if ( GUILayout.Button( HoudiniGUIUtility.myLoadAssetLabel ) )
 		{
@@ -129,7 +129,7 @@ public class HoudiniWindowDebug : EditorWindow
 			}
 		}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		DirectoryInfo di = new DirectoryInfo( path + "//OTLs" );
 
 		try
@@ -179,7 +179,7 @@ public class HoudiniWindowDebug : EditorWindow
 		{
 			Debug.LogError( "Directory navigation failed: " + e.ToString() );
 		}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 
 		GUILayout.EndScrollView();
 
@@ -217,8 +217,8 @@ public class HoudiniWindowDebug : EditorWindow
 
 	private static bool myLockNodesOnHipSave;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 	#pragma warning restore 0414
 	#pragma warning restore 0649
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 }

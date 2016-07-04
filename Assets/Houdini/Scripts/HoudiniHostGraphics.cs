@@ -33,7 +33,7 @@ public static partial class HoudiniHost
 	const string LibGLPath =
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 		"opengl32.dll";
-#elif UNITY_STANDALONE_OSX
+#elif UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
 		"/System/Library/Frameworks/OpenGL.framework/OpenGL";
 #elif UNITY_STANDALONE_LINUX
 		"libGL"; // Untested on Linux, this may not be correct.
@@ -43,7 +43,7 @@ public static partial class HoudiniHost
 
 	private static bool myIsOpenGL;
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || ( UNITY_METRO && UNITY_EDITOR ) || UNITY_STANDALONE_LINUX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) || UNITY_STANDALONE_LINUX )
 	[ DllImport( LibGLPath ) ]
 	private static extern void glEnable( uint cap );
 
