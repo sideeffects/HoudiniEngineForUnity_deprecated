@@ -23,6 +23,7 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 	public bool importTemplatedGeos;
 	public bool splitGeosByGroupOverride;
 	public bool splitGeosByGroup;
+	public bool omitPartNameEnumeration;
 
 	// Bake Settings
 	public float bakeStartTime;
@@ -47,6 +48,7 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 		importTemplatedGeos 			= asset.prImportTemplatedGeos;
 		splitGeosByGroupOverride		= asset.prSplitGeosByGroupOverride;
 		splitGeosByGroup				= asset.prSplitGeosByGroup;
+		omitPartNameEnumeration			= asset.prOmitPartNameEnumeration;
 		bakeStartTime					= asset.prBakeStartTime;
 		bakeEndTime						= asset.prBakeEndTime;
 		bakeSamplesPerSecond			= asset.prBakeSamplesPerSecond;
