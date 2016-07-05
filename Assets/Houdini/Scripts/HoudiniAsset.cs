@@ -240,6 +240,9 @@ public abstract class HoudiniAsset : HoudiniControl
 	public bool prSplitPointsByVertexAttribute { get { return HoudiniHost.prSplitPointsByVertexAttributes; }
 												private set { } }
 
+	public bool prOmitPartNameEnumeration {		get { return myOmitPartNameEnumeration; }
+												set { myOmitPartNameEnumeration = value; } }
+
 	public bool						prEnableLogging {				get { return myEnableLogging; } 
 																	set { myEnableLogging = value; } }
 
@@ -817,6 +820,7 @@ public abstract class HoudiniAsset : HoudiniControl
 		prImportTemplatedGeos 			= HoudiniHost.myDefaultImportTemplatedGeos;
 		prSplitGeosByGroupOverride		= false;
 		prSplitGeosByGroup				= HoudiniHost.myDefaultSplitGeosByGroup;
+		prOmitPartNameEnumeration		= false;
 
 		prEnableLogging					= false;
 
@@ -1954,6 +1958,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	[SerializeField] private bool					myImportTemplatedGeos;
 	[SerializeField] private bool					mySplitGeosByGroupOverride;
 	[SerializeField] private bool					mySplitGeosByGroup;
+	[SerializeField] private bool					myOmitPartNameEnumeration;
 	
 	[SerializeField] private bool					myEnableLogging;
 

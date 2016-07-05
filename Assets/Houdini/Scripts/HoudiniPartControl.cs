@@ -179,7 +179,10 @@ public class HoudiniPartControl : HoudiniGeoControl
 			init( -1, part_info.id, part_info.name );
 
 			// Overwrite name.
-			part_node.name = part_info.name;
+			var part_name = part_info.name;
+			if ( prAsset.prOmitPartNameEnumeration )
+				part_name = part_name.Substring( 0, part_name.LastIndexOf( '_' ) );
+			part_node.name = part_name;
 
 			if ( is_empty )
 			{
@@ -187,11 +190,11 @@ public class HoudiniPartControl : HoudiniGeoControl
 				MeshFilter mesh_filter = getOrCreateComponent< MeshFilter >();
 
 				// Get or create mesh.
-				Mesh part_mesh 				= mesh_filter.sharedMesh;
-				if ( part_mesh == null ) 
+				Mesh part_mesh = mesh_filter.sharedMesh;
+				if ( part_mesh == null )
 				{
-					mesh_filter.mesh 		= new Mesh();
-					part_mesh 				= mesh_filter.sharedMesh;
+					mesh_filter.mesh = new Mesh();
+					part_mesh = mesh_filter.sharedMesh;
 				}
 				part_mesh.Clear();
 			}

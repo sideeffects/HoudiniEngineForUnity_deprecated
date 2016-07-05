@@ -367,6 +367,14 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 					"Ok" ), false,
 				!myAsset.prSplitGeosByGroupOverride, " (check the override checkbox to enable)" );
 		}
+
+		HoudiniGUI.separator();
+
+		// Omit Part Name Enumeration
+		createToggleForProperty(
+			"omit_part_name_enumeration", "Omit Part Name Enumeration", 
+			"prOmitPartNameEnumeration", ref myUndoInfo.omitPartNameEnumeration,
+			null );
 	}
 
 	private void generateAssetSettings()
