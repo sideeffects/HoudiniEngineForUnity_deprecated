@@ -56,9 +56,6 @@ public class HoudiniAssetMerger : HoudiniAsset
 		// We want to preserve the transform of the original mesh as we
 		// assetize it.
 		myLastLocalToWorld = transform.localToWorldMatrix;
-
-		if ( prAssetId < 0 )
-			buildAll();
 	}
 	
 	public override bool build(
@@ -69,6 +66,17 @@ public class HoudiniAssetMerger : HoudiniAsset
 		bool cook_downstream_assets,
 		bool use_delay_for_progress_bar )
 	{
+		if ( prAssetId < 0 )
+			base.build(
+				true,	// reload_asset
+				true,	// unload_asset_first
+				false,	// serializatin_recovery_only
+				true,	// force_reconnect
+				false,	// is_duplication
+				true,	// cook_downstream_assets
+				true	// use_delay_for_progress_bar
+			);
+
 		int last_input_count = myInputs.Count;
 		myInputs.Clear();
 
