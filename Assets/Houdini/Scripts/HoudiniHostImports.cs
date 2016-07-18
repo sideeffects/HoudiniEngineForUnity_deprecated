@@ -787,6 +787,13 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetDisplayGeoInfo(
+		ref HAPI_Session session,
+		HAPI_AssetId object_node_id,
+		out HAPI_GeoInfo geo_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetGeoInfoOnNode(
 		ref HAPI_Session session,
 		HAPI_AssetId node_id,
@@ -1310,6 +1317,101 @@ public static partial class HoudiniHost
 	HAPI_DisconnectAssetGeometry( ref HAPI_Session session, HAPI_AssetId asset_id, int input_idx );
 
 	// MATERIALS ------------------------------------------------------------------------------------------------
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetMaterialNodeIdsOnFaces(
+		ref HAPI_Session session,
+		HAPI_NodeId geometry_node_id, HAPI_PartId part_id,
+		[ MarshalAs( UnmanagedType.U1 ) ] ref bool are_all_the_same,
+		[Out] HAPI_MaterialId[] material_ids_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetMaterialInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		out HAPI_MaterialInfo material_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetMaterialOnPartOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId geometry_node_id, HAPI_PartId part_id,
+		out HAPI_MaterialInfo material_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetMaterialOnGroupOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId geometry_node_id,
+		string group_name,
+		out HAPI_MaterialInfo material_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_RenderTextureToImageOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		HAPI_ParmId parm_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetImageInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		out HAPI_ImageInfo image_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_SetImageInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		ref HAPI_ImageInfo image_info );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetImagePlaneCountOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		out int image_plane_count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetImagePlanesOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		[Out] HAPI_StringHandle[] image_planes_array,
+		int image_plane_count );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_ExtractImageToFileOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		string image_file_format_name,
+		string image_planes,
+		string destination_folder_path,
+		string destination_file_name,
+		out int destination_file_path );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_ExtractImageToMemoryOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		string image_file_format_name,
+		string image_planes,
+		out int buffer_size );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetImageMemoryBufferOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId material_node_id,
+		[Out] byte[] buffer,
+		int length );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result

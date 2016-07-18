@@ -1113,6 +1113,18 @@ public static partial class HoudiniHost
 		
 	// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 
+	public static HAPI_GeoInfo getDisplayGeoInfo( HAPI_NodeId object_node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_GeoInfo geo_info;
+		HAPI_Result status_code = HAPI_GetDisplayGeoInfo( ref mySession, object_node_id, out geo_info );
+		processStatusCode( status_code );
+		return geo_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static HAPI_GeoInfo getGeoInfoOnNode( HAPI_NodeId node_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -2099,6 +2111,176 @@ public static partial class HoudiniHost
 	}
 
 	// MATERIALS ------------------------------------------------------------------------------------------------
+
+	public static HAPI_MaterialInfo[] getMaterialsOnFaces(
+		HAPI_NodeId geometry_node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfoOnNode(
+			ref mySession, geometry_node_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		bool are_all_the_same = false;
+		int[] material_ids = new int[ part_info.faceCount ];
+		status_code = HAPI_GetMaterialNodeIdsOnFaces(
+			ref mySession, geometry_node_id, part_id,
+			ref are_all_the_same, material_ids, 0, part_info.faceCount );
+		processStatusCode( status_code );
+
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		HAPI_MaterialInfo[] material_infos = new HAPI_MaterialInfo[ part_info.faceCount ];
+		for ( int m = 0; m < part_info.faceCount; ++m )
+		{
+			status_code = HAPI_GetMaterialInfoOnNode( ref mySession, material_ids[ m ], out material_info );
+			processStatusCode( status_code );
+			material_infos[ m ] = material_info;
+		}
+
+		return material_infos;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_MaterialInfo getMaterialOnPart(
+		HAPI_NodeId geometry_node_id, HAPI_PartId part_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if true
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		HAPI_Result status_code = HAPI_GetMaterialOnPartOnNode(
+			ref mySession, geometry_node_id, part_id, out material_info );
+		processStatusCode( status_code );
+#else
+		HAPI_PartInfo part_info = new HAPI_PartInfo();
+		HAPI_Result status_code = HAPI_GetPartInfoOnNode(
+			ref mySession, geometry_node_id, part_id, out part_info );
+		processStatusCode( status_code );
+
+		bool are_all_the_same = false;
+		int[] material_ids = new int[ 1 ];
+		status_code = HAPI_GetMaterialNodeIdsOnFaces(
+			ref mySession, geometry_node_id, part_id, ref are_all_the_same, material_ids, 0, 1 );
+		processStatusCode( status_code );
+
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		status_code = HAPI_GetMaterialInfoOnNode( ref mySession, material_ids[ 0 ], out material_info );
+		processStatusCode( status_code );
+#endif
+		return material_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_MaterialInfo getMaterialOnGroup( HAPI_NodeId geometry_node_id, string group_name )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
+		HAPI_Result status_code = HAPI_GetMaterialOnGroupOnNode(
+			ref mySession, geometry_node_id, group_name, out material_info );
+		processStatusCode( status_code );
+		return material_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void renderTextureToImage( HAPI_NodeId material_node_id, HAPI_ParmId parm_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_RenderTextureToImageOnNode( ref mySession, material_node_id, parm_id );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static HAPI_ImageInfo getImageInfo( HAPI_NodeId material_node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_ImageInfo image_info = new HAPI_ImageInfo();
+		HAPI_Result status_code = HAPI_GetImageInfoOnNode( ref mySession, material_node_id, out image_info );
+		processStatusCode( status_code );
+		return image_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void setImageInfo( HAPI_NodeId material_node_id, ref HAPI_ImageInfo image_info )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_SetImageInfoOnNode( ref mySession, material_node_id, ref image_info );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static List< string > getImagePlanes( HAPI_NodeId material_node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = (int) HAPI_Result.HAPI_RESULT_SUCCESS;
+
+		int image_plane_count = 0;
+		status_code = HAPI_GetImagePlaneCountOnNode( ref mySession, material_node_id, out image_plane_count );
+		processStatusCode( status_code );
+
+		int[] image_plane_names_array = new int[ image_plane_count ];
+		status_code = HAPI_GetImagePlanesOnNode( 
+			ref mySession, material_node_id, image_plane_names_array, image_plane_count );
+		processStatusCode( status_code );
+
+		List< string > image_plane_names = new List< string >( image_plane_count );
+		for ( int i = 0; i < image_plane_count; ++i )
+			image_plane_names.Add( getString( image_plane_names_array[ i ] ) );
+
+		return image_plane_names;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static string extractImageToFile( 
+		HAPI_NodeId material_node_id, string image_file_format_name,
+		string image_planes, string destination_folder_path )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int destination_file_path_sh = 0;
+
+		HAPI_Result status_code = HAPI_ExtractImageToFileOnNode(
+			ref mySession, material_node_id, image_file_format_name, image_planes, 
+			destination_folder_path, null, out destination_file_path_sh );
+		processStatusCode( status_code );
+			
+		string destination_file_path = getString( destination_file_path_sh );
+		return destination_file_path;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static byte[] extractImageToMemory( 
+		HAPI_NodeId material_node_id, string image_file_format_name, string image_planes )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		int buffer_size = 0;
+
+		HAPI_Result status_code = HAPI_ExtractImageToMemoryOnNode(
+			ref mySession, material_node_id, image_file_format_name, image_planes, out buffer_size );
+		processStatusCode( status_code );
+
+		byte[] buffer = new byte[ buffer_size ];
+		status_code = HAPI_GetImageMemoryBufferOnNode( ref mySession, material_node_id, buffer, buffer_size );
+		processStatusCode( status_code );
+
+		return buffer;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
 
 	public static HAPI_MaterialInfo[] getMaterialsOnFaces(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
