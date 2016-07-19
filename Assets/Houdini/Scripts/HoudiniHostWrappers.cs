@@ -438,6 +438,18 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static HAPI_AssetInfo getAssetInfoOnNode( HAPI_NodeId node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
+		HAPI_Result status_code = HAPI_GetAssetInfoOnNode( ref mySession, node_id, ref asset_info );
+		processStatusCode( status_code );
+		return asset_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static HAPI_AssetInfo getAssetInfo( HAPI_AssetId asset_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
@@ -524,7 +536,7 @@ public static partial class HoudiniHost
 		if ( !isInstallationOk() )
 			return false;
 
-		bool answer = 0;
+		bool answer = true;
 
 		// No need to process return code because this function is guaranteed to 
 		// always return HAPI_STATUS_SUCCESS.
