@@ -518,6 +518,24 @@ public static partial class HoudiniHost
 
 	// NODES ----------------------------------------------------------------------------------------------------
 
+	public static bool isNodeValid( HAPI_NodeId node_id, int unique_node_id )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		if ( !isInstallationOk() )
+			return false;
+
+		bool answer = 0;
+
+		// No need to process return code because this function is guaranteed to 
+		// always return HAPI_STATUS_SUCCESS.
+		HAPI_IsNodeValid( ref mySession, node_id, unique_node_id, ref answer );
+
+		return answer;
+#else
+		return false;
+#endif
+	}
+
 	public static HAPI_NodeInfo getNodeInfo( HAPI_NodeId node_id )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )

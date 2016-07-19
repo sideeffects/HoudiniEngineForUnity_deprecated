@@ -403,6 +403,13 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_IsNodeValid(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, int unique_node_id,
+		[ MarshalAs( UnmanagedType.U1 ) ] ref bool answer );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetNodeInfo( ref HAPI_Session session, HAPI_NodeId node_id, ref HAPI_NodeInfo node_info );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
