@@ -726,6 +726,7 @@ public static partial class HoudiniHost
 	HAPI_GetObjectTransform(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,
+		HAPI_NodeId relative_to_node_id,
 		HAPI_RSTOrder rst_order,
 		out HAPI_Transform transform );
 

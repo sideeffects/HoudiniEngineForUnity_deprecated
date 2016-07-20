@@ -1026,11 +1026,13 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static HAPI_Transform getObjectTransform( HAPI_NodeId node_id, HAPI_RSTOrder rst_order )
+	public static HAPI_Transform getObjectTransform(
+		HAPI_NodeId node_id, HAPI_NodeId relative_to_node_id, HAPI_RSTOrder rst_order )
 	{
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
 		HAPI_Transform transform;
-		HAPI_Result status_code = HAPI_GetObjectTransform( ref mySession, node_id, rst_order, out transform );
+		HAPI_Result status_code = HAPI_GetObjectTransform(
+			ref mySession, node_id, relative_to_node_id, rst_order, out transform );
 		processStatusCode( status_code );
 		return transform;
 #else
