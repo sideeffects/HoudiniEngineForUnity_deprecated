@@ -42,9 +42,10 @@ public class HoudiniCurvesCollection
 	public AnimationClip assignCurvesToClip()
 	{
 		HoudiniCurvesCollection curves = this;
-						
+
 		AnimationClip clip = new AnimationClip();
-		
+		clip.legacy = true;
+
 		bool found_nonconst_curve = false;
 		
 		if( !curves.isConstantAnimCurve( curves.tx ) )
