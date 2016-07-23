@@ -36,6 +36,10 @@ Shader "Houdini/Line" {
 				}
 
 				half4 frag( v2f i ) : COLOR {
+					// Temporary hack to hid curves when loading a scene file via code.
+					// See bug: #75009
+					clip( -1 );
+
 					return i.colour * _Color;
 				}
 
