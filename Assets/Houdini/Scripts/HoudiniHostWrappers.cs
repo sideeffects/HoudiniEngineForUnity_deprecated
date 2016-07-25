@@ -699,6 +699,20 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static string getNodeInputName(
+		HAPI_NodeId node_id, int input_idx )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_StringHandle name_sh = 0;
+		HAPI_Result status_code = HAPI_GetNodeInputName( ref mySession, node_id, input_idx, out name_sh );
+		processStatusCode( status_code );
+		string name = getString( name_sh );
+		return name;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	// PARAMETERS -----------------------------------------------------------------------------------------------
 
 	public static void getParameters(
