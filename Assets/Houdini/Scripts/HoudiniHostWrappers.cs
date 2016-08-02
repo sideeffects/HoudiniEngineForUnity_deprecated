@@ -965,7 +965,7 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
-		
+
 	// HANDLES --------------------------------------------------------------------------------------------------
 
 	public static void getHandleInfo(

@@ -673,7 +673,24 @@ public static partial class HoudiniHost
 		int instance_position );
 		
 	// HANDLES --------------------------------------------------------------------------------------------------
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetHandleInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		[Out] HAPI_HandleInfo[] handle_infos_array,
+		int start, int length );
 		
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetHandleBindingInfoOnNode(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		int handle_index,
+		[Out] HAPI_HandleBindingInfo[] handle_binding_infos_array,
+		int start, int length );
+
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
 	HAPI_GetHandleInfo(
