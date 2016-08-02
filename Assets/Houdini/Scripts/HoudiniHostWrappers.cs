@@ -1120,6 +1120,21 @@ public static partial class HoudiniHost
 	}
 
 	public static void getInstanceTransforms(
+		HAPI_NodeId node_id,
+		HAPI_RSTOrder rst_order,
+		[Out] HAPI_Transform[] transforms,
+		int start, int length )
+	{
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+		HAPI_Result status_code = HAPI_GetInstanceTransformsOnNode(
+			ref mySession, node_id, rst_order, transforms, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getInstanceTransforms(
 		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
 		HAPI_RSTOrder rst_order, [Out] HAPI_Transform[] transforms,
 		int start, int length )
