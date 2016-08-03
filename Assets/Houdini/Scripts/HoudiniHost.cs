@@ -805,7 +805,7 @@ public static partial class HoudiniHost
 
 		// Check for undefined asset definitions.
 #if UNITY_EDITOR
-		HAPI_AssetInfo asset_info = getAssetInfo( asset_id );
+		HAPI_AssetInfo asset_info = getAssetInfoOnAsset( asset_id );
 		int has_undef_assets = checkForSpecificErrors(
 			asset_info.nodeId, (int) HAPI_ErrorCode.HAPI_ERRORCODE_ASSET_DEF_NOT_FOUND );
 		if ( has_undef_assets > 0 )

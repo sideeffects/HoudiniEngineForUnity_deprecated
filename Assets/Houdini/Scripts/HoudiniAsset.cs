@@ -403,7 +403,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				prUpStreamGeoInputAssetIds[ index ], myUpStreamGeoInputAssetValidationIds[ index ] ) )
 		{
 			prUpStreamGeoInputAssetIds[ index ] = HoudiniHost.createInputAsset( prAssetName + "_GeoInput_" + index );
-			HAPI_AssetInfo asset_info = HoudiniHost.getAssetInfo( prUpStreamGeoInputAssetIds[ index ] );
+			HAPI_AssetInfo asset_info = HoudiniHost.getAssetInfoOnAsset( prUpStreamGeoInputAssetIds[ index ] );
 			myUpStreamGeoInputAssetValidationIds[ index ] = asset_info.validationId;
 		}
 
@@ -948,7 +948,7 @@ public abstract class HoudiniAsset : HoudiniControl
 					// and we need to clean up (unload the asset) in the catch.
 					prAssetId = asset_id;
 
-					prAssetInfo = HoudiniHost.getAssetInfo( asset_id );
+					prAssetInfo = HoudiniHost.getAssetInfoOnAsset( asset_id );
 					HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo( prAssetInfo.nodeId );
 					
 					if ( reload_asset )
@@ -991,7 +991,7 @@ public abstract class HoudiniAsset : HoudiniControl
 				
 			}
 			
-			prAssetInfo = HoudiniHost.getAssetInfo( prAssetId );
+			prAssetInfo = HoudiniHost.getAssetInfoOnAsset( prAssetId );
 			
 			// For convenience we copy some asset info properties locally (since they are constant anyway).
 			// More imporantly, structs are not serialized and therefore putting them into their own
