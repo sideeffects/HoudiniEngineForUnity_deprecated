@@ -346,6 +346,8 @@ public class HoudiniCurve : MonoBehaviour
 
 		prCurrentMode		= Mode.ADD;
 		myModeChangeWait	= false;
+
+		myIsFirstCook		= true;
 	}
 
 	public void buildDummyMesh()
@@ -449,8 +451,12 @@ public class HoudiniCurve : MonoBehaviour
 
 		try
 		{
-			HoudiniHost.setParmIntValue( prControl.prNodeId, "type", 0, HoudiniHost.prCurvePrimitiveTypeDefault );
-			HoudiniHost.setParmIntValue( prControl.prNodeId, "method", 0, HoudiniHost.prCurveMethodDefault );
+			if ( myIsFirstCook )
+			{
+				HoudiniHost.setParmIntValue( prControl.prNodeId, "type", 0, HoudiniHost.prCurvePrimitiveTypeDefault );
+				HoudiniHost.setParmIntValue( prControl.prNodeId, "method", 0, HoudiniHost.prCurveMethodDefault );
+				myIsFirstCook = false;
+			}
 			
 			HoudiniHost.cookAsset(
 				prControl.prAsset.prAssetId,
@@ -536,5 +542,7 @@ public class HoudiniCurve : MonoBehaviour
 
 	[SerializeField] private Mode				myCurrentMode;
 	[SerializeField] private bool				myModeChangeWait;
+
+	[SerializeField] private bool				myIsFirstCook;
 
 }
