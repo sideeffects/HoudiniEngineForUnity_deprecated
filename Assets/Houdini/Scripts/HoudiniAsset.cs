@@ -1810,6 +1810,15 @@ public abstract class HoudiniAsset : HoudiniControl
 							prEnableCooking = false;
 							asset.OnEnable();
 							prEnableCooking = true;
+							asset.build(
+								true,	// reload_asset
+								true,	// unload_asset_first
+								false,	// serializatin_recovery_only
+								true,	// force_reconnect
+								false,	// is_duplication
+								true,	// cook_downstream_assets
+								true	// use_delay_for_progress_bar
+							);
 						}
 						addAssetAsTransformInput( asset, i );
 						need_rebuild_after_reconnect = true;
@@ -1847,6 +1856,15 @@ public abstract class HoudiniAsset : HoudiniControl
 							prEnableCooking = false;
 							asset.OnEnable();
 							prEnableCooking = true;
+							asset.build(
+								true,	// reload_asset
+								true,	// unload_asset_first
+								false,	// serializatin_recovery_only
+								true,	// force_reconnect
+								false,	// is_duplication
+								true,	// cook_downstream_assets
+								true	// use_delay_for_progress_bar
+							);
 						}
 						addAssetAsGeoInput( asset, object_index, i );
 					}
