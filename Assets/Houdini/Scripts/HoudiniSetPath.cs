@@ -239,11 +239,6 @@ public class HoudiniSetPath
 	{
 		string app_path = "";
 
-#if UNITY_EDITOR
-		if ( BuildPipeline.isBuildingPlayer )
-			return app_path;
-#endif // UNITY_EDITOR
-
 #if UNITY_EDITOR_WIN
 		// For Windows, we look at the registry entries made by the Houdini installer. We look for the
 		// "active version" key which gives us the most recently installed Houdini version. Using the
