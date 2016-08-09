@@ -73,7 +73,20 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			}
 	
 			if ( GUILayout.Button( "Recook" ) )
-				myAsset.buildClientSide();
+			{
+				if ( myAsset.prAssetId >= 0 )
+					myAsset.buildClientSide();
+				else
+					myAsset.build(
+						true,	// reload_asset
+						true,	// unload_asset_first
+						false,	// serializatin_recovery_only
+						true,	// force_reconnect
+						false,	// is_duplication
+						true,	// cook_downstream_assets
+						false	// use_delay_for_progress_bar
+					);
+			}
 
 			if ( GUILayout.Button( "Bake" ) )
 				myAsset.bakeAsset();
