@@ -839,18 +839,7 @@ public abstract class HoudiniAsset : HoudiniControl
 	{
 		base.onParmChange();
 
-		if ( prAssetId >= 0 )
-			buildClientSide();
-		else
-			build(
-				true,	// reload_asset
-				true,	// unload_asset_first
-				false,	// serializatin_recovery_only
-				true,	// force_reconnect
-				false,	// is_duplication
-				true,	// cook_downstream_assets
-				false	// use_delay_for_progress_bar
-			);
+		buildClientSide();
 
 		// To keep things consistent with Unity workflow, we should not save parameter changes
 		// while in Play mode.
@@ -874,14 +863,26 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	public virtual bool buildClientSide()
 	{
-		return build(	false,	// reload_asset
-						false,	// unload_asset_first
-						false,	// serializatin_recovery_only
-						false,	// force_reconnect
-						false,	// is_duplication
-						prCookingTriggersDownCooks,	// cook_downstream_assets
-						true	// use_delay_for_progress_bar
-					);
+		if ( prAssetId < 0 )
+			return build(
+				true,	// reload_asset
+				true,	// unload_asset_first
+				false,	// serializatin_recovery_only
+				true,	// force_reconnect
+				false,	// is_duplication
+				true,	// cook_downstream_assets
+				true	// use_delay_for_progress_bar
+			);
+		else
+			return build(
+				false,	// reload_asset
+				false,	// unload_asset_first
+				false,	// serializatin_recovery_only
+				false,	// force_reconnect
+				false,	// is_duplication
+				prCookingTriggersDownCooks,	// cook_downstream_assets
+				true	// use_delay_for_progress_bar
+			);
 	}
 
 	public virtual bool build( bool reload_asset, bool unload_asset_first,
