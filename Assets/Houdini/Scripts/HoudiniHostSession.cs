@@ -23,7 +23,7 @@ public static partial class HoudiniHost
 	public static string prServerExecutablePath;
 	public static string prLibraryPath;
 
-#if UNITY_EDITOR
+#if HAPI_ENABLE_RUNTIME
 	public static long prSessionID {
 		get { return HoudiniDataFile.getLong( "ServerSessionID", -1 ); }
 		private set { HoudiniDataFile.setLong( "ServerSessionID", value ); } }
@@ -37,13 +37,13 @@ public static partial class HoudiniHost
 	public static int prProcessID {
 		get { return 0; }
 		private set {} }
-#endif // UNITY_EDITOR
+#endif // HAPI_ENABLE_RUNTIME
 
 	private static bool initializeSession()
 	{
 #if ( HAPI_ENABLE_RUNTIME )
 		prPipeName = System.Text.RegularExpressions.Regex.Replace( Application.dataPath, "[^\\w\\._]", "__" );
-#if UNITY_EDITOR_WIN
+#if UNITY_STANDALONE_WIN
 		prServerExecutableName = "HARS.exe";
 		prServerExecutablePath = HoudiniSetPath.prHoudiniPath + "/" + prServerExecutableName;
 		prLibraryPath = HoudiniSetPath.prHoudiniPath + "/" + HoudiniVersion.HAPI_LIBRARY;
@@ -51,7 +51,7 @@ public static partial class HoudiniHost
 		prServerExecutableName = "HARS";
 		prServerExecutablePath = HoudiniVersion.HAPI_SERVER;
 		prLibraryPath = HoudiniVersion.HAPI_LIBRARY;
-#endif // UNITY_EDITOR_WIN
+#endif // UNITY_STANDALONE_WIN
 
 		if ( !prHoudiniSceneExists )
 		{
@@ -65,12 +65,12 @@ public static partial class HoudiniHost
 			// Try to restore from data file.
 			mySession.id = prSessionID;
 			mySession.type = HAPI_SessionType.HAPI_SESSION_THRIFT;
-#if UNITY_EDITOR
+
 			Debug.Log(
 				"Houdini Engine: Recovering RPC session info from file.\n" +
 				"    Datafile Path: " + HoudiniDataFile.prDataFilePath + "\n" +
 				"    Session Id: " + prSessionID );
-#endif // UNITY_EDITOR
+
 			return true;
 		}
 #else
@@ -83,12 +83,11 @@ public static partial class HoudiniHost
 #if ( HAPI_ENABLE_RUNTIME )
 		try
 		{
-#if UNITY_EDITOR
 			Debug.Log(
 				"Houdini Engine: Starting HARS process.\n" +
 				"    Executable: " + prServerExecutablePath + "\n" +
 				"    Pipe Name: " + pipe_name );
-#endif // UNITY_EDITOR
+
 			int process_id = 0;
 			HAPI_Result result = HAPI_StartThriftNamedPipeServer( true, pipe_name, 2000.0f, out process_id );
 			if ( result != HAPI_Result.HAPI_RESULT_SUCCESS )

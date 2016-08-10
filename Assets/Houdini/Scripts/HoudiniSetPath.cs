@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEditor;
 #endif // UNITY_EDITOR
 
-#if UNITY_EDITOR_WIN
+#if UNITY_STANDALONE_WIN && HAPI_ENABLE_RUNTIME
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,7 +25,7 @@ public class HoudiniSetPath
 		setPath();
 	}
 
-#if UNITY_EDITOR_WIN
+#if UNITY_STANDALONE_WIN && HAPI_ENABLE_RUNTIME
 	public enum RegSAM
 	{
 		QueryValue = 0x0001,
@@ -98,15 +98,15 @@ public class HoudiniSetPath
 				RegCloseKey( phkResult );
 		}
 	}
-#endif // UNITY_EDITOR_WIN
+#endif // UNITY_STANDALONE_WIN && HAPI_ENABLE_RUNTIME
 
 	public static string getHoudiniPath()
 	{
 		string houdini_app_path = "";
-#if UNITY_EDITOR_WIN
+#if UNITY_STANDALONE_WIN
 
 		string hapi_path = "";
-#if UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
+#if HAPI_ENABLE_RUNTIME
 		hapi_path = System.Environment.GetEnvironmentVariable(
 			"HAPI_PATH", System.EnvironmentVariableTarget.Machine );
 		if ( hapi_path == null || hapi_path.Length == 0 )
@@ -115,7 +115,7 @@ public class HoudiniSetPath
 		if ( hapi_path == null || hapi_path.Length == 0 )
 			hapi_path = System.Environment.GetEnvironmentVariable(
 				"HAPI_PATH", System.EnvironmentVariableTarget.Process );
-#endif // UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
+#endif // HAPI_ENABLE_RUNTIME
 
 		if ( hapi_path != null && hapi_path.Length > 0 )
 		{
@@ -150,7 +150,7 @@ public class HoudiniSetPath
 				break;
 			}
 		}
-#elif UNITY_EDITOR_OSX
+#elif UNITY_STANDALONE_OSX
 		houdini_app_path = HoudiniVersion.HAPI_LIBRARY;
 #else
 		myLastError =
@@ -167,9 +167,9 @@ public class HoudiniSetPath
 			return;
 		myAttemptedPathSetting = true;
 		myIsPathSet = false;
-#if UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
+#if HAPI_ENABLE_RUNTIME
 
-#if UNITY_EDITOR_WIN
+#if UNITY_STANDALONE_WIN
 		string houdini_app_path = getHoudiniPath();
 		string paths = System.Environment.GetEnvironmentVariable(
 			"PATH", System.EnvironmentVariableTarget.Machine );
@@ -211,7 +211,7 @@ public class HoudiniSetPath
 		}
 		myIsPathSet = true;
 
-#elif UNITY_EDITOR_OSX
+#elif UNITY_STANDALONE_OSX
 		string houdini_app_path = getHoudiniPath();
 		if ( !System.IO.File.Exists( houdini_app_path ) )
 		{
@@ -233,7 +233,7 @@ public class HoudiniSetPath
 		myIsPathSet = true;
 #endif
 
-#endif // UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
+#endif // HAPI_ENABLE_RUNTIME
 	}
 
 	public static bool prIsPathSet { get { return myIsPathSet; } private set {} }
@@ -244,7 +244,7 @@ public class HoudiniSetPath
 	{
 		string app_path = "";
 
-#if UNITY_EDITOR_WIN
+#if UNITY_STANDALONE_WIN
 		// For Windows, we look at the registry entries made by the Houdini installer. We look for the
 		// "active version" key which gives us the most recently installed Houdini version. Using the
 		// active version we find the registry made by that particular installer and find the install
@@ -287,7 +287,7 @@ public class HoudiniSetPath
 		//#error "Your current platform is not yet fully supported. Binaries search path not set."
 		//Debug.LogError( "Your current platform is not yet full support. Binaries search path not set." );
 
-#endif // UNITY_EDITOR_WIN
+#endif // UNITY_STANDALONE_WIN
 
 		return app_path;
 	}
