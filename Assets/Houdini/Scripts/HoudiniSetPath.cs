@@ -1,3 +1,8 @@
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -101,7 +106,7 @@ public class HoudiniSetPath
 #if UNITY_EDITOR_WIN
 
 		string hapi_path = "";
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 		hapi_path = System.Environment.GetEnvironmentVariable(
 			"HAPI_PATH", System.EnvironmentVariableTarget.Machine );
 		if ( hapi_path == null || hapi_path.Length == 0 )
@@ -110,7 +115,7 @@ public class HoudiniSetPath
 		if ( hapi_path == null || hapi_path.Length == 0 )
 			hapi_path = System.Environment.GetEnvironmentVariable(
 				"HAPI_PATH", System.EnvironmentVariableTarget.Process );
-#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 
 		if ( hapi_path != null && hapi_path.Length > 0 )
 		{
@@ -162,7 +167,7 @@ public class HoudiniSetPath
 			return;
 		myAttemptedPathSetting = true;
 		myIsPathSet = false;
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 
 #if UNITY_EDITOR_WIN
 		string houdini_app_path = getHoudiniPath();
@@ -228,7 +233,7 @@ public class HoudiniSetPath
 		myIsPathSet = true;
 #endif
 
-#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static bool prIsPathSet { get { return myIsPathSet; } private set {} }

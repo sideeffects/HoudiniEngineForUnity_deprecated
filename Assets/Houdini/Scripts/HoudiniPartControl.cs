@@ -14,6 +14,11 @@
  * 
  */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -544,7 +549,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		mesh_filter.sharedMesh.SetIndices( indices, MeshTopology.Points, 0 );
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 	public virtual void Update()
 	{
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
@@ -555,7 +560,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		myLastLocalToWorld = local_to_world;
 		myTransformChanged = true;
 	}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
@@ -588,9 +593,9 @@ public class HoudiniPartControl : HoudiniGeoControl
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( HAPI_ENABLE_RUNTIME )
 #pragma warning disable 0414
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 	[SerializeField] private int			myPartId;
 	[SerializeField] private string			myPartName;
@@ -612,7 +617,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	[SerializeField] private HoudiniGeoControl myGeoControl;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( HAPI_ENABLE_RUNTIME )
 #pragma warning restore 0414
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 }

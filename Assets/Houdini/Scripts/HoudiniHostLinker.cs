@@ -16,6 +16,11 @@
  *
  */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -39,7 +44,7 @@ public static partial class HoudiniHost
 	// the HAPI calls properly link to the dll via the new PATH.
 	public static bool isInstallationOk()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		bool houdini_scene_exists = prHoudiniSceneExists;
 		bool current_csharp_session_init = myCurrentCSharpSessionInitialized;
 		if ( houdini_scene_exists && current_csharp_session_init )
@@ -49,12 +54,12 @@ public static partial class HoudiniHost
 		return host_initialized;
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static bool isRuntimeInitialized()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		if ( !HoudiniSetPath.prIsPathSet || !prHoudiniSceneExists )
 			return false;
 		else
@@ -71,12 +76,12 @@ public static partial class HoudiniHost
 		}
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static bool initialize()
 	{
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( HAPI_ENABLE_RUNTIME )
 		// Getting rid of warning abiout unused variable.
 		bool tempFlag = myCurrentCSharpSessionInitialized;
 		myCurrentCSharpSessionInitialized = tempFlag;
@@ -162,7 +167,7 @@ public static partial class HoudiniHost
 		myCurrentCSharpSessionInitialized = true;
 
 		return true;
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static void displayHoudiniEngineInstallInfo()
@@ -225,7 +230,7 @@ public static partial class HoudiniHost
 			license_info += "Unknown";
 		}
 
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 		string path_var = "";
 		path_var = System.Environment.GetEnvironmentVariable( "PATH", System.EnvironmentVariableTarget.Process );
 #if UNITY_EDITOR_WIN
@@ -246,11 +251,11 @@ public static partial class HoudiniHost
 			installed_version_msg +
 			"\n\n" +
 			license_info +
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 			"\n\n" +
 			"PATH Variable: \n" +
 			path_var +
-#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 			"";
 
 		Debug.Log( full_message );
@@ -279,14 +284,14 @@ public static partial class HoudiniHost
 	private static string getAllFoldersInPath( string path )
 	{
 		string paths = "";
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		if ( !Directory.Exists( path ) )
 			return "";
 
 		DirectoryInfo di = new DirectoryInfo( path );
 		foreach ( DirectoryInfo child_directory in di.GetDirectories() )
 			paths += ";" + getAllFoldersInPath( child_directory.FullName );
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 		return path + paths;
 	}
