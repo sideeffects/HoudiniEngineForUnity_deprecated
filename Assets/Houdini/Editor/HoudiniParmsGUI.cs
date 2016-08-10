@@ -415,9 +415,15 @@ public class HoudiniParmsGUI : Editor
 			else if ( parm.type == HAPI_ParmType.HAPI_PARMTYPE_PATH_FILE_IMAGE )
 				gui_parm.label += " (image)";
 
-			string file_pattern = parm.typeInfo;
-			if ( file_pattern != "" )
-				gui_parm.label += " (" + file_pattern + ")";
+			// Asset ID might still be invalid here so don't fail if it is.
+			// It is invalid if the asset didn't cook yet after a scene load.
+			try
+			{
+				string file_pattern = parm.typeInfo;
+				if ( file_pattern != "" )
+					gui_parm.label += " (" + file_pattern + ")";
+			}
+			catch {}
 
 			HAPI_Permissions permissions = parm.permissions;
 			if ( permissions == HAPI_Permissions.HAPI_PERMISSIONS_READ_ONLY )
@@ -447,9 +453,15 @@ public class HoudiniParmsGUI : Editor
 			bool gui_enable = GUI.enabled;
 			GUI.enabled = false; // This is not yet supported.
 
-			string op_filter = parm.typeInfo;
-			if ( op_filter != "" )
-				gui_parm.label += " (" + op_filter + ")";
+			// Asset ID might still be invalid here so don't fail if it is.
+			// It is invalid if the asset didn't cook yet after a scene load.
+			try
+			{
+				string op_filter = parm.typeInfo;
+				if ( op_filter != "" )
+					gui_parm.label += " (" + op_filter + ")";
+			}
+			catch {}
 
 			UnityEngine.Object temp_object = null;
 			HoudiniGUI.objectField(
