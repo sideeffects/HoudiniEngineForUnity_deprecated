@@ -39,7 +39,7 @@ public struct HoudiniVersion
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 
 	public const string HAPI_SERVER			= "HARS.exe";
-	#if UNITY_EDITOR_64
+	#if UNITY_EDITOR_64 || UNITY_64
 		public const string HAPI_LIBRARY	= "libHARC";
 	#else
 		public const string HAPI_LIBRARY	= "libHARC32";
@@ -48,7 +48,7 @@ public struct HoudiniVersion
 #elif UNITY_STANDALONE_OSX
 
 	public const string HAPI_SERVER			= "/Applications/Houdini/16.0.335/Frameworks/Houdini.framework/Versions/Current/Resources/bin" + "HARS";
-	#if UNITY_EDITOR_64
+	#if UNITY_EDITOR_64 || UNITY_64
 		public const string HAPI_LIBRARY	= "/Applications/Houdini/16.0.335/Frameworks/Houdini.framework/Versions/Current/Libraries" + "libHARC.dylib";
 	#else
 		public const string HAPI_LIBRARY	= "/Applications/Houdini/16.0.335/Frameworks/Houdini.framework/Versions/Current/Libraries" + "libHARC32.dylib";
