@@ -14,6 +14,11 @@
  * 
  */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;

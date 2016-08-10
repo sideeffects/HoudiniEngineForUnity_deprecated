@@ -14,6 +14,10 @@
  * 
  */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
 
 using UnityEngine;
 using UnityEditor;
@@ -67,7 +71,7 @@ public class HoudiniAssetGUI : Editor
 		bool gui_enable = GUI.enabled;
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( HAPI_ENABLE_RUNTIME )
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 		GUI.enabled = false;
 #else
@@ -76,7 +80,7 @@ public class HoudiniAssetGUI : Editor
 			HoudiniGUI.help( HoudiniHost.getMissingEngineInstallHelpString(), MessageType.Info );
 			GUI.enabled = false;
 		}
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( HAPI_ENABLE_RUNTIME )
 
 		try
 		{
@@ -85,7 +89,7 @@ public class HoudiniAssetGUI : Editor
 
 			///////////////////////////////////////////////////////////////////////
 			// Draw License/Logo Thingy
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 			drawLicenseLogo();
 #endif
 

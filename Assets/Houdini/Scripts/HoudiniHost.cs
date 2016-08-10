@@ -16,6 +16,11 @@
  * 
  */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -262,13 +267,13 @@ public static partial class HoudiniHost
 
 	public static bool initializeHost()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		// During the batch creation of our .unitypackage file we don't want to actually
 		// initialize  We use this environment variable to inhibit initialization.
 		string no_init = System.Environment.GetEnvironmentVariable( "HAPI_UNITY_NO_INIT" );
 		if ( no_init != null )
 			return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 		if ( isRuntimeInitialized() )
 		{
@@ -277,7 +282,7 @@ public static partial class HoudiniHost
 		}
 		else
 		{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 #if UNITY_EDITOR
 			// It's important here to reset prMidPlaymodeStateChange to the playmode state,
 			// not just reset it to false. This is because this part will be called DURING
@@ -285,7 +290,7 @@ public static partial class HoudiniHost
 			// invalidated at that point.
 			prMidPlaymodeStateChange = EditorApplication.isPlayingOrWillChangePlaymode;
 #endif // UNITY_EDITOR
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 			// Call HAPI_Initialize() if needed.
 			if ( !initialize() )
@@ -733,9 +738,9 @@ public static partial class HoudiniHost
 
 	public static void saveScene( string file_name, bool lock_nodes )
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		HAPI_SaveHIPFile( ref mySession, file_name, lock_nodes );
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static int loadOTL(
@@ -754,7 +759,7 @@ public static partial class HoudiniHost
 		string path, bool split_geos_by_group, bool split_points_by_vertex_attributes, bool import_templated_geos,
 		HoudiniProgressBar progress_bar, bool allow_asset_def_overwrite ) 
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -816,12 +821,12 @@ public static partial class HoudiniHost
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 		
 	public static void loadHip( string path ) 
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -829,12 +834,12 @@ public static partial class HoudiniHost
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 		
 	public static int[] getNewAssetIds()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		int asset_count = 0;
 		HAPI_Result status_code = HAPI_CheckForNewAssets( ref mySession, ref asset_count );
 		processStatusCode( status_code );
@@ -846,12 +851,12 @@ public static partial class HoudiniHost
 		return asset_ids_array;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 		
 	public static int createCurve()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -862,12 +867,12 @@ public static partial class HoudiniHost
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static int createInputAsset( string name )
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
@@ -878,12 +883,12 @@ public static partial class HoudiniHost
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static bool destroyAsset( int asset_id ) 
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		if ( asset_id < 0 || !isInstallationOk() )
 			return false;
 			
@@ -894,7 +899,7 @@ public static partial class HoudiniHost
 		return true;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static HAPI_CookOptions getCookOptions(
@@ -950,7 +955,7 @@ public static partial class HoudiniHost
 
 	public static void throwCallError()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		int code;
 		HAPI_GetStatus( ref mySession, HAPI_StatusType.HAPI_STATUS_CALL_RESULT, out code );
 
@@ -964,12 +969,12 @@ public static partial class HoudiniHost
 			throw new HoudiniError( status_string );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	public static void throwCookError()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		int code;
 		HAPI_GetStatus( ref mySession, HAPI_StatusType.HAPI_STATUS_COOK_RESULT, out code );
 
@@ -981,7 +986,7 @@ public static partial class HoudiniHost
 			throw new HoudiniError( status_string );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 	
 	public static void repaint()
@@ -1052,7 +1057,7 @@ public static partial class HoudiniHost
 
 	private static void playmodeStateChanged()
 	{
-#if UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 		// We need to catch any exceptions here because if we let any out they will stall
 		// the entire callback chain bound to EditorApplication.playmodeStateChanged which
 		// causes other bound functions in this callback list to never be called.
@@ -1073,7 +1078,7 @@ public static partial class HoudiniHost
 		{
 			Debug.Log( error.ToString() + "\nSource: " + error.Source );
 		}
-#endif // UNITY_EDITOR && ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // UNITY_EDITOR && ( HAPI_ENABLE_RUNTIME )
 	}
 
 #if UNITY_EDITOR

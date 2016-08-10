@@ -14,6 +14,11 @@
  * 
  */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -262,209 +267,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 					mesh_collider.enabled = true;
 				}
 			}
-			else if ( HoudiniHost.prEnablePointsAsParticles && part_info.vertexCount <= 0 && part_info.pointCount > 0 ) // Particles?
-			{
-				// Get position attributes.
-				HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
-				float[] pos_attr = new float[ 0 ];
-				HoudiniAssetUtility.getAttribute(
-					prAssetId, prObjectId, prGeoId, prPartId, HoudiniConstants.HAPI_ATTRIB_POSITION, 
-					ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
-				if ( !pos_attr_info.exists )
-					throw new HoudiniError( "No position attribute found." );
-				else if ( pos_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-					throw new HoudiniErrorIgnorable( "I only understand position as point attributes!" );
-
-				// Get colour attributes.
-				HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_COLOR );
-				float[] colour_attr = new float[ 0 ];
-				HoudiniAssetUtility.getAttribute( 
-					prAssetId, prObjectId, prGeoId, prPartId, HoudiniConstants.HAPI_ATTRIB_COLOR,
-					ref colour_attr_info, ref colour_attr, HoudiniHost.getAttributeFloatData );
-
-				ParticleEmitter particle_emitter = part_node.GetComponent< ParticleEmitter >();
-				if ( particle_emitter == null )
-				{
-#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
-					particle_emitter = part_node.AddComponent( "EllipsoidParticleEmitter" ) as ParticleEmitter;
-#else
-					particle_emitter = part_node.AddComponent< EllipsoidParticleEmitter >() as ParticleEmitter;
-#endif // UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
-				}
-				particle_emitter.ClearParticles();
-				
-				particle_emitter.emit = false;
-				particle_emitter.useWorldSpace = true;
-
-				particle_emitter.maxSize = 0.06f;
-				particle_emitter.minSize = 0.02f;
-
-				ParticleRenderer renderer = getOrCreateComponent< ParticleRenderer >();
-				Material mat = new Material( Shader.Find( "Particles/Additive (Soft)" ) );
-				int width = 20;
-				int length = 20;
-				Texture2D tex = new Texture2D( width, length, TextureFormat.RGBA32, false );
-				for ( int x = 0; x < width; ++x ) 
-				{
-					for ( int y = 0; y < length; ++y ) 
-					{
-						float dist = (x - 10) * (x-10) + (y-10) * (y-10);
-						dist = Mathf.Sqrt( dist );
-						float alpha_f = 1.0f - dist / 10.0f;
-						Color col = new Color( 0.8f, 0.8f, 0.8f, alpha_f );
-						tex.SetPixel( x, y, col );
-					}
-				}
-				tex.Apply();
-				mat.mainTexture = tex;
-				mat.color = new Color( 1.0f, 1.0f, 0.5f );
-				renderer.material = mat;
-
-				particle_emitter.Emit( part_info.pointCount );
-
-				Particle[] particles = particle_emitter.particles;
-
-				if ( particle_emitter.particles.Length < part_info.pointCount )
-					Debug.LogWarning( "Geo has too many particles. Expected less than "
-									  + particle_emitter.particles.Length
-									  + " but found " + part_info.pointCount + ". "
-									  + " Only using the first "
-									  + particle_emitter.particles.Length + ".");
-
-
-				for ( int i = 0; i < particle_emitter.particles.Length; ++i )
-				{
-					particles[ i ].position = new Vector3( pos_attr[ i * 3 + 0 ], 
-														   pos_attr[ i * 3 + 1 ], 
-														   pos_attr[ i * 3 + 2 ] );
-					if ( colour_attr_info.exists && colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-					{
-						float alpha =
-							colour_attr_info.tupleSize == 4
-								? colour_attr[ i * colour_attr_info.tupleSize + 3 ]
-								: 1.0f;
-						particles[ i ].color = new Color( colour_attr[ i * colour_attr_info.tupleSize + 0 ], 
-														  colour_attr[ i * colour_attr_info.tupleSize + 1 ], 
-														  colour_attr[ i * colour_attr_info.tupleSize + 2 ], 
-														  alpha );
-					}
-				}
-
-				particle_emitter.particles = particles;
-			}
-			
-			if ( part_info.type == HAPI_PartType.HAPI_PARTTYPE_VOLUME )
-			{
-				// Clear previous volume tiles.
-				destroyChildren( part_node.transform );
-
-				// If we have a volume, retrieve the volume info
-				HAPI_VolumeInfo volume = new HAPI_VolumeInfo();
-				HoudiniHost.getVolumeInfo( prAssetId, prObjectId, prGeoId, prPartId, ref volume );
-
-				// The volume.transform.scale is the voxel size. Both the particle
-				// delta and the point size are affected by the voxel size.
-				HoudiniAssetUtility.applyTransform( volume.transform, part_node.transform );
-				float particle_delta = HoudiniConstants.HAPI_VOLUME_SURFACE_DELTA_MULT * Mathf.Max( Mathf.Max( 
-					volume.transform.scale[ 0 ],
-					volume.transform.scale[ 1 ] ),
-					volume.transform.scale[ 2 ] );
-				float point_size = HoudiniConstants.HAPI_VOLUME_SURFACE_PT_SIZE_MULT * particle_delta;
-
-				List< Vector3 > acc_vertices = new List< Vector3 >();
-				List< Vector3 > acc_normals = new List< Vector3 >();
-
-				float[] values = new float[ volume.tileSize * volume.tileSize * volume.tileSize ];
-				int tile_index = 0;
-				int current_container_particle_index = 0;
-
-				// Iterate through the voxels and print out the data, for now.
-				HAPI_VolumeTileInfo tile = new HAPI_VolumeTileInfo();
-				HoudiniHost.getFirstVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
-				while ( tile.isValid )
-				{
-					for ( int i = 0; i < values.Length; ++i )
-						values[ i ] = 0;
-					HoudiniHost.getVolumeTileFloatData( 
-						prAssetId, prObjectId, prGeoId, prPartId, ref tile, values );
-
-					Vector3 tileMin = new Vector3( tile.minX, tile.minY, tile.minZ );
-					int part_index = 0;
-					for ( int z = 0; z < volume.tileSize; ++z )
-						for ( int y = 0; y < volume.tileSize; ++y )
-							for ( int x = 0; x < volume.tileSize; ++x )
-							{
-								int index = z * volume.tileSize * volume.tileSize + y * volume.tileSize + x;
-								if ( values[ index ] > -particle_delta && values[ index ] < particle_delta )
-								{
-									// Make sure we have enough room in our arrays.
-									if ( current_container_particle_index
-										> HoudiniConstants.HAPI_VOLUME_SURFACE_MAX_PT_PER_C )
-									{
-										createVolumeTilesObject(
-											point_size, part_node.transform, acc_vertices, acc_normals );
-										current_container_particle_index = 0;
-										acc_vertices.Clear();
-										acc_normals.Clear();
-									}
-
-									// Get particle position.
-									Vector3 pos = new Vector3( (float) x, (float) y, (float) z );
-									pos = HoudiniConstants.HAPI_VOLUME_POSITION_MULT * ( pos + tileMin );
-									pos.x = -pos.x;
-									acc_vertices.Add( part_node.transform.TransformPoint( pos ) );
-
-									// Get particle normal.
-									int amount = 1;
-									int sample_count = 0;
-									Vector3 average_normal = Vector3.zero;
-									for ( int xi = -1; xi <= 1; ++xi )
-										for ( int yi = -1; yi <= 1; ++yi )
-											for ( int zi = -1; zi <= 1; ++zi )
-											{
-												if ( xi == 0 && yi == 0 && zi == 0 )
-													continue;
-
-												float result = getVolumeData(
-													values, volume, particle_delta, x + xi * amount, y + yi * amount, z + zi * amount );
-
-												Vector3 normal = Vector3.zero;
-												if ( result < -0.5f )
-													normal = new Vector3( -xi, -yi, -zi );
-												else if ( result > 0.5f )
-													normal = new Vector3( xi, yi, zi );
-												else
-													continue;
-
-												average_normal += normal;
-												sample_count++;
-											}
-									average_normal /= sample_count;
-									average_normal.Normalize();
-									acc_normals.Add( average_normal );
-
-									part_index++;
-									current_container_particle_index++;
-								}
-							}
-
-					HoudiniHost.getNextVolumeTile( prAssetId, prObjectId, prGeoId, prPartId, ref tile );
-
-					tile_index++;
-				} // tile iteration
-
-				// If we have left-over particles in our arrays we need another container.
-				createVolumeTilesObject( point_size, part_node.transform, acc_vertices, acc_normals );
-
-			} // if has volume
-			else // Restore part node if previously used to store volume.
-			{
-				// Clear previous volume tiles.
-				destroyChildren( part_node.transform );
-				part_node.transform.localScale = Vector3.one;
-				part_node.transform.localPosition = Vector3.zero;
-				part_node.transform.localRotation = Quaternion.identity;
-			}
 		}
 
 		// Refresh enabled flags.
@@ -519,7 +321,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		mesh_filter.sharedMesh.SetIndices( indices, MeshTopology.Points, 0 );
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 	public virtual void Update()
 	{
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
@@ -530,7 +332,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		myLastLocalToWorld = local_to_world;
 		myTransformChanged = true;
 	}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private
@@ -563,9 +365,9 @@ public class HoudiniPartControl : HoudiniGeoControl
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( HAPI_ENABLE_RUNTIME )
 #pragma warning disable 0414
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 	[SerializeField] private int			myPartId;
 	[SerializeField] private string			myPartName;
@@ -586,7 +388,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 	[SerializeField] private HoudiniGeoControl myGeoControl;
 
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( HAPI_ENABLE_RUNTIME )
 #pragma warning restore 0414
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 }

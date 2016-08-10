@@ -13,7 +13,11 @@
  * COMMENTS:
  * 
  */
-#define ENABLE_PARTICLES
+
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
 
 using UnityEngine;
 
@@ -81,7 +85,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 		prAssetType = asset_type;
 	}
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 	public override void Update()
 	{
 		base.Update();
@@ -96,7 +100,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 			buildClientSide();
 		}
 	}
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 
 	public override bool buildAll()
 	{

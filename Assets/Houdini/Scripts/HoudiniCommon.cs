@@ -46,14 +46,6 @@ public struct HoudiniConstants
 	// Used for things like window titles that have limited space.
 	public const string HAPI_PRODUCT_SHORT_NAME			= "Houdini";
 
-	// This is released as false because most people won't be able to
-	// develop games with Houdini Engine runtime support. Having this
-	// false means that cooking will be disabled outside the editor.
-	//
-	// You can change this to true if you want to experiment with runtime
-	// cooking but you will need a license of Houdini or Houdini Engine.
-	public const bool HAPI_ENABLE_RUNTIME				= false;
-
 	public static string HAPI_TEXTURES_PATH				= Application.dataPath + "/Textures";
 	public static string HAPI_BAKED_ASSETS_PATH			= Application.dataPath + "/Baked Assets";
 

@@ -1,3 +1,8 @@
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -36,7 +41,7 @@ public static partial class HoudiniHost
 
 	private static bool initializeSession()
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		prPipeName = System.Text.RegularExpressions.Regex.Replace( Application.dataPath, "[^\\w\\._]", "__" );
 #if UNITY_EDITOR_WIN
 		prServerExecutableName = "HARS.exe";
@@ -70,12 +75,12 @@ public static partial class HoudiniHost
 		}
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	private static bool startProcess( string server_executable_path, string pipe_name )
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		try
 		{
 #if UNITY_EDITOR
@@ -107,12 +112,12 @@ public static partial class HoudiniHost
 		}
 #else
 		return false;
-#endif // ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // ( HAPI_ENABLE_RUNTIME )
 	}
 
 	private static bool getSession( out HAPI_Session session, string pipe_name )
 	{
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if ( HAPI_ENABLE_RUNTIME )
 		HAPI_Result status_code = HAPI_CreateThriftNamedPipeSession( out session, prPipeName );
 		if ( status_code != HAPI_Result.HAPI_RESULT_SUCCESS )
 		{

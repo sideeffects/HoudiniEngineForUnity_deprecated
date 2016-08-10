@@ -14,6 +14,10 @@
  * 
  */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
 
 using UnityEngine;
 using UnityEditor;
@@ -45,13 +49,13 @@ public class HoudiniAssetGUIInput : HoudiniAssetGUI
 		bool is_editable = true;
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#if !( HAPI_ENABLE_RUNTIME )
 		is_editable = false;
 		HoudiniGUI.help( HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG, MessageType.Info );
 #else
 		if ( !is_editable )
 			HoudiniGUI.help( "This mesh is not editable.", MessageType.Info );
-#endif // !( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+#endif // !( HAPI_ENABLE_RUNTIME )
 
 		bool gui_enable = GUI.enabled;
 		GUI.enabled = is_editable;
