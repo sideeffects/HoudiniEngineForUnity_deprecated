@@ -1,3 +1,8 @@
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -32,33 +37,33 @@ public static class HoudiniDataFile
 
 		if ( !File.Exists( myDataFilePath ) )
 		{
-#if UNITY_EDITOR
+#if HAPI_ENABLE_RUNTIME
 			Debug.Log(
 				"Houdini Engine: State datafile doesn't exist. Creating it.\n" +
 				"Datafile Path: " + myDataFilePath );
-#endif // UNITY_EDITOR
+#endif // HAPI_ENABLE_RUNTIME
 			FileStream file = File.Create( myDataFilePath );
 			file.Close();
 		}
 		else
 		{
-#if UNITY_EDITOR
+#if HAPI_ENABLE_RUNTIME
 			Debug.Log(
 				"Houdini Engine: State datafile exists.\n" +
 				"    Datafile Path: " + myDataFilePath );
-#endif // UNITY_EDITOR
+#endif // HAPI_ENABLE_RUNTIME
 			System.Diagnostics.Process current_process = System.Diagnostics.Process.GetCurrentProcess();
 			int new_process_id = current_process.Id;
 			int old_process_id = getInt( "CurrentProcessId", -1 );
 			if ( old_process_id != new_process_id )
 			{
-#if UNITY_EDITOR
+#if HAPI_ENABLE_RUNTIME
 				Debug.Log(
 					"Houdini Engine: New instance of Unity detected - we have a new process id.\n" +
 					"    Datafile Path: " + myDataFilePath + "\n" +
 					"    Old Process Id: " + old_process_id + "\n" +
 					"    New Process Id: " + new_process_id );
-#endif // UNITY_EDITOR
+#endif // HAPI_ENABLE_RUNTIME
 				reset();
 			}
 
@@ -134,7 +139,7 @@ public static class HoudiniDataFile
 		writer.Close();
 	}
 
-#if UNITY_EDITOR
+#if HAPI_ENABLE_RUNTIME
 
 	public static int getInt( string name, int default_value )
 	{
@@ -223,5 +228,5 @@ public static class HoudiniDataFile
 	
 	public static string getString( string name, string default_value ) { return default_value; }
 	public static void setString( string name, string value ) {}
-#endif // UNITY_EDITOR
+#endif // HAPI_ENABLE_RUNTIME
 }
