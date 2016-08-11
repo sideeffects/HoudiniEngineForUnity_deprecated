@@ -358,7 +358,7 @@ public static partial class HoudiniHost
 											get { return getBool( "HAPI_EnableCooking" ); }
 											set { setBool( "HAPI_EnableCooking", value ); }
 #else
-											get { return getBool( "HAPI_EnableCooking" ) && HoudiniConstants.HAPI_ENABLE_RUNTIME; }
+											get { return getBool( "HAPI_EnableCooking" ); }
 											set {}
 #endif // UNITY_EDITOR
 									   }
