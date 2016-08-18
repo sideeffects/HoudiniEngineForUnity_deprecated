@@ -166,8 +166,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		GameObject part_node = gameObject;
 
 		// Get Part info.
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HoudiniHost.getPartInfo( prAssetId, prObjectId, prGeoId, prPartId, out part_info );
+		HAPI_PartInfo part_info = HoudiniHost.getPartInfo( prGeoId, prPartId );
 		myPartType = part_info.type;
 
 		bool is_empty = part_info.vertexCount <= 0 && part_info.pointCount <= 0;
@@ -570,7 +569,7 @@ public class HoudiniPartControl : HoudiniGeoControl
 		HAPI_AttributeInfo tag_attr_info = new HAPI_AttributeInfo( HoudiniHost.prUnityTagAttribName );
 		int[] tag_attr = new int[ 0 ];
 		HoudiniAssetUtility.getAttribute(
-			prAssetId, prObjectId, prGeoId, prPartId, HoudiniHost.prUnityTagAttribName,
+			prGeoId, prPartId, HoudiniHost.prUnityTagAttribName,
 			ref tag_attr_info, ref tag_attr, HoudiniHost.getAttributeStringData );
 
 		if ( tag_attr_info.exists )

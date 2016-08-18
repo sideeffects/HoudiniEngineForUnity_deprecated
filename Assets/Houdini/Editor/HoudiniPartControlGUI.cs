@@ -36,8 +36,7 @@ public class HoudiniPartControlGUI : Editor
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
 			HoudiniAssetUtility.getAttribute(
-				myPartControl.prAssetId, myPartControl.prObjectId, myPartControl.prGeoId, 
-				myPartControl.prPartId, HoudiniConstants.HAPI_ATTRIB_POSITION, 
+				myPartControl.prGeoId, myPartControl.prPartId, HoudiniConstants.HAPI_ATTRIB_POSITION,
 				ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HoudiniError( "No position attribute found." );
@@ -179,14 +178,12 @@ public class HoudiniPartControlGUI : Editor
 				if ( HoudiniGUI.button( "print_attribute_names", "Print Attribute Names" ) )
 				{
 					HoudiniAssetUtility.printAllAttributeNames(
-						myPartControl.prAssetId, myPartControl.prObjectId,
 						myPartControl.prGeoId, myPartControl.prPartId );
 				}
 
 				if ( HoudiniGUI.button( "print_group_info", "Print Group Info" ) )
 				{
 					HoudiniAssetUtility.printAllGroups(
-						myPartControl.prAssetId, myPartControl.prObjectId,
 						myPartControl.prGeoId, myPartControl.prPartId );
 				}
 			}
@@ -235,11 +232,7 @@ public class HoudiniPartControlGUI : Editor
 			
 			if ( GUILayout.Button( "Clear Edits" ) ) 
 			{
-				HoudiniHost.revertGeo(
-					myPartControl.prAsset.prAssetId,
-					myPartControl.prObjectId,
-					myPartControl.prGeoId );
-				
+				HoudiniHost.revertGeo( myPartControl.prGeoId );
 				myPartControl.prAsset.buildClientSide();
 			}
 

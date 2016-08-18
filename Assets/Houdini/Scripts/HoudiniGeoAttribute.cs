@@ -618,7 +618,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 	}
 
 	public bool sync(
-		int asset_id, int object_id, int geo_id, int part_id,
+		int geo_id, int part_id,
 		Mesh mesh, HAPI_AttributeInfo attribute_info )
 	{
 		int tuple_size = attribute_info.tupleSize;
@@ -643,19 +643,17 @@ public class HoudiniGeoAttribute : ScriptableObject
 		if ( myInitializedVertexCount < mesh.vertexCount )
 		{
 			// Get Vertex list.
-			HAPI_PartInfo part_info = new HAPI_PartInfo();
-			HoudiniHost.getPartInfo(
-				asset_id, object_id, geo_id, part_id, out part_info );
+			HAPI_PartInfo part_info = HoudiniHost.getPartInfo( geo_id, part_id );
 			int[] vertex_list = new int[ part_info.vertexCount ];
-			HoudiniAssetUtility.getArray4Id(
-				asset_id, object_id, geo_id, part_id, HoudiniHost.getVertexList, 
+			HoudiniAssetUtility.getArray2Id(
+				geo_id, part_id, HoudiniHost.getVertexList,
 				vertex_list, part_info.vertexCount );
 
 			if ( type == Type.BOOL || type == Type.INT )
 			{
 				int[] data = new int[ 0 ];
 				HoudiniAssetUtility.getAttribute(
-					asset_id, object_id, geo_id, part_id,
+					geo_id, part_id,
 					myName, 
 					ref attribute_info,
 					ref data,
@@ -670,7 +668,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 			{
 				float[] data = new float[ 0 ];
 				HoudiniAssetUtility.getAttribute(
-					asset_id, object_id, geo_id, part_id,
+					geo_id, part_id,
 					myName, 
 					ref attribute_info,
 					ref data,
@@ -685,7 +683,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 			{
 				int[] data = new int[ 0 ];
 				HoudiniAssetUtility.getAttribute(
-					asset_id, object_id, geo_id, part_id,
+					geo_id, part_id,
 					myName, 
 					ref attribute_info,
 					ref data,

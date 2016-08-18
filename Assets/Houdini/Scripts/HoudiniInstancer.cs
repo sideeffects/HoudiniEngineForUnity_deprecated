@@ -526,13 +526,11 @@ public class HoudiniInstancer : MonoBehaviour
 		HAPI_ObjectInfo object_info = prAsset.prObjects[ prObjectId ];
 			
 		// Get Detail info.
-		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HoudiniHost.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
+		HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prObjectId );
 		if ( geo_info.partCount == 0 )
 			return;
-		
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HoudiniHost.getPartInfo( prAsset.prAssetId, prObjectId, 0, 0, out part_info );
+
+		HAPI_PartInfo part_info =  HoudiniHost.getPartInfo( geo_info.nodeId, 0 );
 		if ( prAsset.prEnableLogging )
 			Debug.Log( "Instancer #" + prObjectId + " (" + object_info.name + "): "
 					   + "points: " + part_info.pointCount );
@@ -566,25 +564,24 @@ public class HoudiniInstancer : MonoBehaviour
 	
 	public void bakeAnimation( float curr_time, GameObject parent_object )
 	{
-		
 		try
 		{
-																			
+			HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prObjectId );
+
 			HAPI_Transform[] instance_transforms = new HAPI_Transform[ myNumInstances ];
-			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, HAPI_RSTOrder.HAPI_SRT, 
-								 HoudiniHost.getInstanceTransforms, instance_transforms, myNumInstances );
-											
-						
+			Utility.getArray2Id(
+				geo_info.nodeId, HAPI_RSTOrder.HAPI_SRT, 
+				HoudiniHost.getInstanceTransforms, instance_transforms, myNumInstances );
+
 			Matrix4x4 parent_xform_inverse = Matrix4x4.identity;
-				
-			if( parent_object != null )
+
+			if ( parent_object != null )
 				parent_xform_inverse = parent_object.transform.localToWorldMatrix.inverse;
-			
+
 			for ( int ii = 0; ii < myNumInstances; ++ii )
-			{										
-										
+			{
 				Vector3 pos = new Vector3();
-				
+
 				// Apply object transforms.
 				//
 				// Axis and Rotation conversions:
@@ -649,41 +646,40 @@ public class HoudiniInstancer : MonoBehaviour
 			return;
 		}
 	}
-	
-		
-	
-	private void getInstanceAndNameAttrs(out int[] instance_attr,out int[] name_attr )
+
+	private void getInstanceAndNameAttrs( out int[] instance_attr, out int[] name_attr )
 	{
-		
 		instance_attr = new int[ 0 ];
 		name_attr = new int[ 0 ];
-		
-		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );		
-		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "instance", 
-							  ref instance_attr_info, ref instance_attr, HoudiniHost.getAttributeStringData );
-		
+
+		HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prObjectId );
+
+		HAPI_AttributeInfo instance_attr_info = new HAPI_AttributeInfo( "instance" );
+		Utility.getAttribute(
+			geo_info.nodeId, 0, "instance", ref instance_attr_info,
+			ref instance_attr, HoudiniHost.getAttributeStringData );
+
 		if ( !instance_attr_info.exists )
 			return;
-		
+
 		if ( instance_attr_info.exists && instance_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HoudiniErrorIgnorable( "I only understand instance as point attributes!" );
 		
 		if ( instance_attr_info.exists && instance_attr.Length != myNumInstances )
-			throw new HoudiniError( "Unexpected instance_hint array length found for asset: " 
-								  + prAsset.prAssetId + "!" );
-				
-		
-		HAPI_AttributeInfo name_attr_info = new HAPI_AttributeInfo( "name" );		
-		Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "name", 
-							  ref name_attr_info, ref name_attr, HoudiniHost.getAttributeStringData );
-					
-		
+			throw new HoudiniError(
+				"Unexpected instance_hint array length found for asset: " + prAsset.prAssetId + "!" );
+
+		HAPI_AttributeInfo name_attr_info = new HAPI_AttributeInfo( "name" );
+		Utility.getAttribute(
+			geo_info.nodeId, 0, "name", ref name_attr_info,
+			ref name_attr, HoudiniHost.getAttributeStringData );
+
 		if ( name_attr_info.exists && name_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 			throw new HoudiniErrorIgnorable( "I only understand name as point attributes!" );
 		
 		if ( name_attr_info.exists && name_attr.Length != myNumInstances )
-			throw new HoudiniError( "Unexpected name array length found for asset: " 
-								  + prAsset.prAssetId + "!" );
+			throw new HoudiniError(
+				"Unexpected name array length found for asset: " + prAsset.prAssetId + "!" );
 	}
 	
 	public bool endBakeAnimation( GameObject parent_object )
@@ -767,25 +763,25 @@ public class HoudiniInstancer : MonoBehaviour
 		{
 			destroyChildren();
 			
-			HAPI_ObjectInfo object_info = prAsset.prObjects[ prObjectId ];
+			HAPI_ObjectInfo object_info = HoudiniHost.getObjectInfo( prObjectId );
 			
 			// Get Detail info.
-			HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-			HoudiniHost.getGeoInfo( prAsset.prAssetId, prObjectId, 0, out geo_info );
+			HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prObjectId );
 			if ( geo_info.partCount == 0 )
 				return;
 			
 			cacheNumInstances();
-											
+
 			HAPI_Transform[] instance_transforms = new HAPI_Transform[ myNumInstances ];
-			Utility.getArray4Id( prAsset.prAssetId, prObjectId, 0, HAPI_RSTOrder.HAPI_SRT, 
-								 HoudiniHost.getInstanceTransforms, instance_transforms, myNumInstances );
-			
+			Utility.getArray2Id(
+				geo_info.nodeId, HAPI_RSTOrder.HAPI_SRT, 
+				HoudiniHost.getInstanceTransforms, instance_transforms, myNumInstances );
+
 			// Get scale point attributes.
 			HAPI_AttributeInfo scale_attr_info = new HAPI_AttributeInfo( "scale" );
 			float[] scale_attr = new float[ 0 ];
-			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "scale",
-								  ref scale_attr_info, ref scale_attr, HoudiniHost.getAttributeFloatData );
+			Utility.getAttribute(
+				geo_info.nodeId, 0, "scale", ref scale_attr_info, ref scale_attr, HoudiniHost.getAttributeFloatData );
 			
 			if ( scale_attr_info.exists && scale_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 				throw new HoudiniErrorIgnorable( "I only understand scale as point attributes!" );
@@ -794,20 +790,19 @@ public class HoudiniInstancer : MonoBehaviour
 				throw new HoudiniError( 
 					"Unexpected scale array length found for asset: " + prAsset.prAssetId + "!\n" +
 					"Expected length of: " + myNumInstances * 3 + " but given: " + scale_attr.Length );
-			
-						
+
 			HAPI_AttributeInfo script_attr_info = new HAPI_AttributeInfo( "Unity_Script" );
 			int[] script_attr = new int[ 0 ];
-			Utility.getAttribute( prAsset.prAssetId, prObjectId, 0, 0, "Unity_Script",
-								  ref script_attr_info, ref script_attr, HoudiniHost.getAttributeStringData );
-			
+			Utility.getAttribute(
+				geo_info.nodeId, 0, "Unity_Script", ref script_attr_info,
+				ref script_attr, HoudiniHost.getAttributeStringData );
+
 			if ( script_attr_info.exists && script_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 				throw new HoudiniErrorIgnorable( "I only understand Unity_Script as point attributes!" );
-			
+
 			if ( script_attr_info.exists && script_attr.Length != myNumInstances )
 				throw new HoudiniError( "Unexpected Unity_Script array length found for asset: " + prAsset.prAssetId + "!" );
-						
-			
+
 			int[] instance_attr = null;
 			int[] name_attr = null;
 			getInstanceAndNameAttrs(out instance_attr,out name_attr );

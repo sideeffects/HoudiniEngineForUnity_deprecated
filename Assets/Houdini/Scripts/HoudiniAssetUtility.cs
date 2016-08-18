@@ -176,9 +176,8 @@ public class HoudiniAssetUtility
 
 	public static void getHoudiniTransformAndApply( int asset_id, string asset_name, Transform transform )
 	{
-		HAPI_TransformEuler hapi_transform;
-		HoudiniHost.getAssetTransform( 
-			asset_id, HAPI_RSTOrder.HAPI_SRT, HAPI_XYZOrder.HAPI_ZXY, out hapi_transform );
+		HAPI_Transform hapi_transform = HoudiniHost.getObjectTransform( 
+			asset_id, -1, HAPI_RSTOrder.HAPI_SRT );
 		if ( 
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||
@@ -543,10 +542,10 @@ public class HoudiniAssetUtility
 	
 	// ATTRIBUTES ---------------------------------------------------------------------------------------------------
 		
-	public delegate void getAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, int part_id, 
+	public delegate void getAttrArrayInputFunc< T >( int geo_id, int part_id, 
 													 string name, ref HAPI_AttributeInfo info, 
 													 [Out] T[] items, int start, int end );
-	public static void getAttrArray< T >( int asset_id, int object_id, int geo_id, int part_id, 
+	public static void getAttrArray< T >( int geo_id, int part_id, 
 										  string name, ref HAPI_AttributeInfo info, T[] items,
 									 	  getAttrArrayInputFunc< T > get_func, int count ) 
 	{
@@ -570,7 +569,7 @@ public class HoudiniAssetUtility
 			}
 			
 			T[] local_array = new T[ length * info.tupleSize ];
-			get_func( asset_id, object_id, geo_id, part_id, name, ref info, local_array, current_index, length );
+			get_func( geo_id, part_id, name, ref info, local_array, current_index, length );
 			
 			// Copy data from the temporary array.
 			for ( int i = current_index; i < current_index + length; ++i )
@@ -581,10 +580,10 @@ public class HoudiniAssetUtility
 		}
 	}
 	
-	public delegate void setAttrArrayInputFunc< T >( int asset_id, int object_id, int geo_id, string name,
+	public delegate void setAttrArrayInputFunc< T >( int geo_id, int part_id, string name,
 												  	 ref HAPI_AttributeInfo info, 
 													 T[] items, int start, int end );
-	public static void setAttrArray< T >( int asset_id, int object_id, int geo_id, string name, 
+	public static void setAttrArray< T >( int geo_id, int part_id, string name, 
 										  ref HAPI_AttributeInfo info, T[] items, 
 										  setAttrArrayInputFunc< T > set_func, int count ) 
 	{
@@ -631,13 +630,13 @@ public class HoudiniAssetUtility
 				for ( int j = 0; j < info.tupleSize; ++j )
 					local_array[ ( i - current_index ) * info.tupleSize + j ] = items[ i * info.tupleSize + j ];
 			
-			set_func( asset_id, object_id, geo_id, name, ref info, local_array, current_index, length );
+			set_func( geo_id, part_id, name, ref info, local_array, current_index, length );
 			
 			current_index += length;
 		}
 	}
 	
-	public static void getAttribute< T >( int asset_id, int object_id, int geo_id, int part_id, string name, 
+	public static void getAttribute< T >( int geo_id, int part_id, string name, 
 										  ref HAPI_AttributeInfo info, ref T[] data,
 										  getAttrArrayInputFunc< T > get_func )
 	{
@@ -645,7 +644,7 @@ public class HoudiniAssetUtility
 		
 		for ( HAPI_AttributeOwner type = 0; type < HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++type )
 		{
-			info = HoudiniHost.getAttributeInfo( asset_id, object_id, geo_id, part_id, name, type );
+			info = HoudiniHost.getAttributeInfo( geo_id, part_id, name, type );
 			if ( info.exists )
 				break;
 		}
@@ -656,22 +655,22 @@ public class HoudiniAssetUtility
 			info.tupleSize = original_tuple_size;
 		
 		data = new T[ info.count * info.tupleSize ];
-		getAttrArray( asset_id, object_id, geo_id, part_id, name, ref info, data, get_func, info.count );
+		getAttrArray( geo_id, part_id, name, ref info, data, get_func, info.count );
 	}
 	
-	public static void setAttribute< T >( int asset_id, int object_id, int geo_id, string name, 
+	public static void setAttribute< T >( int geo_id, int part_id, string name,
 										  ref HAPI_AttributeInfo info, ref T[] data, 
 										  setAttrArrayInputFunc< T > get_func )
 	{
-		setAttrArray( asset_id, object_id, geo_id, name, ref info, data, get_func, info.count );
+		setAttrArray( geo_id, part_id, name, ref info, data, get_func, info.count );
 	}
 
 	public static void printAttributeNames(
-		int asset_id, int object_id, int geo_id, int part_id, HAPI_AttributeOwner owner )
+		int geo_id, int part_id, HAPI_AttributeOwner owner )
 	{
-		string[] names = HoudiniHost.getAttributeNames( asset_id, object_id, geo_id, part_id, owner );
+		string[] names = HoudiniHost.getAttributeNames( geo_id, part_id, owner );
 		
-		string msg = "A" + asset_id + "O" + object_id + "G" + geo_id + "P" + part_id + " - ";
+		string msg = "G" + geo_id + "P" + part_id + " - ";
 		
 		switch ( owner )
 		{
@@ -688,7 +687,7 @@ public class HoudiniAssetUtility
 		foreach ( string name in names )
 		{
 			HAPI_AttributeInfo attribute_info =
-				HoudiniHost.getAttributeInfo( asset_id, object_id, geo_id, part_id, name, owner );
+				HoudiniHost.getAttributeInfo( geo_id, part_id, name, owner );
 
 			if ( comma )
 				msg += ",";
@@ -700,18 +699,18 @@ public class HoudiniAssetUtility
 		Debug.Log( msg );
 	}
 	
-	public static void printAllAttributeNames( int asset_id, int object_id, int geo_id, int part_id )
+	public static void printAllAttributeNames( int geo_id, int part_id )
 	{
 		for ( int owner = 0; owner < (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX; ++owner )
-			printAttributeNames( asset_id, object_id, geo_id, part_id, (HAPI_AttributeOwner) owner );
+			printAttributeNames( geo_id, part_id, (HAPI_AttributeOwner) owner );
 	}
 
 	public static void printGroups(
-		int asset_id, int object_id, int geo_id, int part_id, HAPI_GroupType type )
+		int geo_id, int part_id, HAPI_GroupType type )
 	{
-		string[] names = HoudiniHost.getGroupNames( asset_id, object_id, geo_id, type );
+		string[] names = HoudiniHost.getGroupNames( geo_id, type );
 		
-		string msg = "A" + asset_id + "O" + object_id + "G" + geo_id + "P" + part_id + " - ";
+		string msg = "G" + geo_id + "P" + part_id + " - ";
 		
 		switch ( type )
 		{
@@ -735,7 +734,7 @@ public class HoudiniAssetUtility
 
 			membership_msg += name + " > ";
 			bool[] membership = HoudiniHost.getGroupMembership(
-				asset_id, object_id, geo_id, part_id, type, name );
+				geo_id, part_id, type, name );
 			for ( int i = 0; i < membership.Length; ++i )
 				if ( membership[ i ] )
 					membership_msg += i.ToString() + " ";
@@ -745,10 +744,10 @@ public class HoudiniAssetUtility
 		Debug.Log( msg + "\n" + membership_msg );
 	}
 
-	public static void printAllGroups( int asset_id, int object_id, int geo_id, int part_id )
+	public static void printAllGroups( int geo_id, int part_id )
 	{
 		for ( int type = 0; type < (int) HAPI_GroupType.HAPI_GROUPTYPE_MAX; ++type )
-			printGroups( asset_id, object_id, geo_id, part_id, (HAPI_GroupType) type );
+			printGroups( geo_id, part_id, (HAPI_GroupType) type );
 	}
 
 	// PARAMETERS ---------------------------------------------------------------------------------------------------
@@ -859,13 +858,9 @@ public class HoudiniAssetUtility
 		HoudiniPartControl part_control, HoudiniAsset asset, bool update_houdini_material )
 	{
 		// Get all the juicy infos.
-		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HoudiniHost.getGeoInfo(
-			asset.prAssetId, part_control.prObjectId, part_control.prGeoId, out geo_info );
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HoudiniHost.getPartInfo(
-			asset.prAssetId, part_control.prObjectId, part_control.prGeoId, 
-			part_control.prPartId, out part_info );
+		HAPI_GeoInfo geo_info = HoudiniHost.getGeoInfo( part_control.prGeoId );
+		HAPI_PartInfo part_info = HoudiniHost.getPartInfo(
+			part_control.prGeoId, part_control.prPartId );
 
 		// Determine if this is a mesh and therefore actually needs to be textured.
 		bool is_mesh = ( part_info.vertexCount > 0 );
@@ -905,8 +900,7 @@ public class HoudiniAssetUtility
 		if ( has_multiple_materials )
 		{
 			groups = HoudiniHost.getGroupNames(
-				asset.prAssetId, part_control.prObjectId, part_control.prGeoId,
-				HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
+				part_control.prGeoId, HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
 			if ( groups.Length != geo_info.primitiveGroupCount )
 				Debug.LogError( "Inconsistent group counts on geo." );
 		}
@@ -955,10 +949,10 @@ public class HoudiniAssetUtility
 			HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
 			if ( has_multiple_materials )
 				material_info = HoudiniHost.getMaterialOnGroup(
-					asset.prAssetId, part_control.prObjectId, part_control.prGeoId, groups[ m ] );
+					part_control.prGeoId, groups[ m ] );
 			else
 				material_info = HoudiniHost.getMaterialOnPart(
-					asset.prAssetId, part_control.prObjectId, part_control.prGeoId,
+					part_control.prGeoId,
 					part_control.prPartId );
 			if ( !material_info.exists )
 			{
@@ -1024,18 +1018,18 @@ public class HoudiniAssetUtility
 			{
 				if ( HoudiniHost.prExtractTexturesInRawFormat )
 				{
-					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.assetId, material_info.id );
+					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.id );
 
 					image_info.dataFormat = HAPI_ImageDataFormat.HAPI_IMAGE_DATA_INT8;
 					image_info.interleaved = true;
 					image_info.packing = HAPI_ImagePacking.HAPI_IMAGE_PACKING_RGBA;
 					image_info.gamma = (double) HoudiniHost.prGamma;
 
-					HoudiniHost.setImageInfo( material_info.assetId, material_info.id, ref image_info );
+					HoudiniHost.setImageInfo( material_info.id, ref image_info );
 
 					// Extract image to memory.
 					byte[] image_data = HoudiniHost.extractImageToMemory( 
-						material_info.assetId, material_info.id, HoudiniConstants.HAPI_RAW_FORMAT_NAME, image_planes );
+						material_info.id, HoudiniConstants.HAPI_RAW_FORMAT_NAME, image_planes );
 
 					int colour_data_size = image_info.xRes * image_info.yRes;
 					
@@ -1062,7 +1056,7 @@ public class HoudiniAssetUtility
 				{
 					// Make sure the image format selected is supported by Unity's in-memory texture loading.
 					string desired_file_format = null;
-					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.assetId, material_info.id );
+					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.id );
 					if ( !image_info.isImageFileFormat( HoudiniConstants.HAPI_PNG_FORMAT_NAME ) &&
 						 !image_info.isImageFileFormat( HoudiniConstants.HAPI_JPEG_FORMAT_NAME ) )
 					{
@@ -1070,11 +1064,11 @@ public class HoudiniAssetUtility
 					}
 
 					image_info.gamma = HoudiniHost.prGamma;
-					HoudiniHost.setImageInfo( material_info.assetId, material_info.id, ref image_info );
+					HoudiniHost.setImageInfo( material_info.id, ref image_info );
 
 					// Extract image to memory.
 					byte[] image_data = HoudiniHost.extractImageToMemory( 
-						material_info.assetId, material_info.id, desired_file_format, image_planes );
+						material_info.id, desired_file_format, image_planes );
 
 					// Initial size doesn't matter as LoadImage() will change the size and format.
 					Texture2D tex = new Texture2D( 1, 1 );
@@ -1092,7 +1086,7 @@ public class HoudiniAssetUtility
 
 				// Make sure the image format selected is supported by Unity.
 				string desired_file_format = null;
-				HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.assetId, material_info.id );
+				HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.id );
 				if ( !image_info.isImageFileFormat( HoudiniConstants.HAPI_PNG_FORMAT_NAME ) &&
 					 !image_info.isImageFileFormat( HoudiniConstants.HAPI_JPEG_FORMAT_NAME ) &&
 					 !image_info.isImageFileFormat( HoudiniConstants.HAPI_BMP_FORMAT_NAME ) &&
@@ -1103,7 +1097,7 @@ public class HoudiniAssetUtility
 
 				// Extract image to file.
 				string texture_file_path = HoudiniHost.extractImageToFile(
-					material_info.assetId, material_info.id, desired_file_format, image_planes, folder_path );
+					material_info.id, desired_file_format, image_planes, folder_path );
 
 				string relative_file_path = texture_file_path.Replace(
 					Application.dataPath, "Assets" );
@@ -1157,7 +1151,7 @@ public class HoudiniAssetUtility
 			try
 			{
 				HoudiniHost.renderTextureToImage(
-					material_info.assetId, material_info.id, diffuse_map_parm_id );
+					material_info.id, diffuse_map_parm_id );
 
 				material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" );
 			}
@@ -1171,7 +1165,7 @@ public class HoudiniAssetUtility
 			try
 			{
 				HoudiniHost.renderTextureToImage(
-					material_info.assetId, material_info.id, normal_map_parm_id );
+					material_info.id, normal_map_parm_id );
 
 				material.SetTexture(
 					"_BumpMap", extractHoudiniImageToTexture( material_info, folder_path, "C A", true ) );
@@ -1196,16 +1190,14 @@ public class HoudiniAssetUtility
 	public static Material getUnityMaterial( string material_path, int index, HoudiniPartControl part_control )
 	{
 		// Get position attributes.
-		int asset_id	= part_control.prAssetId;
-		int object_id	= part_control.prObjectId;
-		int geo_id		= part_control.prGeoId;
-		int part_id		= part_control.prPartId;
+		int geo_id = part_control.prGeoId;
+		int part_id = part_control.prPartId;
 
 		HAPI_AttributeInfo sub_material_name_attr_info =
 			new HAPI_AttributeInfo( HoudiniHost.prUnitySubMaterialNameAttribName );
 		int[] sub_material_name_attr = new int[ 0 ];
 		getAttribute(
-			asset_id, object_id, geo_id, part_id, HoudiniHost.prUnitySubMaterialNameAttribName,
+			geo_id, part_id, HoudiniHost.prUnitySubMaterialNameAttribName,
 			ref sub_material_name_attr_info, ref sub_material_name_attr, HoudiniHost.getAttributeStringData );
 
 		HAPI_AttributeInfo sub_material_index_attr_info =
@@ -1213,7 +1205,7 @@ public class HoudiniAssetUtility
 
 		int[] sub_material_index_attr = new int[ 0 ];
 		getAttribute(
-			asset_id, object_id, geo_id, part_id, HoudiniHost.prUnitySubMaterialIndexAttribName, 
+			geo_id, part_id, HoudiniHost.prUnitySubMaterialIndexAttribName, 
 			ref sub_material_index_attr_info, ref sub_material_index_attr, HoudiniHost.getAttributeIntData );
 
 		Material material = (Material) Resources.Load( material_path, typeof( Material ) );
@@ -1269,21 +1261,20 @@ public class HoudiniAssetUtility
 	public static Material getUnityMaterialOnGroup( HoudiniPartControl part_control, string group_name )
 	{
 		// Get position attributes.
-		int asset_id	= part_control.prAssetId;
-		int object_id	= part_control.prObjectId;
-		int geo_id		= part_control.prGeoId;
-		int part_id		= part_control.prPartId;
+		int geo_id = part_control.prGeoId;
+		int part_id = part_control.prPartId;
 
 		HAPI_AttributeInfo material_attr_info = new HAPI_AttributeInfo( HoudiniHost.prUnityMaterialAttribName );
 		int[] material_attr = new int[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniHost.prUnityMaterialAttribName, 
-					  ref material_attr_info, ref material_attr, HoudiniHost.getAttributeStringData );
+		getAttribute(
+			geo_id, part_id, HoudiniHost.prUnityMaterialAttribName, 
+			ref material_attr_info, ref material_attr, HoudiniHost.getAttributeStringData );
 
 		if ( !material_attr_info.exists )
 			return null;
 
 		bool[] group_membership = HoudiniHost.getGroupMembership(
-			asset_id, object_id, geo_id, part_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, group_name );
+			geo_id, part_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, group_name );
 
 		int index = 0;
 		string material_path = "";
@@ -1301,15 +1292,14 @@ public class HoudiniAssetUtility
 	public static Material getUnityMaterialOnPart( HoudiniPartControl part_control )
 	{
 		// Get position attributes.
-		int asset_id	= part_control.prAssetId;
-		int object_id	= part_control.prObjectId;
-		int geo_id		= part_control.prGeoId;
-		int part_id		= part_control.prPartId;
+		int geo_id = part_control.prGeoId;
+		int part_id = part_control.prPartId;
 
 		HAPI_AttributeInfo material_attr_info = new HAPI_AttributeInfo( HoudiniHost.prUnityMaterialAttribName );
 		int[] material_attr = new int[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniHost.prUnityMaterialAttribName, 
-					  ref material_attr_info, ref material_attr, HoudiniHost.getAttributeStringData );
+		getAttribute(
+			geo_id, part_id, HoudiniHost.prUnityMaterialAttribName,
+			ref material_attr_info, ref material_attr, HoudiniHost.getAttributeStringData );
 
 		if ( !material_attr_info.exists )
 			return null;
@@ -1516,8 +1506,7 @@ public class HoudiniAssetUtility
 	public static Material getSubstanceMaterialOnGroup( HoudiniPartControl part_control, string group_name )
 	{
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		material_info = HoudiniHost.getMaterialOnGroup(
-			part_control.prAssetId, part_control.prObjectId, part_control.prGeoId, group_name );
+		material_info = HoudiniHost.getMaterialOnGroup( part_control.prGeoId, group_name );
 
 		return getSubstanceMaterial( material_info, part_control );
 	}
@@ -1526,8 +1515,7 @@ public class HoudiniAssetUtility
 	{
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
 		material_info = HoudiniHost.getMaterialOnPart(
-			part_control.prAssetId, part_control.prObjectId, part_control.prGeoId,
-			part_control.prPartId );
+			part_control.prGeoId, part_control.prPartId );
 
 		return getSubstanceMaterial( material_info, part_control );
 	}
@@ -1542,17 +1530,12 @@ public class HoudiniAssetUtility
 		bool generate_lightmap_uv2s,
 		bool generate_tangents )
 	{
-		int asset_id	= part_control.prAssetId;
-		int object_id	= part_control.prObjectId;
-		int geo_id		= part_control.prGeoId;
-		int part_id		= part_control.prPartId;
+		int geo_id = part_control.prGeoId;
+		int part_id = part_control.prPartId;
 
 		// Get Detail info.
-		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HoudiniHost.getGeoInfo(
-			 asset_id, object_id, geo_id, out geo_info );
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HoudiniHost.getPartInfo( asset_id, object_id, geo_id, part_id, out part_info );
+		HAPI_GeoInfo geo_info = HoudiniHost.getGeoInfo( geo_id );
+		HAPI_PartInfo part_info = HoudiniHost.getPartInfo( geo_id, part_id );
 		
 		// Make sure our primitive and vertex numbers are supported by Unity.
 		// TODO: add this limit in a more proper place
@@ -1564,19 +1547,18 @@ public class HoudiniAssetUtility
 
 		// Get Face counts.
 		int[] face_counts = new int[ part_info.faceCount ];
-		getArray4Id( asset_id, object_id, geo_id, part_id, HoudiniHost.getFaceCounts, 
-					 face_counts, part_info.faceCount );
-		
+		getArray2Id( geo_id, part_id, HoudiniHost.getFaceCounts, face_counts, part_info.faceCount );
+
 		// Get Vertex list.
 		int[] vertex_list = new int[ part_info.vertexCount ];
-		getArray4Id( asset_id, object_id, geo_id, part_id, HoudiniHost.getVertexList, 
-					 vertex_list, part_info.vertexCount );
+		getArray2Id( geo_id, part_id, HoudiniHost.getVertexList, vertex_list, part_info.vertexCount );
 
 		// Get position attributes.
 		HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
 		float[] pos_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_POSITION, 
-					  ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_POSITION,
+			ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
 		if ( !pos_attr_info.exists )
 			throw new HoudiniError( "No position attribute found." );
 		else if ( pos_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
@@ -1586,39 +1568,45 @@ public class HoudiniAssetUtility
 		HAPI_AttributeInfo uv_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_UV );
 		uv_attr_info.tupleSize = 2;
 		float[] uv_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV, 
-					  ref uv_attr_info, ref uv_attr, HoudiniHost.getAttributeFloatData );
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV, 
+			ref uv_attr_info, ref uv_attr, HoudiniHost.getAttributeFloatData );
 		// Get uv2 attributes.
 		HAPI_AttributeInfo uv2_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_UV2 );
 		uv2_attr_info.tupleSize = 2;
 		float[] uv2_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV2, 
-					  ref uv2_attr_info, ref uv2_attr, HoudiniHost.getAttributeFloatData );
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV2, 
+			ref uv2_attr_info, ref uv2_attr, HoudiniHost.getAttributeFloatData );
 		// Get uv3 attributes.
 		HAPI_AttributeInfo uv3_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_UV3 );
 		uv3_attr_info.tupleSize = 2;
 		float[] uv3_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV3, 
-					  ref uv3_attr_info, ref uv3_attr, HoudiniHost.getAttributeFloatData );
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_UV3, 
+			ref uv3_attr_info, ref uv3_attr, HoudiniHost.getAttributeFloatData );
 
 		// Get normal attributes.
 		HAPI_AttributeInfo normal_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_NORMAL );
 		float[] normal_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_NORMAL, 
-					  ref normal_attr_info, ref normal_attr, HoudiniHost.getAttributeFloatData );
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_NORMAL, 
+			ref normal_attr_info, ref normal_attr, HoudiniHost.getAttributeFloatData );
 
 		// Get colour attributes.
 		HAPI_AttributeInfo colour_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_COLOR );
 		float[] colour_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_COLOR, 
-					  ref colour_attr_info, ref colour_attr, HoudiniHost.getAttributeFloatData );
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_COLOR, 
+			ref colour_attr_info, ref colour_attr, HoudiniHost.getAttributeFloatData );
 
 		// Get tangent attributes.
 		HAPI_AttributeInfo tangent_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_TANGENT );
 		float[] tangent_attr = new float[ 0 ];
-		getAttribute( asset_id, object_id, geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_TANGENT, 
-					  ref tangent_attr_info, ref tangent_attr, HoudiniHost.getAttributeFloatData );
-		
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_TANGENT, 
+			ref tangent_attr_info, ref tangent_attr, HoudiniHost.getAttributeFloatData );
+
 		// Save properties.
 		part_control.prVertexList = vertex_list;
 
@@ -1888,7 +1876,7 @@ public class HoudiniAssetUtility
 		if ( !part_control.prAsset.prSplitGeosByGroup && geo_info.primitiveGroupCount > 0 )
 		{
 			string[] groups = HoudiniHost.getGroupNames(
-				asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
+				geo_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM );
 
 			// Destroy any existing colliders.
 			MeshCollider[] old_colliders = part_control.gameObject.GetComponents< MeshCollider >();
@@ -1902,7 +1890,7 @@ public class HoudiniAssetUtility
 				string group = groups[ g ];
 
 				bool[] mem = HoudiniHost.getGroupMembership(
-					asset_id, object_id, geo_id, part_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, group );
+					geo_id, part_id, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, group );
 
 				int membership_count = 0;
 				foreach ( bool m in mem )
@@ -2056,9 +2044,7 @@ public class HoudiniAssetUtility
 		bool data_ok = true;
 		if ( setting_raw_mesh )
 		{
-			HoudiniHost.addAttribute(
-				asset_id, object_id, geo_id,
-				attr, ref attr_info );
+			HoudiniHost.addAttribute( geo_id, 0, attr, ref attr_info );
 
 			for ( int i = 0; i < part_info.pointCount; ++i )
 				for ( int j = 0; j < tuple_size; ++j )
@@ -2078,9 +2064,7 @@ public class HoudiniAssetUtility
 		}
 		else if ( attr == HoudiniConstants.HAPI_ATTRIB_POSITION )
 		{
-			HoudiniHost.addAttribute(
-				asset_id, object_id, geo_id,
-				attr, ref attr_info );
+			HoudiniHost.addAttribute( geo_id, 0, attr, ref attr_info );
 
 			for ( int ii = 0; ii < part_control.prVertexList.Length; ii++ )
 			{
@@ -2098,11 +2082,7 @@ public class HoudiniAssetUtility
 		}
 
 		if ( data_ok )
-		{
-			setAttribute(
-				asset_id, object_id, geo_id, attr,
-				ref attr_info, ref attr_values, HoudiniHost.setAttributeFloatData );
-		}
+			setAttribute( geo_id, 0, attr, ref attr_info, ref attr_values, HoudiniHost.setAttributeFloatData );
 	}
 
 	public static void setMesh(
@@ -2153,13 +2133,13 @@ public class HoudiniAssetUtility
 		if ( normals != null && normals.Length > 0 )
 			part_info.pointAttributeCount++;
 
-		HoudiniHost.setPartInfo( asset_id, object_id, geo_id, ref part_info );
+		HoudiniHost.setPartInfo( geo_id, 0, ref part_info );
 
 		// Set Face counts.
 		int[] face_counts = new int[ part_info.faceCount ];
 		for ( int i = 0; i < part_info.faceCount; ++i )
 			face_counts[ i ] = 3;
-		setArray3Id( asset_id, object_id, geo_id, HoudiniHost.setFaceCounts, face_counts, part_info.faceCount );
+		setArray2Id( geo_id, 0, HoudiniHost.setFaceCounts, face_counts, part_info.faceCount );
 
 		// Set Vertex list.
 		int[] vertex_list = new int[ part_info.vertexCount ];
@@ -2169,7 +2149,7 @@ public class HoudiniAssetUtility
 					vertex_list[ i * 3 + j ] = triangles[ i * 3 + j ];
 		else
 			vertex_list = part_control.prVertexList;
-		setArray3Id( asset_id, object_id, geo_id, HoudiniHost.setVertexList, vertex_list, part_info.vertexCount );
+		setArray2Id( geo_id, 0, HoudiniHost.setVertexList, vertex_list, part_info.vertexCount );
 
 		// Set position attributes.
 		setMeshPointAttribute(
@@ -2212,14 +2192,14 @@ public class HoudiniAssetUtility
 					// "pretend" we are dealing with a point attribute.
 					attr_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 
-					HoudiniHost.addAttribute( asset_id, object_id, geo_id, attribute.prName, ref attr_info );
+					HoudiniHost.addAttribute( geo_id, 0, attribute.prName, ref attr_info );
 
 					if ( attribute.prType == HoudiniGeoAttribute.Type.BOOL ||
 						attribute.prType == HoudiniGeoAttribute.Type.INT )
 					{
 						int[] int_data = attribute.prIntData;
 						setAttribute(
-							asset_id, object_id, geo_id, attribute.prName, 
+							geo_id, 0, attribute.prName, 
 							ref attr_info, ref int_data, HoudiniHost.setAttributeIntData );
 
 						if ( HoudiniHost.prCreateGroupsFromBoolAttributes
@@ -2227,13 +2207,12 @@ public class HoudiniAssetUtility
 							&& attribute.prTupleSize == 1 )
 						{
 							HoudiniHost.addGroup(
-								asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
-								attribute.prName );
+								geo_id, 0, HAPI_GroupType.HAPI_GROUPTYPE_POINT, attribute.prName );
 							bool[] bool_data = new bool[ int_data.Length ];
 							for ( int i = 0; i < int_data.Length; ++i )
 								bool_data[ i ] = int_data[ i ] > 0;
 							HoudiniHost.setGroupMembership(
-								asset_id, object_id, geo_id, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
+								geo_id, 0, HAPI_GroupType.HAPI_GROUPTYPE_POINT,
 								attribute.prName, bool_data, bool_data.Length );
 						}
 					}
@@ -2241,14 +2220,14 @@ public class HoudiniAssetUtility
 					{
 						float[] float_data = attribute.prFloatData;
 						setAttribute(
-							asset_id, object_id, geo_id, attribute.prName, 
+							geo_id, 0, attribute.prName, 
 							ref attr_info, ref float_data, HoudiniHost.setAttributeFloatData );
 					}
 					else if ( attribute.prType == HoudiniGeoAttribute.Type.STRING )
 					{
 						string[] string_data = attribute.prStringData;
 						setAttribute(
-							asset_id, object_id, geo_id, attribute.prName, 
+							geo_id, 0, attribute.prName, 
 							ref attr_info, ref string_data, HoudiniHost.setAttributeStringData );
 					}
 				}
@@ -2261,7 +2240,7 @@ public class HoudiniAssetUtility
 					attr_info.owner = attribute.prOriginalAttributeOwner;
 					if ( attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 						attr_info.count = part_info.pointCount;
-					HoudiniHost.addAttribute( asset_id, object_id, geo_id, attribute.prName, ref attr_info );
+					HoudiniHost.addAttribute( geo_id, 0, attribute.prName, ref attr_info );
 
 					if ( attribute.prType == HoudiniGeoAttribute.Type.BOOL ||
 						attribute.prType == HoudiniGeoAttribute.Type.INT )
@@ -2269,7 +2248,7 @@ public class HoudiniAssetUtility
 						int[] int_data =
 							attribute.getIntPointValues( part_info.pointCount, vertex_list );
 						setAttribute(
-							asset_id, object_id, geo_id, attribute.prName, 
+							geo_id, 0, attribute.prName, 
 							ref attr_info, ref int_data, HoudiniHost.setAttributeIntData );
 					}
 					else if ( attribute.prType == HoudiniGeoAttribute.Type.FLOAT )
@@ -2277,21 +2256,21 @@ public class HoudiniAssetUtility
 						float[] float_data =
 							attribute.getFloatPointValues( part_info.pointCount, vertex_list );
 						setAttribute(
-							asset_id, object_id, geo_id, attribute.prName, 
+							geo_id, 0, attribute.prName, 
 							ref attr_info, ref float_data, HoudiniHost.setAttributeFloatData );
 					}
 					else if ( attribute.prType == HoudiniGeoAttribute.Type.STRING )
 					{
 						string[] string_data = attribute.prStringData;
 						setAttribute(
-							asset_id, object_id, geo_id, attribute.prName, 
+							geo_id, 0, attribute.prName, 
 							ref attr_info, ref string_data, HoudiniHost.setAttributeStringData );
 					}
 				}
 			}
 		}
 
-		HoudiniHost.commitGeo( asset_id, object_id, geo_id );
+		HoudiniHost.commitGeo( geo_id );
 	}
 	
 	// ANIMATION KEYS -----------------------------------------------------------------------------------------------
@@ -2523,7 +2502,7 @@ public class HoudiniAssetUtility
 				asset.prAssetPath = "";
 				
 				asset.prAssetId = asset_id;
-				HoudiniHost.cookAsset(
+				HoudiniHost.cookNode(
 					asset_id,
 					HoudiniHost.prSplitGeosByGroup,
 					HoudiniHost.prSplitPointsByVertexAttributes,

@@ -285,14 +285,14 @@ public class HoudiniMenu : MonoBehaviour
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Two Curves and a Merge", false, 1000 ) ]
 	static private void blah()
 	{
-		int curve1 = HoudiniHost.createInputAsset( "curve1" );
+		HoudiniHost.createInputAsset( "curve1" );
 		{
 			HAPI_PartInfo new_part = new HAPI_PartInfo();
 			new_part.vertexCount = 3;
 			new_part.pointCount = 3;
 			new_part.faceCount = 2;
 			new_part.type = HAPI_PartType.HAPI_PARTTYPE_CURVE;
-			HoudiniHost.setPartInfo( curve1, 0, 0, ref new_part );
+			HoudiniHost.setPartInfo( 0, 0, ref new_part );
 
 			HAPI_AttributeInfo attrib_info = new HAPI_AttributeInfo( "P" );
 			attrib_info.exists = true;
@@ -300,28 +300,28 @@ public class HoudiniMenu : MonoBehaviour
 			attrib_info.tupleSize = 3; // 3 floats per point (x, y, z)
 			attrib_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 			attrib_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
-			HoudiniHost.addAttribute( curve1, 0, 0, "P", ref attrib_info );
+			HoudiniHost.addAttribute( 0, 0, "P", ref attrib_info );
 
 			float[] positions = new float[ 9 ] { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f };
-			HoudiniHost.setAttributeFloatData( curve1, 0, 0, "P", ref attrib_info, positions, 0, 3 );
+			HoudiniHost.setAttributeFloatData( 0, 0, "P", ref attrib_info, positions, 0, 3 );
 
 			int[] vertices = new int[ 3 ] { 0, 1, 2 };
-			HoudiniHost.setVertexList( curve1, 0, 0, vertices, 0, 3 );
+			HoudiniHost.setVertexList( 0, 0, vertices, 0, 3 );
 
 			int[] face_counts = new int[ 2 ] { 2, 2 }; // 3 edges for the first face (the only face)
-			HoudiniHost.setFaceCounts( curve1, 0, 0, face_counts, 0, 2 );
+			HoudiniHost.setFaceCounts( 0, 0, face_counts, 0, 2 );
 
-			HoudiniHost.commitGeo( curve1, 0, 0 );
+			HoudiniHost.commitGeo( 0 );
 		}
 
-		int curve2 = HoudiniHost.createInputAsset( "curve2" );
+		HoudiniHost.createInputNode( "curve2" );
 
-		int merge = HoudiniHost.instantiateAsset( "SOP/merge", true );
-		int convert = HoudiniHost.instantiateAsset( "SOP/convert", true );
+		int merge = HoudiniHost.createNode( -1, "SOP/merge", true );
+		int convert = HoudiniHost.createNode( -1, "SOP/convert", true );
 
-		HoudiniHost.connectAssetGeometry( curve1, 0, merge, 0 );
-		HoudiniHost.connectAssetGeometry( curve2, 0, merge, 1 );
-		HoudiniHost.connectAssetGeometry( merge, 0, convert, 0 );
+		//HoudiniHost.connectAssetGeometry( curve1, 0, merge, 0 );
+		//HoudiniHost.connectAssetGeometry( curve2, 0, merge, 1 );
+		//HoudiniHost.connectAssetGeometry( merge, 0, convert, 0 );
 
 		HAPI_AssetInfo convert_info = HoudiniHost.getAssetInfo( convert );
 
@@ -332,14 +332,14 @@ public class HoudiniMenu : MonoBehaviour
 		int[] value_arr = new int[ 1 ];
 		value_arr[ 0 ] = 2;
 		HoudiniHost.setParmIntValues( convert_info.nodeId, value_arr, convert_to_parm_id, 1 );
-		HoudiniHost.cookAsset( convert, true, true, false );
+		HoudiniHost.cookNode( convert, true, true, false );
 	}
 
 	//[ MenuItem( HoudiniConstants.HAPI_PRODUCT_NAME + "/Create Simple Input Geo", false, 1000 ) ]
 	static private void createSimpleInputGeo()
 	{
-		int asset_id = HoudiniHost.createInputAsset( "simple_input_geo_test" );
-		HoudiniHost.cookAsset(
+		int asset_id = HoudiniHost.createInputNode( "simple_input_geo_test" );
+		HoudiniHost.cookNode(
 			asset_id,
 			HoudiniHost.prSplitGeosByGroup,
 			HoudiniHost.prSplitPointsByVertexAttributes,
@@ -350,7 +350,7 @@ public class HoudiniMenu : MonoBehaviour
 		new_part.pointCount = 3;
 		new_part.faceCount = 1;
 		new_part.type = HAPI_PartType.HAPI_PARTTYPE_MESH;
-		HoudiniHost.setPartInfo( asset_id, 0, 0, ref new_part );
+		HoudiniHost.setPartInfo( 0, 0, ref new_part );
 
 		HAPI_AttributeInfo attrib_info = new HAPI_AttributeInfo( "P" );
 		attrib_info.exists = true;
@@ -358,28 +358,28 @@ public class HoudiniMenu : MonoBehaviour
 		attrib_info.tupleSize = 3; // 3 floats per point (x, y, z)
 		attrib_info.owner = HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 		attrib_info.storage = HAPI_StorageType.HAPI_STORAGETYPE_FLOAT;
-		HoudiniHost.addAttribute( asset_id, 0, 0, "P", ref attrib_info );
+		HoudiniHost.addAttribute( 0, 0, "P", ref attrib_info );
 
 		float[] positions = new float[ 9 ] { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f };
-		HoudiniHost.setAttributeFloatData( asset_id, 0, 0, "P", ref attrib_info, positions, 0, 3 );
+		HoudiniHost.setAttributeFloatData( 0, 0, "P", ref attrib_info, positions, 0, 3 );
 
 		int[] vertices = new int[ 3 ] { 0, 1, 2 };
-		HoudiniHost.setVertexList( asset_id, 0, 0, vertices, 0, 3 );
+		HoudiniHost.setVertexList( 0, 0, vertices, 0, 3 );
 
 		int[] face_counts = new int[ 1 ] { 3 }; // 3 edges for the first face (the only face)
-		HoudiniHost.setFaceCounts( asset_id, 0, 0, face_counts, 0, 1 );
+		HoudiniHost.setFaceCounts( 0, 0, face_counts, 0, 1 );
 
 		bool[] point_group_mem = new bool[ 3 ] { true, true, false };
-		HoudiniHost.addGroup( asset_id, 0, 0, HAPI_GroupType.HAPI_GROUPTYPE_POINT, "test_pt_group" );
+		HoudiniHost.addGroup( 0, 0, HAPI_GroupType.HAPI_GROUPTYPE_POINT, "test_pt_group" );
 		HoudiniHost.setGroupMembership(
-			asset_id, 0, 0, HAPI_GroupType.HAPI_GROUPTYPE_POINT, "test_pt_group", point_group_mem, 3 );
+			0, 0, HAPI_GroupType.HAPI_GROUPTYPE_POINT, "test_pt_group", point_group_mem, 3 );
 
 		bool[] prim_group_mem = new bool[ 1 ] { true };
-		HoudiniHost.addGroup( asset_id, 0, 0, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, "test_prim_group" );
+		HoudiniHost.addGroup( 0, 0, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, "test_prim_group" );
 		HoudiniHost.setGroupMembership(
-			asset_id, 0, 0, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, "test_prim_group", prim_group_mem, 1 );
+			0, 0, HAPI_GroupType.HAPI_GROUPTYPE_PRIM, "test_prim_group", prim_group_mem, 1 );
 
-		HoudiniHost.commitGeo( asset_id, 0, 0 );
+		HoudiniHost.commitGeo( 0 );
 	}
 
 }

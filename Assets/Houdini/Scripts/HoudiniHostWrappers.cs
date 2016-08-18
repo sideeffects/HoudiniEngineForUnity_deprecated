@@ -410,39 +410,6 @@ public static partial class HoudiniHost
 
 	// ASSETS -------------------------------------------------------------------------------------------------------
 
-	public static bool isAssetValid( HAPI_AssetId asset_id, int asset_validation_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		if ( !isInstallationOk() )
-			return false;
-
-		int answer = 0;
-			
-		// No need to process return code because this function is guaranteed to 
-		// always return HAPI_STATUS_SUCCESS.
-		HAPI_IsAssetValid( ref mySession, asset_id, asset_validation_id, out answer );
-			
-		if ( answer > 0 )
-			return true;
-		else
-			return false;
-#else
-		return false;
-#endif
-	}
-
-	public static HAPI_AssetId instantiateAsset( string asset_name, bool cook_on_load )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_AssetId asset_id = 0;
-		HAPI_Result status_code = HAPI_InstantiateAsset( ref mySession, asset_name, cook_on_load, out asset_id );
-		processStatusCode( status_code );
-		return asset_id;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static HAPI_AssetInfo getAssetInfo( HAPI_NodeId node_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
@@ -455,79 +422,11 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static HAPI_AssetInfo getAssetInfoOnAsset( HAPI_AssetId asset_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_AssetInfo asset_info = new HAPI_AssetInfo();
-		HAPI_Result status_code = HAPI_GetAssetInfoOnAsset( ref mySession, asset_id, ref asset_info );
-		processStatusCode( status_code );
-		return asset_info;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void cookAsset( HAPI_AssetId asset_id )
-	{
-		cookAsset( asset_id, prSplitGeosByGroup, prSplitPointsByVertexAttributes, prImportTemplatedGeos );
-	}
-
-	public static void cookAsset(
-		HAPI_AssetId asset_id, bool split_geos_by_group, bool split_points_by_vertex_attribute, bool import_templated_geos )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_CookOptions cook_options =
-			getCookOptions( split_geos_by_group, split_points_by_vertex_attribute, import_templated_geos );
-
-		HAPI_Result status_code = HAPI_CookAsset( ref mySession, asset_id, ref cook_options );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static void interrupt()
 	{
 #if ( HAPI_ENABLE_RUNTIME )
 		HAPI_Result status_code = HAPI_Interrupt( ref mySession );
 		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getAssetTransform(
-		HAPI_AssetId asset_id, HAPI_RSTOrder rst_order, HAPI_XYZOrder rot_order,
-		out HAPI_TransformEuler transform )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetAssetTransform( ref mySession, asset_id, rst_order, rot_order, out transform );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setAssetTransform(
-		HAPI_AssetId asset_id, ref HAPI_TransformEuler transform )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetAssetTransform( ref mySession, asset_id, ref transform );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static string getInputName(
-		HAPI_AssetId asset_id, int input_idx, HAPI_InputType input_type )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_StringHandle name_sh = 0;
-		HAPI_Result status_code = HAPI_GetInputName( ref mySession, asset_id, input_idx, input_type, out name_sh );
-		processStatusCode( status_code );
-		string name = getString( name_sh );
-		return name;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -603,7 +502,7 @@ public static partial class HoudiniHost
 
 	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name, bool cook_on_creation )
 	{
-		return createNode( parent_node_id, operator_name, cook_on_creation, operator_name );
+		return createNode( parent_node_id, operator_name, cook_on_creation, "" );
 	}
 
 	public static HAPI_NodeId createNode( HAPI_NodeId parent_node_id, string operator_name, bool cook_on_creation, string node_label )
@@ -630,6 +529,11 @@ public static partial class HoudiniHost
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
+	}
+
+	public static void cookNode( HAPI_NodeId node_id )
+	{
+		cookNode( node_id, prSplitGeosByGroup, prSplitPointsByVertexAttributes, prImportTemplatedGeos );
 	}
 
 	public static void cookNode(
@@ -974,12 +878,12 @@ public static partial class HoudiniHost
 	// HANDLES --------------------------------------------------------------------------------------------------
 
 	public static void getHandleInfo(
-		HAPI_AssetId asset_id,
+		HAPI_NodeId node_id,
 		[Out] HAPI_HandleInfo[] handle_infos,
 		int start, int length )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetHandleInfoOnAsset( ref mySession, asset_id, handle_infos, start, length );
+		HAPI_Result status_code = HAPI_GetHandleInfo( ref mySession, node_id, handle_infos, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -987,13 +891,13 @@ public static partial class HoudiniHost
 	}
 
 	public static void getHandleBindingInfo(
-		HAPI_AssetId asset_id,
+		HAPI_NodeId node_id,
 		int handle_index,
 		[Out] HAPI_HandleBindingInfo[] handle_infos,
 		int start, int length )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetHandleBindingInfoOnAsset( ref mySession, asset_id, handle_index, handle_infos, start, length );
+		HAPI_Result status_code = HAPI_GetHandleBindingInfo( ref mySession, node_id, handle_index, handle_infos, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1097,27 +1001,40 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void getObjects(
-		HAPI_AssetId asset_id,
+	public static int composeObjectList( HAPI_NodeId node_id )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		int object_count = 0;
+		HAPI_Result status_code = HAPI_ComposeObjectList( ref mySession, node_id, "", out object_count );
+		processStatusCode( status_code );
+
+		return object_count;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getComposedObjectList(
+		HAPI_NodeId node_id,
 		[Out] HAPI_ObjectInfo[] object_infos,
 		int start, int length )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetObjects( ref mySession, asset_id, object_infos, start, length );
+		HAPI_Result status_code = HAPI_GetComposedObjectList( ref mySession, node_id, object_infos, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
 
-	public static void getObjectTransforms(
-		HAPI_AssetId asset_id,
+	public static void getComposedObjectTransforms(
+		HAPI_NodeId node_id,
 		HAPI_RSTOrder rst_order,
 		[Out] HAPI_Transform[] transforms,
 		int start, int length )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetObjectTransforms( ref mySession, asset_id, rst_order, transforms, start, length );
+		HAPI_Result status_code = HAPI_GetComposedObjectTransforms( ref mySession, node_id, rst_order, transforms, start, length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1139,20 +1056,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void getInstanceTransforms(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		HAPI_RSTOrder rst_order, [Out] HAPI_Transform[] transforms,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetInstanceTransformsOnAsset(
-			ref mySession, asset_id, object_id, geo_id, rst_order, transforms, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static void setObjectTransform(
 		HAPI_NodeId node_id,
 		ref HAPI_TransformEuler transform )
@@ -1165,18 +1068,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void setObjectTransform(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id,
-		ref HAPI_TransformEuler transform )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetObjectTransformOnAsset( ref mySession, asset_id, object_id, ref transform );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-		
 	// GEOMETRY GETTERS -----------------------------------------------------------------------------------------
 
 	public static HAPI_GeoInfo getDisplayGeoInfo( HAPI_NodeId object_node_id )
@@ -1203,18 +1094,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void getGeoInfo(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		out HAPI_GeoInfo geo_info )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetGeoInfoOnAsset( ref mySession, asset_id, object_id, geo_id, out geo_info );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static HAPI_PartInfo getPartInfo( HAPI_NodeId node_id, HAPI_PartId part_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
@@ -1222,6 +1101,18 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetPartInfo( ref mySession, node_id, part_id, out part_info );
 		processStatusCode( status_code );
 		return part_info;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getFaceCounts(
+		HAPI_NodeId node_id, HAPI_PartId part_id, [Out] int[] face_counts,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetFaceCounts( ref mySession, node_id, part_id, face_counts, start, length );
+		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -1236,6 +1127,18 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetFaceCounts( ref mySession, node_id, part_id, face_counts, start, length );
 		processStatusCode( status_code );
 		return face_counts;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getVertexList(
+		HAPI_NodeId node_id, HAPI_PartId part_id, [Out] int[] vertex_list,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetVertexList( ref mySession, node_id, part_id, vertex_list, start, length );
+		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -1294,6 +1197,21 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void getAttributeIntData(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info, [Out] int[] data,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetAttributeIntData(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static int[] getAttributeIntData(
 		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1306,6 +1224,21 @@ public static partial class HoudiniHost
 			ref attr_info, -1, data, start, length );
 		processStatusCode( status_code );
 		return data;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getAttributeInt64Data(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info, [Out] HAPI_Int64[] data,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetAttributeInt64Data(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -1328,6 +1261,21 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void getAttributeFloatData(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info, [Out] float[] data,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetAttributeFloatData(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static float[] getAttributeFloatData(
 		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1345,6 +1293,21 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void getAttributeFloat64Data(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info, [Out] double[] data,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetAttributeFloat64Data(
+			ref mySession, node_id, part_id, name,
+			ref attr_info, -1, data, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static double[] getAttributeFloat64Data(
 		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
 		ref HAPI_AttributeInfo attr_info,
@@ -1357,6 +1320,20 @@ public static partial class HoudiniHost
 			ref attr_info, -1, data, start, length );
 		processStatusCode( status_code );
 		return data;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static void getAttributeStringData(
+		HAPI_NodeId node_id, HAPI_PartId part_id, string name,
+		ref HAPI_AttributeInfo attr_info, [Out] int[] data,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetAttributeStringData(
+			ref mySession, node_id, part_id, name, ref attr_info, data, start, length );
+		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -1484,274 +1461,6 @@ public static partial class HoudiniHost
 		{
 			status_code = HAPI_GetInstancerPartTransforms(
 				ref mySession, node_id, part_id, rst_order, transforms, 0, count );
-			processStatusCode( status_code );
-		}
-
-		return transforms;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getPartInfo(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		out HAPI_PartInfo part_info )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetPartInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getFaceCounts(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		[Out] int[] face_counts,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetFaceCountsOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, face_counts, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getVertexList(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		[Out] int[] vertex_list,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetVertexListOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, vertex_list, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_AttributeInfo getAttributeInfo(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name, HAPI_AttributeOwner owner )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_AttributeInfo info = new HAPI_AttributeInfo();
-		HAPI_Result status_code = HAPI_GetAttributeInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, name, owner, ref info );
-		processStatusCode( status_code );
-		return info;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static string[] getAttributeNames(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		HAPI_AttributeOwner owner )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
-		processStatusCode( status_code );
-
-		int count = part_info.attributeCounts[ (int) owner ];
-
-		int[] names = new int[ count ];
-		status_code = HAPI_GetAttributeNamesOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, owner, names, count );
-		processStatusCode( status_code );
-
-		string[] name_strings = new string[ count ];
-		for ( int i = 0; i < count; ++i )
-			name_strings[ i ] = getString( names[ i ] );
-
-		return name_strings;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getAttributeIntData(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		[Out] int[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetAttributeIntDataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, name,
-			ref attr_info, -1, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getAttributeInt64Data(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		[Out] HAPI_Int64[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetAttributeInt64DataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, name,
-			ref attr_info, -1, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getAttributeFloatData(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		[Out] float[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetAttributeFloatDataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, name,
-			ref attr_info, -1, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getAttributeFloat64Data(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		[Out] double[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetAttributeFloat64DataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, name,
-			ref attr_info, -1, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getAttributeStringData(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		[Out] int[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetAttributeStringDataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, name, ref attr_info, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static string[] getGroupNames(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		HAPI_GroupType group_type )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_GeoInfo geo_info = new HAPI_GeoInfo();
-		HAPI_Result status_code = HAPI_GetGeoInfoOnAsset( ref mySession, asset_id, object_id, geo_id, out geo_info );
-		processStatusCode( status_code );
-
-		int count = geo_info.getGroupCountByType( group_type );
-
-		int[] names = new int[ count ];
-		status_code = HAPI_GetGroupNamesOnAsset(
-			ref mySession, asset_id, object_id, geo_id, group_type, names, count );
-		processStatusCode( status_code );
-
-		string[] name_strings = new string[ count ];
-		for ( int i = 0; i < count; ++i )
-			name_strings[ i ] = getString( names[ i ] );
-
-		return name_strings;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static bool[] getGroupMembership(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		HAPI_GroupType group_type,
-		string group_name )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
-		processStatusCode( status_code );
-
-		int count = part_info.getElementCountByGroupType( group_type );
-
-		int[] membership = new int[ count ];
-
-		if ( count > 0 )
-		{
-			bool membership_array_all_equal = false;
-			status_code = HAPI_GetGroupMembershipOnAsset(
-				ref mySession, asset_id, object_id, geo_id, part_id,
-				group_type, group_name, 
-				ref membership_array_all_equal,
-				membership, 0, count );
-			processStatusCode( status_code );
-		}
-
-		bool[] membership_bools = new bool[ count ];
-		for ( int i = 0; i < count; ++i )
-			membership_bools[ i ] = membership[ i ] > 0;
-
-		return membership_bools;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_PartId[] getInstancedPartIds(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
-		processStatusCode( status_code );
-
-		int count = part_info.instancedPartCount;
-
-		HAPI_PartId[] part_ids = new HAPI_PartId[ count ];
-
-		if ( count > 0 )
-		{
-			status_code = HAPI_GetInstancedPartIdsOnAsset(
-				ref mySession, asset_id, object_id, geo_id, part_id, part_ids, 0, count );
-			processStatusCode( status_code );
-		}
-
-		return part_ids;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_Transform[] getInstancerPartTransforms(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		HAPI_RSTOrder rst_order )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
-		processStatusCode( status_code );
-
-		int count = part_info.instanceCount;
-
-		HAPI_Transform[] transforms = new HAPI_Transform[ count ];
-
-		if ( count > 0 )
-		{
-			status_code = HAPI_GetInstancerPartTransformsOnAsset(
-				ref mySession, asset_id, object_id, geo_id, part_id, rst_order, transforms, 0, count );
 			processStatusCode( status_code );
 		}
 
@@ -1950,231 +1659,50 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void setPartInfo(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		ref HAPI_PartInfo part_info )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetPartInfoOnAsset( ref mySession, asset_id, object_id, geo_id, ref part_info );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setFaceCounts(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		int[] face_counts,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetFaceCountsOnAsset( ref mySession, asset_id, object_id, geo_id, face_counts, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setVertexList(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		int[] vertex_list,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetVertexListOnAsset( ref mySession, asset_id, object_id, geo_id, vertex_list, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void addAttribute(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
-		ref HAPI_AttributeInfo attr_info )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_AddAttributeOnAsset( ref mySession, asset_id, object_id, geo_id, name, ref attr_info );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setAttributeIntData(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		int[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetAttributeIntDataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setAttributeInt64Data(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		HAPI_Int64[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetAttributeInt64DataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setAttributeFloatData(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		float[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetAttributeFloatDataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setAttributeFloat64Data(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		double[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetAttributeFloat64DataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setAttributeStringData(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string name,
-		ref HAPI_AttributeInfo attr_info,
-		string[] data,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetAttributeStringDataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, name, ref attr_info, data, start, length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void addGroup(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		HAPI_GroupType group_type, string group_name )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_AddGroupOnAsset(
-			ref mySession, asset_id, object_id, geo_id, group_type, group_name );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setGroupMembership(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id,
-		HAPI_GroupType group_type,
-		string group_name,
-		bool[] membership,
-		int count )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		if ( count != membership.Length )
-			throw new HoudiniErrorInvalidArgument( "Membership array not same size as count argument!" );
-
-		int[] membership_int = new int[ count ];
-		for ( int i = 0; i < count; ++i )
-			membership_int[ i ] = membership[ i ] ? 1 : 0;
-
-		HAPI_Result status_code = HAPI_SetGroupMembershipOnAsset(
-			ref mySession, asset_id, object_id, geo_id, group_type, group_name, membership_int, 0, count );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void commitGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_CommitGeoOnAsset( ref mySession, asset_id, object_id, geo_id );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void revertGeo( HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_RevertGeoOnAsset( ref mySession, asset_id, object_id, geo_id );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	// INTER-ASSET ----------------------------------------------------------------------------------------------
 
-	public static void connectAssetTransform( int asset_id_from, int asset_id_to, int input_idx )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_ConnectAssetTransform( ref mySession, asset_id_from, asset_id_to, input_idx );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
+//	public static void connectAssetTransform( int asset_id_from, int asset_id_to, int input_idx )
+//	{
+//#if ( HAPI_ENABLE_RUNTIME )
+//		HAPI_Result status_code = HAPI_ConnectAssetTransform( ref mySession, asset_id_from, asset_id_to, input_idx );
+//		processStatusCode( status_code );
+//#else
+//		throw new HoudiniErrorUnsupportedPlatform();
+//#endif
+//	}
 
-	public static void disconnectAssetTransform( HAPI_AssetId asset_id, int input_idx )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_DisconnectAssetTransform( ref mySession, asset_id, input_idx );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
+//	public static void disconnectAssetTransform( HAPI_AssetId asset_id, int input_idx )
+//	{
+//#if ( HAPI_ENABLE_RUNTIME )
+//		HAPI_Result status_code = HAPI_DisconnectAssetTransform( ref mySession, asset_id, input_idx );
+//		processStatusCode( status_code );
+//#else
+//		throw new HoudiniErrorUnsupportedPlatform();
+//#endif
+//	}
 
-	public static void connectAssetGeometry(
-		HAPI_AssetId asset_id_from, HAPI_ObjectId object_id_from,
-		HAPI_AssetId asset_id_to, int input_idx )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_ConnectAssetGeometry(
-			ref mySession, asset_id_from, object_id_from, asset_id_to, input_idx );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
+//	public static void connectAssetGeometry(
+//		HAPI_AssetId asset_id_from, HAPI_ObjectId object_id_from,
+//		HAPI_AssetId asset_id_to, int input_idx )
+//	{
+//#if ( HAPI_ENABLE_RUNTIME )
+//		HAPI_Result status_code = HAPI_ConnectAssetGeometry(
+//			ref mySession, asset_id_from, object_id_from, asset_id_to, input_idx );
+//		processStatusCode( status_code );
+//#else
+//		throw new HoudiniErrorUnsupportedPlatform();
+//#endif
+//	}
 
-	public static void disconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_DisconnectAssetGeometry( ref mySession, asset_id, input_idx );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
+//	public static void disconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx )
+//	{
+//#if ( HAPI_ENABLE_RUNTIME )
+//		HAPI_Result status_code = HAPI_DisconnectAssetGeometry( ref mySession, asset_id, input_idx );
+//		processStatusCode( status_code );
+//#else
+//		throw new HoudiniErrorUnsupportedPlatform();
+//#endif
+//	}
 
 	// MATERIALS ------------------------------------------------------------------------------------------------
 
@@ -2348,92 +1876,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static HAPI_MaterialInfo[] getMaterialsOnFaces(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfoOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, out part_info );
-		processStatusCode( status_code );
-
-		bool are_all_the_same = false;
-		int[] material_ids = new int[ part_info.faceCount ];
-		status_code = HAPI_GetMaterialIdsOnFaces(
-			ref mySession, asset_id, object_id, geo_id, part_id,
-			ref are_all_the_same, material_ids, 0, part_info.faceCount );
-		processStatusCode( status_code );
-
-		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		HAPI_MaterialInfo[] material_infos = new HAPI_MaterialInfo[ part_info.faceCount ];
-		for ( int m = 0; m < part_info.faceCount; ++m )
-		{
-			status_code = HAPI_GetMaterialInfoOnAsset( ref mySession, asset_id, material_ids[ m ], out material_info );
-			processStatusCode( status_code );
-			material_infos[ m ] = material_info;
-		}
-
-		return material_infos;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_MaterialInfo getMaterialOnPart(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-#if true
-		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		HAPI_Result status_code = HAPI_GetMaterialOnPartOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, out material_info );
-		processStatusCode( status_code );
-#else
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfo(
-			asset_id, object_id, geo_id, part_id, out part_info );
-		processStatusCode( status_code );
-
-		bool are_all_the_same = false;
-		int[] material_ids = new int[ 1 ];
-		status_code = HAPI_GetMaterialIdsOnFaces(
-			asset_id, object_id, geo_id, part_id, ref are_all_the_same, material_ids, 0, 1 );
-		processStatusCode( status_code );
-
-		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		status_code = HAPI_GetMaterialInfo( asset_id, material_ids[ 0 ], out material_info );
-		processStatusCode( status_code );
-#endif
-		return material_info;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_MaterialInfo getMaterialOnGroup(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, string group_name )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		HAPI_Result status_code = HAPI_GetMaterialOnGroupOnAsset(
-			ref mySession, asset_id, object_id, geo_id, group_name, out material_info );
-		processStatusCode( status_code );
-		return material_info;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void renderTextureToImage( HAPI_AssetId asset_id, HAPI_MaterialId material_id, HAPI_ParmId parm_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_RenderTextureToImageOnAsset( ref mySession, asset_id, material_id, parm_id );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	public static int getSupportedImageFileFormatCount()
 	{
 #if ( HAPI_ENABLE_RUNTIME )
@@ -2454,92 +1896,6 @@ public static partial class HoudiniHost
 		HAPI_Result status_code = HAPI_GetSupportedImageFileFormats( ref mySession, formats, format_count );
 		processStatusCode( status_code );
 		return formats;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_ImageInfo getImageInfo( HAPI_AssetId asset_id, HAPI_MaterialId material_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_ImageInfo image_info = new HAPI_ImageInfo();
-		HAPI_Result status_code = HAPI_GetImageInfoOnAsset( ref mySession, asset_id, material_id, out image_info );
-		processStatusCode( status_code );
-		return image_info;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void setImageInfo(
-		HAPI_AssetId asset_id, HAPI_MaterialId material_id, ref HAPI_ImageInfo image_info )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SetImageInfoOnAsset( ref mySession, asset_id, material_id, ref image_info );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static List< string > getImagePlanes( HAPI_AssetId asset_id, HAPI_MaterialId material_id )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = (int) HAPI_Result.HAPI_RESULT_SUCCESS;
-
-		int image_plane_count = 0;
-		status_code = HAPI_GetImagePlaneCountOnAsset( ref mySession, asset_id, material_id, out image_plane_count );
-		processStatusCode( status_code );
-
-		int[] image_plane_names_array = new int[ image_plane_count ];
-		status_code = HAPI_GetImagePlanesOnAsset( 
-			ref mySession, asset_id, material_id, image_plane_names_array, image_plane_count );
-		processStatusCode( status_code );
-
-		List< string > image_plane_names = new List< string >( image_plane_count );
-		for ( int i = 0; i < image_plane_count; ++i )
-			image_plane_names.Add( getString( image_plane_names_array[ i ] ) );
-
-		return image_plane_names;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static string extractImageToFile( 
-		HAPI_AssetId asset_id, HAPI_MaterialId material_id, string image_file_format_name, 
-		string image_planes, string destination_folder_path )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		int destination_file_path_sh = 0;
-
-		HAPI_Result status_code = HAPI_ExtractImageToFileOnAsset(
-			ref mySession, asset_id, material_id, image_file_format_name, image_planes, 
-			destination_folder_path, null, out destination_file_path_sh );
-		processStatusCode( status_code );
-			
-		string destination_file_path = getString( destination_file_path_sh );
-		return destination_file_path;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static byte[] extractImageToMemory( 
-		HAPI_AssetId asset_id, HAPI_MaterialId material_id, string image_file_format_name, string image_planes )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		int buffer_size = 0;
-
-		HAPI_Result status_code = HAPI_ExtractImageToMemoryOnAsset(
-			ref mySession, asset_id, material_id, image_file_format_name, image_planes, out buffer_size );
-		processStatusCode( status_code );
-
-		byte[] buffer = new byte[ buffer_size ];
-		status_code = HAPI_GetImageMemoryBufferOnAsset( ref mySession, asset_id, material_id, buffer, buffer_size );
-		processStatusCode( status_code );
-
-		return buffer;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
@@ -2637,55 +1993,6 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void getVolumeInfo(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		ref HAPI_VolumeInfo volume_info )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetVolumeInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, ref volume_info );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getFirstVolumeTile(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		ref HAPI_VolumeTileInfo tile )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetFirstVolumeTileOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, ref tile );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getNextVolumeTile(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		ref HAPI_VolumeTileInfo next )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetNextVolumeTileOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, ref next );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void getVolumeTileFloatData(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		ref HAPI_VolumeTileInfo tile, [Out] float[] values )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_GetVolumeTileFloatDataOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, 0.0f, ref tile, values, values.Length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
 	// CURVES ---------------------------------------------------------------------------------------------------
 
 	public static HAPI_CurveInfo getCurveInfo( HAPI_NodeId node_id, HAPI_PartId part_id )
@@ -2738,65 +2045,6 @@ public static partial class HoudiniHost
 		float[] knots = new float[ length ];
 		HAPI_Result status_code = HAPI_GetCurveKnots(
 			ref mySession, node_id, part_id, knots, start, length );
-		processStatusCode( status_code );
-		return knots;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static HAPI_CurveInfo getCurveInfo(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		ref HAPI_VolumeInfo volume_info )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_CurveInfo curve_info = new HAPI_CurveInfo();
-		HAPI_Result status_code = HAPI_GetCurveInfoOnAsset( ref mySession, asset_id, object_id, geo_id, part_id, ref curve_info );
-		processStatusCode( status_code );
-		return curve_info;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static int[] getCurveCounts(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		int[] counts = new int[ length ];
-		HAPI_Result status_code = HAPI_GetCurveCountsOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, counts, start, length );
-		processStatusCode( status_code );
-		return counts;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static int[] getCurveOrders(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		int[] orders = new int[ length ];
-		HAPI_Result status_code = HAPI_GetCurveOrdersOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, orders, start, length );
-		processStatusCode( status_code );
-		return orders;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static float[] getCurveKnots(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, HAPI_PartId part_id,
-		int start, int length )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		float[] knots = new float[ length ];
-		HAPI_Result status_code = HAPI_GetCurveKnotsOnAsset(
-			ref mySession, asset_id, object_id, geo_id, part_id, knots, start, length );
 		processStatusCode( status_code );
 		return knots;
 #else
@@ -2940,66 +2188,6 @@ public static partial class HoudiniHost
 #if ( HAPI_ENABLE_RUNTIME )
 		HAPI_Result status_code = HAPI_LoadGeoFromMemory(
 			ref mySession, node_id, format, buffer, buffer.Length );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void saveGeoToFile(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
-		string file_name )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_SaveGeoToFileOnAsset(
-			ref mySession, asset_id, object_id, geo_id, file_name );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void loadGeoFromFile(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
-		string file_name )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_LoadGeoFromFileOnAsset(
-			ref mySession, asset_id, object_id, geo_id, file_name );
-		processStatusCode( status_code );
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static byte[] saveGeoToMemory(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
-		string format )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		int size;
-		HAPI_Result status_code = HAPI_GetGeoSizeOnAsset(
-			ref mySession, asset_id, object_id, geo_id, format, out size );
-		processStatusCode( status_code );
-
-		byte[] memory = new byte[ size ];
-		status_code = HAPI_SaveGeoToMemoryOnAsset(
-			ref mySession, asset_id, object_id, geo_id, memory, size );
-		processStatusCode( status_code );
-
-		return memory;
-#else
-		throw new HoudiniErrorUnsupportedPlatform();
-#endif
-	}
-
-	public static void loadGeoFromMemory(
-		HAPI_AssetId asset_id, HAPI_ObjectId object_id, HAPI_GeoId geo_id, 
-		string format, byte[] buffer )
-	{
-#if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_LoadGeoFromMemoryOnAsset(
-			ref mySession, asset_id, object_id, geo_id, format, buffer, buffer.Length );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();

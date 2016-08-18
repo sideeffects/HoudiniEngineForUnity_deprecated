@@ -117,9 +117,13 @@ public class HoudiniObjectControl : HoudiniControl
 
 		if ( reload_asset || object_info.haveGeosChanged )
 		{
+			// TODO: Add back support for templated geos and curve SOPs.
+			HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prObjectId );
+			object_info.geoCount = 1;
+			
 			// Add new geos as needed.
 			while ( myGeos.Count < object_info.geoCount )
-				myGeos.Add( createGeo( myGeos.Count ) );
+				myGeos.Add( createGeo( geo_info.id ) );
 
 			// Remove stale geos.
 			while ( myGeos.Count > object_info.geoCount )

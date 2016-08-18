@@ -96,7 +96,7 @@ public class HoudiniAssetGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
 
-			if ( HoudiniHost.isAssetValid( myAsset.prAssetId, myAsset.prAssetValidationId ) &&
+			if ( HoudiniHost.isNodeValid( myAsset.prAssetId, myAsset.prNodeInfo.uniqueHoudiniNodeId ) &&
 				( myAsset.prTransformInputCount > 0 || myAsset.prGeoInputCount > 0 ) &&
 				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
 			{

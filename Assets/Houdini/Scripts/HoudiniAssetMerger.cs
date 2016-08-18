@@ -166,8 +166,8 @@ public class HoudiniAssetMerger : HoudiniAsset
 
 	protected override int buildCreateAsset( HoudiniProgressBar progress_bar )
 	{
-		//return HoudiniHost.createInputAsset( transform.name );
-		return HoudiniHost.instantiateAsset( "SOP/merge", true );
+		//return HoudiniHost.createInputNode( transform.name );
+		return HoudiniHost.createNode( -1, "SOP/merge", true );
 	}
 
 	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar, bool is_duplication )

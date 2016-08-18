@@ -44,8 +44,9 @@ public class HoudiniAssetOTL : HoudiniAsset
 																set { myActiveAttributeManager = value; } }
 	public List< HoudiniGeoControl > prEditPaintGeos {			get { return myEditPaintGeos; }
 																set { myEditPaintGeos = value; } }
-	public HAPI_HandleInfo[] prHandleInfos { get; set; }
-	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get; set; }
+	public HAPI_HandleInfo[] prHandleInfos { get { return myHandleInfos; } set { myHandleInfos = value; } }
+	public List< HAPI_HandleBindingInfo[] > prHandleBindingInfos { get { return myHandleBindingInfos; }
+																   set { myHandleBindingInfos = value; } }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public Methods
@@ -324,7 +325,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 			object_control = prGameObjects[ object_id ].AddComponent< HoudiniObjectControl >();
 			object_control.init(
-				prAssetId, object_info.nodeId, prAsset, object_id, object_info.name, object_info.isVisible );
+				prAssetId, object_info.nodeId, prAsset, object_info.nodeId, object_info.name, object_info.isVisible );
 		}
 		else
 		{
@@ -362,4 +363,6 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 	[SerializeField] private HoudiniGeoAttributeManager myActiveAttributeManager;
 	[SerializeField] private List< HoudiniGeoControl > myEditPaintGeos;
+	[SerializeField] private HAPI_HandleInfo[] myHandleInfos;
+	[SerializeField] private List< HAPI_HandleBindingInfo[] > myHandleBindingInfos;
 }

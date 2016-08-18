@@ -122,7 +122,7 @@ public class HoudiniGeoControl : HoudiniObjectControl
 			// If templated geos are off this will error out for templated
 			// geos because they woudn't have cooked. But we still need to
 			// get the geo info to see that this is a templated geo and skip it.
-			HoudiniHost.getGeoInfo( prAssetId, prObjectId, prGeoId, out geo_info );
+			geo_info = HoudiniHost.getGeoInfo( prGeoId );
 		}
 		catch ( HoudiniErrorInvalidArgument ) {}
 
@@ -241,7 +241,7 @@ public class HoudiniGeoControl : HoudiniObjectControl
 				int[] script_attr = new int[ 0 ];
 			
 				HoudiniAssetUtility.getAttribute( 
-					prAssetId, prObjectId, prGeoId, 0, "Unity_Script",
+					prGeoId, 0, "Unity_Script",
 					ref script_attr_info, ref script_attr, HoudiniHost.getAttributeStringData );
 			
 				if ( script_attr_info.exists && script_attr_info.owner != HAPI_AttributeOwner.HAPI_ATTROWNER_DETAIL )

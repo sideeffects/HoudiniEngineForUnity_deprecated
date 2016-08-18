@@ -425,7 +425,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 
 		// Fetch all point attributes.
 		string[] point_attribute_names = HoudiniHost.getAttributeNames(
-			asset_id, object_id, geo_id, part_id, HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
+			geo_id, part_id, HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
 
 		foreach ( string point_attribute_name in point_attribute_names )
 		{
@@ -433,7 +433,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 				continue;
 
 			HAPI_AttributeInfo point_attribute_info = HoudiniHost.getAttributeInfo(
-				asset_id, object_id, geo_id, part_id, point_attribute_name,
+				geo_id, part_id, point_attribute_name,
 				HAPI_AttributeOwner.HAPI_ATTROWNER_POINT );
 
 			HoudiniGeoAttribute attribute = null;
@@ -466,7 +466,7 @@ public class HoudiniGeoAttributeManager : ScriptableObject {
 			}
 
 			// Sync the values of the Unity attribute with the Houdini attribute.
-			needs_recook |= attribute.sync( asset_id, object_id, geo_id, part_id, mesh, point_attribute_info );
+			needs_recook |= attribute.sync( geo_id, part_id, mesh, point_attribute_info );
 
 			// If the sync updated the values from the asset we need to refresh our mesh.
 			if ( needs_recook )

@@ -394,8 +394,9 @@ public class HoudiniCurve : MonoBehaviour
 			// Get position attributes (this is all we get for the curve's geometry).
 			HAPI_AttributeInfo pos_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_POSITION );
 			float[] pos_attr = new float[ 0 ];
-			HoudiniAssetUtility.getAttribute( prControl.prAsset.prAssetId, object_id, geo_id, 0, HoudiniConstants.HAPI_ATTRIB_POSITION, 
-								  ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
+			HoudiniAssetUtility.getAttribute(
+				geo_id, 0, HoudiniConstants.HAPI_ATTRIB_POSITION, 
+				ref pos_attr_info, ref pos_attr, HoudiniHost.getAttributeFloatData );
 			if ( !pos_attr_info.exists )
 				throw new HoudiniError( "No position attribute found." );
 
@@ -458,7 +459,7 @@ public class HoudiniCurve : MonoBehaviour
 				myIsFirstCook = false;
 			}
 			
-			HoudiniHost.cookAsset(
+			HoudiniHost.cookNode(
 				prControl.prAsset.prAssetId,
 				prControl.prAsset.prSplitGeosByGroup,
 				prControl.prAsset.prSplitPointsByVertexAttribute,

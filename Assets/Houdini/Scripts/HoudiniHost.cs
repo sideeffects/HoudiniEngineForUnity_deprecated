@@ -799,18 +799,19 @@ public static partial class HoudiniHost
 			//Debug.Log( asset_names[ i ] );
 		}
 
-		int asset_id = -1;
+		int node_id = -1;
 		string first_asset_name = asset_names[ 0 ];
 		bool cook_on_load = false;
-		status_code = HAPI_InstantiateAsset( ref mySession, first_asset_name, cook_on_load, out asset_id );
+		status_code = HAPI_CreateNode(
+			ref mySession, -1, first_asset_name, "", cook_on_load, out node_id );
 		processStatusCode( status_code );
 		progress_bar.statusCheckLoop();
-		cookAsset( asset_id, split_geos_by_group, split_points_by_vertex_attributes, import_templated_geos );
+		cookNode( node_id, split_geos_by_group, split_points_by_vertex_attributes, import_templated_geos );
 		progress_bar.statusCheckLoop();
 
 		// Check for undefined asset definitions.
 #if UNITY_EDITOR
-		HAPI_AssetInfo asset_info = getAssetInfoOnAsset( asset_id );
+		HAPI_AssetInfo asset_info = getAssetInfo( node_id );
 		int has_undef_assets = checkForSpecificErrors(
 			asset_info.nodeId, (int) HAPI_ErrorCode.HAPI_ERRORCODE_ASSET_DEF_NOT_FOUND );
 		if ( has_undef_assets > 0 )
@@ -821,7 +822,7 @@ public static partial class HoudiniHost
 				"asset definitions are missing.", "Ok" );
 #endif // UNITY_EDITOR
 
-		return asset_id;
+		return node_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif // ( HAPI_ENABLE_RUNTIME )
@@ -843,14 +844,7 @@ public static partial class HoudiniHost
 	public static int[] getNewAssetIds()
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-		int asset_count = 0;
-		HAPI_Result status_code = HAPI_CheckForNewAssets( ref mySession, ref asset_count );
-		processStatusCode( status_code );
-
-		int[] asset_ids_array = new int[ asset_count ];
-		status_code = HAPI_GetNewAssetIds( ref mySession, asset_ids_array, asset_count );
-		processStatusCode( status_code );
-
+		int[] asset_ids_array = new int[ 0 ];
 		return asset_ids_array;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -863,10 +857,7 @@ public static partial class HoudiniHost
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
-		int asset_id = -1;
-		HAPI_Result status_code = HAPI_CreateCurve( ref mySession, out asset_id );
-		processStatusCode( status_code );
-
+		int asset_id = HoudiniHost.createNode( -1, "Sop/curve", true );
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -879,10 +870,7 @@ public static partial class HoudiniHost
 		if ( !isInstallationOk() )
 			throw new HoudiniError( "DLL Not Found." );
 
-		int asset_id = -1;
-		HAPI_Result status_code = HAPI_CreateInputAsset( ref mySession, out asset_id, name );
-		processStatusCode( status_code );
-
+		int asset_id = HoudiniHost.createInputNode( name );
 		return asset_id;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -894,11 +882,8 @@ public static partial class HoudiniHost
 #if ( HAPI_ENABLE_RUNTIME )
 		if ( asset_id < 0 || !isInstallationOk() )
 			return false;
-			
-		HAPI_Result result = HAPI_DestroyAsset( ref mySession, asset_id );
-			
-		processStatusCode( result );
-			
+
+		HoudiniHost.deleteNode( asset_id );
 		return true;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
