@@ -865,6 +865,7 @@ public struct HAPI_CookOptions
 
 // NODES --------------------------------------------------------------------------------------------------------
 
+[ Serializable ]
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_NodeInfo
 {

@@ -1005,7 +1005,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			// More imporantly, structs are not serialized and therefore putting them into their own
 			// variables is required in order to maintain state between serialization cycles.
 			prAssetId 					= prAssetInfo.id;
-			prAssetValidationId			= prAssetInfo.validationId;
+			prAssetValidationId			= prNodeInfo.uniqueHoudiniNodeId;
 			prNodeId					= prAssetInfo.nodeId;
 			prObjectNodeId				= prAssetInfo.objectNodeId;
 			prObjectCount 				= HoudiniHost.composeObjectList( prAssetId );
