@@ -110,7 +110,7 @@ public class HoudiniAssetGUI : Editor
 					
 					if ( myAsset.prUpStreamGeoObjects == null || myAsset.prUpStreamGeoAssets == null ||
 						 myAsset.prUpStreamGeoObjects.Count <= 0 || myAsset.prUpStreamGeoAssets.Count <= 0 )
-						return;
+						myAsset.prGeoInputCount = 0;
 
 					for ( int input_index = 0; input_index < myAsset.prGeoInputCount; ++input_index )
 					{
