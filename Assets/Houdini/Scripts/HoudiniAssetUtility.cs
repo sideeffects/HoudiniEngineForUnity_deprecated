@@ -176,8 +176,12 @@ public class HoudiniAssetUtility
 
 	public static void getHoudiniTransformAndApply( int asset_id, string asset_name, Transform transform )
 	{
-		HAPI_Transform hapi_transform = HoudiniHost.getObjectTransform( 
-			asset_id, -1, HAPI_RSTOrder.HAPI_SRT );
+		int node_id = asset_id;
+		HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo( asset_id );
+		if ( node_info.type == HAPI_NodeType.HAPI_NODETYPE_SOP )
+			node_id = node_info.parentId;
+
+		HAPI_Transform hapi_transform = HoudiniHost.getObjectTransform( node_id, -1, HAPI_RSTOrder.HAPI_SRT );
 		if ( 
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 0 ] ) ||
 			Mathf.Approximately( 0.0f, hapi_transform.scale[ 1 ] ) ||

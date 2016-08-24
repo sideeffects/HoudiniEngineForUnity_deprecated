@@ -1668,7 +1668,11 @@ public abstract class HoudiniAsset : HoudiniControl
 		Matrix4x4 local_to_world = transform.localToWorldMatrix;
 
 		HAPI_TransformEuler hapi_transform = HoudiniAssetUtility.getHapiTransform( local_to_world );
-		HoudiniHost.setObjectTransform( prAssetId, ref hapi_transform );
+
+		if ( prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
+			HoudiniHost.setObjectTransform( prAssetId, ref hapi_transform );
+		else
+			HoudiniHost.setObjectTransform( prNodeInfo.parentId, ref hapi_transform );
 
 		float [] parm_data = new float[ 3 ];
 
