@@ -227,12 +227,10 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 	public virtual HAPI_ParmInfo findParm( string name )
 	{
 		if ( prParms == null )
-		{
 			throw new HoudiniErrorNotFound( "Parameters have not been initialized!" );
-		}
 
-		for ( int i = 0; i < prParms.Length; ++i )
-			if ( prParms[ i ].name == name )
+		for ( int i = 0; i < prParmInfoStrings.Length; ++i )
+			if ( prParmInfoStrings[ i ].name == name )
 				return prParms[ i ];
 
 		throw new HoudiniErrorNotFound( "Parameter with the name " + name + " does not exist!" );
