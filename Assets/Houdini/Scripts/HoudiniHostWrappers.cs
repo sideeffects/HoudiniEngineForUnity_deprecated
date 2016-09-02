@@ -1048,6 +1048,20 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void getInstancedObjectIds(
+		HAPI_NodeId node_id,
+		[Out] HAPI_NodeId[] instanced_node_id_array,
+		int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetInstancedObjectIds(
+			ref mySession, node_id, instanced_node_id_array, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static void getInstanceTransforms(
 		HAPI_NodeId node_id,
 		HAPI_RSTOrder rst_order,
