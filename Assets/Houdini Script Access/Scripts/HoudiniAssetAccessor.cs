@@ -69,7 +69,7 @@ public class HoudiniAssetAccessor
 
 	public string[] getParameters()
 	{
-		var parm_infos = myAssetParms.prParms;
+		var parm_infos = myAssetParms.prParmInfoStrings;
 		string[] names = new string[ parm_infos.Length ];
 
 		for ( int i = 0; i < parm_infos.Length; i++ )
@@ -141,7 +141,10 @@ public class HoudiniAssetAccessor
 		
 		int values_index = parm_info.intValuesIndex + index;
 		int[] int_value = { value };
-		
+
+		if ( myAsset.prAssetId < 0 )
+			myAsset.buildClientSide();
+
 		HoudiniHost.setParmIntValues( myAsset.prNodeId, int_value, values_index, 1 );
 		
 		myAsset.buildClientSide();
@@ -156,7 +159,10 @@ public class HoudiniAssetAccessor
 		
 		int values_index = parm_info.floatValuesIndex + index;
 		float[] float_value = { value };
-		
+
+		if ( myAsset.prAssetId < 0 )
+			myAsset.buildClientSide();
+
 		HoudiniHost.setParmFloatValues( myAsset.prNodeId, float_value, values_index, 1 );
 		
 		myAsset.buildClientSide();
@@ -168,9 +174,12 @@ public class HoudiniAssetAccessor
 		
 		if ( !parm_info.isString() )
 			throw new HoudiniErrorInvalidArgument( name + " is not a string!" );
-		
+
+		if ( myAsset.prAssetId < 0 )
+			myAsset.buildClientSide();
+
 		HoudiniHost.setParmStringValue( myAsset.prNodeId, value, parm_info.id, index );
-		
+
 		myAsset.buildClientSide();
 	}
 

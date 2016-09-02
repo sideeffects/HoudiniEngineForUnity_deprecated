@@ -723,6 +723,7 @@ public abstract class HoudiniAsset : HoudiniControl
 			{
 				// Loading Scene (no Houdini scene exists yet).
 				prAssetId = -1;
+				prNodeId = -1;
 			}
 		}
 #endif // ( HAPI_ENABLE_RUNTIME )
