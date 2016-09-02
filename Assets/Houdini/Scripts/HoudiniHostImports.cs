@@ -339,7 +339,7 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetNodeInfo( ref HAPI_Session session, HAPI_NodeId node_id, ref HAPI_NodeInfo node_info );
+	HAPI_GetNodeInfo( ref HAPI_Session session, HAPI_NodeId node_id, out HAPI_NodeInfo node_info );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
@@ -1159,6 +1159,7 @@ public static partial class HoudiniHost
 	HAPI_SetVolumeInfo(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,
+		HAPI_PartId part_id,
 		ref HAPI_VolumeInfo volume_info );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
@@ -1166,6 +1167,7 @@ public static partial class HoudiniHost
 	HAPI_SetVolumeTileFloatData(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,
+		HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile,
 		float[] values_array,
 		int length );
@@ -1175,6 +1177,7 @@ public static partial class HoudiniHost
 	HAPI_SetVolumeTileIntData(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,
+		HAPI_PartId part_id,
 		ref HAPI_VolumeTileInfo tile,
 		int[] values_array,
 		int length );

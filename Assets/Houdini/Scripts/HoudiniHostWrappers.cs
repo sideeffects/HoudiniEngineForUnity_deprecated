@@ -455,8 +455,8 @@ public static partial class HoudiniHost
 	public static HAPI_NodeInfo getNodeInfo( HAPI_NodeId node_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-		HAPI_NodeInfo node_info = new HAPI_NodeInfo();
-		HAPI_Result status_code = HAPI_GetNodeInfo( ref mySession, node_id, ref node_info );
+		HAPI_NodeInfo node_info;
+		HAPI_Result status_code = HAPI_GetNodeInfo( ref mySession, node_id, out node_info );
 		processStatusCode( status_code );
 		return node_info;
 #else
@@ -1004,8 +1004,15 @@ public static partial class HoudiniHost
 	public static int composeObjectList( HAPI_NodeId node_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
+		HAPI_NodeInfo node_info;
+		HAPI_Result status_code = HAPI_GetNodeInfo( ref mySession, node_id, out node_info );
+		
+		int obj_node_id = node_id;
+		if ( node_info.type == HAPI_NodeType.HAPI_NODETYPE_SOP )
+			obj_node_id = node_info.parentId;
+
 		int object_count = 0;
-		HAPI_Result status_code = HAPI_ComposeObjectList( ref mySession, node_id, "", out object_count );
+		status_code = HAPI_ComposeObjectList( ref mySession, obj_node_id, "", out object_count );
 		processStatusCode( status_code );
 
 		return object_count;
