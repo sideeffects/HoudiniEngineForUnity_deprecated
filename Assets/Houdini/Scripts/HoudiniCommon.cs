@@ -92,6 +92,7 @@ public struct HoudiniConstants
 	public const string HAPI_ATTRIB_TANGENT				= "tangentu";
 	public const string HAPI_ATTRIB_COLOR				= "Cd";
 	public const string HAPI_ATTRIB_NAME				= "name";
+	public const string HAPI_ATTRIB_INSTANCE			= "instance";
 
 	public const string HAPI_UNGROUPED_GROUP_NAME		= "__ungrouped_group";
 
@@ -1151,6 +1152,7 @@ public struct HAPI_ObjectInfo
 
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool isVisible;
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool isInstancer;
+	[ MarshalAs( UnmanagedType.U1 ) ] public bool isInstanced;
 
 	public int geoCount;
 
