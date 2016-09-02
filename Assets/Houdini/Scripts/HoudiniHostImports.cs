@@ -31,13 +31,10 @@ using HAPI_Int64 = System.Int64;
 using HAPI_StringHandle = System.Int32;
 using HAPI_ErrorCodeBits = System.Int32;
 using HAPI_AssetLibraryId = System.Int32;
-using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
 using HAPI_NodeTypeBits = System.Int32;
 using HAPI_NodeFlagsBits = System.Int32;
 using HAPI_ParmId = System.Int32;
-using HAPI_ObjectId = System.Int32;
-using HAPI_GeoId = System.Int32;
 using HAPI_PartId = System.Int32;
 using HAPI_MaterialId = System.Int32;
 
@@ -717,7 +714,7 @@ public static partial class HoudiniHost
 	private static extern HAPI_Result
 	HAPI_GetGeoInfo(
 		ref HAPI_Session session,
-		HAPI_AssetId node_id,
+		HAPI_NodeId node_id,
 		out HAPI_GeoInfo geo_info );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
@@ -1093,7 +1090,7 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_ResetSimulation( ref HAPI_Session session, HAPI_AssetId asset_id );
+	HAPI_ResetSimulation( ref HAPI_Session session, HAPI_NodeId node_id );
 
 	// VOLUMES --------------------------------------------------------------------------------------------------
 

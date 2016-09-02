@@ -1938,10 +1938,10 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void resetSimulation( HAPI_AssetId asset_id )
+	public static void resetSimulation( HAPI_NodeId node_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-		HAPI_Result status_code = HAPI_ResetSimulation( ref mySession, asset_id );
+		HAPI_Result status_code = HAPI_ResetSimulation( ref mySession, node_id );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
