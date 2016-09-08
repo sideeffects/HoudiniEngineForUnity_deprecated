@@ -862,6 +862,9 @@ public struct HAPI_CookOptions
 	/// part types will just be refined to ::HAPI_PARTTYPE_MESH.
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool handleBoxPartTypes;
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool handleSpherePartTypes;
+
+	/// For internal use only. :)
+	public int extraFlags;
 }
 
 // NODES --------------------------------------------------------------------------------------------------------
