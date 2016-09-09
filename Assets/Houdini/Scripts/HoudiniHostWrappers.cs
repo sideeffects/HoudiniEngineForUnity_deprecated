@@ -464,6 +464,21 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static string getNodePath( HAPI_NodeId node_id, HAPI_NodeId relative_to_node_id )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_StringHandle path_sh;
+		HAPI_Result status_code = HAPI_GetNodePath( ref mySession, node_id, relative_to_node_id, out path_sh );
+		processStatusCode( status_code );
+
+		string path = getString( path_sh );
+
+		return path;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static HAPI_NodeId getManagerNodeId( HAPI_NodeType node_type )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
