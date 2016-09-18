@@ -15,5 +15,5 @@
 !README.md
 /Assets/*
 !/Assets/Houdini
-!/Assets/Houdini Script Access
+!/Assets/HoudiniApi
 Assets/Houdini/Scripts/HoudiniVersion.cs
