@@ -864,20 +864,24 @@ public class HoudiniGUI : Editor
 	}
 	
 	public static bool objectField(
-		string name, string label, ref Object obj, System.Type type )
+		string name, string label, ref Object obj, System.Type type, Object undo_info,
+		ref GameObject undo_value )
 	{
 		HoudiniGUIParm gui_parm = new HoudiniGUIParm( name, label );
-		return objectField( ref gui_parm, ref obj, type );
+		return objectField( ref gui_parm, ref obj, type, undo_info, ref undo_value );
 	}
 	public static bool objectField(
-		ref HoudiniGUIParm parm, ref Object obj, System.Type type )
+		ref HoudiniGUIParm parm, ref Object obj, System.Type type, Object undo_info,
+		ref GameObject undo_value )
 	{
 		bool join_last = false; bool no_label_toggle_last = false;
-		return objectField( ref parm, ref obj, type, ref join_last, ref no_label_toggle_last );
+		return objectField( ref parm, ref obj, type, ref join_last,
+			ref no_label_toggle_last, undo_info, ref undo_value );
 	}
 	public static bool objectField(
 		ref HoudiniGUIParm parm, ref Object obj, System.Type type,
-		ref bool join_last, ref bool no_label_toggle_last )
+		ref bool join_last, ref bool no_label_toggle_last, Object undo_info,
+		ref GameObject undo_value )
 	{
 		initializeConstants();
 		disableGUI( parm.disabled );
@@ -897,6 +901,14 @@ public class HoudiniGUI : Editor
 		if ( new_obj != old_obj )
 		{
 			obj = new_obj;
+
+			// record undo info
+			if ( undo_info != null )
+			{
+				Undo.RecordObject( undo_info, parm.label );
+				undo_value = (GameObject) new_obj;
+			}
+
 			changed |= true;
 		}
 		

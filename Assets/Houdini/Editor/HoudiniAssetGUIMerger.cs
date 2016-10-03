@@ -48,7 +48,10 @@ public class HoudiniAssetGUIMerger : HoudiniAssetGUI
 			bool changed = false;
 
 			Object input_object = myAssetMerger.prInputObject as Object;
-			HoudiniGUI.objectField( "input_object", "Input Object", ref input_object, typeof( GameObject ) );
+			GameObject temp_obj = null;
+			HoudiniGUI.objectField(
+				"input_object", "Input Object", ref input_object,
+				typeof( GameObject ), null, ref temp_obj );
 			myAssetMerger.prInputObject = input_object as GameObject;
 
 			bool input_layer_enable = myAssetMerger.prUseLayerMask;

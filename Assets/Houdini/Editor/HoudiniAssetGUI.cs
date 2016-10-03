@@ -96,7 +96,7 @@ public class HoudiniAssetGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
 
-			if ( HoudiniHost.isNodeValid( myAsset.prAssetId, myAsset.prNodeInfo.uniqueHoudiniNodeId ) &&
+			/*if ( HoudiniHost.isNodeValid( myAsset.prAssetId, myAsset.prNodeInfo.uniqueHoudiniNodeId ) &&
 				( myAsset.prTransformInputCount > 0 || myAsset.prGeoInputCount > 0 ) &&
 				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
 			{
@@ -172,6 +172,7 @@ public class HoudiniAssetGUI : Editor
 					} // for
 				} // if
 			} // if
+			*/
 
 			// Draw Cook Log Pane
 			myAsset.prShowCookLog = HoudiniGUI.foldout( "Asset Cook Log", myAsset.prShowCookLog, true );
@@ -192,6 +193,7 @@ public class HoudiniAssetGUI : Editor
 	
 	protected bool setTransformInput( int index )
 	{
+		/*
 		if ( myAsset.prUpStreamTransformObjects == null || myAsset.prUpStreamTransformObjects.Count <= 0 )
 			return false;
 
@@ -224,6 +226,8 @@ public class HoudiniAssetGUI : Editor
 		}
 		
 		return changed;
+		*/
+		return false;
 	}
 
 	protected void drawLicenseLogo()

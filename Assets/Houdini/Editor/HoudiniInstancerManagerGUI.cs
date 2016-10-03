@@ -126,8 +126,9 @@ public partial class HoudiniInstancerManagerGUI: Editor
 							if ( jj == 0 )
 								label = instanced_name;
 
+							GameObject temp_obj = null;
 							changed |= HoudiniGUI.objectField(
-								"object_to_instantiate", label, ref obj, typeof( GameObject ) );
+								"object_to_instantiate", label, ref obj, typeof( GameObject ), null, ref temp_obj );
 
 							if ( changed )
 							{

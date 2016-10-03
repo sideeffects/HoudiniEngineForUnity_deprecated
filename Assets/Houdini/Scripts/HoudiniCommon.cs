@@ -1076,6 +1076,17 @@ public struct HAPI_ParmInfoStrings
 	public string help;
 }
 
+// Used for input parameters.
+[ Serializable ]
+public struct HAPI_ParmInput
+{
+	public bool isAsset;
+	public GameObject inputObject;
+	public GameObject newInputObject;
+	public HAPI_NodeId inputNodeId;
+	public int inputNodeUniqueId;
+}
+
 [ Serializable ]
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_ParmChoiceInfo

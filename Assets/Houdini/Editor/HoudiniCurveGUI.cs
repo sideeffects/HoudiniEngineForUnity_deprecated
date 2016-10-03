@@ -109,7 +109,8 @@ public class HoudiniCurveGUI : Editor
 		GUI.enabled = is_editable;
 
 		Object target = (Object) myTarget;
-		if ( HoudiniGUI.objectField( "target", "Target", ref target, typeof( GameObject ) ) )
+		GameObject temp_obj = null;
+		if ( HoudiniGUI.objectField( "target", "Target", ref target, typeof( GameObject ), null, ref temp_obj ) )
 			myTarget = (GameObject) target;
 
 		GUI.enabled = gui_enable;

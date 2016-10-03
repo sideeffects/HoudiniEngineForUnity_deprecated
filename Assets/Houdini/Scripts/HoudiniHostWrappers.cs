@@ -440,6 +440,9 @@ public static partial class HoudiniHost
 		if ( !isInstallationOk() )
 			return false;
 
+		if ( node_id < 0 )
+			return false;
+
 		bool answer = true;
 
 		// No need to process return code because this function is guaranteed to 

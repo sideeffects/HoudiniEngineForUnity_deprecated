@@ -274,6 +274,10 @@ public class HoudiniParmsGUI : Editor
 							new_string_value, parm.id, i );
 					}
 				}
+			}
+			else if ( parm.isNode() )
+			{
+				// TODO
 			} // By type of parm.
 		} // For all parms.
 	}
@@ -286,16 +290,16 @@ public class HoudiniParmsGUI : Editor
 		if ( myParms.prParms[ index ].invisible )
 			return false;
 
-		bool changed 				= false;
+		bool changed = false;
 		
 		HAPI_ParmInfo[] parms = myParms.prParms;
 		HAPI_ParmInfo parm = parms[ index ];
 		HAPI_ParmInfoStrings parm_strings = myParms.prParmInfoStrings[ index ];
 
-		int[] parm_int_values		= myParms.prParmIntValues;
-		float[] parm_float_values	= myParms.prParmFloatValues;
+		int[] parm_int_values = myParms.prParmIntValues;
+		float[] parm_float_values = myParms.prParmFloatValues;
 
-		HoudiniGUIParm gui_parm 	= new HoudiniGUIParm( parm, parm_strings );
+		HoudiniGUIParm gui_parm = new HoudiniGUIParm( parm, parm_strings );
 
 		///////////////////////////////////////////////////////////////////////
 		// Integer Parameter
@@ -451,7 +455,6 @@ public class HoudiniParmsGUI : Editor
 		else if ( parm.isNode() )
 		{
 			bool gui_enable = GUI.enabled;
-			GUI.enabled = false; // This is not yet supported.
 
 			// Asset ID might still be invalid here so don't fail if it is.
 			// It is invalid if the asset didn't cook yet after a scene load.
@@ -463,12 +466,18 @@ public class HoudiniParmsGUI : Editor
 			}
 			catch {}
 
-			UnityEngine.Object temp_object = null;
-			HoudiniGUI.objectField(
+			HAPI_ParmInput parm_input = myParms.prParmInputs[ parm.id ];
+			UnityEngine.Object temp_object = parm_input.inputObject;
+			GameObject undo_object = null;
+			changed = HoudiniGUI.objectField(
 				ref gui_parm, ref temp_object, typeof( GameObject ),
-				ref join_last, ref no_label_toggle_last );
+				ref join_last, ref no_label_toggle_last, null, ref undo_object );
 
-			GUI.enabled = gui_enable;
+			if ( changed )
+			{
+				parm_input.newInputObject = (GameObject) temp_object;
+				myParms.prParmInputs[ index ] = parm_input;
+			}
 		}
 		///////////////////////////////////////////////////////////////////////
 		// Toggle Parameter
