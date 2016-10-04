@@ -454,8 +454,6 @@ public class HoudiniParmsGUI : Editor
 		// Node Path Field
 		else if ( parm.isNode() )
 		{
-			bool gui_enable = GUI.enabled;
-
 			// Asset ID might still be invalid here so don't fail if it is.
 			// It is invalid if the asset didn't cook yet after a scene load.
 			try

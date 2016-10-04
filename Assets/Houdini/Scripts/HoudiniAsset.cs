@@ -31,7 +31,7 @@ using System.Reflection;
 using System.IO;
 
 [ ExecuteInEditMode ]
-public abstract class HoudiniAsset : HoudiniControl
+public abstract class HoudiniAsset : HoudiniObjectControl
 {
 	public enum AssetType
 	{
@@ -959,7 +959,7 @@ public abstract class HoudiniAsset : HoudiniControl
 
 					prAssetInfo = HoudiniHost.getAssetInfo( asset_id );
 					prNodeInfo = HoudiniHost.getNodeInfo( asset_id );
-					
+
 					if ( reload_asset )
 						Debug.Log( 
 							"Houdini Engine: Asset Loaded - ID: " + prAssetInfo.id + "\n" +

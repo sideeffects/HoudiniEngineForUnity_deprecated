@@ -25,11 +25,12 @@ public class HoudiniObjectControl : HoudiniControl
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Control.reset().
 
-	public int		prObjectId {		get { return myObjectId; }			set { myObjectId = value; } }
-	public string	prObjectName {		get { return myObjectName; }		set { myObjectName = value; } }
-	public bool		prObjectVisible {	get { return myObjectVisible; }		set { myObjectVisible = value; } }
+	public int		prObjectId {			get { return myObjectId; }		set { myObjectId = value; } }
+	public string	prObjectName {			get { return myObjectName; }	set { myObjectName = value; } }
+	public bool		prObjectVisible {		get { return myObjectVisible; }	set { myObjectVisible = value; } }
+	public HAPI_ObjectInfo prObjectInfo {	get { return myObjectInfo; }	set { myObjectInfo = value; } }
 
-	public List< GameObject > prGeos {	get { return myGeos; }				set { myGeos = value; } }
+	public List< GameObject > prGeos {		get { return myGeos; }			set { myGeos = value; } }
 
 	public HoudiniObjectControl() 
 	{
@@ -47,9 +48,11 @@ public class HoudiniObjectControl : HoudiniControl
 
 		// Please keep these in the same order and grouping as their declarations at the top.
 		
-		myObjectId		= -1;
-		myObjectName	= "object_name";
-		myObjectVisible	= false;
+		myObjectId = -1;
+		myObjectName = "object_name";
+		myObjectVisible = false;
+		myObjectInfo = new HAPI_ObjectInfo();
+		myObjectInfo.id = -1;
 
 		myGeos = new List< GameObject >( 0 );
 	}
@@ -279,6 +282,7 @@ public class HoudiniObjectControl : HoudiniControl
 	[SerializeField] private int		myObjectId;
 	[SerializeField] private string		myObjectName;
 	[SerializeField] private bool		myObjectVisible;
+	[SerializeField] private HAPI_ObjectInfo myObjectInfo;
 
 	[SerializeField] private List< GameObject > myGeos;
 	

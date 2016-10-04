@@ -257,6 +257,30 @@ public class HoudiniAssetOTL : HoudiniAsset
 			}
 		}
 
+		if ( prObjectCount <= 0 )
+		{
+			bool needs_init = prObjectInfo.id < 0;
+
+			if ( prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
+				prObjectInfo = HoudiniHost.getObjectInfo( prAssetId );
+			else if ( prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_SOP )
+				prObjectInfo = HoudiniHost.getObjectInfo( prNodeInfo.parentId );
+			else
+			{
+				Debug.LogError( "Unsupported asset type!" );
+				return needs_recook;
+			}
+
+			if ( needs_init )
+			{
+				init(
+					prAssetId, prObjectInfo.nodeId, prAsset,
+					prObjectInfo.nodeId, prObjectInfo.name, prObjectInfo.isVisible );
+			}
+
+			needs_recook = refresh( reload_asset, prObjectInfo );
+		}
+
 		// Enumerate edit and paint geos.
 		HoudiniGeoControl[] geo_controls = gameObject.GetComponentsInChildren< HoudiniGeoControl >();
 		prEditPaintGeos.Clear();
