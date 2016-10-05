@@ -478,7 +478,6 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 	public bool setNodeParameterIntoHost( int id )
 	{
 		HAPI_ParmInfo parm = findParm( id );
-		bool need_rebuild_after_reconnect = false;
 
 		var parm_input = myParmInputs[ id ];
 		if ( !parm_input.inputObject )
@@ -493,13 +492,14 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 			houdini_control.prAsset.gameObject.GetComponentInChildren< HoudiniGeoControl >() )
 		{
 			if ( !houdini_control.prAsset.isAssetValid() )
-			{
 				houdini_control.prAsset.buildAll();
-				need_rebuild_after_reconnect = true;
-			}
+
 			HoudiniGeoControl geo_control =
 				houdini_control.prAsset.gameObject.GetComponentInChildren< HoudiniGeoControl >();
 			parm_input.inputNodeId = geo_control.prNodeId;
+
+			// Add ourselves to our input asset's downstream nodes so when it cooks we cook.
+			houdini_control.prAsset.addDownstreamAsset( myControl.prAsset );
 		}
 		else if ( mesh_filter && mesh_filter.sharedMesh )
 		{
@@ -513,11 +513,9 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 				HoudiniAssetUtility.getHapiTransform( input_object.transform.localToWorldMatrix );
 			HAPI_NodeInfo input_node_info = HoudiniHost.getNodeInfo( parm_input.inputNodeId );
 			HoudiniHost.setObjectTransform( input_node_info.parentId, ref trans );
-
-			need_rebuild_after_reconnect = true;
 		}
 		else
-			return need_rebuild_after_reconnect;
+			return false;
 
 		HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo( parm_input.inputNodeId );
 		parm_input.inputNodeUniqueId = node_info.uniqueHoudiniNodeId;
@@ -527,7 +525,7 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 
 		myParmInputs[ id ] = parm_input;
 
-		return need_rebuild_after_reconnect;
+		return true;
 	}
 
 	public void setChangedNodeParameterIntoHost( int id )
@@ -541,12 +539,16 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 		if ( myParmInputs[ id ].inputObject )
 		{
 			HoudiniHost.setParmNodeValue( prControl.prNodeId, parm.name, -1 );
-			if ( !myParmInputs[ id ].inputObject.GetComponent< HoudiniControl >() )
+			if ( myParmInputs[ id ].inputObject.GetComponent< HoudiniControl >() )
 			{
-				if ( HoudiniHost.isNodeValid(
+				var houdini_control = myParmInputs[ id ].inputObject.GetComponent< HoudiniControl >();
+				houdini_control.prAsset.removeDownstreamAsset( myControl.prAsset );
+			}
+			else if ( HoudiniHost.isNodeValid(
 						myParmInputs[ id ].inputNodeId,
 						myParmInputs[ id ].inputNodeUniqueId ) )
-					HoudiniHost.deleteNode( myParmInputs[ id ].inputNodeId );
+			{
+				HoudiniHost.deleteNode( myParmInputs[ id ].inputNodeId );
 			}
 
 			myParmInputs[ id ].inputObject = null;
