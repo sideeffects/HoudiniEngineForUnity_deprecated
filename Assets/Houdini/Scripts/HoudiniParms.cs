@@ -475,6 +475,90 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 		prLastChangedParmId = HoudiniConstants.HAPI_INVALID_PARM_ID;
 	}
 
+	public bool setNodeParameterIntoHost( int id )
+	{
+		HAPI_ParmInfo parm = findParm( id );
+		bool need_rebuild_after_reconnect = false;
+
+		var parm_input = myParmInputs[ id ];
+		if ( !parm_input.inputObject )
+			return false;
+
+		// Create new input node.
+		GameObject input_object = parm_input.inputObject;
+		HoudiniControl houdini_control = input_object.GetComponent< HoudiniControl >();
+		MeshFilter mesh_filter = input_object.GetComponent< MeshFilter >();
+
+		if ( houdini_control &&
+			houdini_control.prAsset.gameObject.GetComponentInChildren< HoudiniGeoControl >() )
+		{
+			if ( !houdini_control.prAsset.isAssetValid() )
+			{
+				houdini_control.prAsset.buildAll();
+				need_rebuild_after_reconnect = true;
+			}
+			HoudiniGeoControl geo_control =
+				houdini_control.prAsset.gameObject.GetComponentInChildren< HoudiniGeoControl >();
+			parm_input.inputNodeId = geo_control.prNodeId;
+		}
+		else if ( mesh_filter && mesh_filter.sharedMesh )
+		{
+			parm_input.inputNodeId = HoudiniHost.createInputNode( input_object.name );
+			Mesh mesh = mesh_filter.sharedMesh;
+			HoudiniAssetUtility.setMesh(
+				parm_input.inputNodeId, 0, parm_input.inputNodeId, ref mesh, null, null );
+
+			// Set the asset transform from the source GameObject transform.
+			HAPI_TransformEuler trans =
+				HoudiniAssetUtility.getHapiTransform( input_object.transform.localToWorldMatrix );
+			HAPI_NodeInfo input_node_info = HoudiniHost.getNodeInfo( parm_input.inputNodeId );
+			HoudiniHost.setObjectTransform( input_node_info.parentId, ref trans );
+
+			need_rebuild_after_reconnect = true;
+		}
+		else
+			return need_rebuild_after_reconnect;
+
+		HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo( parm_input.inputNodeId );
+		parm_input.inputNodeUniqueId = node_info.uniqueHoudiniNodeId;
+
+		// Assign node parm input.
+		HoudiniHost.setParmNodeValue( prControl.prNodeId, parm.name, parm_input.inputNodeId );
+
+		myParmInputs[ id ] = parm_input;
+
+		return need_rebuild_after_reconnect;
+	}
+
+	public void setChangedNodeParameterIntoHost( int id )
+	{
+		HAPI_ParmInfo parm = findParm( id );
+
+		if ( id >= myParmInputs.Length )
+			Array.Resize( ref myParmInputs, id + 1 );
+
+		// Take care of old input node.
+		if ( myParmInputs[ id ].inputObject )
+		{
+			HoudiniHost.setParmNodeValue( prControl.prNodeId, parm.name, -1 );
+			if ( !myParmInputs[ id ].inputObject.GetComponent< HoudiniControl >() )
+			{
+				if ( HoudiniHost.isNodeValid(
+						myParmInputs[ id ].inputNodeId,
+						myParmInputs[ id ].inputNodeUniqueId ) )
+					HoudiniHost.deleteNode( myParmInputs[ id ].inputNodeId );
+			}
+
+			myParmInputs[ id ].inputObject = null;
+		}
+		
+		if ( !myParmInputs[ id ].newInputObject )
+			return;
+
+		myParmInputs[ id ].inputObject = myParmInputs[ id ].newInputObject;
+		setNodeParameterIntoHost( id );
+	}
+
 	public void setChangedParameterIntoHost( int id )
 	{
 		if ( prControl == null )
@@ -501,62 +585,7 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 		}
 		else if ( parm.isNode() )
 		{
-			if ( id >= myParmInputs.Length )
-				Array.Resize( ref myParmInputs, id + 1 );
-
-			var parm_input = myParmInputs[ id ];
-
-			// Take care of old input node.
-			if ( parm_input.inputObject )
-			{
-				HoudiniHost.setParmNodeValue( prControl.prNodeId, parm.name, -1 );
-				if ( !parm_input.inputObject.GetComponent< HoudiniControl >() )
-				{
-					if ( HoudiniHost.isNodeValid(
-							parm_input.inputNodeId,
-							parm_input.inputNodeUniqueId ) )
-						HoudiniHost.deleteNode( parm_input.inputNodeId );
-				}
-
-				parm_input.inputObject = null;
-				myParmInputs[ id ] = parm_input;
-			}
-
-			if ( !parm_input.newInputObject )
-				return;
-
-			// Create new input node.
-			GameObject input_object = parm_input.newInputObject;
-			HoudiniControl houdini_control = input_object.GetComponent< HoudiniControl >();
-			MeshFilter mesh_filter = input_object.GetComponent< MeshFilter >();
-
-			if ( houdini_control )
-				parm_input.inputNodeId = houdini_control.prNodeId;
-			else if ( mesh_filter && mesh_filter.sharedMesh )
-			{
-				parm_input.inputNodeId = HoudiniHost.createInputNode( input_object.name );
-				Mesh mesh = mesh_filter.sharedMesh;
-				HoudiniAssetUtility.setMesh(
-					parm_input.inputNodeId, 0, parm_input.inputNodeId, ref mesh, null, null );
-
-				// Set the asset transform from the source GameObject transform.
-				HAPI_TransformEuler trans =
-					HoudiniAssetUtility.getHapiTransform( input_object.transform.localToWorldMatrix );
-				HAPI_NodeInfo input_node_info = HoudiniHost.getNodeInfo( parm_input.inputNodeId );
-				HoudiniHost.setObjectTransform( input_node_info.parentId, ref trans );
-			}
-			else
-				return;
-
-			HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo( parm_input.inputNodeId );
-			parm_input.inputNodeUniqueId = node_info.uniqueHoudiniNodeId;
-
-			// Assign node parm input.
-			HoudiniHost.setParmNodeValue( prControl.prNodeId, parm.name, parm_input.inputNodeId );
-			parm_input.inputObject = parm_input.newInputObject;
-			parm_input.newInputObject = null;
-
-			myParmInputs[ id ] = parm_input;
+			setChangedNodeParameterIntoHost( id );
 		}
 		else if ( parm.isFloat() )
 		{

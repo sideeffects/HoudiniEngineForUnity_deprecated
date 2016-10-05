@@ -114,7 +114,8 @@ public class HoudiniObjectControl : HoudiniControl
 		if ( reload_asset )
 		{
 			for ( int i = 0; i < myGeos.Count; ++i )
-				HoudiniAssetUtility.destroyGameObject( myGeos[ i ] );
+				if ( myGeos[ i ] )
+					HoudiniAssetUtility.destroyGameObject( myGeos[ i ] );
 			myGeos.Clear();
 		}
 

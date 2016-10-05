@@ -259,7 +259,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 		if ( prObjectCount <= 0 )
 		{
-			bool needs_init = prObjectInfo.id < 0;
+			bool needs_init = prObjectInfo.id < 0 || reload_asset;
 
 			if ( prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
 				prObjectInfo = HoudiniHost.getObjectInfo( prAssetId );

@@ -1774,6 +1774,30 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		bool is_duplication,
 		bool use_delay_for_progress_bar )
 	{
+		if ( !force_reconnect )
+			return;
+
+		bool need_rebuild_after_reconnect = false;
+		foreach ( var parm in prParms.prParms )
+		{
+			if ( !parm.isNode() )
+				continue;
+
+			need_rebuild_after_reconnect |= prParms.setNodeParameterIntoHost( parm.id );
+		}
+
+		// Need to rebuild because now we're connected to other assets.
+		if ( need_rebuild_after_reconnect )
+			build(
+				false, // reload_asset
+				false, // unload_asset_first
+				false, // serialization_recovery_only
+				false, // force_reconnect
+				false, // is_duplication
+				true,  // cook_downstream_assets
+				use_delay_for_progress_bar );
+
+		/*
 		bool need_rebuild_after_reconnect = false;
 		
 		if ( !serialization_recovery_only )
@@ -1899,6 +1923,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 						true,  // cook_downstream_assets
 						use_delay_for_progress_bar );
 		}
+		*/
 	}
 	
 	// PROGRESS BAR -------------------------------------------------------------------------------------------------
