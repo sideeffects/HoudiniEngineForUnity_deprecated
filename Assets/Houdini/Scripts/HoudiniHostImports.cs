@@ -1012,6 +1012,12 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_RenderCOPToImage(
+		ref HAPI_Session session,
+		HAPI_NodeId cop_node_id );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_RenderTextureToImage(
 		ref HAPI_Session session,
 		HAPI_NodeId material_node_id,
