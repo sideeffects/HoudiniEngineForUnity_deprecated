@@ -2042,6 +2042,19 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static void getHeightFieldData(
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		[Out] float[] values, int start, int length )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_Result status_code = HAPI_GetHeightFieldData(
+			ref mySession, node_id, part_id, values, start, length );
+		processStatusCode( status_code );
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	// CURVES ---------------------------------------------------------------------------------------------------
 
 	public static HAPI_CurveInfo getCurveInfo( HAPI_NodeId node_id, HAPI_PartId part_id )

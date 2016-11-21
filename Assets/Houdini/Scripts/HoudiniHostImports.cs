@@ -1175,6 +1175,14 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetHeightFieldData(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id, HAPI_PartId part_id,
+		[Out] float[] values_array,
+		int start, int length );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_SetVolumeInfo(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,
