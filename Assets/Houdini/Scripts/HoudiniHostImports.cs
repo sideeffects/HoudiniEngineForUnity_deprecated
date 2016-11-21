@@ -463,6 +463,24 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
+	HAPI_GetParmTagName(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		HAPI_ParmId parm_id,
+		int tag_index,
+		out HAPI_StringHandle tag_name );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
+	HAPI_GetParmTagValue(
+		ref HAPI_Session session,
+		HAPI_NodeId node_id,
+		HAPI_ParmId parm_id,
+		string tag_name,
+		out HAPI_StringHandle tag_value );
+
+	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
+	private static extern HAPI_Result
 	HAPI_GetParmIntValue(
 		ref HAPI_Session session,
 		HAPI_NodeId node_id,

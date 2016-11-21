@@ -678,6 +678,34 @@ public static partial class HoudiniHost
 #endif
 	}
 
+	public static string getParmTagName( HAPI_NodeId node_id, HAPI_ParmId parm_id, int tag_index )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_StringHandle tag_name_sh = -1;
+		HAPI_Result status_code = HAPI_GetParmTagName( ref mySession, node_id, parm_id, tag_index, out tag_name_sh );
+		processStatusCode( status_code );
+
+		string tag_name = getString( tag_name_sh );
+		return tag_name;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
+	public static string getParmTagValue( HAPI_NodeId node_id, HAPI_ParmId parm_id, string tag_name )
+	{
+#if ( HAPI_ENABLE_RUNTIME )
+		HAPI_StringHandle tag_value_sh = -1;
+		HAPI_Result status_code = HAPI_GetParmTagValue( ref mySession, node_id, parm_id, tag_name, out tag_value_sh );
+		processStatusCode( status_code );
+
+		string tag_value = getString( tag_value_sh );
+		return tag_value;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+	}
+
 	public static int getParmIntValue(
 		HAPI_NodeId node_id, string parm_name, int index )
 	{
