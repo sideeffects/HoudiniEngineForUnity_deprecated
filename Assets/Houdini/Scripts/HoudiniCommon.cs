@@ -955,6 +955,8 @@ public struct HAPI_ParmInfo
 
 	public HAPI_Permissions permissions;
 
+	public int tagCount;
+
 	public int size; // Tuple Size
 
 	HAPI_ChoiceListType choiceListType;
