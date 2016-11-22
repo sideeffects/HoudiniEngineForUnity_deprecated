@@ -777,7 +777,12 @@ public class HoudiniAssetUtility
 
 		int parm_id = findParm( ref parms, parm_name );
 		if ( parm_id < 0 )
-			return default_value;
+		{
+			// Try to find the tag instead.
+			parm_id = HoudiniHost.getParmWithTag( node_id, parm_name );
+			if ( parm_id < 0 )
+				return default_value;
+		}
 
 		int values_index = parms[ parm_id ].floatValuesIndex;
 		float[] value = new float[ 1 ];
@@ -797,7 +802,12 @@ public class HoudiniAssetUtility
 
 		int parm_id = findParm( ref parms, parm_name );
 		if ( parm_id < 0 )
-			return default_value;
+		{
+			// Try to find the tag instead.
+			parm_id = HoudiniHost.getParmWithTag( node_id, parm_name );
+			if ( parm_id < 0 )
+				return default_value;
+		}
 
 		if ( parms[ parm_id ].size < 3 )
 			Debug.LogError( "Parm size not large enough to be a color3." );
@@ -820,7 +830,12 @@ public class HoudiniAssetUtility
 
 		int parm_id = findParm( ref parms, parm_name );
 		if ( parm_id < 0 )
-			return default_value;
+		{
+			// Try to find the tag instead.
+			parm_id = HoudiniHost.getParmWithTag( node_id, parm_name );
+			if ( parm_id < 0 )
+				return default_value;
+		}
 
 		if ( parms[ parm_id ].size < 4 )
 			Debug.LogError( "Parm size not large enough to be a color4." );

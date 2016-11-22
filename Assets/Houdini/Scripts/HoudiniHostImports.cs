@@ -1032,21 +1032,6 @@ public static partial class HoudiniHost
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
 	private static extern HAPI_Result
-	HAPI_GetMaterialOnPart(
-		ref HAPI_Session session,
-		HAPI_NodeId geometry_node_id, HAPI_PartId part_id,
-		out HAPI_MaterialInfo material_info );
-
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
-	HAPI_GetMaterialOnGroup(
-		ref HAPI_Session session,
-		HAPI_NodeId geometry_node_id,
-		string group_name,
-		out HAPI_MaterialInfo material_info );
-
-	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
-	private static extern HAPI_Result
 	HAPI_RenderCOPToImage(
 		ref HAPI_Session session,
 		HAPI_NodeId cop_node_id );

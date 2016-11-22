@@ -1832,27 +1832,17 @@ public static partial class HoudiniHost
 		HAPI_NodeId geometry_node_id, HAPI_PartId part_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
-#if true
-		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		HAPI_Result status_code = HAPI_GetMaterialOnPart(
-			ref mySession, geometry_node_id, part_id, out material_info );
-		processStatusCode( status_code );
-#else
-		HAPI_PartInfo part_info = new HAPI_PartInfo();
-		HAPI_Result status_code = HAPI_GetPartInfo(
-			ref mySession, geometry_node_id, part_id, out part_info );
-		processStatusCode( status_code );
-
 		bool are_all_the_same = false;
-		int[] material_ids = new int[ 1 ];
-		status_code = HAPI_GetMaterialNodeIdsOnFaces(
+		HAPI_NodeId[] material_ids = new HAPI_NodeId[ 1 ];
+		HAPI_Result status_code = HAPI_GetMaterialNodeIdsOnFaces(
 			ref mySession, geometry_node_id, part_id, ref are_all_the_same, material_ids, 0, 1 );
 		processStatusCode( status_code );
 
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		status_code = HAPI_GetMaterialInfo( ref mySession, material_ids[ 0 ], out material_info );
+		status_code = HAPI_GetMaterialInfo(
+			ref mySession, material_ids[ 0 ], out material_info );
 		processStatusCode( status_code );
-#endif
+
 		return material_info;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
@@ -1863,9 +1853,11 @@ public static partial class HoudiniHost
 	{
 #if ( HAPI_ENABLE_RUNTIME )
 		HAPI_MaterialInfo material_info = new HAPI_MaterialInfo();
-		HAPI_Result status_code = HAPI_GetMaterialOnGroup(
-			ref mySession, geometry_node_id, group_name, out material_info );
-		processStatusCode( status_code );
+
+		// This method is no longer supported.
+		// TODO: Sweep!
+		material_info.exists = false;
+
 		return material_info;
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
