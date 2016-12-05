@@ -750,15 +750,6 @@ public struct HAPI_AssetInfo
 	public HAPI_AssetType		type;
 	public HAPI_AssetSubType	subType;
 
-	// This id is primarily used to check whether the asset still exists
-	// within the Houdini scene running inside the runtime. The asset id
-	// alone is not enough as asset ids are re-used between sessions.
-	// We use this id to determine whether we need to re-instatiate an asset
-	// we have on the client side so that Houdini also knows about it -
-	// which is different from the case where a new asset is being loaded
-	// for the first time.
-	public int validationId;
-
 	// Use the node id to get the asset's parameters.
 	public HAPI_NodeId nodeId;
 
@@ -873,7 +864,6 @@ public struct HAPI_NodeInfo
 {
 	public HAPI_NodeId id;
 	public HAPI_NodeId parentId;
-	public HAPI_NodeId assetId;
 	public HAPI_StringHandle nameSH;
 	public HAPI_NodeType type;
 
@@ -1315,7 +1305,6 @@ public struct HAPI_AttributeInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_MaterialInfo
 {
-	public HAPI_NodeId assetId;
 	public HAPI_NodeId nodeId;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]
