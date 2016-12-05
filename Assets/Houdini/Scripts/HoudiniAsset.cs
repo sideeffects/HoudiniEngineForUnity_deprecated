@@ -65,10 +65,6 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 																	set { myAssetHelp = value; } }
 	public AssetType				prAssetType {					get { return myAssetType; }
 																	set { myAssetType = value; } }
-	public HAPI_AssetType			prHAPIAssetType {				get { return myHAPIAssetType; }
-																	set { myHAPIAssetType = value; } }
-	public HAPI_AssetSubType		prAssetSubType {				get { return myAssetSubType; }
-																	set { myAssetSubType = value; } }
 
 	public HoudiniAssetUndoInfo prAssetUndoInfo 
 	{
@@ -538,8 +534,6 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		prAssetOpName					= "ASSET_OP_NAME";
 		prAssetHelp						= "ASSET_HELP";
 		prAssetType						= AssetType.TYPE_INVALID;
-		prHAPIAssetType 				= HAPI_AssetType.HAPI_ASSETTYPE_INVALID;
-		prAssetSubType 					= 0;
 
 		// Parameters -----------------------------------------------------------------------------------------------
 
@@ -785,7 +779,6 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 			prAssetName					= prAssetInfo.name;
 			prAssetOpName				= prAssetInfo.fullOpName;
 			prAssetHelp					= prAssetInfo.helpText;
-			prHAPIAssetType				= prAssetInfo.type;
 
 			// Try to load presets.
 			if ( ( reload_asset && unload_asset_first )
@@ -1553,8 +1546,6 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 	[SerializeField] private string					myAssetOpName;
 	[SerializeField] private string					myAssetHelp;
 	[SerializeField] private AssetType				myAssetType;
-	[SerializeField] private HAPI_AssetType			myHAPIAssetType;
-	[SerializeField] private HAPI_AssetSubType		myAssetSubType;
 
 	// Inputs -------------------------------------------------------------------------------------------------------
 

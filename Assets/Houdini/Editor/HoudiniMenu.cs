@@ -194,9 +194,7 @@ public class HoudiniMenu : MonoBehaviour
 
 		// Add HAPI Object Control script component.
 		HoudiniAssetMerger asset = game_object.AddComponent< HoudiniAssetMerger >();
-		
-		asset.prAssetSubType = HAPI_AssetSubType.HAPI_ASSETSUBTYPE_DEFAULT;
-		
+
 		// Do a test build to see if things are ok.
 		bool build_result = asset.buildClientSide();
 		if ( !build_result ) // Something is not right. Clean up and die.
@@ -235,9 +233,7 @@ public class HoudiniMenu : MonoBehaviour
 		
 		// Add HAPI Object Control script component.
 		HoudiniAssetCurve asset = game_object.AddComponent< HoudiniAssetCurve >();
-		
-		asset.prAssetSubType = HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE;
-		
+
 		// Do first build.
 		bool build_result = asset.buildAll();
 		if ( !build_result ) // Something is not right. Clean up and die.

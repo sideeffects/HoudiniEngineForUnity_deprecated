@@ -369,36 +369,6 @@ public enum HAPI_NodeFlags
 	HAPI_NODEFLAGS_SOP_CURVE	= 1 << 11
 };
 
-public enum HAPI_AssetType
-{
-	HAPI_ASSETTYPE_INVALID = -1,
-	HAPI_ASSETTYPE_OBJ = 0,
-	HAPI_ASSETTYPE_SOP,
-	HAPI_ASSETTYPE_POPNET,
-	HAPI_ASSETTYPE_POP,
-	HAPI_ASSETTYPE_CHOPNET,
-	HAPI_ASSETTYPE_CHOP,
-	HAPI_ASSETTYPE_ROP,
-	HAPI_ASSETTYPE_SHOP,
-	HAPI_ASSETTYPE_COP2,
-	HAPI_ASSETTYPE_COPNET,
-	HAPI_ASSETTYPE_VOP,
-	HAPI_ASSETTYPE_VOPNET,
-	HAPI_ASSETTYPE_DOP,
-	HAPI_ASSETTYPE_MGR,
-	HAPI_ASSETTYPE_DIR,
-	HAPI_ASSETTYPE_MAX
-}
-	
-public enum HAPI_AssetSubType
-{
-	HAPI_ASSETSUBTYPE_INVALID = -1,
-	HAPI_ASSETSUBTYPE_DEFAULT,
-	HAPI_ASSETSUBTYPE_CURVE,
-	HAPI_ASSETSUBTYPE_INPUT,
-	HAPI_ASSETSUBTYPE_MAX
-}
-
 public enum HAPI_GroupType
 {
 	HAPI_GROUPTYPE_INVALID = -1,
@@ -747,9 +717,6 @@ public struct HAPI_TimelineOptions
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_AssetInfo 
 {
-	public HAPI_AssetType		type;
-	public HAPI_AssetSubType	subType;
-
 	// Use the node id to get the asset's parameters.
 	public HAPI_NodeId nodeId;
 
@@ -1206,14 +1173,6 @@ public struct HAPI_GeoInfo
 	// Accessors
 	public string name
 	{ get { return HoudiniHost.getString( nameSH ); } private set {} }
-}
-	
-[ StructLayout( LayoutKind.Sequential ) ]
-public struct HAPI_GeoInputInfo
-{
-	public HAPI_NodeId objectId;
-	public HAPI_NodeId geoId;
-	public HAPI_NodeId objectNodeId;
 }
 
 [ StructLayout( LayoutKind.Sequential ) ]
