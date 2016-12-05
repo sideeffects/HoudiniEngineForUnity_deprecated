@@ -983,10 +983,10 @@ public class HoudiniAssetUtility
 			}
 
 			// TODO: Temporary hack until we switch to centralized material depo.
-			if ( part_control.prMaterialId != material_info.id )
+			if ( part_control.prMaterialId != material_info.nodeId )
 			{
 				material_info.hasChanged = true;
-				part_control.prMaterialId = material_info.id;
+				part_control.prMaterialId = material_info.nodeId;
 			}
 
 			// Check if we actually need to update the material.
@@ -1037,18 +1037,18 @@ public class HoudiniAssetUtility
 			{
 				if ( HoudiniHost.prExtractTexturesInRawFormat )
 				{
-					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.id );
+					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.nodeId );
 
 					image_info.dataFormat = HAPI_ImageDataFormat.HAPI_IMAGE_DATA_INT8;
 					image_info.interleaved = true;
 					image_info.packing = HAPI_ImagePacking.HAPI_IMAGE_PACKING_RGBA;
 					image_info.gamma = (double) HoudiniHost.prGamma;
 
-					HoudiniHost.setImageInfo( material_info.id, ref image_info );
+					HoudiniHost.setImageInfo( material_info.nodeId, ref image_info );
 
 					// Extract image to memory.
 					byte[] image_data = HoudiniHost.extractImageToMemory( 
-						material_info.id, HoudiniConstants.HAPI_RAW_FORMAT_NAME, image_planes );
+						material_info.nodeId, HoudiniConstants.HAPI_RAW_FORMAT_NAME, image_planes );
 
 					int colour_data_size = image_info.xRes * image_info.yRes;
 					
@@ -1075,7 +1075,7 @@ public class HoudiniAssetUtility
 				{
 					// Make sure the image format selected is supported by Unity's in-memory texture loading.
 					string desired_file_format = null;
-					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.id );
+					HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.nodeId );
 					if ( !image_info.isImageFileFormat( HoudiniConstants.HAPI_PNG_FORMAT_NAME ) &&
 						 !image_info.isImageFileFormat( HoudiniConstants.HAPI_JPEG_FORMAT_NAME ) )
 					{
@@ -1083,11 +1083,11 @@ public class HoudiniAssetUtility
 					}
 
 					image_info.gamma = HoudiniHost.prGamma;
-					HoudiniHost.setImageInfo( material_info.id, ref image_info );
+					HoudiniHost.setImageInfo( material_info.nodeId, ref image_info );
 
 					// Extract image to memory.
 					byte[] image_data = HoudiniHost.extractImageToMemory( 
-						material_info.id, desired_file_format, image_planes );
+						material_info.nodeId, desired_file_format, image_planes );
 
 					// Initial size doesn't matter as LoadImage() will change the size and format.
 					Texture2D tex = new Texture2D( 1, 1 );
@@ -1105,7 +1105,7 @@ public class HoudiniAssetUtility
 
 				// Make sure the image format selected is supported by Unity.
 				string desired_file_format = null;
-				HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.id );
+				HAPI_ImageInfo image_info = HoudiniHost.getImageInfo( material_info.nodeId );
 				if ( !image_info.isImageFileFormat( HoudiniConstants.HAPI_PNG_FORMAT_NAME ) &&
 					 !image_info.isImageFileFormat( HoudiniConstants.HAPI_JPEG_FORMAT_NAME ) &&
 					 !image_info.isImageFileFormat( HoudiniConstants.HAPI_BMP_FORMAT_NAME ) &&
@@ -1116,7 +1116,7 @@ public class HoudiniAssetUtility
 
 				// Extract image to file.
 				string texture_file_path = HoudiniHost.extractImageToFile(
-					material_info.id, desired_file_format, image_planes, folder_path );
+					material_info.nodeId, desired_file_format, image_planes, folder_path );
 
 				string relative_file_path = texture_file_path.Replace(
 					Application.dataPath, "Assets" );
@@ -1170,7 +1170,7 @@ public class HoudiniAssetUtility
 			try
 			{
 				HoudiniHost.renderTextureToImage(
-					material_info.id, diffuse_map_parm_id );
+					material_info.nodeId, diffuse_map_parm_id );
 
 				material.mainTexture = extractHoudiniImageToTexture( material_info, folder_path, "C A" );
 			}
@@ -1184,7 +1184,7 @@ public class HoudiniAssetUtility
 			try
 			{
 				HoudiniHost.renderTextureToImage(
-					material_info.id, normal_map_parm_id );
+					material_info.nodeId, normal_map_parm_id );
 
 				material.SetTexture(
 					"_BumpMap", extractHoudiniImageToTexture( material_info, folder_path, "C A", true ) );
@@ -2117,7 +2117,7 @@ public class HoudiniAssetUtility
 		Vector3[] normals 				= mesh.normals;
 		
 		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
-		geo_info.id 					= geo_id;
+		geo_info.nodeId 				= geo_id;
 
 		HAPI_PartInfo part_info			= new HAPI_PartInfo();
 

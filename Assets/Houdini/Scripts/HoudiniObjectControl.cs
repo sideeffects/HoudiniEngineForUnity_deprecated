@@ -52,7 +52,7 @@ public class HoudiniObjectControl : HoudiniControl
 		myObjectName = "object_name";
 		myObjectVisible = false;
 		myObjectInfo = new HAPI_ObjectInfo();
-		myObjectInfo.id = -1;
+		myObjectInfo.nodeId = -1;
 
 		myGeos = new List< GameObject >( 0 );
 	}
@@ -127,7 +127,7 @@ public class HoudiniObjectControl : HoudiniControl
 			
 			// Add new geos as needed.
 			while ( myGeos.Count < object_info.geoCount )
-				myGeos.Add( createGeo( geo_info.id ) );
+				myGeos.Add( createGeo( geo_info.nodeId ) );
 
 			// Remove stale geos.
 			while ( myGeos.Count > object_info.geoCount )

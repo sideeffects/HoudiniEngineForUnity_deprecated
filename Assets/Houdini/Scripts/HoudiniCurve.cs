@@ -440,7 +440,7 @@ public class HoudiniCurve : MonoBehaviour
 		}
 		catch ( HoudiniError error )
 		{
-			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
+			error.addMessagePrefix( "Obj(id: " + object_info.nodeId + ", name: " + object_info.name + ")" );
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;
 		}

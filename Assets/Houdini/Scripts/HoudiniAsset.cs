@@ -732,7 +732,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 
 					if ( reload_asset )
 						Debug.Log( 
-							"Houdini Engine: Asset Loaded - ID: " + prAssetInfo.id + "\n" +
+							"Houdini Engine: Asset Loaded - ID: " + prAssetInfo.nodeId + "\n" +
 							"    Full Name: " + prAssetInfo.fullOpName + "\n" +
 							"    Version: " + prAssetInfo.version + "\n" + 
 							"    Unique Node Id: " + prNodeInfo.uniqueHoudiniNodeId + "\n" +
@@ -775,7 +775,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 			// For convenience we copy some asset info properties locally (since they are constant anyway).
 			// More imporantly, structs are not serialized and therefore putting them into their own
 			// variables is required in order to maintain state between serialization cycles.
-			prAssetId 					= prAssetInfo.id;
+			prAssetId 					= prAssetInfo.nodeId;
 			prAssetValidationId			= prNodeInfo.uniqueHoudiniNodeId;
 			prNodeId					= prAssetInfo.nodeId;
 			prObjectNodeId				= prAssetInfo.objectNodeId;

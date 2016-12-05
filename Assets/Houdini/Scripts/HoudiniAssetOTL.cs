@@ -259,7 +259,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 
 		if ( prObjectCount <= 0 )
 		{
-			bool needs_init = prObjectInfo.id < 0 || reload_asset;
+			bool needs_init = prObjectInfo.nodeId < 0 || reload_asset;
 
 			if ( prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
 				prObjectInfo = HoudiniHost.getObjectInfo( prAssetId );
@@ -372,7 +372,7 @@ public class HoudiniAssetOTL : HoudiniAsset
 		{
 			DestroyImmediate( main_child );
 			prGameObjects[ object_id ] = null;
-			error.addMessagePrefix( "Obj(id: " + object_info.id + ", name: " + object_info.name + ")" );
+			error.addMessagePrefix( "Obj(id: " + object_info.nodeId + ", name: " + object_info.name + ")" );
 			error.addMessageDetail( "Object Path: " + object_info.objectInstancePath );
 			throw;
 		}

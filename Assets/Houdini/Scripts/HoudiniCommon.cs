@@ -747,7 +747,6 @@ public struct HAPI_TimelineOptions
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_AssetInfo 
 {
-	public HAPI_NodeId			id;
 	public HAPI_AssetType		type;
 	public HAPI_AssetSubType	subType;
 
@@ -1157,8 +1156,6 @@ public struct HAPI_HandleBindingInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_ObjectInfo 
 {
-	public HAPI_NodeId id;
-
 	private HAPI_StringHandle nameSH;
 	private HAPI_StringHandle objectInstancePathSH;
 
@@ -1198,7 +1195,6 @@ public struct HAPI_GeoInfo
 		}
 	}
 
-	public HAPI_NodeId id;
 	public HAPI_GeoType type;
 	private HAPI_StringHandle nameSH;
 
@@ -1319,7 +1315,6 @@ public struct HAPI_AttributeInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_MaterialInfo
 {
-	public HAPI_NodeId id;
 	public HAPI_NodeId assetId;
 	public HAPI_NodeId nodeId;
 
