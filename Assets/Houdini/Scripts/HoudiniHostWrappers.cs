@@ -31,15 +31,11 @@ using System.Text;
 using HAPI_Int64 = System.Int64;
 using HAPI_StringHandle = System.Int32;
 using HAPI_ErrorCodeBits = System.Int32;
-using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
 using HAPI_NodeTypeBits = System.Int32;
 using HAPI_NodeFlagsBits = System.Int32;
 using HAPI_ParmId = System.Int32;
-using HAPI_ObjectId = System.Int32;
-using HAPI_GeoId = System.Int32;
 using HAPI_PartId = System.Int32;
-using HAPI_MaterialId = System.Int32;
 
 public static partial class HoudiniHost
 {
@@ -1762,7 +1758,7 @@ public static partial class HoudiniHost
 //#endif
 //	}
 
-//	public static void disconnectAssetTransform( HAPI_AssetId asset_id, int input_idx )
+//	public static void disconnectAssetTransform( HAPI_NodeId asset_id, int input_idx )
 //	{
 //#if ( HAPI_ENABLE_RUNTIME )
 //		HAPI_Result status_code = HAPI_DisconnectAssetTransform( ref mySession, asset_id, input_idx );
@@ -1773,8 +1769,8 @@ public static partial class HoudiniHost
 //	}
 
 //	public static void connectAssetGeometry(
-//		HAPI_AssetId asset_id_from, HAPI_ObjectId object_id_from,
-//		HAPI_AssetId asset_id_to, int input_idx )
+//		HAPI_NodeId asset_id_from, HAPI_NodeId object_id_from,
+//		HAPI_NodeId asset_id_to, int input_idx )
 //	{
 //#if ( HAPI_ENABLE_RUNTIME )
 //		HAPI_Result status_code = HAPI_ConnectAssetGeometry(
@@ -1785,7 +1781,7 @@ public static partial class HoudiniHost
 //#endif
 //	}
 
-//	public static void disconnectAssetGeometry( HAPI_AssetId asset_id, int input_idx )
+//	public static void disconnectAssetGeometry( HAPI_NodeId asset_id, int input_idx )
 //	{
 //#if ( HAPI_ENABLE_RUNTIME )
 //		HAPI_Result status_code = HAPI_DisconnectAssetGeometry( ref mySession, asset_id, input_idx );

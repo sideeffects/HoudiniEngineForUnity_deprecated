@@ -23,7 +23,6 @@ using System.Collections.Generic;
 
 // Typedefs
 using HAPI_NodeId = System.Int32;
-using HAPI_AssetId = System.Int32;
 
 public class HoudiniControl : MonoBehaviour 
 {
@@ -32,7 +31,7 @@ public class HoudiniControl : MonoBehaviour
 	
 	// Please keep these in the same order and grouping as their initializations in HAPI_Control.reset().
 
-	public HAPI_AssetId prAssetId { get { return myAssetId; } set { myAssetId = value; } }
+	public HAPI_NodeId prAssetId { get { return myAssetId; } set { myAssetId = value; } }
 	public HAPI_NodeId prNodeId { get { return myNodeId; } set { myNodeId = value; } }
 	public HAPI_NodeId prObjectNodeId { get { return myObjectNodeId; } set { myObjectNodeId = value; } }
 	public HoudiniAsset prAsset { get { return myAsset; } set { myAsset = value; } }
@@ -177,7 +176,7 @@ public class HoudiniControl : MonoBehaviour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data
 
-	[SerializeField] private HAPI_AssetId myAssetId;
+	[SerializeField] private HAPI_NodeId myAssetId;
 	[SerializeField] private HAPI_NodeId myNodeId;
 	[SerializeField] private HAPI_NodeId myObjectNodeId;
 	[SerializeField] private HoudiniAsset myAsset;

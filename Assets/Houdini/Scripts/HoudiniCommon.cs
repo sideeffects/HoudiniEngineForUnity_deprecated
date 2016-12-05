@@ -23,13 +23,9 @@ using System.Runtime.InteropServices;
 using HAPI_SessionId = System.Int64;
 using HAPI_Int64 = System.Int64;
 using HAPI_StringHandle = System.Int32;
-using HAPI_AssetId = System.Int32;
 using HAPI_NodeId = System.Int32;
 using HAPI_ParmId = System.Int32;
-using HAPI_ObjectId = System.Int32;
-using HAPI_GeoId = System.Int32;
 using HAPI_PartId = System.Int32;
-using HAPI_MaterialId = System.Int32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Defines
@@ -751,7 +747,7 @@ public struct HAPI_TimelineOptions
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_AssetInfo 
 {
-	public HAPI_AssetId			id;
+	public HAPI_NodeId			id;
 	public HAPI_AssetType		type;
 	public HAPI_AssetSubType	subType;
 
@@ -878,7 +874,7 @@ public struct HAPI_NodeInfo
 {
 	public HAPI_NodeId id;
 	public HAPI_NodeId parentId;
-	public HAPI_AssetId assetId;
+	public HAPI_NodeId assetId;
 	public HAPI_StringHandle nameSH;
 	public HAPI_NodeType type;
 
@@ -1161,7 +1157,7 @@ public struct HAPI_HandleBindingInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_ObjectInfo 
 {
-	public HAPI_ObjectId id;
+	public HAPI_NodeId id;
 
 	private HAPI_StringHandle nameSH;
 	private HAPI_StringHandle objectInstancePathSH;
@@ -1178,7 +1174,7 @@ public struct HAPI_ObjectInfo
 	// Use the node id to get the node's parameters.
 	public HAPI_NodeId nodeId;
 
-	public HAPI_ObjectId objectToInstanceId;
+	public HAPI_NodeId objectToInstanceId;
 
 	// Accessors
 	public string name
@@ -1202,7 +1198,7 @@ public struct HAPI_GeoInfo
 		}
 	}
 
-	public HAPI_GeoId id;
+	public HAPI_NodeId id;
 	public HAPI_GeoType type;
 	private HAPI_StringHandle nameSH;
 
@@ -1229,8 +1225,8 @@ public struct HAPI_GeoInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_GeoInputInfo
 {
-	public HAPI_ObjectId objectId;
-	public HAPI_GeoId geoId;
+	public HAPI_NodeId objectId;
+	public HAPI_NodeId geoId;
 	public HAPI_NodeId objectNodeId;
 }
 
@@ -1323,8 +1319,8 @@ public struct HAPI_AttributeInfo
 [ StructLayout( LayoutKind.Sequential ) ]
 public struct HAPI_MaterialInfo
 {
-	public HAPI_MaterialId id;
-	public HAPI_AssetId assetId;
+	public HAPI_NodeId id;
+	public HAPI_NodeId assetId;
 	public HAPI_NodeId nodeId;
 
 	[ MarshalAs( UnmanagedType.U1 ) ]

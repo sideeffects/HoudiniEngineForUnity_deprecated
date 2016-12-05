@@ -36,7 +36,6 @@ using HAPI_NodeTypeBits = System.Int32;
 using HAPI_NodeFlagsBits = System.Int32;
 using HAPI_ParmId = System.Int32;
 using HAPI_PartId = System.Int32;
-using HAPI_MaterialId = System.Int32;
 
 /// <summary>
 /// 	Singleton Houdini host object that maintains the singleton Houdini scene and all access to the
@@ -1020,7 +1019,7 @@ public static partial class HoudiniHost
 		ref HAPI_Session session,
 		HAPI_NodeId geometry_node_id, HAPI_PartId part_id,
 		[ MarshalAs( UnmanagedType.U1 ) ] ref bool are_all_the_same,
-		[Out] HAPI_MaterialId[] material_ids_array,
+		[Out] HAPI_NodeId[] material_ids_array,
 		int start, int length );
 
 	[ DllImport( HoudiniVersion.HAPI_LIBRARY, CallingConvention = CallingConvention.Cdecl ) ]
