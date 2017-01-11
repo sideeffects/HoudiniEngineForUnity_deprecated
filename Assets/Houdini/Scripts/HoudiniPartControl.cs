@@ -108,18 +108,6 @@ public class HoudiniPartControl : HoudiniGeoControl
 		myLastLocalToWorld = transform.localToWorldMatrix;
 	}
 
-	public void selectParent()
-	{
-#if UNITY_EDITOR
-		if ( prAsset != null && prAsset.prAutoSelectAssetRootNode && HoudiniHost.prAutoSelectAssetRootNode )
-		{
-			GameObject[] selection 	= new GameObject[ 1 ];
-			selection[ 0 ] 			= prAsset.gameObject;
-			Selection.objects 		= selection;
-		}
-#endif // UNITY_EDITOR
-	}
-
 	public void init( HoudiniPartControl part_control )
 	{
 		init( (HoudiniGeoControl) part_control );

@@ -28,7 +28,6 @@ public class HoudiniPartControlGUI : Editor
 	public void OnSceneGUI()
 	{
 		HoudiniPartControl control = target as HoudiniPartControl;
-		control.selectParent();
 
 		if ( control.prShowPointNumbers )
 		{

@@ -161,23 +161,6 @@ public class HoudiniWindowSettings : EditorWindow
 
 		HoudiniGUI.separator();
 
-		// Auto Select Asset Root Node
-		{
-			bool value = HoudiniHost.prAutoSelectAssetRootNode;
-			bool changed = HoudiniGUI.toggle(
-				"auto_select_asset_root_node", 
-				"Auto Select Asset Root Node", 
-				ref value, myUndoInfo,
-				ref myUndoInfo.autoSelectAssetRootNode );
-			if ( changed )
-			{
-				HoudiniHost.prAutoSelectAssetRootNode = value;
-				HoudiniHost.repaint();
-			}
-		}
-
-		HoudiniGUI.separator();
-
 		// Enable particles
 		{
 			bool value = HoudiniHost.prEnablePointsAsParticles;

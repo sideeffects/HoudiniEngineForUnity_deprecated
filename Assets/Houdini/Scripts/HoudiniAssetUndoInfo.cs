@@ -6,7 +6,6 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 	// View Settings
 	public bool isGeoVisible;
 	public bool showPinnedInstances;
-	public bool autoSelectAssetRootNode;
 
 	// Material Settings
 	public bool showOnlyVertexColours;
@@ -35,7 +34,6 @@ public class HoudiniAssetUndoInfo : ScriptableObject
 	{
 		isGeoVisible 					= asset.prIsGeoVisible;
 		showPinnedInstances 			= asset.prShowPinnedInstances;
-		autoSelectAssetRootNode 		= asset.prAutoSelectAssetRootNode;
 		showOnlyVertexColours 			= asset.prShowOnlyVertexColours;
 		generateUVs						= asset.prGenerateUVs;
 		generateLightmapUV2s			= asset.prGenerateLightmapUV2s;

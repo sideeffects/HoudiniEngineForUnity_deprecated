@@ -11,7 +11,6 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	public bool autoPinInstances;
 	public bool enableDragAndDrop;
 	public bool enableSupportWarnings;
-	public bool autoSelectAssetRootNode;
 	public bool enablePointsAsParticles;
 
 	// Material Settings
@@ -74,7 +73,6 @@ public class HoudiniHostUndoInfo : ScriptableObject
 		pinColour 						= HoudiniHost.prPinColour;
 		autoPinInstances 				= HoudiniHost.prAutoPinInstances;
 		enableSupportWarnings 			= HoudiniHost.prEnableSupportWarnings;
-		autoSelectAssetRootNode 		= HoudiniHost.prAutoSelectAssetRootNode;
 		enablePointsAsParticles 		= HoudiniHost.prEnablePointsAsParticles;
 
 		// Set material settings.

@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 
+[ SelectionBase ]
 [ ExecuteInEditMode ]
 public abstract class HoudiniAsset : HoudiniControl
 {
@@ -189,11 +190,6 @@ public abstract class HoudiniAsset : HoudiniControl
 																	set { myIsGeoVisible = value; } }
 	public bool						prShowPinnedInstances {			get { return myShowPinnedInstances; }
 																	set { myShowPinnedInstances = value; } }
-	public bool	prAutoSelectAssetRootNode {		get { return (	myAutoSelectAssetRootNode && 
-																HoudiniHost.isAutoSelectAssetRootNodeDefault() )
-														  || (	HoudiniHost.prAutoSelectAssetRootNode &&
-																!HoudiniHost.isAutoSelectAssetRootNodeDefault() ); } 
-												set { myAutoSelectAssetRootNode = value; } }
 
 	public bool						prShowOnlyVertexColours{get { return myShowOnlyVertexColours; }
 															set { myShowOnlyVertexColours = value; } }
@@ -810,7 +806,6 @@ public abstract class HoudiniAsset : HoudiniControl
 
 		prIsGeoVisible					= true;
 		prShowPinnedInstances			= true;
-		prAutoSelectAssetRootNode 		= HoudiniHost.myDefaultAutoSelectAssetRootNode;
 
 		prShowOnlyVertexColours			= false;
 
@@ -1968,7 +1963,6 @@ public abstract class HoudiniAsset : HoudiniControl
 
 	[SerializeField] private bool					myIsGeoVisible;
 	[SerializeField] private bool					myShowPinnedInstances;
-	[SerializeField] private bool					myAutoSelectAssetRootNode;
 
 	[SerializeField] private bool					myShowOnlyVertexColours;
 	[SerializeField] private bool					myGenerateUVs;

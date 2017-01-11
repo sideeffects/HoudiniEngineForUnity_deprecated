@@ -73,10 +73,9 @@ public class HoudiniAssetInput : HoudiniAsset
 		prOriginalMesh = null;
 		
 		// Overwrite some settings that should be different by default for input assets than other asset types.
-		prAutoSelectAssetRootNode	= false;
-		prAssetType					= AssetType.TYPE_INPUT;
+		prAssetType = AssetType.TYPE_INPUT;
 
-		myGeoAttributeManager		= null;
+		myGeoAttributeManager = null;
 	}
 
 	public override void OnEnable()
