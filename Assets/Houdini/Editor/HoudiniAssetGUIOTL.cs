@@ -246,12 +246,6 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		createToggleForProperty(
 			"show_pinned_instances", "Show Pinned Instances", "prShowPinnedInstances", 
 			ref myUndoInfo.showPinnedInstances, null );
-
-		// Auto Select Asset Root Node Toggle
-		createToggleForProperty(
-			"auto_select_asset_root_node", "Auto Select Asset Root Node", 
-			"prAutoSelectAssetRootNode", ref myUndoInfo.autoSelectAssetRootNode,
-			null, !HoudiniHost.isAutoSelectAssetRootNodeDefault() );
 	}
 	
 	private void generateMaterialSettings()

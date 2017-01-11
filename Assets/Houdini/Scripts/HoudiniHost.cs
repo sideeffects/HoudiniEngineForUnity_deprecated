@@ -124,8 +124,6 @@ public static partial class HoudiniHost
 
 	private const bool myDefaultEnableSupportWarnings					= true;
 
-	public const bool myDefaultAutoSelectAssetRootNode					= true;
-
 	public const float myDefaultGamma									= 2.2f;
 	private const bool myDefaultDontCreateTextureFiles					= false;
 	private const bool myDefaultExtractTexturesInRawFormat				= false;
@@ -207,11 +205,9 @@ public static partial class HoudiniHost
 		setFloat(	"HAPI_PinSize", myDefaultPinSize, true );
 		setColour(	"HAPI_PinColour", myDefaultPinColour, true );
 		setBool(	"HAPI_AutoPinInstances", myDefaultAutoPinInstances, true );
-		
+
 		setBool(	"HAPI_EnableSupportWarnings", myDefaultEnableSupportWarnings, true );
-		
-		setBool(	"HAPI_AutoSelectAssetRootNode", myDefaultAutoSelectAssetRootNode, true );
-		
+
 		setFloat(	"HAPI_Gamma", myDefaultGamma, true );
 		setBool(	"HAPI_DontCreateTextureFiles", myDefaultDontCreateTextureFiles, true );
 		setBool(	"HAPI_ExtractTexturesInRawFormat", myDefaultExtractTexturesInRawFormat, true );
@@ -338,10 +334,6 @@ public static partial class HoudiniHost
 	public static bool prEnableSupportWarnings {
 											get { return getBool( "HAPI_EnableSupportWarnings" ); } 
 											set { setBool( "HAPI_EnableSupportWarnings", value ); } }
-
-	public static bool prAutoSelectAssetRootNode {
-											get { return getBool( "HAPI_AutoSelectAssetRootNode" ); } 
-											set { setBool( "HAPI_AutoSelectAssetRootNode", value ); } }
 
 	public static float prGamma {
 											get { return getFloat( "HAPI_Gamma" ); } 
@@ -537,10 +529,6 @@ public static partial class HoudiniHost
 											{ return	prEnableSupportWarnings == 
 														myDefaultEnableSupportWarnings; }
 
-	public static bool isAutoSelectAssetRootNodeDefault()
-											{ return	prAutoSelectAssetRootNode == 
-														myDefaultAutoSelectAssetRootNode; }
-
 	public static bool isGammaDefault()
 											{ return	Mathf.Approximately(
 															prGamma, myDefaultGamma ); }
@@ -669,8 +657,6 @@ public static partial class HoudiniHost
 		prAutoPinInstances						= myDefaultAutoPinInstances;
 
 		prEnableSupportWarnings					= myDefaultEnableSupportWarnings;
-
-		prAutoSelectAssetRootNode				= myDefaultAutoSelectAssetRootNode;
 
 		prGamma									= myDefaultGamma;
 		prDontCreateTextureFiles				= myDefaultDontCreateTextureFiles;
