@@ -387,8 +387,8 @@ public class HoudiniCurve : MonoBehaviour
 
 	public void createObject( int object_id, int geo_id )
 	{
-		HAPI_ObjectInfo object_info = prControl.prAsset.prObjects[ object_id ];
-		
+		HAPI_ObjectInfo object_info = HoudiniHost.getObjectInfo( object_id );
+
 		try
 		{
 			// Get position attributes (this is all we get for the curve's geometry).
