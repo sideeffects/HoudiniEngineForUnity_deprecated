@@ -125,7 +125,11 @@ public class HoudiniAssetCurve : HoudiniAsset
 		try
 		{
 			prCurve.syncPointsWithParm();
-			prCurve.createObject( 0, 0 );
+
+			HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prCurve.prControl.prAssetId );
+			HAPI_NodeInfo geo_node_info = HoudiniHost.getNodeInfo( geo_info.nodeId );
+			prCurve.createObject( geo_node_info.parentId, geo_info.nodeId );
+
 			HoudiniHost.repaint();
 		}
 		catch ( HoudiniError )
