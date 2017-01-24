@@ -33,9 +33,9 @@ public struct HoudiniVersion
 
 	public const int HOUDINI_ENGINE_MAJOR	= 3;
 	public const int HOUDINI_ENGINE_MINOR	= 0;
-	
+
 	public const int HOUDINI_ENGINE_API		= 57;
-	
+
 #if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
 
 	public const string HAPI_SERVER			= "HARS.exe";
@@ -47,11 +47,11 @@ public struct HoudiniVersion
 
 #elif UNITY_STANDALONE_OSX
 
-	public const string HAPI_SERVER			= "/Applications/Houdini/Houdini16.5.2/Frameworks/Houdini.framework/Versions/Current/Resources/bin" + "HARS";
+	public const string HAPI_SERVER			= "/Applications/Houdini/Houdini16.5.2/Frameworks/Houdini.framework/Versions/16.5.2/Resources/bin" + "HARS";
 	#if UNITY_EDITOR_64 || UNITY_64
-		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.5.2/Frameworks/Houdini.framework/Versions/Current/Libraries" + "libHARC.dylib";
+		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.5.2/Frameworks/Houdini.framework/Versions/16.5.2/Libraries" + "libHARC.dylib";
 	#else
-		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.5.2/Frameworks/Houdini.framework/Versions/Current/Libraries" + "libHARC32.dylib";
+		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.5.2/Frameworks/Houdini.framework/Versions/16.5.2/Libraries" + "libHARC32.dylib";
 	#endif // UNITY_EDITOR_64
 
 #elif UNITY_STANDALONE_LINUX
