@@ -242,12 +242,15 @@ public class HoudiniAssetOTL : HoudiniAsset
 			{
 				try
 				{
-					if ( object_info.objectToInstanceId >= 0 && 
-							prGameObjects[ object_info.objectToInstanceId ] == null )
-						needs_recook |= createObject( object_info.objectToInstanceId, reload_asset );
-						
-					if( reload_asset || object_info.haveGeosChanged )
-						instanceObjects( object_index, progress_bar );
+					if ( object_info.objectToInstanceId >= 0 )
+					{
+						int instanced_object_index = findObjectByNodeId( object_info.objectToInstanceId );
+						if ( instanced_object_index >= 0 )
+							needs_recook |= createObject( instanced_object_index, reload_asset );
+					}
+
+					if ( reload_asset || object_info.haveGeosChanged )
+						instanceObjects( object_info.nodeId, object_index, progress_bar );
 				}
 				catch ( HoudiniError error )
 				{
@@ -301,10 +304,10 @@ public class HoudiniAssetOTL : HoudiniAsset
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private Methods
 	
-	private void instanceObjects( int object_id, HoudiniProgressBar progress_bar )
+	private void instanceObjects( int object_id, int object_idx, HoudiniProgressBar progress_bar )
 	{
-		HAPI_ObjectInfo object_info		= prObjects[ object_id ];
-		HoudiniInstancer instancer		= null;
+		HAPI_ObjectInfo object_info = prObjects[ object_idx ];
+		HoudiniInstancer instancer = null;
 		
 		Transform old_instancer_transform = transform.Find( object_info.name );
 		if ( old_instancer_transform && old_instancer_transform.gameObject.GetComponent< HoudiniInstancer >() )
@@ -314,22 +317,22 @@ public class HoudiniAssetOTL : HoudiniAsset
 		else
 		{
 
-			if( gameObject.GetComponent< HoudiniInstancerManager >() == null )
+			if ( gameObject.GetComponent< HoudiniInstancerManager >() == null )
 				gameObject.AddComponent< HoudiniInstancerManager >();
 
 			GameObject main_object = new GameObject( object_info.name );
 			main_object.transform.parent = transform;
 
 			main_object.AddComponent< HoudiniInstancer >();
-			prGameObjects[ object_id ] = main_object;
+			prGameObjects[ object_idx ] = main_object;
 			instancer = main_object.GetComponent< HoudiniInstancer >();
 
 			HoudiniInstancerManager instancer_manager = gameObject.GetComponent< HoudiniInstancerManager >();
 			instancer_manager.updateInstancerData( instancer );
 		}
 		
-		instancer.prAsset		= this;
-		instancer.prObjectId	= object_id;
+		instancer.prAsset = this;
+		instancer.prObjectId = object_id;
 		
 		instancer.instanceObjects( progress_bar );
 	}

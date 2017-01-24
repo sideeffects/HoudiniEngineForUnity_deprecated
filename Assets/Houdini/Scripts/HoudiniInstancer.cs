@@ -528,7 +528,8 @@ public class HoudiniInstancer : MonoBehaviour
 	
 	private void cacheNumInstances()
 	{
-		HAPI_ObjectInfo object_info = prAsset.prObjects[ prObjectId ];
+		var obj_idx = prAsset.findObjectByNodeId( prObjectId );
+		HAPI_ObjectInfo object_info = prAsset.prObjects[ obj_idx ];
 			
 		// Get Detail info.
 		HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prObjectId );
@@ -837,52 +838,47 @@ public class HoudiniInstancer : MonoBehaviour
 				}
 			}
 
-			bool liveTransformPropagationSetting	= false;
-			bool syncAssetTransformSetting			= false;
-			bool enableCooking						= true;
-			for ( int ii = 0; ii < myNumInstances; ++ii )
+			bool liveTransformPropagationSetting = false;
+			bool syncAssetTransformSetting = false;
+			bool enableCooking = true;
+			for ( int i = 0; i < myNumInstances; ++i )
 			{
-				if ( exclusion_list.Contains( ii ) )
+				if ( exclusion_list.Contains( i ) )
 					continue;
-				
-				GameObject objToInstantiate = null;
-				
-				if ( instance_attr.Length > 0 || name_attr.Length > 0 )
-				{					
-					if( name_attr.Length > 0 )
-					{
-						string obj_name	= HoudiniHost.getString( name_attr[ ii ] );
-						int object_index = prAsset.findObjectByName( obj_name );
-						if ( object_index >= 0 )
-						{
-							objToInstantiate = prAsset.prGameObjects[ object_index ];
-						}
-						else
-						{
-							objToInstantiate = prAsset.findPartByName( obj_name, true );
-						}
 
-						if( objToInstantiate == null )
-						{
-							objToInstantiate = GameObject.Find( obj_name );
-						}
+				GameObject obj_to_instance = null;
+
+				if ( instance_attr.Length > 0 || name_attr.Length > 0 )
+				{
+					if ( name_attr.Length > 0 )
+					{
+						string obj_name	= HoudiniHost.getString( name_attr[ i ] );
+						int object_index = prAsset.findObjectByName( obj_name );
+
+						if ( object_index >= 0 )
+							obj_to_instance = prAsset.prGameObjects[ object_index ];
+						else
+							obj_to_instance = prAsset.findPartByName( obj_name, true );
+
+						if ( obj_to_instance == null )
+							obj_to_instance = GameObject.Find( obj_name );
 					}
 					else 
 					{
-						string instanceObjectPath	= HoudiniHost.getString( instance_attr[ ii ] );
-						string[] pathItems			= instanceObjectPath.Split('/');
-						string instanceObjectName	= pathItems[ pathItems.Length - 1 ];
-																																		
+						string instanceObjectPath = HoudiniHost.getString( instance_attr[ i ] );
+						string [] pathItems = instanceObjectPath.Split( '/' );
+						string instanceObjectName = pathItems[ pathItems.Length - 1 ];
+
 						int objectIndex = prAsset.findObjectByName( instanceObjectName );
 						if ( objectIndex >= 0 )
-							objToInstantiate = prAsset.prGameObjects[ objectIndex ];
+							obj_to_instance = prAsset.prGameObjects[ objectIndex ];
 						else
-							objToInstantiate = GameObject.Find( instanceObjectName );
+							obj_to_instance = GameObject.Find( instanceObjectName );
 					}
 
-					if ( objToInstantiate != null )
+					if ( obj_to_instance != null )
 					{
-						HoudiniAsset hapi_asset = objToInstantiate.GetComponent< HoudiniAsset >();
+						HoudiniAsset hapi_asset = obj_to_instance.GetComponent< HoudiniAsset >();
 						if ( hapi_asset != null )
 						{
 							liveTransformPropagationSetting				= hapi_asset.prTransformChangeTriggersCooks;
@@ -895,18 +891,22 @@ public class HoudiniInstancer : MonoBehaviour
 					}
 				}
 				else if ( object_info.objectToInstanceId >= 0 )
-					objToInstantiate = prAsset.prGameObjects[ object_info.objectToInstanceId ];
+				{
+					int object_to_instance_idx = prAsset.findObjectByNodeId( object_info.objectToInstanceId );
+					if ( object_to_instance_idx >= 0 )
+						obj_to_instance = prAsset.prGameObjects[ object_to_instance_idx ];
+				}
 
-				if ( objToInstantiate != null )
+				if ( obj_to_instance != null )
 				{
 					// Set progress bar information.
-					progress_bar.prCurrentValue = ii;
-					progress_bar.prMessage = "Instancing: " + objToInstantiate.name + " (" + ii + " of " + myNumInstances + ")";
+					progress_bar.prCurrentValue = i;
+					progress_bar.prMessage = "Instancing: " + obj_to_instance.name + " (" + i + " of " + myNumInstances + ")";
 					progress_bar.displayProgressBar();
 
-					if ( !unique_instantiated_names.Contains( objToInstantiate.name ) )
+					if ( !unique_instantiated_names.Contains( obj_to_instance.name ) )
 					{
-						unique_instantiated_names.Add( objToInstantiate.name );
+						unique_instantiated_names.Add( obj_to_instance.name );
 					}
 	
 					Vector3 pos = new Vector3();
@@ -920,22 +920,22 @@ public class HoudiniInstancer : MonoBehaviour
 					// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
 					// causes a double negative - yeah, I know).
 					
-					pos[ 0 ] = -instance_transforms[ ii ].position[ 0 ];
-					pos[ 1 ] =  instance_transforms[ ii ].position[ 1 ];
-					pos[ 2 ] =  instance_transforms[ ii ].position[ 2 ];
+					pos[ 0 ] = -instance_transforms[ i ].position[ 0 ];
+					pos[ 1 ] =  instance_transforms[ i ].position[ 1 ];
+					pos[ 2 ] =  instance_transforms[ i ].position[ 2 ];
 					
-					Quaternion quat = new Quaternion( 	instance_transforms[ ii ].rotationQuaternion[ 0 ],
-														instance_transforms[ ii ].rotationQuaternion[ 1 ],
-														instance_transforms[ ii ].rotationQuaternion[ 2 ],
-														instance_transforms[ ii ].rotationQuaternion[ 3 ] );
+					Quaternion quat = new Quaternion( 	instance_transforms[ i ].rotationQuaternion[ 0 ],
+														instance_transforms[ i ].rotationQuaternion[ 1 ],
+														instance_transforms[ i ].rotationQuaternion[ 2 ],
+														instance_transforms[ i ].rotationQuaternion[ 3 ] );
 					
 					Vector3 euler = quat.eulerAngles;
 					euler.y = -euler.y;
 					euler.z = -euler.z;
 					
-					Vector3 scale = new Vector3 ( instance_transforms[ ii ].scale[ 0 ],
-												  instance_transforms[ ii ].scale[ 1 ],
-												  instance_transforms[ ii ].scale[ 2 ] );
+					Vector3 scale = new Vector3 ( instance_transforms[ i ].scale[ 0 ],
+												  instance_transforms[ i ].scale[ 1 ],
+												  instance_transforms[ i ].scale[ 2 ] );
 					
 					
 					
@@ -959,18 +959,18 @@ public class HoudiniInstancer : MonoBehaviour
 					
 					string script_to_attach = "";
 					if( script_attr_info.exists )
-						script_to_attach = HoudiniHost.getString( script_attr[ ii ] );
-					instanceObject( objToInstantiate, 
+						script_to_attach = HoudiniHost.getString( script_attr[ i ] );
+					instanceObject( obj_to_instance, 
 								 	pos,
 									euler,									
-								 	ii,
+								 	i,
 									scale_attr_info.exists,
 									scale,
 									script_attr_info.exists,
 									script_to_attach );
 						
 
-					HoudiniAsset hapi_asset = objToInstantiate.GetComponent< HoudiniAsset >();
+					HoudiniAsset hapi_asset = obj_to_instance.GetComponent< HoudiniAsset >();
 					if ( hapi_asset != null )
 					{
 						hapi_asset.prTransformChangeTriggersCooks	= liveTransformPropagationSetting;

@@ -266,6 +266,16 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		return -1;
 	}
 	
+	public int findObjectByNodeId( int object_id )
+	{
+		for ( int object_index = 0; object_index < prObjectCount; ++object_index )
+		{
+			HAPI_ObjectInfo object_info = prObjects[ object_index ];
+			if ( object_info.nodeId == object_id )
+				return object_index;
+		}
+		return -1;
+	}
 	
 	public GameObject findPartByName( string part_name, bool allow_partial_match )
 	{
