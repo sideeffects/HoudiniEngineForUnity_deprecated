@@ -43,7 +43,7 @@ public static partial class HoudiniHost
 
 	private static bool myIsOpenGL;
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) || UNITY_STANDALONE_LINUX )
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
 	[ DllImport( LibGLPath ) ]
 	private static extern void glEnable( uint cap );
 
