@@ -28,6 +28,11 @@
 *
 */
 
+// Master control for enabling runtime.
+#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
+	#define HAPI_ENABLE_RUNTIME
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -40,6 +45,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 	// Public
 	public void handlesOnSceneGUI()
 	{
+#if HAPI_ENABLE_RUNTIME
 		if ( myAssetOTL.prShowPinnedInstances )
 			drawPinnedInstances();
 
@@ -416,6 +422,7 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 		
 		if ( changed )
 			myAssetOTL.buildClientSide();
+#endif // HAPI_ENABLE_RUNTIME
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
