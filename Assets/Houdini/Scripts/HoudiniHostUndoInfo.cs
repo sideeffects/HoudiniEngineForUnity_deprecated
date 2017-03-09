@@ -91,7 +91,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	// Initialization --------------------------------------------------------------------------
 	public HoudiniHostUndoInfo()
 	{
-		initialize();
+		// Can't call initialize() here.
 	}
 
 	public void initialize()
