@@ -515,6 +515,14 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 			// Add ourselves to our input asset's downstream nodes so when it cooks we cook.
 			houdini_control.prAsset.addDownstreamAsset( myControl.prAsset );
 		}
+		else if ( houdini_control &&
+			input_object.GetComponent< HoudiniAssetCurve >() )
+		{
+			if ( !houdini_control.prAsset.isAssetValid() )
+				houdini_control.prAsset.buildAll();
+
+			parm_input.inputNodeId = houdini_control.prNodeId;
+		}
 		else if ( mesh_filter && mesh_filter.sharedMesh )
 		{
 			parm_input.inputNodeId = HoudiniHost.createInputNode( input_object.name );
