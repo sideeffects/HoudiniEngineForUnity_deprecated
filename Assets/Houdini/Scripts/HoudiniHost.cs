@@ -502,7 +502,10 @@ public static partial class HoudiniHost
 		get 
 		{ 
 			if ( myHostUndoInfo == null )
+			{
 				myHostUndoInfo = ScriptableObject.CreateInstance< HoudiniHostUndoInfo >();
+				myHostUndoInfo.initialize();
+			}
 			return myHostUndoInfo; 
 		}
 		set { myHostUndoInfo = value; } 
