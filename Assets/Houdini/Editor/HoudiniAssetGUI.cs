@@ -110,15 +110,15 @@ public class HoudiniAssetGUI : Editor
 			///////////////////////////////////////////////////////////////////////
 			// Draw Game Object Controls
 
-			/*if ( HoudiniHost.isNodeValid( myAsset.prAssetId, myAsset.prNodeInfo.uniqueHoudiniNodeId ) &&
+			if ( HoudiniHost.isNodeValid( myAsset.prAssetId, myAsset.prNodeInfo.uniqueHoudiniNodeId ) &&
 				( myAsset.prTransformInputCount > 0 || myAsset.prGeoInputCount > 0 ) &&
-				 myAsset.prAssetSubType != HAPI_AssetSubType.HAPI_ASSETSUBTYPE_CURVE )
+				 myAsset.prAssetType != HoudiniAsset.AssetType.TYPE_CURVE )
 			{
 				myAsset.prShowInputControls = HoudiniGUI.foldout( "Inputs", myAsset.prShowInputControls, true );
 			
 				if ( myAsset.prShowInputControls )
 				{
-					if ( myAsset.prHAPIAssetType == HAPI_AssetType.HAPI_ASSETTYPE_OBJ )
+					if ( myAsset.prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
 						for ( int ii = 0; ii < myAsset.prTransformInputCount; ++ii )
 							myParmChanges |= setTransformInput( ii );
 					
@@ -131,12 +131,13 @@ public class HoudiniAssetGUI : Editor
 						bool join_last = false;
 						bool no_label_toggle_last = true;
 
-						HoudiniGUIParm geo_input = new HoudiniGUIParm(
+                        GameObject temp_obj = null;
+                        HoudiniGUIParm geo_input = new HoudiniGUIParm(
 							"geo_input_" + input_index, myAsset.prGeoInputNames[ input_index ] );
 						Object obj = (Object) myAsset.prUpStreamGeoObjects[ input_index ];
 						myParmChanges |= HoudiniGUI.objectField(
-							ref geo_input, ref obj, typeof( GameObject ), ref join_last, ref no_label_toggle_last );
-					
+							ref geo_input, ref obj, typeof( GameObject ), ref join_last, ref no_label_toggle_last, null, ref temp_obj );
+						
 						if ( myParmChanges || !myAsset.isGeoInputValid( input_index ) )
 						{
 							if ( !obj )
@@ -186,7 +187,6 @@ public class HoudiniAssetGUI : Editor
 					} // for
 				} // if
 			} // if
-			*/
 
 			// Draw Cook Log Pane
 			myAsset.prShowCookLog = HoudiniGUI.foldout( "Asset Cook Log", myAsset.prShowCookLog, true );
