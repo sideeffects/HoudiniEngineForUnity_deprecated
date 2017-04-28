@@ -137,17 +137,33 @@ public class HoudiniObjectControl : HoudiniControl
 		{
 			// TODO: Add back support for templated geos and curve SOPs.
 			HAPI_GeoInfo geo_info = HoudiniHost.getDisplayGeoInfo( prObjectId );
-			object_info.geoCount = 1;
-			
-			// Add new geos as needed.
-			while ( myGeos.Count < object_info.geoCount )
-				myGeos.Add( createGeo( geo_info.nodeId ) );
+			int GeoCount = object_info.geoCount = 1;
+
+            // Add new geos as needed.
+            while ( myGeos.Count < GeoCount )
+                myGeos.Add( createGeo( geo_info.nodeId ) );
+
+            // Look for editable nodes
+            const bool recursive = true;
+            int[] editable_networks = HoudiniHost.getChildNodeList(
+                prAssetId,
+                (int)HAPI_NodeType.HAPI_NODETYPE_SOP,
+                (int)HAPI_NodeFlags.HAPI_NODEFLAGS_EDITABLE,
+                recursive);
+
+            // Add the editable nodes to it
+            for (int n = 0; n < editable_networks.Length; n++)
+            {
+                HAPI_GeoInfo editGeoInfo = HoudiniHost.getGeoInfo( editable_networks[n] );
+                myGeos.Add( createGeo( editGeoInfo.nodeId ) );
+                GeoCount++;
+            }
 
 			// Remove stale geos.
-			while ( myGeos.Count > object_info.geoCount )
+			while ( myGeos.Count > GeoCount )
 			{
-				HoudiniAssetUtility.destroyGameObject( myGeos[ object_info.geoCount ] );
-				myGeos.RemoveAt( object_info.geoCount );
+				HoudiniAssetUtility.destroyGameObject( myGeos[ GeoCount ] );
+				myGeos.RemoveAt( GeoCount );
 			}
 
 			// Refresh all geos.

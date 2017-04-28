@@ -336,7 +336,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		return null;
 	}
 
-	// Transform related connection methods -------------------------------------------------------
+    // Transform related connection methods -------------------------------------------------------
 
 	public void addAssetAsTransformInput( HoudiniAsset asset, int index )
 	{
@@ -1035,7 +1035,8 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 			prAssetValidationId			= prNodeInfo.uniqueHoudiniNodeId;
 			prNodeId					= prAssetInfo.nodeId;
 			prObjectNodeId				= prAssetInfo.objectNodeId;
-			prObjectCount 				= HoudiniHost.composeObjectList( prAssetId );
+
+            prObjectCount 				= HoudiniHost.composeObjectList( prAssetId );
 			prHandleCount 				= prAssetInfo.handleCount;
 
 			prAssetName					= prAssetInfo.name;
@@ -1124,22 +1125,22 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 				updateParameters( progress_bar );
 			}
 
-			// Create local object info caches (transforms need to be stored in a parallel array).
+            // Create local object info caches (transforms need to be stored in a parallel array).
 			if ( prObjects == null || prObjects.Length != prObjectCount )
 				prObjects = new HAPI_ObjectInfo[ prObjectCount ];
 			
 			if ( prObjectTransforms == null || prObjectTransforms.Length != prObjectCount )
 				prObjectTransforms = new HAPI_Transform[ prObjectCount ];
-			
-			// Refresh object info arrays as they are lost after serialization.
-			HoudiniHost.composeObjectList( prAssetId );
+
+            // Refresh object info arrays as they are lost after serialization.
+            HoudiniHost.composeObjectList( prAssetId );
 			HoudiniAssetUtility.getArray1Id(
 				prAssetId, HoudiniHost.getComposedObjectList, prObjects, prObjectCount );
 			HoudiniAssetUtility.getArray2Id(
 				prAssetId, HAPI_RSTOrder.HAPI_SRT, HoudiniHost.getComposedObjectTransforms, 
 				prObjectTransforms, prObjectCount );
 
-			bool objects_need_recook = false;
+            bool objects_need_recook = false;
 			if ( !serialization_recovery_only )
 			{
 				// Set asset's transform.
@@ -1874,7 +1875,6 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 	[SerializeField] private List< HoudiniAsset >	myUpStreamTransformAssets;
 	[SerializeField] private List< GameObject >		myUpStreamTransformObjects;
 	
-	[SerializeField] private List< HoudiniAsset >	myDownStreamGeoAssets;
 	[SerializeField] private List< HoudiniAsset >	myUpStreamGeoAssets;
 	[SerializeField] private List< GameObject >		myUpStreamGeoObjects;
 	[SerializeField] private List< int >			myUpStreamGeoInputAssetIds;
