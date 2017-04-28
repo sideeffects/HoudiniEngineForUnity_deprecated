@@ -146,7 +146,7 @@ public class HoudiniObjectControl : HoudiniControl
             // Look for editable nodes
             const bool recursive = true;
             int[] editable_networks = HoudiniHost.getChildNodeList(
-                prAssetId,
+                object_info.nodeId,
                 (int)HAPI_NodeType.HAPI_NODETYPE_SOP,
                 (int)HAPI_NodeFlags.HAPI_NODEFLAGS_EDITABLE,
                 recursive);
@@ -154,7 +154,7 @@ public class HoudiniObjectControl : HoudiniControl
             // Add the editable nodes to it
             for (int n = 0; n < editable_networks.Length; n++)
             {
-                // The editable node needs to be cooked first
+                // Cook the editable node
                 HoudiniHost.cookNode(editable_networks[n]);
 
                 HAPI_GeoInfo editGeoInfo = HoudiniHost.getGeoInfo( editable_networks[n] );
