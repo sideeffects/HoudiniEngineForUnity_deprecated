@@ -178,7 +178,7 @@ public class HoudiniGeoControl : HoudiniObjectControl
 		if ( geo_info.type == HAPI_GeoType.HAPI_GEOTYPE_CURVE )
 		{
 			createAndInitCurve( prNodeId, prObjectId, prGeoId, prIsEditable );
-			needs_recook = true;
+			//needs_recook = true;
 		}
 		else
 		{
@@ -340,7 +340,10 @@ public class HoudiniGeoControl : HoudiniObjectControl
 
 		try
 		{
-			curve.syncPointsWithParm();
+            // Make sure the node is cooked
+            HoudiniHost.cookNode(geo_id);
+
+            curve.syncPointsWithParm();
 			curve.createObject( object_id, geo_id );
 			HoudiniHost.repaint();
 		}

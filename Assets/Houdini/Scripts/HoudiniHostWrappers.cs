@@ -1041,6 +1041,7 @@ public static partial class HoudiniHost
 #endif
 	}
 
+    /*
 	public static HAPI_ObjectInfo[] getObjectInfos( HAPI_NodeId node_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
@@ -1059,8 +1060,52 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
+    */
 
-	public static HAPI_Transform[] getObjectTransforms( HAPI_NodeId node_id, HAPI_RSTOrder rst_order )
+    public static HAPI_ObjectInfo[] getObjectInfos(HAPI_NodeId node_id)
+    {
+#if (HAPI_ENABLE_RUNTIME)
+        HAPI_NodeInfo LocalAssetNodeInfo = getNodeInfo( node_id );
+
+        int object_count = 0;
+        HAPI_ObjectInfo[] object_infos = new HAPI_ObjectInfo[0];
+        if ( LocalAssetNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_SOP )
+        {
+            object_count = 1;
+
+            object_infos = new HAPI_ObjectInfo[object_count];
+            getObjectInfo( LocalAssetNodeInfo.parentId );
+        }
+        else if ( LocalAssetNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
+        {
+            HAPI_Result status_code = HAPI_ComposeObjectList(
+            ref mySession, node_id, "", out object_count );
+            processStatusCode(status_code);
+
+            if ( object_count <= 0)
+            {
+                object_count = 1;
+
+                object_infos = new HAPI_ObjectInfo[object_count];
+                getObjectInfo( node_id );
+            }
+            else
+            {
+                object_infos = new HAPI_ObjectInfo[object_count];
+                status_code = HAPI_GetComposedObjectList(
+                    ref mySession, node_id, object_infos, 0, object_count);
+                processStatusCode(status_code);
+            }            
+        }
+
+        return object_infos;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+    }
+    
+    /*
+    public static HAPI_Transform[] getObjectTransforms( HAPI_NodeId node_id, HAPI_RSTOrder rst_order )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
 		int object_count = 0;
@@ -1078,8 +1123,41 @@ public static partial class HoudiniHost
 		throw new HoudiniErrorUnsupportedPlatform();
 #endif
 	}
+    */
+    
+    public static HAPI_Transform[] getObjectTransforms(HAPI_NodeId node_id, HAPI_RSTOrder rst_order)
+    {
+#if (HAPI_ENABLE_RUNTIME)
+        HAPI_NodeInfo LocalAssetNodeInfo = getNodeInfo(node_id);
 
-	public static int composeObjectList( HAPI_NodeId node_id )
+        HAPI_Transform identity = new HAPI_Transform(true);
+
+        int object_count = 1;
+        HAPI_Transform[] object_transforms = new HAPI_Transform[1];
+        object_transforms[0] = identity;
+
+        if (LocalAssetNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ)
+        {
+            HAPI_Result status_code = HAPI_ComposeObjectList(
+                ref mySession, node_id, "", out object_count);
+            processStatusCode(status_code);
+
+            if (object_count > 0)
+            {
+                object_transforms = new HAPI_Transform[ object_count ];
+                status_code = HAPI_GetComposedObjectTransforms(
+                    ref mySession, node_id, rst_order, object_transforms, 0, object_count);
+                processStatusCode(status_code);
+            }
+        }
+
+        return object_transforms;
+#else
+		throw new HoudiniErrorUnsupportedPlatform();
+#endif
+    }
+    
+    public static int composeObjectList( HAPI_NodeId node_id )
 	{
 #if ( HAPI_ENABLE_RUNTIME )
 		HAPI_NodeInfo node_info;
@@ -1099,7 +1177,7 @@ public static partial class HoudiniHost
 #endif
 	}
 
-	public static void getComposedObjectList(
+    public static void getComposedObjectList(
 		HAPI_NodeId node_id,
 		[Out] HAPI_ObjectInfo[] object_infos,
 		int start, int length )

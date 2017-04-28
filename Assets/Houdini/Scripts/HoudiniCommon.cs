@@ -616,9 +616,12 @@ public struct HAPI_Transform
 		shear = new float[ HoudiniConstants.HAPI_SHEAR_VECTOR_SIZE ];
 
 		rstOrder = HAPI_RSTOrder.HAPI_SRT;
+
+        if ( initialize_fields )
+            init();
 	}
 
-	[ MarshalAs(
+    [ MarshalAs(
 		UnmanagedType.ByValArray,
 		SizeConst = HoudiniConstants.HAPI_POSITION_VECTOR_SIZE,
 		ArraySubType = UnmanagedType.R4 ) ]
@@ -643,6 +646,26 @@ public struct HAPI_Transform
 	public float[] shear;
 
 	public HAPI_RSTOrder rstOrder;
+    
+    public void init()
+    {
+        for (int n = 0; n < HoudiniConstants.HAPI_POSITION_VECTOR_SIZE; n++)
+            position[n] = 0.0f;
+
+        for (int n = 0; n < HoudiniConstants.HAPI_QUATERNION_VECTOR_SIZE; n++)
+        {
+            if (n == 3)
+                rotationQuaternion[n] = 1.0f;
+            else
+                rotationQuaternion[n] = 0.0f;
+        }
+
+        for (int n = 0; n < HoudiniConstants.HAPI_SCALE_VECTOR_SIZE; n++)
+            scale[n] = 1.0f;
+
+        for (int n = 0; n < HoudiniConstants.HAPI_SHEAR_VECTOR_SIZE; n++)
+            scale[n] = 0.0f;
+    }
 }
 	
 [ StructLayout( LayoutKind.Sequential ) ]
