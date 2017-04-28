@@ -154,6 +154,9 @@ public class HoudiniObjectControl : HoudiniControl
             // Add the editable nodes to it
             for (int n = 0; n < editable_networks.Length; n++)
             {
+                // The editable node needs to be cooked first
+                HoudiniHost.cookNode(editable_networks[n]);
+
                 HAPI_GeoInfo editGeoInfo = HoudiniHost.getGeoInfo( editable_networks[n] );
                 myGeos.Add( createGeo( editGeoInfo.nodeId ) );
                 GeoCount++;

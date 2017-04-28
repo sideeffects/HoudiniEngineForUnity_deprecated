@@ -340,9 +340,6 @@ public class HoudiniGeoControl : HoudiniObjectControl
 
 		try
 		{
-            // Make sure the node is cooked
-            HoudiniHost.cookNode(geo_id);
-
             curve.syncPointsWithParm();
 			curve.createObject( object_id, geo_id );
 			HoudiniHost.repaint();
