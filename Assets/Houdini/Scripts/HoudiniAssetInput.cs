@@ -170,8 +170,8 @@ public class HoudiniAssetInput : HoudiniAsset
 	{
 		try
 		{
-			const int object_id = 0;
-			const int geo_id = 0;
+			int object_id = prObjectNodeId;
+			int geo_id = prAssetId;
 
 			// Write marshalled geo to Input Asset.
 			HoudiniAssetUtility.setMesh(
