@@ -899,7 +899,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 
 	public void paint( int vertex_index, float paint_factor, bool inverse )
 	{
-		if ( vertex_index <= 0 || vertex_index >= myVertexCount )
+		if ( vertex_index < 0 || vertex_index >= myVertexCount )
 			return; // TODO: Throw error.
 
 		// If we start writing to our data we assume our data is initialized.
