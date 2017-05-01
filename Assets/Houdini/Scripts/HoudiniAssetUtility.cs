@@ -2105,12 +2105,19 @@ public class HoudiniAssetUtility
 			HoudiniHost.addAttribute( geo_id, 0, attr, ref attr_info );
 
 			for ( int ii = 0; ii < part_control.prVertexList.Length; ii++ )
+			//for (int ii = 0; ii < attr_values.Length; ii++)
 			{
-				int point_index = part_control.prVertexList[ ii ] * 3;
+				int input_index = part_control.prVertexList[ ii ];
+				if ( (input_index < 0 ) || ( input_index >= input_data.Length ) )
+					continue;
+
+				int point_index = input_index * 3;
+				if ( ( point_index + 2 ) >= attr_values.Length )
+					continue;
 				
-				attr_values[ point_index ] = -input_data[ ii ][ 0 ];
-				attr_values[ point_index + 1 ] = input_data[ ii ][ 1 ];
-				attr_values[ point_index + 2 ] = input_data[ ii ][ 2 ];
+				attr_values[ point_index ] = -input_data[ input_index ].x;
+				attr_values[ point_index + 1 ] = input_data[ input_index ].y;
+				attr_values[ point_index + 2 ] = input_data[ input_index ].z;
 			}
 		}
 		else
