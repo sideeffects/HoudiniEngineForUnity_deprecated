@@ -149,6 +149,8 @@ public class HoudiniAssetInput : HoudiniAsset
 
 	protected override int buildCreateAsset( HoudiniProgressBar progress_bar )
 	{
+		// Remove spaces in the node name
+		string inputName = transform.name.Replace(' ', '_');
 		return HoudiniHost.createInputAsset( transform.name );
 	}
 
