@@ -426,15 +426,15 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 			prUpStreamGeoInputAssetIds[ index ] < 0 || 
 			!HoudiniHost.isNodeValid( prUpStreamGeoInputAssetIds[ index ], myUpStreamGeoInputAssetValidationIds[ index ] ) )
 		{
-            prUpStreamGeoInputAssetIds[index] = HoudiniHost.createInputNode(prAssetName + "_GeoInput_" + index);// obj.name );
+			// Remove spaces in the node name
+			string inputName = prAssetName + "_GeoInput_" + index;
+			inputName = inputName.Replace(' ', '_');
 
-            HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo(prUpStreamGeoInputAssetIds[index]);
-            myUpStreamGeoInputAssetValidationIds[index] = node_info.uniqueHoudiniNodeId;
+			prUpStreamGeoInputAssetIds[index] = HoudiniHost.createInputNode( inputName );
 
-            // prUpStreamGeoInputAssetIds[index] = HoudiniHost.createInputAsset(prAssetName + "_GeoInput_" + index);
-            // HAPI_AssetInfo asset_info = HoudiniHost.getAssetInfo( prUpStreamGeoInputAssetIds[ index ] );
-            // myUpStreamGeoInputAssetValidationIds[index] = prNodeInfo.uniqueHoudiniNodeId;// asset_info.nodeId;
-        }
+			HAPI_NodeInfo node_info = HoudiniHost.getNodeInfo(prUpStreamGeoInputAssetIds[index]);
+			myUpStreamGeoInputAssetValidationIds[index] = node_info.uniqueHoudiniNodeId;
+		}
 
 		// Add the geo info onto the asset.
 		if ( !obj.GetComponent< MeshFilter >() )
