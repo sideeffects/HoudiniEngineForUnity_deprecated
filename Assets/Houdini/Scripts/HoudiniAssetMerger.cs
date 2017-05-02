@@ -158,15 +158,13 @@ public class HoudiniAssetMerger : HoudiniAsset
 			if ( !obj || !obj.GetComponent< MeshFilter >() )
 				continue;
 
-
-			//HoudiniHost.connectNodeInput( prNodeId, i, 
+			addGeoAsGeoInput( obj, i );
 		}
 
 		// Cleanup inputs.
 		while ( last_input_count > myInputs.Count )
 		{
-
-			//removeGeoInput( last_input_count - 1 );
+			removeGeoInput( last_input_count - 1 );
 			last_input_count--;
 		}
 
@@ -220,6 +218,7 @@ public class HoudiniAssetMerger : HoudiniAsset
 	[SerializeField] private bool myShowInputSelection;
 
 	[SerializeField] private GameObject myInputObject;
+
 
 	[SerializeField] private bool myUseLayerMask;
 	[SerializeField] private LayerMask myLayerMask;
