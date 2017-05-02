@@ -176,6 +176,8 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 		bool is_collision_geo = ( part_info.name.Contains( HoudiniHost.prCollisionGroupName ) );
 		bool is_rendered_collision_geo = ( part_info.name.Contains( HoudiniHost.prRenderedCollisionGroupName ) );
+		if ( is_rendered_collision_geo )
+			is_collision_geo = false;
 
 		// For Debugging.
 #if false
@@ -253,16 +255,30 @@ public class HoudiniPartControl : HoudiniGeoControl
 				// picks up the mesh automagically)
 				if ( prAsset.prSplitGeosByGroup )
 				{
-					if ( is_rendered_collision_geo )
+					if ( is_rendered_collision_geo || is_collision_geo )
 					{
+						getOrCreateComponent<MeshRenderer>();
+
+						// For simple prim collider (Box / Sphere), recreating the Box/Sphere collider
+						// will use the mesh renderer to position/size it properly
+						// Unfortunately for now, the returned part infos can have transform issue for box/sphere prim
+
 						// Create the box collider if one exists.
 						if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_BOX )
 						{
-							createBoxCollider( part_info );
+							//createBoxCollider( part_info );
+							removeComponent<BoxCollider>();
+							BoxCollider mesh_collider = getOrCreateComponent<BoxCollider>();
+							mesh_collider.enabled = false;
+							mesh_collider.enabled = true;
 						}
 						else if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_SPHERE )
 						{
-							createSphereCollider( part_info );
+							//createSphereCollider( part_info );
+							removeComponent<SphereCollider>();
+							SphereCollider mesh_collider = getOrCreateComponent<SphereCollider>();
+							mesh_collider.enabled = false;
+							mesh_collider.enabled = true;
 						}
 						else
 						{
@@ -271,28 +287,11 @@ public class HoudiniPartControl : HoudiniGeoControl
 							mesh_collider.enabled = true;
 						}
 
-						getOrCreateComponent< MeshRenderer >();
-					}
-					else if ( is_collision_geo )
-					{
-						// Create the box collider if one exists.
-						if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_BOX )
+						if ( is_collision_geo )
 						{
-							createBoxCollider( part_info );
+							// We're not a rendered collision geo so we dont need a renderer
+							removeComponent<MeshRenderer>();
 						}
-						else if ( myPartType == HAPI_PartType.HAPI_PARTTYPE_SPHERE )
-						{
-							createSphereCollider( part_info );
-						}
-						else
-						{
-							MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
-							mesh_collider.enabled = false;
-							mesh_collider.enabled = true;
-						}
-
-						// We're not a rendered collision geo so we dont need a renderer
-						removeComponent< MeshRenderer >();
 					}
 					else
 					{
@@ -447,15 +446,23 @@ public class HoudiniPartControl : HoudiniGeoControl
 		{
 			bool is_visible = prObjectVisible;
 			is_visible &= ( prAsset.prIsGeoVisible || prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE );
-			if ( prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE &&
-				myGeoControl.prGeoAttributeManager != null )
-				is_visible &=
-					myGeoControl.prGeoAttributeManager.prCurrentMode != HoudiniGeoAttributeManager.Mode.NONE;
+			if ( prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE && myGeoControl.prGeoAttributeManager != null )
+				is_visible &= myGeoControl.prGeoAttributeManager.prCurrentMode != HoudiniGeoAttributeManager.Mode.NONE;
 
-			if ( gameObject.GetComponent< MeshCollider >() )
-				gameObject.GetComponent< MeshCollider >().enabled = is_visible && ( is_collision_geo || is_rendered_collision_geo );
+			// Do we need to enable the colliders?
+			bool enable_colliders = is_visible && ( is_collision_geo || is_rendered_collision_geo );
+
+			if ( gameObject.GetComponent<MeshCollider>() )
+				gameObject.GetComponent<MeshCollider>().enabled = enable_colliders;
+			if ( gameObject.GetComponent<BoxCollider>() )
+				gameObject.GetComponent<BoxCollider>().enabled = enable_colliders;
+			if ( gameObject.GetComponent<SphereCollider>() )
+				gameObject.GetComponent<SphereCollider>().enabled = enable_colliders;
+
+			// Do we need to enable the mesh renderer ?
+			bool enable_renderers = is_visible && !is_collision_geo;
 			if ( gameObject.GetComponent< MeshRenderer >() )
-				gameObject.GetComponent< MeshRenderer >().enabled = is_visible && !is_collision_geo;
+				gameObject.GetComponent< MeshRenderer >().enabled = enable_renderers;
 		}
 
 		// Assign materials.
