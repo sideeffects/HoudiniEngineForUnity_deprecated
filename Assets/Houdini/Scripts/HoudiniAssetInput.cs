@@ -151,7 +151,7 @@ public class HoudiniAssetInput : HoudiniAsset
 	{
 		// Remove spaces in the node name
 		string inputName = transform.name.Replace(' ', '_');
-		return HoudiniHost.createInputAsset( transform.name );
+		return HoudiniHost.createInputAsset( inputName );
 	}
 
 	protected override void buildFullBuildCustomWork( ref HoudiniProgressBar progress_bar, bool is_duplication )
