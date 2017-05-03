@@ -242,7 +242,8 @@ public class HoudiniPartControl : HoudiniGeoControl
 						this, part_mesh,
 						prAsset.prGenerateUVs,
 						prAsset.prGenerateLightmapUV2s,
-						prAsset.prGenerateTangents );
+						prAsset.prGenerateTangents,
+						prAsset.prSplitPointsByVertexAttribute );
 				}
 				catch ( HoudiniErrorIgnorable ) {}
 				catch ( HoudiniError error )

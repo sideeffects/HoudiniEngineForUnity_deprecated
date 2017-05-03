@@ -249,8 +249,12 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 														? mySplitGeosByGroup
 														: HoudiniHost.prSplitGeosByGroup; } 
 												set { mySplitGeosByGroup = value; } }
-	public bool prSplitPointsByVertexAttribute { get { return HoudiniHost.prSplitPointsByVertexAttributes; }
-												private set { } }
+	public bool prSplitPointsByVertexAttributeOverride {	get { return mySplitPointsByVertexAttributesOverride; }
+															set { mySplitPointsByVertexAttributesOverride = value; } }
+	public bool prSplitPointsByVertexAttribute { get { return mySplitPointsByVertexAttributesOverride
+																? mySplitPointsByVertexAttributes
+																: HoudiniHost.prSplitPointsByVertexAttributes; }
+												set { mySplitPointsByVertexAttributes = value; } }
 
 	public bool prOmitPartNameEnumeration {		get { return myOmitPartNameEnumeration; }
 												set { myOmitPartNameEnumeration = value; } }
@@ -854,6 +858,8 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		prImportTemplatedGeos 			= HoudiniHost.myDefaultImportTemplatedGeos;
 		prSplitGeosByGroupOverride		= false;
 		prSplitGeosByGroup				= HoudiniHost.myDefaultSplitGeosByGroup;
+		prSplitPointsByVertexAttributeOverride = false;
+		prSplitPointsByVertexAttribute  = HoudiniHost.myDefaultSplitPointsByVertexAttributes;
 		prOmitPartNameEnumeration		= false;
 
 		prEnableLogging					= false;
@@ -1933,6 +1939,8 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 	[SerializeField] private bool					myImportTemplatedGeos;
 	[SerializeField] private bool					mySplitGeosByGroupOverride;
 	[SerializeField] private bool					mySplitGeosByGroup;
+	[SerializeField] private bool					mySplitPointsByVertexAttributesOverride;
+	[SerializeField] private bool					mySplitPointsByVertexAttributes;
 	[SerializeField] private bool					myOmitPartNameEnumeration;
 	
 	[SerializeField] private bool					myEnableLogging;
