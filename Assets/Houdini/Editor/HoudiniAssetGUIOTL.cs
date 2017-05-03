@@ -382,6 +382,22 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 
 		HoudiniGUI.separator();
 
+		// Split Points By Vertex Attributes Toggle
+		{
+			createToggleForProperty(
+				"split_points_by_vertex_attribute_override", "Override Split Points by Vertex Attributes", "prSplitPointsByVertexAttributeOverride",
+				ref myUndoInfo.splitPointsByVertexAttributeOverride, null );
+			createToggleForProperty(
+				"split_points_by_vertex_attribute", "Split Points by Vertex Attributes", "prSplitPointsByVertexAttribute",
+				ref myUndoInfo.splitPointsByVertexAttribute, () => EditorUtility.DisplayDialog(
+					"Rebuild Required",
+					"This change will take affect only after a full asset rebuild.",
+					"Ok"), false,
+				!myAsset.prSplitPointsByVertexAttributeOverride, " (check the override checkbox to enable)");
+		}
+
+		HoudiniGUI.separator();
+
 		// Omit Part Name Enumeration
 		createToggleForProperty(
 			"omit_part_name_enumeration", "Omit Part Name Enumeration", 
