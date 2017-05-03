@@ -1761,7 +1761,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 				}
 		}
 	
-		if ( prGeoInputCount > 0 )
+		if ( prGeoInputCount > 0 && prUpStreamGeoAssets.Count <= 0 )
 			for ( int ii = 0; ii < prGeoInputCount ; ++ii )
 			{
 				prUpStreamGeoAssets.Add( null );
@@ -1773,8 +1773,20 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		if (prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
 			for ( int ii = 0; ii < prTransformInputCount ; ++ii )
 				if ( prUpStreamTransformAssets[ ii ] )
-                    HoudiniHost.connectNodeInput( prNodeId, ii, prUpStreamTransformAssets[ii].prNodeId );
-                    //HoudiniHost.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
+					HoudiniHost.connectNodeInput( prNodeId, ii, prUpStreamTransformAssets[ii].prNodeId );
+					//HoudiniHost.connectAssetTransform( prUpStreamTransformAssets[ ii ].prAssetId, prAssetId, ii );
+
+		for ( int ii = 0; ii < prGeoInputCount ; ++ii )
+		{
+			if ( prUpStreamGeoAssets[ ii ] && ( prUpStreamGeoAssets[ ii ].prNodeId >= 0 ) )
+			{
+				HoudiniHost.connectNodeInput( prNodeId, ii, prUpStreamGeoAssets[ ii ].prNodeId );
+			}
+			else if ( prUpStreamGeoObjects[ ii ] && ( prUpStreamGeoInputAssetIds[ ii ] >= 0 ) )
+			{
+				HoudiniHost.connectNodeInput( prNodeId, ii, prUpStreamGeoInputAssetIds[ ii ] );
+			}
+		}
 
 		foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
 		{

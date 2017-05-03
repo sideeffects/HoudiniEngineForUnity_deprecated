@@ -88,6 +88,8 @@ public partial class HoudiniAssetGUIOTL : HoudiniAssetGUI
 			{
 				myGeoAttributeManagerGUI = null;
 				myAsset.buildAll();
+				if ( myAsset.prGeoInputCount > 0 || myAsset.prTransformInputCount > 0 )
+					myAsset.buildClientSide();
 			}
 	
 			if ( GUILayout.Button( "Recook" ) )
