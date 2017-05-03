@@ -151,6 +151,15 @@ public class HoudiniGUIUtility : Editor
 
 		return near_plane_point;
 	}
+
+	public static float getPixelsPerPoint()
+	{
+#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_5_3
+		return 1.0f;
+#else
+		return EditorGUIUtility.pixelsPerPoint;
+#endif
+	}
 	
 	public const string mySaveHoudiniSceneLabel		= "Save Current Houdini Scene...";
 	public const string myLoadAssetLabel			= "Load Houdini Asset...";

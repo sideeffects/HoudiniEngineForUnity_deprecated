@@ -582,9 +582,13 @@ public class HoudiniCurveGUI : Editor
 	private Vector3 getMousePosition( ref Event current_event )
 	{
 		Vector3 mouse_position = current_event.mousePosition;
-		
+
+		// We need to take PixelPerPoints into consideration for Retina displays
+		float fPixelsPerPoints = HoudiniGUIUtility.getPixelsPerPoint();
+		mouse_position *= fPixelsPerPoints;
+
 		// Camera.current.pixelHeight != Screen.height for some reason.
-		mouse_position.y = myTempCamera.pixelHeight - mouse_position.y;
+		mouse_position.y = ( myTempCamera.pixelHeight / fPixelsPerPoints ) - mouse_position.y;
 
 		return mouse_position;
 	}
@@ -910,10 +914,12 @@ public class HoudiniCurveGUI : Editor
 		if ( !mySceneWindowHasFocus && myCurve.prEditable )
 			help_text = "Scene window doesn't have focus. Hotkeys may not work. Right click anywhere in the scene to focus.";
 
+		// We need to take PixelsPerPoint into consideration for Retina Displays
+		float fPixelsPerPoints = HoudiniGUIUtility.getPixelsPerPoint();
+
 		Color original_color		= GUI.color;
-		
-		float scene_width			= myTempCamera.pixelWidth;
-		float scene_height			= myTempCamera.pixelHeight;
+		float scene_width			= myTempCamera.pixelWidth / fPixelsPerPoints;
+		float scene_height			= myTempCamera.pixelHeight / fPixelsPerPoints;
 		float border_width			= myActiveBorderWidth;
 		float border_padding		= mySceneUIBorderPadding;
 		float border_total			= border_width + border_padding;
