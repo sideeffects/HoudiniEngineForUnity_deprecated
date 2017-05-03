@@ -207,18 +207,18 @@ public class HoudiniAssetGUI : Editor
 	
 	protected bool setTransformInput( int index )
 	{
-		/*
 		if ( myAsset.prUpStreamTransformObjects == null || myAsset.prUpStreamTransformObjects.Count <= 0 )
 			return false;
 
 		bool join_last				= false;
 		bool no_label_toggle_last	= true;
+		GameObject temp_obj         = null;
 
 		HoudiniGUIParm trans_input	= new HoudiniGUIParm( "trans_input_" + index, myAsset.prTransInputNames[ index ] );
 		Object obj					= (Object) myAsset.prUpStreamTransformObjects[ index ];
 		bool changed				= HoudiniGUI.objectField( ref trans_input, ref obj, typeof( GameObject ),
-															ref join_last, ref no_label_toggle_last );
-		
+															ref join_last, ref no_label_toggle_last, null, ref temp_obj );
+
 		if ( changed )
 		{
 			if ( !obj )
@@ -240,8 +240,6 @@ public class HoudiniAssetGUI : Editor
 		}
 		
 		return changed;
-		*/
-		return false;
 	}
 
 	protected void drawLicenseLogo()
