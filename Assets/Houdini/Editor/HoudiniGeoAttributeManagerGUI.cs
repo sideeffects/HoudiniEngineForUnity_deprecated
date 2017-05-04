@@ -556,7 +556,7 @@ public class HoudiniGeoAttributeManagerGUI
 		mouse_position *= fPixelsPerPoints;
 
 		// Camera.current.pixelHeight != Screen.height for some reason.
-		mouse_position.y = ( myTempCamera.pixelHeight / fPixelsPerPoints ) - mouse_position.y;
+		mouse_position.y = myTempCamera.pixelHeight - mouse_position.y;
 
 		return mouse_position;
 	}
@@ -943,7 +943,9 @@ public class HoudiniGeoAttributeManagerGUI
 		// Start Drawing --------------------------------------------------------------------------------------------
 		Handles.BeginGUI();
 
-		GUILayout.BeginArea( new Rect( 0, 0, Screen.width, Screen.height ) );
+		float screenWidth = Screen.width / fPixelsPerPoints;
+		float screenHeight = Screen.height / fPixelsPerPoints;
+		GUILayout.BeginArea( new Rect( 0, 0, screenWidth, screenHeight ) );
 
 		// Draw the background boxes for the Scene UI.
 		GUI.color = box_color;
@@ -1005,8 +1007,8 @@ public class HoudiniGeoAttributeManagerGUI
 			border_texture.SetPixel( 0, 0, new Color( box_color.r, box_color.g, box_color.b, 0.6f ) );
 			border_texture.Apply();
 
-			float width					= myTempCamera.pixelWidth;
-			float height				= myTempCamera.pixelHeight;
+			float width					= scene_width;
+			float height				= scene_height;
 
 			if ( myManager.prCurrentMode == HoudiniGeoAttributeManager.Mode.NONE )
 			{
