@@ -476,19 +476,16 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		if ( ( input_index < 0 ) || ( input_index >= prGeoInputCount ) )
 			return;
 
-		if ( prGeoInputsTransformTypes[ input_index ] == newTransformType )
-			return;
-
 		try
 		{
-			int inputNodeID = HoudiniHost.queryNodeInput(prNodeId, input_index);
-			if (inputNodeID < 0)
+			int inputNodeID = HoudiniHost.queryNodeInput( prNodeId, input_index );
+			if ( inputNodeID < 0 )
 				return;
 
 			string sXformType = "xformtype";
 			HoudiniHost.setParmIntValue( inputNodeID, sXformType, 0, newTransformType );
 
-			prGeoInputsTransformTypes[input_index] = newTransformType;
+			prGeoInputsTransformTypes[ input_index ] = newTransformType;
 		}
 		catch ( HoudiniError )
 		{
@@ -830,7 +827,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		// Inputs ---------------------------------------------------------------------------------------------------
         prTransformInputCount 			= 0;
 		prGeoInputCount 				= 0;
-		prGeoInputsTransformTypes       = new List< int >();
+		prGeoInputsTransformTypes		= new List< int >();
 		
 		prDownStreamTransformAssets		= new List< HoudiniAsset >();
 		prUpStreamTransformAssets 		= new List< HoudiniAsset >();
@@ -1812,6 +1809,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 
 		for ( int ii = 0; ii < prGeoInputCount ; ++ii )
 		{
+			// Reconnect the Geo inputs
 			if ( prUpStreamGeoAssets[ ii ] && ( prUpStreamGeoAssets[ ii ].prNodeId >= 0 ) )
 			{
 				HoudiniHost.connectNodeInput( prNodeId, ii, prUpStreamGeoAssets[ ii ].prNodeId );
@@ -1820,6 +1818,9 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 			{
 				HoudiniHost.connectNodeInput( prNodeId, ii, prUpStreamGeoInputAssetIds[ ii ] );
 			}
+
+			// Update their Transform Type
+			updateGeoInputTransformType( ii, prGeoInputsTransformTypes[ ii ] );
 		}
 
 		foreach ( HoudiniAsset downstream_asset in prDownStreamTransformAssets )
