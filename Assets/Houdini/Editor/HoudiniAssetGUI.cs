@@ -137,13 +137,21 @@ public class HoudiniAssetGUI : Editor
 						Object obj = (Object) myAsset.prUpStreamGeoObjects[ input_index ];
 						myParmChanges |= HoudiniGUI.objectField(
 							ref geo_input, ref obj, typeof( GameObject ), ref join_last, ref no_label_toggle_last, null, ref temp_obj );
-						
+
+						HoudiniGUIParm geo_input_transform_type = new HoudiniGUIParm(
+							"geo_input_transform_type_" + input_index, "Keep world transform" );
+
+						bool transform_type = myAsset.prGeoInputsTransformTypes[input_index] != 0;
+						bool TransformTypeUpdate = HoudiniGUI.toggle(ref geo_input_transform_type, ref transform_type);
+
+						bool need_build_client_side = false;
 						if ( myParmChanges || !myAsset.isGeoInputValid( input_index ) )
 						{
 							if ( !obj )
 							{
 								myAsset.removeGeoInput( input_index );
-								myAsset.buildClientSide();
+								//myAsset.buildClientSide();
+								need_build_client_side = true;
 							}
 							else
 							{
@@ -169,21 +177,36 @@ public class HoudiniAssetGUI : Editor
 
 								if ( asset == null )
 								{
+									// Connecting a new game object
 									myAsset.addGeoAsGeoInput( new_obj, input_index );
-									myAsset.buildClientSide();
+									myAsset.updateGeoInputTransformType( input_index, transform_type ? 1 : 0 );
+									need_build_client_side = true;
+									//myAsset.buildClientSide();
 								}
 								else if ( myAsset.prUpStreamGeoAssets[ input_index ] != asset )
 								{
+									// Connecting a new asset
 									if ( myAsset == asset )
 										Debug.LogError( "Can't connect an asset to itself!" );
 									else
 									{
 										myAsset.addAssetAsGeoInput( asset, object_index, input_index );
-										myAsset.buildClientSide();
+										myAsset.updateGeoInputTransformType( input_index, transform_type ? 1 : 0 );
+										need_build_client_side = true;
+										//myAsset.buildClientSide();
 									}
 								}
 							}
 						}
+
+						if ( TransformTypeUpdate )
+						{
+							myAsset.updateGeoInputTransformType(input_index, transform_type ? 1 : 0);
+							need_build_client_side = true;
+						}
+
+						if ( need_build_client_side )
+							myAsset.buildClientSide();
 					} // for
 				} // if
 			} // if
