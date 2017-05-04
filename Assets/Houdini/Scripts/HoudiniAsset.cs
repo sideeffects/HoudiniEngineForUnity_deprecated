@@ -118,6 +118,8 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 																	set { myTransformInputCount = value; } }
 	public int						prGeoInputCount {				get { return myGeoInputCount; } 
 																	set { myGeoInputCount = value; } }
+	public List< int >				prGeoInputsTransformTypes {		get { return myGeoInputsTransformTypes; }
+																	set { myGeoInputsTransformTypes = value; } }
 	
 	public List< HoudiniAsset >		prDownStreamTransformAssets {	get { return myDownStreamTransformAssets; } 
 																	set { myDownStreamTransformAssets = value; } }
@@ -468,6 +470,36 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 			savePreset();
 #endif // UNITY_EDITOR
 	}
+
+	public void updateGeoInputTransformType( int input_index, int newTransformType )
+	{
+		if ( ( input_index < 0 ) || ( input_index >= prGeoInputCount ) )
+			return;
+
+		if ( prGeoInputsTransformTypes[ input_index ] == newTransformType )
+			return;
+
+		try
+		{
+			int inputNodeID = HoudiniHost.queryNodeInput(prNodeId, input_index);
+			if (inputNodeID < 0)
+				return;
+
+			string sXformType = "xformtype";
+			HoudiniHost.setParmIntValue( inputNodeID, sXformType, 0, newTransformType );
+
+			prGeoInputsTransformTypes[input_index] = newTransformType;
+		}
+		catch ( HoudiniError )
+		{
+			// Do nothing.
+		}
+		catch ( Exception error )
+		{
+			Debug.LogError( error.ToString() );
+		}
+	}
+
 #if UNITY_EDITOR
 	protected void marshalAnimCurve( int node_id, AnimationCurve curve, HAPI_TransformComponent transform_component )
 	{
@@ -798,6 +830,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		// Inputs ---------------------------------------------------------------------------------------------------
         prTransformInputCount 			= 0;
 		prGeoInputCount 				= 0;
+		prGeoInputsTransformTypes       = new List< int >();
 		
 		prDownStreamTransformAssets		= new List< HoudiniAsset >();
 		prUpStreamTransformAssets 		= new List< HoudiniAsset >();
@@ -1768,6 +1801,7 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 				prUpStreamGeoObjects.Add( null );
 				prUpStreamGeoInputAssetIds.Add( -1 );
 				myUpStreamGeoInputAssetValidationIds.Add( -1 );
+				prGeoInputsTransformTypes.Add(1);
 			}
 
 		if (prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_OBJ )
@@ -1888,7 +1922,8 @@ public abstract class HoudiniAsset : HoudiniObjectControl
     	
 	[SerializeField] private int 					myTransformInputCount;
 	[SerializeField] private int					myGeoInputCount;
-	
+	[SerializeField] private List<int>				myGeoInputsTransformTypes;
+
 	[SerializeField] private List< HoudiniAsset >	myDownStreamTransformAssets;
 	[SerializeField] private List< HoudiniAsset >	myUpStreamTransformAssets;
 	[SerializeField] private List< GameObject >		myUpStreamTransformObjects;

@@ -143,10 +143,14 @@ public class HoudiniObjectControl : HoudiniControl
 			while ( myGeos.Count < GeoCount )
 				myGeos.Add( createGeo( display_geo_info.nodeId ) );
 
-			// Look for editable nodes inside the network
+			int node_id = object_info.nodeId;
+			if ( prAsset.prNodeInfo.type == HAPI_NodeType.HAPI_NODETYPE_SOP )
+				node_id = display_geo_info.nodeId;
+
+			// Look for editable nodes inside the network/the object
 			const bool recursive = true;
 			int[] editable_networks = HoudiniHost.getChildNodeList(
-				display_geo_info.nodeId,
+				node_id,
 				(int)HAPI_NodeType.HAPI_NODETYPE_SOP,
 				(int)HAPI_NodeFlags.HAPI_NODEFLAGS_EDITABLE,
 				recursive);
