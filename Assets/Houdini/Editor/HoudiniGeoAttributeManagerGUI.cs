@@ -254,6 +254,8 @@ public class HoudiniGeoAttributeManagerGUI
 				ray.origin = myTempCamera.transform.position;
 
 				MeshCollider mesh_collider  = myManager.prMeshCollider;
+				if ( !mesh_collider.enabled )
+					mesh_collider.enabled = true;
 				RaycastHit hit_info;
 				mesh_collider.Raycast( ray, out hit_info, myIntersectionRayLength );
 
