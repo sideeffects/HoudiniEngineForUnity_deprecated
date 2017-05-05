@@ -151,6 +151,11 @@ public class HoudiniPartControl : HoudiniGeoControl
 		bool is_empty = part_info.vertexCount <= 0 && part_info.pointCount <= 0;
 		bool is_mesh = ( part_info.vertexCount > 0 );
 
+		bool is_collision_geo = ( part_info.name.Contains( HoudiniHost.prCollisionGroupName ) );
+		bool is_rendered_collision_geo = ( part_info.name.Contains( HoudiniHost.prRenderedCollisionGroupName ) );
+		if ( is_rendered_collision_geo )
+			is_collision_geo = false;
+
 		// For Debugging.
 #if false
 		Debug.Log( "ATTRIBS" );
@@ -224,22 +229,29 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 				// Add collider if group name matches. (Should be added after the mesh is set so that it
 				// picks up the mesh automagically)
-				if ( part_info.name.Contains( HoudiniHost.prRenderedCollisionGroupName ) )
+				if ( is_rendered_collision_geo )
 				{
-					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 					getOrCreateComponent< MeshRenderer >();
+
+					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 					mesh_collider.enabled = false;
-					mesh_collider.enabled = true;
+					mesh_collider.enabled = true;                    
 				}
-				else if ( part_info.name.Contains( HoudiniHost.prCollisionGroupName ) )
+				else if ( is_collision_geo )
 				{
 					MeshCollider mesh_collider = getOrCreateComponent< MeshCollider >();
 					mesh_collider.enabled = false;
 					mesh_collider.enabled = true;
+
+					// We're not a rendered collision geo so we dont need a renderer
+					removeComponent< MeshRenderer >();
 				}
 				else
 				{
 					getOrCreateComponent< MeshRenderer >();
+
+					// We're not a collision geo so we dont need a collider
+					removeComponent< MeshCollider >();
 				}
 
 				if ( myGeoControl.prGeoType == HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
@@ -267,9 +279,9 @@ public class HoudiniPartControl : HoudiniGeoControl
 					myGeoControl.prGeoAttributeManager.prCurrentMode != HoudiniGeoAttributeManager.Mode.NONE;
 
 			if ( gameObject.GetComponent< MeshCollider >() )
-				gameObject.GetComponent< MeshCollider >().enabled = is_visible;
+				gameObject.GetComponent< MeshCollider >().enabled = is_visible && ( is_collision_geo || is_rendered_collision_geo );
 			if ( gameObject.GetComponent< MeshRenderer >() )
-				gameObject.GetComponent< MeshRenderer >().enabled = is_visible;
+				gameObject.GetComponent< MeshRenderer >().enabled = is_visible && !is_collision_geo;
 		}
 
 		// Assign materials.

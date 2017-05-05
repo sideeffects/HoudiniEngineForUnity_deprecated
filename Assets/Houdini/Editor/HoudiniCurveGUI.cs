@@ -1,18 +1,32 @@
 ﻿/*
- * PROPRIETARY INFORMATION.  This software is proprietary to
- * Side Effects Software Inc., and is not to be reproduced,
- * transmitted, or disclosed in any way without written permission.
- *
- * Produced by:
- *      Side Effects Software Inc
- *		123 Front Street West, Suite 1401
- *		Toronto, Ontario
- *		Canada   M5J 2M2
- *		416-504-9876
- *
- * COMMENTS:
- * 
- */
+* Copyright (c) <2017> Side Effects Software Inc.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+* Produced by:
+*      Side Effects Software Inc
+*      123 Front Street West, Suite 1401
+*      Toronto, Ontario
+*      Canada   M5J 2M2
+*      416-504-9876
+*
+*/
 
 // Master control for enabling runtime.
 #if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
@@ -567,7 +581,11 @@ public class HoudiniCurveGUI : Editor
 	private Vector3 getMousePosition( ref Event current_event )
 	{
 		Vector3 mouse_position = current_event.mousePosition;
-		
+
+		// We need to take PixelPerPoints into consideration for Retina displays
+		float fPixelsPerPoints = HoudiniGUIUtility.getPixelsPerPoint();
+		mouse_position *= fPixelsPerPoints;
+
 		// Camera.current.pixelHeight != Screen.height for some reason.
 		mouse_position.y = myTempCamera.pixelHeight - mouse_position.y;
 
@@ -895,10 +913,12 @@ public class HoudiniCurveGUI : Editor
 		if ( !mySceneWindowHasFocus && myCurve.prEditable )
 			help_text = "Scene window doesn't have focus. Hotkeys may not work. Right click anywhere in the scene to focus.";
 
+		// We need to take PixelsPerPoint into consideration for Retina Displays
+		float fPixelsPerPoints = HoudiniGUIUtility.getPixelsPerPoint();
+
 		Color original_color		= GUI.color;
-		
-		float scene_width			= myTempCamera.pixelWidth;
-		float scene_height			= myTempCamera.pixelHeight;
+		float scene_width			= myTempCamera.pixelWidth / fPixelsPerPoints;
+		float scene_height			= myTempCamera.pixelHeight / fPixelsPerPoints;
 		float border_width			= myActiveBorderWidth;
 		float border_padding		= mySceneUIBorderPadding;
 		float border_total			= border_width + border_padding;
@@ -952,7 +972,9 @@ public class HoudiniCurveGUI : Editor
 
 		// Start Drawing --------------------------------------------------------------------------------------------
 		Handles.BeginGUI();
-		GUILayout.BeginArea( new Rect( 0, 0, Screen.width, Screen.height ) );
+		float screenWidth = Screen.width / fPixelsPerPoints;
+		float screenHeight = Screen.height / fPixelsPerPoints;
+		GUILayout.BeginArea( new Rect( 0, 0, screenWidth, screenHeight ) );
 
 		// Draw the background boxes for the Scene UI.
 		GUI.color = box_color;
@@ -1014,8 +1036,8 @@ public class HoudiniCurveGUI : Editor
 			border_texture.SetPixel( 0, 0, new Color( box_color.r, box_color.g, box_color.b, 0.6f ) );
 			border_texture.Apply();
 
-			float width					= myTempCamera.pixelWidth;
-			float height				= myTempCamera.pixelHeight;
+			float width					= scene_width;
+			float height				= scene_height;
 
 			if ( myCurve.prCurrentMode == HoudiniCurve.Mode.NONE )
 			{

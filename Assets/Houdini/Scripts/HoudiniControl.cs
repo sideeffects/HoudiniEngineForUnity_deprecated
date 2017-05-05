@@ -117,6 +117,17 @@ public class HoudiniControl : MonoBehaviour
 		return component;
 	}
 
+	public void removeComponent<T>() where T : Component
+	{
+		removeComponent<T>(gameObject);
+	}
+	static public void removeComponent<T>(GameObject game_object) where T : Component
+	{
+		T component = game_object.GetComponent<T>();
+		if (component != null)
+			DestroyImmediate(component);
+	}
+
 	public void removeComponentsFromChildren< T >() where T : Component
 	{
 		removeComponentsFromChildren< T >( gameObject );
