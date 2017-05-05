@@ -129,7 +129,7 @@ public class HoudiniMenu : MonoBehaviour
 		HoudiniHost.saveScene( path_to_hip, false );
 		var houdini = new System.Diagnostics.Process();
 		houdini.StartInfo.FileName = path_to_houdini;
-		houdini.StartInfo.Arguments = path_to_hip;
+		houdini.StartInfo.Arguments = "\"" + path_to_hip + "\"";
 		houdini.Start();
 	}
 
