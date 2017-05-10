@@ -298,6 +298,9 @@ public class HoudiniAssetGUIInput : HoudiniAssetGUI
 			myAssetInput.prGeoAttributeManager.prHasChanged = false;
 			myAssetInput.buildClientSide();
 		}
+
+		if (myAssetInput.GetComponent<MeshRenderer>() )
+			myAssetInput.GetComponent<MeshRenderer>().enabled = true;
 	}
 
 	private HoudiniAssetInput myAssetInput;

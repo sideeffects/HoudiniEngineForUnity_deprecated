@@ -1639,6 +1639,13 @@ public class HoudiniAssetUtility
 			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_COLOR, 
 			ref colour_attr_info, ref colour_attr, HoudiniHost.getAttributeFloatData );
 
+		// Get Alpha attributes.
+		HAPI_AttributeInfo alpha_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_ALPHA );
+		float[] alpha_attr = new float[ 0 ];
+		getAttribute(
+			geo_id, part_id, HoudiniConstants.HAPI_ATTRIB_ALPHA,
+			ref alpha_attr_info, ref alpha_attr, HoudiniHost.getAttributeFloatData );
+
 		// Get tangent attributes.
 		HAPI_AttributeInfo tangent_attr_info = new HAPI_AttributeInfo( HoudiniConstants.HAPI_ATTRIB_TANGENT );
 		float[] tangent_attr = new float[ 0 ];
@@ -1846,31 +1853,53 @@ public class HoudiniAssetUtility
 			colours[ i ].g = 1.0f;
 			colours[ i ].b = 1.0f;
 			colours[ i ].a = 1.0f;
-			if ( colour_attr_info.exists &&
-				part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
+			if ( colour_attr_info.exists &&	part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 			{
-                bool point_owner = colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+				bool point_owner = colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 
-                // If the colours are per face divide the vertex index by the number of vertices per face
-                // which should always be HAPI_MAX_VERTICES_PER_FACE.
-                if (colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM)
-                {
-                    int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-                    for (int j = 0; j < colour_attr_info.tupleSize; ++j)
-                        colours[i][j]
-                            = colour_attr[face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j];
-                }
+				// If the colours are per face divide the vertex index by the number of vertices per face
+				// which should always be HAPI_MAX_VERTICES_PER_FACE.
+				if (colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM)
+				{
+					int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+					for (int j = 0; j < colour_attr_info.tupleSize; ++j)
+						colours[i][j]
+							= colour_attr[face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j];
+				}
 
-                // If the colours are per vertex just query directly into the normals array we filled above.
-                else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
-                    for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
+				// If the colours are per vertex just query directly into the colour array we filled above.
+				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
+					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
 						colours[ i ][ j ] = colour_attr[ i * colour_attr_info.tupleSize + j ];
 				
-				// If the colours are per point use the vertex list array point indicies to query into
-				// the normal array we filled above.
+				// If the colours are per point use the vertex list array point indices to query into
+				// the colour array we filled above.
 				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
 						colours[ i ][ j ] = colour_attr[ vertex_list[ i ] * colour_attr_info.tupleSize + j ];
+			}
+
+			// Fill the colour's alpha if available
+			if ( alpha_attr_info.exists &&	part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
+			{
+				bool point_owner = alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
+
+				// If the alphas are per face divide the vertex index by the number of vertices per face
+				// which should always be HAPI_MAX_VERTICES_PER_FACE.
+				if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
+				{
+					int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
+					colours[ i ].a = alpha_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE ];
+				}
+
+				// If the alphas are per vertex just query directly into the alpha array we filled above.
+				else if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
+					colours[ i ].a = alpha_attr[ i ];
+				
+				// If the alphas are per point use the vertex list array point indices to query into
+				// the alpha array we filled above.
+				else if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
+					colours[ i ].a = alpha_attr[ vertex_list[ i ] ];
 			}
 		}
 
@@ -2180,6 +2209,7 @@ public class HoudiniAssetUtility
 		int[] triangles 				= mesh.triangles;
 		Vector2[] uvs 					= mesh.uv;
 		Vector3[] normals 				= mesh.normals;
+		Color[] colors					= mesh.colors;
 		
 		HAPI_GeoInfo geo_info 			= new HAPI_GeoInfo();
 		geo_info.nodeId 				= geo_id;
@@ -2215,6 +2245,8 @@ public class HoudiniAssetUtility
 		if ( uvs != null && uvs.Length > 0 )
 			part_info.pointAttributeCount++;
 		if ( normals != null && normals.Length > 0 )
+			part_info.pointAttributeCount++;
+		if ( colors != null && colors.Length > 0 )
 			part_info.pointAttributeCount++;
 
 		HoudiniHost.setPartInfo( geo_id, 0, ref part_info );
@@ -2258,6 +2290,32 @@ public class HoudiniAssetUtility
 			setMeshPointAttribute( 
 				asset_id, object_id, geo_id, 
 				HoudiniConstants.HAPI_ATTRIB_UV, 3, uvs3,
+				setting_raw_mesh, false, part_info, part_control );
+		}
+
+		if ( colors != null && colors.Length > 0 )
+		{
+			Vector3[] rgb = new Vector3[ colors.Length ];
+			Vector3[] alpha = new Vector3[ colors.Length ];
+			for ( int ii = 0; ii < colors.Length; ii++ )
+			{
+				rgb[ ii ][ 0 ] = colors[ ii ].r;
+				rgb[ ii ][ 1 ] = colors[ ii ].g;
+				rgb[ ii ][ 2 ] = colors[ ii ].b;
+
+				alpha[ ii ][ 0 ] = colors[ ii ].a;
+				alpha[ ii ][ 1 ] = colors[ ii ].a;
+				alpha[ ii ][ 2 ] = colors[ ii ].a;
+			}
+
+			setMeshPointAttribute(
+				asset_id, object_id, geo_id,
+				HoudiniConstants.HAPI_ATTRIB_COLOR, 3, rgb,
+				setting_raw_mesh, false, part_info, part_control );
+
+			setMeshPointAttribute(
+				asset_id, object_id, geo_id,
+				HoudiniConstants.HAPI_ATTRIB_ALPHA, 1, alpha,
 				setting_raw_mesh, false, part_info, part_control );
 		}
 
