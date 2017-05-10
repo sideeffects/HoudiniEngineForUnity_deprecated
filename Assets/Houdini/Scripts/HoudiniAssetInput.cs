@@ -102,6 +102,13 @@ public class HoudiniAssetInput : HoudiniAsset
 
 		if ( prAssetId < 0 )
 			buildAll();
+
+		// We need to enable the MeshRenderer
+		if ( GetComponent<MeshRenderer>() )
+			GetComponent<MeshRenderer>().enabled = true;
+
+		if ( GetComponent<MeshCollider>() )
+			GetComponent<MeshCollider>().enabled = true;
 	}
 	
 	public override bool build( bool reload_asset, bool unload_asset_first,

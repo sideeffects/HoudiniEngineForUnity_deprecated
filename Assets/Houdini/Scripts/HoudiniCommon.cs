@@ -100,6 +100,7 @@ public struct HoudiniConstants
 	public const string HAPI_ATTRIB_NORMAL				= "N";
 	public const string HAPI_ATTRIB_TANGENT				= "tangentu";
 	public const string HAPI_ATTRIB_COLOR				= "Cd";
+	public const string HAPI_ATTRIB_ALPHA				= "Alpha";
 	public const string HAPI_ATTRIB_NAME				= "name";
 	public const string HAPI_ATTRIB_INSTANCE			= "instance";
 
