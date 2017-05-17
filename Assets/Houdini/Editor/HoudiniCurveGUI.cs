@@ -186,12 +186,11 @@ public class HoudiniCurveGUI : Editor
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
 				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
-				bool button_press 	= Handles.Button( 	position, 
-														rotation,
-														handle_size,
-														handle_size,
-														Handles.RectangleCap );
-
+#if UNITY_5_5_OR_NEWER
+				bool button_press = Handles.Button(position, rotation, handle_size, handle_size, Handles.RectangleHandleCap );
+#else
+				bool button_press = Handles.Button(position, rotation, handle_size, handle_size, Handles.RectangleCap );
+#endif
 				Ray ray = myTempCamera.ScreenPointToRay( mouse_position );
 #if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6
 				if ( !myTempCamera.isOrthoGraphic )
@@ -398,7 +397,11 @@ public class HoudiniCurveGUI : Editor
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
 				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+#if UNITY_5_5_OR_NEWER
+				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleHandleCap );
+#else
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
+#endif
 
 				// Prevent the delete key from deleting the curve in this mode.
 				if ( current_event.isKey && current_event.keyCode == KeyCode.Delete )
@@ -572,7 +575,7 @@ public class HoudiniCurveGUI : Editor
 		}
 
 #if !( HAPI_ENABLE_RUNTIME )
-		#pragma warning restore 0162
+	#pragma warning restore 0162
 #endif // !( HAPI_ENABLE_RUNTIME )
 	}
 	

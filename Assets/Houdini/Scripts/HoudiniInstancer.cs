@@ -535,27 +535,42 @@ public class HoudiniInstancer : MonoBehaviour
 		
 		Vector3 position = new Vector3( 0, 0, 0 );
 		position.y = 0.5f*pin_sphere_displacement/vertical_scale;
-		
+
+#if UNITY_5_5_OR_NEWER
+		Handles.CylinderHandleCap(	override_info.instancePointNumber,
+									position,
+									Quaternion.Euler( new Vector3( 90, 0, 0 ) ),
+									scale_factor * scale_factor_tweak2,
+									EventType.Repaint );
+#else
 		Handles.CylinderCap( override_info.instancePointNumber,
 							 position,
 							 Quaternion.Euler( new Vector3( 90, 0, 0)),
 							 scale_factor*scale_factor_tweak2 );
-		
-		
+#endif
+
 		mat.m11 = 1.0f;
 		Handles.matrix = mat;
 		
-		Handles.color = HoudiniHost.prPinColour;	
+		Handles.color = HoudiniHost.prPinColour;
 		position.y = pin_sphere_displacement;
+#if UNITY_5_5_OR_NEWER
+		Handles.SphereHandleCap(	override_info.instancePointNumber,
+									position,
+									Quaternion.Euler( new Vector3( 90, 0, 0 ) ),
+									scale_factor * 1.3f,
+									EventType.Repaint );
+#else
 		Handles.SphereCap  ( override_info.instancePointNumber,
 							 position,
 							 Quaternion.Euler( new Vector3( 90, 0, 0)),
 							 scale_factor*1.3f );
-		
+#endif
+
 		Handles.matrix = old_handles_mat;
 	}
 #endif // UNITY_EDITOR
-	
+
 	private void cacheNumInstances()
 	{
 		var obj_idx = prAsset.findObjectByNodeId( prObjectId );
