@@ -248,7 +248,11 @@ public class HoudiniGeoAttributeManagerGUI
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
 				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+#if UNITY_5_5_OR_NEWER
+				Handles.Button( position, rotation, handle_size, handle_size, Handles.RectangleHandleCap );
+#else
 				Handles.Button( position, rotation, handle_size, handle_size, Handles.RectangleCap );
+#endif
 
 				Ray ray = myTempCamera.ScreenPointToRay( myFirstMousePosition );
 				ray.origin = myTempCamera.transform.position;
@@ -265,9 +269,17 @@ public class HoudiniGeoAttributeManagerGUI
 					Handles.DrawLine(
 						hit_info.point,
 						hit_info.point + ( Vector3.Normalize( hit_info.normal ) * myManager.prBrushRadius ) );
+#if UNITY_5_5_OR_NEWER
+					Handles.CircleHandleCap(
+						0, hit_info.point,
+						Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
+						myManager.prBrushRadius, EventType.Repaint );
+#else
 					Handles.CircleCap(
-						0, hit_info.point, Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
+						0, hit_info.point,
+						Quaternion.FromToRotation( Vector3.forward, hit_info.normal ),
 						myManager.prBrushRadius );
+#endif
 
 					// Consume scroll-wheel event.
 					if ( current_event.type == EventType.ScrollWheel
@@ -380,7 +392,11 @@ public class HoudiniGeoAttributeManagerGUI
 				Vector3 position	= Vector3.zero;
 				float handle_size 	= HandleUtility.GetHandleSize( position ) * myBigButtonHandleSizeMultiplier;
 				Quaternion rotation = HoudiniAssetUtility.getQuaternion( myTempCamera.transform.localToWorldMatrix );
+#if UNITY_5_5_OR_NEWER
+				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleHandleCap );
+#else
 				Handles.Button(	position, rotation, handle_size, handle_size, Handles.RectangleCap );
+#endif
 
 				// Prevent the delete key from deleting the mesh in this mode.
 				if ( current_event.isKey && current_event.keyCode == KeyCode.Delete )
@@ -539,8 +555,8 @@ public class HoudiniGeoAttributeManagerGUI
 		return selected_node_index;
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( HAPI_ENABLE_RUNTIME )
-		#pragma warning restore 0162
+#if !(HAPI_ENABLE_RUNTIME)
+	#pragma warning restore 0162
 #endif // !( HAPI_ENABLE_RUNTIME )
 	}
 	
@@ -1487,8 +1503,8 @@ public class HoudiniGeoAttributeManagerGUI
 	private HoudiniGeoAttributeManager.Mode myLastMode;
 }
 
-#if !( HAPI_ENABLE_RUNTIME )
-#pragma warning restore 0162 // Unreachable Code
-#pragma warning restore 0414 // Initialized but unused Private Member Variable
+#if !(HAPI_ENABLE_RUNTIME)
+	#pragma warning restore 0162 // Unreachable Code
+	#pragma warning restore 0414 // Initialized but unused Private Member Variable
 #endif // !( HAPI_ENABLE_RUNTIME )
 
