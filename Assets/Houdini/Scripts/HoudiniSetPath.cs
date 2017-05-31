@@ -180,7 +180,7 @@ public class HoudiniSetPath
 				break;
 			}
 		}
-#elif UNITY_STANDALONE_OSX
+#elif ( UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
 		houdini_app_path = HoudiniVersion.HAPI_LIBRARY;
 #else
 		myLastError =
@@ -241,7 +241,7 @@ public class HoudiniSetPath
 		}
 		myIsPathSet = true;
 
-#elif UNITY_STANDALONE_OSX
+#elif ( UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
 		string houdini_app_path = getHoudiniPath();
 		if ( !System.IO.File.Exists( houdini_app_path ) )
 		{
