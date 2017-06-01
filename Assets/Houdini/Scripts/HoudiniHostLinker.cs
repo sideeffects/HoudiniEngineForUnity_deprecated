@@ -29,7 +29,7 @@
 */
 
 // Master control for enabling runtime.
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
+#if ( UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_LINUX )
 	#define HAPI_ENABLE_RUNTIME
 #endif
 
@@ -230,14 +230,14 @@ public static partial class HoudiniHost
 		}
 		else
 		{
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR )
 			installed_version_msg =
 				"Reason for Installation Detection Failure: " + prLastInitializationError;
 #else
 			installed_version_msg =
 				"Reason for Installation Detection Failure: Unsupported Platform\n" +
 				HoudiniConstants.HAPI_UNSUPPORTED_PLATFORM_MSG;
-#endif // UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR )
+#endif // UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR )
 			dialog_title = "No Houdini Engine Installed";
 			license_info += "Unknown";
 		}

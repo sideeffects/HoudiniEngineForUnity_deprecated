@@ -51,9 +51,9 @@ public class HoudiniGUIUtility : Editor
 	public static string promptForOTLPath( string old_path )
 	{
 		string ext = "";
-#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_EDITOR_WIN || ( UNITY_METRO && UNITY_EDITOR )
 		ext = "otl;*.hda;*.otllc;*.hdalc;*.otlnc;*.hdanc";
-#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#endif // UNITY_EDITOR_WIN || ( UNITY_METRO && UNITY_EDITOR )
 
 		string new_path = EditorUtility.OpenFilePanel( "Load Houdini Asset", old_path, ext );
 		return new_path;
@@ -66,9 +66,9 @@ public class HoudiniGUIUtility : Editor
 	public static string promptForHIPPath( string old_path )
 	{
 		string ext = "";
-#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_EDITOR_WIN || ( UNITY_METRO && UNITY_EDITOR )
 		ext = "hip;*.hiplc;*.hipnc";
-#endif // UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#endif // UNITY_EDITOR_WIN || ( UNITY_METRO && UNITY_EDITOR )
 
 		string new_path = EditorUtility.OpenFilePanel( "Open Houdini HIP", old_path, ext );
 		return new_path;
