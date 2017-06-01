@@ -29,7 +29,7 @@
 */
 
 // Master control for enabling runtime.
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
+#if ( UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_LINUX )
 	#define HAPI_ENABLE_RUNTIME
 #endif
 

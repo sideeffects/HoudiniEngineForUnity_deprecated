@@ -41,9 +41,9 @@ public static partial class HoudiniHost
 {
 	const uint GL_VERTEX_PROGRAM_POINT_SIZE = 0x8642;
 	const string LibGLPath =
-#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_EDITOR_WIN || ( UNITY_METRO && UNITY_EDITOR )
 		"opengl32.dll";
-#elif UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+#elif UNITY_EDITOR_OSX || UNITY_STANDALONE_LINUX
 		"/System/Library/Frameworks/OpenGL.framework/OpenGL";
 #elif UNITY_STANDALONE_LINUX
 		"libGL"; // Untested on Linux, this may not be correct.
@@ -53,7 +53,7 @@ public static partial class HoudiniHost
 
 	private static bool myIsOpenGL;
 
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) || UNITY_STANDALONE_LINUX )
+#if ( UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_LINUX || ( UNITY_METRO && UNITY_EDITOR ) || UNITY_STANDALONE_LINUX )
 	[ DllImport( LibGLPath ) ]
 	private static extern void glEnable( uint cap );
 

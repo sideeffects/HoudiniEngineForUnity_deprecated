@@ -29,7 +29,7 @@
 */
 
 // Master control for enabling runtime.
-#if ( UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX )
+#if ( UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_LINUX )
 	#define HAPI_ENABLE_RUNTIME
 #endif
 
@@ -73,7 +73,7 @@ public static partial class HoudiniHost
 	{
 #if ( HAPI_ENABLE_RUNTIME )
 		prPipeName = System.Text.RegularExpressions.Regex.Replace( Application.dataPath, "[^\\w\\._]", "__" );
-#if UNITY_STANDALONE_WIN
+#if UNITY_EDITOR_WIN
 		prServerExecutableName = "HARS.exe";
 		prServerExecutablePath = HoudiniSetPath.prHoudiniPath + "/" + prServerExecutableName;
 		prLibraryPath = HoudiniSetPath.prHoudiniPath + "/" + HoudiniVersion.HAPI_LIBRARY;
@@ -81,7 +81,7 @@ public static partial class HoudiniHost
 		prServerExecutableName = "HARS";
 		prServerExecutablePath = HoudiniVersion.HAPI_SERVER;
 		prLibraryPath = HoudiniVersion.HAPI_LIBRARY;
-#endif // UNITY_STANDALONE_WIN
+#endif // UNITY_EDITOR_WIN
 
 		if ( !prHoudiniSceneExists )
 		{
