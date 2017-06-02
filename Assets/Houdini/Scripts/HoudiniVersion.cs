@@ -28,7 +28,7 @@ public struct HoudiniVersion
 {
 	public const int HOUDINI_MAJOR			= 16;
 	public const int HOUDINI_MINOR			= 0;
-	public const int HOUDINI_BUILD			= 627;
+	public const int HOUDINI_BUILD			= 628;
 	public const int HOUDINI_PATCH			= 0;
 
 	public const int HOUDINI_ENGINE_MAJOR	= 3;
@@ -36,7 +36,7 @@ public struct HoudiniVersion
 
 	public const int HOUDINI_ENGINE_API		= 59;
 
-#if UNITY_STANDALONE_WIN || ( UNITY_METRO && UNITY_EDITOR )
+#if UNITY_EDITOR_WIN || ( UNITY_METRO && UNITY_EDITOR )
 
 	public const string HAPI_SERVER			= "HARS.exe";
 	#if UNITY_EDITOR_64 || UNITY_64
@@ -45,19 +45,19 @@ public struct HoudiniVersion
 		public const string HAPI_LIBRARY	= "libHARC32";
 	#endif // UNITY_EDITOR_64
 
-#elif UNITY_STANDALONE_OSX
+#elif UNITY_EDITOR_OSX
 
-	public const string HAPI_SERVER			= "/Applications/Houdini/Houdini16.0.627/Frameworks/Houdini.framework/Versions/16.0.627/Resources/bin/" + "HARS";
+	public const string HAPI_SERVER			= "/Applications/Houdini/Houdini16.0.628/Frameworks/Houdini.framework/Versions/16.0.628/Resources/bin/" + "HARS";
 	#if UNITY_EDITOR_64 || UNITY_64
-		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.0.627/Frameworks/Houdini.framework/Versions/16.0.627/Libraries/" + "libHARC.dylib";
+		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.0.628/Frameworks/Houdini.framework/Versions/16.0.628/Libraries/" + "libHARC.dylib";
 	#else
-		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.0.627/Frameworks/Houdini.framework/Versions/16.0.627/Libraries/" + "libHARC32.dylib";
+		public const string HAPI_LIBRARY	= "/Applications/Houdini/Houdini16.0.628/Frameworks/Houdini.framework/Versions/16.0.628/Libraries/" + "libHARC32.dylib";
 	#endif // UNITY_EDITOR_64
 
 #elif UNITY_STANDALONE_LINUX
 
-	public const string HAPI_SERVER			= "/opt/hfs16.0.627/bin/" + "HARS";
-	public const string HAPI_LIBRARY		= "/opt/hfs16.0.627/dsolib/" + "libHARC.so";
+	public const string HAPI_SERVER			= "/opt/hfs16.0.628/bin/" + "HARS";
+	public const string HAPI_LIBRARY		= "/opt/hfs16.0.628/dsolib/" + "libHARC.so";
 
 #else
 
