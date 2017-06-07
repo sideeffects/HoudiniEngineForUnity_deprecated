@@ -170,7 +170,9 @@ public class HoudiniAssetUtility
 		// which doesn't need to be flipped because the change in handedness AND direction of the left x axis
 		// causes a double negative - yeah, I know).
 				
-		transform.localPosition = new Vector3( -hapi_transform.position[ 0 ], 
+        // Note: Using global coordinate space when setting since we send global matrix into Houdini
+
+		transform.position = new Vector3( -hapi_transform.position[ 0 ], 
 												hapi_transform.position[ 1 ],
 												hapi_transform.position[ 2 ] );
 		Quaternion quat = new Quaternion(		hapi_transform.rotationQuaternion[ 0 ],
@@ -182,10 +184,24 @@ public class HoudiniAssetUtility
 		euler.y = -euler.y;
 		euler.z = -euler.z;
 				
-		transform.localRotation = Quaternion.Euler( euler );
-		transform.localScale = new Vector3( hapi_transform.scale[ 0 ], 
-											hapi_transform.scale[ 1 ], 
-											hapi_transform.scale[ 2 ] );
+		transform.rotation = Quaternion.Euler( euler );
+
+        // We can't directly set global scale in Unity, but the workaround is to unparent, set scale, then reparent
+        if (transform.parent != null)
+        {
+            Transform parent = transform.parent;
+            transform.parent = null;
+            transform.localScale = new Vector3(hapi_transform.scale[0],
+                                            hapi_transform.scale[1],
+                                            hapi_transform.scale[2]);
+            transform.parent = parent;
+        }
+        else
+        {
+            transform.localScale = new Vector3(hapi_transform.scale[0],
+                                            hapi_transform.scale[1],
+                                            hapi_transform.scale[2]);
+        }
 	}
 
 	public static void getHoudiniTransformAndApply( int asset_id, string asset_name, Transform transform )
