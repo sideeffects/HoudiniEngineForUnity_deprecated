@@ -32,7 +32,7 @@ For support and reporting bugs:
 Currently, the supported Unity versions are:
 
 * 4.6
-* 5.3
+* 5.6
 
 ## Installing from Source
 1. Fork this repository to your own Github account using the Fork button at the top.
