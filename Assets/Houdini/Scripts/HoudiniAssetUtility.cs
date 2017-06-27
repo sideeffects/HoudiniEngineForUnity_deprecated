@@ -1710,7 +1710,8 @@ public class HoudiniAssetUtility
 		Vector2[] uv2s		= new Vector2[  true_vertex_count ];
 		Vector2[] uv3s		= new Vector2[  true_vertex_count ];
 		Vector3[] normals 	= new Vector3[ 	true_vertex_count ];
-		Color[] colours		= new Color[	true_vertex_count ];
+		// Using Color32 as it fixes blue tint bug when using vertex colours in particle system
+		Color32[] colours	= new Color32[	true_vertex_count ];
 		Vector4[] tangents	= generate_tangents ? new Vector4[ true_vertex_count ] : null;
 		
 		// Fill Unity-specific data objects with data from the runtime.
@@ -1865,10 +1866,7 @@ public class HoudiniAssetUtility
             }
 
 			// Fill colours.
-			colours[ i ].r = 1.0f;
-			colours[ i ].g = 1.0f;
-			colours[ i ].b = 1.0f;
-			colours[ i ].a = 1.0f;
+			Color tempColor = new Color(1f, 1f, 1f, 1f);
 			if ( colour_attr_info.exists &&	part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 			{
 				bool point_owner = colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
@@ -1879,20 +1877,19 @@ public class HoudiniAssetUtility
 				{
 					int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
 					for (int j = 0; j < colour_attr_info.tupleSize; ++j)
-						colours[i][j]
-							= colour_attr[face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j];
+						tempColor[j] = colour_attr[face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE + j];
 				}
 
 				// If the colours are per vertex just query directly into the colour array we filled above.
 				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
 					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
-						colours[ i ][ j ] = colour_attr[ i * colour_attr_info.tupleSize + j ];
-				
+						tempColor[j] = colour_attr[i * colour_attr_info.tupleSize + j];
+
 				// If the colours are per point use the vertex list array point indices to query into
 				// the colour array we filled above.
 				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
 					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
-						colours[ i ][ j ] = colour_attr[ vertex_list[ i ] * colour_attr_info.tupleSize + j ];
+						tempColor[j] = colour_attr[vertex_list[i] * colour_attr_info.tupleSize + j];
 			}
 
 			// Fill the colour's alpha if available
@@ -1905,18 +1902,20 @@ public class HoudiniAssetUtility
 				if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM )
 				{
 					int face_index = i / HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE;
-					colours[ i ].a = alpha_attr[ face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE ];
+					tempColor.a = alpha_attr[face_index * HoudiniConstants.HAPI_MAX_VERTICES_PER_FACE];
 				}
 
 				// If the alphas are per vertex just query directly into the alpha array we filled above.
 				else if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
-					colours[ i ].a = alpha_attr[ i ];
-				
+					tempColor.a = alpha_attr[i];
+
 				// If the alphas are per point use the vertex list array point indices to query into
 				// the alpha array we filled above.
 				else if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT )
-					colours[ i ].a = alpha_attr[ vertex_list[ i ] ];
+					tempColor.a = alpha_attr[vertex_list[i]];
 			}
+
+			colours[i] = tempColor;
 		}
 
 		int[] triangles;
@@ -1982,7 +1981,8 @@ public class HoudiniAssetUtility
 		// we would overwrite the painted values.
 		if ( part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 		{
-			mesh.colors = colours;
+			// Using Color32 as it fixes blue tint bug when using vertex colours in particle system
+			mesh.SetColors(new List<Color32>(colours));
 		}
 
 		mesh.RecalculateBounds();
