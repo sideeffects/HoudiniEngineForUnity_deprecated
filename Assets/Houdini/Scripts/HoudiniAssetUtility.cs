@@ -1982,7 +1982,7 @@ public class HoudiniAssetUtility
 		if ( part_control.prGeoControl.prGeoType != HAPI_GeoType.HAPI_GEOTYPE_INTERMEDIATE )
 		{
 			// Using Color32 as it fixes blue tint bug when using vertex colours in particle system
-			mesh.SetColors(new List<Color32>(colours));
+			mesh.colors32 = colours;
 		}
 
 		mesh.RecalculateBounds();
