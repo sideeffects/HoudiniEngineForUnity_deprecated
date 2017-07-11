@@ -1261,10 +1261,15 @@ public abstract class HoudiniAsset : HoudiniObjectControl
 		}
 
 		// We can only build or do anything if we can link to our libraries.
-#if !( HAPI_ENABLE_RUNTIME )
-		#pragma warning restore 0162
+#if !(HAPI_ENABLE_RUNTIME)
+#pragma warning restore 0162
 #endif // !( HAPI_ENABLE_RUNTIME )
-		
+
+#if UNITY_EDITOR
+		// Mark the scene dirty after we do a build to make sure the changes get saved
+		UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
+#endif
+
 		return true;
 	}
 	
