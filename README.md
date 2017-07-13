@@ -10,7 +10,7 @@ available right inside Unity.
 
 The easiest way for artists to access the plug-in is to download the latest
 production build of Houdini or the [FREE Houdini Apprentice Learning
-Edition](http://www.sidefx.com/index.php?option=com_download&task=apprentice&Itemid=208)
+Edition](https://www.sidefx.com/products/houdini-apprentice/)
 and install the Unity plug-in along with the Houdini interactive software.
 Houdini Digital Assets created in either Houdini or Apprentice can then be
 loaded into Unity through the plug-in. A growing library of Digital Assets for
@@ -19,14 +19,13 @@ Store](http://www.orbolt.com/unity).
 
 For more information:
 
-* [Houdini Engine for Unity](http://www.sidefx.com/unity)
-* [FAQ](http://www.sidefx.com/index.php?option=com_content&task=view&id=2618&Itemid=393)
-* [SideFX Labs](http://labs.sidefx.com)
+* [Houdini Engine for Unity](https://www.sidefx.com/products/houdini-engine/unity-plug-in/)
+* [FAQ](https://www.sidefx.com/faq/houdini-engine-faq/)
 
 For support and reporting bugs:
 
-* [SideFX Labs forum](http://www.sidefx.com/index.php?option=com_forum&Itemid=172&page=viewforum&f=46)
-* [Bug Submission](http://www.sidefx.com/index.php?option=com_content&task=view&id=768&Itemid=239)
+* [SideFX Houdini Engine for Unity forum](https://www.sidefx.com/forum/50/)
+* [Bug Submission](https://www.sidefx.com/bugs/submit/)
 
 ## Supported Unity versions
 Currently, the supported Unity versions are:
