@@ -150,6 +150,7 @@ public static partial class HoudiniHost
 	public const bool myDefaultSplitPointsByVertexAttributes			= true;
 
 	private const string myDefaultUnityTagAttribName					= "unity_tag";
+    private const string myDefaultUnityLayerAttribName					= "unity_layer";
 
 	private const float myDefaultPaintBrushRate							= 0.2f; // Should be between zero and one.
 	private const KeyCode myDefaultPaintingModeHotKey					= KeyCode.LeftShift;
@@ -234,6 +235,7 @@ public static partial class HoudiniHost
 		setBool(	"HAPI_SplitPointsByVertexAttributes", myDefaultSplitPointsByVertexAttributes, true );
 
 		setString(	"HAPI_UnityTagAttribName", myDefaultUnityTagAttribName, true );
+        setString(	"HAPI_UnityLayerAttribName", myDefaultUnityLayerAttribName, true );
 		
 		setFloat(	"HAPI_PaintBrushRate", myDefaultPaintBrushRate, true );
 		setKeyCode( "HAPI_PaintingHotKey", myDefaultPaintingModeHotKey, true );
@@ -391,6 +393,9 @@ public static partial class HoudiniHost
 	public static string prUnityTagAttribName {
 											get { return getString( "HAPI_UnityTagAttribName" ); }
 											set { setString( "HAPI_UnityTagAttribName", value ); } } 
+    public static string prUnityLayerAttribName {
+                                            get { return getString("HAPI_UnityLayerAttribName"); }
+                                            set { setString("HAPI_UnityLayerAttribName", value); } }
 
 	public static float prPaintBrushRate {
 											get { return getFloat( "HAPI_PaintBrushRate" ); }
@@ -582,6 +587,9 @@ public static partial class HoudiniHost
 	public static bool isUnityTagAttribNameDefault()
 											{ return	prUnityTagAttribName ==
 														myDefaultUnityTagAttribName; }
+    public static bool isUnityLayerAttribNameDefault()
+                                            { return    prUnityLayerAttribName ==
+                                                        myDefaultUnityLayerAttribName; }
 
 	public static bool isPaintBrushRateDefault()
 											{ return	prPaintBrushRate ==
@@ -687,6 +695,7 @@ public static partial class HoudiniHost
 		prSplitPointsByVertexAttributes 		= myDefaultSplitPointsByVertexAttributes;
 
 		prUnityTagAttribName					= myDefaultUnityTagAttribName;
+        prUnityLayerAttribName					= myDefaultUnityLayerAttribName;
 
 		prPaintBrushRate						= myDefaultPaintBrushRate;
 		prPaintingModeHotKey					= myDefaultPaintingModeHotKey;

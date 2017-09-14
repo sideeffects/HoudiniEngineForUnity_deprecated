@@ -879,6 +879,17 @@ public class HoudiniWindowSettings : EditorWindow
 				HoudiniHost.prUnityTagAttribName = value;
 		}
 
+        // Unity Layer Attrib Name
+        {
+            string value = HoudiniHost.prUnityLayerAttribName;
+            bool changed = HoudiniGUI.stringField(
+                "unity_layer_attrib_name", "Unity Layer Attrib.",
+                ref value, myUndoInfo,
+                ref myUndoInfo.unityLayerAttribName);
+            if (changed)
+                HoudiniHost.prUnityLayerAttribName = value;
+        }
+        
 		GUI.enabled = gui_enabled;
 	}
 
