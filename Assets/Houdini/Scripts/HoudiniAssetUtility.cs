@@ -1591,14 +1591,16 @@ public class HoudiniAssetUtility
 		// Get Detail info.
 		HAPI_GeoInfo geo_info = HoudiniHost.getGeoInfo( geo_id );
 		HAPI_PartInfo part_info = HoudiniHost.getPartInfo( geo_id, part_id );
-		
+
 		// Make sure our primitive and vertex numbers are supported by Unity.
-		// TODO: add this limit in a more proper place
-		if ( part_info.faceCount > 65000 * 3 )
+		const int unity_max_buffer = 65000;
+		if ( part_info.faceCount > unity_max_buffer * 3 )
 			throw new HoudiniError( part_control.name + ": Face count (" + part_info.faceCount 
-								  + ") above limit (" + ( 65000 * 3 ) + ")!" );
-		if ( part_info.vertexCount > 65000 )
-			throw new HoudiniError( part_control.name + ": Vertex count (" + part_info.vertexCount + ") above limit (" + 65000 + ")!" );
+								  + ") above limit (" + (unity_max_buffer * 3 ) + ")!" );
+		if ( splitPointsByVertexAttributes && ( part_info.vertexCount > unity_max_buffer) )
+			throw new HoudiniError( part_control.name + ": Vertex count (" + part_info.vertexCount + ") above limit (" + unity_max_buffer + ")!" );
+		else if(!splitPointsByVertexAttributes && ( part_info.faceCount > unity_max_buffer) )
+			throw new HoudiniError(part_control.name + ": Face count (" + part_info.faceCount + ") above limit (" + unity_max_buffer + ")!");
 
 		// Get Face counts.
 		int[] face_counts = new int[ part_info.faceCount ];
@@ -1676,7 +1678,7 @@ public class HoudiniAssetUtility
         // be either the Houdini-vertex count or Houdini point-count.
         bool point_split = splitPointsByVertexAttributes;
 		int true_vertex_count = part_info.vertexCount;
-		if ( point_split )
+		if ( !point_split )
 			true_vertex_count = part_info.pointCount;
 
         // Warn the user if the splitting by points might prevent some attributes to be transfered properly
@@ -1720,7 +1722,7 @@ public class HoudiniAssetUtility
 			// Fill position information.
 			for ( int j = 0; j < 3; ++j )
 			{
-				if ( point_split )
+				if ( !point_split )
 					vertices[ i ][ j ] = pos_attr[ i * 3 + j ];
 				else
 					vertices[ i ][ j ] = pos_attr[ vertex_list[ i ] * 3 + j ];
@@ -1737,7 +1739,7 @@ public class HoudiniAssetUtility
                 // If the UVs are per vertex just query directly into the UV array we filled above.
                 // This is also the case if we did a point-split by vertex attributes as all the
                 // vertex attributes should now be point attributes.
-                if ( uv_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_split && point_owner ) )
+                if ( uv_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( !point_split && point_owner ) )
 					for ( int j = 0; j < 2; ++j )
 						uvs[ i ][ j ] = uv_attr[ i * 2 + j ];
 				
@@ -1752,7 +1754,7 @@ public class HoudiniAssetUtility
                 bool point_owner = uv2_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 
                 // If the UVs are per vertex just query directly into the UV array we filled above.
-                if ( uv2_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_split && point_owner ) )
+                if ( uv2_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( !point_split && point_owner ) )
 					for ( int j = 0; j < 2; ++j )
 						uv2s[ i ][ j ] = uv2_attr[ i * 2 + j ];
 				
@@ -1767,7 +1769,7 @@ public class HoudiniAssetUtility
                 bool point_owner = uv3_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_POINT;
 
                 // If the UVs are per vertex just query directly into the UV array we filled above.
-                if ( uv3_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_split && point_owner ) )
+                if ( uv3_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( !point_split && point_owner ) )
 					for ( int j = 0; j < 2; ++j )
 						uv3s[ i ][ j ] = uv3_attr[ i * 2 + j ];
 				
@@ -1785,7 +1787,7 @@ public class HoudiniAssetUtility
                 
                 // If the normals are per face divide the vertex index by the number of vertices per face
                 // which should always be HAPI_MAX_VERTICES_PER_FACE.
-                if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM && !point_split )
+                if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM && point_split )
                 {
                     for (int j = 0; j < 3; ++j)
                     {
@@ -1799,7 +1801,7 @@ public class HoudiniAssetUtility
                 }
 
                 // If the normals are per vertex just query directly into the normals array we filled above.
-                else if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
+                else if ( normal_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && !point_split ) )
 					for ( int j = 0; j < 3; ++j )
 					{
 						normals[ i ][ j ] = normal_attr[ i * 3 + j ];
@@ -1829,7 +1831,7 @@ public class HoudiniAssetUtility
 
                 // If the tangents are per face divide the vertex index by the number of vertices per face
                 // which should always be HAPI_MAX_VERTICES_PER_FACE.
-                if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM && !point_split )
+                if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_PRIM && point_split )
                 {                 
                     for (int j = 0; j < tuple_size; ++j)
                     {
@@ -1843,7 +1845,7 @@ public class HoudiniAssetUtility
                 }
 
                 // If the tangents are per vertex just query directly into the tangents array we filled above.
-                else if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
+                else if ( tangent_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && !point_split ) )
                     for ( int j = 0; j < tuple_size; ++j )
 					{
 						tangents[ i ][ j ] = tangent_attr[ i * tuple_size + j ];
@@ -1881,7 +1883,7 @@ public class HoudiniAssetUtility
 				}
 
 				// If the colours are per vertex just query directly into the colour array we filled above.
-				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
+				else if ( colour_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && !point_split ) )
 					for ( int j = 0; j < colour_attr_info.tupleSize; ++j )
 						tempColor[j] = colour_attr[i * colour_attr_info.tupleSize + j];
 
@@ -1906,7 +1908,7 @@ public class HoudiniAssetUtility
 				}
 
 				// If the alphas are per vertex just query directly into the alpha array we filled above.
-				else if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && point_split ) )
+				else if ( alpha_attr_info.owner == HAPI_AttributeOwner.HAPI_ATTROWNER_VERTEX || ( point_owner && !point_split ) )
 					tempColor.a = alpha_attr[i];
 
 				// If the alphas are per point use the vertex list array point indices to query into
@@ -1919,7 +1921,7 @@ public class HoudiniAssetUtility
 		}
 
 		int[] triangles;
-		if ( point_split )
+		if ( !point_split )
 		{
 			triangles = vertex_list;
 			for ( int i = 0; i < part_info.faceCount; ++i )
@@ -1932,6 +1934,87 @@ public class HoudiniAssetUtility
 			for ( int i = 0; i < part_info.faceCount; ++i )
 				for ( int j = 0; j < 3; ++j )
 					triangles[ i * 3 + j ] = i * 3 + j;
+		}
+
+		// Calculate normal if its not provided and we're doing point splitting.
+		// We can't use Unity's built-in normal calculation due it not supporting shared vertices.
+		if (!normal_attr_info.exists && point_split)
+		{
+			float cosineThreshold = Mathf.Cos(80f * Mathf.Deg2Rad);
+			List<Vector3> triangleNormals = new List<Vector3>(part_info.faceCount);
+
+			int numVertices = vertices.Length;
+			Dictionary<VertexKey, List<VertexEntry>> vertexMap = new Dictionary<VertexKey, List<VertexEntry>>(numVertices);
+
+			// First go through each vertex, build its triangle normal, and build a list of
+			// shared vertices and their corresponding triangle normals.
+			for(int i = 0; i < numVertices; i+=3)
+			{
+				int i1 = triangles[i + 0];
+				int i2 = triangles[i + 1];
+				int i3 = triangles[i + 2];
+
+				// Calculate triangle normal
+				Vector3 p1 = vertices[i2] - vertices[i1];
+				Vector3 p2 = vertices[i3] - vertices[i1];
+				Vector3 normal = Vector3.Cross(p1, p2).normalized;
+				triangleNormals.Add(normal);
+				int normalIndex = triangleNormals.Count - 1;
+
+				List<VertexEntry> entry;
+				VertexKey key;
+
+				if(!vertexMap.TryGetValue(key = new VertexKey(vertices[i1]), out entry))
+				{
+					entry = new List<VertexEntry>();
+					vertexMap.Add(key, entry);
+				}
+				entry.Add(new VertexEntry(i + 0, normalIndex));
+
+				if (!vertexMap.TryGetValue(key = new VertexKey(vertices[i2]), out entry))
+				{
+					entry = new List<VertexEntry>();
+					vertexMap.Add(key, entry);
+				}
+				entry.Add(new VertexEntry(i + 1, normalIndex));
+
+				if (!vertexMap.TryGetValue(key = new VertexKey(vertices[i3]), out entry))
+				{
+					entry = new List<VertexEntry>();
+					vertexMap.Add(key, entry);
+				}
+				entry.Add(new VertexEntry(i + 2, normalIndex));
+			}
+
+			// Now go through each vertex-shared map, and assign normal
+			foreach(var vertexList in vertexMap.Values)
+			{
+				for(int i = 0; i < vertexList.Count; ++i)
+				{
+					Vector3 normalSum = new Vector3();
+					VertexEntry leftEntry = vertexList[i];
+
+					for(int j = 0; j < vertexList.Count; ++j)
+					{
+						VertexEntry rightEntry = vertexList[j];
+
+						if(leftEntry._vertexIndex == rightEntry._vertexIndex)
+						{
+							normalSum += triangleNormals[rightEntry._normalIndex];
+						}
+						else
+						{
+							float dot = Vector3.Dot(triangleNormals[leftEntry._normalIndex], triangleNormals[rightEntry._normalIndex]);
+							if(dot >= cosineThreshold)
+							{
+								normalSum += triangleNormals[rightEntry._normalIndex];
+							}
+						}
+					}
+
+					normals[leftEntry._vertexIndex] = normalSum.normalized;
+				}
+			}
 		}
 
 		// Set known mesh data.
@@ -1987,7 +2070,9 @@ public class HoudiniAssetUtility
 
 		mesh.RecalculateBounds();
 
-		if ( !normal_attr_info.exists )
+		// Note that if point spliting, we are doing it earlier manually due to Unity not supporting
+		// shared vertex normal calculation.
+		if ( !normal_attr_info.exists && !point_split )
 			mesh.RecalculateNormals();
 
 		if ( mesh.uv != null && mesh.uv.Length > 0 && generate_tangents && !tangent_attr_info.exists )
@@ -2682,6 +2767,64 @@ public class HoudiniAssetUtility
 		catch ( HoudiniError error )
 		{
 			Debug.LogError( error.ToString() );
+		}
+	}
+
+	/// <summary>
+	/// For normal calculation, helper to find shared vertices via their values
+	/// </summary>
+	private class VertexKey
+	{
+		private readonly long _x;
+		private readonly long _y;
+		private readonly long _z;
+
+		// Precision for shared vertex calculation
+		private const int Tolerance = 100000;
+
+		// Magic FNV values. Do not change these.
+		private const long FNV32Init = 0x811c9dc5;
+		private const long FNV32Prime = 0x01000193;
+
+		public VertexKey(Vector3 position)
+		{
+			_x = (long)(Mathf.Round(position.x * Tolerance));
+			_y = (long)(Mathf.Round(position.y * Tolerance));
+			_z = (long)(Mathf.Round(position.z * Tolerance));
+		}
+
+		public override bool Equals(object obj)
+		{
+			var key = (VertexKey)obj;
+			return _x == key._x && _y == key._y && _z == key._z;
+		}
+
+		public override int GetHashCode()
+		{
+			long rv = FNV32Init;
+			rv ^= _x;
+			rv *= FNV32Prime;
+			rv ^= _y;
+			rv *= FNV32Prime;
+			rv ^= _z;
+			rv *= FNV32Prime;
+
+			return rv.GetHashCode();
+		}
+	}
+
+	/// <summary>
+	/// For shared vertices, helper to store vertex and normal relation
+	/// </summary>
+	private class VertexEntry
+	{
+		public int _vertexIndex;
+		public int _normalIndex;
+
+		public VertexEntry(int vertexIndex, int normalIndex)
+		{
+			_vertexIndex = vertexIndex;
+			_normalIndex = normalIndex;
 		}
 	}
 }
