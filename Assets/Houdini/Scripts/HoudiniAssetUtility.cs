@@ -1592,15 +1592,18 @@ public class HoudiniAssetUtility
 		HAPI_GeoInfo geo_info = HoudiniHost.getGeoInfo( geo_id );
 		HAPI_PartInfo part_info = HoudiniHost.getPartInfo( geo_id, part_id );
 
-		// Make sure our primitive and vertex numbers are supported by Unity.
-		const int unity_max_buffer = 65000;
-		if ( part_info.faceCount > unity_max_buffer * 3 )
-			throw new HoudiniError( part_control.name + ": Face count (" + part_info.faceCount 
-								  + ") above limit (" + (unity_max_buffer * 3 ) + ")!" );
-		if ( splitPointsByVertexAttributes && ( part_info.vertexCount > unity_max_buffer) )
-			throw new HoudiniError( part_control.name + ": Vertex count (" + part_info.vertexCount + ") above limit (" + unity_max_buffer + ")!" );
-		else if(!splitPointsByVertexAttributes && ( part_info.faceCount > unity_max_buffer) )
-			throw new HoudiniError(part_control.name + ": Face count (" + part_info.faceCount + ") above limit (" + unity_max_buffer + ")!");
+		// Check vertex count is under the Unity limit!
+#if UNITY_2017_3_OR_NEWER
+		uint UNITY_MAX_VERTS = uint.MaxValue;
+#else
+		uint UNITY_MAX_VERTS = ushort.MaxValue;
+#endif
+		uint maxVertexCount = System.Convert.ToUInt32(part_info.vertexCount);
+		if (maxVertexCount >= UNITY_MAX_VERTS)
+		{
+			string errorMsg = string.Format("Part {0} has vertex count of {1} which is above Unity maximum of {2}.\nReduce this in Houdini.", part_info.name, maxVertexCount, UNITY_MAX_VERTS);
+			throw new HoudiniError(errorMsg);
+		}
 
 		// Get Face counts.
 		int[] face_counts = new int[ part_info.faceCount ];
