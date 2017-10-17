@@ -411,6 +411,13 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 
 		foreach ( HAPI_ParmInfo parm in prParms )
 		{
+			if (parm.isNode() && parm.id >= myParmInputs.Length)
+			{
+				// For input node params, make sure they have an entry
+				// in myParmInputs for their data. Fixes bug 85804
+				setChangedNodeParameterIntoHost(parm.id);
+			}
+
 			// Need to check the index values are greater or equal to 0
 			// for now because there is a bug where some parameters are
 			// being set to have an integer parameter type, a size of 
@@ -422,7 +429,7 @@ public class HoudiniParms : MonoBehaviour, ISerializationCallbackReceiver
 			else if ( parm.isString() && parm.stringValuesIndex >= 0 )
 				myParmsUndoInfo.parmIndices.Add( parm.stringValuesIndex );
 			else
-				continue;
+				continue;		
 
 			myParmsUndoInfo.parmNames.Add( parm.name );
 		}
