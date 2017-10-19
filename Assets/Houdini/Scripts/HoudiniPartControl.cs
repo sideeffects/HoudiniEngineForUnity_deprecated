@@ -471,6 +471,9 @@ public class HoudiniPartControl : HoudiniGeoControl
 
 		// Assign unity tag.
 		assignUnityTag();
+        
+        // Assign unity layer.
+        assignUnityLayer();
 	}
 
 	public void createBoxCollider( HAPI_PartInfo part_info )
@@ -609,6 +612,32 @@ public class HoudiniPartControl : HoudiniGeoControl
 			}
 		}
 	}
+
+    private void assignUnityLayer()
+    {
+        HAPI_AttributeInfo layer_attr_info = new HAPI_AttributeInfo(HoudiniHost.prUnityLayerAttribName);
+        int[] layer_attr = new int[0];
+        HoudiniAssetUtility.getAttribute(
+            prGeoId, prPartId, HoudiniHost.prUnityLayerAttribName,
+            ref layer_attr_info, ref layer_attr, HoudiniHost.getAttributeStringData);
+
+        if (layer_attr_info.exists)
+        {
+            string layer = HoudiniHost.getString(layer_attr[0]);
+            if (layer != string.Empty)
+            {
+                try
+                {
+                    Debug.Log(layer);
+                    gameObject.layer = LayerMask.NameToLayer(layer);
+                }
+                catch
+                {
+                    Debug.LogWarning("Unity Layer " + layer + " is not defined!");
+                }
+            }
+        }
+    }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Serialized Private Data

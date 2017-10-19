@@ -63,6 +63,7 @@ public class HoudiniHostUndoInfo : ScriptableObject
 	
 	// Geometry Settings
 	public string unityTagAttribName;
+    public string unityLayerAttribName;
 	public float paintBrushRate;
 	public KeyCode paintingModeHotKey;
 	public Color paintingModeColour;
