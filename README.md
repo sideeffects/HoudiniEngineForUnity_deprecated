@@ -32,11 +32,12 @@ Currently, the supported Unity versions are:
 
 * 4.6
 * 5.6
+* 2017.2
 
 ## Installing from Source
 1. Fork this repository to your own Github account using the Fork button at the top.
 1. Clone the forked repository where you'd normally save your Unity projects.
-1. Download and install the correct build of Houdini. You must have the exact build number and version as HOUDINI_MAJOR, HOUDINI_MINOR, and HOUDINI_BUILD int values in Assets/Houdini/Scripts/HoudiniVersion.cs. You can get the correct build from: http://www.sidefx.com/index.php?option=com_download&Itemid=208 (you might need to wait for the build to finish and show up if you're updating to the very latest version of the plugin)
+1. Download and install the correct build of Houdini. You must have the exact build number and version as HOUDINI_MAJOR, HOUDINI_MINOR, and HOUDINI_BUILD int values in Assets/Houdini/Scripts/HoudiniVersion.cs. You can get the correct build from: http://www.sidefx.com/download/daily-builds (you might need to wait for the build to finish and show up if you're updating to the very latest version of the plugin)
 1. Open Unity and open a new project by selecting the folder containing your cloned repository (the folder containing the Assets folder).
 1. Restart Unity.
 1. Ensure Houdini Engine loaded successfully by going to the "Houdini Engine" top menu and selecting "Installation Info" and making sure all the versions match.
