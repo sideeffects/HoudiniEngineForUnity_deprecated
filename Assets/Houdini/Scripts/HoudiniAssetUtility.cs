@@ -1595,6 +1595,7 @@ public class HoudiniAssetUtility
 		// Check vertex count is under the Unity limit!
 #if UNITY_2017_3_OR_NEWER
 		uint UNITY_MAX_VERTS = uint.MaxValue;
+		mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 #else
 		uint UNITY_MAX_VERTS = ushort.MaxValue;
 #endif
