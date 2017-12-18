@@ -166,6 +166,7 @@ public class HoudiniParmsGUI : Editor
 		{
 			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
 		}
+		catch (ExitGUIException) { throw; }
 		catch ( System.Exception error )
 		{
 			Debug.LogError( error.ToString() + "\nSource: " + error.Source );
@@ -488,7 +489,7 @@ public class HoudiniParmsGUI : Editor
 			if ( changed )
 			{
 				parm_input.newInputObject = (GameObject) temp_object;
-				myParms.prParmInputs[ index ] = parm_input;
+				myParms.prParmInputs[ parm.id ] = parm_input;
 			}
 		}
 		///////////////////////////////////////////////////////////////////////
