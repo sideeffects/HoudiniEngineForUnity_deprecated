@@ -675,7 +675,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 
 				for ( int i = myInitializedVertexCount; i < part_info.vertexCount; ++i )
 					for ( int tuple = 0; tuple < tuple_size; ++tuple )
-						prIntData[vertex_list[ i ] * tuple_size + tuple ] =
+						prIntData[ i * tuple_size + tuple ] =
 							data[ vertex_list[ i ] * tuple_size + tuple ];
 			}
 			else if ( type == Type.FLOAT )
@@ -690,7 +690,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 
 				for ( int i = myInitializedVertexCount; i < part_info.vertexCount; ++i )
 					for ( int tuple = 0; tuple < tuple_size; ++tuple )
-						prFloatData[ vertex_list[ i ] * tuple_size + tuple ] =
+						prFloatData[ i * tuple_size + tuple ] =
 							data[ vertex_list[ i ] * tuple_size + tuple ];
 			}
 			else if ( type == Type.STRING )
@@ -705,7 +705,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 
 				for ( int i = myInitializedVertexCount; i < part_info.vertexCount; ++i )
 					for ( int tuple = 0; tuple < tuple_size; ++tuple )
-						prStringData[vertex_list[i] * tuple_size + tuple ] =
+						prStringData[ i * tuple_size + tuple ] =
 							HoudiniHost.getString( data[ vertex_list[ i ] * tuple_size + tuple ] );
 			}
 		}
@@ -845,7 +845,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 		for ( int i = 0; i < vertex_list.Length; ++i )
 			for ( int tuple = 0; tuple < myTupleSize; ++tuple )
 				point_values[ vertex_list[ i ] * myTupleSize + tuple ] =
-					prIntData[ vertex_list[ i ] * myTupleSize + tuple ];
+					prIntData[ i * myTupleSize + tuple ];
 
 		return point_values;
 	}
@@ -856,7 +856,7 @@ public class HoudiniGeoAttribute : ScriptableObject
 		for ( int i = 0; i < vertex_list.Length; ++i )
 			for ( int tuple = 0; tuple < myTupleSize; ++tuple )
 				point_values[ vertex_list[ i ] * myTupleSize + tuple ] =
-					prFloatData[ vertex_list[ i ] * myTupleSize + tuple ];
+					prFloatData[ i * myTupleSize + tuple ];
 
 		return point_values;
 	}
