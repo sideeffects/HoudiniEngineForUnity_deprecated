@@ -429,6 +429,26 @@ public enum HAPI_StorageType
 	HAPI_STORAGETYPE_MAX
 }
 
+public enum HAPI_AttributeTypeInfo
+{
+	HAPI_ATTRIBUTE_TYPE_INVALID = -1,
+	HAPI_ATTRIBUTE_TYPE_NONE,       // Implicit type based on data
+	HAPI_ATTRIBUTE_TYPE_POINT,      // Position
+	HAPI_ATTRIBUTE_TYPE_HPOINT,     // Homogeneous position
+	HAPI_ATTRIBUTE_TYPE_VECTOR,     // Direction vector
+	HAPI_ATTRIBUTE_TYPE_NORMAL,     // Normal
+	HAPI_ATTRIBUTE_TYPE_COLOR,      // Color
+	HAPI_ATTRIBUTE_TYPE_QUATERNION, // Quaternion
+	HAPI_ATTRIBUTE_TYPE_MATRIX3,    // 3x3 Matrix
+	HAPI_ATTRIBUTE_TYPE_MATRIX,     // Matrix
+	HAPI_ATTRIBUTE_TYPE_ST,         // Parametric interval
+	HAPI_ATTRIBUTE_TYPE_HIDDEN,     // "Private" (hidden)
+	HAPI_ATTRIBUTE_TYPE_BOX2,       // 2x2 Bounding box
+	HAPI_ATTRIBUTE_TYPE_BOX,        // 3x3 Bounding box
+	HAPI_ATTRIBUTE_TYPE_TEXTURE,     // Texture coordinate
+	HAPI_ATTRIBUTE_TYPE_MAX
+};
+
 public enum HAPI_GeoType
 {
 	HAPI_GEOTYPE_INVALID = -1,
@@ -1283,6 +1303,7 @@ public struct HAPI_AttributeInfo
 		originalOwner	= HAPI_AttributeOwner.HAPI_ATTROWNER_INVALID;
 		count 			= 0;
 		tupleSize 		= 0;
+		typeInfo        = HAPI_AttributeTypeInfo.HAPI_ATTRIBUTE_TYPE_INVALID;
 	}
 		
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool exists;
@@ -1294,6 +1315,8 @@ public struct HAPI_AttributeInfo
 
 	public int count;
 	public int tupleSize;
+
+	public HAPI_AttributeTypeInfo typeInfo;
 }
 	
 // MATERIALS ----------------------------------------------------------------------------------------------------
