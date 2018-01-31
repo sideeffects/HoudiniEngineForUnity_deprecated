@@ -369,32 +369,46 @@ public class HoudiniCurve : MonoBehaviour
 		//////////////////////////////////
 		// Line Mesh
 
-		if ( gameObject.GetComponent< MeshFilter >() == null )
-			return; //throw new MissingComponentException( "Missing MeshFilter." );
-		if ( gameObject.GetComponent< MeshFilter >().sharedMesh == null )
-			return; //throw new HAPI_Error( "Missing sharedMesh on curve object." );
-		if ( gameObject.GetComponent< MeshRenderer >() == null )
-			return; //throw new MissingComponentException( "Missing MeshRenderer." );
+		MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+		MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
 
-		Mesh mesh = gameObject.GetComponent< MeshFilter >().sharedMesh;
-
-		if ( prPoints.Count <= 1 )
-			gameObject.GetComponent< MeshFilter >().sharedMesh = null;
+		if (prPoints.Count <= 1)
+		{
+			if(meshFilter != null && meshFilter.sharedMesh != null)
+			{
+				meshFilter.sharedMesh = null;
+			}
+		}
 		else
 		{
-			int[] line_indices = new int[ prVertices.Length ];
-			for ( int i = 0; i < prVertices.Length; ++i )
-				line_indices[ i ] = i;
+			if(meshFilter == null)
+			{
+				meshFilter = gameObject.AddComponent<MeshFilter>();
+			}
+			if(meshRenderer == null)
+			{
+				meshRenderer = gameObject.AddComponent<MeshRenderer>();
+			}
 
-			Color[] line_colours = new Color[ prVertices.Length ];
-			for ( int i = 0; i < prVertices.Length; ++i )
-				line_colours[ i ] = HoudiniHost.prWireframeColour;
+			if (meshFilter.sharedMesh == null)
+			{
+				meshFilter.sharedMesh = new Mesh();
+			}
+			Mesh mesh = meshFilter.sharedMesh;
+
+			int[] line_indices = new int[prVertices.Length];
+			for (int i = 0; i < prVertices.Length; ++i)
+				line_indices[i] = i;
+
+			Color[] line_colours = new Color[prVertices.Length];
+			for (int i = 0; i < prVertices.Length; ++i)
+				line_colours[i] = HoudiniHost.prWireframeColour;
 
 			mesh.Clear();
-		
+
 			mesh.vertices = prVertices;
 			mesh.colors = line_colours;
-			mesh.SetIndices( line_indices, MeshTopology.LineStrip, 0 );
+			mesh.SetIndices(line_indices, MeshTopology.LineStrip, 0);
 			mesh.RecalculateBounds();
 		}
 	}
