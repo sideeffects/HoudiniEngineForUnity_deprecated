@@ -1282,6 +1282,9 @@ public class HoudiniAssetUtility
 
 		if ( material != null && ( has_sub_material_name || has_sub_material_index ) )
 		{
+#if UNITY_2018_1_OR_NEWER
+			Debug.LogErrorFormat("Houdini Engine for Unity does not support the new Substance plugin for Unity 2018.x!");
+#else
 			// Try Substance materials.
 			string abs_path = AssetDatabase.GetAssetPath( material );
 
@@ -1307,9 +1310,10 @@ public class HoudiniAssetUtility
 			else
 				Debug.LogWarning(
 					"sub_material_index (" + sub_material_index + ") out of range for material: " + abs_path );
+#endif
 		}
 #endif // UNITY_EDITOR
-		return material;
+			return material;
 	}
 
 	public static Material getUnityMaterialOnGroup( HoudiniPartControl part_control, string group_name )
@@ -1368,7 +1372,7 @@ public class HoudiniAssetUtility
 #if ( HAPI_ENABLE_RUNTIME )
 	public static Material getSubstanceMaterial( HAPI_MaterialInfo material_info, HoudiniPartControl part_control )
 	{
-#if UNITY_EDITOR
+#if UNITY_EDITOR &&!UNITY_2018_1_OR_NEWER
 		if ( !material_info.exists )
 			return null;
 
