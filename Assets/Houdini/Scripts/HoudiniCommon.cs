@@ -801,6 +801,7 @@ public struct HAPI_AssetInfo
 
 	public int transformInputCount;
 	public int geoInputCount;
+	public int geoOutputCount;
 
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool haveObjectsChanged;
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool haveMaterialsChanged;
@@ -906,6 +907,7 @@ public struct HAPI_NodeInfo
 
 	public int childNodeCount;
 	public int inputCount;
+	public int outputCount;
 
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool createdPostAssetLoad;
 

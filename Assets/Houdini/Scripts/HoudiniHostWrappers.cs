@@ -604,7 +604,7 @@ public static partial class HoudiniHost
 	{
 #if ( HAPI_ENABLE_RUNTIME )
 		HAPI_Result status_code = HAPI_ConnectNodeInput(
-			ref mySession, node_id, input_index, node_id_to_connect );
+			ref mySession, node_id, input_index, node_id_to_connect, 0 );
 		processStatusCode( status_code );
 #else
 		throw new HoudiniErrorUnsupportedPlatform();
