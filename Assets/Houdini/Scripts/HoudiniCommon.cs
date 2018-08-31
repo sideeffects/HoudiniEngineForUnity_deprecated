@@ -877,6 +877,13 @@ public struct HAPI_CookOptions
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool handleBoxPartTypes;
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool handleSpherePartTypes;
 
+	/// If enabled, sets the ::HAPI_PartInfo::hasChanged member during the
+	/// cook.  If disabled, the member will always be true.  Checking for
+	/// part changes can be expensive, so there is a potential performance
+	/// gain when disabled.
+	[MarshalAs(UnmanagedType.U1)]
+	public bool checkPartChanges;
+
 	/// For internal use only. :)
 	public int extraFlags;
 }
@@ -1275,6 +1282,9 @@ public struct HAPI_PartInfo
 	[ MarshalAs( UnmanagedType.U1 ) ] public bool isInstanced;
 	public int instancedPartCount;
 	public int instanceCount;
+
+	[MarshalAs(UnmanagedType.U1)]
+	public bool hasChanged;
 
 	// Accessors
 	public void init() { if ( attributeCounts == null ) attributeCounts  = new int[ (int) HAPI_AttributeOwner.HAPI_ATTROWNER_MAX ]; }
