@@ -2,7 +2,7 @@
 
 ### Deprecated Repo
 **Please note that this plugin version has been deprecated and the repo is now archived.**
-**The repo for the latest version of the plugin is here: **
+The repo for the latest version of the plugin is here:
 https://github.com/sideeffects/HoudiniEngineForUnity
 
 
